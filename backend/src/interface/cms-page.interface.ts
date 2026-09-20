@@ -29,6 +29,14 @@ export interface CmsPagePublicationInput {
 }
 
 //==================================================
+//==== TRASH LIST ITEM
+//==================================================
+
+export interface CmsPageTrashListItem extends CmsPageListItem {
+  cms_page_deleted_at: string | Date;
+}
+
+//==================================================
 //==== LIST ITEM
 //==================================================
 
