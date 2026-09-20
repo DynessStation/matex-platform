@@ -134,6 +134,40 @@ export const menu: ISidebar[] = [
   },
 
   //==================================================
+  //==== CONTENT
+  //==================================================
+
+  {
+    id: 4,
+
+    title: 'content',
+
+    active: false,
+
+    icon: 'ri-file-text-line',
+
+    type: 'sub',
+
+    level: 1,
+
+    children: [
+      {
+        parent_id: 4,
+
+        title: 'pages',
+
+        path: '/cms-page',
+
+        type: 'link',
+
+        level: 2,
+
+        permission: 'cms_page.view',
+      },
+    ],
+  },
+
+  //==================================================
   //==== MEDIA
   //==================================================
 

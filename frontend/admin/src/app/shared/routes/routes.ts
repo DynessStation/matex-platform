@@ -70,6 +70,21 @@ export const content: Routes = [
       ),
   },
 
+  //==================================================
+  //==== CMS PAGE
+  //==================================================
+
+  {
+    path: 'cms-page',
+
+    canActivate: [AuthGuard],
+
+    loadChildren: () =>
+      import('../../components/cms-page/cms-page.routes').then(
+        (routes) => routes.cmsPageRoutes,
+      ),
+  },
+
   {
     path: 'account',
 
