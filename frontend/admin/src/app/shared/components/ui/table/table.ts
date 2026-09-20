@@ -29,7 +29,9 @@ import { IPermission } from '../../../interface/role.interface';
 import {
   ITableClickedAction,
   ITableColumn,
+  IBaseRow,
   ITableConfig,
+  TableRowId,
 } from '../../../interface/table.interface';
 import { CurrencySymbolPipe } from '../../../pipe/currency-symbol.pipe';
 import { AccountState } from '../../../store/state/account.state';
@@ -125,7 +127,7 @@ export class Table {
 
   readonly rowClicked = output<any>();
 
-  readonly selectedItems = output<number[]>();
+  readonly selectedItems = output<TableRowId[]>();
 
   //==================================================
   //==== MODAL
@@ -152,7 +154,7 @@ export class Table {
     paginate: 15,
   };
 
-  public selected: number[] = [];
+  public selected: TableRowId[] = [];
 
   public permissions: string[] = [];
 
@@ -547,27 +549,23 @@ export class Table {
   //==== ITEM CHECK
   //==================================================
 
-  onItemChecked(event: Event) {
-    this.setSelectedItem(
-      (event.target as HTMLInputElement)?.checked,
-
-      Number((event.target as HTMLInputElement)?.value),
-    );
+  onItemChecked(event: Event, id: TableRowId): void {
+    this.setSelectedItem((event.target as HTMLInputElement).checked, id);
   }
 
   //==================================================
   //==== SELECTED ITEM
   //==================================================
 
-  setSelectedItem(checked: Boolean, value: Number) {
-    const index = this.selected.indexOf(Number(value));
+  setSelectedItem(checked: boolean, value: TableRowId): void {
+    const index = this.selected.indexOf(value);
 
     if (checked) {
       if (index === -1) {
-        this.selected.push(Number(value));
+        this.selected.push(value);
       }
     } else {
-      this.selected = this.selected.filter((id) => id !== Number(value));
+      this.selected = this.selected.filter((id) => id !== value);
     }
 
     this.selectedItems.emit(this.selected);

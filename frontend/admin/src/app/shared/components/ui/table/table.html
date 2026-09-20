@@ -233,13 +233,13 @@
                     class="custom-control-input checkbox_animated"
                     id="table-checkbox-item-{{ columnData.id }}"
                     [disabled]="columnData['system_reserve'] === '1'"
-                    [value]="columnData?.id"
+                    [value]="columnData.id"
                     [checked]="
                       columnData['system_reserve'] !== '1' &&
-                      selected?.length &&
-                      selected.includes(columnData?.id)
+                      selected.length &&
+                      selected.includes(columnData.id)
                     "
-                    (change)="onItemChecked($event)"
+                    (change)="onItemChecked($event, columnData.id)"
                   />
                   <label
                     class="custom-control-label"

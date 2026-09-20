@@ -6,8 +6,10 @@ export interface ITableConfig<T extends IBaseRow = IBaseRow> {
   permission?: string | string[];
 }
 
+export type TableRowId = number | string;
 export interface IBaseRow {
-  id: number | string;
+  id: TableRowId;
+  [key: string]: any;
 }
 
 export interface ITableColumn {
