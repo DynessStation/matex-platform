@@ -80,6 +80,7 @@ import { WalletState } from './shared/store/state/wallet.state';
 import { WithdrawalState } from './shared/store/state/withdrawal.state';
 import { ChairState } from './shared/store/state/chair.state';
 import { OfficeState } from './shared/store/state/office.state';
+import { CmsPageState } from './shared/store/state/cms-page.state';
 import { AuditLogState } from './shared/store/state/audit-log.state';
 
 import { LocalizationService } from './shared/services/localization.service';
@@ -160,6 +161,7 @@ export const appConfig: ApplicationConfig = {
         AdminAccessState,
         ChairState,
         OfficeState,
+        CmsPageState,
         AttachmentState,
         AuditLogState,
         AttributeState,
