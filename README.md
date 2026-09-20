@@ -16,5 +16,3 @@ Phase 4.8 stabilization complete.
 ## Security
 
 Environment files, credentials, dependencies, build outputs, and local IDE files are excluded from version control.
-
-Test
