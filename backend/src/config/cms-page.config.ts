@@ -12,6 +12,30 @@ export type CmsPageStatus =
   (typeof CMS_PAGE_STATUS)[keyof typeof CMS_PAGE_STATUS];
 
 //==================================================
+//==== CMS PAGE PUBLICATION ACTION
+//==================================================
+
+export const CMS_PAGE_PUBLICATION_ACTION = {
+  PUBLISH: "publish",
+  SCHEDULE: "schedule",
+  CANCEL_SCHEDULE: "cancel_schedule",
+  UNPUBLISH: "unpublish",
+  ARCHIVE: "archive",
+  RESTORE: "restore",
+} as const;
+
+export type CmsPagePublicationAction =
+  (typeof CMS_PAGE_PUBLICATION_ACTION)[keyof typeof CMS_PAGE_PUBLICATION_ACTION];
+
+export const isCmsPagePublicationAction = (
+  value: string,
+): value is CmsPagePublicationAction => {
+  return (
+    Object.values(CMS_PAGE_PUBLICATION_ACTION) as readonly string[]
+  ).includes(value);
+};
+
+//==================================================
 //==== CMS PAGE VISIBILITY
 //==================================================
 

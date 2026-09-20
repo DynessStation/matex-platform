@@ -10,18 +10,21 @@ import {
   CMS_PAGE_DEFAULT_LOCALE,
   CMS_PAGE_LIST_DEFAULT_LIMIT,
   CMS_PAGE_LIST_MAX_LIMIT,
+  CMS_PAGE_PUBLICATION_ACTION,
   CMS_PAGE_STATUS,
   CMS_PAGE_VISIBILITY,
   CmsPageI18nStatus,
   CmsPageStatus,
   CmsPageVisibility,
   isCmsPageLocale,
+  isCmsPagePublicationAction,
 } from "../../config/cms-page.config";
 
 import {
   CmsPageAttachmentInput,
   CmsPageEffectiveStatus,
   CmsPageListItem,
+  CmsPagePublicationInput,
   CmsPageTranslationInput,
 } from "../../interface/cms-page.interface";
 
@@ -4807,6 +4810,618 @@ app.put(
       }
 
       console.error("Update CMS page error:", error);
+
+      return sendError(
+        res,
+        500,
+        "INTERNAL_SERVER_ERROR",
+        "Internal Server Error",
+      );
+    } finally {
+      if (connection) {
+        connection.release();
+      }
+    }
+  },
+);
+
+//==================================================
+//==== CMS PAGE - PUBLICATION LIFECYCLE
+//==================================================
+
+app.post(
+  "/api/v1/cms-page/:id/publication",
+
+  verifyToken,
+
+  requirePermission("cms_page.publish"),
+
+  async (
+    req: AuthRequest,
+
+    res: Response,
+  ) => {
+    let connection: any = null;
+
+    try {
+      //==================================================
+      //==== ID
+      //==================================================
+
+      const idCmsPage = decodeCmsPageId(req.params.id);
+
+      if (!idCmsPage) {
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_INVALID_ID",
+          "Invalid CMS page identifier",
+        );
+      }
+
+      //==================================================
+      //==== SESSION
+      //==================================================
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      //==================================================
+      //==== BODY
+      //==================================================
+
+      const body = req.body as CmsPagePublicationInput;
+
+      const action = String(body?.action ?? "")
+        .trim()
+        .toLowerCase();
+
+      if (!isCmsPagePublicationAction(action)) {
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_PUBLICATION_ACTION_INVALID",
+          "Invalid CMS page publication action",
+        );
+      }
+
+      //==================================================
+      //==== TRANSACTION
+      //==================================================
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      //==================================================
+      //==== CURRENT PAGE
+      //==================================================
+
+      const [pageRows] = await connection.query(
+        `
+          SELECT
+            id_cms_page,
+
+            id_master_comp,
+
+            cms_page_default_locale,
+
+            cms_page_status,
+
+            cms_page_publish_at,
+
+            cms_page_unpublish_at
+
+          FROM cms_page
+
+          WHERE id_cms_page = ?
+
+            AND id_master_comp = ?
+
+            AND cms_page_deleted_at IS NULL
+
+          LIMIT 1
+
+          FOR UPDATE
+        `,
+        [idCmsPage, scope.idMasterComp],
+      );
+
+      const pages = pageRows as any[];
+
+      if (!pages.length) {
+        await connection.rollback();
+
+        return sendError(res, 404, "CMS_PAGE_NOT_FOUND", "CMS page not found");
+      }
+
+      const currentPage = pages[0];
+
+      const currentStatus = Number(currentPage.cms_page_status);
+
+      const currentPublishAt = currentPage.cms_page_publish_at ?? null;
+
+      const currentUnpublishAt = currentPage.cms_page_unpublish_at ?? null;
+
+      const currentEffectiveStatus = getEffectiveStatus(
+        currentStatus,
+
+        currentPublishAt,
+
+        currentUnpublishAt,
+      );
+
+      //==================================================
+      //==== DEFAULT TRANSLATION
+      //==================================================
+
+      const [translationRows] = await connection.query(
+        `
+          SELECT
+            cms_page_title,
+
+            cms_page_i18n_status
+
+          FROM cms_page_i18n
+
+          WHERE id_cms_page = ?
+
+            AND id_master_comp = ?
+
+            AND cms_page_locale = ?
+
+          LIMIT 1
+        `,
+        [idCmsPage, scope.idMasterComp, currentPage.cms_page_default_locale],
+      );
+
+      const defaultTranslations = translationRows as any[];
+
+      if (!defaultTranslations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          409,
+          "CMS_PAGE_DEFAULT_TRANSLATION_REQUIRED",
+          "Default locale translation is required",
+          {
+            locale: currentPage.cms_page_default_locale,
+          },
+        );
+      }
+
+      const defaultTranslation = defaultTranslations[0];
+
+      //==================================================
+      //==== NEXT STATE
+      //==================================================
+
+      let nextStatus = currentStatus;
+
+      let nextPublishAt: Date | string | null = currentPublishAt;
+
+      let nextUnpublishAt: Date | string | null = currentUnpublishAt;
+
+      const now = new Date();
+
+      //==================================================
+      //==== PUBLISH
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.PUBLISH) {
+        if (currentStatus === CMS_PAGE_STATUS.ARCHIVED) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_ARCHIVED_RESTORE_REQUIRED",
+            "Archived CMS page must be restored before publishing",
+          );
+        }
+
+        if (Number(defaultTranslation.cms_page_i18n_status) !== 1) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_DEFAULT_TRANSLATION_NOT_PUBLISHED",
+            "Default translation must be published before publishing the CMS page",
+          );
+        }
+
+        nextStatus = CMS_PAGE_STATUS.PUBLISHED;
+
+        nextPublishAt = now;
+
+        if (body.cms_page_unpublish_at !== undefined) {
+          if (
+            body.cms_page_unpublish_at === null ||
+            body.cms_page_unpublish_at === ""
+          ) {
+            nextUnpublishAt = null;
+          } else {
+            const parsed = normalizeDateValue(body.cms_page_unpublish_at);
+
+            if (!parsed || parsed.getTime() <= now.getTime()) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_UNPUBLISH_AT_INVALID",
+                "Unpublish date must be in the future",
+              );
+            }
+
+            nextUnpublishAt = parsed;
+          }
+        } else if (
+          nextUnpublishAt &&
+          new Date(nextUnpublishAt).getTime() <= now.getTime()
+        ) {
+          nextUnpublishAt = null;
+        }
+      }
+
+      //==================================================
+      //==== SCHEDULE
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.SCHEDULE) {
+        if (currentStatus === CMS_PAGE_STATUS.ARCHIVED) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_ARCHIVED_RESTORE_REQUIRED",
+            "Archived CMS page must be restored before scheduling",
+          );
+        }
+
+        if (Number(defaultTranslation.cms_page_i18n_status) !== 1) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_DEFAULT_TRANSLATION_NOT_PUBLISHED",
+            "Default translation must be published before scheduling the CMS page",
+          );
+        }
+
+        const parsedPublishAt = normalizeDateValue(body.cms_page_publish_at);
+
+        if (!parsedPublishAt || parsedPublishAt.getTime() <= now.getTime()) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_SCHEDULE_DATE_INVALID",
+            "Scheduled publish date must be in the future",
+          );
+        }
+
+        let parsedUnpublishAt: Date | null = null;
+
+        if (
+          body.cms_page_unpublish_at !== undefined &&
+          body.cms_page_unpublish_at !== null &&
+          body.cms_page_unpublish_at !== ""
+        ) {
+          parsedUnpublishAt = normalizeDateValue(body.cms_page_unpublish_at);
+
+          if (!parsedUnpublishAt) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_UNPUBLISH_AT_INVALID",
+              "Invalid CMS page unpublish date",
+            );
+          }
+
+          if (parsedUnpublishAt.getTime() <= parsedPublishAt.getTime()) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_PUBLISH_WINDOW_INVALID",
+              "Unpublish date must be after publish date",
+            );
+          }
+        }
+
+        nextStatus = CMS_PAGE_STATUS.PUBLISHED;
+
+        nextPublishAt = parsedPublishAt;
+
+        nextUnpublishAt = parsedUnpublishAt;
+      }
+
+      //==================================================
+      //==== CANCEL SCHEDULE
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.CANCEL_SCHEDULE) {
+        if (currentEffectiveStatus !== "scheduled") {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_NOT_SCHEDULED",
+            "CMS page is not currently scheduled",
+          );
+        }
+
+        nextStatus = CMS_PAGE_STATUS.DRAFT;
+
+        nextPublishAt = null;
+
+        nextUnpublishAt = null;
+      }
+
+      //==================================================
+      //==== UNPUBLISH
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.UNPUBLISH) {
+        if (currentStatus === CMS_PAGE_STATUS.ARCHIVED) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_ARCHIVED",
+            "Archived CMS page cannot be unpublished",
+          );
+        }
+
+        if (currentStatus === CMS_PAGE_STATUS.DRAFT) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_ALREADY_DRAFT",
+            "CMS page is already unpublished",
+          );
+        }
+
+        nextStatus = CMS_PAGE_STATUS.DRAFT;
+
+        nextPublishAt = null;
+
+        nextUnpublishAt = null;
+      }
+
+      //==================================================
+      //==== ARCHIVE
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.ARCHIVE) {
+        if (currentStatus === CMS_PAGE_STATUS.ARCHIVED) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_ALREADY_ARCHIVED",
+            "CMS page is already archived",
+          );
+        }
+
+        nextStatus = CMS_PAGE_STATUS.ARCHIVED;
+
+        nextPublishAt = null;
+
+        nextUnpublishAt = null;
+      }
+
+      //==================================================
+      //==== RESTORE
+      //==================================================
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.RESTORE) {
+        if (currentStatus !== CMS_PAGE_STATUS.ARCHIVED) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_NOT_ARCHIVED",
+            "CMS page is not archived",
+          );
+        }
+
+        nextStatus = CMS_PAGE_STATUS.DRAFT;
+
+        nextPublishAt = null;
+
+        nextUnpublishAt = null;
+      }
+
+      //==================================================
+      //==== BEFORE / AFTER
+      //==================================================
+
+      const beforeAudit = {
+        cms_page_status: currentStatus,
+
+        effective_status: currentEffectiveStatus,
+
+        cms_page_publish_at: currentPublishAt,
+
+        cms_page_unpublish_at: currentUnpublishAt,
+      };
+
+      const nextEffectiveStatus = getEffectiveStatus(
+        nextStatus,
+
+        nextPublishAt,
+
+        nextUnpublishAt,
+      );
+
+      const afterAudit = {
+        cms_page_status: nextStatus,
+
+        effective_status: nextEffectiveStatus,
+
+        cms_page_publish_at: nextPublishAt,
+
+        cms_page_unpublish_at: nextUnpublishAt,
+      };
+
+      //==================================================
+      //==== UPDATE
+      //==================================================
+
+      await connection.query(
+        `
+          UPDATE cms_page
+
+          SET
+            cms_page_status = ?,
+
+            cms_page_publish_at = ?,
+
+            cms_page_unpublish_at = ?,
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_cms_page = ?
+
+            AND id_master_comp = ?
+        `,
+        [
+          nextStatus,
+
+          nextPublishAt,
+
+          nextUnpublishAt,
+
+          scope.idAdminAcct,
+
+          idCmsPage,
+
+          scope.idMasterComp,
+        ],
+      );
+
+      //==================================================
+      //==== AUDIT EVENT
+      //==================================================
+
+      let eventCode = "cms_page.publication_changed";
+
+      if (action === CMS_PAGE_PUBLICATION_ACTION.PUBLISH) {
+        eventCode = "cms_page.published";
+      } else if (action === CMS_PAGE_PUBLICATION_ACTION.SCHEDULE) {
+        eventCode = "cms_page.scheduled";
+      } else if (action === CMS_PAGE_PUBLICATION_ACTION.CANCEL_SCHEDULE) {
+        eventCode = "cms_page.schedule_cancelled";
+      } else if (action === CMS_PAGE_PUBLICATION_ACTION.UNPUBLISH) {
+        eventCode = "cms_page.unpublished";
+      } else if (action === CMS_PAGE_PUBLICATION_ACTION.ARCHIVE) {
+        eventCode = "cms_page.archived";
+      } else if (action === CMS_PAGE_PUBLICATION_ACTION.RESTORE) {
+        eventCode = "cms_page.restored";
+      }
+
+      //==================================================
+      //==== AUDIT
+      //==================================================
+
+      await writeAuditLog({
+        req,
+
+        connection,
+
+        writeMode: "strict",
+
+        idMasterComp: scope.idMasterComp,
+
+        eventCode,
+
+        category: "data_change",
+
+        module: "cms_page",
+
+        action,
+
+        actorType: "admin",
+
+        actorId: scope.idAdminAcct,
+
+        actorLabel: req.user?.alias ?? null,
+
+        entityType: "cms_page",
+
+        entityId: idCmsPage,
+
+        entityLabel: defaultTranslation.cms_page_title ?? null,
+
+        before: beforeAudit,
+
+        after: afterAudit,
+
+        metadata: {
+          publication_action: action,
+        },
+
+        httpStatus: 200,
+      });
+
+      //==================================================
+      //==== COMMIT
+      //==================================================
+
+      await connection.commit();
+
+      //==================================================
+      //==== RESPONSE
+      //==================================================
+
+      return sendSuccess(
+        res,
+        200,
+        "CMS_PAGE_PUBLICATION_UPDATED",
+        "CMS page publication updated successfully",
+        {
+          id_cms_page: keyhsid.idCmsPage.encode(idCmsPage),
+
+          action,
+
+          cms_page_status: nextStatus,
+
+          effective_status: nextEffectiveStatus,
+
+          cms_page_publish_at: nextPublishAt,
+
+          cms_page_unpublish_at: nextUnpublishAt,
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error("CMS page publication lifecycle error:", error);
 
       return sendError(
         res,

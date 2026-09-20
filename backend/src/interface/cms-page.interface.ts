@@ -1,5 +1,6 @@
 import {
   CmsPageI18nStatus,
+  CmsPagePublicationAction,
   CmsPageStatus,
   CmsPageVisibility,
 } from "../config/cms-page.config";
@@ -14,6 +15,18 @@ export type CmsPageEffectiveStatus =
   | "published"
   | "expired"
   | "archived";
+
+//==================================================
+//==== PUBLICATION INPUT
+//==================================================
+
+export interface CmsPagePublicationInput {
+  action: CmsPagePublicationAction;
+
+  cms_page_publish_at?: string | Date | null;
+
+  cms_page_unpublish_at?: string | Date | null;
+}
 
 //==================================================
 //==== LIST ITEM
