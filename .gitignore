@@ -46,6 +46,10 @@
 **/*.sqlite3
 **/*.db
 
+# Version-controlled database migrations / seeds
+!backend/database/migrations/**/*.sql
+!backend/database/seeds/**/*.sql
+
 #==================================================
 #==== IDE
 #==================================================
