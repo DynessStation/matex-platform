@@ -1,0 +1,36 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'chair.title' | translate">
+  <!--==================================================
+  ==== CREATE
+  ==================================================-->
+
+  <div button class="d-flex flex-wrap gap-2" *hasPermission="'chair.create'">
+    <a
+      [routerLink]="['/chair/create']"
+      class="align-items-center btn btn-theme"
+    >
+      <i class="ri-add-line"></i>
+
+      {{ 'chair.add' | translate }}
+    </a>
+  </div>
+
+  <!--==================================================
+  ==== TABLE
+  ==================================================-->
+
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [actionMode]="'dropdown'"
+    [externalPermissions]="(authPermissions$ | async) ?? []"
+    [externalAllAccess]="(isAllAccess$ | async) ?? false"
+    (tableChanged)="onTableChange($event)"
+    (action)="onActionClicked($event)"
+  />
+</app-page-wrapper>
+
+<!--==================================================
+==== CONFIRMATION
+==================================================-->
+
+<app-confirmation-modal #confirmationModal (confirmed)="onConfirmed($event)" />

@@ -1,0 +1,6 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'office.create_title' | translate"
+>
+  <app-form-office [mode]="'create'" (formSubmit)="submit($event)" />
+</app-page-wrapper>

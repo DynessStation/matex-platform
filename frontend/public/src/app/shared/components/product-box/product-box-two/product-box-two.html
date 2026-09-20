@@ -1,0 +1,51 @@
+<div class="product-white-box productMain">
+  <div class="product-image">
+    <a [routerLink]="['/product/' + product()?.slug]">
+      <img
+        [src]="
+          product()?.product_thumbnail
+            ? product()?.product_thumbnail?.asset_url!
+            : 'assets/images/placeholder/product.png'
+        "
+        class="img-fluid productImage loaded"
+        alt="image"
+      />
+    </a>
+    <ul class="product-option">
+      <li>
+        <app-wishlist [product]="product()" [class]="'wishlistProduct'" />
+      </li>
+      <li>
+        <app-quick-view [product]="product()" [quickViewStyle]="'icon'" />
+      </li>
+      <li>
+        <app-compare [product]="product()" [text]="'Compare'" />
+      </li>
+    </ul>
+  </div>
+  <div class="product-content">
+    <h6 [routerLink]="['/brand', product()?.brand?.slug]">{{ product()?.brand?.name }}</h6>
+    <a [routerLink]="['/product/' + product()?.slug]">
+      <h5 class="name productName">{{ product()?.name }}</h5>
+    </a>
+    <ul class="rating">
+      <ngb-rating [rate]="product()?.rating_count!">
+        <ng-template let-fill="fill" let-index="index">
+          <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+        </ng-template>
+      </ngb-rating>
+    </ul>
+    <h5 class="price">
+      {{ product()?.sale_price | currencySymbol }}
+      <del>{{ product()?.price | currencySymbol }}</del>
+    </h5>
+    <div class="btn-box">
+      <app-cart-button
+        [product]="product()"
+        [selectedVariation]="selectedVariation"
+        [class]="'btn'"
+        [text]="'Add to Cart'"
+      ></app-cart-button>
+    </div>
+  </div>
+</div>

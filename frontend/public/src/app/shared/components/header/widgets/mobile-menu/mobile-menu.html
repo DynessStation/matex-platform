@@ -1,0 +1,38 @@
+<div class="mobile-menu d-sm-none">
+  <ul>
+    <li class="active">
+      <a [routerLinkActive]="['active']" [routerLink]="['/home']">
+        <i class="ri-home-2-line"></i>
+        <span>Home</span>
+      </a>
+    </li>
+
+    <li class="mobile-category">
+      <a [routerLinkActive]="['active']" [routerLink]="['/collections']">
+        <i class="ri-menu-line"></i>
+        <span>Shop</span>
+      </a>
+    </li>
+
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="['/cart']" class="search-box">
+        <i class="ri-shopping-cart-line"></i>
+        <span>Cart</span>
+      </a>
+    </li>
+
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="['/wishlist']">
+        <i class="ri-heart-3-line"></i>
+        <span>Wishlist</span>
+      </a>
+    </li>
+
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="['/account/dashboard']">
+        <i class="ri-user-3-line"></i>
+        <span>Account</span>
+      </a>
+    </li>
+  </ul>
+</div>

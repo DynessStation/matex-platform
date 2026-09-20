@@ -1,0 +1,154 @@
+@if (type() === 'category_box_one') {
+  <div class="category-box-slide">
+    <div class="swiper" #categorySwiperContainer>
+      <div class="swiper-wrapper">
+        @for (category of categories; track category.id) {
+          <div class="swiper-slide">
+            <a [routerLink]="['/category/' + category?.slug]" class="category-box">
+              <img
+                [src]="category?.category_icon?.asset_url"
+                class="img-fluid"
+                [alt]="category?.name"
+              />
+              <h5>{{ category?.name }}</h5>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else if (type() === 'category_box_two') {
+  <div class="swiper arrivals-box" #categorySwiperContainer>
+    <div class="swiper-wrapper">
+      @for (category of categories; track category.id) {
+        <div class="swiper-slide">
+          <a [routerLink]="['/category/' + category?.slug]" class="new-arrivals-box">
+            <div class="arrivals-image">
+              <img
+                [src]="category?.category_icon?.asset_url"
+                class="img-fluid"
+                [alt]="category?.name"
+              />
+            </div>
+            <h4>{{ category?.name }}</h4>
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (type() === 'category_box_three') {
+  <div class="swiper toy-collection-slider" #categorySwiperContainer>
+    <div class="swiper-wrapper">
+      @for (category of categories; track category.id) {
+        <div class="swiper-slide">
+          <a [routerLink]="['/category/' + category?.slug]" class="product-kid-box product-s-box">
+            <div class="product-image-box">
+              <img
+                [src]="category?.category_icon?.asset_url"
+                class="img-fluid"
+                [alt]="category?.name"
+              />
+            </div>
+            <div class="product-content">
+              <h5>{{ category?.name }}</h5>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+}
+@if (type() === 'category_box_four') {
+  <div class="swiper top-category-swiper" #categorySwiperContainer>
+    <div class="swiper-wrapper justify-content-center">
+      @for (category of categories; track category.id) {
+        <div class="swiper-slide">
+          <a [routerLink]="['/category/' + category.name]" class="top-category-box">
+            <h6>{{ category?.name }}</h6>
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+}
+@if (type() === 'category_box_five') {
+  <div class="swiper electronic-category-slider" #categorySwiperContainer>
+    <div class="swiper-wrapper">
+      @for (category of categories; track category.id) {
+        <div class="swiper-slide">
+          <div class="category-sm-box">
+            <a [routerLink]="['/category/' + category?.slug]" class="category-image">
+              <img
+                [src]="category?.category_icon?.asset_url"
+                class="img-fluid"
+                [alt]="category?.name"
+              />
+              <h6>{{ category?.name }}</h6>
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (type() === 'sub_category') {
+  <div class="left-banner-content">
+    @for (category of categories; track category.id) {
+      <div class="accessories-computer-box">
+        <h4 class="deal-title">{{ category?.name }}</h4>
+        @if (category?.subcategories?.length) {
+          <ul class="deal-list">
+            @for (subCategory of category?.subcategories?.slice(0, 4); track subCategory?.id) {
+              <li>
+                <a [routerLink]="['/collections']">{{ subCategory?.name }}</a>
+              </li>
+            }
+            <li>
+              <a [routerLink]="['/category/' + category?.slug]">See More</a>
+            </li>
+          </ul>
+        }
+      </div>
+    }
+  </div>
+} @else if (type() === 'category_list') {
+  <div class="category-header">
+    <h5>Category</h5>
+    <button class="btn-close lead" type="button" (click)="close()">
+      <i class="ri-close-fill"></i>
+    </button>
+  </div>
+  <div class="category-menu-list">
+    <ul class="sub-menu-list">
+      @for (category of categories; track category.id) {
+        <li>
+          <a [routerLink]="['/category/' + category?.slug]" class="sub-category-box">
+            <h5>{{ category.name }}</h5>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+} @else if (type() === 'two-column-category') {
+  <div class="row g-sm-3 g-2">
+    @for (category of categories; track category.id) {
+      <div class="col-lg-6 col-md-12 col-6">
+        <a [routerLink]="['/category/' + category?.slug]" class="collection-box">
+          <div class="collection-image">
+            <img [src]="category?.category_icon?.asset_url" class="img-fluid" alt="image" />
+          </div>
+          <h6>{{ category.name }}</h6>
+        </a>
+      </div>
+    }
+  </div>
+} @else if (type() === 'category_list_two') {
+  <ul class="banner-product-list">
+    @for (category of categories; track category.id) {
+      <li>
+        <a [routerLink]="['/category/' + category?.slug]">
+          {{ category.name }}
+        </a>
+      </li>
+    }
+  </ul>
+}

@@ -1,0 +1,324 @@
+@use 'sass:math';
+@use '../utils/mixin/common' as *;
+
+/**=====================
+   2.14 Ratio CSS Start
+==========================**/
+.bg-size {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
+
+  > img {
+    &:first-child {
+      display: none;
+    }
+  }
+}
+
+.ratio_30 {
+  .bg-size {
+    &:before {
+      padding-top: 30%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_45 {
+  .bg-size {
+    &:before {
+      padding-top: 45%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_50 {
+  .bg-size {
+    &:before {
+      padding-top: 50%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_57 {
+  .bg-size {
+    &:before {
+      padding-top: 57%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_60 {
+  .bg-size {
+    &:before {
+      padding-top: 60%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_62 {
+  .bg-size {
+    &:before {
+      padding-top: 62.3%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_66 {
+  .bg-size {
+    &:before {
+      padding-top: 66.66%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_69 {
+  .bg-size {
+    &:before {
+      padding-top: 69%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_72 {
+  .bg-size {
+    &:before {
+      padding-top: 72%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_75 {
+  .bg-size {
+    &:before {
+      padding-top: 75%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_82 {
+  .bg-size {
+    &:before {
+      padding-top: 82.6%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_86 {
+  .bg-size {
+    &:before {
+      padding-top: 86%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_89 {
+  .bg-size {
+    &:before {
+      padding-top: 89%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_100 {
+  .bg-size {
+    &:before {
+      padding-top: 100%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_116 {
+  .bg-size {
+    &:before {
+      padding-top: 116%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_120 {
+  .bg-size {
+    &:before {
+      padding-top: 120%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_127 {
+  .bg-size {
+    &:before {
+      padding-top: 127.7777778%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_130 {
+  .bg-size {
+    &:before {
+      padding-top: 130.4%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_136 {
+  .bg-size {
+    &:before {
+      padding-top: 136%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_144 {
+  .bg-size {
+    &:before {
+      padding-top: 144%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_148 {
+  .bg-size {
+    content: '';
+    padding-top: 148%;
+    display: block;
+
+    @include max(1199.98px) {
+      padding-top: 88%;
+    }
+  }
+}
+
+.ratio_150 {
+  .bg-size {
+    &:before {
+      padding-top: 150%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_170 {
+  .bg-size {
+    &:before {
+      padding-top: 170%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_176 {
+  .bg-size {
+    &:before {
+      padding-top: 176%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_179 {
+  .bg-size {
+    &:before {
+      padding-top: 179%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.ratio_190 {
+  .bg-size {
+    &:before {
+      padding-top: 190%;
+      content: '';
+      display: block;
+    }
+  }
+}
+
+.b-top {
+  .bg-size {
+    background-position: top !important;
+  }
+
+  img {
+    object-position: top;
+  }
+}
+
+.b-right {
+  .bg-size {
+    background-position: right !important;
+  }
+
+  img {
+    object-position: right;
+  }
+}
+
+.b-bottom {
+  .bg-size {
+    background-position: bottom !important;
+  }
+
+  img {
+    object-position: bottom;
+  }
+}
+
+.b-left {
+  .bg-size {
+    background-position: left !important;
+  }
+
+  img {
+    object-position: left;
+  }
+}
+
+.ratio-8x5 {
+  @include ratio(math.div(8, 5), cover, left);
+}

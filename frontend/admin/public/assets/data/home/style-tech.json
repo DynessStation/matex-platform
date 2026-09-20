@@ -1,0 +1,179 @@
+{
+  "home_section": {
+    "left_banner": {
+      "image_url": "assets/images/banner/43.jpg",
+      "redirection_type": "product",
+      "link": "wild-stripe-sleeveless-top-zebra"
+    },
+    "center_banner": {
+      "image_url": "assets/images/banner/44.jpg",
+      "redirection_type": "product",
+      "link": "premium-over-ear-noise-cancelling-headphones"
+    },
+    "right_banner": {
+      "top_banner": {
+        "image_url": "assets/images/banner/45.jpg",
+        "redirection_type": "product",
+        "link": "apple-iphone-16"
+      },
+      "bottom_banner": {
+        "image_url": "assets/images/banner/46.jpg",
+        "redirection_type": "product",
+        "link": "sport-stripe-contrast-t-shirt-black-red"
+      }
+    }
+  },
+  "service_with_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/47.jpg",
+      "redirection_type": "product",
+      "link": "classic-sky-blue-oxford-shirt"
+    },
+    "service_ids": [9, 10, 11, 12],
+    "status": true
+  },
+  "category_section": {
+    "status": true,
+    "title": "Browse by categories",
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "today_deal": {
+    "deal_products": {
+      "status": true,
+      "title": "Today Deal",
+      "button_text": "See all deals",
+      "button_link": "/collections",
+      "product_ids": [171, 172, 173, 174, 175, 176, 177, 178, 179, 180]
+    },
+    "full_width_banner": {
+      "image_url": "assets/images/banner/48.jpg",
+      "redirection_type": "product",
+      "link": "apple-iphone-16"
+    }
+  },
+  "category_with_banner": {
+    "status": true,
+    "title": "Best Seller's Products",
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "banner": {
+      "image_url": "assets/images/banner/51.jpg",
+      "redirection_type": "product",
+      "link": "outdoor-4k-hd-smart-security-camera"
+    }
+  },
+  "deals_product": {
+    "title": "Deal hot today",
+    "product_ids": [111],
+    "status": true
+  },
+  "right_banner": {
+    "top_banner": {
+      "image_url": "assets/images/banner/49.jpg",
+      "redirection_type": "product",
+      "link": "round-face-ecg-health-smartwatch"
+    },
+    "bottom_banner": {
+      "image_url": "assets/images/banner/50.jpg",
+      "redirection_type": "product",
+      "link": "gentle-moisturizing-baby-body-wash"
+    }
+  },
+  "banner_with_tabs_product": {
+    "status": true,
+    "tabs_product": {
+      "title": "Fashion Products",
+      "tabs": [
+        {
+          "tab": "Top 20",
+          "product_ids": [182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 111, 112, 113]
+        },
+        {
+          "tab": "New Arrival",
+          "product_ids": [111, 112, 113, 114, 115, 116, 117, 118, 119, 186, 185, 189, 182, 186]
+        },
+        {
+          "tab": "Top Rated",
+          "product_ids": [184, 185, 186, 187, 188, 112, 113, 114, 115, 116, 117, 118, 189, 186]
+        }
+      ]
+    }
+  },
+  "banner_section": {
+    "image_url": "assets/images/banner/52.jpg",
+    "redirection_type": "product",
+    "link": "apple-iphone-16"
+  },
+  "tabs_with_banner_product": {
+    "status": true,
+    "tabs_product": {
+      "title": "Recommendations",
+      "tabs": [
+        {
+          "tab": "Top 20",
+          "product_ids": [111, 112, 113, 114, 115, 116, 117, 118]
+        },
+        {
+          "tab": "Best Rated",
+          "product_ids": [124, 125, 126]
+        },
+        {
+          "tab": "Editor's Choices",
+          "product_ids": [119, 120, 121, 122, 123]
+        }
+      ]
+    }
+  },
+  "tab_product_right_banner": {
+    "top_banner": {
+      "image_url": "assets/images/banner/53.jpg",
+      "redirection_type": "product",
+      "link": "13inch-ultra-thin-performance-laptop"
+    },
+    "bottom_banner": {
+      "image_url": "assets/images/banner/54.jpg",
+      "redirection_type": "product",
+      "link": "stripped-bodycon-dress"
+    }
+  },
+  "tags": {
+    "status": true,
+    "title": "Hot Tag:",
+    "tags_ids": [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+    ]
+  },
+  "offer_section": {
+    "title": "Don't Miss This Offers",
+    "button_text": "See all deals",
+    "button_link": "/collections",
+    "banner": [
+      {
+        "image_url": "assets/images/banner/55.jpg",
+        "redirection_type": "product",
+        "link": "dual-device-portable-power-bank-digital"
+      },
+      {
+        "image_url": "assets/images/banner/56.jpg",
+        "redirection_type": "product",
+        "link": "stripped-bodycon-dress"
+      },
+      {
+        "image_url": "assets/images/banner/57.jpg",
+        "redirection_type": "product",
+        "link": "premium-anc-headphones-rose-gold"
+      },
+      {
+        "image_url": "assets/images/banner/58.jpg",
+        "redirection_type": "product",
+        "link": "true-wireless-bluetooth-earbuds-charging-case"
+      }
+    ]
+  },
+  "recent_view_product": {
+    "status": true,
+    "title": "Recent Viewed Products",
+    "product_ids": [111, 112, 113, 114, 115, 116, 117, 118, 120, 110]
+  },
+  "products_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "slug": "style-tech"
+}

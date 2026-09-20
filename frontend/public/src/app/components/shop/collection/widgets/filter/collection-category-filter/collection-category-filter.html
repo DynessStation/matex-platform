@@ -1,0 +1,51 @@
+@if (((filteredCategories$ | async) || []).length > 5) {
+  <div class="search-box">
+    <input type="text" placeholder="Search..." [(ngModel)]="searchText" class="form-control" />
+    <button class="search-button btn">
+      <i class="ri-search-2-line"></i>
+    </button>
+  </div>
+}
+@if (((filteredCategories$ | async) || []).length) {
+  <ul class="category-list custom-padding custom-height">
+    <div *ngTemplateOutlet="recursiveCategories; context: { $implicit: (filteredCategories$ | async) }"></div>
+    <ng-template #recursiveCategories let-categories>
+      @for (category of categories | filter: searchText : 'subcategories'; track category) {
+        <li>
+          <div class="form-check ps-0 m-0 category-list-box">
+            <input
+              type="checkbox"
+              class="checkbox_animated"
+              id="category-{{ category?.id }}"
+              [value]="category?.slug"
+              [checked]="checked(category?.slug!)"
+              (change)="applyFilter($event)"
+            />
+            <label class="form-check-label" for="category-{{ category?.id }}">
+              <span class="name">{{ category?.name }}</span>
+            </label>
+          </div>
+          @if (category?.subcategories?.length) {
+            <ul class="sub-category-list">
+              <ng-container
+                *ngTemplateOutlet="
+                  recursiveCategories;
+                  context: { $implicit: category.subcategories }
+                "
+              ></ng-container>
+            </ul>
+          }
+        </li>
+      }
+    </ng-template>
+  </ul>
+  @if (((filteredCategories$ | async) || [] | filter : searchText : 'subcategories').length === 0) {
+    <div class="search-not-found-box">
+      <h5>No Category Found</h5>
+    </div>
+  }
+}
+<!-- No Data -->
+@if (!((filteredCategories$ | async) || []).length) {
+  <app-no-data [class]="'no-data-added'" [text]="'No Category Found'"> </app-no-data>
+}

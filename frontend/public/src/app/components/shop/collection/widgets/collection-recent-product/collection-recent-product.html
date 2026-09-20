@@ -1,0 +1,20 @@
+@for (product of product$ | async; track product) {
+  <section class="product-list-section section-block-space">
+    <div class="custom-container">
+      <div class="related-title">
+        <h2>Recent Product</h2>
+      </div>
+
+      <div
+        class="swiper related-products product-option-box slider-pagination-lg"
+        #relatedProductSwiperContainer
+      >
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <app-product-box [product]="product" [style]="'product_box_one'"></app-product-box>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}

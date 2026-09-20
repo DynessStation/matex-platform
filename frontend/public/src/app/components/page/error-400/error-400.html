@@ -1,0 +1,25 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+<section class="section-t-space page-error-section">
+  <div class="custom-container">
+    <div class="page-error-box">
+      <div class="page-error-image">
+        <img [src]="errorPage.error_400.image" class="img-fluid" alt="400 error" />
+      </div>
+      <div class="page-error-contain">
+        <h4>{{ errorPage.error_400.title }}</h4>
+        <p>{{ errorPage.error_400.description }}</p>
+        <button class="btn btn-bg-theme" [routerLink]="['/']">
+          {{ errorPage.error_400.back_button_text }}
+          <i class="ri-arrow-right-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

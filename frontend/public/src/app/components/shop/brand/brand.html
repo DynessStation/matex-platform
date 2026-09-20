@@ -1,0 +1,26 @@
+<app-breadcrumb [breadcrumb]="breadcrumb$ | async" />
+
+<section class="section-t-space shop-section">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-custom-3">
+        <div class="left-box" [class.show]="layoutService.offCanvasFilterMenu">
+          <app-collection-sidebar
+            [filter]="filter"
+            [hideFilter]="['brand']"
+          ></app-collection-sidebar>
+        </div>
+      </div>
+
+      <div class="col-custom-9">
+        <app-collection-products [filter]="filter"></app-collection-products>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

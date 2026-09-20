@@ -1,0 +1,187 @@
+/**=====================
+    5.2 Variables CSS
+==========================**/
+/*common variables*/
+:root {
+  --size: 20px;
+  --Color: rgba(var(--title-color), 1);
+  --white: 255, 255, 255; //#ffffff
+  --rating: 255, 153, 0; //#ff9900
+  --black: 0, 0, 0; //#000000
+  --light-blue: 33, 157, 171; //#219DAB
+  --light-gray: 245, 246, 249; //#f5f6f9
+  --border-color: 236, 236, 236; //#ececec
+  --danger-color: 255, 79, 79; //#ff4f4f
+  --gradient-color: linear-gradient(
+    274.63deg,
+    rgba(var(--primary-color2), 1) 13.1%,
+    rgba(var(--primary-color), 1) 174.18%
+  );
+  --scaler: calc(1.08 + (1.15 - 1.08) * ((100vw - 320px) / (1920 - 320)));
+
+  /* Demo 1 */
+  --base-gray: 242, 243, 248; //#f2f3f8
+  --primary-color: 255, 153, 0; //#ff9900
+  --primary-color2: 251, 57, 57; //#fb3939
+  --theme-green: 70, 147, 71; //#469347
+  --title-color: 32, 35, 38; //#202326
+  --bs-heading-color: 32, 35, 38; //#202326
+  --content-color: 94, 98, 120; //#5e6278
+  --theme-blue: 32, 44, 60; //#202C3C
+  --theme-blue-dark: 19, 25, 33; //#131921
+  --theme-blue2: 34, 66, 163; //#2242a3
+  --dark-blue: 35, 47, 62; //#232f3e
+
+  /* Box shadow */
+  --shadow-2:
+    0px 0px 10px rgba(var(--title-color), 0.1), 0px 10px 10px rgba(82, 77, 141, 0.04),
+    0px 8.69547px 6.95638px rgba(82, 77, 141, 0.06),
+    0px 4.6181px 3.69448px rgba(82, 77, 141, 0.0484671),
+    0px 1.9217px 1.53736px rgba(82, 77, 141, 0.0337375);
+
+  .dark {
+    --base-gray: 26, 35, 46; //#131921
+    --light-gray: 26, 35, 46; //#131921
+    --theme-blue: 32, 44, 59; //#202C3B
+    --white: 32, 44, 59; //#202C3B
+    --title-color: 255, 255, 255; //#ffffff
+    --content-color: 194, 194, 194; //#c2c2c2
+    --black: 255, 255, 255; //#ffffff
+    --border-color: 55, 70, 88; //#374658
+    --bs-heading-color: rgba(var(--title-color), 1); //#ffffff
+  }
+}
+
+/* for demo 2 */
+.demo-2 {
+  --primary-color: 254, 229, 1; //#FEE501
+  --primary-color2: 251, 57, 57; //#fb3939
+  --primary-color3: 39, 119, 252; //#2777FC
+
+  &.dark {
+    --base-gray: 21, 21, 21;
+    --light-gray: 21, 21, 21;
+    --white: 32, 35, 38;
+    --border-color: 51, 53, 56;
+  }
+}
+
+.demo-3 {
+  --primary-color: 255, 186, 10; //#FFBA0A
+  --primary-color2: 255, 57, 57; //#FF3939
+  --primary-color3: 7, 84, 79; //#07544F
+  --base-gray: 218, 238, 235; //#daeeeb
+
+  &.dark {
+    --base-gray: 3, 42, 39;
+    --white: 2, 32, 30;
+    --content-color: 255, 255, 255;
+    --border-color: 21, 53, 55;
+  }
+}
+
+.demo-4 {
+  --base-gray: 242, 243, 248; //#f2f3f8
+  --primary-color3: 34, 66, 163; //#2242a3
+
+  &.dark {
+    --light-gray: 15, 22, 44;
+    --base-gray: 24, 35, 65;
+    --white: 24, 35, 65;
+    --border-color: 60, 66, 92;
+  }
+}
+
+.demo-5 {
+  --primary-color3: 45, 40, 120; //#2D2878
+  --primary-color4: 37, 32, 105; //#252069
+  --theme-yellow: 255, 186, 10; //#FFBA0A
+
+  &.dark {
+    --base-gray: 28, 26, 59;
+    --white: 36, 33, 75;
+  }
+}
+
+.demo-6 {
+  --primary-color: 28, 163, 209; //#1ca3d1
+  --primary-color2: 255, 111, 150; //#FF6F96
+  --theme-pink: 255, 111, 150; //#FF6F96
+  --theme-blue: 28, 163, 209; //#1CA3D1
+
+  &.dark {
+    --border-color: 57, 61, 69;
+    --white: 32, 35, 38;
+  }
+}
+
+.text-yellow-color {
+  color: rgba(var(--theme-yellow), 1) !important;
+}
+
+.title-bg-color {
+  background-color: rgba(var(--title-color), 1) !important;
+}
+
+.text-theme-content {
+  color: rgba(var(--content-color), 1) !important;
+}
+
+.theme-bg-color {
+  background-color: rgba(var(--primary-color), 1) !important;
+}
+
+.theme-bg-color2 {
+  background-color: rgba(var(--primary-color2), 1) !important;
+}
+
+.theme-bg-color3 {
+  background-color: rgba(var(--primary-color3), 1) !important;
+}
+
+.theme-color {
+  color: rgba(var(--primary-color), 1) !important;
+}
+
+.theme-color2 {
+  color: rgba(var(--primary-color2), 1) !important;
+}
+
+.theme-color3 {
+  color: rgba(var(--primary-color3), 1) !important;
+}
+
+.theme-color4 {
+  color: rgba(var(--primary-color4), 1) !important;
+}
+
+.theme-color {
+  fill: rgba(var(--primary-color2), 1) !important;
+}
+
+/* Shadow List */
+$shadow: 0 0.125rem 0.25rem rgba(var(--title-color), 0.075);
+
+/* Font Family List */
+$br-hendrix: 'BR Hendrix';
+$dancing-script: 'Dancing Script', cursive;
+
+/* Breakpoints */
+$min-breakpoints: (
+  lg: 992px,
+  xl: 1200px,
+  2xl: 1366px,
+  3xl: 1400px,
+);
+
+$max-breakpoints: (
+  2xs: 360px,
+  xs: 480px,
+  sm: 575px,
+  md: 767px,
+  lg: 991px,
+  xl: 1199px,
+  2xl: 1366px,
+  3xl: 1400px,
+  4xl: 1660px,
+);

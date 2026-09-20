@@ -1,0 +1,48 @@
+@use '../utils/variables';
+@use '../utils/breakpoints';
+
+/**=====================
+     Footer CSS Start
+==========================**/
+.footer {
+  background-color: variables.$footer_bg_color;
+  box-shadow: variables.$footer_box_shadow;
+  padding: 15px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: calc(100% - 264px);
+  z-index: 6;
+  transition: 0.5s;
+
+  @media (max-width: 1199px) {
+    width: calc(100% - 260px);
+    right: unset;
+    left: 260px;
+  }
+
+  @include breakpoints.mq-max(lg) {
+    width: 100vw;
+    right: unset;
+    left: 0;
+  }
+
+  &.footer-dark {
+    background-color: variables.$footer_dark_color;
+
+    p {
+      color: variables.$white;
+    }
+  }
+}
+
+.footer-fix {
+  width: calc(100% - 320px);
+  position: fixed;
+}
+
+.payment-card-bottom {
+  img {
+    height: 30px;
+  }
+}

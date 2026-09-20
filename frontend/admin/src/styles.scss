@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+
+//==================================================
+//==== KARTIFY THEME
+//==================================================
+
+@use "../public/assets/scss/app.scss";
+
+//==================================================
+//==== NGX TOASTR
+//==================================================
+
+@import "ngx-toastr/toastr";
+
+//==================================================
+//==== TOAST OVERRIDE
+//==================================================
+
+// .toast-container {
+//   position: fixed !important;
+//   z-index: 999999 !important;
+// }
+
+// .toast-container .ngx-toastr {
+//   color: #ffffff !important;
+// }

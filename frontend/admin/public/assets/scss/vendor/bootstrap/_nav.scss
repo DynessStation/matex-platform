@@ -1,0 +1,203 @@
+@use './variables';
+@use './vendor/rfs';
+@use './mixins/transition';
+@use './mixins/border-radius';
+@use './mixins/gradients';
+
+// Base class
+//
+// Kickstart any navigation component with a set of style resets. Works with
+// `<nav>`s, `<ul>`s or `<ol>`s.
+
+.nav {
+  // scss-docs-start nav-css-vars
+  --#{variables.$prefix}nav-link-padding-x: #{variables.$nav-link-padding-x};
+  --#{variables.$prefix}nav-link-padding-y: #{variables.$nav-link-padding-y};
+  @include rfs.rfs(variables.$nav-link-font-size, --#{variables.$prefix}nav-link-font-size);
+  --#{variables.$prefix}nav-link-font-weight: #{variables.$nav-link-font-weight};
+  --#{variables.$prefix}nav-link-color: #{variables.$nav-link-color};
+  --#{variables.$prefix}nav-link-hover-color: #{variables.$nav-link-hover-color};
+  --#{variables.$prefix}nav-link-disabled-color: #{variables.$nav-link-disabled-color};
+  // scss-docs-end nav-css-vars
+
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.nav-link {
+  display: block;
+  padding: var(--#{variables.$prefix}nav-link-padding-y) var(--#{variables.$prefix}nav-link-padding-x);
+  @include rfs.font-size(var(--#{variables.$prefix}nav-link-font-size));
+  font-weight: var(--#{variables.$prefix}nav-link-font-weight);
+  color: var(--#{variables.$prefix}nav-link-color);
+  text-decoration: if(variables.$link-decoration == none, null, none);
+  background: none;
+  border: 0;
+  @include transition.transition(variables.$nav-link-transition);
+
+  &:hover,
+  &:focus {
+    color: var(--#{variables.$prefix}nav-link-hover-color);
+    text-decoration: if(variables.$link-hover-decoration == underline, none, null);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: variables.$nav-link-focus-box-shadow;
+  }
+
+  // Disabled state lightens text
+  &.disabled,
+  &:disabled {
+    color: var(--#{variables.$prefix}nav-link-disabled-color);
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+//
+// Tabs
+//
+
+.nav-tabs {
+  // scss-docs-start nav-tabs-css-vars
+  --#{variables.$prefix}nav-tabs-border-width: #{variables.$nav-tabs-border-width};
+  --#{variables.$prefix}nav-tabs-border-color: #{variables.$nav-tabs-border-color};
+  --#{variables.$prefix}nav-tabs-border-radius: #{variables.$nav-tabs-border-radius};
+  --#{variables.$prefix}nav-tabs-link-hover-border-color: #{variables.$nav-tabs-link-hover-border-color};
+  --#{variables.$prefix}nav-tabs-link-active-color: #{variables.$nav-tabs-link-active-color};
+  --#{variables.$prefix}nav-tabs-link-active-bg: #{variables.$nav-tabs-link-active-bg};
+  --#{variables.$prefix}nav-tabs-link-active-border-color: #{variables.$nav-tabs-link-active-border-color};
+  // scss-docs-end nav-tabs-css-vars
+
+  border-bottom: var(--#{variables.$prefix}nav-tabs-border-width) solid var(--#{variables.$prefix}nav-tabs-border-color);
+
+  .nav-link {
+    margin-bottom: calc(-1 * var(--#{variables.$prefix}nav-tabs-border-width)); // stylelint-disable-line function-disallowed-list
+    border: var(--#{variables.$prefix}nav-tabs-border-width) solid transparent;
+    @include border-radius.border-top-radius(var(--#{variables.$prefix}nav-tabs-border-radius));
+
+    &:hover,
+    &:focus {
+      // Prevents active .nav-link tab overlapping focus outline of previous/next .nav-link
+      isolation: isolate;
+      border-color: var(--#{variables.$prefix}nav-tabs-link-hover-border-color);
+    }
+  }
+
+  .nav-link.active,
+  .nav-item.show .nav-link {
+    color: var(--#{variables.$prefix}nav-tabs-link-active-color);
+    background-color: var(--#{variables.$prefix}nav-tabs-link-active-bg);
+    border-color: var(--#{variables.$prefix}nav-tabs-link-active-border-color);
+  }
+
+  .dropdown-menu {
+    // Make dropdown border overlap tab border
+    margin-top: calc(-1 * var(--#{variables.$prefix}nav-tabs-border-width)); // stylelint-disable-line function-disallowed-list
+    // Remove the top rounded corners here since there is a hard edge above the menu
+    @include border-radius.border-top-radius(0);
+  }
+}
+
+
+//
+// Pills
+//
+
+.nav-pills {
+  // scss-docs-start nav-pills-css-vars
+  --#{variables.$prefix}nav-pills-border-radius: #{variables.$nav-pills-border-radius};
+  --#{variables.$prefix}nav-pills-link-active-color: #{variables.$nav-pills-link-active-color};
+  --#{variables.$prefix}nav-pills-link-active-bg: #{variables.$nav-pills-link-active-bg};
+  // scss-docs-end nav-pills-css-vars
+
+  .nav-link {
+    @include border-radius.border-radius(var(--#{variables.$prefix}nav-pills-border-radius));
+  }
+
+  .nav-link.active,
+  .show > .nav-link {
+    color: var(--#{variables.$prefix}nav-pills-link-active-color);
+    @include gradients.gradient-bg(var(--#{variables.$prefix}nav-pills-link-active-bg));
+  }
+}
+
+
+//
+// Underline
+//
+
+.nav-underline {
+  // scss-docs-start nav-underline-css-vars
+  --#{variables.$prefix}nav-underline-gap: #{variables.$nav-underline-gap};
+  --#{variables.$prefix}nav-underline-border-width: #{variables.$nav-underline-border-width};
+  --#{variables.$prefix}nav-underline-link-active-color: #{variables.$nav-underline-link-active-color};
+  // scss-docs-end nav-underline-css-vars
+
+  gap: var(--#{variables.$prefix}nav-underline-gap);
+
+  .nav-link {
+    padding-right: 0;
+    padding-left: 0;
+    border-bottom: var(--#{variables.$prefix}nav-underline-border-width) solid transparent;
+
+    &:hover,
+    &:focus {
+      border-bottom-color: currentcolor;
+    }
+  }
+
+  .nav-link.active,
+  .show > .nav-link {
+    font-weight: variables.$font-weight-bold;
+    color: var(--#{variables.$prefix}nav-underline-link-active-color);
+    border-bottom-color: currentcolor;
+  }
+}
+
+
+//
+// Justified variants
+//
+
+.nav-fill {
+  > .nav-link,
+  .nav-item {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
+.nav-justified {
+  > .nav-link,
+  .nav-item {
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: center;
+  }
+}
+
+.nav-fill,
+.nav-justified {
+  .nav-item .nav-link {
+    width: 100%; // Make sure button will grow
+  }
+}
+
+
+// Tabbable tabs
+//
+// Hide tabbable panes to start, show them when `.active`
+
+.tab-content {
+  > .tab-pane {
+    display: none;
+  }
+  > .active {
+    display: block;
+  }
+}

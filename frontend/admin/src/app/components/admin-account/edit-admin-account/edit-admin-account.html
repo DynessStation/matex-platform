@@ -1,0 +1,18 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'admin_account.edit_title' | translate"
+>
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/admin-account'"
+      (retry)="retryDetail()"
+    />
+  } @else if (adminAccount$ | async; as adminAccount) {
+    <app-form-admin-account
+      [mode]="'edit'"
+      [editData]="adminAccount"
+      (formSubmit)="submit($event)"
+    />
+  }
+</app-page-wrapper>

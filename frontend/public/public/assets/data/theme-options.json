@@ -1,0 +1,697 @@
+{
+  "id": 1,
+  "options": {
+    "seo": {
+      "og_title": "Kartify Angular: Uniting Vendors for Shopping Excellence",
+      "meta_tags": "Kartify Angular: Where Vendors Shine Together",
+      "meta_title": "Online Angular, Vendor Collaboration, E-commerce Platform",
+      "og_image_id": 107,
+      "og_description": "Experience a unique shopping journey at Kartify Angular, where vendors collaborate to provide a vast array of products. Explore, shop, and connection in one convenient destination.",
+      "meta_description": "Discover Kartify Angular – a vibrant online platform where vendors unite to showcase their products, creating a diverse shopping experience. Explore a wide range of offerings and connect with sellers on a single platform.",
+      "og_image": {
+        "id": 107,
+        "name": "fashion_two_1",
+        "file_name": "fashion_two_1.png",
+        "mime_type": "image/png",
+        "disk": "public",
+        "created_by_id": "1",
+        "created_at": "2024-05-06T03:56:14.000000Z",
+        "asset_url": "/storage/107/fashion_two_1.png",
+        "original_url": "/storage/107/fashion_two_1.png"
+      }
+    },
+    "blog": {
+      "blog_style": "grid_view",
+      "read_more_enable": true,
+      "blog_sidebar_type": "left_sidebar",
+      "blog_author_enable": true
+    },
+    "logo": {
+      "footer_logo_id": 3950,
+      "header_logo_id": 3939,
+      "favicon_icon_id": 3946,
+      "favicon_icon": {
+        "id": 3946,
+        "name": "favicon",
+        "file_name": "favicon.png",
+        "mime_type": "image/png",
+        "disk": "public",
+        "created_by_id": "1",
+        "created_at": "2024-06-25T10:28:25.000000Z",
+        "asset_url": "/storage/3946/favicon.png",
+        "original_url": "assets/images/logo/1.png"
+      },
+      "header_logo": {
+        "id": 3939,
+        "name": "logo (1)",
+        "file_name": "logo-(1).png",
+        "mime_type": "image/png",
+        "disk": "public",
+        "created_by_id": "1",
+        "created_at": "2024-06-25T10:19:57.000000Z",
+        "asset_url": "assets/images/logo/1.svg",
+        "original_url": "assets/images/logo/1.svg"
+      },
+      "footer_logo": {
+        "id": 3950,
+        "name": "f6",
+        "file_name": "f6.png",
+        "mime_type": "image/png",
+        "disk": "public",
+        "created_by_id": "1",
+        "created_at": "2024-06-25T11:42:51.000000Z",
+        "asset_url": "assets/images/logo/1-dark.svg",
+        "original_url": "assets/images/logo/1-dark.svg"
+      }
+    },
+    "popup": {
+      "auth": {
+        "image_url": "/storage/3766/auth-img.jpeg"
+      },
+      "exit": {
+        "title": "WAIT",
+        "image_url": "/storage/3766/auth-img.jpeg",
+        "is_enable": true,
+        "sub_title": "Sorry to see you leaving...",
+        "description": "Enter your email address to receive 10% off your first order"
+      },
+      "sale": {
+        "text": "SALE",
+        "is_enable": true
+      },
+      "news_letter": {
+        "offer": "80% off",
+        "title": "NEWSLETTER",
+        "image_url": "/storage/3766/auth-img.jpeg",
+        "is_enable": true,
+        "description": "plus, early access to new arrivals, exclusive sales, & lots more?"
+      }
+    },
+    "footer": {
+      "title": "KNOW IT ALL FIRST!",
+      "twitter": "https://twitter.com/",
+      "bg_color": "#212121",
+      "bg_image": "/storage/3865/christmas.jpg",
+      "facebook": "https://facebook.com/",
+      "instagram": "https://instagram.com/",
+      "pinterest": "https://pinterest.com/",
+      "sub_title": "Never Miss Anything From Store By Signing Up To Our Newsletter.",
+      "about_email": "kartify@contact.com",
+      "footer_list": [
+        {
+          "value": "Quick & Direct ordering"
+        },
+        {
+          "value": "Shop smarter, save time & Simply"
+        },
+        {
+          "value": "Save more on app"
+        }
+      ],
+      "payment_option": [
+        {
+          "id": 1,
+          "image": "assets/images/payment/1.svg"
+        },
+        {
+          "id": 2,
+          "image": "assets/images/payment/2.svg"
+        },
+        {
+          "id": 3,
+          "image": "assets/images/payment/3.svg"
+        },
+        {
+          "id": 4,
+          "image": "assets/images/payment/4.svg"
+        },
+        {
+          "id": 5,
+          "image": "assets/images/payment/5.svg"
+        },
+        {
+          "id": 6,
+          "image": "assets/images/payment/6.svg"
+        },
+        {
+          "id": 7,
+          "image": "assets/images/payment/7.svg"
+        }
+      ],
+      "my_account": [
+        {
+          "id": 1,
+          "name": "My Account",
+          "value": "account/dashboard"
+        },
+        {
+          "id": 2,
+          "name": "My Shop",
+          "value": "collections"
+        },
+        {
+          "id": 3,
+          "name": "My Cart",
+          "value": "cart"
+        },
+        {
+          "id": 4,
+          "name": "Checkout",
+          "value": "checkout"
+        },
+        {
+          "id": 6,
+          "name": "My Wishlist",
+          "value": "wishlist"
+        },
+        {
+          "id": 7,
+          "name": "Tracking Order",
+          "value": "/order/tracking"
+        }
+      ],
+      "our_service": [
+        {
+          "id": 1,
+          "name": "Mobile Phones",
+          "value": "collections"
+        },
+        {
+          "id": 2,
+          "name": "Television",
+          "value": "collections"
+        },
+        {
+          "id": 3,
+          "name": "Washing Machine",
+          "value": "collections"
+        },
+        {
+          "id": 4,
+          "name": "Women Fashion",
+          "value": "collections"
+        },
+        {
+          "id": 5,
+          "name": "Laptop",
+          "value": "collections"
+        }
+      ],
+      "information": [
+        {
+          "id": 1,
+          "name": "Home",
+          "value": "home"
+        },
+        {
+          "id": 2,
+          "name": "Collection",
+          "value": "collections"
+        },
+        {
+          "id": 3,
+          "name": "About Us",
+          "value": "about-us"
+        },
+        {
+          "id": 4,
+          "name": "Blogs",
+          "value": "blogs"
+        },
+        {
+          "id": 5,
+          "name": "Offer",
+          "value": "offers"
+        },
+        {
+          "id": 6,
+          "name": "Search",
+          "value": "search"
+        },
+        {
+          "id": 7,
+          "name": "FAQ's",
+          "value": "faq"
+        },
+        {
+          "id": 8,
+          "name": "Contact us",
+          "value": "contact-us"
+        }
+      ],
+      "footer_about": "Discover the latest trends and enjoy seamless shopping with our exclusive collections.",
+      "footer_style": "footer_three",
+      "about_address": "3228 Bicetown Road Huntington, NY 11743",
+      "app_store_url": "https://www.apple.com/in/app-store/",
+      "support_email": "support@gmail.com",
+      "play_store_url": "https://play.google.com/store/apps",
+      "play_store_image": "assets/images/google-play.svg",
+      "app_store_image": "assets/images/app-store.svg",
+      "support_number": "(603) 555-0123",
+      "footer_copyright": true,
+      "copyright_content": "2023-24 themeforest powered by pixelstrap",
+      "footer_categories": [74, 41, 98, 107, 12, 55],
+      "social_media_enable": true,
+      "payment_option_image_url": "images/payments.png"
+    },
+    "header": {
+      "today_deals": [],
+      "category_ids": [74, 41, 98, 107],
+      "header_options": "header_one",
+      "support_number": "123 - 456 - 7890",
+      "top_bar_content": [
+        {
+          "content": "<i class=\"ri-truck-line\"></i>Free Shipping on Orders $100+"
+        },
+        {
+          "content": "<i class=\"ri-megaphone-line\"></i>Buy One Get Two Free"
+        },
+        {
+          "content": "<i class=\"ri-gift-line\"></i>Gift Card for all the season"
+        }
+      ],
+      "page_top_bar_enable": true,
+      "sticky_header_enable": true
+    },
+    "seller": {
+      "home_section": {
+        "title": "Boost your marketing and sales with us",
+        "description": "We are currently working on an awesome new site. Stay tuned for more information. Subscribe to our newsletter to stay updated on our progress.",
+        "button_text": "Get started",
+        "image": "assets/images/inner-page/become-seller/marketing.jpg",
+        "status": true
+      },
+      "why_selling": {
+        "status": true,
+        "title": "Why sell on Kartify?",
+        "description": "Kartify gives you the tools to build a powerful online store with ease. From seamless product listings to hassle-free payments and shipping, we make selling simple—so you can focus on what you do best.",
+        "seller_benefits": [
+          {
+            "icon": "assets/svg/become-seller.svg#lowest-cost",
+            "title": "Lowest Cost",
+            "description": "We offer the most competitive pricing with low transaction fees, maximizing your profits while keeping costs minimal."
+          },
+          {
+            "icon": "assets/svg/become-seller.svg#high-growth",
+            "title": "Ease of Doing Business",
+            "description": "Seamless setup and hassle-free management make selling effortless. Focus on growth while we handle the complexities."
+          },
+          {
+            "icon": "assets/svg/become-seller.svg#dedicated-pickup",
+            "title": "Growth",
+            "description": "Expand your reach, increase sales, and scale effortlessly with our powerful tools and vast customer base. Your success starts here!"
+          },
+          {
+            "icon": "assets/svg/become-seller.svg#most-approachable",
+            "title": "Most Approachable",
+            "description": "Our user-friendly platform and dedicated support make selling simple. We're always here to help you succeed!"
+          }
+        ]
+      },
+      "seller_stories": {
+        "status": true,
+        "title": "Seller Success Stories",
+        "description": "At Kartify, we celebrate the incredible journeys of sellers who turned ambition into achievement. Through hard work, smart strategies, and the right support, they built thriving businesses and reached new heights.",
+        "review": [
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "When I first opened my store, I didn't know what to expect. But the platform made everything easy—from setting up listings to tracking orders. Within weeks, I made my first sale. Now I'm running a steady online business, and it's changed my life. I used to struggle to reach customers for my digital artwork. Once I joined, everything changed. The visibility, combined with the analytics dashboard, helped me optimize my shop. Now I'm doing what I love and making a real living from it.",
+            "image": "assets/images/user/9.jpg",
+            "name": "Jack marckno",
+            "designation": "Head of Marketing Department"
+          },
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "I was completely new to e-commerce, but the support here has been incredible. From clear tutorials to a responsive help team, everything just clicked. My sales have doubled each month, and I've even started hiring help to manage the volume. From the very beginning, I felt supported. The onboarding was simple, the seller dashboard was intuitive, and I could start selling right away. In just six months, I've built a steady stream of income that keeps growing.",
+            "image": "assets/images/user/10.jpg",
+            "name": "Blaine Perez",
+            "designation": "Head of BDE Department"
+          },
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "Selling my handmade soaps used to be just a weekend hobby. Since joining, my shop has gained loyal customers and consistent traffic. The built-in tools helped me understand buyer behavior and improve my listings. Now I'm turning a passion into a career. My small jewelry business was mostly local before. But once I got online, everything changed. I now get orders from across the globe. The tools here made me feel like I was running a much bigger operation.",
+            "image": "assets/images/user/1.jpg",
+            "name": "Nicholas Spears",
+            "designation": "Head of Web Designer"
+          },
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "I've always wanted to run my own boutique, and this platform gave me the chance. With personalized marketing and easy order management, I was able to focus on curating great products. Seeing customers return again and again is the best feeling. What started as a side hustle has now become my full-time job. This platform gave me the audience I needed and the features to run things efficiently. It's been an amazing journey, and I'm excited to see where it goes next.",
+            "image": "assets/images/user/2.jpg",
+            "name": "Loretta Harrison",
+            "designation": "Head of Python Developer"
+          },
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "Shipping used to be my biggest concern, but this platform streamlined the whole process. From order tracking to customer notifications, everything runs smoothly. It gave me the confidence to expand my product line, and my income grew with it. As a first-time entrepreneur, I was worried about handling orders and customer service. But everything was so well-organized, it gave me the confidence to keep going. I'm now running a full-time online store with consistent monthly sales.",
+            "image": "assets/images/user/3.jpg",
+            "name": "Edith Bullock",
+            "designation": "Head of HR department"
+          },
+          {
+            "icon": "assets/svg/quote.svg#quote",
+            "message": "Being a stay-at-home parent, I needed something flexible. I started selling home decor items in my spare time, and it quickly picked up momentum. I've now built a brand I'm proud of, with customers who appreciate what I do. I launched my eco-friendly clothing line here and couldn't believe the support I received. Between the analytics, seller dashboard, and promotions, I saw real growth. I've expanded my product line and even collaborated with influences!",
+            "image": "assets/images/user/5.jpg",
+            "name": "Noa Ruiz",
+            "designation": "Head of Security Engineer"
+          }
+        ]
+      },
+      "selling_steps": {
+        "status": true,
+        "title": "Why sell on Kartify?",
+        "description": "List products, manage orders, and grow your brand, all in one place. Our tools are built to help you sell smarter, not harder. No tech skills? No worries. Everything is simple and intuitive. From marketing to logistics.",
+        "sell_steps": [
+          {
+            "step_number": "Step 1",
+            "title": "Register",
+            "description": "Sign up and create your store in just a few clicks. It’s simple and free to get started."
+          },
+          {
+            "step_number": "Step 2",
+            "title": "List",
+            "description": "Add your products with images, descriptions, and prices. Make your store stand."
+          },
+          {
+            "step_number": "Step 3",
+            "title": "Orders",
+            "description": "Once your store is live, track incoming orders, manage inventory, and stay on top of customer requests."
+          },
+          {
+            "step_number": "Step 4",
+            "title": "Ship & Paid",
+            "description": "Ship your products and receive payments quickly and securely. We handle the transactions."
+          },
+          {
+            "step_number": "Step 5",
+            "title": "Register",
+            "description": "Sign up and create your store in just a few clicks. It’s simple and free to get started."
+          }
+        ]
+      },
+      "about": {
+        "title": "Start Your Business With Kartify & Reach Customers Across The World...",
+        "status": true,
+        "image_url": "/storage/3831/vendor.jpg",
+        "description": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,\n\nOn the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains."
+      },
+      "steps": {
+        "title": "Doing Business On Kartify Is Really Easy",
+        "status": true,
+        "step_1": {
+          "title": "List your products & Get support service provider",
+          "description": "Register your business for free and create a product catalogue. Sell under your own private label or sell an existing brand. Get your documentation & cataloging done with ease from our Professional Services network."
+        },
+        "step_2": {
+          "title": "Receive Orders & Schedule A Pickup",
+          "description": "Once listed, your products will be available to millions of users.Get orders and manage your online business via our Seller Panel and Seller Zone Mobile App."
+        },
+        "step_3": {
+          "title": "Receive Quick Payment & Grow Your Business",
+          "description": "Receive quick and hassle-free payments in your account once your orders are fulfilled. Expand your business with low interest & collateral-free loans."
+        }
+      },
+      "services": {
+        "title": "WHY SELL ON Kartify?",
+        "status": true,
+        "service_1": {
+          "title": "lowest cost",
+          "image_url": "/storage/1072/seller1.png",
+          "description": "Contrary to popular belief, Lorem Ipsum is not simply random text."
+        },
+        "service_2": {
+          "title": "high growth rate",
+          "image_url": "/storage/1075/seller4.png",
+          "description": "Contrary to popular belief, Lorem Ipsum is not simply random text"
+        },
+        "service_3": {
+          "title": "dedicated pickup",
+          "image_url": "/storage/1073/seller2.png",
+          "description": "Contrary to popular belief, Lorem Ipsum is not simply random text"
+        },
+        "service_4": {
+          "title": "most approachable",
+          "image_url": "/storage/1074/seller3.png",
+          "description": "Contrary to popular belief, Lorem Ipsum is not simply random text"
+        }
+      },
+      "start_selling": {
+        "title": "Start Selling",
+        "status": true,
+        "description": "Kartify Angular is India’s leading platform for selling online. Be it a manufacturer, vendor or supplier, simply sell your products online on Kartify and become a top ecommerce player with minimum investment. Through a team of experts offering exclusive seller workshops, training, seller support and convenient seller portal, Kartify focuses on educating and empowering sellers across India. Selling on Kartify.com is easy and absolutely free. All you need is to register, list your catalogue and start selling your products."
+      }
+    },
+    "general": {
+      "mode": "light",
+      "taglines": ["⚡ Come Back !!", "🎉 Offers for you..."],
+      "cart_style": "cart_sidebar",
+      "site_title": "Kartify Angular: Where Vendors Shine Together",
+      "site_tagline": "Shop Unique, Sell Exceptional – Kartify Multi-Vendor Universe.",
+      "primary_color": "#ec8951",
+      "secondary_color": null,
+      "back_to_top_enable": true,
+      "celebration_effect": true,
+      "language_direction": "ltr",
+      "exit_tagline_enable": true,
+      "seller_register_url": "https://angular.pixelstrap.net/kartify"
+    },
+    "product": {
+      "services": {
+        "banners": [
+          {
+            "title": "Free Shipping",
+            "status": true,
+            "image_url": "/storage/3580/service1.png",
+            "description": "Free Shipping World Wide"
+          },
+          {
+            "title": "24 X 7 Service",
+            "status": true,
+            "image_url": "/storage/3581/service2.png",
+            "description": "Online Service For 24 X 7"
+          },
+          {
+            "title": "Festival Offer",
+            "status": true,
+            "image_url": "/storage/3582/service3.png",
+            "description": "Super Sale Upto 50% Off"
+          }
+        ]
+      },
+      "social_share": true,
+      "image_variant": "image_thumbnail",
+      "safe_checkout": true,
+      "encourage_view": true,
+      "product_layout": "product_thumbnail",
+      "sticky_product": true,
+      "encourage_order": true,
+      "secure_checkout": true,
+      "sticky_checkout": true,
+      "banner_image_url": "assets/images/banner/21.jpg",
+      "is_trending_product": true,
+      "product_box_variant": "product_box_two",
+      "safe_checkout_image": "assets/images/secure_payments.png",
+      "shipping_and_return": "<p>Shipping and Returns are integral parts of your shopping experience, and we aim to make them as smooth as possible. We prioritize efficient shipping, striving to deliver your orders promptly within the estimated delivery window, typically ranging from 5 to 7 days. We understand that sometimes your purchase may not meet your expectations, so we offer a straightforward return policy. If you find yourself unsatisfied with your order, eligible items can be returned within 30 days of purchase, ensuring you have ample time to make a decision. Our commitment is to ensure your satisfaction and convenience throughout your shopping journey with us, and we're here to assist you every step of the way.</p><p><strong>Our Shipping Commitment:</strong></p><ul><li><p>Timely and reliable delivery within 5-7 days.</p></li><li><p>Real-time tracking for your orders.</p></li><li><p>Exceptional packaging to ensure your items arrive in perfect condition.</p></li></ul><p><strong>Our Hassle-Free Returns:</strong></p><ul><li><p>Eligible items can be returned within 30 days.</p></li><li><p>Easy return initiation through our website.</p></li><li><p>Prompt processing of returns for a hassle-free experience.</p></li></ul><p>We understand that your shopping needs may vary, and we are here to accommodate them while providing exceptional service.</p>",
+      "secure_checkout_image": "assets/images/payments.png",
+      "encourage_max_view_count": 5,
+      "encourage_max_order_count": 50
+    },
+    "about_us": {
+      "team": {
+        "title": "Kartify Team Member",
+        "description": "We're a passionate team of developers, designers, and problem-solvers who love turning ideas into powerful digital products. Each member brings unique skills and energy, working together to build innovative solutions that make an impact.",
+        "status": true,
+        "members": [
+          {
+            "name": "Osiris Nash",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "Chief Executive Officer",
+            "profile_image_url": "assets/images/user/12.jpg"
+          },
+          {
+            "name": "Rosa Olson",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "CEO, Company",
+            "profile_image_url": "assets/images/user/11.jpg"
+          },
+          {
+            "name": "Joseph Park",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "CEo & Founder At Company",
+            "profile_image_url": "assets/images/user/13.jpg"
+          },
+          {
+            "name": "Rohan Gillespie",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "Jr. Project Manager",
+            "profile_image_url": "assets/images/user/14.jpg"
+          },
+          {
+            "name": "Anna Baranov",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "Sr. Project Manager",
+            "profile_image_url": "assets/images/user/15.jpg"
+          },
+          {
+            "name": "Ellis Atkinson",
+            "facebook": "https://www.facebook.com/",
+            "instagram": "https://instagram.com/",
+            "linkedin": "https://www.linkedin.com/",
+            "youtube": "https://www.youtube.com/",
+            "designation": "Chief Executive Officer",
+            "profile_image_url": "assets/images/user/16.jpg"
+          }
+        ],
+        "sub_title": "Our Creative Team Kartify"
+      },
+      "about": {
+        "title": "About Software Agency",
+        "status": true,
+        "futures": [
+          {
+            "icon": "/storage/3580/service1.png",
+            "title": "Years of eCommerce Excellence",
+            "description": "For years, Kartify Web has been driving digital growth through powerful eCommerce solutions. We specialize in building scalable online stores, seamless user experiences, and data-driven strategies that help businesses achieve measurable success in the digital Angular."
+          },
+          {
+            "icon": "/storage/3581/service2.png",
+            "title": "A Legacy of Digital Commerce Innovation",
+            "description": "Since its inception, Kartify Web has been at the forefront of eCommerce innovation. Our expertise spans custom store development, UX optimization, and conversion-focused strategies — helping brands grow and sustain their online presence with confidence."
+          },
+          {
+            "icon": "/storage/3582/service3.png",
+            "title": "Building eCommerce Success Stories for Years",
+            "description": "At Kartify Web, we’ve dedicated years to crafting exceptional eCommerce experiences. Our professional team blends technology and creativity to deliver solutions that elevate brands and maximize online revenue."
+          }
+        ],
+        "description": "At Kartify, we specialize in building innovative, reliable, and scalable software solutions tailored to your business goals. From startups to enterprises, we partner with clients across industries to turn their ideas into high-performing digital products. Our team brings together skilled developers, creative designers, and strategic thinkers who are passionate about technology and problem-solving. We believe in agile development, transparent communication, and a user-first approach. Whether it's a mobile app, a custom platform, or a full-stack web solution, we deliver with speed and precision. With a focus on clean code and beautiful design, our work is both functional and future-proof. Collaboration is at the heart of everything we do. We don't just deliver projects - we build long-term partnerships. At Kartify, innovation meets execution. Let's create something exceptional together.",
+        "content_bg_image_url": "assets/images/inner-page/contact-us.jpg",
+        "content_left_image_url": null,
+        "content_right_image_url": null
+      },
+      "testimonial": {
+        "title": "Testimonial",
+        "description": "Hear what our clients have to say about working with us. From startups to enterprises, their success stories speak for our dedication, quality, and results. Real feedback from real people who've seen real impact",
+        "status": true,
+        "reviews": [
+          {
+            "name": "Jack marckno",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": " Kartify exceeded our expectations from day one. Their team understood our business goals and built an eCommerce platform that’s both elegant and high-performing. The site runs smoothly, loads fast, and has greatly improved our conversion rates. Truly a professional and dependable partner.",
+            "designation": "Head of Marketing Department",
+            "profile_image_url": "assets/images/user/9.jpg"
+          },
+          {
+            "name": "Blaine Perez",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": " We collaborated with Kartify to redesign our online store, and the results were outstanding. The team was proactive, creative, and very professional throughout the project. Our new website not only looks better but also performs far more efficiently. A great experience overall!",
+            "designation": "Head of BDE Department",
+            "profile_image_url": "assets/images/user/10.jpg"
+          },
+          {
+            "name": "Nicholas Spears",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": "Kartify helped us create a strong digital identity with a beautifully designed  eCommerce website. Their attention to detail and technical expertise made every  step effortless. We’re extremely satisfied with the outcome and the positive  feedback from our customers.",
+            "designation": "Head of Web Designer",
+            "profile_image_url": "assets/images/user/1.jpg"
+          },
+          {
+            "name": "Loretta Harrison",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": "  From concept to launch, Kartify handled our entire eCommerce project with precision and creativity. The team delivered a clean, modern website that perfectly fits our brand. We’ve already seen a noticeable improvement in user engagement and sales.",
+            "designation": "Head of Python Developer",
+            "profile_image_url": "assets/images/user/2.jpg"
+          },
+          {
+            "name": "Edith Bullock",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": "Our experience with Kartify was exceptional. They listened to our needs, offered innovative ideas, and delivered a website that truly stands out. The final product is fast, responsive, and built to perform — exactly what we needed for our online business.",
+            "designation": "Head of HR department",
+            "profile_image_url": "assets/images/user/3.jpg"
+          },
+          {
+            "name": "Noa Ruiz",
+            "icon": "assets/svg/quote.svg#quote",
+            "review": "NOT marked 'poison,' it is to find that she did not get dry very soon. 'Ahem!'  said the Dormouse: 'not in that ridiculous fashion.' And he got up this morning?  NOT marked 'poison,' it is to find that she did not get dry very soon. 'Ahem!'  said the Dormouse: 'not in that ridiculous fashion.' And he got up this morning?",
+            "designation": "Head of Security Engineer",
+            "profile_image_url": "assets/images/user/5.jpg"
+          }
+        ],
+        "sub_title": "Latest Testimonials"
+      }
+    },
+    "collection": {
+      "collection_layout": "collection_category_slider",
+      "collection_categories_ids": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25
+      ],
+      "collection_banner_image_url": "assets/images/shop/1.jpg",
+      "product_ids": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    "seller_store": {
+      "seller_layout": "seller_details"
+    },
+    "contact_us": {
+      "title": "Contact us",
+      "description": "Have any questions or need assistance? Our team is here to help! Reach out to us anytime, and we'll get back to you ASAP.",
+      "contact_email": "contact@kartify.com",
+      "contact_number": "520-245-2465",
+      "imageUrl": "CONTACT",
+      "main_title": "TALK WIH US",
+      "topic": [
+        { "label": "Our Story", "value": "our-story" },
+        { "label": "Mission Vision", "value": "mission-vision" },
+        { "label": "Core Values", "value": "core-values" }
+      ]
+    },
+    "error_page": {
+      "back_button_text": "back to home",
+      "back_button_enable": true,
+      "error_page_content": "page not found",
+      "error_400": {
+        "title": "URL not found requests (Bad Request Error)",
+        "description": "The server was unable to perform the request because of an issue with the URL or input, as indicated by a 400 Bad Request error. It could be due to incorrect arguments or incorrect formatting. Please review and modify your request as needed.",
+        "image": "assets/images/inner-page/400.png",
+        "back_button_text": "Go Home",
+        "back_button_enable": true
+      },
+      "error_404": {
+        "title": "This page was not found.",
+        "description": "The page you requested was not found. It might not be there anymore, or the link you clicked on might not be working. You may either go back to the previous page or try searching for what you need.",
+        "image": "assets/images/inner-page/404.png",
+        "back_button_text": "Go Home",
+        "back_button_enable": true
+      },
+
+      "error_500": {
+        "title": "Internal Server Errors",
+        "description": "Your request could not be fulfilled by the server due to an internal problem. This could be the result of a system fault or a transient problem. If the issue continues, kindly try again later or get in touch with support.",
+        "image": "assets/images/inner-page/500.png",
+        "back_button_text": "Go Home",
+        "back_button_enable": true
+      }
+    },
+    "coming_soon": {
+      "title": "Our new website is on the way",
+      "description": "We are currently working on an awesome new site. Stay tuned for more information. Subscribe to our newsletter to stay updated on our progress.",
+      "button_text": "Notify Me",
+      "image_url": "assets/images/coming-soon-bg.jpg",
+      "theme_logo": "assets/images/logo/1-dark.svg"
+    }
+  }
+}

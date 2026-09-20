@@ -1,0 +1,32 @@
+[dir='rtl'] {
+  .text-end {
+    text-align: left !important;
+  }
+
+  .ms-2 {
+    margin-left: unset !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n + 3),
+  .input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-control,
+  .input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-select,
+  .input-group:not(.has-validation)
+    > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .input-group
+    > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(
+      .invalid-tooltip
+    ):not(.invalid-feedback) {
+    margin-right: unset;
+    margin-left: calc(-1 * var(--bs-border-width));
+  }
+
+  .was-validated .form-control:valid,
+  .form-control.is-valid {
+    background-position: left calc(0.375em + 0.1875rem) center;
+  }
+}

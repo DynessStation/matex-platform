@@ -1,0 +1,144 @@
+@if (
+  filter()!['layout'] === 'collection_full_width' ||
+  filter()!['layout'] === 'collection_3_grid_offcanvas' ||
+  filter()!['layout'] === 'collection_2_grid_offcanvas' ||
+  filter()!['layout'] === 'collection_4_grid_offcanvas' ||
+  filter()!['layout'] === 'collection_5_grid_offcanvas' ||
+  filter()!['layout'] === 'collection_list_view_offcanvas'
+) {
+  <div class="offcanvas-button">
+    <button
+      (click)="layoutService.offCanvasFilterMenu = !layoutService.offCanvasFilterMenu"
+      class="filter-main-btn btn"
+    >
+      <i class="ri-equalizer-2-line"></i> Filter Menu
+    </button>
+  </div>
+}
+<div class="show-button show-button-2">
+  <div class="top-filter-menu">
+    <div class="category-dropdown w-100">
+      <div
+        class="filter-overlay"
+        id="filterOverlay"
+        [class.show]="layoutService.offCanvasFilterMenu"
+        (click)="layoutService.offCanvasFilterMenu = !layoutService.offCanvasFilterMenu"
+      ></div>
+
+      <div class="filter-button d-inline-block d-lg-none">
+        <button (click)="openOffCanvasFilter(true)" class="filter-main-btn btn">
+          <i class="ri-equalizer-2-line"></i> Filter Menu
+        </button>
+      </div>
+
+      @if (offCanvasLayouts.includes(filter()!['layout'])) {
+        <div class="left-box left-box-2" [class.show]="layoutService.offCanvasFilterMenu">
+          <app-collection-sidebar [filter]="filter"></app-collection-sidebar>
+        </div>
+      }
+
+      <div class="d-flex align-items-center dropdown-box flex-wrap w-100">
+        <h5 class="text-content">Sort By :</h5>
+        <div class="filter-page-review">
+          @if (isBrowser) {
+            <div class="product-page-per-view">
+              <select2
+                class="custom-select"
+                [displaySearchStatus]="'hidden'"
+                [placeholder]="'Sort'"
+                [value]="filter()!['sortBy']"
+                [data]="sorting ? sorting : []"
+                (update)="sortByFilter($event)"
+              >
+              </select2>
+            </div>
+            <div class="product-page-filter">
+              <select2
+                class="custom-select"
+                [displaySearchStatus]="'hidden'"
+                [value]="filter()!['paginate']"
+                [placeholder]="'Sort Item'"
+                [data]="sortingItem ? sortingItem : []"
+                (update)="sortProductsLength($event)"
+              >
+              </select2>
+            </div>
+          }
+        </div>
+        <div class="grid-option d-none d-md-block">
+          <ul>
+            <li
+              class="two-grid"
+              [class.active]="
+                selectedGrid === 'collection_2_grid' ||
+                selectedGrid === 'collection_2_grid_offcanvas'
+              "
+            >
+              <button class="btn" (click)="grid('collection_2_grid')">
+                <svg>
+                  <use xlink:href="assets/svg/grid-option.svg#gridTwo"></use>
+                </svg>
+              </button>
+            </li>
+            <li
+              class="three-grid"
+              [class.active]="
+                selectedGrid === 'collection_3_grid' ||
+                selectedGrid === 'collection_3_grid_offcanvas'
+              "
+            >
+              <button class="btn" (click)="grid('collection_3_grid')">
+                <svg>
+                  <use xlink:href="assets/svg/grid-option.svg#gridThree"></use>
+                </svg>
+              </button>
+            </li>
+            <li
+              class="grid-btn"
+              [class.active]="
+                selectedGrid === 'collection_4_grid' ||
+                selectedGrid === 'collection_4_grid_offcanvas'
+              "
+            >
+              <button class="btn" (click)="grid('collection_4_grid')">
+                <svg>
+                  <use xlink:href="assets/svg/grid-option.svg#gridFour"></use>
+                </svg>
+              </button>
+            </li>
+            <li
+              class="d-xxl-inline-block d-none"
+              [class.active]="
+                selectedGrid === 'collection_5_grid' ||
+                selectedGrid === 'collection_5_grid_offcanvas'
+              "
+            >
+              <button class="btn five-grid" (click)="grid('collection_5_grid')">
+                <svg class="d-lg-inline-block d-none">
+                  <use xlink:href="assets/svg/grid-option.svg#gridFive"></use>
+                </svg>
+                <svg class="d-lg-none">
+                  <use xlink:href="assets/svg/grid-option.svg#grid"></use>
+                </svg>
+              </button>
+            </li>
+            <li
+              class="list-btn"
+              [class.active]="
+                selectedGrid === 'collection_list_view' ||
+                selectedGrid === 'collection_list_view_offcanvas' ||
+                selectedGrid === 'collection_shop_list_infinite'
+              "
+            >
+              <button class="btn" (click)="grid('collection_list_view')">
+                <svg>
+                  <use xlink:href="assets/svg/grid-option.svg#list"></use>
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

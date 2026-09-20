@@ -1,0 +1,109 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+@if (layout === 'seller_details_two') {
+  <app-seller-details-two />
+} @else {
+  <section class="seller-details-section section-t-space">
+    <div class="custom-container">
+      <div class="seller-top-box">
+        <div class="profile-image">
+          <div>
+            <div class="band-image">
+              @if (selectedStore.store_logo) {
+                <img
+                  [src]="selectedStore.store_logo.asset_url"
+                  [alt]="selectedStore.store_name"
+                  class="img-fluid"
+                />
+              } @else {
+                <h1 class="vendor-text">
+                  {{ selectedStore.store_name.charAt(0)!.toString().toUpperCase() }}
+                </h1>
+              }
+            </div>
+            <h3>{{ selectedStore.store_name | titlecase }}</h3>
+            <div class="rating">
+              <ngb-rating [(rate)]="selectedStore.rating_count">
+                <ng-template let-fill="fill" let-index="index">
+                  <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                </ng-template>
+              </ngb-rating>
+            </div>
+            <h6>{{ selectedStore.reviews_count }} review</h6>
+          </div>
+        </div>
+        <div class="profile-detail">
+          <div>
+            <p [innerHTML]="selectedStore.description"></p>
+          </div>
+        </div>
+        <div class="vendor-contact">
+          <app-seller-store-social-media [store]="selectedStore">
+            <div class="vendor-details-box">
+              <h6>{{ 'if you have any query' | translate }}:</h6>
+              <ul class="vendor-details">
+                @if (!selectedStore.hide_vendor_phone && selectedStore.vendor) {
+                  <li>
+                    <i class="ri-smartphone-line"></i>
+                    <h5>
+                      +{{ selectedStore.vendor.country_code }} {{ selectedStore.vendor.phone }}
+                    </h5>
+                  </li>
+                }
+                @if (!selectedStore.hide_vendor_email && selectedStore.vendor) {
+                  <li>
+                    <i class="ri-mail-line"></i>
+                    <h5>
+                      <a href="mailto:{{ selectedStore.vendor.email }}">{{
+                        selectedStore.vendor.email
+                      }}</a>
+                    </h5>
+                  </li>
+                }
+              </ul>
+            </div>
+          </app-seller-store-social-media>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-t-space shop-section">
+    <div class="custom-container">
+      <div class="row">
+        <div class="col-custom-3">
+          <div class="left-box">
+            <app-collection-sidebar [filter]="filter"></app-collection-sidebar>
+          </div>
+        </div>
+
+        <div class="col-custom-9">
+          <div class="light-bg-color light-sm-box mb-14">
+            <div class="title-2 title-2-sm slider-button-sm">
+              <h3>Browse by categories</h3>
+              <div class="title-slider-button">
+                <div class="electronic-category-prev swiper-btn-prev">
+                  <i class="ri-arrow-left-s-line"></i>
+                </div>
+                <div class="electronic-category-next swiper-btn-next">
+                  <i class="ri-arrow-right-s-line"></i>
+                </div>
+              </div>
+            </div>
+            <app-home-category
+              [categoryIds]="[1, 2, 3, 4, 5, 6, 7, 8, 9]"
+              [type]="'category_box_five'"
+              [option]="browserCategoryOption"
+            ></app-home-category>
+          </div>
+          <app-collection-products [filter]="filter"></app-collection-products>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+}

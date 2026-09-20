@@ -1,0 +1,35 @@
+@if (categories.length > 5) {
+  <div class="search-box">
+    <input
+      type="search"
+      class="form-control"
+      id="search"
+      placeholder="Search .."
+      [(ngModel)]="searchText"
+    />
+    <button class="search-button btn">
+      <i class="ri-search-2-line"></i>
+    </button>
+  </div>
+}
+
+<ul class="category-list custom-padding custom-height">
+  @for (category of categories | filter: searchText : 'subcategories'; track category.id) {
+    <li>
+      <div class="form-check category-list-box">
+        <input
+          type="checkbox"
+          class="form-check-input checkbox_animated"
+          id="category-{{ category?.id }}"
+          [value]="category?.slug"
+          [checked]="checked(category?.slug!)"
+          (change)="applyFilter($event)"
+        />
+        <label class="form-check-label" for="category-{{ category?.id }}">
+          <span class="name"> {{ category?.name }}</span>
+          <span class="number">(15)</span>
+        </label>
+      </div>
+    </li>
+  }
+</ul>

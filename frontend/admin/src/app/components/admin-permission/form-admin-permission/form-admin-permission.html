@@ -1,0 +1,140 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="row g-3">
+    <!--==================================================
+    ==== PERMISSION KEY
+    ==================================================-->
+
+    <div class="col-md-6">
+      <app-form-fields
+        [label]="'admin_permission.permission_key' | translate"
+        [for]="'permission_key'"
+      >
+        <input
+          id="permission_key"
+          type="text"
+          class="form-control"
+          formControlName="permission_key"
+          [placeholder]="
+            'admin_permission.permission_key_placeholder' | translate
+          "
+        />
+
+        @if (mode() === 'edit') {
+          <small class="form-helper">
+            {{ 'admin_permission.permission_key_immutable' | translate }}
+          </small>
+        } @else {
+          <small class="form-helper">
+            {{ 'admin_permission.permission_key_helper' | translate }}
+          </small>
+        }
+
+        @if (
+          form.controls.permission_key.touched &&
+          form.controls.permission_key.errors
+        ) {
+          <div class="text-danger form-error">
+            @if (form.controls.permission_key.errors['required']) {
+              {{ 'admin_permission.permission_key_required' | translate }}
+            }
+
+            @if (form.controls.permission_key.errors['pattern']) {
+              {{ 'admin_permission.permission_key_invalid' | translate }}
+            }
+          </div>
+        }
+      </app-form-fields>
+    </div>
+
+    <!--==================================================
+    ==== NAME
+    ==================================================-->
+
+    <div class="col-md-6">
+      <app-form-fields
+        [label]="'admin_permission.permission_name' | translate"
+        [for]="'permission_name'"
+      >
+        <input
+          id="permission_name"
+          type="text"
+          class="form-control"
+          formControlName="permission_name"
+          [placeholder]="
+            'admin_permission.permission_name_placeholder' | translate
+          "
+        />
+
+        @if (
+          form.controls.permission_name.touched &&
+          form.controls.permission_name.errors?.['required']
+        ) {
+          <div class="text-danger form-error">
+            {{ 'admin_permission.permission_name_required' | translate }}
+          </div>
+        }
+      </app-form-fields>
+    </div>
+
+    <!--==================================================
+    ==== GROUP
+    ==================================================-->
+
+    <div class="col-md-6">
+      <app-form-fields
+        [label]="'admin_permission.group' | translate"
+        [for]="'permission_group'"
+      >
+        <input
+          id="permission_group"
+          type="text"
+          class="form-control"
+          formControlName="permission_group"
+          [placeholder]="'admin_permission.group_placeholder' | translate"
+        />
+
+        <small class="form-helper">
+          {{ 'admin_permission.group_helper' | translate }}
+        </small>
+      </app-form-fields>
+    </div>
+
+    <!--==================================================
+    ==== DESCRIPTION
+    ==================================================-->
+
+    <div class="col-12">
+      <app-form-fields
+        [label]="'admin_permission.description' | translate"
+        [for]="'permission_description'"
+      >
+        <textarea
+          id="permission_description"
+          class="form-control"
+          rows="4"
+          formControlName="permission_description"
+          [placeholder]="'admin_permission.description_placeholder' | translate"
+        ></textarea>
+      </app-form-fields>
+    </div>
+  </div>
+
+  <!--==================================================
+  ==== SUBMIT
+  ==================================================-->
+
+  <div class="form-submit-wrapper">
+    <app-button
+      [id]="'admin_permission_submit_btn'"
+      [class]="'btn btn-theme'"
+      [type]="'submit'"
+    >
+      {{
+        (mode() === 'create'
+          ? 'admin_permission.create'
+          : 'admin_permission.update'
+        ) | translate
+      }}
+    </app-button>
+  </div>
+</form>

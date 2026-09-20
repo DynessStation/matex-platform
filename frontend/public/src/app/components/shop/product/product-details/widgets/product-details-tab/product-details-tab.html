@@ -1,0 +1,41 @@
+<section class="section-block-space">
+  <div class="custom-container">
+    <div class="product-section-box m-0">
+      <ul ngbNav #nav="ngbNav" class="nav-tabs custom-nav">
+        <li ngbNavItem>
+          <a ngbNavLink>Description</a>
+          <ng-template ngbNavContent>
+            @if (product()?.description) {
+              <div
+                class="part ckeditor-content"
+                [innerHTML]="getTrustedHtml(product()?.description)"
+              ></div>
+            }
+          </ng-template>
+        </li>
+        <li ngbNavItem>
+          <a ngbNavLink>Review</a>
+          <ng-template ngbNavContent>
+            <app-product-review
+              [product]="product()"
+              [reviews]="(review$ | async)?.data || []"
+            ></app-product-review>
+          </ng-template>
+        </li>
+        <li ngbNavItem>
+          <a ngbNavLink>Q&A</a>
+          <ng-template ngbNavContent>
+            <div class="information-box">
+              <app-product-questions-answers
+                [product]="product()!"
+                [questionAnswers]="(question$ | async)?.data || []"
+              ></app-product-questions-answers>
+            </div>
+          </ng-template>
+        </li>
+      </ul>
+
+      <div [ngbNavOutlet]="nav" class="mt-2 custom-tab"></div>
+    </div>
+  </div>
+</section>

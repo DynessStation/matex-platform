@@ -1,0 +1,25 @@
+<div class="product-category productMain p-0">
+  <div class="product-image">
+    <a [routerLink]="['/product/' + product()?.slug]">
+      <img [src]="product()?.product_thumbnail?.asset_url!" class="productImage" alt="image" />
+    </a>
+    <ul class="hover-box">
+      <li>
+        <app-wishlist [product]="product()" [class]="'wishlistProduct'" />
+      </li>
+      <li>
+        <app-quick-view [product]="product()" [quickViewStyle]="'icon'" />
+      </li>
+      <li>
+        <app-compare [product]="product()" [text]="'Compare'" />
+      </li>
+    </ul>
+  </div>
+  <a [routerLink]="['/product/' + product()?.slug]" class="category-content">
+    <h5 class="name productName">{{ product()?.name }}</h5>
+    <h5 class="offer">Min. {{ product()?.sale_price | currencySymbol }}</h5>
+    <h5 class="rate">
+      <del>{{ product()?.price | currencySymbol }}</del>
+    </h5>
+  </a>
+</div>

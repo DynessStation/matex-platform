@@ -1,0 +1,353 @@
+<section class="top-category-section">
+  <div class="custom-container">
+    <app-home-category
+      [categoryIds]="data()?.categories?.category_ids!"
+      [type]="'category_box_four'"
+      [option]="categorySliderOption"
+    ></app-home-category>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="custom-container">
+    <div class="custom-row2 row g-3">
+      @if (layoutService.headerCategoryCanvasToggle) {
+        <div class="custom-col-xxl-3 h-100 mt-xl-3 m-0">
+          <div
+            class="category-full-box offcanvas"
+            id="categoryCanvas"
+            [class.show]="layoutService.headerCategoryCanvasToggle"
+          >
+            <app-home-category [type]="'category_list'"></app-home-category>
+          </div>
+        </div>
+      }
+
+      <div [ngClass]="layoutService.headerCategoryCanvasToggle ? 'custom-col-xxl-9' : 'col-12'">
+        <div class="row h-100">
+          <div class="col-xl-4 col-md-5 col-12 ratio_136 d-md-block d-none">
+            <app-home-banner
+              [image]="data()?.home_selection?.main_banner"
+              [className]="'banner-box h-100 hover-effect b-left'"
+              [imageClass]="'bg-img'"
+              [bgImage]="true"
+            ></app-home-banner>
+          </div>
+          <div class="col-xl-8 col-md-7">
+            <div class="row h-100">
+              <div class="col-12">
+                <div class="row h-100">
+                  <div class="col-sm-6 ratio_69">
+                    <app-home-banner
+                      [image]="data()?.home_selection?.sub_banner_1"
+                      [className]="'banner-box h-100 hover-effect b-left'"
+                      [imageClass]="'bg-img'"
+                      [bgImage]="true"
+                    ></app-home-banner>
+                  </div>
+                  <div class="col-sm-6 mt-sm-0 mt-3 ratio_69">
+                    <app-home-banner
+                      [image]="data()?.home_selection?.sub_banner_2"
+                      [className]="'banner-box h-100 b-left'"
+                      [imageClass]="'bg-img'"
+                      [bgImage]="true"
+                    ></app-home-banner>
+                  </div>
+                  <div class="col-12 ratio_30 mt-sm-4 mt-3">
+                    <app-home-banner
+                      [image]="data()?.home_selection?.sub_banner_3"
+                      [className]="'banner-box h-100 b-left'"
+                      [imageClass]="'bg-im'"
+                      [bgImage]="true"
+                    ></app-home-banner>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pt-20">
+  <div class="custom-container">
+    <div class="custom-row2 row">
+      <div class="custom-col-xxl-3 d-xxl-block d-none">
+        <div class="position-sticky top-0 start-0">
+          @if (data()?.daily_deal?.status) {
+            <div class="light-bg-color light-sm-box">
+              <div class="title-2 title-2-sm slider-button-sm">
+                <h3>{{ data()?.daily_deal?.title }}</h3>
+                <div class="title-slider-button">
+                  <button class="daily-deal-prev swiper-btn-prev">
+                    <i class="ri-arrow-left-s-line"></i>
+                  </button>
+                  <button class="daily-deal-next swiper-btn-next">
+                    <i class="ri-arrow-right-s-line"></i>
+                  </button>
+                </div>
+              </div>
+              <app-home-deal-products
+                [type]="'daily-deal'"
+                [productIds]="data()?.daily_deal?.product_ids!"
+              />
+            </div>
+          }
+
+          <div class="pt-20">
+            <app-home-banner
+              [image]="data()?.banner_1"
+              [className]="'banner-box'"
+            ></app-home-banner>
+          </div>
+
+          <div class="pt-20">
+            <app-home-banner
+              [image]="data()?.banner_2"
+              [className]="'banner-box'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-col-xxl-6">
+        @if (data()?.browse_by_categories?.status) {
+          <div class="light-bg-color light-sm-box">
+            <div class="title-2 title-2-sm slider-button-sm">
+              <h3>{{ data()?.browse_by_categories?.title }}</h3>
+              <div class="title-slider-button">
+                <button class="electronic-category-prev swiper-btn-prev">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="electronic-category-next swiper-btn-next">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <app-home-category
+              [categoryIds]="data()?.browse_by_categories?.category_ids!"
+              [type]="'category_box_five'"
+              [option]="browserCategoryOption"
+            ></app-home-category>
+          </div>
+        }
+
+        <section class="pt-20">
+          <div class="light-bg-color recommendations-product-section">
+            <app-home-tabs-products
+              [tabSelection]="data()?.recommendations_tabs_product!"
+              [style]="'column'"
+              [type]="'product_box_five'"
+              [itemsPerSlide]="5"
+              [spaceBetween]="0"
+              [rows]="3"
+            ></app-home-tabs-products>
+          </div>
+        </section>
+
+        <section class="pt-20">
+          <div class="light-bg-color">
+            <app-home-tabs-products
+              [tabSelection]="data()?.recommendations_for_you_tabs_product!"
+              [style]="'column'"
+              [itemsPerSlide]="3"
+              [rows]="4"
+            ></app-home-tabs-products>
+          </div>
+        </section>
+      </div>
+
+      <div class="custom-col-xxl-3 d-xxl-block d-none">
+        <div class="position-sticky top-0 start-0">
+          <div class="light-bg-color light-sm-box">
+            <div class="title-2 title-2-sm slider-button-sm">
+              <h3>{{ data()?.best_seller?.title }}</h3>
+              <div class="title-slider-button">
+                <button class="best-seller-prev swiper-btn-prev">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="best-seller-next swiper-btn-next">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+            <app-home-product
+              [productIds]="data()?.best_seller?.product_ids!"
+              [style]="'column_slider_four'"
+              [option]="bestSellerSwiperOption"
+            ></app-home-product>
+          </div>
+
+          <div class="pt-20">
+            <app-home-banner
+              [image]="data()?.best_seller_banner?.banner_1"
+              [className]="'banner-box'"
+            ></app-home-banner>
+          </div>
+
+          <div class="pt-20">
+            <app-home-banner
+              [image]="data()?.best_seller_banner?.banner_2"
+              [className]="'banner-box'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pt-20">
+  <div class="custom-container">
+    <div class="light-bg-color">
+      <div class="title-2 title-flex justify-content-between">
+        <h3 class="d-block">{{ data()?.feature_brand_banner?.title }}</h3>
+        <app-button
+          [buttonLink]="data()?.feature_brand_banner?.button_link!"
+          [buttonText]="data()?.feature_brand_banner?.button_text!"
+        />
+      </div>
+      <div class="swiper banner-slider" #featureBannerSwiperContainer>
+        <div class="swiper-wrapper">
+          @for (banner of data()?.feature_brand_banner?.feature_banner; track banner) {
+            <div class="swiper-slide">
+              <app-home-banner [image]="banner" [className]="'banner-box'"></app-home-banner>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="custom-container">
+    <div class="custom-row2 row">
+      <div class="custom-col-xxl-3 d-xxl-block d-none">
+        <app-home-banner
+          [image]="data()?.banner_with_tabs_product?.banner_top"
+          [className]="'banner-box h-100'"
+          [imageClass]="'img-fluid h-100 object-fit-cover'"
+        ></app-home-banner>
+      </div>
+
+      <div class="custom-col-xxl-6">
+        <div class="light-bg-color recommendations-product-section">
+          <app-home-tabs-products
+            [tabSelection]="data()?.banner_with_tabs_product!"
+            [style]="'column'"
+            [type]="'product_box_five'"
+            [spaceBetween]="0"
+            [itemsPerSlide]="5"
+            [rows]="1"
+          ></app-home-tabs-products>
+        </div>
+      </div>
+
+      <div class="custom-col-xxl-3 d-xxl-block d-none">
+        <app-home-banner
+          [image]="data()?.banner_with_tabs_product?.banner_bottom"
+          [className]="'banner-box h-100'"
+          [imageClass]="'img-fluid h-100 object-fit-cover'"
+        ></app-home-banner>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (data()?.new_trending_laptop?.status) {
+  <section class="pt-20">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-2-sm slider-button-sm">
+          <h3>{{ data()?.new_trending_laptop?.title }}</h3>
+          <div class="title-slider-button">
+            <div class="banner-two-prev swiper-btn-prev">
+              <i class="ri-arrow-left-s-line"></i>
+            </div>
+            <div class="banner-two-next swiper-btn-next">
+              <i class="ri-arrow-right-s-line"></i>
+            </div>
+          </div>
+        </div>
+        <div class="swiper banner-slider2" #newTrendingSwiperContainer>
+          <div class="swiper-wrapper">
+            @for (banner of data()?.new_trending_laptop?.feature_banner; track banner) {
+              <div class="swiper-slide">
+                <app-home-banner [image]="banner" [className]="'banner-box'"></app-home-banner>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data()?.buy_guide_choice?.status) {
+  <section class="pt-20">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-2-sm slider-button-sm">
+          <h3>{{ data()?.buy_guide_choice?.title }}</h3>
+          <div class="title-slider-button">
+            <button class="discover-product-prev swiper-btn-prev">
+              <i class="ri-arrow-left-s-line"></i>
+            </button>
+            <button class="discover-product-next swiper-btn-next">
+              <i class="ri-arrow-right-s-line"></i>
+            </button>
+          </div>
+        </div>
+        <app-home-product
+          [productIds]="data()?.buy_guide_choice?.product_ids"
+          [style]="'product-slider-two'"
+        ></app-home-product>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-t-space offer-section">
+  <div class="custom-container">
+    <div class="row g-md-4 g-3">
+      <div class="col-xl-6">
+        <app-home-banner
+          [image]="data()?.offer_section_banner?.banner_1"
+          [className]="'banner-box b-left'"
+        ></app-home-banner>
+      </div>
+
+      <div class="col-xl-6">
+        <app-home-banner
+          [image]="data()?.offer_section_banner?.banner_2"
+          [className]="'banner-box b-left'"
+        ></app-home-banner>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (data()?.tags?.status) {
+  <section class="section-t-space d-md-block d-none">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-timer justify-content-between">
+          <h3>{{ data()?.tags?.title }}</h3>
+        </div>
+        <ul class="hot-tag-list">
+          <app-home-tags [tagsIds]="data()?.tags?.tags_ids!"></app-home-tags>
+        </ul>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-block-space">
+  <div class="custom-container">
+    <app-home-newsletter [type]="'newsletter-two'"></app-home-newsletter>
+  </div>
+</section>

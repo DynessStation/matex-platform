@@ -1,0 +1,22 @@
+<div class="footer-title-2">
+  <h4>Get Shopping App</h4>
+</div>
+<ul class="footer-list-2">
+  @for (list of data()?.footer?.footer_list; track list) {
+    <li>
+      <p>{{ list.value }}</p>
+    </li>
+  }
+</ul>
+<ul class="app-store-link">
+  <li>
+    <a href="{{ data()?.footer?.play_store_url }}" target="_blank">
+      <img [src]="data()?.footer?.play_store_image" class="img-fluid" alt="image" />
+    </a>
+  </li>
+  <li>
+    <a href="{{ data()?.footer?.app_store_url }}" target="_blank">
+      <img [src]="data()?.footer?.app_store_image" class="img-fluid" alt="image" />
+    </a>
+  </li>
+</ul>

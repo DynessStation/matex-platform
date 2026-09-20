@@ -1,0 +1,586 @@
+//==================================================
+//==== ACCESS INFORMATION
+//==================================================
+
+.access-information {
+  margin-bottom: 24px;
+}
+
+//==================================================
+//==== PERMISSION SECTION
+//==================================================
+
+.permission-section {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+//==================================================
+//==== TOOLBAR
+//==================================================
+
+.permission-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-bottom: 16px;
+}
+
+.permission-title {
+  margin: 0 0 4px;
+}
+
+.permission-description {
+  margin: 0;
+
+  color: #777;
+
+  font-size: 13px;
+}
+
+.permission-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.permission-total {
+  white-space: nowrap;
+
+  color: #666;
+
+  font-size: 13px;
+}
+
+.permission-select-all,
+.permission-group-select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.permission-select-all .form-check-input,
+.permission-group-select-all .form-check-input {
+  margin: 0;
+}
+
+//==================================================
+//==== WORKSPACE
+//==================================================
+
+.permission-workspace {
+  display: grid;
+
+  grid-template-columns:
+    minmax(230px, 28%)
+    minmax(0, 1fr);
+
+  height: clamp(480px, 56vh, 620px);
+
+  overflow: hidden;
+
+  border: 1px solid #eee;
+
+  border-radius: 6px;
+
+  background: #fff;
+}
+
+//==================================================
+//==== LEFT SIDEBAR
+//==================================================
+
+.permission-sidebar {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
+  // WAJIB:
+  // biar child bisa overflow di dalam
+  // grid yang punya fixed height.
+  min-height: 0;
+
+  overflow: hidden;
+
+  border-right: 1px solid #eee;
+
+  background: #fafafa;
+}
+
+.permission-sidebar-header {
+  flex: 0 0 auto;
+
+  padding: 18px;
+
+  border-bottom: 1px solid #eee;
+
+  background: #fff;
+}
+
+.permission-sidebar-header h6 {
+  margin: 0 0 12px;
+
+  font-weight: 600;
+}
+
+//==================================================
+//==== SEARCH
+//==================================================
+
+.permission-search {
+  position: relative;
+}
+
+.permission-search i {
+  position: absolute;
+
+  top: 50%;
+  left: 13px;
+
+  transform: translateY(-50%);
+
+  color: #999;
+
+  pointer-events: none;
+}
+
+.permission-search .form-control {
+  padding-left: 38px;
+}
+
+//==================================================
+//==== GROUP LIST
+//==================================================
+
+.permission-group-list {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  overflow-x: hidden;
+
+  overflow-y: auto;
+
+  padding: 8px;
+}
+
+//==================================================
+//==== GROUP ITEM
+//==================================================
+
+.permission-group-item {
+  display: block;
+
+  width: 100%;
+
+  margin: 0 0 5px;
+
+  padding: 12px 13px;
+
+  border: 1px solid transparent;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  text-align: left;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  cursor: pointer;
+}
+
+.permission-group-item:hover {
+  background: #fff;
+
+  border-color: #eee;
+}
+
+.permission-group-item.active {
+  background: #fff8ed;
+
+  border-color: #ffb13b;
+}
+
+.permission-group-main {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.permission-group-name {
+  overflow: hidden;
+
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.permission-group-count {
+  flex: 0 0 auto;
+
+  min-width: 42px;
+
+  padding: 2px 7px;
+
+  border-radius: 20px;
+
+  background: #eee;
+
+  text-align: center;
+
+  font-size: 11px;
+}
+
+.permission-group-item.has-selection .permission-group-count {
+  background: #fff0d7;
+
+  color: #c97800;
+}
+
+.permission-group-item.active .permission-group-count {
+  background: #ff9f00;
+
+  color: #fff;
+}
+
+//==================================================
+//==== GROUP STATUS
+//==================================================
+
+.permission-group-progress {
+  margin-top: 5px;
+
+  color: #999;
+
+  font-size: 11px;
+}
+
+.permission-complete {
+  color: #3c9c5b;
+}
+
+//==================================================
+//==== GROUP EMPTY
+//==================================================
+
+.permission-group-empty {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 160px;
+
+  padding: 20px;
+
+  color: #999;
+
+  text-align: center;
+}
+
+.permission-group-empty i {
+  font-size: 24px;
+}
+
+//==================================================
+//==== RIGHT CONTENT
+//==================================================
+
+.permission-content {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
+  min-height: 0;
+
+  overflow: hidden;
+
+  background: #fff;
+}
+
+//==================================================
+//==== CONTENT HEADER
+//==================================================
+
+.permission-content-header {
+  display: flex;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #eee;
+
+  background: #fff;
+}
+
+.permission-content-header h5 {
+  margin: 0 0 4px;
+
+  font-size: 16px;
+}
+
+.permission-content-header p {
+  margin: 0;
+
+  color: #888;
+
+  font-size: 12px;
+}
+
+//==================================================
+//==== PERMISSION LIST
+//==================================================
+
+.permission-list {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  overflow-x: hidden;
+
+  overflow-y: auto;
+
+  padding: 0 20px;
+}
+
+//==================================================
+//==== PERMISSION ITEM
+//==================================================
+
+.permission-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  width: 100%;
+
+  margin: 0;
+
+  padding: 16px 2px;
+
+  border-bottom: 1px solid #f0f0f0;
+
+  cursor: pointer;
+}
+
+.permission-item:last-child {
+  border-bottom: 0;
+}
+
+//==================================================
+//==== CHECKBOX ALIGNMENT
+//==================================================
+
+.permission-item > .form-check-input {
+  flex: 0 0 auto;
+
+  margin-top: 3px;
+}
+
+//==================================================
+//==== PERMISSION TEXT
+//==================================================
+
+.permission-item-content {
+  min-width: 0;
+
+  line-height: 1.4;
+}
+
+.permission-item-title {
+  margin-bottom: 2px;
+
+  color: #333;
+
+  font-weight: 600;
+}
+
+.permission-item-key {
+  color: #777;
+
+  font-size: 12px;
+
+  word-break: break-word;
+}
+
+.permission-item-description {
+  margin-top: 3px;
+
+  color: #999;
+
+  font-size: 12px;
+}
+
+//==================================================
+//==== EMPTY
+//==================================================
+
+.permission-empty {
+  display: flex;
+
+  flex: 1;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #aaa;
+}
+
+.permission-empty i {
+  font-size: 36px;
+}
+
+//==================================================
+//==== FOOTER
+//==================================================
+
+.permission-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-top: 18px;
+}
+
+.permission-footer-summary {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color: #666;
+
+  font-size: 13px;
+}
+
+.permission-footer-summary i {
+  color: #ff9f00;
+
+  font-size: 18px;
+}
+
+//==================================================
+//==== SCROLLBAR
+//==================================================
+
+// .permission-group-list,
+// .permission-list {
+//   scrollbar-width: thin;
+// }
+
+//==================================================
+//==== RESPONSIVE
+//==================================================
+
+@media (max-width: 991px) {
+  .permission-toolbar {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .permission-toolbar-actions {
+    width: 100%;
+
+    justify-content: space-between;
+  }
+
+  .permission-workspace {
+    display: flex;
+
+    flex-direction: column;
+
+    height: auto;
+
+    max-height: none;
+  }
+
+  .permission-sidebar {
+    border-right: 0;
+
+    border-bottom: 1px solid #eee;
+  }
+
+  .permission-group-list {
+    max-height: 260px;
+  }
+
+  .permission-content {
+    min-height: 420px;
+  }
+
+  .permission-list {
+    max-height: 420px;
+  }
+}
+
+@media (max-width: 575px) {
+  .permission-toolbar-actions {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .permission-content-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .permission-footer {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .permission-footer app-button {
+    align-self: flex-end;
+  }
+}

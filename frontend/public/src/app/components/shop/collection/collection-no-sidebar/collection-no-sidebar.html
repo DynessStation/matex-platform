@@ -1,0 +1,16 @@
+<section class="section-t-space shop-section">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-12">
+        @if (bannerImageUrl) {
+          <a href="javascript:void()" class="banner-main-box mb-4">
+            <div class="banner-image">
+              <img [src]="bannerImageUrl" class="img-fluid" alt="banner" />
+            </div>
+          </a>
+        }
+        <app-collection-products [filter]="filter()!"></app-collection-products>
+      </div>
+    </div>
+  </div>
+</section>

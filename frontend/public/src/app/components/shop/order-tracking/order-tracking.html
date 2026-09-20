@@ -1,0 +1,69 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+<section class="section-t-space order-tracking-section">
+  <div class="container w-100">
+    <div class="row">
+      <div class="col-xl-5 col-lg-6 col-sm-8 mx-auto">
+        <div class="order-search-content">
+          <h3>Order Tracking</h3>
+          <p>
+            Please enter your Order ID and click the Track button to see the progress of your order.
+          </p>
+          <div class="input-box">
+            <form class="row g-3" [formGroup]="form" (ngSubmit)="submit()">
+              <div class="col-12 theme-form">
+                <label class="form-label" for="order_number">Order Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="order_number"
+                  formControlName="order_number"
+                  placeholder="{{ 'order_number' | translate }}"
+                />
+
+                @if (
+                  form.controls['order_number'].touched &&
+                  form.controls['order_number'].errors?.['required']
+                ) {
+                  <div class="invalid-feedback">{{ 'order_number_is_required' | translate }}</div>
+                }
+              </div>
+              <div class="col-12">
+                <div class="theme-form">
+                  <label class="form-label" for="email">{{
+                    'Enter email or phone' | translate
+                  }}</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    formControlName="email_or_phone"
+                    placeholder="{{ 'Enter email or phone' | translate }}"
+                  />
+                </div>
+
+                @if (
+                  form.controls['email_or_phone'].touched &&
+                  form.controls['email_or_phone'].errors?.['required']
+                ) {
+                  <div class="invalid-feedback">{{ 'Email or phone is required' | translate }}</div>
+                }
+              </div>
+              <div class="col-12 text-end">
+                <app-button [id]="'track_btn'" [class]="'btn theme-bg-color text-white'">{{
+                  'Track' | translate
+                }}</app-button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

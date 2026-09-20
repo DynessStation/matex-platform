@@ -1,0 +1,282 @@
+<form class="theme-form theme-form-2 mega-form" [formGroup]="form" (ngSubmit)="submit()">
+  <app-form-fields [label]="'title' | translate" [for]="'title'">
+    <input
+      class="form-control"
+      type="text"
+      placeholder="{{ 'enter_title' | translate }}"
+      formControlName="title"
+      />
+    @if (form.controls['title'].touched && form.controls['title'].errors?.['required']) {
+      <div
+        class="invalid-feedback"
+        >
+        {{ 'title_is_required' | translate }}
+      </div>
+    }
+  </app-form-fields>
+  <app-form-fields [label]="'link_type'" [for]="'type'">
+    @if(isBrowser) {
+      <select2
+        class="custom-select"
+        [data]="link_type?.length ? link_type : []"
+        formControlName="link_type"
+        [placeholder]="'select_type' | translate "
+        noResultMessage="{{ 'no_data_found' | translate }}"
+        />
+    }
+    @if (form.controls['link_type'].touched && form.controls['link_type'].errors?.['required']) {
+      <div
+        class="invalid-feedback"
+        >
+        {{ 'link_type_is_required' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  @if (form.get('link_type')?.value === 'link') {
+    <app-form-fields
+      [label]="'target_blank'"
+      [for]="'is_target_blank'"
+      >
+      <div class="form-check form-switch ps-0">
+        <label class="switch">
+          <input type="checkbox" id="is_target_blank" formControlName="is_target_blank" />
+          <span class="switch-state"></span>
+        </label>
+      </div>
+      @if (form.controls['is_target_blank'].touched && form.controls['is_target_blank'].errors?.['required']) {
+        <div
+          class="invalid-feedback"
+          >
+          {{ 'target_is_required' | translate }}
+        </div>
+      }
+    </app-form-fields>
+  }
+
+  @if (form.get('link_type')?.value === 'link') {
+    <app-form-fields
+      [label]="'set_page_link'"
+      [for]="'set_page_link'"
+      >
+      @if(isBrowser) {
+        <select2
+          class="custom-select"
+          [data]="(page$ | async) ? (page$ | async) : []"
+          [placeholder]="'select_page' | translate "
+          formControlName="set_page_link"
+          noResultMessage="{{'no_data_found' | translate }}"
+          (update)="setPage($event)"
+          resettable
+          multiple="false"
+          />
+      }
+    </app-form-fields>
+  }
+
+  @if (form.get('link_type')?.value === 'link') {
+    <app-form-fields
+      [label]="'path' | translate"
+      [for]="'path'"
+      >
+      <input
+        class="form-control"
+        type="text"
+        placeholder="{{ form.get('is_target_blank')?.value === 0 || form.get('is_target_blank')?.value === false ? 'enter_path' : 'enter_url' | translate }}"
+        formControlName="path"
+        />
+      @if (form.get('is_target_blank')?.value === 0 || form.get('is_target_blank')?.value === false) {
+        <p
+          class="help-text"
+          >
+          *{{ 'ensure_that_the_path_creates_a_route_in_the_frontend' | translate }}:
+          "{{form.get('path')?.value }}"
+        </p>
+      } @else {
+        <p class="help-text">{{ 'ensure_that_the_url_is_external_link_url' | translate }}</p>
+      }
+      @if (form.controls['path'].touched && form.controls['path'].errors?.['required']) {
+        <div
+          class="invalid-feedback"
+          >
+          {{ 'path_is_required' | translate }}
+        </div>
+      }
+    </app-form-fields>
+  }
+
+  <app-form-fields [label]="'select_parent' | translate " [for]="'category'" [required]="false">
+    <app-advance-dropdown
+      [selectSingle]="true"
+      [selectedOption]="menu && menu.parent_id ? [menu.parent_id] : []"
+      [displayKey]="'title'"
+      [subArrayKey]="'child'"
+      [options]="(menu$ | async)?.data?.length ? (menu$ | async)?.data : []"
+      (selectedItem)="selectItem($event)"
+      [showImage]="false"
+      />
+  </app-form-fields>
+
+  @if (!form.get('parent_id')?.value && form.get('link_type')?.value === 'sub') {
+    <app-form-fields
+      [label]="'mega_menu'"
+      [for]="'mega_menu_enable'"
+      >
+      <div class="form-check form-switch ps-0">
+        <label class="switch">
+          <input type="checkbox" id="mega_menu_enable" formControlName="mega_menu" />
+          <span class="switch-state"></span>
+        </label>
+      </div>
+    </app-form-fields>
+  }
+
+  @if (form.get('mega_menu')?.value === true || form.get('mega_menu')?.value === 1 && form.get('link_type')?.value === 'sub') {
+    <app-form-fields [label]="'mega_menu_type'" [for]="'mega_menu_type'">
+      <div>
+        <ul class="mega-menu-list">
+          @for(item of megaMenuLayout; track i; let i = $index){
+            <div class="selection-box">
+              <input
+                type="radio"
+                [id]="item.value"
+                [value]="item.value"
+                name="mega_menu_type"
+                formControlName="mega_menu_type"
+                />
+              <label [for]="item.value">
+                <div class="circle"></div>
+                <div>
+                  <img [src]="item.image" class="img-fluid dummy-img" [alt]="item.value" />
+                  <p class="mt-1">{{item.label}}</p>
+                </div>
+              </label>
+            </div>
+          }
+        </ul>
+      </div>
+    </app-form-fields>
+    @if (form.get('mega_menu_type')?.value === 'product_box') {
+      <app-form-fields
+        [label]="'products' "
+        [for]="'product_ids'"
+        [required]="false"
+        >
+        @if(isBrowser) {
+          <select2
+            class="custom-select"
+            [templates]="template"
+            [data]="(products$ | async)?.length ? (products$ | async) : []"
+            [placeholder]="'select_product' | translate"
+            formControlName="product_ids"
+            noResultMessage="{{ 'no_data_found' | translate }}"
+            [customSearchEnabled]="true"
+            (close)="productDropdown($event)"
+            (search)="searchProduct($event)"
+            [multiple]="true"
+            >
+            <ng-template #template let-data="data">
+              <div class="image">
+                <img [src]="data.image" [class]="'img-fluid selection-image'" alt="img"/>
+              </div>
+              {{ data.name }}
+            </ng-template>
+          </select2>
+        }
+      </app-form-fields>
+    }
+    @if (form.get('mega_menu_type')?.value === 'blog_box') {
+      <app-form-fields
+        [label]="'blogs'"
+        [for]="'type'"
+        >
+        @if(isBrowser) {
+          <select2
+            class="custom-select"
+            [data]="(blogs$ | async) ? (blogs$ | async) : []"
+            [placeholder]="'select_blogs' | translate "
+            formControlName="blog_ids"
+            noResultMessage="{{'no_data_found' | translate }}"
+            multiple="true"
+            />
+        }
+      </app-form-fields>
+    }
+    @if (form.get('mega_menu_type')?.value === 'bottom_banner' ||
+      form.get('mega_menu_type')?.value === 'side_banner') {
+      <app-form-fields
+        [label]="'banner'"
+        [for]="'banner_image_id'"
+        [required]="false"
+        >
+        <app-image-upload
+          [accept]="[mediaConfig.image]"
+          [image]="menu?.banner_image"
+          [multipleImage]="false"
+          (selectedFiles)="selectThumbnail($event, 'banner_image_id')"
+          />
+        @if (form.controls['banner_image_id'].touched && form.controls['banner_image_id'].errors?.['required']) {
+          <div
+            class="invalid-feedback"
+            >
+            {{ 'banner_image_is_required' | translate }}
+          </div>
+        }
+      </app-form-fields>
+    }
+  }
+  @if (selectedMenu && selectedMenu[0]?.mega_menu_type === 'link_with_image' && form.get('parent_id')?.value) {
+    <app-form-fields
+      [label]="'link_image'"
+      [for]="'item_image_id'"
+      [required]="false"
+      >
+      <app-image-upload
+        [accept]="[mediaConfig.image]"
+        [image]="menu?.item_image"
+        [multipleImage]="false"
+        (selectedFiles)="selectThumbnail($event, 'item_image_id')"
+        />
+    </app-form-fields>
+  }
+
+  <app-form-fields [label]="'badge_text' | translate" [for]="'badge_text'">
+    <input
+      class="form-control"
+      type="text"
+      placeholder="{{ 'enter_badge_text' | translate }}"
+      formControlName="badge_text"
+      />
+  </app-form-fields>
+
+  <app-form-fields [label]="'badge_color'" [for]="'badge_color'">
+    <div>
+      <ul class="badge-color-list">
+        @for(color of colors; track color){
+          <li>
+            <div class="selection-box {{ color }}">
+              <input
+                type="radio"
+                [id]="color"
+                [value]="color"
+                name="badge_color"
+                formControlName="badge_color"
+                />
+              <label [for]="color" class="cursor-pointer"></label>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+    @if (form.controls['badge_color']?.touched && form.controls['badge_color']?.errors?.['required']) {
+      <div
+        class="invalid-feedback"
+        >
+        {{ 'badge_color_is_required' | translate }}
+      </div>
+    }
+  </app-form-fields>
+  <app-button [id]="'category_btn'">
+    {{ (type() === 'create' ? 'save_menu' : 'update_menu') | translate }}
+  </app-button>
+</form>

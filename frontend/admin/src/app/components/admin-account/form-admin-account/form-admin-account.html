@@ -1,0 +1,700 @@
+<form
+  class="theme-form theme-form-2 mega-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <!--==================================================-->
+  <!--==== COUNTRY CODE TEMPLATE =======================-->
+  <!--==================================================-->
+
+  <ng-template #countryTemplate let-data="data">
+    <div class="country">
+      <div class="flag-box">
+        <div class="iti-flag {{ data?.class }}"></div>
+      </div>
+
+      <span class="dial-code"> {{ data?.code }} </span>
+    </div>
+  </ng-template>
+
+  <!--==================================================-->
+  <!--==== PROFILE PHOTO ================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.profile_photo' | translate"
+    [for]="'id_profile_photo'"
+  >
+    <app-image-upload
+      [image]="profilePhoto"
+      [multipleImage]="false"
+      [url]="false"
+      [accept]="profilePhotoAccept"
+      [collection]="'admin_profile'"
+      (selectedFiles)="selectProfilePhoto($event)"
+    />
+
+    <small class="form-helper">
+      {{ 'admin_account.profile_photo_helper' | translate }}
+    </small>
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== NAME =========================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.name' | translate"
+    [for]="'name'"
+    [required]="true"
+  >
+    <input
+      type="text"
+      id="name"
+      class="form-control"
+      maxlength="50"
+      formControlName="name"
+      [placeholder]="'admin_account.name_placeholder' | translate"
+      (input)="sanitizeName()"
+      (blur)="normalizeName()"
+      [class.is-invalid]="
+        form.controls.name.touched && form.controls.name.invalid
+      "
+    />
+
+    @if (
+      form.controls.name.touched && form.controls.name.errors?.['required']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.name_required' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.name.touched && form.controls.name.errors?.['invalidName']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.name_invalid' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.name.touched && form.controls.name.errors?.['maxlength']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.name_maxlength' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== ALIAS ========================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.alias' | translate"
+    [for]="'alias'"
+    [required]="true"
+  >
+    <input
+      type="text"
+      id="alias"
+      class="form-control"
+      maxlength="15"
+      formControlName="alias"
+      [placeholder]="'admin_account.alias_placeholder' | translate"
+      (input)="sanitizeAlias()"
+      [class.is-invalid]="
+        form.controls.alias.touched && form.controls.alias.invalid
+      "
+    />
+
+    @if (
+      form.controls.alias.touched && form.controls.alias.errors?.['required']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.alias_required' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.alias.touched &&
+      form.controls.alias.errors?.['invalidAlias']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.alias_invalid' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.alias.touched && form.controls.alias.errors?.['maxlength']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.alias_maxlength' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== PRIMARY EMAIL ================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.primary_email' | translate"
+    [for]="'email_1'"
+    [required]="true"
+  >
+    <input
+      type="email"
+      id="email_1"
+      class="form-control"
+      formControlName="email_1"
+      [placeholder]="'admin_account.primary_email_placeholder' | translate"
+      [class.is-invalid]="
+        form.controls.email_1.touched && form.controls.email_1.invalid
+      "
+    />
+
+    @if (
+      form.controls.email_1.touched &&
+      form.controls.email_1.errors?.['required']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.primary_email_required' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.email_1.touched && form.controls.email_1.errors?.['email']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.email_invalid' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== SECONDARY EMAIL ==============================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.secondary_email' | translate"
+    [for]="'email_2'"
+  >
+    <input
+      type="email"
+      id="email_2"
+      class="form-control"
+      formControlName="email_2"
+      [placeholder]="'admin_account.secondary_email_placeholder' | translate"
+      [class.is-invalid]="
+        form.controls.email_2.touched && form.controls.email_2.invalid
+      "
+    />
+
+    @if (
+      form.controls.email_2.touched && form.controls.email_2.errors?.['email']
+    ) {
+      <div class="invalid-feedback">
+        {{ 'admin_account.email_invalid' | translate }}
+      </div>
+    }
+    @if (form.controls.email_2.disabled) {
+      <small class="form-helper">
+        {{ 'admin_account.secondary_email_helper' | translate }}
+      </small>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== PRIMARY PHONE ================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.primary_phone' | translate"
+    [for]="'phone_1'"
+    [required]="true"
+  >
+    <div class="phone-control-row">
+      @if (isBrowser) {
+        <div class="phone-code-wrapper">
+          <select2
+            class="custom-select intl-tel-input"
+            [templates]="countryTemplate"
+            [data]="countryCodes"
+            formControlName="phone_country_1"
+            [noResultMessage]="'admin_account.no_data_found' | translate"
+          />
+        </div>
+      }
+
+      <input
+        type="text"
+        inputmode="numeric"
+        id="phone_1"
+        class="form-control phone-number-input"
+        formControlName="phone_1"
+        placeholder="81234567890"
+        (input)="sanitizePhone('phone_1')"
+        [class.is-invalid]="
+          form.controls.phone_1.touched && form.controls.phone_1.invalid
+        "
+      />
+    </div>
+
+    @if (
+      form.controls.phone_1.touched &&
+      form.controls.phone_1.errors?.['required']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.primary_phone_required' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.phone_1.touched &&
+      form.controls.phone_1.errors?.['invalidPhone']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.phone_digits_only' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.phone_1.touched &&
+      form.controls.phone_1.errors?.['phoneStartsWithZero']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.phone_no_leading_zero' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== SECONDARY PHONE ==============================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.secondary_phone' | translate"
+    [for]="'phone_2'"
+  >
+    <div class="phone-control-row">
+      @if (isBrowser) {
+        <div class="phone-code-wrapper">
+          <select2
+            class="custom-select intl-tel-input"
+            [templates]="countryTemplate"
+            [data]="countryCodes"
+            formControlName="phone_country_2"
+            [noResultMessage]="'admin_account.no_data_found' | translate"
+          />
+        </div>
+      }
+
+      <input
+        type="text"
+        inputmode="numeric"
+        id="phone_2"
+        class="form-control phone-number-input"
+        formControlName="phone_2"
+        [placeholder]="'admin_account.secondary_phone_placeholder' | translate"
+        (input)="sanitizePhone('phone_2')"
+        [class.is-invalid]="
+          form.controls.phone_2.touched && form.controls.phone_2.invalid
+        "
+      />
+    </div>
+
+    @if (form.controls.phone_2.disabled) {
+      <small class="form-helper">
+        {{ 'admin_account.secondary_phone_helper' | translate }}
+      </small>
+    }
+    @if (
+      form.controls.phone_2.touched &&
+      form.controls.phone_2.errors?.['invalidPhone']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.phone_digits_only' | translate }}
+      </div>
+    }
+    @if (
+      form.controls.phone_2.touched &&
+      form.controls.phone_2.errors?.['phoneStartsWithZero']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.phone_no_leading_zero' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== COMPANY ======================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.company' | translate"
+    [for]="'id_master_comp'"
+    [required]="true"
+  >
+    <div class="select-loading-wrapper">
+      @if (isBrowser) {
+        <select2
+          class="custom-select"
+          [data]="companyOptions"
+          [placeholder]="'admin_account.select_company' | translate"
+          [customSearchEnabled]="true"
+          [displaySearchStatus]="'always'"
+          [infiniteScroll]="true"
+          [infiniteScrollThrottle]="150"
+          formControlName="id_master_comp"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+          (open)="onLookupOpen('company')"
+          (search)="onLookupSearch('company', $event)"
+          (scroll)="onLookupScroll('company', $event)"
+        />
+      }
+      @if (isLookupLoading('company')) {
+        <span
+          class="spinner-border spinner-border-sm select-local-loader"
+          role="status"
+        ></span>
+      }
+    </div>
+
+    @if (
+      form.controls.id_master_comp.touched &&
+      form.controls.id_master_comp.errors?.['required']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'admin_account.company_required' | translate }}
+      </div>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== OFFICE =======================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.office' | translate"
+    [for]="'id_office'"
+    [required]="true"
+  >
+    <div class="select-loading-wrapper">
+      @if (isBrowser) {
+        <select2
+          class="custom-select"
+          [data]="officeOptions"
+          [placeholder]="'admin_account.select_office' | translate"
+          [customSearchEnabled]="true"
+          [displaySearchStatus]="'always'"
+          [infiniteScroll]="true"
+          [infiniteScrollThrottle]="150"
+          formControlName="id_office"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+          (open)="onLookupOpen('office')"
+          (search)="onLookupSearch('office', $event)"
+          (scroll)="onLookupScroll('office', $event)"
+        />
+      }
+      @if (isLookupLoading('office')) {
+        <span
+          class="spinner-border spinner-border-sm select-local-loader"
+          role="status"
+        ></span>
+      }
+    </div>
+
+    @if (form.controls.id_office.disabled) {
+      <small class="form-helper">
+        {{ 'admin_account.select_company_first' | translate }}
+      </small>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== CHAIR ========================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.position' | translate"
+    [for]="'id_chair'"
+    [required]="true"
+  >
+    <div class="select-loading-wrapper">
+      @if (isBrowser) {
+        <select2
+          class="custom-select"
+          [data]="chairOptions"
+          [placeholder]="'admin_account.select_position' | translate"
+          [customSearchEnabled]="true"
+          [displaySearchStatus]="'always'"
+          [infiniteScroll]="true"
+          [infiniteScrollThrottle]="150"
+          formControlName="id_chair"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+          (open)="onLookupOpen('chair')"
+          (search)="onLookupSearch('chair', $event)"
+          (scroll)="onLookupScroll('chair', $event)"
+        />
+      }
+      @if (isLookupLoading('chair')) {
+        <span
+          class="spinner-border spinner-border-sm select-local-loader"
+          role="status"
+        ></span>
+      }
+    </div>
+    @if (form.controls.id_chair.disabled) {
+      <small class="form-helper">
+        {{ 'admin_account.select_company_first' | translate }}
+      </small>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== ACCESS =======================================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.access_profile' | translate"
+    [for]="'id_access'"
+    [required]="true"
+  >
+    <div class="select-loading-wrapper">
+      @if (isBrowser) {
+        <select2
+          class="custom-select"
+          [data]="accessOptions"
+          [placeholder]="'admin_account.select_access_profile' | translate"
+          [customSearchEnabled]="true"
+          [displaySearchStatus]="'always'"
+          [infiniteScroll]="true"
+          [infiniteScrollThrottle]="150"
+          formControlName="id_access"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+          (open)="onLookupOpen('access')"
+          (search)="onLookupSearch('access', $event)"
+          (scroll)="onLookupScroll('access', $event)"
+        />
+      }
+      @if (isLookupLoading('access')) {
+        <span
+          class="spinner-border spinner-border-sm select-local-loader"
+          role="status"
+        ></span>
+      }
+    </div>
+    @if (form.controls.id_access.disabled) {
+      <small class="form-helper">
+        {{ 'admin_account.select_company_first' | translate }}
+      </small>
+    }
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== FULL SYSTEM ACCESS ===========================-->
+  <!--==================================================-->
+
+  <app-form-fields
+    [label]="'admin_account.full_system_access' | translate"
+    [for]="'is_all_access'"
+  >
+    <div
+      class="all-access-card"
+      [class.active]="form.controls.is_all_access.value"
+    >
+      <div class="all-access-content">
+        <div class="fw-semibold">
+          {{ 'admin_account.grant_full_system_access' | translate }}
+        </div>
+
+        <small>
+          {{ 'admin_account.full_system_access_description' | translate }}
+        </small>
+      </div>
+
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="is_all_access"
+          formControlName="is_all_access"
+        />
+
+        <span class="switch-state"></span>
+      </label>
+    </div>
+  </app-form-fields>
+
+  <!--==================================================-->
+  <!--==== CREATE PASSWORD ==============================-->
+  <!--==================================================-->
+
+  @if (mode() === 'create') {
+    <!--==================================================-->
+    <!--==== PASSWORD =====================================-->
+    <!--==================================================-->
+
+    <app-form-fields
+      [label]="'admin_account.password' | translate"
+      [for]="'password'"
+      [required]="true"
+    >
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          class="form-control"
+          formControlName="password"
+          [placeholder]="'admin_account.password_placeholder' | translate"
+          [class.is-invalid]="
+            form.controls.password.touched && form.controls.password.invalid
+          "
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword()"
+        >
+          <i
+            [class.ri-eye-line]="!showPassword"
+            [class.ri-eye-off-line]="showPassword"
+          ></i>
+        </button>
+      </div>
+
+      @if (
+        form.controls.password.touched &&
+        form.controls.password.errors?.['required']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_required' | translate }}
+        </div>
+      }
+      @if (
+        form.controls.password.touched &&
+        form.controls.password.errors?.['minlength']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_minlength' | translate }}
+        </div>
+      }
+      @if (
+        form.controls.password.touched &&
+        form.controls.password.errors?.['maxlength']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_maxlength' | translate }}
+        </div>
+      }
+      @if (
+        form.controls.password.touched &&
+        form.controls.password.errors?.['passwordHasSpace']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_no_spaces' | translate }}
+        </div>
+      }
+      @if (
+        form.controls.password.touched &&
+        form.controls.password.errors?.['passwordRequiresNonLetter']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_requires_non_letter' | translate }}
+        </div>
+      }
+      @if (form.controls.password.value) {
+        <div class="password-strength" [attr.data-strength]="passwordStrength">
+          <div class="strength-bars">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <small class="strength-label">
+            @switch (passwordStrength) {
+              @case ('weak') {
+                {{ 'admin_account.password_weak' | translate }}
+              }
+
+              @case ('normal') {
+                {{ 'admin_account.password_normal' | translate }}
+              }
+
+              @case ('strong') {
+                {{ 'admin_account.password_strong' | translate }}
+              }
+            }
+          </small>
+        </div>
+      }
+
+      <small class="password-requirements">
+        {{ 'admin_account.password_requirements' | translate }}
+      </small>
+    </app-form-fields>
+
+    <!--==================================================-->
+    <!--==== CONFIRM PASSWORD =============================-->
+    <!--==================================================-->
+
+    <app-form-fields
+      [label]="'admin_account.confirm_password' | translate"
+      [for]="'confirm_password'"
+      [required]="true"
+    >
+      <div class="password-wrapper">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          id="confirm_password"
+          class="form-control"
+          formControlName="confirm_password"
+          [placeholder]="
+            'admin_account.confirm_password_placeholder' | translate
+          "
+          [class.is-invalid]="
+            form.controls.confirm_password.touched &&
+            (form.controls.confirm_password.invalid ||
+              form.errors?.['passwordMismatch'])
+          "
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="toggleConfirmPassword()"
+        >
+          <i
+            [class.ri-eye-line]="!showConfirmPassword"
+            [class.ri-eye-off-line]="showConfirmPassword"
+          ></i>
+        </button>
+      </div>
+
+      @if (
+        form.controls.confirm_password.touched &&
+        form.controls.confirm_password.errors?.['required']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.confirm_password_required' | translate }}
+        </div>
+      }
+      @if (
+        form.controls.confirm_password.touched &&
+        form.errors?.['passwordMismatch']
+      ) {
+        <div class="text-danger form-error">
+          {{ 'admin_account.password_mismatch' | translate }}
+        </div>
+      }
+    </app-form-fields>
+  }
+
+  <!--==================================================-->
+  <!--==== SUBMIT =======================================-->
+  <!--==================================================-->
+
+  <div class="form-submit-wrapper">
+    <app-button [id]="'admin_account_submit_btn'" [class]="'btn btn-theme'">
+      {{
+        (mode() === 'create' ? 'admin_account.create' : 'admin_account.update')
+          | translate
+      }}
+    </app-button>
+  </div>
+</form>

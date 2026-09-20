@@ -1,0 +1,102 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 1,
+      "title": "Privacy Policy",
+      "slug": "privacy-policy",
+      "meta_title": null,
+      "status": 1,
+      "page_meta_image_id": null,
+      "created_by_id": "1",
+      "created_at": "2023-10-11T06:02:57.000000Z",
+      "updated_at": "2025-03-12T07:04:06.000000Z",
+      "deleted_at": null,
+      "page_meta_image": null,
+      "content": "<h3 class=\"text-center\">User Privacy and Data Security Policy</h3>\n<h4 class=\"privacy-title\">1. Introduction</h4>\n<p class=\"ms-4\">\n  Welcome to <strong>Kartify</strong>. Your privacy is important to us. This Privacy Policy\n  explains how we collect, use, disclose, and safeguard your information when you visit our\n  website and use our services.\n</p>\n\n<h4 class=\"privacy-title\">2. Information We Collect</h4>\n<ul class=\"sub-list ms-4\">\n  <li>\n    <strong>Contact:</strong> name, email address, phone number and address when you submit\n    forms.\n  </li>\n  <li>\n    <strong>Product Details:</strong> Details about purchased products, including quantity,\n    price, shipping method, and delivery address.\n  </li>\n  <li>\n    <strong>Account Information:</strong> User credentials, including usernames and passwords,\n    if you create an account.\n  </li>\n</ul>\n\n<h4 class=\"privacy-title\">3. How We Use Your Information</h4>\n<p class=\"ms-4\">We use your information for the following purposes :</p>\n<ul class=\"sub-list ms-4\">\n  <li>\n    <strong>To Provide Services : </strong>To process and manage your Order and provide customer\n    support.\n  </li>\n  <li>\n    <strong>To Improve Our Website : </strong>To analyze usage patterns and improve website\n    functionality.\n  </li>\n  <li>\n    <strong>To Communicate With You : </strong>To send updates, notifications, and promotional\n    materials related to our services.\n  </li>\n  <li>\n    <strong>To Comply with Legal Obligations : </strong>To comply with applicable laws and\n    regulations.\n  </li>\n</ul>\n\n<h4 class=\"privacy-title\">4. Sharing of Information</h4>\n<p class=\"ms-4\">We may share your information with :</p>\n<ul class=\"sub-list ms-4\">\n  <li>\n    <strong>Service Providers : </strong>Third-party vendors who perform services on our behalf,\n    such as payment processors and IT support.\n  </li>\n  <li>\n    <strong>Business Partners : </strong>Partners who offer related services and may provide you\n    with information relevant to your interests.\n  </li>\n  <li>\n    <strong>Legal Authorities : </strong>When required by law or to protect our rights and the\n    rights of others.\n  </li>\n</ul>\n\n<h4 class=\"privacy-title\">5. Data Security</h4>\n<p class=\"ms-4\">\n  We implement reasonable security measures to protect your personal information from\n  unauthorized access, disclosure, alteration, and destruction. However, no online transmission\n  or storage system is completely secure, so we cannot guarantee absolute security.\n</p>\n\n<h4 class=\"privacy-title\">6. Your Rights and Choices</h4>\n<p class=\"ms-4\">You have the following rights regarding your personal information:</p>\n<ul class=\"sub-list ms-4\">\n  <li>\n    <strong>Access and Correction : </strong>You can access and update your personal information\n    through your account or by contacting us.\n  </li>\n  <li>\n    <strong>Opt-Out : </strong>You may opt out of receiving promotional communications by\n    following the unsubscribe instructions provided in those communications.\n  </li>\n  <li>\n    <strong>Deletion : </strong> You can request the deletion of your personal information,\n    subject to legal and contractual obligations.\n  </li>\n</ul>\n\n<h4 class=\"privacy-title\">7. Third-Party Links</h4>\n<p class=\"ms-4\">\n  Our website may contain links to third-party sites. We are not responsible for the privacy\n  practices or content of these external sites. We encourage you to review the privacy policies\n  of any third-party sites you visit.\n</p>\n\n<h4 class=\"privacy-title\">8. Changes to This Privacy Policy</h4>\n<p class=\"ms-4\">\n  We may update this Privacy Policy from time to time. Any changes will be posted on this page\n  with an updated effective date. Your continued use of our website after changes are made\n  constitutes your acceptance of the revised policy.\n</p>\n\n<h4 class=\"privacy-title\">9. Contact Us</h4>\n<p class=\"ms-4\">\n  If you have any questions or concerns about this Privacy Policy or our data practices, please\n  contact us at:\n</p>\n\n<ul class=\"bottom-information\">\n  <li>\n    <h5>Kartify</h5>\n  </li>\n  <li>\n    <strong>Email : </strong>\n    contact@gmail.com\n  </li>\n  <li>\n    <strong>Address : </strong>\n    French Southern Territories\n  </li>\n  <li>\n    <strong>Phone : </strong>\n    +44 256 236 2362\n  </li>\n</ul>",
+      "created_by": {
+        "id": 1,
+        "name": "Super Admin",
+        "email": "admin@example.com",
+        "country_code": "1",
+        "phone": 5551865359,
+        "profile_image_id": null,
+        "system_reserve": " 1",
+        "status": 1,
+        "created_by_id": 1,
+        "email_verified_at": "2023-08-24T08:16:03.000000Z",
+        "created_at": "2023-08-24T08:16:03.000000Z",
+        "orders_count": 0,
+        "role": {
+          "id": 1,
+          "name": "admin",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "profile_image": null,
+        "wallet": null,
+        "point": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "Terms & Condition",
+      "slug": "terms-condition",
+      "meta_title": null,
+      "status": 1,
+      "page_meta_image_id": null,
+      "created_by_id": "1",
+      "created_at": "2023-10-11T06:02:57.000000Z",
+      "updated_at": "2025-03-12T07:04:06.000000Z",
+      "deleted_at": null,
+      "page_meta_image": null,
+      "content": "<h3 class=\"text-center\">General Terms and Conditions</h3>\n\n<h4 class=\"privacy-title\">1. Introduction</h4>\n<p class=\"ms-4\">\n  Welcome to Kartify. By accessing or using our website Kartify.com and services related to\n  classified purchased Product, you agree to comply with and be bound by the following Terms and\n  Conditions. Please read them carefully.\n</p>\n\n<h4 class=\"privacy-title\">2. Acceptance of Terms</h4>\n<p class=\"ms-4\">\n  By using our Site and Services, you agree to these Terms and Conditions and our Privacy\n  Policy. If you do not agree with any part of these Terms, you should not use our Site or\n  Services\n</p>\n\n<h4 class=\"privacy-title\">3. Services Provided</h4>\n<p class=\"ms-4\">\n  Kartify provides a platform for users to post and browse classified ads related to purchased\n  Product and Multiple Demo. We do not guarantee the accuracy or completeness of any listings\n  and are not responsible for the transactions or interactions between users.\n</p>\n\n<h4 class=\"privacy-title\">4. User Responsibilities</h4>\n<ul class=\"sub-list ms-4\">\n  <li>Provide accurate, complete information when requested.</li>\n  <li>Comply with applicable laws and not use services for illegal activities.</li>\n  <li>Not upload or distribute content that infringes third-party rights.</li>\n</ul>\n\n<h4 class=\"privacy-title\">5. Intellectual Property</h4>\n<p class=\"ms-4\">\n  All content on the site — text, images, logos, code — is owned by us or our licensors. You may\n  not copy, reproduce, or distribute our content without prior written permission.\n</p>\n\n<h4 class=\"privacy-title\">6. Indemnification</h4>\n<p class=\"ms-4\">\n  You agree to indemnify and hold harmless Kartify and its affiliates from any claims,\n  liabilities, damages, losses, or expenses (including reasonable attorneys' fees) arising out\n  of or in connection with your use of our Site or Services or your violation of these Terms.\n</p>\n\n<h4 class=\"privacy-title\">7. Termination</h4>\n<p class=\"ms-4\">\n  We reserve the right to suspend or terminate your access to our Site and Services at our sole\n  discretion, without notice, for any reason, including but not limited to violations of these\n  Terms.\n</p>\n\n<h4 class=\"privacy-title\">8. Changes to Terms</h4>\n<p class=\"ms-4\">\n  We may update these Terms from time to time. Any changes will be posted on this page with an\n  updated effective date. Your continued use of our Site after changes are made constitutes your\n  acceptance of the revised Terms.\n</p>\n\n<h4 class=\"privacy-title\">9. Contact Us</h4>\n<p class=\"ms-4\">\n  If you have any questions or concerns about these Terms and Conditions, please contact us at:\n</p>\n\n<ul class=\"bottom-information\">\n  <li>\n    <h5>Kartify</h5>\n  </li>\n  <li>\n    <strong>Email : </strong>\n    contact@gmail.com\n  </li>\n  <li>\n    <strong>Address : </strong>\n    French Southern Territories\n  </li>\n  <li>\n    <strong>Phone : </strong>\n    +44 256 236 2362\n  </li>\n</ul>",
+      "created_by": {
+        "id": 1,
+        "name": "Super Admin",
+        "email": "admin@example.com",
+        "country_code": "1",
+        "phone": 5551865359,
+        "profile_image_id": null,
+        "system_reserve": "1",
+        "status": 1,
+        "created_by_id": 1,
+        "email_verified_at": "2023-08-24T08:16:03.000000Z",
+        "created_at": "2023-08-24T08:16:03.000000Z",
+        "orders_count": 0,
+        "role": {
+          "id": 1,
+          "name": "admin",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "profile_image": null,
+        "wallet": null,
+        "point": null
+      }
+    }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "per_page": 1,
+  "prev_page_url": null,
+  "to": 1,
+  "total": 1
+}

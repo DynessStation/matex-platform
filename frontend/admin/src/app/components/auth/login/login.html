@@ -1,0 +1,144 @@
+<section class="log-in-section section-b-space">
+  <div class="container w-100">
+    <div class="row">
+      <div class="col-xl-5 col-lg-6 m-auto">
+        <app-alert />
+
+        <div class="log-in-box">
+          <!--==================================================
+          ==== TITLE
+          ==================================================-->
+
+          <div class="log-in-title">
+            <img
+              [src]="(setting$ | async)?.general?.dark_logo_image?.asset_url"
+              class="img-fluid logo-img"
+              alt="logo"
+            />
+
+            <h4>
+              {{ 'auth_ui.login_title' | translate }}
+            </h4>
+          </div>
+
+          <div class="input-box">
+            <form class="row g-4" [formGroup]="form" (ngSubmit)="submit()">
+              <!--==================================================
+              ==== IDENTITY
+              ==================================================-->
+
+              <div class="col-12">
+                <div class="form-floating theme-form-floating log-in-form">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="identity"
+                    formControlName="identity"
+                    [placeholder]="'auth_ui.identity' | translate"
+                    [class.is-invalid]="
+                      form.controls.identity.touched &&
+                      form.controls.identity.invalid
+                    "
+                  />
+
+                  <label for="identity">
+                    {{ 'auth_ui.identity' | translate }}
+                  </label>
+
+                  @if (
+                    form.controls.identity.touched &&
+                    form.controls.identity.hasError('required')
+                  ) {
+                    <div class="invalid-feedback">
+                      {{ 'auth_ui.identity_required' | translate }}
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!--==================================================
+              ==== PASSWORD
+              ==================================================-->
+
+              <div class="col-12">
+                <div
+                  class="form-floating theme-form-floating log-in-form password-wrapper"
+                >
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-control"
+                    id="password"
+                    formControlName="password"
+                    [placeholder]="'auth_ui.password' | translate"
+                    [class.is-invalid]="
+                      form.controls.password.touched &&
+                      form.controls.password.invalid
+                    "
+                  />
+
+                  <label for="password">
+                    {{ 'auth_ui.password' | translate }}
+                  </label>
+
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="
+                      showPassword
+                        ? ('auth_ui.hide_password' | translate)
+                        : ('auth_ui.show_password' | translate)
+                    "
+                  >
+                    <i
+                      class="ri-eye-line"
+                      [class.ri-eye-line]="!showPassword"
+                      [class.ri-eye-off-line]="showPassword"
+                    ></i>
+                  </button>
+
+                  @if (
+                    form.controls.password.touched &&
+                    form.controls.password.hasError('required')
+                  ) {
+                    <div class="invalid-feedback">
+                      {{ 'auth_ui.password_required' | translate }}
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!--==================================================
+              ==== FORGOT PASSWORD
+              ==================================================-->
+
+              <div class="col-12">
+                <div class="forgot-box">
+                  <a
+                    class="forgot-password"
+                    [routerLink]="['/auth/forgot-password']"
+                  >
+                    {{ 'auth_ui.forgot_password' | translate }}
+                  </a>
+                </div>
+              </div>
+
+              <!--==================================================
+              ==== SUBMIT
+              ==================================================-->
+
+              <div class="col-12">
+                <app-button
+                  [class]="'btn btn-theme w-100 justify-content-center'"
+                  [id]="'login_btn'"
+                >
+                  {{ 'auth_ui.login' | translate }}
+                </app-button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

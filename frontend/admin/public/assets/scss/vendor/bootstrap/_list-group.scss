@@ -1,0 +1,203 @@
+@use './variables';
+@use './mixins/border-radius';
+@use './mixins/breakpoints';
+
+// Base class
+//
+// Easily usable on <ul>, <ol>, or <div>.
+
+.list-group {
+  // scss-docs-start list-group-css-vars
+  --#{variables.$prefix}list-group-color: #{variables.$list-group-color};
+  --#{variables.$prefix}list-group-bg: #{variables.$list-group-bg};
+  --#{variables.$prefix}list-group-border-color: #{variables.$list-group-border-color};
+  --#{variables.$prefix}list-group-border-width: #{variables.$list-group-border-width};
+  --#{variables.$prefix}list-group-border-radius: #{variables.$list-group-border-radius};
+  --#{variables.$prefix}list-group-item-padding-x: #{variables.$list-group-item-padding-x};
+  --#{variables.$prefix}list-group-item-padding-y: #{variables.$list-group-item-padding-y};
+  --#{variables.$prefix}list-group-action-color: #{variables.$list-group-action-color};
+  --#{variables.$prefix}list-group-action-hover-color: #{variables.$list-group-action-hover-color};
+  --#{variables.$prefix}list-group-action-hover-bg: #{variables.$list-group-hover-bg};
+  --#{variables.$prefix}list-group-action-active-color: #{variables.$list-group-action-active-color};
+  --#{variables.$prefix}list-group-action-active-bg: #{variables.$list-group-action-active-bg};
+  --#{variables.$prefix}list-group-disabled-color: #{variables.$list-group-disabled-color};
+  --#{variables.$prefix}list-group-disabled-bg: #{variables.$list-group-disabled-bg};
+  --#{variables.$prefix}list-group-active-color: #{variables.$list-group-active-color};
+  --#{variables.$prefix}list-group-active-bg: #{variables.$list-group-active-bg};
+  --#{variables.$prefix}list-group-active-border-color: #{variables.$list-group-active-border-color};
+  // scss-docs-end list-group-css-vars
+
+  display: flex;
+  flex-direction: column;
+
+  // No need to set list-style: none; since .list-group-item is block level
+  padding-left: 0; // reset padding because ul and ol
+  margin-bottom: 0;
+  @include border-radius.border-radius(var(--#{variables.$prefix}list-group-border-radius));
+}
+
+.list-group-numbered {
+  list-style-type: none;
+  counter-reset: section;
+
+  > .list-group-item::before {
+    // Increments only this instance of the section counter
+    content: counters(section, ".") ". ";
+    counter-increment: section;
+  }
+}
+
+// Individual list items
+//
+// Use on `li`s or `div`s within the `.list-group` parent.
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: var(--#{variables.$prefix}list-group-item-padding-y) var(--#{variables.$prefix}list-group-item-padding-x);
+  color: var(--#{variables.$prefix}list-group-color);
+  text-decoration: if(variables.$link-decoration == none, null, none);
+  background-color: var(--#{variables.$prefix}list-group-bg);
+  border: var(--#{variables.$prefix}list-group-border-width) solid var(--#{variables.$prefix}list-group-border-color);
+
+  &:first-child {
+    @include border-radius.border-top-radius(inherit);
+  }
+
+  &:last-child {
+    @include border-radius.border-bottom-radius(inherit);
+  }
+
+  &.disabled,
+  &:disabled {
+    color: var(--#{variables.$prefix}list-group-disabled-color);
+    pointer-events: none;
+    background-color: var(--#{variables.$prefix}list-group-disabled-bg);
+  }
+
+  // Include both here for `<a>`s and `<button>`s
+  &.active {
+    z-index: 2; // Place active items above their siblings for proper border styling
+    color: var(--#{variables.$prefix}list-group-active-color);
+    background-color: var(--#{variables.$prefix}list-group-active-bg);
+    border-color: var(--#{variables.$prefix}list-group-active-border-color);
+  }
+
+  // stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
+  & + .list-group-item {
+    border-top-width: 0;
+
+    &.active {
+      margin-top: calc(-1 * var(--#{variables.$prefix}list-group-border-width)); // stylelint-disable-line function-disallowed-list
+      border-top-width: var(--#{variables.$prefix}list-group-border-width);
+    }
+  }
+}
+
+// Interactive list items
+//
+// Use anchor or button elements instead of `li`s or `div`s to create interactive
+// list items. Includes an extra `.active` modifier class for selected items.
+
+.list-group-item-action {
+  width: 100%; // For `<button>`s (anchors become 100% by default though)
+  color: var(--#{variables.$prefix}list-group-action-color);
+  text-align: inherit; // For `<button>`s (anchors inherit)
+
+  &:not(.active) {
+    // Hover state
+    &:hover,
+    &:focus {
+      z-index: 1; // Place hover/focus items above their siblings for proper border styling
+      color: var(--#{variables.$prefix}list-group-action-hover-color);
+      text-decoration: none;
+      background-color: var(--#{variables.$prefix}list-group-action-hover-bg);
+    }
+
+    &:active {
+      color: var(--#{variables.$prefix}list-group-action-active-color);
+      background-color: var(--#{variables.$prefix}list-group-action-active-bg);
+    }
+  }
+}
+
+// Horizontal
+//
+// Change the layout of list group items from vertical (default) to horizontal.
+
+@each $breakpoint in map-keys(variables.$grid-breakpoints) {
+  @include breakpoints.media-breakpoint-up($breakpoint) {
+    $infix: breakpoints.breakpoint-infix($breakpoint, variables.$grid-breakpoints);
+
+    .list-group-horizontal#{$infix} {
+      flex-direction: row;
+
+      > .list-group-item {
+        &:first-child:not(:last-child) {
+          @include border-radius.border-bottom-start-radius(var(--#{variables.$prefix}list-group-border-radius));
+          @include border-radius.border-top-end-radius(0);
+        }
+
+        &:last-child:not(:first-child) {
+          @include border-radius.border-top-end-radius(var(--#{variables.$prefix}list-group-border-radius));
+          @include border-radius.border-bottom-start-radius(0);
+        }
+
+        &.active {
+          margin-top: 0;
+        }
+
+        + .list-group-item {
+          border-top-width: var(--#{variables.$prefix}list-group-border-width);
+          border-left-width: 0;
+
+          &.active {
+            margin-left: calc(-1 * var(--#{variables.$prefix}list-group-border-width)); // stylelint-disable-line function-disallowed-list
+            border-left-width: var(--#{variables.$prefix}list-group-border-width);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// Flush list items
+//
+// Remove borders and border-radius to keep list group items edge-to-edge. Most
+// useful within other components (e.g., cards).
+
+.list-group-flush {
+  @include border-radius.border-radius(0);
+
+  > .list-group-item {
+    border-width: 0 0 var(--#{variables.$prefix}list-group-border-width);
+
+    &:last-child {
+      border-bottom-width: 0;
+    }
+  }
+}
+
+
+// scss-docs-start list-group-modifiers
+// List group contextual variants
+//
+// Add modifier classes to change text and background color on individual items.
+// Organizationally, this must come after the `:hover` states.
+
+@each $state in map-keys(variables.$theme-colors) {
+  .list-group-item-#{$state} {
+    --#{variables.$prefix}list-group-color: var(--#{variables.$prefix}#{$state}-text-emphasis);
+    --#{variables.$prefix}list-group-bg: var(--#{variables.$prefix}#{$state}-bg-subtle);
+    --#{variables.$prefix}list-group-border-color: var(--#{variables.$prefix}#{$state}-border-subtle);
+    --#{variables.$prefix}list-group-action-hover-color: var(--#{variables.$prefix}emphasis-color);
+    --#{variables.$prefix}list-group-action-hover-bg: var(--#{variables.$prefix}#{$state}-border-subtle);
+    --#{variables.$prefix}list-group-action-active-color: var(--#{variables.$prefix}emphasis-color);
+    --#{variables.$prefix}list-group-action-active-bg: var(--#{variables.$prefix}#{$state}-border-subtle);
+    --#{variables.$prefix}list-group-active-color: var(--#{variables.$prefix}#{$state}-bg-subtle);
+    --#{variables.$prefix}list-group-active-bg: var(--#{variables.$prefix}#{$state}-text-emphasis);
+    --#{variables.$prefix}list-group-active-border-color: var(--#{variables.$prefix}#{$state}-text-emphasis);
+  }
+}
+// scss-docs-end list-group-modifiers

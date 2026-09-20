@@ -1,0 +1,112 @@
+@if ((time$ | async); as time) {
+  @if (type() === 'timer-one') {
+    <div class="title-timer clockdiv">
+      <span class="timer">Ending in :</span>
+      <div class="counter">
+        <span class="hours">{{ time.hours }}</span>
+      </div>
+      <div class="counter">
+        <span class="minutes">{{ time.minutes }}</span>
+      </div>
+      <div class="counter">
+        <span class="seconds">{{ time.seconds }}</span>
+      </div>
+    </div>
+  } @else if (type() === 'timer-two') {
+    <ul class="clockdiv-2 {{ class() }}">
+      <li>
+        <div class="counter-box">
+          <div class="counter">
+            <div class="days">{{ time.days }}</div>
+          </div>
+          <div class="smalltext">Days</div>
+        </div>
+      </li>
+      <li>
+        <div class="counter-box">
+          <div class="counter">
+            <div class="hours">{{ time.hours }}</div>
+          </div>
+          <div class="smalltext">Hour</div>
+        </div>
+      </li>
+      <li>
+        <div class="counter-box">
+          <div class="counter">
+            <div class="minutes">{{ time.minutes }}</div>
+          </div>
+          <div class="smalltext">Min</div>
+        </div>
+      </li>
+      <li>
+        <div class="counter-box">
+          <div class="counter">
+            <div class="seconds">{{ time.seconds }}</div>
+          </div>
+          <div class="smalltext">Sec</div>
+        </div>
+      </li>
+    </ul>
+  } @else if (type() === 'timer-three') {
+    <ul class="timer-list" id="timer">
+      <li>
+        <h5 id="days">{{ time.days }}</h5>
+        <span>Days</span>
+      </li>
+      <li class="dots">:</li>
+      <li>
+        <h5 id="hours">{{ time.hours }}</h5>
+        <span>Hours</span>
+      </li>
+      <li class="dots">:</li>
+      <li>
+        <h5 id="minutes">{{ time.minutes }}</h5>
+        <span>Minutes</span>
+      </li>
+      <li class="dots">:</li>
+      <li>
+        <h5 id="seconds">{{ time.seconds }}</h5>
+        <span>second</span>
+      </li>
+    </ul>
+  } @else if (type() === 'timer-four') {
+    <ul class="quick-timer" id="quickClock">
+      <li class="counter">
+        <span class="minutes">{{ time.minutes }}</span>
+      </li>
+      <li class="counter">
+        <span class="seconds">{{ time.seconds }}</span>
+      </li>
+    </ul>
+  } @else if (type() === 'timer-five') {
+    <div class="bordered-box sale-timer-box">
+      @if (title()) {
+        <h4 class="sub-title">
+          <span class="clock"></span>
+          {{ title() }}
+        </h4>
+      }
+      <ul class="timer-list" id="timer">
+        <li>
+          <h5 id="days">{{ time.days }}</h5>
+          <span>Days</span>
+        </li>
+        <li class="dots">:</li>
+        <li>
+          <h5 id="hours">{{ time.hours }}</h5>
+          <span>Hours</span>
+        </li>
+        <li class="dots">:</li>
+        <li>
+          <h5 id="minutes">{{ time.minutes }}</h5>
+          <span>Minutes</span>
+        </li>
+        <li class="dots">:</li>
+        <li>
+          <h5 id="seconds">{{ time.seconds }}</h5>
+          <span>second</span>
+        </li>
+      </ul>
+    </div>
+  }
+}

@@ -1,0 +1,77 @@
+@if (type === 'wishlistOffcanvas') {
+  <div class="offcanvas-body">
+    <div class="cart-product-box">
+      <ul class="product-box-list">
+        @for (product of (wishlistItems$ | async)?.data; track product.id) {
+          <li>
+            <div class="vertical-product-box">
+              <a class="product-image">
+                <img
+                  [src]="
+                    product.product_thumbnail
+                      ? product.product_thumbnail.asset_url
+                      : 'assets/images/placeholder/product.png'
+                  "
+                  [alt]="product.name"
+                  class="img-fluid"
+                  alt="image"
+                />
+              </a>
+              <div class="product-content">
+                <h5 class="name title-color">{{ product.name }}</h5>
+                <h5 class="price">
+                  {{ product.sale_price | currencySymbol }}
+                  <del>{{ product.price | currencySymbol }}</del>
+                </h5>
+                <app-product-cart-button [product]="product" [type]="'wishlist'" />
+              </div>
+              <button class="btn wishlist-btn" (click)="removeWishlist(product.id)">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+      <div class="total-price-box">
+        <p class="tax-text">
+          Now that you have products in your wishlist, remember to put them in your cart later.
+        </p>
+        <div class="cart-btn-group">
+          <a class="btn check-out-button" [routerLink]="['/wishlist']">View Wishlist</a>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <app-breadcrumb [breadcrumb]="breadcrumb" />
+  <section class="section-t-space wishlist-section">
+    <div class="custom-container">
+      @if (wishlistItems && wishlistItems.length) {
+        <div class="row g-sm-4 g-3 row-cols-xxl-5 row-cols-xl-4 row-cols-md-3 row-cols-2">
+          @for (product of wishlistItems; track product.id) {
+            <div class="col pro-bg-white">
+              <app-product-box-one
+                [product]="product"
+                [style]="'product_box_one'"
+              ></app-product-box-one>
+            </div>
+          }
+        </div>
+      }
+      @if (!wishlistItems.length) {
+        <app-no-data
+          [class]="'no-data-added'"
+          [image]="'assets/images/inner-page/empty-cart.svg#emptyCart'"
+          [text]="'no_item' | translate"
+          [description]="'no_wishlist_item' | translate"
+        />
+      }
+    </div>
+  </section>
+
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter></app-home-newsletter>
+    </div>
+  </section>
+}

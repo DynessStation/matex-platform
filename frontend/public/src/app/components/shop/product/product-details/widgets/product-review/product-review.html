@@ -1,0 +1,188 @@
+<div class="review-box">
+  @if (product()?.can_review || product()?.reviews_count) {
+    <div class="rating-comment-box">
+      <div class="row g-xl-5 g-md-4 g-3">
+        <div class="col-xl-6 b-end">
+          <div class="review-title">
+            <h4>Customer reviews</h4>
+          </div>
+
+          <div class="customer-review-box">
+            <h6>{{ product()?.rating_count?.toFixed(2) }} <span>/5</span></h6>
+            <div class="product-rating">
+              <div class="rating">
+                <ngb-rating [rate]="product()?.rating_count || 0">
+                  <ng-template let-fill="fill" let-index="index">
+                    <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                  </ng-template>
+                </ngb-rating>
+              </div>
+              <h6>
+                {{ 'Based on' | translate }} {{ product()?.reviews_count }}
+                {{ 'rating' | translate }}
+              </h6>
+            </div>
+          </div>
+
+          <div class="rating-box">
+            <ul>
+              @for (
+                rate of product()?.review_ratings?.slice()?.reverse();
+                track rate;
+                let i = $index
+              ) {
+                <li>
+                  <div class="rating-list">
+                    <h5>{{ product()?.review_ratings?.length! - 1 - i + 1 }} Star</h5>
+                    <div class="progress">
+                      <div
+                        class="progress-bar"
+                        [style.width]="((rate / product()?.reviews_count!) * 100).toFixed(0) + '%'"
+                        aria-valuenow="100"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        {{ ((rate / product()?.reviews_count!) * 100).toFixed(0) + '%' }}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-xl-6">
+          <div class="review-title">
+            <h4 class="fw-500">Add a review</h4>
+          </div>
+
+          <div class="row g-sm-4 g-3">
+            <div class="col-md-6">
+              <div class="review-form-box theme-form">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter your name" />
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="review-form-box theme-form">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="Email Address" />
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="review-form-box theme-form">
+                <label class="form-label" for="floatingTextarea2">Write Your Comment</label>
+                <textarea
+                  class="form-control"
+                  id="floatingTextarea2"
+                  placeholder="Leave a comment here"
+                  style="height: 150px"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn theme-bg-color text-light">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="product-review-box">
+    <div class="review-title">
+      <h4 class="fw-500">Customer questions & answers</h4>
+      <div class="sort-message">
+        <span>Sort By :</span>
+        <select class="form-select">
+          <option selected="">Newest</option>
+          <option value="1">Oldest</option>
+          <option value="2">Top</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="review-people">
+      @if (reviews().length) {
+        <ul class="review-list">
+          @for (review of reviews(); track review) {
+            <li>
+              <div class="people-box">
+                <div>
+                  <div class="people-image">
+                    @if (review?.consumer?.profile_image) {
+                      <img
+                        [src]="review?.consumer?.profile_image?.asset_url"
+                        class="img-fluid"
+                        alt="user"
+                      />
+                    } @else {
+                      <div class="user-round">
+                        <h4>
+                          {{ review?.consumer?.name?.charAt(0)?.toString()?.toUpperCase() || 'F' }}
+                        </h4>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="people-comment">
+                  <div class="name">
+                    <a href="javascript:void()">{{ review?.consumer?.name }}</a>
+                    <div class="product-rating">
+                      <div class="rating">
+                        <ngb-rating [rate]="review?.rating || 0">
+                          <ng-template let-fill="fill" let-index="index">
+                            <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                          </ng-template>
+                        </ngb-rating>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="date-time">
+                    <h6 class="text-content">
+                      {{ review?.created_at | date: 'dd MMM yyyy hh:mm:a' }}
+                    </h6>
+                  </div>
+
+                  <div class="reply">
+                    <p>
+                      {{ review?.description }}
+                    </p>
+                  </div>
+
+                  <ul class="share-box">
+                    <li>
+                      <a href="javascript:void(0)">
+                        <i class="ri-heart-3-line"></i>
+                        <span>Like</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0)">
+                        <i class="ri-share-line"></i>
+                        <span>Reply</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+      @if (!reviews().length) {
+        <app-no-data
+          [class]="'no-data-added'"
+          [text]="'No Review Yet'"
+          [description]="'There are currently no ratings or reviews for this product'"
+        >
+        </app-no-data>
+      }
+    </div>
+  </div>
+</div>

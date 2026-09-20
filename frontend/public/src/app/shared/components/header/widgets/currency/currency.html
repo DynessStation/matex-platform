@@ -1,0 +1,25 @@
+<div class="dropdown theme-form-select" (clickOutside)="hideDropdown()">
+  <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
+    @if (selectedCurrency$ | async; as selectedCurrency) {
+      @if (selectedCurrency.code) {
+        <span>{{ selectedCurrency.code }}</span>
+      }
+    }
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end" [class.show]="open">
+    @if ((currency$ | async)?.data?.length) {
+      @for (currency of (currency$ | async)?.data; track currency.id) {
+        <li>
+          <a
+            class="dropdown-item"
+            href="javascript:void()"
+            (click)="selectCurrency(currency)"
+            [class.active]="currency.code === (selectedCurrency$ | async)?.code"
+          >
+            <span>{{ currency.code }}</span>
+          </a>
+        </li>
+      }
+    }
+  </ul>
+</div>

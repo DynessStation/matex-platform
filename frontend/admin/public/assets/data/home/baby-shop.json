@@ -1,0 +1,156 @@
+{
+  "home_section": {
+    "left_banner": {
+      "image_url": "assets/images/banner/75.jpg",
+      "redirection_type": "product",
+      "link": "ultra-compact-travel-stroller-blush-pink"
+    },
+    "center_banner": {
+      "image_url": "assets/images/banner/76.jpg",
+      "redirection_type": "product",
+      "link": "activity-center-2in1-baby-walker-aqua"
+    },
+    "right_banner": {
+      "top_banner": {
+        "image_url": "assets/images/banner/77.jpg",
+        "redirection_type": "product",
+        "link": "dolphin-ride-on-toy-teether-set"
+      },
+      "bottom_banner": {
+        "image_url": "assets/images/banner/78.jpg",
+        "redirection_type": "product",
+        "link": "gentle-moisturizing-baby-body-wash"
+      }
+    }
+  },
+  "left_banner": {
+    "image_url": "assets/images/banner/99.jpg",
+    "redirection_type": "product",
+    "link": "ultra-compact-travel-stroller-blush-pink"
+  },
+  "arrivals_product": {
+    "title": "New Arrivals for Newborns",
+    "button_text": "See all",
+    "button_link": "/collections",
+    "product_ids": [141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152]
+  },
+  "full_width_banner": {
+    "image_url": "assets/images/banner/79.jpg",
+    "redirection_type": "product",
+    "link": "cute-bear-silicone-straw-sippy-cup"
+  },
+  "category_section": {
+    "status": true,
+    "category_ids": [146, 147, 148, 149, 150, 151, 152]
+  },
+  "three_column_banner": {
+    "status": true,
+    "banner_1": {
+      "image_url": "assets/images/banner/80.jpg",
+      "redirection_type": "product",
+      "link": "electric-baby-nail-trimmer-set"
+    },
+    "banner_2": {
+      "image_url": "assets/images/banner/81.jpg",
+      "redirection_type": "product",
+      "link": "organic-cotton-teddy-bear-loungewear-set"
+    },
+    "banner_3": {
+      "image_url": "assets/images/banner/82.jpg",
+      "redirection_type": "product",
+      "link": "infant-ruffled-romper-gingham-mauve"
+    }
+  },
+  "banner_with_tabs_product": {
+    "status": true,
+    "banner_top": {
+      "image_url": "assets/images/banner/84.jpg",
+      "redirection_type": "product",
+      "link": "elephant-teether-pacifier-clip-set"
+    },
+    "banner_bottom": {
+      "image_url": "assets/images/banner/85.jpg",
+      "redirection_type": "product",
+      "link": "silicone-training-sippy-cup-elephant"
+    },
+    "banner_portrait": {
+      "image_url": "assets/images/banner/86.jpg",
+      "redirection_type": "product",
+      "link": "cubby-bites-organic-baby-snacks"
+    },
+    "tabs_product": {
+      "title": "Stylist Collection",
+      "tabs": [
+        {
+          "tab": "New arrivals",
+          "product_ids": [153, 154, 155, 156, 157, 158, 159, 160]
+        },
+        {
+          "tab": "Best Seller",
+          "product_ids": [159, 160]
+        },
+        {
+          "tab": "Feature",
+          "product_ids": [159, 160]
+        }
+      ]
+    }
+  },
+  "banners_slider": {
+    "status": true,
+    "banners": [
+      {
+        "image_url": "assets/images/banner/91.jpg",
+        "redirection_type": "product",
+        "link": "gentle-moisturizing-baby-body-wash"
+      },
+      {
+        "image_url": "assets/images/banner/88.jpg",
+        "redirection_type": "product",
+        "link": "soft-silicone-baby-feeding-bib-food-catcher"
+      },
+      {
+        "image_url": "assets/images/banner/89.jpg",
+        "redirection_type": "product",
+        "link": "ultra-soft-disposable-baby-diapers"
+      },
+      {
+        "image_url": "assets/images/banner/90.jpg",
+        "redirection_type": "product",
+        "link": "activity-center-2in1-baby-walker-aqua"
+      },
+      {
+        "image_url": "assets/images/banner/91.jpg",
+        "redirection_type": "product",
+        "link": "gentle-moisturizing-baby-body-wash"
+      }
+    ]
+  },
+  "category_section_two": {
+    "status": true,
+    "category_ids": []
+  },
+  "discount_banner": {
+    "image_url": "assets/images/banner/98.png",
+    "redirection_type": "product",
+    "link": "rainbow-pull-along-toy-long-handle"
+  },
+  "feature_product": {
+    "status": true,
+    "title": "Toy Feature Product",
+    "button_text": "See all",
+    "button_link": "/collections",
+    "banner": {
+      "image_url": "assets/images/banner/93.jpg",
+      "redirection_type": "product",
+      "link": "soft-silicone-baby-pacifier"
+    },
+    "product_ids": [161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 151, 152]
+  },
+  "brand": {
+    "status": true,
+    "brand_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "products_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "slug": "baby-shop"
+}

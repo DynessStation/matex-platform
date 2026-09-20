@@ -1,0 +1,122 @@
+/*!
+-----------------------------------------------------------------------------------
+Template Name: Kartify - 
+Template URI: https://themes.pixelstrap.com/kartify/
+Description: This is E-commerce website
+Author: Pixelstrap
+Author URI: https://themeforest.net/user/pixelstrap
+-----------------------------------------------------------------------------------
+
+1. Base Files
+	1.1 Reset CSS
+	1.2 Typography CSS
+
+2. Components Files
+	2.1 Accordion CSS
+	2.2 Brand CSS
+	2.3 Breadcrumb CSS
+	2.4 Buttons CSS
+	2.5 Dropdown CSS
+	2.6 Form CSS 
+	2.7 Layzload CSS
+	2.8 Light Gallery CSS
+	2.9 Modal CSS
+	2.10 Nav-tabs CSS
+	2.11 Offcanvas CSS
+	2.12 Pagination CSS
+	2.13 Rating CSS
+	2.14 Ratio CSS
+	2.15 Sidebar Category CSS
+	2.16 Slider CSS
+	2.17 Table CSS
+	2.18 Title CSS
+
+3. Layout Files
+    3.1 Banner CSS
+    3.2 Category CSS
+    3.3 Cookie Bar CSS
+    3.4 Footer CSS
+    3.5 Header CSS
+    3.6 Hone CSS
+    3.7 Mobile Menu CSS
+    3.8 Nav CSS
+    3.9 Newsletter CSS
+    3.10 Product CSS
+    3.11 Service CSS
+
+4. Pages Files
+    4.1 Blog Page CSS
+    4.2 Checkout CSS
+    4.3 Inner Page CSS
+    4.4 Portfolio CSS
+    4.5 Product Page CSS
+    4.6 Shop Page CSS
+    4.7 Vendor Page CSS
+
+5. Themes Files
+    5.1 Dark CSS
+
+6. Utils Files
+    6.1 Mixin Files
+        6.1.1 Animation CSS
+        6.1.2 Common CSS
+    6.2 Variables CSS
+*/
+
+/* Util Files */
+@use 'utils/variables';
+
+/* Mixin Files */
+@use 'utils/mixin/common';
+@use 'utils/mixin/animation';
+
+/* Base Files */
+@use 'base/reset';
+@use 'base/typography';
+
+/* Components Files */
+@use 'components/accordion';
+@use 'components/brand';
+@use 'components/breadcrumb';
+@use 'components/button';
+@use 'components/ckeditor';
+@use 'components/dropdown';
+@use 'components/form';
+@use 'components/lightgallery';
+@use 'components/modal';
+@use 'components/nav-tabs';
+@use 'components/offcanvas';
+@use 'components/pagination';
+@use 'components/rating';
+@use 'components/ratio';
+@use 'components/sidebar-category';
+@use 'components/slider';
+@use 'components/table';
+@use 'components/title';
+
+/* Layout Files */
+@use 'layout/banner';
+@use 'layout/category';
+@use 'layout/cookie_bar';
+@use 'layout/footer';
+@use 'layout/header';
+@use 'layout/home';
+@use 'layout/mobile-menu';
+@use 'layout/nav';
+@use 'layout/loader';
+@use 'layout/newsletter';
+@use 'layout/product';
+@use 'layout/service';
+
+/* Pages Files */
+@use 'pages/blog_page';
+@use 'pages/checkout';
+@use 'pages/inner_page';
+@use 'pages/portfolio';
+@use 'pages/product_page';
+@use 'pages/shop_page';
+@use 'pages/vendor_page';
+
+/* Theme Files */
+@use 'themes/dark';
+@use 'themes/rtl';

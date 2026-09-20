@@ -1,0 +1,123 @@
+@if (style() === 'seller_grid_2' || style() === 'seller_list_2') {
+  <app-store-sort [filter]="filter" [stores]="(store$ | async)?.data" />
+}
+<div class="row g-3" [ngClass]="getRowClass()">
+  @if ((paginateStore$ | async)?.length) {
+    @for (store of (paginateStore$ | async); track store.id) {
+      <div [ngClass]="getColClass()">
+        <div class="seller-box" [ngClass]="getBoxClass()">
+          <div class="seller-head">
+            <div class="seller-img">
+              @if (store?.store_logo) {
+                <img
+                  [src]="store?.store_logo?.asset_url"
+                  [alt]="store?.store_name"
+                  class="img-fluid"
+                />
+              } @else {
+                <h1 class="vendor-text">
+                  {{ store?.store_name?.charAt(0)!.toString().toUpperCase() }}
+                </h1>
+              }
+            </div>
+            <div class="seller-name">
+              <a [routerLink]="['/seller/store/', store?.slug]">{{ store?.store_name }}</a>
+              <div class="rating">
+                <ngb-rating [rate]="store.rating_count">
+                  <ng-template let-fill="fill" let-index="index">
+                    <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                  </ng-template>
+                </ngb-rating>
+                <span>({{ store.rating_count }} ratings)</span>
+              </div>
+            </div>
+          </div>
+          @if (style() !== 'seller_grid') {
+            <p class="details">{{ store.description }}</p>
+          }
+          @if (style() === 'seller_grid_2') {
+            <ul class="category-list">
+              @for (category of store.categories; track category) {
+                <li>{{ category.name }}</li>
+              }
+            </ul>
+          }
+
+          @if (style() !== 'seller_grid_2') {
+            <div class="seller-contain">
+              <ul class="details-list">
+                <li>
+                  @if (style() === 'seller_list' || style() === 'seller_list_2') {
+                    <h5>Address:</h5>
+                  } @else {
+                    <i class="ri-map-pin-fill"></i>
+                  }
+                  <span>{{ store.address }}</span>
+                </li>
+                <li>
+                  @if (style() === 'seller_list' || style() === 'seller_list_2') {
+                    <h5>Phone:</h5>
+                  } @else {
+                    <i class="ri-phone-fill"></i>
+                  }
+                  <span>{{ store.vendor.phone }}</span>
+                </li>
+              </ul>
+            </div>
+          }
+
+          <div class="seller-bottom">
+            @if (style() !== 'seller_grid' && style() !== 'seller_list') {
+              <ul class="product-list">
+                @for (image of store.product_images; track image) {
+                  <li>
+                    <img
+                      [src]="image ? image : 'assets/images/placeholder/product.png'"
+                      class="img-fluid"
+                      alt="image"
+                    />
+                  </li>
+                }
+                @if (store.products_count > 3) {
+                  <li class="number">
+                    <span>+{{ store.products_count - 3 }}</span>
+                  </li>
+                }
+              </ul>
+            }
+            @if (style() !== 'seller_grid_2' && style() !== 'seller_list_2') {
+              <ul class="left-box">
+                <li>
+                  {{ store.products_count }} stock - High
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 50%"></div>
+                  </div>
+                </li>
+              </ul>
+            }
+            <div class="right-box">
+              <button class="btn btn-bg-theme" [routerLink]="['/seller/store/', store?.slug]">
+                Shop Now <i class="ri-arrow-right-long-fill d-sm-inline-block d-none"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>
+<nav class="custom-pagination">
+  <ul class="pagination justify-content-center">
+    <ngb-pagination
+      [collectionSize]="total"
+      [(page)]="filter()!['page']"
+      [pageSize]="filter()!['paginate']"
+      [maxSize]="5"
+      [rotate]="true"
+      [boundaryLinks]="true"
+      [ellipses]="false"
+      (pageChange)="setPage()"
+    >
+    </ngb-pagination>
+  </ul>
+</nav>

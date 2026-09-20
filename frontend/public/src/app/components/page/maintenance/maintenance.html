@@ -1,0 +1,21 @@
+<section class="page-error-section section-t-space maintenance-section section-b-space">
+  <div class="custom-container">
+    <div class="page-error-box">
+      <div class="page-error-image">
+        <img
+          [src]="(setting$ | async)?.maintenance?.maintenance_image?.asset_url"
+          class="img-fluid"
+          alt="maintenance"
+        />
+      </div>
+      <div class="page-error-contain">
+        <h4>{{ (setting$ | async)?.maintenance?.title }}</h4>
+        <p>{{ (setting$ | async)?.maintenance?.description }}</p>
+        <button class="btn btn-bg-theme" [routerLink]="['/']">
+          {{ (setting$ | async)?.maintenance?.button_text }}
+          <i class="ri-arrow-right-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

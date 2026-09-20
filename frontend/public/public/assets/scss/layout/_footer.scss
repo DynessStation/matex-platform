@@ -1,0 +1,764 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    3.4 Footer CSS
+==========================**/
+.footer-section {
+  background-color: rgba(var(--white), 1);
+
+  .main-footer {
+    padding-block: calc(22px + (46 - 22) * ((100vw - 320px) / (1920 - 320)))
+      calc(15px + (38 - 15) * ((100vw - 320px) / (1920 - 320)));
+    border-bottom: 1px solid rgba(var(--title-color), 0.1);
+
+    .footer-title,
+    .footer-title-2 {
+      margin-bottom: calc(8px + (18 - 8) * ((100vw - 320px) / (1920 - 320)));
+
+      @include max(575.98px) {
+        cursor: pointer;
+        margin: 0;
+      }
+
+      h4 {
+        font-weight: 500;
+        font-size: calc(16px + (20 - 16) * ((100vw - 320px) / (1920 - 320)));
+      }
+    }
+
+    .footer-title {
+      @include max(575.98px) {
+        margin: 0;
+        @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+        &::after {
+          content: '\ea4e';
+          color: rgba(var(--title-color), 1);
+          @include font;
+        }
+
+        &.active {
+          ~ * {
+            > .footer-list {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    .footer-title-2 {
+      ~ .footer-content-list {
+        margin-top: calc(10px + (17 - 10) * ((100vw - 320px) / (1920 - 320)));
+      }
+    }
+
+    .footer-content-list {
+      margin-bottom: calc(10px + (17 - 10) * ((100vw - 320px) / (1920 - 320)));
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      li {
+        width: 100%;
+        display: block;
+
+        &:first-child {
+          .content-box {
+            color: rgba(var(--primary-color), 1);
+            display: flex;
+            align-items: center;
+            gap: calc(7px + (11 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+            svg {
+              fill: rgba(var(--primary-color), 1);
+              @include pseudowh(
+                $width: calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))),
+                $height: calc(21px + (29 - 21) * ((100vw - 320px) / (1920 - 320)))
+              );
+
+              &.svg-theme-color {
+                fill: rgba(var(--primary-color3), 1);
+                stroke: rgba(var(--primary-color3), 1);
+              }
+            }
+
+            h4 {
+              width: calc(
+                100% - calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))) - calc(
+                    7px + (11 - 7) * ((100vw - 320px) / (1920 - 320))
+                  )
+              );
+              font-weight: 400;
+              font-size: calc(18px + (20 - 18) * ((100vw - 320px) / (1920 - 320)));
+            }
+
+            &.theme-color4 {
+              svg {
+                fill: rgba(var(--primary-color), 1);
+              }
+
+              h4 {
+                color: rgba(var(--primary-color), 1);
+              }
+            }
+          }
+        }
+
+        .content-box {
+          color: rgba(var(--content-color), 1);
+          display: flex;
+          align-items: center;
+          gap: calc(7px + (11 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+          .footer-content-icon {
+            width: calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320)));
+            display: grid;
+            place-items: center;
+
+            svg {
+              @include pseudowh($width: 21px, $height: 21px);
+
+              body.dark & {
+                fill: #fff;
+              }
+
+              &.content-color {
+                fill: rgba(var(--content-color), 1);
+              }
+            }
+          }
+
+          h5 {
+            width: calc(
+              100% - calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))) - calc(
+                  7px + (11 - 7) * ((100vw - 320px) / (1920 - 320))
+                )
+            );
+          }
+        }
+      }
+    }
+
+    .social-icon-box {
+      align-items: center;
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(6px + (10 - 6) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      .social-icon-list {
+        li {
+          position: relative;
+          line-height: 1;
+
+          + li {
+            margin-left: 6px;
+            padding-left: 6px;
+
+            [dir='rtl'] & {
+              margin-left: unset;
+              padding-left: unset;
+              margin-right: 6px;
+              padding-right: 6px;
+            }
+
+            &::before {
+              left: -2px;
+              background-color: rgba(var(--content-color), 0.2);
+              @include pos;
+              @include center(vertical);
+              @include pseudowh($width: 1px, $height: 14px);
+
+              [dir='rtl'] & {
+                left: unset;
+                right: -2px;
+              }
+            }
+          }
+
+          a {
+            color: rgba(var(--content-color), 1);
+            font-size: 17px;
+            line-height: 1;
+          }
+        }
+      }
+    }
+
+    .footer-list,
+    .footer-list-2 {
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(2px + (9 - 2) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      @include max(575.98px) {
+        margin-top: calc(8px + (18 - 8) * ((100vw - 320px) / (1920 - 320)));
+        display: none;
+      }
+
+      li {
+        width: 100%;
+        display: block;
+
+        a {
+          font-weight: 400;
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--content-color), 1);
+          position: relative;
+          display: inline-block;
+          transition: 0.3s ease-in-out;
+
+          @include max(575.98px) {
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: calc(6px + (10 - 6) * ((100vw - 320px) / (576 - 320)));
+
+            [dir='rtl'] & {
+              margin-left: unset;
+              margin-right: 5px;
+            }
+          }
+
+          &::before {
+            bottom: 0;
+            left: 0;
+            background-color: rgba(var(--content-color), 0.3);
+            transition: 0.3s ease-in-out;
+            @include pos;
+            @include pseudowh($width: 0, $height: 2px);
+
+            [dir='rtl'] & {
+              left: unset;
+              right: 0;
+            }
+
+            @include max(575.98px) {
+              position: relative;
+              inset: unset;
+              display: block;
+              border-radius: 100%;
+              background-color: rgba(var(--title-color), 0.7);
+              @include pseudowh(
+                $width: calc(4px + (5 - 4) * ((100vw - 320px) / (576 - 320))),
+                $height: calc(4px + (5 - 4) * ((100vw - 320px) / (576 - 320)))
+              );
+            }
+          }
+
+          &:hover {
+            color: rgba(var(--title-color), 1);
+
+            &::before {
+              width: 100%;
+              background-color: rgba(var(--title-color), 0.8);
+
+              @include max(575.98px) {
+                background-color: rgba(var(--title-color), 0.7);
+                width: 5px;
+              }
+            }
+          }
+        }
+
+        p {
+          font-weight: 400;
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--content-color), 1);
+          position: relative;
+          display: inline-block;
+          transition: 0.3s ease-in-out;
+        }
+      }
+    }
+
+    .app-store-link {
+      margin-top: calc(11px + (18 - 11) * ((100vw - 320px) / (1920 - 320)));
+      align-items: center;
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(6px + (11 - 6) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      li {
+        a {
+          display: block;
+          width: calc(110px + (135 - 110) * ((100vw - 320px) / (1920 - 320)));
+        }
+      }
+    }
+
+    &.light-b-bottom {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+      .footer-title {
+        color: rgba(var(--white), 1);
+      }
+
+      .footer-content-list {
+        li {
+          .content-box {
+            color: #fff;
+
+            .footer-content-icon {
+              svg {
+                &.content-color {
+                  fill: #fff;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .social-icon-box {
+        h5 {
+          &.text-theme-content {
+            color: #fff !important;
+          }
+        }
+
+        .social-icon-list {
+          li {
+            a {
+              color: #fff;
+            }
+          }
+        }
+      }
+
+      .footer-list,
+      .footer-list-2 {
+        li {
+          a {
+            color: rgba(255, 255, 255, 0.6);
+
+            &:hover {
+              color: rgba(255, 255, 255, 1);
+
+              &::before {
+                background-color: rgba(255, 255, 255, 0.8);
+              }
+            }
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.6);
+          }
+        }
+      }
+    }
+  }
+
+  .sub-footer {
+    padding-block: 14px 13px;
+    flex-wrap: wrap;
+    gap: 15px;
+    @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+    @include max(767.98px) {
+      justify-content: center;
+    }
+
+    @include max(575.98px) {
+      padding-bottom: calc(79px + (86 - 79) * ((100vw - 320px) / (575 - 320)));
+    }
+
+    .payment-list {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sub-footer-logo {
+      width: calc(110px + (180 - 110) * ((100vw - 320px) / (1920 - 320)));
+      display: block;
+    }
+  }
+}
+
+.footer-section-2 {
+  background-color: rgb(21, 21, 21);
+
+  .main-footer {
+    padding-block: calc(22px + (46 - 22) * ((100vw - 320px) / (1920 - 320)))
+      calc(15px + (38 - 15) * ((100vw - 320px) / (1920 - 320)));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+    .footer-title,
+    .footer-title-2 {
+      margin-bottom: calc(8px + (18 - 8) * ((100vw - 320px) / (1920 - 320)));
+
+      @include max(575.98px) {
+        cursor: pointer;
+      }
+
+      h4 {
+        font-weight: 500;
+        color: #fff;
+        font-size: calc(17px + (20 - 17) * ((100vw - 320px) / (1920 - 320)));
+      }
+    }
+
+    .footer-title {
+      @include max(575.98px) {
+        margin: 0;
+        @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+        &::after {
+          content: '\ea4e';
+          color: #fff;
+          @include font;
+        }
+
+        &.active {
+          ~ * {
+            > .footer-list {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+
+    .footer-content-list {
+      margin-bottom: calc(10px + (17 - 10) * ((100vw - 320px) / (1920 - 320)));
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      li {
+        width: 100%;
+        display: block;
+
+        &:first-child {
+          .content-box {
+            color: rgba(var(--primary-color3), 1);
+            display: flex;
+            align-items: center;
+            gap: calc(7px + (11 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+            svg {
+              fill: rgba(var(--primary-color3), 1);
+              @include pseudowh(
+                $width: calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))),
+                $height: calc(21px + (29 - 21) * ((100vw - 320px) / (1920 - 320)))
+              );
+            }
+
+            h4 {
+              width: calc(
+                100% - calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))) - calc(
+                    7px + (11 - 7) * ((100vw - 320px) / (1920 - 320))
+                  )
+              );
+              font-weight: 400;
+              font-size: calc(18px + (20 - 18) * ((100vw - 320px) / (1920 - 320)));
+            }
+
+            &.theme-color {
+              color: rgba(var(--primary-color), 1);
+
+              svg {
+                fill: rgba(var(--primary-color), 1);
+              }
+            }
+          }
+        }
+
+        .content-box {
+          color: rgba(var(--white), 0.5);
+          display: flex;
+          align-items: center;
+          gap: calc(7px + (11 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+          .footer-content-icon {
+            width: calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320)));
+            display: grid;
+            place-items: center;
+
+            svg {
+              fill: rgba(var(--white), 0.5);
+              @include pseudowh($width: 21px, $height: 21px);
+
+              body.dark & {
+                fill: rgba(255, 255, 255, 0.5);
+              }
+            }
+          }
+
+          h5 {
+            width: calc(
+              100% - calc(24px + (29 - 24) * ((100vw - 320px) / (1920 - 320))) - calc(
+                  7px + (11 - 7) * ((100vw - 320px) / (1920 - 320))
+                )
+            );
+          }
+        }
+      }
+    }
+
+    .social-icon-box {
+      display: flex;
+      align-items: center;
+      gap: calc(6px + (10 - 6) * ((100vw - 320px) / (1920 - 320)));
+
+      h5 {
+        color: rgba(var(--white), 0.5) !important;
+
+        body.dark & {
+          color: rgba(255, 255, 255, 0.5) !important;
+        }
+      }
+
+      .social-icon-list {
+        li {
+          position: relative;
+          line-height: 1;
+
+          &:hover {
+            a {
+              color: rgba(var(--white), 0.9);
+
+              body.dark & {
+                color: rgba(255, 255, 255, 0.9);
+              }
+            }
+          }
+
+          + li {
+            margin-left: 6px;
+            padding-left: 6px;
+
+            [dir='rtl'] & {
+              margin-left: unset;
+              margin-right: 6px;
+              padding-left: unset;
+              padding-right: 6px;
+            }
+
+            &::before {
+              left: -2px;
+              background-color: rgba(var(--white), 0.2);
+              @include pos;
+              @include center(vertical);
+              @include pseudowh($width: 1px, $height: 14px);
+
+              [dir='rtl'] & {
+                left: unset;
+                right: -2px;
+              }
+
+              body.dark & {
+                background-color: rgba(255, 255, 255, 0.2);
+              }
+            }
+          }
+
+          a {
+            color: rgba(var(--white), 0.5);
+            font-size: calc(15px + (17 - 15) * ((100vw - 320px) / (1920 - 320)));
+            line-height: 1;
+            transition: 0.3s ease-in-out;
+
+            body.dark & {
+              color: rgba(255, 255, 255, 0.5);
+            }
+          }
+        }
+      }
+    }
+
+    .footer-list,
+    .footer-list-2 {
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(2px + (9 - 2) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      @include max(575.98px) {
+        margin-top: calc(8px + (18 - 8) * ((100vw - 320px) / (1920 - 320)));
+        display: none;
+      }
+
+      li {
+        width: 100%;
+        display: block;
+
+        &:hover {
+          a {
+            color: rgba(var(--white), 0.9);
+
+            body.dark & {
+              color: rgba(255, 255, 255, 0.9);
+            }
+
+            &::after {
+              width: 100%;
+              background-color: rgba(var(--white), 0.9);
+
+              @include max(575.98px) {
+                width: 5px;
+              }
+
+              body.dark & {
+                background-color: rgba(255, 255, 255, 0.9);
+              }
+            }
+          }
+        }
+
+        a {
+          font-weight: 400;
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--white), 0.5);
+          display: inline-block;
+          position: relative;
+          transition: 0.3s ease-in-out;
+
+          @include max(575.98px) {
+            margin-left: 5px;
+            flex-direction: row-reverse;
+            gap: calc(6px + (10 - 6) * ((100vw - 320px) / (576 - 320)));
+            @include flex_common($dis: flex, $align: center, $justify: start);
+
+            [dir='rtl'] & {
+              margin-left: unset;
+              margin-right: 5px;
+            }
+          }
+
+          body.dark & {
+            color: rgba(255, 255, 255, 0.5);
+          }
+
+          &::after {
+            bottom: 0;
+            left: 0;
+            background-color: rgba(var(--white), 0.5);
+            transition: 0.3s ease-in-out;
+            @include pos;
+            @include pseudowh($width: 0, $height: 1px);
+
+            [dir='rtl'] & {
+              left: unset;
+              right: 0;
+            }
+
+            body.dark & {
+              background-color: rgba(255, 255, 255, 0.5);
+            }
+
+            @include max(575.98px) {
+              position: relative;
+              inset: unset;
+              display: block;
+              border-radius: 100%;
+              background-color: rgba(var(--content-color), 0.7);
+              @include pseudowh(
+                $width: calc(4px + (5 - 4) * ((100vw - 320px) / (576 - 320))),
+                $height: calc(4px + (5 - 4) * ((100vw - 320px) / (576 - 320)))
+              );
+
+              [dir='rtl'] & {
+                inset: unset;
+              }
+            }
+          }
+        }
+
+        p {
+          font-weight: 400;
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--white), 0.5);
+          display: inline-block;
+          position: relative;
+          transition: 0.3s ease-in-out;
+
+          body.dark & {
+            color: rgba(255, 255, 255, 0.5);
+          }
+        }
+      }
+    }
+
+    .app-store-link {
+      margin-top: calc(11px + (18 - 11) * ((100vw - 320px) / (1920 - 320)));
+      align-items: center;
+      @include flex_wrap(
+        $dis: flex,
+        $wrap: wrap,
+        $gap: calc(6px + (11 - 6) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      li {
+        a {
+          display: block;
+          width: calc(110px + (135 - 110) * ((100vw - 320px) / (1920 - 320)));
+        }
+      }
+    }
+  }
+
+  .sub-footer {
+    padding-block: 14px 13px;
+    flex-wrap: wrap;
+    gap: calc(7px + (15 - 7) * ((100vw - 320px) / (1920 - 320)));
+    @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+    @include max(767.98px) {
+      justify-content: center;
+    }
+
+    @include max(575.98px) {
+      margin-bottom: calc(79px + (86 - 79) * ((100vw - 320px) / (576 - 320)));
+    }
+
+    .payment-list {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sub-footer-logo {
+      display: block;
+      @include pseudowh(
+        $width: auto,
+        $height: calc(37px + (50 - 37) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      img {
+        @extend %img-contain;
+      }
+    }
+  }
+}
+
+.demo-6 {
+  .footer-section {
+    .main-footer {
+      .social-icon-box {
+        h5 {
+          color: #fff !important;
+        }
+      }
+
+      .footer-title,
+      .footer-title-2 {
+        h4 {
+          color: #fff;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,241 @@
+<section class="home-section">
+  <div class="custom-container">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <app-home-banner
+          [image]="data()?.home_section?.banner_1"
+          [className]="'b-left'"
+        ></app-home-banner>
+      </div>
+      <div class="col-md-6">
+        <app-home-banner
+          [image]="data()?.home_section?.banner_2"
+          [className]="'b-left'"
+        ></app-home-banner>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section-t-space-2 section-b-space">
+  <div class="custom-container">
+    <div class="row custom-row7">
+      <div class="custom-col-xxl-2 col-xl-3 d-xl-block d-none">
+        <div class="category-left-sidebar">
+          <div class="category-menu-list-2">
+            <app-home-category
+              [categoryIds]="data()?.main_content?.left_banner_section?.categories?.category_ids!"
+              [type]="'category_list'"
+            ></app-home-category>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_1"
+            ></app-home-banner>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_2"
+            ></app-home-banner>
+          </div>
+
+          <div class="section-t-space-2">
+            <div class="banner-box-17 light-bg-color-2 p-0 bg-light">
+              <app-home-banner
+                [image]="data()?.main_content?.left_banner_section?.banner_3"
+              ></app-home-banner>
+              <div class="banner-contain">
+                <h3>Today Offer</h3>
+                <h4><span>Weekly</span> Greens Boundle</h4>
+                <h5>$30.00 <del>$49.00</del></h5>
+                <p>Accepting your mortality is like eating your vegetables</p>
+                <app-timer [type]="'timer-two'" [class]="'banner-timer'" />
+                <a [routerLink]="['/collections']" class="btn banner-btn"
+                  >Add to cart <i class="ri-arrow-right-line"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_4"
+            ></app-home-banner>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_5"
+            ></app-home-banner>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_6"
+            ></app-home-banner>
+          </div>
+
+          <div class="section-t-space-2">
+            <app-home-banner
+              [image]="data()?.main_content?.left_banner_section?.banner_7"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-col-xxl-10 col-xl-9">
+        <div class="service-section-2">
+          <ul class="service-list">
+            <app-home-service
+              [serviceIds]="data()?.main_content?.right_product_section?.services?.service_ids!"
+            ></app-home-service>
+          </ul>
+        </div>
+        <div class="section-t-space-2">
+          <div class="product-section light-bg-color-2">
+            <div class="title-2 slider-button">
+              <h3>Featured Products</h3>
+              <div class="title-slider-button">
+                <button class="product-six-prev swiper-btn-prev bg-white">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="product-six-next swiper-btn-next bg-white">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+            <app-home-product
+              [productIds]="
+                data()?.main_content?.right_product_section?.featured_products?.product_ids
+              "
+              [style]="'column_slider'"
+              [option]="swiperOption"
+            ></app-home-product>
+          </div>
+        </div>
+        <div class="section-t-space-2">
+          <app-home-banner
+            [image]="data()?.main_content?.right_product_section?.full_width_banner"
+          ></app-home-banner>
+        </div>
+        <div class="section-t-space-2">
+          <div class="light-bg-color-2">
+            <div class="title-2 slider-button">
+              <h3>Bestsellers in previous week</h3>
+              <div class="title-slider-button">
+                <button class="product-three-slider-prev swiper-btn-prev bg-white">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="product-three-slider-next swiper-btn-next bg-white">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="swiper product-three-slider" #columnSwiperContainer>
+              <div class="swiper-wrapper">
+                @for (
+                  column of data()?.main_content?.right_product_section?.bestsellers_products
+                    ?.products;
+                  track $index
+                ) {
+                  <div class="swiper-slide">
+                    <div class="product-title-box">
+                      <app-home-banner [image]="column.banner"></app-home-banner>
+                    </div>
+                    <div class="white-product-box-list">
+                      <app-home-product
+                        [productIds]="column?.products_ids"
+                        [style]="'column'"
+                        [type]="'horizontal'"
+                      ></app-home-product>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-t-space-2">
+          <div class="light-bg-color-2">
+            <div class="title-2 slider-button">
+              <h3 class="text-uppercase">This week best seller</h3>
+              <div class="title-slider-button">
+                <button class="product-two-slider-prev swiper-btn-prev bg-white">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="product-two-slider-next swiper-btn-next bg-white">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="swiper product-two-slider" #twoColumnSwiperContainer>
+              <div class="swiper-wrapper">
+                @for (
+                  column of data()?.main_content?.right_product_section?.week_bestsellers_products
+                    ?.products;
+                  track column
+                ) {
+                  <div class="swiper-slide">
+                    <div class="product-title-box">
+                      <app-home-banner [image]="column.banner"></app-home-banner>
+                    </div>
+                    <div class="bg-white product-box-3">
+                      <div class="row gx-4 gy-sm-4 gy-3">
+                        <app-home-product
+                          [productIds]="column.products_ids"
+                          [col]="'col-xxl-4 col-6'"
+                          [style]="'product_box_two'"
+                        ></app-home-product>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-t-space-2">
+          <div class="row g-3 g-sm-4">
+            <div class="col-xl-4 col-sm-6">
+              <app-home-banner
+                [image]="data()?.main_content?.right_product_section?.three_column_banner?.banner_1"
+              ></app-home-banner>
+            </div>
+            <div class="col-xl-4 col-sm-6">
+              <app-home-banner
+                [image]="data()?.main_content?.right_product_section?.three_column_banner?.banner_2"
+              ></app-home-banner>
+            </div>
+            <div class="col-xl-4 col-sm-6">
+              <app-home-banner
+                [image]="data()?.main_content?.right_product_section?.three_column_banner?.banner_3"
+              ></app-home-banner>
+            </div>
+          </div>
+        </div>
+        <div class="section-t-space-2">
+          <div class="light-bg-color-2">
+            <div class="title-2 slider-button">
+              <h3 class="text-uppercase">Shop by our best brands</h3>
+              <div class="title-slider-button">
+                <button class="brand-prev swiper-btn-prev bg-white">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="brand-next swiper-btn-next bg-white">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <app-home-brand
+              [brandIds]="data()?.main_content?.right_product_section?.brand?.brand_ids!"
+            ></app-home-brand>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

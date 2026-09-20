@@ -1,0 +1,56 @@
+<app-collection-sort
+  [filter]="filter()!"
+  [gridCol]="gridCol()"
+  (setGridClass)="setGridClass($event)"
+  [products]="(product$ | async)?.total"
+></app-collection-sort>
+
+<div class="row g-sm-4 g-3" [class]="gridClass">
+  @for (
+    product of filter()!['layout'] === 'collection_product_infinite_scroll' ||
+    filter()!['layout'] === 'collection_shop_list_infinite'
+      ? ((moreProduct$ | async) ?? [])
+      : paginateProduct;
+    track product.id
+  ) {
+    <div class="col pro-bg-white">
+      <app-product-box [product]="product" [productBoxStyle]="'product_box_one'"></app-product-box>
+    </div>
+  }
+</div>
+
+@if (infiniteScroll() && !productService.skeletonLoader && (moreProduct$ | async)?.length) {
+  <div class="load-more-sec">
+    <a
+      href="javascript:void(0)"
+      class="loadMore btn"
+      [class.disabled]="products === total_product"
+      (click)="onScroll(1)"
+    >
+      @if (button_loader) {
+        <img src="assets/images/loading.gif" alt="loading" />
+      } @else {
+        {{ finished ? ('no_more_product' | translate) : ('load_more' | translate) }}
+      }
+    </a>
+  </div>
+}
+@if ((product$ | async)?.data?.length && !productService.skeletonLoader && !infiniteScroll()) {
+  <div class="product-pagination">
+    <div class="theme-pagination-block">
+      <nav>
+        <ngb-pagination
+          [collectionSize]="total"
+          [(page)]="filter()!['page']"
+          [pageSize]="filter()!['paginate']"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          [ellipses]="false"
+          (pageChange)="setPage()"
+        >
+        </ngb-pagination>
+      </nav>
+    </div>
+  </div>
+}

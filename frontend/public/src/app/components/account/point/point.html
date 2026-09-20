@@ -1,0 +1,85 @@
+<div class="wallet-balance-box">
+  @if ((point$ | async)?.transactions?.data?.length) {
+    <div class="wallet-total-box">
+      <div class="total-image">
+        <i class="iconsax" icon-name="coins-4"></i>
+      </div>
+      <div class="total-detail">
+        <div class="total-box">
+          <h5>{{ 'total_points' | translate }}</h5>
+          <h3>{{ (point$ | async) ? (point$ | async)?.balance : 0 }}</h3>
+        </div>
+        <div class="point-ratio">
+          <h3>
+            <i class="ri-information-line"></i>
+            {{ '1_point' | translate }} =
+            {{ 1 / (setting$ | async)?.wallet_points?.point_currency_ratio! | currencySymbol }}
+            {{ 'balance' | translate }}
+          </h3>
+        </div>
+      </div>
+      @if ((point$ | async)?.transactions?.data?.length) {}
+    </div>
+  }
+
+  <div class="col-12">
+    @if ((point$ | async)?.transactions?.data?.length) {
+      <div class="dashboard-bg-box p-0 border-0">
+        <div class="wallet-table">
+          <div class="table-responsive dashboard-point-table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ 'Date' | translate }}</th>
+                  <th>{{ 'Points' | translate }}</th>
+                  <th>{{ 'Remark' | translate }}</th>
+                  <th>{{ 'Status' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (
+                  transaction of (point$ | async)?.transactions?.data;
+                  track transaction;
+                  let i = $index
+                ) {
+                  <tr>
+                    <td>{{ transaction?.created_at | date: 'dd MMM yyyy hh:mm:a' }}</td>
+                    <td>{{ transaction?.amount }}</td>
+                    <td>{{ transaction?.detail }}</td>
+                    <td>
+                      <div class="badge bg-{{ transaction?.type }} custom-badge">
+                        <span>{{ transaction?.type | titlecase }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if ((point$ | async)?.transactions?.data?.length) {
+              <div class="product-pagination">
+                <div class="theme-pagination-block">
+                  <nav>
+                    <app-pagination
+                      [total]="(point$ | async)?.transactions?.total || 0"
+                      [currentPage]="filter['page']"
+                      [pageSize]="filter['paginate']"
+                      (setPage)="setPaginate($event)"
+                    >
+                    </app-pagination>
+                  </nav>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <app-no-data
+        [class]="'no-data-added'"
+        [text]="'no_transaction' | translate"
+        [description]="'no_points' | translate"
+      >
+      </app-no-data>
+    }
+  </div>
+</div>

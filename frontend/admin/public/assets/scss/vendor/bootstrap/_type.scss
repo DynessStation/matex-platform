@@ -1,0 +1,110 @@
+@use './variables';
+@use './mixins/lists';
+@use './vendor/rfs';
+
+//
+// Headings
+//
+.h1 {
+  @extend h1 !optional;
+}
+
+.h2 {
+  @extend h2 !optional;
+}
+
+.h3 {
+  @extend h3 !optional;
+}
+
+.h4 {
+  @extend h4 !optional;
+}
+
+.h5 {
+  @extend h5 !optional;
+}
+
+.h6 {
+  @extend h6 !optional;
+}
+
+
+.lead {
+  @include rfs.font-size(variables.$lead-font-size);
+  font-weight: variables.$lead-font-weight;
+}
+
+// Type display classes
+@each $display, $font-size in variables.$display-font-sizes {
+  .display-#{$display} {
+    font-family: variables.$display-font-family;
+    font-style: variables.$display-font-style;
+    font-weight: variables.$display-font-weight;
+    line-height: variables.$display-line-height;
+    @include rfs.font-size($font-size);
+  }
+}
+
+//
+// Emphasis
+//
+.small {
+  @extend small !optional;
+}
+
+.mark {
+  @extend mark !optional;
+}
+
+//
+// Lists
+//
+
+.list-unstyled {
+  @include lists.list-unstyled();
+}
+
+// Inline turns list items into inline-block
+.list-inline {
+  @include lists.list-unstyled();
+}
+.list-inline-item {
+  display: inline-block;
+
+  &:not(:last-child) {
+    margin-right: variables.$list-inline-padding;
+  }
+}
+
+
+//
+// Misc
+//
+
+// Builds on `abbr`
+.initialism {
+  @include rfs.font-size(variables.$initialism-font-size);
+  text-transform: uppercase;
+}
+
+// Blockquotes
+.blockquote {
+  margin-bottom: variables.$blockquote-margin-y;
+  @include rfs.font-size(variables.$blockquote-font-size);
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.blockquote-footer {
+  margin-top: variables.$blockquote-margin-y;
+  margin-bottom: variables.$blockquote-margin-y;
+  @include rfs.font-size(variables.$blockquote-footer-font-size);
+  color: variables.$blockquote-footer-color;
+
+  &::before {
+    content: "\2014\00A0"; // em dash, nbsp
+  }
+}

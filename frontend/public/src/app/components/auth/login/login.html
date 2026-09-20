@@ -1,0 +1,100 @@
+<div class="authentication-box login-box">
+  <div class="auth-title">
+    <h4>Log in</h4>
+    <p>Welcome! To access your account, please enter your username and password.</p>
+  </div>
+  <app-alert />
+  @if (loginForm) {
+    <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="email"
+          placeholder="{{ 'email' | translate }}"
+          formControlName="email"
+          [class]="{
+            'is-invalid':
+              loginForm.controls['email'].touched &&
+              (loginForm.controls['email'].errors?.['required'] ||
+                loginForm.controls['email'].errors?.['email']),
+            'is-valid': loginForm.controls['email'].valid,
+          }"
+        />
+        @if (
+          loginForm.controls['email'].touched && loginForm.controls['email'].errors?.['required']
+        ) {
+          <div class="invalid-feedback">Email is required</div>
+        } @else if (
+          loginForm.controls['email'].touched && loginForm.controls['email'].errors?.['email']
+        ) {
+          <div class="invalid-feedback">Please enter valid email address</div>
+        }
+      </div>
+      <div class="mb-3">
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          placeholder="{{ 'enter_password' | translate }}"
+          formControlName="password"
+          [class]="{
+            'is-invalid':
+              loginForm.controls['password'].touched &&
+              (loginForm.controls['password'].errors?.['required'] ||
+                loginForm.controls['password'].errors?.['password']),
+            'is-valid': loginForm.controls['password'].valid,
+          }"
+        />
+        @if (
+          loginForm.controls['password'].touched &&
+          loginForm.controls['password'].errors?.['required']
+        ) {
+          <div class="invalid-feedback">Password is required</div>
+        } @else if (
+          loginForm.controls['password'].touched &&
+          loginForm.controls['password'].errors?.['password']
+        ) {
+          <div class="invalid-feedback">Please enter valid Password address</div>
+        }
+      </div>
+
+      <div class="forgot-box">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="exampleCheck1" />
+          <label class="form-check-label" for="exampleCheck1">Remember for 30 days</label>
+        </div>
+        <a href="javascript:void(0)" class="forgot-pass" (click)="action('email')"
+          >Forgot Password</a
+        >
+      </div>
+      <app-button
+        [class]="'btn btn-bg-theme mt-3 w-100'"
+        [type]="'submit'"
+        [id]="'login_btn'"
+        [spinner]="true"
+        >{{ 'login' | translate }}</app-button
+      >
+      <div class="divider">
+        <span>{{ 'or' | translate }}</span>
+      </div>
+
+      <div class="social-link">
+        <a href="https://www.google.com/" class="btn w-100" target="_blank">
+          <img src="assets/images/inner-page/google.png" class="img-fluid" alt="image" />
+          <span>Sign in with google</span>
+        </a>
+        <a href="https://www.facebook.com/" class="btn w-100" target="_blank">
+          <img src="assets/images/inner-page/facebook.png" class="img-fluid" alt="image" />
+          <span>Sign in with facebook</span>
+        </a>
+      </div>
+      <h6 class="sign-up-next">
+        Don't have an account?
+        <a href="javascript:void(0)" class="next-button btn" (click)="action('register')"
+          >Sign up now</a
+        >
+      </h6>
+    </form>
+  }
+</div>

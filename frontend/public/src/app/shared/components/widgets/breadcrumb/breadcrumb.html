@@ -1,0 +1,23 @@
+@if (breadcrumb()) {
+  <section class="breadcrumb-section">
+    <div class="custom-container">
+      <div class="breadcrumb-contain">
+        <h2>{{ breadcrumb()?.title | titleCase }}</h2>
+        <nav>
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/']">
+                <i class="ri-home-3-fill"></i>
+              </a>
+            </li>
+            @for (item of breadcrumb()?.items; track item) {
+              <li class="breadcrumb-item" [class.active]="item?.active">
+                {{ item?.label! | titleCase }}
+              </li>
+            }
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </section>
+}

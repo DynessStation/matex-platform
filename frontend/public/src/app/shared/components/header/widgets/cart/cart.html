@@ -1,0 +1,162 @@
+<div
+  class="cart-overlay"
+  id="cartOverlay"
+  [class.show]="sidebarCartOpen$ | async"
+  (click)="cartToggle(false)"
+></div>
+
+<div class="position-relative" (click)="cart === 'cart_sidebar' && cartToggle(true)">
+  <button class="btn icon-btn">
+    <i class="iconsax" icon-name="basket-2"></i>
+  </button>
+  @if ((cartItem$ | async)?.length) {
+    <span class="label-count">
+      <span>{{ (cartItem$ | async)?.length }}</span>
+    </span>
+  }
+</div>
+<div
+  id="cart_side"
+  [ngClass]="{
+    'add_to_cart right right-cart-box': cart === 'cart_sidebar',
+    'show-div shopping-cart': cart === 'cart_mini',
+  }"
+  [class.open-side]="sidebarCartOpen$ | async"
+>
+  <div class="offcanvas-header">
+    <div class="title-offcanvas">
+      <h4>Shopping Cart</h4>
+      <button class="btn close-btn" (click)="cartToggle(false)">
+        <i class="ri-close-fill"></i>
+      </button>
+    </div>
+  </div>
+  <div class="offcanvas-body">
+    <div class="cart-product-box">
+      @if ((cartItem$ | async)?.length) {
+        <div class="clear-box">
+          <a href="javascript:void(0)" (click)="clearCart()">{{ 'Clear cart' | translate }}</a>
+        </div>
+      }
+      <ul class="product-box-list">
+        @if ((cartItem$ | async)?.length) {
+          @for (item of cartItem$ | async; track item) {
+            <li class="vertical-product-box">
+              <a href="javascript:void(0)" class="product-image">
+                <img
+                  [src]="
+                    item?.variation && item?.variation?.variation_image
+                      ? item?.variation?.variation_image?.asset_url
+                      : item?.product?.product_thumbnail
+                        ? item?.product?.product_thumbnail?.asset_url
+                        : 'assets/images/placeholder/product.png'
+                  "
+                  class=""
+                  [alt]="item?.product?.name"
+                />
+              </a>
+              <div class="product-content">
+                <a href="javascript:void(0)">
+                  <h5 class="name title-color">
+                    {{ item?.variation ? item?.variation?.name : item?.product?.name }}
+                  </h5>
+                </a>
+                <span>
+                  {{
+                    (item?.variation
+                      ? item.variation.sale_price
+                      : item?.product && item?.wholesale_price
+                        ? item?.wholesale_price
+                        : item?.product?.sale_price)! | currencySymbol
+                  }}
+                  <span>x</span> <span>{{ item?.quantity }}</span></span
+                >
+                @if (item?.variation) {
+                  <h5 class="gram">{{ item?.variation?.selected_variation }}</h5>
+                }
+
+                <div class="quantity-box qty-container">
+                  <app-button
+                    [type]="'button'"
+                    [class]="'btn qty-btn-minus'"
+                    [id]="'add-to-cart' + item.product.id"
+                    (click)="updateQuantity(item, -1)"
+                    [spinner]="false"
+                  >
+                    @if (item.quantity > 1) {
+                      <i class="ri-subtract-line"></i>
+                    }
+                    @if (item.quantity <= 1) {
+                      <i class="ri-delete-bin-line"></i>
+                    }
+                  </app-button>
+                  <input
+                    class="form-control input-number qty-input"
+                    type="number"
+                    name="quantity"
+                    [value]="item?.quantity"
+                    readonly
+                  />
+                  <app-button
+                    [type]="'button'"
+                    [class]="'btn qty-btn-plus'"
+                    [id]="'qty-left-minus' + item.product.id"
+                    (click)="updateQuantity(item, 1)"
+                    [spinner]="false"
+                  >
+                    <i class="ri-add-line"></i>
+                  </app-button>
+                </div>
+              </div>
+              <app-button
+                [class]="'btn close-button'"
+                [id]="'cart_item_delete_btn' + item.product.id"
+                [spinner]="false"
+                [iconClass]="'ri-delete-bin-line'"
+                (click)="delete(item.id)"
+                [label]="'dddd'"
+              >
+              </app-button>
+            </li>
+          }
+        } @else {
+          <li class="empty-cart">
+            <svg>
+              <use xlink:href="assets/images/inner-page/empty-cart.svg#emptyCart"></use>
+            </svg>
+            <h4>Your cart is empty.</h4>
+          </li>
+        }
+      </ul>
+
+      <div class="total-price-box">
+        <p class="free">
+          Almost there, add {{ shippingFreeAmt - cartTotal | currencySymbol }} more to get
+          <b>FREE SHIPPING!</b>
+        </p>
+        <div
+          class="progress"
+          [class]="{
+            'danger-progress': shippingCal <= 30,
+            'warning-progress': shippingCal >= 31 && shippingCal <= 80,
+          }"
+        >
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            [style.width]="shippingCal + '%'"
+          >
+            <i class="ri-truck-line"></i>
+          </div>
+        </div>
+        <h4 class="sub-total">
+          Subtotal <span id="total-price">{{ (cartTotal$ | async)! | currencySymbol }}</span>
+        </h4>
+        <p class="tax-text">Tax included <span>shipping</span>calculator at checkout.</p>
+        <div class="cart-btn-group">
+          <a [routerLink]="['/checkout']" class="btn check-out-button">Check Out</a>
+          <a [routerLink]="['/cart']" class="btn cart-button">View Cart</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

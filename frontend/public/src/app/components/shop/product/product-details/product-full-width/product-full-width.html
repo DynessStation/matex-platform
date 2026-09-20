@@ -1,0 +1,75 @@
+<section class="product-section product-slider-section section-t-space">
+  <div class="custom-container">
+    <div class="row g-md-4 g-3">
+      <div class="col-xl-6">
+        <div class="product-left-box">
+          <div class="row g-sm-4 g-2 product-original-box product-original-box-sm">
+            @if (
+              product()?.product_galleries?.length ||
+              (selectedVariation && selectedVariation.variation_galleries.length)
+            ) {
+              @for (
+                image of selectedVariation && selectedVariation.variation_galleries.length
+                  ? selectedVariation && selectedVariation.variation_galleries
+                  : product()?.product_galleries;
+                track image
+              ) {
+                <div class="col-6">
+                  <div class="slider-image">
+                    @if (videType.includes(image?.mime_type!)) {
+                      <video class="w-100" controls>
+                        <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                      </video>
+                    } @else if (audioType.includes(image?.mime_type!)) {
+                      <audio controls>
+                        <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                      </audio>
+                    } @else {
+                      <img
+                        [src]="image ? image.asset_url : 'assets/images/placeholder/product.png'"
+                        class="img-fluid"
+                        [alt]="product()?.name"
+                      />
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-6">
+        <div class="right-box-contain custom-padding">
+          <app-product-details
+            [option]="option()"
+            [product]="product()"
+            [selectedVariation]="selectedVariation ? selectedVariation! : product()"
+          ></app-product-details>
+
+          <app-product-content
+            [product]="product()"
+            [option]="option()"
+            (selectedVariant)="selectedVariant($event)"
+          ></app-product-content>
+
+          <app-product-buy-button
+            [product]="product()"
+            [selectedVariation]="selectedVariation ? selectedVariation! : null"
+          ></app-product-buy-button>
+
+          <app-product-information [product]="product()"></app-product-information>
+          <app-product-delivery-information
+            [product]="product()"
+          ></app-product-delivery-information>
+          <app-payment-option [product]="product()" [option]="option()"></app-payment-option>
+          <app-product-social-share></app-product-social-share>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+@if (product()?.cross_sell_products?.length) {
+  <app-product-bundle [product]="product()"></app-product-bundle>
+}
+<app-product-details-tab [product]="product()"></app-product-details-tab>

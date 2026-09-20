@@ -1,0 +1,33 @@
+@if (type() === 'service-two') {
+  <div class="row g-sm-4 g-3">
+    @for (service of services; track service.id) {
+      <div class="col-lg-3 col-sm-6">
+        <div class="service-box">
+          <div>
+            <svg>
+              <use [attr.xlink:href]="service.icon"></use>
+            </svg>
+            <div class="service-content">
+              <h4>{{ service.name }}</h4>
+              <h5>{{ service.description }}</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  @for (service of services; track service.id) {
+    <li>
+      <div class="service-box">
+        <svg>
+          <use [attr.xlink:href]="service.icon"></use>
+        </svg>
+        <div>
+          <h5>{{ service.name }}</h5>
+          <p>{{ service.description }}</p>
+        </div>
+      </div>
+    </li>
+  }
+}

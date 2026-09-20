@@ -1,0 +1,66 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.13 Rating CSS
+==========================**/
+.rating {
+  line-height: 1;
+
+  > .d-inline-flex {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    span {
+      font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: bold;
+      color: rgba(var(--content-color), 0.3);
+      line-height: 1;
+
+      i {
+        color: rgba(var(--content-color), 0.3);
+
+        body.dark & {
+          color: rgba(var(--content-color), 0.8);
+        }
+
+        &.filled {
+          color: rgba(var(--rating), 1);
+
+          body.dark & {
+            color: rgba(var(--rating), 1);
+          }
+        }
+      }
+    }
+  }
+
+  &.d-inline-flex {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    span {
+      font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: bold;
+      color: rgba(var(--content-color), 0.3);
+      line-height: 1;
+
+      i {
+        color: rgba(var(--content-color), 0.3);
+
+        body.dark & {
+          color: rgba(var(--content-color), 0.8);
+        }
+
+        &.filled {
+          color: rgba(var(--rating), 1);
+
+          body.dark & {
+            color: rgba(var(--rating), 1);
+          }
+        }
+      }
+    }
+  }
+}

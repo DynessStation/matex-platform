@@ -1,0 +1,286 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.3 breadcrumb scss
+==========================**/
+.breadcrumb-section {
+  background-color: rgba(var(--white), 1);
+
+  body.dark & {
+    background-color: rgba(var(--white), 0.7);
+  }
+
+  .breadcrumb-contain {
+    padding: calc(14px + (20 - 14) * ((100vw - 320px) / (1920 - 320))) 0;
+    text-align: center;
+    color: rgba(var(--black), 1);
+    display: flex;
+    align-items: center;
+
+    @include max(480px) {
+      display: block;
+    }
+
+    h2 {
+      font-weight: 500;
+      font-size: calc(18px + (24 - 18) * ((100vw - 320px) / (1920 - 320)));
+      margin-bottom: 0;
+      max-width: calc(280px + (406 - 280) * ((100vw - 320px) / (1920 - 320)));
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      display: block;
+
+      @include max(480px) {
+        text-align: center;
+        margin-bottom: 8px;
+        margin-inline: auto;
+        white-space: unset;
+        max-width: unset;
+        @include line($line: 2);
+      }
+    }
+
+    .search-box-breadcrumb {
+      position: relative;
+      width: 70%;
+      margin: 0 auto;
+
+      @include max(575.98px) {
+        width: 90%;
+      }
+
+      @include max(360px) {
+        width: 100%;
+      }
+
+      input {
+        width: 100%;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+      }
+
+      i {
+        position: absolute;
+        right: calc(14px + (20 - 14) * ((100vw - 320px) / (1920 - 320)));
+        color: rgba(var(--content-color), 1);
+        font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+        @include center(vertical);
+      }
+    }
+
+    nav {
+      margin-left: auto;
+
+      [dir='rtl'] & {
+        margin-left: unset;
+        margin-right: auto;
+      }
+
+      .breadcrumb {
+        @include flex_common;
+
+        .breadcrumb-item {
+          font-weight: 500;
+          font-size: calc(15px + (16 - 15) * ((100vw - 320px) / (1920 - 320)));
+          max-width: calc(180px + (266 - 180) * ((100vw - 320px) / (1920 - 320)));
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          display: block;
+
+          @include max(480px) {
+            max-width: calc(285px + (360 - 285) * ((100vw - 320px) / (481 - 320)));
+          }
+
+          i {
+            font-size: 17px;
+            line-height: 1;
+          }
+
+          &.active {
+            color: rgba(var(--content-color), 1);
+            margin-top: 2px;
+          }
+
+          + .breadcrumb-item {
+            position: relative;
+            padding-left: calc(4px + (8 - 4) * ((100vw - 320px) / (1920 - 320)));
+
+            [dir='rtl'] & {
+              padding-left: unset;
+              padding-right: calc(4px + (8 - 4) * ((100vw - 320px) / (1920 - 320)));
+            }
+
+            a {
+              color: rgba(var(--title-color), 1);
+            }
+
+            &::before {
+              content: '/';
+              color: rgba(var(--title-color), 0.3);
+              padding-right: calc(4px + (8 - 4) * ((100vw - 320px) / (1920 - 320)));
+
+              [dir='rtl'] & {
+                float: right;
+                padding-left: calc(4px + (8 - 4) * ((100vw - 320px) / (1920 - 320)));
+                padding-right: unset;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .order-number-contain {
+      display: flex;
+      align-items: center;
+
+      li {
+        position: relative;
+
+        + li {
+          margin-left: 20px;
+          padding-left: 20px;
+
+          &::before {
+            top: calc(50% - 2px);
+            @include pos;
+            transform: translateY(-50%);
+            left: 0;
+            @include pseudowh($width: 4px, $height: 4px);
+            border-radius: 100%;
+            background-color: rgba(var(--content-color), 1);
+          }
+        }
+
+        h3 {
+          font-size: 28px;
+          font-weight: 600;
+        }
+
+        h5 {
+          font-size: 18px;
+          font-weight: 400;
+          color: rgba(var(--content-color), 1);
+        }
+      }
+    }
+  }
+}
+
+.faq-breadcrumb {
+  background-color: #f8f8f8;
+  position: relative;
+  overflow: hidden;
+
+  .breadcrumb-contain {
+    padding: calc(26px + (60 - 26) * ((100vw - 320px) / (1920 - 320))) 0;
+    text-align: center;
+    color: rgba(var(--title-color), 1);
+    display: block;
+
+    h2 {
+      font-size: calc(22px + (48 - 22) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: 700;
+      margin-top: -6px;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: calc(11px + (16 - 11) * ((100vw - 320px) / (1920 - 320))) auto 0;
+      color: rgba(var(--content-color), 1);
+      width: 50%;
+      line-height: 1.7;
+      font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      @include max(1660px) {
+        width: 60%;
+      }
+
+      @include max(1366px) {
+        width: 70%;
+      }
+
+      @include max(991.98px) {
+        width: 90%;
+      }
+
+      @include max(767.98px) {
+        width: 100%;
+      }
+
+      span {
+        display: inline;
+      }
+    }
+
+    .faq-form-tag {
+      position: relative;
+      margin: calc(18px + (35 - 18) * ((100vw - 320px) / (1920 - 320))) auto 0;
+      width: 50%;
+
+      @include max(1660px) {
+        width: 60%;
+      }
+
+      @include max(1366px) {
+        width: 70%;
+      }
+
+      @include max(991.98px) {
+        width: 90%;
+      }
+
+      @include max(767.98px) {
+        width: 100%;
+      }
+
+      .input-group {
+        background-color: rgba(var(--white), 1);
+
+        i {
+          display: flex;
+          align-items: center;
+          padding: 0 calc(12px + (20 - 12) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--primary-color), 1);
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+        }
+
+        .form-control {
+          padding-left: 0;
+          border: none;
+
+          &:focus {
+            background-color: transparent;
+          }
+        }
+
+        .faq-dropdown-menu {
+          li {
+            display: block;
+          }
+        }
+
+        .faq-dropdown-button {
+          font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+          font-weight: 600;
+          color: rgba(var(--primary-color), 1);
+          z-index: 0;
+
+          &::after {
+            content: unset;
+          }
+
+          i {
+            position: relative;
+            padding: 0;
+            margin-left: 5px;
+            font-size: calc(13px + (14 - 13) * ((100vw - 320px) / (1920 - 320)));
+          }
+        }
+      }
+    }
+  }
+}

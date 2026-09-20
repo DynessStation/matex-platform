@@ -1,0 +1,307 @@
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-xl-3 d-xl-block d-none">
+        <app-home-banner
+          [image]="data()?.home_section?.left_banner"
+          [className]="'banner-box h-100'"
+        ></app-home-banner>
+      </div>
+      <div class="col-xl-6 col-md-8">
+        <app-home-banner
+          [image]="data()?.home_section?.center_banner"
+          [className]="'banner-box h-100'"
+        ></app-home-banner>
+      </div>
+      <div class="col-xl-3 col-md-4 d-md-block d-none">
+        <div class="row h-100">
+          <div class="col-12">
+            <app-home-banner
+              [image]="data()?.home_section?.right_banner?.top_banner"
+              [className]="'banner-box h-100 '"
+            ></app-home-banner>
+          </div>
+          <div class="col-12">
+            <app-home-banner
+              [image]="data()?.home_section?.right_banner?.bottom_banner"
+              [className]="'banner-box banner-box-2 mt-3'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (data()?.service_with_banner?.status) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="row">
+        <div class="col-xl-3 d-xl-block d-none">
+          <app-home-banner
+            [image]="data()?.service_with_banner?.banner"
+            [className]="'banner-box h-100'"
+            [bgImage]="true"
+          ></app-home-banner>
+        </div>
+        <div class="col-xl-9">
+          <div class="service-section-3">
+            <app-home-service
+              [type]="'service-two'"
+              [serviceIds]="data()?.service_with_banner?.service_ids!"
+            ></app-home-service>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data()?.category_section?.status) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="title slider-button">
+        <h3>{{ data()?.category_section?.title }}</h3>
+        <div class="title-slider-button">
+          <button class="category-three-prev swiper-btn-prev">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <button class="category-three-next swiper-btn-next">
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+      <div class="category-box-4">
+        <app-home-category
+          [categoryIds]="data()?.category_section?.category_ids!"
+          [option]="swiperOption"
+        ></app-home-category>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="title slider-button">
+      <div class="title-flex">
+        <h3>{{ data()?.today_deal?.deal_products?.title }}</h3>
+        <app-button
+          [buttonLink]="data()?.today_deal?.deal_products?.button_link!"
+          [buttonText]="data()?.today_deal?.deal_products?.button_text!"
+        />
+      </div>
+      <div class="title-slider-button">
+        <button class="product-five-slider-prev swiper-btn-prev">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+        <button class="product-five-slider-next swiper-btn-next">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-3 d-xl-block d-none">
+        <app-home-banner
+          [image]="data()?.today_deal?.full_width_banner"
+          [className]="'banner-box'"
+        ></app-home-banner>
+      </div>
+
+      <div class="col-xl-9">
+        <app-home-product
+          [productIds]="data()?.today_deal?.deal_products?.product_ids!"
+          [style]="'column_slider_three'"
+          [option]="todayDealSwiperOption"
+        ></app-home-product>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="row">
+      @if (data()?.category_with_banner?.status) {
+        <div class="col-xl-3 d-xl-block d-none ratio_120">
+          <div
+            class="banner-box-25 bg-size"
+            [style.background-image]="
+              'url(' + data()?.category_with_banner?.banner?.image_url + ')'
+            "
+          >
+            <img
+              [src]="data()?.category_with_banner?.banner?.image_url"
+              class="bg-img"
+              alt="image"
+            />
+            <div class="banner-content">
+              <div>
+                <h4>{{ data()?.category_with_banner?.title }}</h4>
+                <app-home-category
+                  [type]="'category_list_two'"
+                  [categoryIds]="data()?.category_section?.category_ids!"
+                ></app-home-category>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (data()?.deals_product?.status) {
+        <div class="col-xl-6 col-lg-7">
+          <div class="deal-day-box d-block">
+            <div class="title slider-button">
+              <h3>{{ data()?.deals_product?.title }}</h3>
+            </div>
+            <app-home-deal-products
+              [type]="'product-deal'"
+              [productIds]="data()?.deals_product?.product_ids!"
+            />
+          </div>
+        </div>
+      }
+
+      <div class="col-xl-3 col-lg-5 d-lg-block d-none">
+        <div class="row h-100">
+          <div class="col-12">
+            <app-home-banner
+              [image]="data()?.right_banner?.top_banner"
+              [className]="'banner-box h-100 b-left'"
+            ></app-home-banner>
+          </div>
+          <div class="col-12 mt-3">
+            <app-home-banner
+              [image]="data()?.right_banner?.bottom_banner"
+              [className]="'banner-box h-100 b-left'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (data()?.banner_with_tabs_product?.status) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <app-home-tabs-products
+        [tabSelection]="data()?.banner_with_tabs_product!"
+        [style]="'column'"
+        [type]="'product_box_one'"
+        [itemsPerSlide]="7"
+        [rows]="2"
+      ></app-home-tabs-products>
+    </div>
+  </section>
+}
+
+@if (data()?.banner_section) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <app-home-banner
+        [image]="data()?.banner_section"
+        [className]="'banner-box'"
+      ></app-home-banner>
+    </div>
+  </section>
+}
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="row">
+      @if (data()?.tabs_with_banner_product?.status) {
+        <div class="col-xxl-8-1 col-xl-8">
+          <app-home-tabs-products
+            [tabSelection]="data()?.tabs_with_banner_product!"
+            [style]="'column'"
+            [itemsPerSlide]="3"
+            [rows]="3"
+            [class]="'recommendations-tab'"
+          ></app-home-tabs-products>
+        </div>
+      }
+      @if (data()?.tab_product_right_banner) {
+        <div class="col-xxl-3-1 col-xl-4 d-xl-block d-none">
+          <div class="row g-4 h-100">
+            <div class="col-12">
+              <app-home-banner
+                [image]="data()?.tab_product_right_banner?.top_banner"
+                [className]="'banner-box b-left h-100'"
+              ></app-home-banner>
+            </div>
+            <div class="col-12">
+              <app-home-banner
+                [image]="data()?.tab_product_right_banner?.bottom_banner"
+                [className]="'banner-box b-left h-100'"
+              ></app-home-banner>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+@if (data()?.tags?.status) {
+  <section class="section-t-space d-md-block d-none">
+    <div class="custom-container">
+      <div class="title title-timer justify-content-between">
+        <h3>{{ data()?.tags?.title }}</h3>
+      </div>
+      <ul class="hot-tag-list">
+        <app-home-tags [tagsIds]="data()?.tags?.tags_ids!" [class]="'wow fadeIn'"></app-home-tags>
+      </ul>
+    </div>
+  </section>
+}
+
+@if (data()?.offer_section) {
+  <section class="section-t-space offer-section">
+    <div class="custom-container">
+      <div class="title title title-timer justify-content-between">
+        <h3>{{ data()?.offer_section?.title }}</h3>
+        <app-button
+          [buttonLink]="data()?.offer_section?.button_link!"
+          [buttonText]="data()?.offer_section?.button_text!"
+        />
+      </div>
+      <div class="row g-sm-4 g-3">
+        @for (banner of data()?.offer_section?.banner; track banner) {
+          <div class="col-xxl-3 col-6">
+            <app-home-banner [image]="banner" [className]="'offer-product-box'"></app-home-banner>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="title slider-button">
+      <h3>Recent Viewed Products</h3>
+      <div class="title-slider-button">
+        <button class="recent-product-prev swiper-btn-prev">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+        <button class="recent-product-next swiper-btn-next">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="recent-product-section">
+      <app-home-product
+        [productIds]="data()?.recent_view_product?.product_ids!"
+        [style]="'product-slider'"
+      ></app-home-product>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section-3">
+  <div class="custom-container">
+    <app-home-newsletter></app-home-newsletter>
+  </div>
+</section>

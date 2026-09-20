@@ -1,0 +1,21 @@
+@if ((matchedRelatedProducts$ | async)?.length) {
+  <section class="pt-0 section-b-space">
+    <div class="custom-container">
+      <div class="related-title">
+        <h2>{{ 'Related products' | translate }}</h2>
+      </div>
+      <div class="swiper related-products slider-bottom-spacing" #relatedProductSwiperContainer>
+        <div class="swiper-wrapper">
+          @for (product of (matchedRelatedProducts$ | async); track product) {
+            <div class="swiper-slide pro-bg-white">
+              <app-product-box
+                [product]="product"
+                [productBoxStyle]="'product_box_one'"
+              ></app-product-box>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+}

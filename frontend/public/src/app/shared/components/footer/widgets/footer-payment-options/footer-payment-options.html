@@ -1,0 +1,7 @@
+<ul class="payment-list">
+  @for (payment of data()?.footer?.payment_option; track payment) {
+    <li>
+      <img [src]="payment.image" class="img-fluid" alt="payment-image" />
+    </li>
+  }
+</ul>

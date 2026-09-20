@@ -1,0 +1,377 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'activity_log_detail'">
+  <div button>
+    <a
+      [routerLink]="['/activity-log']"
+      class="align-items-center btn btn-light-bg d-flex"
+    >
+      <i class="ri-arrow-left-line me-1"></i>
+
+      {{ 'audit_back' | translate }}
+    </a>
+  </div>
+
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/activity-log'"
+      (retry)="retryDetail()"
+    />
+  } @else if (auditLog$ | async; as audit) {
+    <!--==================================================-->
+    <!--==== HEADER ======================================-->
+    <!--==================================================-->
+
+    <div class="audit-header mb-4">
+      <div>
+        <div class="audit-event">
+          {{ audit.event_code }}
+        </div>
+
+        <div class="audit-created">
+          {{
+            audit.created
+              | date
+                : localization.dateTimeFormat()
+                : undefined
+                : localization.locale()
+          }}
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <span
+          class="badge"
+          [class.bg-success]="audit.outcome === 'success'"
+          [class.bg-danger]="
+            audit.outcome === 'failure' || audit.outcome === 'denied'
+          "
+          [class.bg-secondary]="
+            audit.outcome !== 'success' &&
+            audit.outcome !== 'failure' &&
+            audit.outcome !== 'denied'
+          "
+        >
+          {{ 'audit_outcome_' + audit.outcome | translate }}
+        </span>
+
+        <span
+          class="badge"
+          [class.bg-success]="audit.integrity.valid"
+          [class.bg-danger]="!audit.integrity.valid"
+        >
+          <i
+            [class]="
+              audit.integrity.valid
+                ? 'ri-shield-check-line'
+                : 'ri-shield-cross-line'
+            "
+          ></i>
+
+          {{
+            (audit.integrity.valid
+              ? 'audit_integrity_verified'
+              : 'audit_integrity_invalid'
+            ) | translate
+          }}
+        </span>
+      </div>
+    </div>
+
+    <!--==================================================-->
+    <!--==== OVERVIEW ====================================-->
+    <!--==================================================-->
+
+    <section class="audit-section">
+      <h6 class="audit-section-title">
+        {{ 'audit_overview' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-xl-3 col-md-6">
+          <div class="audit-field">
+            <span>{{ 'audit_module' | translate }}</span>
+
+            <strong>{{ audit.module || '-' }}</strong>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="audit-field">
+            <span>{{ 'audit_action_placeholder' | translate }}</span>
+
+            <strong>{{ audit.action || '-' }}</strong>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="audit-field">
+            <span>{{ 'audit_category' | translate }}</span>
+
+            <strong>{{ audit.category || '-' }}</strong>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="audit-field">
+            <span>{{ 'audit_source' | translate }}</span>
+
+            <strong>{{ audit.source || '-' }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--==================================================-->
+    <!--==== ACTOR / ENTITY ==============================-->
+    <!--==================================================-->
+
+    <section class="audit-section">
+      <h6 class="audit-section-title">
+        {{ 'audit_actor_entity' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="audit-info-box">
+            <div class="audit-info-icon">
+              <i class="ri-user-line"></i>
+            </div>
+
+            <div>
+              <small>{{ 'audit_actor_label' | translate }}</small>
+
+              <h6>
+                {{ audit.actor.label || '-' }}
+              </h6>
+
+              <span>
+                {{ audit.actor.type || '-' }}
+                @if (audit.actor.id) {
+                  · {{ audit.actor.id }}
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="audit-info-box">
+            <div class="audit-info-icon">
+              <i class="ri-database-2-line"></i>
+            </div>
+
+            <div>
+              <small>{{ 'audit_entity_label' | translate }}</small>
+
+              <h6>
+                {{ audit.entity.label || '-' }}
+              </h6>
+
+              <span>
+                {{ audit.entity.type || '-' }}
+
+                @if (audit.entity.id) {
+                  · {{ audit.entity.id }}
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--==================================================-->
+    <!--==== REQUEST =====================================-->
+    <!--==================================================-->
+
+    <section class="audit-section">
+      <h6 class="audit-section-title">
+        {{ 'audit_request_context' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="audit-field">
+            <span>{{ 'audit_request_id' | translate }}</span>
+
+            <code>{{ audit.request_id || '-' }}</code>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="audit-field">
+            <span>{{ 'audit_correlation_id' | translate }}</span>
+
+            <code>{{ audit.correlation_id || '-' }}</code>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="audit-field">
+            <span>{{ 'audit_http_method' | translate }}</span>
+
+            <strong>{{ audit.http.method || '-' }}</strong>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="audit-field">
+            <span>{{ 'audit_http_status' | translate }}</span>
+
+            <strong>
+              {{ audit.http.status ?? '-' }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="audit-field">
+            <span>{{ 'audit_route' | translate }}</span>
+
+            <code>{{ audit.http.route || '-' }}</code>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="audit-field">
+            <span>{{ 'audit_ip_address' | translate }}</span>
+
+            <code>{{ audit.http.ip_address || '-' }}</code>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="audit-field">
+            <span>{{ 'audit_duration' | translate }}</span>
+
+            <strong>
+              {{ audit.duration_ms !== null ? audit.duration_ms + ' ms' : '-' }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="audit-field">
+            <span>{{ 'audit_company_scope' | translate }}</span>
+
+            <code>
+              {{ audit.id_master_comp || ('audit_global_scope' | translate) }}
+            </code>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="audit-field">
+            <span>{{ 'audit_user_agent' | translate }}</span>
+
+            <div class="text-break">
+              {{ audit.http.user_agent || '-' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--==================================================-->
+    <!--==== CHANGES =====================================-->
+    <!--==================================================-->
+
+    <section class="audit-section">
+      <h6 class="audit-section-title">
+        {{ 'audit_changes' | translate }}
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="audit-json-box">
+            <div class="audit-json-title">
+              {{ 'audit_before' | translate }}
+            </div>
+
+            <pre>{{ formatJson(audit.changes.before) }}</pre>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="audit-json-box">
+            <div class="audit-json-title">
+              {{ 'audit_after' | translate }}
+            </div>
+
+            <pre>{{ formatJson(audit.changes.after) }}</pre>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="audit-json-box">
+            <div class="audit-json-title">
+              {{ 'audit_changed_fields' | translate }}
+            </div>
+
+            <pre>{{ formatJson(audit.changes.changed_fields) }}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--==================================================-->
+    <!--==== METADATA ====================================-->
+    <!--==================================================-->
+
+    <section class="audit-section">
+      <h6 class="audit-section-title">
+        {{ 'audit_metadata' | translate }}
+      </h6>
+
+      <div class="audit-json-box">
+        <pre>{{ formatJson(audit.metadata) }}</pre>
+      </div>
+    </section>
+
+    <!--==================================================-->
+    <!--==== INTEGRITY ===================================-->
+    <!--==================================================-->
+
+    <section class="audit-section mb-0">
+      <h6 class="audit-section-title">
+        {{ 'audit_integrity_verification' | translate }}
+      </h6>
+
+      <div
+        class="integrity-box"
+        [class.integrity-valid]="audit.integrity.valid"
+        [class.integrity-invalid]="!audit.integrity.valid"
+      >
+        <div class="integrity-icon">
+          <i
+            [class]="
+              audit.integrity.valid
+                ? 'ri-shield-check-line'
+                : 'ri-shield-cross-line'
+            "
+          ></i>
+        </div>
+
+        <div class="flex-grow-1">
+          <strong>
+            {{
+              (audit.integrity.valid
+                ? 'audit_integrity_verified_message'
+                : 'audit_integrity_invalid_message'
+              ) | translate
+            }}
+          </strong>
+
+          <div class="mt-2">
+            {{ 'audit_integrity_version' | translate }}:
+            {{ audit.integrity.version }}
+          </div>
+
+          <code class="integrity-hash">
+            {{ audit.integrity.hash || '-' }}
+          </code>
+        </div>
+      </div>
+    </section>
+  }
+</app-page-wrapper>

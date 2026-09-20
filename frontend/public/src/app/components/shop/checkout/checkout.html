@@ -1,0 +1,300 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+<!-- Return login section start -->
+<section class="return-login-section section-t-space">
+  <div class="custom-container">
+    <div class="return-box">
+      <h5>Returning customer?</h5>
+      <button class="btn" (click)="openLoginModal()">
+        Click here to Login
+        <app-login-modal #loginModal />
+      </button>
+    </div>
+  </div>
+</section>
+<!-- Return login section end -->
+
+<!-- Checkout Section Start -->
+<section class="checkout-section-new section-block-space">
+  <div class="custom-container">
+    <div class="row g-sm-4 g-3">
+      <div class="col-xl-7 col-lg-6">
+        <div class="checkout-left-box">
+          <div class="billing-box checkbox-bg-color">
+            <div class="checkout-title">
+              <h4>Shipping details</h4>
+            </div>
+            <app-address-block
+              [addresses]="(user$ | async)?.address!"
+              [type]="'shipping'"
+              (selectAddress)="selectShippingAddress($event)"
+            >
+            </app-address-block>
+
+            <div class="checkout-title">
+              <h4>Billing details</h4>
+            </div>
+            <app-address-block
+              [addresses]="(user$ | async)?.address!"
+              [type]="'billing'"
+              (selectAddress)="selectBillingAddress($event)"
+            >
+            </app-address-block>
+
+            @if (!(cartDigital$ | async)!) {
+              <div class="checkout-title">
+                <h4>Delivery Options</h4>
+              </div>
+              <app-delivery-block
+                [setting]="(setting$ | async)!"
+                (selectDelivery)="selectDelivery($event)"
+              >
+              </app-delivery-block>
+            }
+
+            <div class="checkout-title">
+              <h4>Payment Option</h4>
+            </div>
+            @if (!(user$ | async)!) {
+              <div class="empty-box">
+                <h2>{{ 'No payment options found' | translate }}</h2>
+              </div>
+            }
+            <app-payment-block
+              [setting]="(setting$ | async)!"
+              (selectPaymentMethod)="selectPaymentMethod($event)"
+            >
+            </app-payment-block>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-5 col-lg-6">
+        <div class="checkout-right-box checkbox-bg-color">
+          <div class="checkout-title">
+            <h4>Your order</h4>
+          </div>
+          <div class="table-responsive">
+            <table class="table order-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of cartItem$ | async; track item) {
+                  <tr>
+                    <td>
+                      <div class="checkout-product-box">
+                        <a [routerLink]="['/product/' + item.product.slug]" class="product-image">
+                          <img
+                            [src]="
+                              item?.variation && item?.variation?.variation_image
+                                ? item?.variation?.variation_image?.asset_url
+                                : item?.product?.product_thumbnail
+                                  ? item?.product?.product_thumbnail?.asset_url
+                                  : 'assets/images/placeholder/product.png'
+                            "
+                            class="img-fluid"
+                            alt="product"
+                          />
+                        </a>
+                        <div class="product-contain">
+                          <a [routerLink]="['/product/' + item.product!.slug]">
+                            <h5>
+                              {{ item?.variation ? item?.variation?.name : item?.product?.name }}
+                              <span
+                                >{{
+                                  (item?.variation
+                                    ? item.variation.sale_price
+                                    : item?.product && item?.wholesale_price
+                                      ? item?.wholesale_price
+                                      : item?.product?.sale_price)! | currencySymbol
+                                }}
+                                X {{ item.quantity }}</span
+                              >
+                            </h5>
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {{
+                        (item?.variation
+                          ? item.variation.sale_price
+                          : item?.product && item?.wholesale_price
+                            ? item?.wholesale_price
+                            : item?.product?.sale_price)! * item.quantity | currencySymbol
+                      }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <form [formGroup]="form" (ngSubmit)="placeorder()">
+            <div class="custom-box-loader">
+              @if (loading) {
+                <div class="box-loader">
+                  <app-loader [loaderClass]="'loader-wrapper blur-bg'"></app-loader>
+                </div>
+              }
+              <ul class="sub-total">
+                <li>
+                  {{ 'Subtotal' | translate }}
+                  <span class="count">{{
+                    (checkout$ | async)
+                      ? ((checkout$ | async)!.total.sub_total | currencySymbol)
+                      : 'Not Calculated Yet'
+                  }}</span>
+                </li>
+
+                @if (!(cartDigital$ | async)!) {
+                  <li>
+                    {{ 'Shipping' | translate }}
+                    <span class="count">{{
+                      (checkout$ | async)
+                        ? ((checkout$ | async)!.total.shipping_total | currencySymbol)
+                        : 'Not Calculated Yet'
+                    }}</span>
+                  </li>
+                }
+
+                <li>
+                  {{ 'Tax' | translate }}
+                  <span class="count">{{
+                    (checkout$ | async)
+                      ? ((checkout$ | async)!.total.tax_total | currencySymbol)
+                      : 'Not Calculated Yet'
+                  }}</span>
+                </li>
+
+                @if (
+                  (user$ | async) &&
+                  (checkout$ | async) &&
+                  (user$ | async)?.point?.balance &&
+                  (setting$ | async)?.activation?.point_enable
+                ) {
+                  <li>
+                    <h4
+                      [class]="
+                        form.controls['points_amount'].value ? 'txt-primary fw-bold' : 'txt-muted'
+                      "
+                    >
+                      {{ 'Points' | translate }}
+                    </h4>
+                    <h4
+                      [class]="
+                        form.controls['points_amount'].value
+                          ? 'txt-primary fw-bold price'
+                          : 'txt-muted price'
+                      "
+                    >
+                      {{
+                        (checkout$ | async)
+                          ? ((checkout$ | async)!.total.convert_point_amount! | currencySymbol)
+                          : 'not_calculated_yet'
+                      }}
+                    </h4>
+                  </li>
+
+                  <li class="border-cls">
+                    <label class="form-check-label m-0" for="ponts">{{
+                      'Would you prefer to pay using points?'
+                    }}</label>
+                    <input
+                      class="checkbox_animated check-it"
+                      type="checkbox"
+                      id="ponts"
+                      (change)="togglePoint($event)"
+                    />
+                  </li>
+                }
+                @if (
+                  (user$ | async) &&
+                  (checkout$ | async) &&
+                  (user$ | async)?.point?.balance &&
+                  (setting$ | async)?.activation?.wallet_enable
+                ) {
+                  <li>
+                    <h4
+                      [class]="form.controls['wallet_balance'].value ? 'txt-primary fw-bold' : ''"
+                    >
+                      {{ 'Wallet Balance' | translate }}
+                    </h4>
+                    <h4
+                      [class]="
+                        form.controls['wallet_balance'].value
+                          ? 'txt-primary fw-bold price'
+                          : 'price'
+                      "
+                    >
+                      {{
+                        (checkout$ | async)
+                          ? ((checkout$ | async)!.total.convert_wallet_balance! | currencySymbol)
+                          : 'Not Calculated Yet'
+                      }}
+                    </h4>
+                  </li>
+
+                  <li class="border-cls">
+                    <label class="form-check-label m-0" for="wallet">{{
+                      'Would you prefer to pay using wallet?'
+                    }}</label>
+                    <input
+                      class="checkbox_animated check-it"
+                      type="checkbox"
+                      id="wallet"
+                      (change)="toggleWallet($event)"
+                    />
+                  </li>
+                }
+              </ul>
+              <ul class="total-product-box">
+                @if (
+                  appliedCoupon ||
+                  (form.get('points_amount')?.value &&
+                    (checkout$ | async)?.total?.convert_point_amount &&
+                    (setting$ | async)?.activation?.point_enable) ||
+                  (form.get('wallet_balance')?.value &&
+                    (checkout$ | async)?.total?.convert_wallet_balance &&
+                    (setting$ | async)?.activation?.wallet_enable)
+                ) {
+                  <li>
+                    {{ 'You Save' | translate }}
+                    <span class="count">{{
+                      (checkout$ | async)
+                        ? ((checkout$ | async)!.total.total - (checkout$ | async)!.total.sub_total
+                          | currencySymbol)
+                        : 'Not Calculated Yet'
+                    }}</span>
+                  </li>
+                }
+                <li class="total">
+                  {{ 'Total' | translate }}
+                  <span class="count">{{
+                    (checkout$ | async)
+                      ? ((checkout$ | async)!.total.total | currencySymbol)
+                      : 'Not Calculated Yet'
+                  }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="text-end">
+              <app-button
+                [class]="'btn theme-bg-color text-white rounded-pill w-100'"
+                [id]="'place_order'"
+                [disabled]="form.valid && (checkout$ | async) ? false : true"
+                [routerLink]="['/order-success']"
+              >
+                {{ 'Place Order' | translate }}
+              </app-button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Checkout Section End -->

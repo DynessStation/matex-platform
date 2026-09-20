@@ -1,0 +1,9 @@
+@if (quickViewStyle() === 'text') {
+  <button class="btn view-btn" (click)="openModal(product()!)" [class]="class()">Quick View</button>
+}
+@if (quickViewStyle() === 'icon') {
+  <button class="p-shop-btn btn" (click)="openModal(product()!)" [class]="class()">
+    <i class="ri-eye-line"></i>
+    <span>Quick view</span>
+  </button>
+}

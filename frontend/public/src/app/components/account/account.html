@@ -1,0 +1,31 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+<section class="user-dashboard-section section-t-space">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-xxl-3 col-lg-4">
+        <app-sidebar></app-sidebar>
+      </div>
+
+      <div class="col-xxl-9 col-lg-8">
+        <button
+          class="btn left-dashboard-show btn-bg-theme btn-md mb-4 d-lg-none"
+          (click)="openMenu()"
+        >
+          Show Menu
+        </button>
+        <div class="tab-content dashboard-right-sidebar h-100" id="pills-tabContent">
+          <div class="dashboard-bg-box">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="account-overlay" id="accountOverlay" [class.show]="accountService.isOpenMenu"></div>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

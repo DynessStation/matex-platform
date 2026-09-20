@@ -1,0 +1,3381 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 47,
+      "order_number": 1020,
+      "consumer_id": 2,
+      "tax_total": 2.94,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 0,
+      "amount": 58.8,
+      "total": 61.73,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 2,
+        "city": "San Jose",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "Old Home",
+        "street": "53B, Claire New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 8.46,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 19,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Express Delivery|Schedule",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 1,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-07-06T10:21:44.000000Z",
+      "updated_at": "2024-07-06T10:21:44.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 45,
+          "status": "pending",
+          "order_id": 47,
+          "changed_at": "2024-07-06 10:21:44",
+          "created_at": "2024-07-06T10:21:44.000000Z",
+          "updated_at": "2024-07-06T10:21:44.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 29,
+        "store_name": "Powerhouse Electronics",
+        "description": "Powerhouse Electronics brings innovation and excitement to every cycling journey. From sleek, high-performance bikes to family-friendly rides, our store is your gateway to adventure, quality, and endless fun on two wheels.",
+        "slug": "powerhouse-electronics",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3759,
+        "city": "Denver",
+        "address": "Apartment 27B, The Grand Residences at Oakwood Heights 1847, East Wing Northwest Suburban District, Postal Code 94873-0012",
+        "pincode": "80014",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 32,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-06-17T10:04:57.000000Z",
+        "updated_at": "2025-06-17T10:04:57.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 15,
+        "product_images": [
+          "assets/images/product/electronic_2-1.png",
+          "assets/images/product/electronic_15-1.png",
+          "assets/images/product/electronic_21-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 2,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 32,
+          "name": "Nathan Lockehart",
+          "email": "nathan.l@gmail.com",
+          "country_code": "1",
+          "phone": 2564567891,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-06-17T10:04:57.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 44,
+      "order_number": 1017,
+      "consumer_id": 2,
+      "tax_total": 1.97,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 39.4,
+      "amount": 39.4,
+      "total": 1.97,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": null,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 2,
+        "city": "San Jose",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "Old Home",
+        "street": "53B, Claire New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 47.86,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 16,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Express Delivery|Schedule",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 1,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-07-06T09:45:33.000000Z",
+      "updated_at": "2024-07-06T09:45:33.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 42,
+          "status": "pending",
+          "order_id": 44,
+          "changed_at": "2024-07-06 09:45:33",
+          "created_at": "2024-07-06T09:45:33.000000Z",
+          "updated_at": "2024-07-06T09:45:33.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": null,
+      "sub_orders": [
+        {
+          "id": 45,
+          "order_number": 1018,
+          "consumer_id": 2,
+          "tax_total": 1,
+          "shipping_total": 0,
+          "points_amount": 0,
+          "wallet_balance": 0,
+          "amount": 20,
+          "total": 21,
+          "is_digital_only": 0,
+          "coupon_total_discount": 0,
+          "payment_method": "cod",
+          "payment_status": "PENDING",
+          "store_id": 4,
+          "billing_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "shipping_address": {
+            "id": 2,
+            "city": "San Jose",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "Old Home",
+            "street": "53B, Claire New Street",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "94088",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "consumer": {
+            "id": 2,
+            "name": "john due",
+            "role": {
+              "id": 2,
+              "name": "consumer",
+              "guard_name": "web",
+              "system_reserve": "1"
+            },
+            "email": "john.customer@example.com",
+            "phone": 0,
+            "point": {
+              "id": 3,
+              "balance": 1970,
+              "consumer_id": 2
+            },
+            "status": 1,
+            "wallet": {
+              "id": 2,
+              "balance": 47.86,
+              "consumer_id": 2
+            },
+            "created_at": "2024-05-02T08:34:46.000000Z",
+            "country_code": "1",
+            "orders_count": 17,
+            "created_by_id": 2,
+            "profile_image": null,
+            "system_reserve": "0",
+            "profile_image_id": null,
+            "email_verified_at": "2024-05-02T08:34:46.000000Z"
+          },
+          "delivery_description": "Express Delivery|Schedule",
+          "delivery_interval": null,
+          "order_status_id": 1,
+          "coupon_id": null,
+          "parent_id": "44",
+          "created_by_id": 1,
+          "invoice_url": "assets/file.txt",
+          "is_guest": 0,
+          "status": 1,
+          "note": null,
+          "delivered_at": null,
+          "created_at": "2024-07-06T09:45:34.000000Z",
+          "updated_at": "2024-07-06T09:45:34.000000Z",
+          "deleted_at": null,
+          "order_status": {
+            "id": 1,
+            "name": "pending",
+            "sequence": 1,
+            "slug": "pending"
+          },
+          "order_status_activities": [
+            {
+              "id": 43,
+              "status": "pending",
+              "order_id": 45,
+              "changed_at": "2024-07-06 09:45:34",
+              "created_at": "2024-07-06T09:45:34.000000Z",
+              "updated_at": "2024-07-06T09:45:34.000000Z",
+              "deleted_at": null
+            }
+          ],
+          "store": {
+            "id": 29,
+            "store_name": "Powerhouse Electronics",
+            "description": "Powerhouse Electronics brings innovation and excitement to every cycling journey. From sleek, high-performance bikes to family-friendly rides, our store is your gateway to adventure, quality, and endless fun on two wheels.",
+            "slug": "powerhouse-electronics",
+            "store_logo_id": null,
+            "store_cover_id": null,
+            "country_id": 840,
+            "state_id": 3759,
+            "city": "Denver",
+            "address": "Apartment 27B, The Grand Residences at Oakwood Heights 1847, East Wing Northwest Suburban District, Postal Code 94873-0012",
+            "pincode": "80014",
+            "facebook": null,
+            "twitter": null,
+            "instagram": null,
+            "youtube": null,
+            "pinterest": null,
+            "hide_vendor_email": 0,
+            "hide_vendor_phone": 0,
+            "vendor_id": 32,
+            "created_by_id": "1",
+            "status": 1,
+            "is_approved": 1,
+            "created_at": "2025-06-17T10:04:57.000000Z",
+            "updated_at": "2025-06-17T10:04:57.000000Z",
+            "deleted_at": null,
+            "orders_count": 0,
+            "reviews_count": 0,
+            "products_count": 15,
+            "product_images": [
+              "assets/images/product/electronic_2-1.png",
+              "assets/images/product/electronic_15-1.png",
+              "assets/images/product/electronic_21-1.png"
+            ],
+            "order_amount": 0,
+            "rating_count": 2,
+            "store_logo": null,
+            "store_cover": null,
+            "vendor": {
+              "id": 32,
+              "name": "Nathan Lockehart",
+              "email": "nathan.l@gmail.com",
+              "country_code": "1",
+              "phone": 2564567891,
+              "profile_image_id": null,
+              "system_reserve": "0",
+              "status": 1,
+              "created_by_id": 1,
+              "email_verified_at": null,
+              "created_at": "2025-06-17T10:04:57.000000Z",
+              "orders_count": 0,
+              "role": {
+                "id": 3,
+                "name": "vendor",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": null,
+              "point": null
+            },
+            "country": {
+              "id": 840,
+              "name": "United States",
+              "currency": "US dollar",
+              "currency_symbol": "$",
+              "iso_3166_2": "US",
+              "iso_3166_3": "USA",
+              "calling_code": "1",
+              "flag": "US.png"
+            },
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "reviews": [
+              {
+                "id": 1,
+                "product_id": 16,
+                "consumer_id": 2,
+                "store_id": 4,
+                "review_image_id": null,
+                "rating": 5,
+                "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+                "created_at": "2024-06-21T10:07:31.000000Z",
+                "review_image": null,
+                "consumer": {
+                  "id": 2,
+                  "name": "john due",
+                  "email": "john.customer@example.com",
+                  "profile_image_id": null,
+                  "role": {
+                    "id": 2,
+                    "name": "consumer",
+                    "guard_name": "web",
+                    "system_reserve": "1"
+                  },
+                  "profile_image": null,
+                  "wallet": {
+                    "id": 2,
+                    "consumer_id": 2,
+                    "balance": 8.46
+                  },
+                  "point": {
+                    "id": 3,
+                    "consumer_id": 2,
+                    "balance": 1970
+                  }
+                }
+              },
+              {
+                "id": 2,
+                "product_id": 15,
+                "consumer_id": 34,
+                "store_id": 4,
+                "review_image_id": null,
+                "rating": 4,
+                "description": "Product Quality Is Good As Expexpected",
+                "created_at": "2024-06-25T10:22:38.000000Z",
+                "review_image": null,
+                "consumer": {
+                  "id": 34,
+                  "name": "Rhoda Mayer",
+                  "email": "rhoda@mail.com",
+                  "profile_image_id": null,
+                  "role": {
+                    "id": 2,
+                    "name": "consumer",
+                    "guard_name": "web",
+                    "system_reserve": "1"
+                  },
+                  "profile_image": null,
+                  "wallet": {
+                    "id": 5,
+                    "consumer_id": 34,
+                    "balance": 0
+                  },
+                  "point": {
+                    "id": 6,
+                    "consumer_id": 34,
+                    "balance": 100
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 46,
+          "order_number": 1019,
+          "consumer_id": 2,
+          "tax_total": 0.97,
+          "shipping_total": 0,
+          "points_amount": 0,
+          "wallet_balance": 0,
+          "amount": 19.39,
+          "total": 20.37,
+          "is_digital_only": 0,
+          "coupon_total_discount": 0,
+          "payment_method": "cod",
+          "payment_status": "PENDING",
+          "store_id": 24,
+          "billing_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "shipping_address": {
+            "id": 2,
+            "city": "San Jose",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "Old Home",
+            "street": "53B, Claire New Street",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "94088",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "consumer": {
+            "id": 2,
+            "name": "john due",
+            "role": {
+              "id": 2,
+              "name": "consumer",
+              "guard_name": "web",
+              "system_reserve": "1"
+            },
+            "email": "john.customer@example.com",
+            "phone": 0,
+            "point": {
+              "id": 3,
+              "balance": 1970,
+              "consumer_id": 2
+            },
+            "status": 1,
+            "wallet": {
+              "id": 2,
+              "balance": 47.86,
+              "consumer_id": 2
+            },
+            "created_at": "2024-05-02T08:34:46.000000Z",
+            "country_code": "1",
+            "orders_count": 18,
+            "created_by_id": 2,
+            "profile_image": null,
+            "system_reserve": "0",
+            "profile_image_id": null,
+            "email_verified_at": "2024-05-02T08:34:46.000000Z"
+          },
+          "delivery_description": "Express Delivery|Schedule",
+          "delivery_interval": null,
+          "order_status_id": 1,
+          "coupon_id": null,
+          "parent_id": "44",
+          "created_by_id": 1,
+          "invoice_url": "assets/file.txt",
+          "is_guest": 0,
+          "status": 1,
+          "note": null,
+          "delivered_at": null,
+          "created_at": "2024-07-06T09:45:34.000000Z",
+          "updated_at": "2024-07-06T09:45:34.000000Z",
+          "deleted_at": null,
+          "order_status": {
+            "id": 1,
+            "name": "pending",
+            "sequence": 1,
+            "slug": "pending"
+          },
+          "order_status_activities": [
+            {
+              "id": 44,
+              "status": "pending",
+              "order_id": 46,
+              "changed_at": "2024-07-06 09:45:34",
+              "created_at": "2024-07-06T09:45:34.000000Z",
+              "updated_at": "2024-07-06T09:45:34.000000Z",
+              "deleted_at": null
+            }
+          ],
+          "store": {
+            "id": 28,
+            "store_name": "Trendy Fashion",
+            "description": "Trendy Fashion is your ultimate destination for the latest styles and wardrobe essentials. From chic everyday wear to statement pieces, we bring you quality fashion that keeps you ahead of trends and feeling confident every day.",
+            "slug": "trendy-fashion",
+            "store_logo_id": null,
+            "store_cover_id": null,
+            "country_id": 840,
+            "state_id": 3787,
+            "city": "Newark",
+            "address": "Villa 9, Rosehill Estate, The Overlook at Briarwood Hills 2891 North Hollow  Creek Trail, Westgate Borough Stonebridge City, Massachusetts 01760-9845,  USA",
+            "pincode": "734051",
+            "facebook": null,
+            "twitter": null,
+            "instagram": null,
+            "youtube": null,
+            "pinterest": null,
+            "hide_vendor_email": 0,
+            "hide_vendor_phone": 0,
+            "vendor_id": 31,
+            "created_by_id": "1",
+            "status": 1,
+            "is_approved": 1,
+            "created_at": "2025-06-15T08:42:33.000000Z",
+            "updated_at": "2025-06-15T08:42:33.000000Z",
+            "deleted_at": null,
+            "orders_count": 1,
+            "reviews_count": 0,
+            "products_count": 16,
+            "product_images": [
+              "assets/images/product/fashion_1-1-1.png",
+              "assets/images/product/fashion_2-1.png",
+              "assets/images/product/fashion_3-1.png"
+            ],
+            "order_amount": 42,
+            "rating_count": 3,
+            "store_logo": null,
+            "store_cover": null,
+            "vendor": {
+              "id": 31,
+              "name": "Joseph Williams",
+              "email": "joseph.store@example.com",
+              "country_code": "1",
+              "phone": 8239142922,
+              "profile_image_id": null,
+              "system_reserve": "0",
+              "status": 1,
+              "created_by_id": 1,
+              "email_verified_at": null,
+              "created_at": "2025-06-15T08:42:33.000000Z",
+              "orders_count": 0,
+              "role": {
+                "id": 3,
+                "name": "vendor",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": null,
+              "point": null
+            },
+            "country": {
+              "id": 840,
+              "name": "United States",
+              "currency": "US dollar",
+              "currency_symbol": "$",
+              "iso_3166_2": "US",
+              "iso_3166_3": "USA",
+              "calling_code": "1",
+              "flag": "US.png"
+            },
+            "state": {
+              "id": 3787,
+              "name": "New York",
+              "country_id": "840"
+            },
+            "reviews": []
+          }
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "order_number": 1016,
+      "consumer_id": 2,
+      "tax_total": 2.19,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 0,
+      "amount": 43.95,
+      "total": 46.14,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 47.86,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 15,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Express Delivery | Schedule",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-26T04:53:58.000000Z",
+      "updated_at": "2024-06-26T04:53:58.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 41,
+          "status": "pending",
+          "order_id": 43,
+          "changed_at": "2024-06-26 04:53:58",
+          "created_at": "2024-06-26T04:53:58.000000Z",
+          "updated_at": "2024-06-26T04:53:58.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 28,
+        "store_name": "Trendy Fashion",
+        "description": "Trendy Fashion is your ultimate destination for the latest styles and wardrobe essentials. From chic everyday wear to statement pieces, we bring you quality fashion that keeps you ahead of trends and feeling confident every day.",
+        "slug": "trendy-fashion",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3787,
+        "city": "Newark",
+        "address": "Villa 9, Rosehill Estate, The Overlook at Briarwood Hills 2891 North Hollow  Creek Trail, Westgate Borough Stonebridge City, Massachusetts 01760-9845,  USA",
+        "pincode": "734051",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 31,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-06-15T08:42:33.000000Z",
+        "updated_at": "2025-06-15T08:42:33.000000Z",
+        "deleted_at": null,
+        "orders_count": 1,
+        "reviews_count": 0,
+        "products_count": 16,
+        "product_images": [
+          "assets/images/product/fashion_1-1-1.png",
+          "assets/images/product/fashion_2-1.png",
+          "assets/images/product/fashion_3-1.png"
+        ],
+        "order_amount": 42,
+        "rating_count": 3,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 31,
+          "name": "Joseph Williams",
+          "email": "joseph.store@example.com",
+          "country_code": "1",
+          "phone": 8239142922,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-06-15T08:42:33.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3787,
+          "name": "New York",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 42,
+      "order_number": 1015,
+      "consumer_id": 2,
+      "tax_total": 18.75,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 375,
+      "amount": 375,
+      "total": 18.75,
+      "is_digital_only": 0,
+      "coupon_total_discount": 150,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": null,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 422.86,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 14,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": 6,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-25T13:04:21.000000Z",
+      "updated_at": "2024-06-25T13:04:21.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 40,
+          "status": "pending",
+          "order_id": 42,
+          "changed_at": "2024-06-25 13:04:21",
+          "created_at": "2024-06-25T13:04:22.000000Z",
+          "updated_at": "2024-06-25T13:04:22.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 21,
+        "store_name": "Tiny Treasures",
+        "description": "Tiny Treasures Baby Store is dedicated to providing the safest and highest-quality products for your little ones. From adorable clothing and playful toys to essential baby care items, we make sure every parent finds exactly what they need to nurture and delight their child.",
+        "slug": "tiny-treasures",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3800,
+        "city": "Austin",
+        "address": "Estate House 14, Grand Sycamore Grove 999 Heritage Circle Road, North Hollow District Maple Hill Estates, Oregon 97035-6432, USA",
+        "pincode": "78562",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 23,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-05-23T08:09:09.000000Z",
+        "updated_at": "2025-05-23T08:09:09.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 18,
+        "product_images": [
+          "assets/images/product/babyproduct_28-1.png",
+          "assets/images/product/babyproduct_30-1.png",
+          "assets/images/product/babyproduct_27-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 4,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 23,
+          "name": "Emma Winters",
+          "email": "emma.store@example.com",
+          "country_code": "1",
+          "phone": 5186570492,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-05-23T08:09:09.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3800,
+          "name": "Texas",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 40,
+      "order_number": 1013,
+      "consumer_id": 2,
+      "tax_total": 1.72,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 34.44,
+      "amount": 34.44,
+      "total": 1.72,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 2,
+        "city": "San Jose",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "Old Home",
+        "street": "53B, Claire New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 3,
+        "city": "San Jose",
+        "phone": 551865359,
+        "state": {
+          "id": 3757,
+          "name": "California",
+          "country_id": "840"
+        },
+        "title": "Office",
+        "street": "21B, Row New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3757,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 457.3,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 13,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-24T08:59:59.000000Z",
+      "updated_at": "2024-06-24T08:59:59.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 34,
+          "status": "pending",
+          "order_id": 40,
+          "changed_at": "2024-06-24 08:59:59",
+          "created_at": "2024-06-24T08:59:59.000000Z",
+          "updated_at": "2024-06-24T08:59:59.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 27,
+        "store_name": "Green Basket",
+        "description": "Green Basket brings fresh, farm-to-table vegetables directly to your kitchen. Healthy, organic, and handpicked for quality—because your family deserves the best.",
+        "slug": "green-basket",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3800,
+        "city": "Houston",
+        "address": "Suite 21D, The Prestige Lofts at Harbourfront Circle 7700 Seaside Promenade,Block A, Waterfront Quarter East Bay Haven, California 94123-1102, USA",
+        "pincode": "76107",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 29,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-06-06T06:17:44.000000Z",
+        "updated_at": "2025-06-06T06:17:44.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 16,
+        "product_images": [
+          "assets/images/product/grocery_24-1.png",
+          "assets/images/product/grocery_14-1.png",
+          "assets/images/product/grocery_27-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 1,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 29,
+          "name": "Jessica Smith",
+          "email": "jessica@gmail.com",
+          "country_code": "1",
+          "phone": 7327942925,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-06-06T06:17:44.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3800,
+          "name": "Texas",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 39,
+      "order_number": 1012,
+      "consumer_id": 2,
+      "tax_total": 0.29,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 0,
+      "amount": 5.94,
+      "total": 6.23,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 457.3,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 12,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-21T11:48:47.000000Z",
+      "updated_at": "2024-06-21T11:48:47.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 33,
+          "status": "pending",
+          "order_id": 39,
+          "changed_at": "2024-06-21 11:48:47",
+          "created_at": "2024-06-21T11:48:47.000000Z",
+          "updated_at": "2024-06-21T11:48:47.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 26,
+        "store_name": "Little Joys",
+        "description": "Little Joys is your one-stop shop for all things baby. From diapers to toys, clothes, and accessories, we ensure your little ones get only the safest and cutest products.",
+        "slug": "little-joys",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3783,
+        "city": "New Hampton",
+        "address": "The Magnolia House, 1234 Colonial Crescent Drive Hillside Historic District,  Westgate Village Brookhaven, Georgia 30339-2005, USA",
+        "pincode": "3256",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 28,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-05-29T07:50:19.000000Z",
+        "updated_at": "2025-05-29T07:50:19.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 20,
+        "product_images": [
+          "assets/images/product/babyproduct_10-1.png",
+          "assets/images/product/babyproduct_11-1.png",
+          "assets/images/product/babyproduct_13-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 4,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 28,
+          "name": "Lucas Sawyer",
+          "email": "lucas@gmail.com",
+          "country_code": "1",
+          "phone": 7895412365,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-05-29T07:50:19.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3783,
+          "name": "New Hampshire",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 38,
+      "order_number": 1011,
+      "consumer_id": 2,
+      "tax_total": 1.89,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 0,
+      "amount": 37.83,
+      "total": 39.72,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 29,
+      "billing_address": {
+        "id": 3,
+        "city": "San Jose",
+        "phone": 551865359,
+        "state": {
+          "id": 3757,
+          "name": "California",
+          "country_id": "840"
+        },
+        "title": "Office",
+        "street": "21B, Row New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3757,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 3,
+        "city": "San Jose",
+        "phone": 551865359,
+        "state": {
+          "id": 3757,
+          "name": "California",
+          "country_id": "840"
+        },
+        "title": "Office",
+        "street": "21B, Row New Street",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "94088",
+        "user_id": "2",
+        "state_id": 3757,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 457.3,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 11,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery|Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 1,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-21T11:48:35.000000Z",
+      "updated_at": "2024-06-21T11:48:35.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 32,
+          "status": "pending",
+          "order_id": 38,
+          "changed_at": "2024-06-21 11:48:35",
+          "created_at": "2024-06-21T11:48:35.000000Z",
+          "updated_at": "2024-06-21T11:48:35.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 26,
+        "store_name": "Little Joys",
+        "description": "Little Joys is your one-stop shop for all things baby. From diapers to toys, clothes, and accessories, we ensure your little ones get only the safest and cutest products.",
+        "slug": "little-joys",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3783,
+        "city": "New Hampton",
+        "address": "The Magnolia House, 1234 Colonial Crescent Drive Hillside Historic District,  Westgate Village Brookhaven, Georgia 30339-2005, USA",
+        "pincode": "3256",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 28,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-05-29T07:50:19.000000Z",
+        "updated_at": "2025-05-29T07:50:19.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 20,
+        "product_images": [
+          "assets/images/product/babyproduct_10-1.png",
+          "assets/images/product/babyproduct_11-1.png",
+          "assets/images/product/babyproduct_13-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 4,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 28,
+          "name": "Lucas Sawyer",
+          "email": "lucas@gmail.com",
+          "country_code": "1",
+          "phone": 7895412365,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-05-29T07:50:19.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3783,
+          "name": "New Hampshire",
+          "country_id": "840"
+        },
+        "reviews": []
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 37,
+      "order_number": 1010,
+      "consumer_id": 2,
+      "tax_total": 3.76,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 75.21,
+      "amount": 75.2,
+      "total": 3.76,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 1970,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 532.51,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 10,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-21T10:59:00.000000Z",
+      "updated_at": "2024-06-21T10:59:00.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 31,
+          "status": "pending",
+          "order_id": 37,
+          "changed_at": "2024-06-21 10:59:00",
+          "created_at": "2024-06-21T10:59:00.000000Z",
+          "updated_at": "2024-06-21T10:59:00.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 25,
+        "store_name": "Gadget Galaxy",
+        "description": "Gadget Galaxy is your universe of electronics, gadgets, and smart devices. Discover the latest innovations and elevate your tech lifestyle.",
+        "slug": "gadget-galaxy",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3782,
+        "city": "Las Vegas",
+        "address": "Apt. 1901, The Skyrise at Monarch Heights 1517 Innovation Avenue, Midtown Tech Corridor Crystal Valley, Texas 75201-1123, USA",
+        "pincode": "89086",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 27,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-05-29T06:58:48.000000Z",
+        "updated_at": "2025-05-29T06:58:48.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 16,
+        "product_images": [
+          "assets/images/product/electronic_9-1.png",
+          "assets/images/product/electronic_3-1.png",
+          "assets/images/product/electronic_4-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 3,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 27,
+          "name": "Nathan Stark",
+          "email": "nathan@gmail.com",
+          "country_code": "1",
+          "phone": 7894581256,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-05-29T06:58:48.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3782,
+          "name": "Nevada",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 36,
+      "order_number": 1009,
+      "consumer_id": 2,
+      "tax_total": 1.52,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 30.52,
+      "amount": 30.52,
+      "total": 1.52,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": 4,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 0,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 563.03,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 9,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-21T10:27:57.000000Z",
+      "updated_at": "2024-06-21T10:27:57.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 30,
+          "status": "pending",
+          "order_id": 36,
+          "changed_at": "2024-06-21 10:27:57",
+          "created_at": "2024-06-21T10:27:57.000000Z",
+          "updated_at": "2024-06-21T10:27:57.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": {
+        "id": 24,
+        "store_name": "Daily Harvest",
+        "description": "Daily Harvest delivers fresh groceries, pantry staples, and everyday essentials right to your door. Freshness and quality you can trust every time.",
+        "slug": "daily-harvest",
+        "store_logo_id": null,
+        "store_cover_id": null,
+        "country_id": 840,
+        "state_id": 3759,
+        "city": "Denver",
+        "address": "The Chancellor's Manor, 88 Regency Way Eastern Highland Sector, Hillsborough  County Meadowridge Park, Virginia 22903-7744, USA",
+        "pincode": "80014",
+        "facebook": null,
+        "twitter": null,
+        "instagram": null,
+        "youtube": null,
+        "pinterest": null,
+        "hide_vendor_email": 0,
+        "hide_vendor_phone": 0,
+        "vendor_id": 26,
+        "created_by_id": "1",
+        "status": 1,
+        "is_approved": 1,
+        "created_at": "2025-05-25T12:15:44.000000Z",
+        "updated_at": "2025-05-25T12:15:44.000000Z",
+        "deleted_at": null,
+        "orders_count": 0,
+        "reviews_count": 0,
+        "products_count": 25,
+        "product_images": [
+          "assets/images/product/fashion_21-1.png",
+          "assets/images/product/fashion_24-1.png",
+          "assets/images/product/fashion_20-1.png"
+        ],
+        "order_amount": 0,
+        "rating_count": 2,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": {
+          "id": 26,
+          "name": "Lucian Rollins",
+          "email": "lucian.rollins@gmail.com",
+          "country_code": "1",
+          "phone": 7895642587,
+          "profile_image_id": null,
+          "system_reserve": "0",
+          "status": 1,
+          "created_by_id": 1,
+          "email_verified_at": null,
+          "created_at": "2025-05-25T12:15:44.000000Z",
+          "orders_count": 0,
+          "role": {
+            "id": 3,
+            "name": "vendor",
+            "guard_name": "web",
+            "system_reserve": "1"
+          },
+          "profile_image": null,
+          "wallet": null,
+          "point": null
+        },
+        "country": {
+          "id": 840,
+          "name": "United States",
+          "currency": "US dollar",
+          "currency_symbol": "$",
+          "iso_3166_2": "US",
+          "iso_3166_3": "USA",
+          "calling_code": "1",
+          "flag": "US.png"
+        },
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "sub_orders": []
+    },
+    {
+      "id": 33,
+      "order_number": 1006,
+      "consumer_id": 2,
+      "tax_total": 5.49,
+      "shipping_total": 0,
+      "points_amount": 0,
+      "wallet_balance": 109.97,
+      "amount": 109.96,
+      "total": 5.49,
+      "is_digital_only": 0,
+      "coupon_total_discount": 0,
+      "payment_method": "cod",
+      "payment_status": "PENDING",
+      "store_id": null,
+      "billing_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "shipping_address": {
+        "id": 1,
+        "city": "Denver",
+        "phone": 5551855359,
+        "state": {
+          "id": 3759,
+          "name": "Colorado",
+          "country_id": "840"
+        },
+        "title": "New Home",
+        "street": "26, Starts Hollow Colony",
+        "country": {
+          "id": 840,
+          "name": "United States"
+        },
+        "pincode": "80014",
+        "user_id": "2",
+        "state_id": 3759,
+        "country_id": 840,
+        "is_default": 0,
+        "country_code": "1"
+      },
+      "consumer": {
+        "id": 2,
+        "name": "john due",
+        "role": {
+          "id": 2,
+          "name": "consumer",
+          "guard_name": "web",
+          "system_reserve": "1"
+        },
+        "email": "john.customer@example.com",
+        "phone": 0,
+        "point": {
+          "id": 3,
+          "balance": 0,
+          "consumer_id": 2
+        },
+        "status": 1,
+        "wallet": {
+          "id": 2,
+          "balance": 673,
+          "consumer_id": 2
+        },
+        "created_at": "2024-05-02T08:34:46.000000Z",
+        "country_code": "1",
+        "orders_count": 6,
+        "created_by_id": 2,
+        "profile_image": null,
+        "system_reserve": "0",
+        "profile_image_id": null,
+        "email_verified_at": "2024-05-02T08:34:46.000000Z"
+      },
+      "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+      "delivery_interval": null,
+      "order_status_id": 1,
+      "coupon_id": null,
+      "parent_id": null,
+      "created_by_id": 2,
+      "invoice_url": "assets/file.txt",
+      "is_guest": 0,
+      "status": 1,
+      "note": null,
+      "delivered_at": null,
+      "created_at": "2024-06-21T10:18:45.000000Z",
+      "updated_at": "2024-06-21T10:18:45.000000Z",
+      "deleted_at": null,
+      "order_status": {
+        "id": 1,
+        "name": "pending",
+        "sequence": 1,
+        "slug": "pending"
+      },
+      "order_status_activities": [
+        {
+          "id": 19,
+          "status": "pending",
+          "order_id": 33,
+          "changed_at": "2024-06-21 10:18:45",
+          "created_at": "2024-06-21T10:18:46.000000Z",
+          "updated_at": "2024-06-21T10:18:46.000000Z",
+          "deleted_at": null
+        }
+      ],
+      "store": null,
+      "sub_orders": [
+        {
+          "id": 34,
+          "order_number": 1007,
+          "consumer_id": 2,
+          "tax_total": 5,
+          "shipping_total": 0,
+          "points_amount": 0,
+          "wallet_balance": 0,
+          "amount": 100,
+          "total": 105,
+          "is_digital_only": 0,
+          "coupon_total_discount": 0,
+          "payment_method": "cod",
+          "payment_status": "COMPLETED",
+          "store_id": 19,
+          "billing_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "shipping_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "consumer": {
+            "id": 2,
+            "name": "john due",
+            "role": {
+              "id": 2,
+              "name": "consumer",
+              "guard_name": "web",
+              "system_reserve": "1"
+            },
+            "email": "john.customer@example.com",
+            "phone": 0,
+            "point": {
+              "id": 3,
+              "balance": 0,
+              "consumer_id": 2
+            },
+            "status": 1,
+            "wallet": {
+              "id": 2,
+              "balance": 673,
+              "consumer_id": 2
+            },
+            "created_at": "2024-05-02T08:34:46.000000Z",
+            "country_code": "1",
+            "orders_count": 7,
+            "created_by_id": 2,
+            "profile_image": null,
+            "system_reserve": "0",
+            "profile_image_id": null,
+            "email_verified_at": "2024-05-02T08:34:46.000000Z"
+          },
+          "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+          "delivery_interval": null,
+          "order_status_id": 6,
+          "coupon_id": null,
+          "parent_id": "33",
+          "created_by_id": 1,
+          "invoice_url": "assets/file.txt",
+          "is_guest": 0,
+          "status": 1,
+          "note": null,
+          "delivered_at": "2024-06-21 00:00:00",
+          "created_at": "2024-06-21T10:18:46.000000Z",
+          "updated_at": "2024-06-21T10:19:31.000000Z",
+          "deleted_at": null,
+          "order_status": {
+            "id": 6,
+            "name": "delivered",
+            "sequence": 6,
+            "slug": "delivered"
+          },
+          "order_status_activities": [
+            {
+              "id": 20,
+              "status": "pending",
+              "order_id": 34,
+              "changed_at": "2024-06-21T15:49:23.394394+0530",
+              "created_at": "2024-06-21T10:18:46.000000Z",
+              "updated_at": "2024-06-21T10:19:30.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 22,
+              "status": "processing",
+              "order_id": 34,
+              "changed_at": "2024-06-21T15:49:23.394394+0530",
+              "created_at": "2024-06-21T10:19:30.000000Z",
+              "updated_at": "2024-06-21T10:19:30.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 23,
+              "status": "shipped",
+              "order_id": 34,
+              "changed_at": "2024-06-21T15:49:23.394394+0530",
+              "created_at": "2024-06-21T10:19:30.000000Z",
+              "updated_at": "2024-06-21T10:19:30.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 24,
+              "status": "out_for_delivery",
+              "order_id": 34,
+              "changed_at": "2024-06-21T15:49:23.394394+0530",
+              "created_at": "2024-06-21T10:19:30.000000Z",
+              "updated_at": "2024-06-21T10:19:30.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 25,
+              "status": "delivered",
+              "order_id": 34,
+              "changed_at": "2024-06-21T15:49:23.394394+0530",
+              "created_at": "2024-06-21T10:19:31.000000Z",
+              "updated_at": "2024-06-21T10:19:31.000000Z",
+              "deleted_at": null
+            }
+          ],
+          "store": {
+            "id": 23,
+            "store_name": "Tech Haven",
+            "description": "Tech Haven offers cutting-edge gadgets and electronics to make your life smarter, faster, and more connected. From home appliances to the latest devices, find everything tech under one roof.",
+            "slug": "tech-heven",
+            "store_logo_id": null,
+            "store_cover_id": null,
+            "country_id": 840,
+            "state_id": 3778,
+            "city": "Cottage Grove",
+            "address": "4500 Greenstone Boulevard, Tower C, Unit 5F The Summit Residences at Lakewood Shores North Oak District, Denver, Colorado 80205-9898, USA",
+            "pincode": "55033",
+            "facebook": null,
+            "twitter": null,
+            "instagram": null,
+            "youtube": null,
+            "pinterest": null,
+            "hide_vendor_email": 0,
+            "hide_vendor_phone": 0,
+            "vendor_id": 25,
+            "created_by_id": "1",
+            "status": 1,
+            "is_approved": 1,
+            "created_at": "2025-05-24T08:05:56.000000Z",
+            "updated_at": "2025-05-24T08:05:56.000000Z",
+            "deleted_at": null,
+            "orders_count": 0,
+            "reviews_count": 0,
+            "products_count": 24,
+            "product_images": [
+              "assets/images/product/fashion_16-1.png",
+              "assets/images/product/electronic_25-1.png",
+              "assets/images/product/electronic_26-1.png"
+            ],
+            "order_amount": 0,
+            "rating_count": 3,
+            "store_logo": null,
+            "store_cover": null,
+            "vendor": {
+              "id": 25,
+              "name": "Elsa Stone",
+              "email": "elsa@gmail.com",
+              "country_code": "1",
+              "phone": 6358974562,
+              "profile_image_id": null,
+              "system_reserve": "0",
+              "status": 1,
+              "created_by_id": 1,
+              "email_verified_at": null,
+              "created_at": "2025-05-24T08:05:56.000000Z",
+              "orders_count": 0,
+              "role": {
+                "id": 3,
+                "name": "vendor",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": null,
+              "point": null
+            },
+            "country": {
+              "id": 840,
+              "name": "United States",
+              "currency": "US dollar",
+              "currency_symbol": "$",
+              "iso_3166_2": "US",
+              "iso_3166_3": "USA",
+              "calling_code": "1",
+              "flag": "US.png"
+            },
+            "state": {
+              "id": 3778,
+              "name": "Minnesota",
+              "country_id": "840"
+            },
+            "reviews": []
+          }
+        },
+        {
+          "id": 35,
+          "order_number": 1008,
+          "consumer_id": 2,
+          "tax_total": 0.49,
+          "shipping_total": 0,
+          "points_amount": 0,
+          "wallet_balance": 0,
+          "amount": 9.96,
+          "total": 10.458,
+          "is_digital_only": 0,
+          "coupon_total_discount": 0,
+          "payment_method": "cod",
+          "payment_status": "COMPLETED",
+          "store_id": 4,
+          "billing_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "shipping_address": {
+            "id": 1,
+            "city": "Denver",
+            "phone": 5551855359,
+            "state": {
+              "id": 3759,
+              "name": "Colorado",
+              "country_id": "840"
+            },
+            "title": "New Home",
+            "street": "26, Starts Hollow Colony",
+            "country": {
+              "id": 840,
+              "name": "United States"
+            },
+            "pincode": "80014",
+            "user_id": "2",
+            "state_id": 3759,
+            "country_id": 840,
+            "is_default": 0,
+            "country_code": "1"
+          },
+          "consumer": {
+            "id": 2,
+            "name": "john due",
+            "role": {
+              "id": 2,
+              "name": "consumer",
+              "guard_name": "web",
+              "system_reserve": "1"
+            },
+            "email": "john.customer@example.com",
+            "phone": 0,
+            "point": {
+              "id": 3,
+              "balance": 0,
+              "consumer_id": 2
+            },
+            "status": 1,
+            "wallet": {
+              "id": 2,
+              "balance": 673,
+              "consumer_id": 2
+            },
+            "created_at": "2024-05-02T08:34:46.000000Z",
+            "country_code": "1",
+            "orders_count": 8,
+            "created_by_id": 2,
+            "profile_image": null,
+            "system_reserve": "0",
+            "profile_image_id": null,
+            "email_verified_at": "2024-05-02T08:34:46.000000Z"
+          },
+          "delivery_description": "Standard Delivery | Approx 5 to 7 Days",
+          "delivery_interval": null,
+          "order_status_id": 6,
+          "coupon_id": null,
+          "parent_id": "33",
+          "created_by_id": 1,
+          "invoice_url": "assets/file.txt",
+          "is_guest": 0,
+          "status": 1,
+          "note": null,
+          "delivered_at": "2024-06-21 00:00:00",
+          "created_at": "2024-06-21T10:18:46.000000Z",
+          "updated_at": "2024-06-21T10:19:52.000000Z",
+          "deleted_at": null,
+          "order_status": {
+            "id": 6,
+            "name": "delivered",
+            "sequence": 6,
+            "slug": "delivered"
+          },
+          "order_status_activities": [
+            {
+              "id": 21,
+              "status": "pending",
+              "order_id": 35,
+              "changed_at": "2024-06-21T15:49:51.730730+0530",
+              "created_at": "2024-06-21T10:18:46.000000Z",
+              "updated_at": "2024-06-21T10:19:52.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 26,
+              "status": "processing",
+              "order_id": 35,
+              "changed_at": "2024-06-21T15:49:51.730730+0530",
+              "created_at": "2024-06-21T10:19:52.000000Z",
+              "updated_at": "2024-06-21T10:19:52.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 27,
+              "status": "shipped",
+              "order_id": 35,
+              "changed_at": "2024-06-21T15:49:51.730730+0530",
+              "created_at": "2024-06-21T10:19:52.000000Z",
+              "updated_at": "2024-06-21T10:19:52.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 28,
+              "status": "out_for_delivery",
+              "order_id": 35,
+              "changed_at": "2024-06-21T15:49:51.730730+0530",
+              "created_at": "2024-06-21T10:19:52.000000Z",
+              "updated_at": "2024-06-21T10:19:52.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 29,
+              "status": "delivered",
+              "order_id": 35,
+              "changed_at": "2024-06-21T15:49:51.730730+0530",
+              "created_at": "2024-06-21T10:19:52.000000Z",
+              "updated_at": "2024-06-21T10:19:52.000000Z",
+              "deleted_at": null
+            }
+          ],
+          "store": {
+            "id": 22,
+            "store_name": "Kitchen Kingdom",
+            "description": "Kitchen Kingdom is your ultimate destination for all kitchen essentials. Cook, bake, and organize with top-quality tools, gadgets, and home accessories.",
+            "slug": "kitchen-kingdom",
+            "store_logo_id": null,
+            "store_cover_id": null,
+            "country_id": 840,
+            "state_id": 3763,
+            "city": "Cumming",
+            "address": "Garden Flat 2B, Whitestone Terrace Villas 3325 Hawthorne Lane, Old Riverbend  Quarters Elmhurst Township, Pennsylvania 19003-5550, USA",
+            "pincode": "30040",
+            "facebook": null,
+            "twitter": null,
+            "instagram": null,
+            "youtube": null,
+            "pinterest": null,
+            "hide_vendor_email": 0,
+            "hide_vendor_phone": 0,
+            "vendor_id": 24,
+            "created_by_id": "1",
+            "status": 1,
+            "is_approved": 1,
+            "created_at": "2025-05-24T06:59:01.000000Z",
+            "updated_at": "2025-05-24T06:59:01.000000Z",
+            "deleted_at": null,
+            "orders_count": 0,
+            "reviews_count": 0,
+            "products_count": 14,
+            "product_images": [
+              "assets/images/product/fashion_22-1.png",
+              "assets/images/product/fashion_18-1.png",
+              "assets/images/product/fashion_19-1.png"
+            ],
+            "order_amount": 0,
+            "rating_count": 2,
+            "store_logo": null,
+            "store_cover": null,
+            "vendor": {
+              "id": 24,
+              "name": "Patrick Moores",
+              "email": "patrick@gmail.com",
+              "country_code": "1",
+              "phone": 2568458792,
+              "profile_image_id": null,
+              "system_reserve": "0",
+              "status": 1,
+              "created_by_id": 1,
+              "email_verified_at": null,
+              "created_at": "2025-05-24T06:59:01.000000Z",
+              "orders_count": 0,
+              "role": {
+                "id": 3,
+                "name": "vendor",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": null,
+              "point": null
+            },
+            "country": {
+              "id": 840,
+              "name": "United States",
+              "currency": "US dollar",
+              "currency_symbol": "$",
+              "iso_3166_2": "US",
+              "iso_3166_3": "USA",
+              "calling_code": "1",
+              "flag": "US.png"
+            },
+            "state": {
+              "id": 3763,
+              "name": "Georgia",
+              "country_id": "840"
+            },
+            "reviews": [
+              {
+                "id": 1,
+                "product_id": 16,
+                "consumer_id": 2,
+                "store_id": 4,
+                "review_image_id": null,
+                "rating": 5,
+                "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+                "created_at": "2024-06-21T10:07:31.000000Z",
+                "review_image": null,
+                "consumer": {
+                  "id": 2,
+                  "name": "john due",
+                  "email": "john.customer@example.com",
+                  "profile_image_id": null,
+                  "role": {
+                    "id": 2,
+                    "name": "consumer",
+                    "guard_name": "web",
+                    "system_reserve": "1"
+                  },
+                  "profile_image": null,
+                  "wallet": {
+                    "id": 2,
+                    "consumer_id": 2,
+                    "balance": 8.46
+                  },
+                  "point": {
+                    "id": 3,
+                    "consumer_id": 2,
+                    "balance": 1970
+                  }
+                }
+              },
+              {
+                "id": 2,
+                "product_id": 15,
+                "consumer_id": 34,
+                "store_id": 4,
+                "review_image_id": null,
+                "rating": 4,
+                "description": "Product Quality Is Good As Expexpected",
+                "created_at": "2024-06-25T10:22:38.000000Z",
+                "review_image": null,
+                "consumer": {
+                  "id": 34,
+                  "name": "Rhoda Mayer",
+                  "email": "rhoda@mail.com",
+                  "profile_image_id": null,
+                  "role": {
+                    "id": 2,
+                    "name": "consumer",
+                    "guard_name": "web",
+                    "system_reserve": "1"
+                  },
+                  "profile_image": null,
+                  "wallet": {
+                    "id": 5,
+                    "consumer_id": 34,
+                    "balance": 0
+                  },
+                  "point": {
+                    "id": 6,
+                    "consumer_id": 34,
+                    "balance": 100
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "from": 1,
+  "last_page": 2,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "label": "2",
+      "active": false
+    },
+    {
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "per_page": 10,
+  "prev_page_url": null,
+  "to": 10,
+  "total": 16
+}

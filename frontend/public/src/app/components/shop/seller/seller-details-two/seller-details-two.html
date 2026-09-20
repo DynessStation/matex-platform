@@ -1,0 +1,100 @@
+<section class="seller-details-section-2 section-t-space">
+  <div class="custom-container">
+    <div class="seller-main-box">
+      <div
+        class="seller-top-box bg-size"
+        [style.background-image]="'url(assets/images/seller-banner.jpg)'"
+      >
+        <img src="assets/images/seller-banner.jpg" alt="image" class="img-fluid bg-img" />
+        <div class="seller-main-box">
+          <div class="profile-image">
+            <div class="band-image">
+              @if (selectedStore.store_logo) {
+                <img
+                  [src]="selectedStore.store_logo.asset_url"
+                  [alt]="selectedStore.store_name"
+                  class="img-fluid"
+                />
+              } @else {
+                <h1 class="vendor-text">
+                  {{ selectedStore.store_name.charAt(0)!.toString().toUpperCase() }}
+                </h1>
+              }
+            </div>
+            <div>
+              <h3>{{ selectedStore.store_name | titlecase }}</h3>
+              <div class="rating">
+                <ngb-rating [(rate)]="selectedStore.rating_count">
+                  <ng-template let-fill="fill" let-index="index">
+                    <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                  </ng-template>
+                </ngb-rating>
+                <span>({{ selectedStore.rating_count }})</span>
+              </div>
+            </div>
+          </div>
+          <p>{{ selectedStore.description }}</p>
+        </div>
+      </div>
+
+      <div class="brand-related-product">
+        <div class="top-trending-box">
+          <div class="title-2 title-2-sm slider-button-sm mb-3">
+            <div class="title-flex">
+              <h3>Top trending Product</h3>
+            </div>
+          </div>
+          <app-home-product
+            [productIds]="[111, 112, 113, 114, 115, 116, 117, 118, 120, 121]"
+            [style]="'product_box_one'"
+            [type]="'trending-product'"
+          ></app-home-product>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space recent-product-section">
+  <div class="custom-container">
+    <div class="light-bg-color light-sm-box">
+      <div class="title-2 title-2-sm slider-button-sm mb-3">
+        <h3>Recent Viewed Products</h3>
+        <div class="title-slider-button">
+          <button class="recent-product-prev swiper-btn-prev">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <button class="recent-product-next swiper-btn-next">
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+      <app-home-product
+        [productIds]="[122, 123, 124, 125, 126, 127, 128, 129, 130, 131]"
+        [style]="'product-slider'"
+      ></app-home-product>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space shop-section">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-custom-3">
+        <div class="left-box">
+          <app-collection-sidebar [filter]="filter"></app-collection-sidebar>
+        </div>
+      </div>
+
+      <div class="col-custom-9">
+        <app-collection-products [filter]="filter"></app-collection-products>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

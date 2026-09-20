@@ -1,0 +1,148 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'activity_log'">
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [dateRange]="true"
+    [emitInitialChange]="false"
+    [externalPermissions]="(authPermissions$ | async) ?? []"
+    [externalAllAccess]="(isAllAccess$ | async) ?? false"
+    (tableChanged)="onTableChange($event)"
+    (rowClicked)="view($event)"
+    (action)="onActionClicked($event)"
+  >
+    <!--==================================================-->
+    <!--==== FILTER TOGGLE ===============================-->
+    <!--==================================================-->
+
+    <div filter class="top-panel-selection">
+      <button
+        type="button"
+        class="align-items-center btn d-flex h-100 fs-5 px-3 py-1"
+        [class.btn-theme]="openFilterPanel"
+        [class.btn-light-bg]="!openFilterPanel"
+        (click)="openFilter()"
+        title="{{ 'audit_advanced_filter' | translate }}"
+      >
+        <i class="ri-filter-3-line"></i>
+      </button>
+    </div>
+
+    <!--==================================================-->
+    <!--==== ADVANCED FILTER =============================-->
+    <!--==================================================-->
+
+    @if (openFilterPanel) {
+      <div advanceFilter class="show-box mb-4 d-block product-category-option">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+          <div class="row g-sm-4 g-3">
+            <!-- CATEGORY -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              @if (isBrowser) {
+                <select2
+                  class="custom-select d-block"
+                  [data]="categories"
+                  [placeholder]="'audit_select_category' | translate"
+                  formControlName="category"
+                  [noResultMessage]="'common_ui.no_data_found' | translate"
+                  resettable
+                />
+              }
+            </div>
+
+            <!-- OUTCOME -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              @if (isBrowser) {
+                <select2
+                  class="custom-select d-block"
+                  [data]="outcomes"
+                  [placeholder]="'audit_select_outcome' | translate"
+                  formControlName="outcome"
+                  [noResultMessage]="'common_ui.no_data_found' | translate"
+                  resettable
+                />
+              }
+            </div>
+
+            <!-- SOURCE -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              @if (isBrowser) {
+                <select2
+                  class="custom-select d-block"
+                  [data]="sources"
+                  [placeholder]="'audit_select_source' | translate"
+                  formControlName="source"
+                  [noResultMessage]="'common_ui.no_data_found' | translate"
+                  resettable
+                />
+              }
+            </div>
+
+            <!-- MODULE -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="module"
+                placeholder="{{ 'audit_module_placeholder' | translate }}"
+              />
+
+              <small class="form-helper d-block mt-1">
+                {{ 'audit_module_example' | translate }}
+              </small>
+            </div>
+
+            <!-- ACTION -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="action"
+                placeholder="{{ 'audit_action_placeholder' | translate }}"
+              />
+
+              <small class="form-helper d-block mt-1">
+                {{ 'audit_action_example' | translate }}
+              </small>
+            </div>
+
+            <!-- EVENT -->
+
+            <div class="col-xl-2 col-lg-4 col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="event_code"
+                placeholder="{{ 'audit_event_code_placeholder' | translate }}"
+              />
+
+              <small class="form-helper d-block mt-1">
+                {{ 'audit_event_code_example' | translate }}
+              </small>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button
+                type="button"
+                class="btn btn-light-bg"
+                (click)="resetFilters()"
+              >
+                {{ 'audit_reset_filter' | translate }}
+              </button>
+
+              <button type="submit" class="btn btn-theme">
+                {{ 'audit_apply_filter' | translate }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+  </app-table>
+</app-page-wrapper>

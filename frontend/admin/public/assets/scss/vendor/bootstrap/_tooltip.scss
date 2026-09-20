@@ -1,0 +1,125 @@
+@use './variables';
+@use './vendor/rfs';
+@use './mixins/deprecate';
+@use './mixins/reset-text';
+@use './mixins/border-radius';
+
+// Base class
+.tooltip {
+  // scss-docs-start tooltip-css-vars
+  --#{variables.$prefix}tooltip-zindex: #{variables.$zindex-tooltip};
+  --#{variables.$prefix}tooltip-max-width: #{variables.$tooltip-max-width};
+  --#{variables.$prefix}tooltip-padding-x: #{variables.$tooltip-padding-x};
+  --#{variables.$prefix}tooltip-padding-y: #{variables.$tooltip-padding-y};
+  --#{variables.$prefix}tooltip-margin: #{variables.$tooltip-margin};
+  @include rfs.rfs(variables.$tooltip-font-size, --#{variables.$prefix}tooltip-font-size);
+  --#{variables.$prefix}tooltip-color: #{variables.$tooltip-color};
+  --#{variables.$prefix}tooltip-bg: #{variables.$tooltip-bg};
+  --#{variables.$prefix}tooltip-border-radius: #{variables.$tooltip-border-radius};
+  --#{variables.$prefix}tooltip-opacity: #{variables.$tooltip-opacity};
+  --#{variables.$prefix}tooltip-arrow-width: #{variables.$tooltip-arrow-width};
+  --#{variables.$prefix}tooltip-arrow-height: #{variables.$tooltip-arrow-height};
+  // scss-docs-end tooltip-css-vars
+
+  z-index: var(--#{variables.$prefix}tooltip-zindex);
+  display: block;
+  margin: var(--#{variables.$prefix}tooltip-margin);
+  @include deprecate.deprecate("`$tooltip-margin`", "v5", "v5.x", true);
+  // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
+  // So reset our font and text properties to avoid inheriting weird values.
+  @include reset-text.reset-text();
+  @include rfs.font-size(var(--#{variables.$prefix}tooltip-font-size));
+  // Allow breaking very long words so they don't overflow the tooltip's bounds
+  word-wrap: break-word;
+  opacity: 0;
+
+  &.show { opacity: var(--#{variables.$prefix}tooltip-opacity); }
+
+  .tooltip-arrow {
+    display: block;
+    width: var(--#{variables.$prefix}tooltip-arrow-width);
+    height: var(--#{variables.$prefix}tooltip-arrow-height);
+
+    &::before {
+      position: absolute;
+      content: "";
+      border-color: transparent;
+      border-style: solid;
+    }
+  }
+}
+
+.bs-tooltip-top .tooltip-arrow {
+  bottom: calc(-1 * var(--#{variables.$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+
+  &::before {
+    top: -1px;
+    border-width: var(--#{variables.$prefix}tooltip-arrow-height) calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+    border-top-color: var(--#{variables.$prefix}tooltip-bg);
+  }
+}
+
+/* rtl:begin:ignore */
+.bs-tooltip-end .tooltip-arrow {
+  left: calc(-1 * var(--#{variables.$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+  width: var(--#{variables.$prefix}tooltip-arrow-height);
+  height: var(--#{variables.$prefix}tooltip-arrow-width);
+
+  &::before {
+    right: -1px;
+    border-width: calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) var(--#{variables.$prefix}tooltip-arrow-height) calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+    border-right-color: var(--#{variables.$prefix}tooltip-bg);
+  }
+}
+
+/* rtl:end:ignore */
+
+.bs-tooltip-bottom .tooltip-arrow {
+  top: calc(-1 * var(--#{variables.$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+
+  &::before {
+    bottom: -1px;
+    border-width: 0 calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) var(--#{variables.$prefix}tooltip-arrow-height); // stylelint-disable-line function-disallowed-list
+    border-bottom-color: var(--#{variables.$prefix}tooltip-bg);
+  }
+}
+
+/* rtl:begin:ignore */
+.bs-tooltip-start .tooltip-arrow {
+  right: calc(-1 * var(--#{variables.$prefix}tooltip-arrow-height)); // stylelint-disable-line function-disallowed-list
+  width: var(--#{variables.$prefix}tooltip-arrow-height);
+  height: var(--#{variables.$prefix}tooltip-arrow-width);
+
+  &::before {
+    left: -1px;
+    border-width: calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) 0 calc(var(--#{variables.$prefix}tooltip-arrow-width) * .5) var(--#{variables.$prefix}tooltip-arrow-height); // stylelint-disable-line function-disallowed-list
+    border-left-color: var(--#{variables.$prefix}tooltip-bg);
+  }
+}
+
+/* rtl:end:ignore */
+
+.bs-tooltip-auto {
+  &[data-popper-placement^="top"] {
+    @extend .bs-tooltip-top;
+  }
+  &[data-popper-placement^="right"] {
+    @extend .bs-tooltip-end;
+  }
+  &[data-popper-placement^="bottom"] {
+    @extend .bs-tooltip-bottom;
+  }
+  &[data-popper-placement^="left"] {
+    @extend .bs-tooltip-start;
+  }
+}
+
+// Wrapper for the tooltip content
+.tooltip-inner {
+  max-width: var(--#{variables.$prefix}tooltip-max-width);
+  padding: var(--#{variables.$prefix}tooltip-padding-y) var(--#{variables.$prefix}tooltip-padding-x);
+  color: var(--#{variables.$prefix}tooltip-color);
+  text-align: center;
+  background-color: var(--#{variables.$prefix}tooltip-bg);
+  @include border-radius.border-radius(var(--#{variables.$prefix}tooltip-border-radius));
+}

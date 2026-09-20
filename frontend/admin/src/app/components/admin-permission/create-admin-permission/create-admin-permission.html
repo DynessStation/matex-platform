@@ -1,0 +1,6 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'admin_permission.create_title' | translate"
+>
+  <app-form-admin-permission [mode]="'create'" (formSubmit)="submit($event)" />
+</app-page-wrapper>

@@ -1,0 +1,107 @@
+{
+  "current_page": 1,
+  "data": [
+    { "id": 1, "name": "Nokia", "slug": "nokia", "status": 1 },
+    { "id": 2, "name": "Acer", "slug": "acer", "status": 1 },
+    {
+      "id": 3,
+      "name": "Samsung Tablet",
+      "slug": "samsung-tablet",
+      "status": 1
+    },
+    { "id": 4, "name": "Apple iPhone", "slug": "apple-iphone", "status": 1 },
+    { "id": 5, "name": "HTC", "slug": "htc", "status": 1 },
+    { "id": 6, "name": "Macbook", "slug": "macbook", "status": 1 },
+    { "id": 7, "name": "Sony TV", "slug": "sony-tv", "status": 1 },
+    { "id": 8, "name": "Lenovo", "slug": "lenovo", "status": 1 },
+    { "id": 9, "name": "iPhone 12 Pro", "slug": "iphone-12-pro", "status": 1 },
+    { "id": 10, "name": "Dell", "slug": "dell", "status": 1 },
+    {
+      "id": 11,
+      "name": "Samsung LED TV",
+      "slug": "samsung-led-tv",
+      "status": 1
+    },
+    { "id": 12, "name": "Accessories", "slug": "accessories", "status": 1 },
+    { "id": 13, "name": "Desktops", "slug": "desktops", "status": 1 },
+    { "id": 14, "name": "LG LCD TV", "slug": "lg-lcd-tv", "status": 1 },
+    { "id": 15, "name": "Sharp LCD TV", "slug": "sharp-lcd-tv", "status": 1 },
+    { "id": 16, "name": "Panasonic TV", "slug": "panasonic-tv", "status": 1 },
+    { "id": 17, "name": "Electronic", "slug": "electronic", "status": 1 },
+    { "id": 18, "name": "Toshiba", "slug": "toshiba", "status": 1 },
+    { "id": 19, "name": "Toshiba TV", "slug": "toshiba-tv", "status": 1 },
+    { "id": 20, "name": "PC Gaming", "slug": "pc-gaming", "status": 1 },
+    { "id": 21, "name": "LED TV", "slug": "led-tv", "status": 1 },
+    { "id": 22, "name": "Sony", "slug": "sony", "status": 1 },
+    {
+      "id": 23,
+      "name": "Windows Tablets",
+      "slug": "windows-tablets",
+      "status": 1
+    },
+    {
+      "id": 24,
+      "name": "Mini Refrigerators",
+      "slug": "mini-refrigerators",
+      "status": 1
+    },
+    {
+      "id": 25,
+      "name": "Apple Accessories",
+      "slug": "apple-accessories",
+      "status": 1
+    },
+    { "id": 26, "name": "Blackberry", "slug": "blackberry", "status": 1 },
+    { "id": 27, "name": "Furnishing", "slug": "furnishing", "status": 1 },
+    { "id": 28, "name": "Fashion", "slug": "fashion", "status": 1 },
+    { "id": 29, "name": "Christmas", "slug": "christmas", "status": 1 },
+    { "id": 30, "name": "Bags", "slug": "bags", "status": 1 },
+    { "id": 31, "name": "Marijuana", "slug": "marijuana", "status": 1 },
+    {
+      "id": 32,
+      "name": "Smart Speakers",
+      "slug": "smart-speakers",
+      "status": 1
+    },
+    { "id": 33, "name": "Hair Care", "slug": "hair-care", "status": 1 },
+    {
+      "id": 34,
+      "name": "Audio Accessories",
+      "slug": "audio-accessories",
+      "status": 1
+    },
+    { "id": 35, "name": "Baby Care", "slug": "baby-care", "status": 1 },
+    {
+      "id": 36,
+      "name": "Baby Activity Center",
+      "slug": "baby-activity-center",
+      "status": 1
+    },
+    { "id": 37, "name": "Baby Toys", "slug": "baby-toys", "status": 1 },
+    { "id": 38, "name": "Baby Feeding", "slug": "baby-feeding", "status": 1 },
+    {
+      "id": 39,
+      "name": "Home Appliances",
+      "slug": "home-appliances",
+      "status": 1
+    },
+    { "id": 40, "name": "Fruits", "slug": "fruits", "status": 1 },
+    { "id": 41, "name": "Grocery", "slug": "grocery", "status": 1 },
+    { "id": 42, "name": "Vegetables", "slug": "vegetables", "status": 1 }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    { "url": null, "label": "« Previous", "active": false },
+    {
+      "label": "1",
+      "active": true
+    },
+    { "url": null, "label": "Next »", "active": false }
+  ],
+  "next_page_url": null,
+  "per_page": 26,
+  "prev_page_url": null,
+  "to": 26,
+  "total": 26
+}

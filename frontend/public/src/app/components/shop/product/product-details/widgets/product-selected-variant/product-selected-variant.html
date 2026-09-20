@@ -1,0 +1,42 @@
+<div class="right-sidebar-box">
+  <div class="side-product-detail">
+    <div class="side-title">
+      <h4>Assign Order</h4>
+    </div>
+
+    <div class="side-product-box">
+      <div class="product-image">
+        <img
+          [src]="
+            selectedVariation()
+              ? selectedVariation()?.variation_image?.asset_url
+              : product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product/png'
+          "
+          class="img-fluid"
+          [alt]="product()?.name"
+        />
+      </div>
+      <div class="product-contain">
+        <h5>{{ selectedVariation() ? selectedVariation()?.name : product()?.name }}</h5>
+      </div>
+    </div>
+
+    <app-product-buy-button
+      [product]="product()"
+      [selectedVariation]="selectedVariation() ? selectedVariation()! : null"
+    ></app-product-buy-button>
+
+    <div class="seller-product">
+      <h5>
+        <a href="javascript:void(0)"><i class="ri-message-2-fill"></i> Chat Seller</a>
+      </h5>
+      <h5>
+        <a (click)="openShareModal(product()!)"><i class="ri-share-fill"></i> Share Product</a>
+      </h5>
+    </div>
+  </div>
+
+  <a [routerLink]="['/collections']" class="banner-box">
+    <img [src]="option()?.product?.banner_image_url" class="img-fluid" alt="banner" />
+  </a>
+</div>

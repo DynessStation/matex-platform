@@ -1,0 +1,141 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    4.4 Portfolio CSS
+==========================**/
+.portfolio-section {
+  .filters-button-list {
+    gap: calc(10px + (14 - 10) * ((100vw - 320px) / (1920 - 320)));
+    margin-bottom: calc(12px + (24 - 12) * ((100vw - 320px) / (1920 - 320)));
+    flex-wrap: nowrap;
+    overflow: auto;
+    @include flex_common;
+
+    @include max(575.98px) {
+      justify-content: flex-start;
+    }
+
+    button {
+      color: rgba(var(--content-color), 1);
+      border: 1px solid rgba(var(--border-color), 0.7);
+      background-color: rgba(var(--white), 0.55);
+      font-size: calc(15px + (16 - 15) * ((100vw - 320px) / (1920 - 320)));
+      white-space: nowrap;
+
+      &:hover,
+      &.active {
+        color: #ffffff;
+        background-color: rgba(var(--primary-color), 1);
+        border-color: transparent;
+      }
+    }
+  }
+
+  .portfolio-images-box {
+    .portfolio-box {
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+
+      &:hover {
+        .portfolio-content {
+          bottom: 0;
+        }
+      }
+
+      img {
+        width: 100%;
+      }
+
+      .portfolio-content {
+        position: absolute;
+        bottom: -83px;
+        transition: all 0.2s ease-in-out;
+        left: 0;
+        width: 100%;
+        background-color: rgba(var(--border-color), 1);
+        padding: calc(10px + (19 - 10) * ((100vw - 320px) / (1920 - 320)))
+          calc(12px + (23 - 12) * ((100vw - 320px) / (1920 - 320)));
+
+        @include max(767.98px) {
+          bottom: 0;
+          padding: 10px 12px;
+        }
+
+        h5 {
+          color: rgba(var(--content-color), 1);
+          font-size: calc(16px + (19 - 16) * ((100vw - 320px) / (1920 - 320)));
+          font-weight: 400;
+        }
+
+        h4 {
+          margin-top: 3px;
+          margin-bottom: calc(-5px + (-9 - -5) * ((100vw - 320px) / (1920 - 320)));
+          font-size: calc(18px + (23 - 18) * ((100vw - 320px) / (1920 - 320)));
+        }
+      }
+
+      .m-p-g__thumbs-img {
+        transition: all 0.5s ease-in-out;
+
+        &:hover {
+          filter: unset;
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    &.grid-portfolio-box {
+      .portfolio-box {
+        img {
+          aspect-ratio: 7/5;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .m-p-g {
+    .m-p-g__fullscreen {
+      &.active {
+        margin: 0 !important;
+      }
+
+      .m-p-g__fullscreen-img {
+        border-radius: 8px;
+      }
+    }
+
+    .m-p-g__controls {
+      .m-p-g__controls-close {
+        left: unset;
+        right: 3vw;
+      }
+
+      .m-p-g__controls-arrow {
+        opacity: 1;
+      }
+
+      .m-p-g__controls-arrow {
+        .m-p-g__btn {
+          @include pseudowh(
+            $width: calc(35px + (50 - 35) * ((100vw - 320px) / (1920 - 320))),
+            $height: calc(35px + (50 - 35) * ((100vw - 320px) / (1920 - 320)))
+          );
+
+          @include max(850px) {
+            background: rgba(0, 0, 0, 1);
+          }
+
+          svg {
+            @include pseudowh(
+              $width: calc(18px + (24 - 18) * ((100vw - 320px) / (1920 - 320))),
+              $height: calc(18px + (24 - 18) * ((100vw - 320px) / (1920 - 320)))
+            );
+          }
+        }
+      }
+    }
+  }
+}

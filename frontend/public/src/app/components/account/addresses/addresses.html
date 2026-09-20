@@ -1,0 +1,46 @@
+<div class="title justify-content-between">
+  <h3>{{ 'address_book' | translate }}</h3>
+  <a href="javascript:void(0)" class="btn bg-primary-color text-white" (click)="AddressModal()"
+    >+ {{ 'add_new' | translate }}</a
+  >
+</div>
+@if ((user$ | async)?.address?.length) {
+  <div class="address-book-section">
+    <div class="row g-md-4 g-3">
+      @for (address of (user$ | async)?.address; track address; let i = $index) {
+        <div class="col-xl-4 col-md-6">
+          <div class="address-box">
+            <div class="top">
+              <h6>{{ (user$ | async)?.name | titlecase }}</h6>
+              <span class="label">{{ address?.title }}</span>
+            </div>
+            <div class="middle">
+              <p>{{ address?.street }}, {{ address?.city }}</p>
+              <p>{{ address?.state?.name }}, {{ address?.country?.name }}</p>
+              <p>{{ address?.pincode }}</p>
+              <p>
+                {{ 'phone' | translate }}:
+                <span>+ {{ address?.country_code }} {{ address?.phone }}</span>
+              </p>
+            </div>
+            <div class="bottom">
+              <a href="javascript:void(0)" class="bottom_btn" (click)="AddressModal(address)">{{
+                'edit' | translate
+              }}</a>
+              <a href="javascript:void(0)" class="bottom_btn" (click)="removeAddress(address)">{{
+                'remove' | translate
+              }}</a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <app-no-data
+    [class]="'no-data-added'"
+    [text]="'no_address' | translate"
+    [description]="'no_address_yet' | translate"
+  >
+  </app-no-data>
+}

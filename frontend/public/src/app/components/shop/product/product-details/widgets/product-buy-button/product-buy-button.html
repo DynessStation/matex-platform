@@ -1,0 +1,125 @@
+@if (!product()?.is_external) {
+  <div class="product-buttons">
+    <div class="qty-stock-box">
+      <div class="qty-box h-100 qty-container quantity-box-2">
+        <span class="input-group-prepend">
+          <app-button
+            [id]="'quantity-left-minus' + product()?.id"
+            [class]="'btn qty-btn qty-btn-minus'"
+            [iconClass]="'ri-subtract-line'"
+            [spinner]="false"
+            (click)="updateQuantity(-1)"
+          >
+          </app-button>
+        </span>
+
+        <input
+          type="text"
+          name="quantity"
+          class="qty-input form-control input-qty"
+          [value]="productQty"
+          readonly
+        />
+
+        <span class="input-group-prepend">
+          <app-button
+            [id]="'quantity-left-plus' + product()?.id"
+            [class]="'btn qty-btn qty-btn-plus'"
+            [iconClass]="'ri-add-line'"
+            [spinner]="false"
+            (click)="updateQuantity(1)"
+          >
+          </app-button>
+        </span>
+      </div>
+      <div class="stock-box">
+        <h5>
+          stock:
+          <span>{{
+            selectedVariation() ? selectedVariation()?.quantity : product()?.quantity
+          }}</span>
+        </h5>
+      </div>
+    </div>
+
+    <div class="total-price-box">
+      <h4>
+        <span>Total Price:</span>
+        {{
+          productQty *
+            (selectedVariation() ? selectedVariation()?.sale_price : product()?.sale_price)!
+            | currencySymbol
+        }}
+      </h4>
+    </div>
+
+    <div class="product-buy-btn-group">
+      @if (
+        (selectedVariation() &&
+          selectedVariation()?.status &&
+          selectedVariation()?.quantity! >= productQty) ||
+        (!selectedVariation && product()?.quantity! >= productQty)
+      ) {
+        <app-button
+          [class]="'btn buy-btn theme-border fw-500'"
+          [id]="'addcartbtnVariation' + product()?.id"
+          [spinner]="true"
+          [type]="'button'"
+          (click)="addToCart(product()!)"
+        >
+          <div class="d-inline-block ring-animation">
+            <i class="ri-shopping-cart-line me-1"></i>
+          </div>
+          {{ 'Add to Cart' | translate }}
+        </app-button>
+      } @else {
+        <app-button
+          [class]="'btn buy-btn theme-border fw-500'"
+          [id]="'soldoutbtnproductcontain'"
+          [spinner]="false"
+          [disabled]="true"
+          [spinner]="false"
+          [type]="'button'"
+        >
+          {{
+            (selectedVariation() &&
+              selectedVariation()?.status &&
+              selectedVariation()?.quantity! < productQty) ||
+            (!selectedVariation() && product()?.quantity! < productQty)
+              ? 'Out of Stock'
+              : 'Add to Cart'
+          }}
+        </app-button>
+      }
+      <app-button
+        [class]="'btn buy-btn theme-bg-color text-white'"
+        [id]="'buynowbtn' + product()?.id"
+        [disabled]="
+          (selectedVariation() &&
+            selectedVariation()?.status &&
+            selectedVariation()?.quantity! >= productQty) ||
+          (!selectedVariation && product()?.quantity! >= productQty)
+            ? false
+            : true
+        "
+        (click)="
+          ((selectedVariation() &&
+            selectedVariation()?.status &&
+            selectedVariation()?.quantity! >= productQty) ||
+            (!selectedVariation() && product()?.quantity! >= productQty)) &&
+            addToCart(product()!, true)
+        "
+      >
+        {{ 'Buy now' | translate }}
+      </app-button>
+    </div>
+  </div>
+} @else {
+  <app-button
+    [id]="'externalBtn' + product()?.id"
+    [class]="'btn btn-solid rounded-3'"
+    (click)="externalProductLink(product()?.external_url!)"
+  >
+    {{ product()?.external_button_text ? product()?.external_button_text : 'Buy now' }}
+  </app-button>
+}

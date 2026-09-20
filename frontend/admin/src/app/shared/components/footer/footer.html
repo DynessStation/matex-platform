@@ -1,0 +1,27 @@
+<div class="container-fluid">
+  <footer class="footer">
+    <div class="row">
+      <div class="col-md-8 col-sm-12 footer-copyright text-center">
+        <p class="mb-0">
+          {{
+            (setting$ | async)?.general?.copyright
+              ? (setting$ | async)?.general?.copyright
+              : '©
+          Pixelstrap'
+          }}
+        </p>
+      </div>
+
+      @if (remainingTime$ | async; as remaining) {
+        @if (remaining > 0 && remaining <= 86400000) {
+          <div class="col-md-4 col-sm-12 footer-copyright text-right">
+            <span>
+              {{ 'auth_ui.session_expires_in' | translate }}
+              {{ remaining | date: 'HH:mm:ss' : 'UTC' }}
+            </span>
+          </div>
+        }
+      }
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,15 @@
+<div class="swiper brand-slider brand-section" #brandSwiperContainer>
+  <div class="swiper-wrapper">
+    @for (brand of brands; track brand.id) {
+      <div class="swiper-slide">
+        <a [routerLink]="['/brand/' + brand?.slug]" [class]="className()">
+          @if (brand.brand_image && brand.brand_image.asset_url) {
+            <img [src]="brand.brand_image.asset_url" class="img-fluid" alt="image" />
+          } @else {
+            <h5>{{ brand.name }}</h5>
+          }
+        </a>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'office.title' | translate"
+>
+  <div button class="d-flex flex-wrap gap-2" *hasPermission="'office.create'">
+    <a
+      [routerLink]="['/office/create']"
+      class="align-items-center btn btn-theme"
+    >
+      <i class="ri-add-line"></i>
+
+      {{ 'office.add' | translate }}
+    </a>
+  </div>
+
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [actionMode]="'dropdown'"
+    [externalPermissions]="(authPermissions$ | async) ?? []"
+    [externalAllAccess]="(isAllAccess$ | async) ?? false"
+    (tableChanged)="onTableChange($event)"
+    (action)="onActionClicked($event)"
+  />
+</app-page-wrapper>
+
+<app-confirmation-modal #confirmationModal (confirmed)="onConfirmed($event)" />

@@ -1,0 +1,68 @@
+<div class="shop-left-sidebar">
+  <button class="back-button btn" (click)="openOffCanvasFilter(false)">
+    Back <i class="ri-arrow-left-line"></i>
+  </button>
+  <app-collection-filter [filter]="filter()"></app-collection-filter>
+
+  <div class="accordion custom-accordion-2" ngbAccordion>
+    @if (hideFilter() && !hideFilter().includes('category')) {
+      <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span>Categories</span>
+          </button>
+        </h2>
+        <div class="accordion-collapse collapse show" ngbAccordionCollapse>
+          <div class="accordion-body" ngbAccordionBody>
+            <app-collection-category-filter [filter]="filter()"></app-collection-category-filter>
+          </div>
+        </div>
+      </div>
+    }
+    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          <span>Price</span>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse show" ngbAccordionCollapse>
+        <div class="accordion-body" ngbAccordionBody>
+          <app-collection-price-filter [filter]="filter()"></app-collection-price-filter>
+        </div>
+      </div>
+    </div>
+
+    @for (attribute of (attribute$ | async)?.data; track attribute) {
+      @if (attribute.style === 'image') {
+        <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" ngbAccordionButton>
+              <span>{{ attribute.name }}</span>
+            </button>
+          </h2>
+          <div class="accordion-collapse collapse show" ngbAccordionCollapse>
+            <div class="accordion-body" ngbAccordionBody>
+              <app-collection-attribute-filter
+                [filter]="filter()"
+                [attribute]="attribute"
+              ></app-collection-attribute-filter>
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          <span>Customer Review</span>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse show" ngbAccordionCollapse>
+        <div class="accordion-body" ngbAccordionBody>
+          <app-collection-rating-filter [filter]="filter"></app-collection-rating-filter>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

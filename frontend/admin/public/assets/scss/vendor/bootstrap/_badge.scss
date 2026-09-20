@@ -1,0 +1,43 @@
+@use './variables';
+@use './vendor/rfs';
+@use './mixins/border-radius';
+@use './mixins/gradients';
+
+// Base class
+//
+// Requires one of the contextual, color modifier classes for `color` and
+// `background-color`.
+
+.badge {
+  // scss-docs-start badge-css-vars
+  --#{variables.$prefix}badge-padding-x: #{variables.$badge-padding-x};
+  --#{variables.$prefix}badge-padding-y: #{variables.$badge-padding-y};
+  @include rfs.rfs(variables.$badge-font-size, --#{variables.$prefix}badge-font-size);
+  --#{variables.$prefix}badge-font-weight: #{variables.$badge-font-weight};
+  --#{variables.$prefix}badge-color: #{variables.$badge-color};
+  --#{variables.$prefix}badge-border-radius: #{variables.$badge-border-radius};
+  // scss-docs-end badge-css-vars
+
+  display: inline-block;
+  padding: var(--#{variables.$prefix}badge-padding-y) var(--#{variables.$prefix}badge-padding-x);
+  @include rfs.font-size(var(--#{variables.$prefix}badge-font-size));
+  font-weight: var(--#{variables.$prefix}badge-font-weight);
+  line-height: 1;
+  color: var(--#{variables.$prefix}badge-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  @include border-radius.border-radius(var(--#{variables.$prefix}badge-border-radius));
+  @include gradients.gradient-bg();
+
+  // Empty badges collapse automatically
+  &:empty {
+    display: none;
+  }
+}
+
+// Quick fix for badges in buttons
+.btn .badge {
+  position: relative;
+  top: -1px;
+}

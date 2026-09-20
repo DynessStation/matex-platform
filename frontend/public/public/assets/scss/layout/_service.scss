@@ -1,0 +1,240 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    3.11 Service CSS
+==========================**/
+.service-section {
+  background-color: rgba(var(--title-color), 1);
+  color: rgba(var(--white), 1);
+
+  body.dark & {
+    background-color: #202326;
+  }
+
+  .service-list {
+    > * {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+      gap: calc(18px + (36 - 18) * ((100vw - 320px) / (1920 - 320)));
+
+      @include max(1199.98px) {
+        grid-template-columns: repeat(2, auto);
+      }
+
+      @include max(664px) {
+        grid-template-columns: auto;
+      }
+
+      li {
+        position: relative;
+        border-right: 1px solid rgba(var(--grey), 0.3);
+        padding-right: calc(18px + (36 - 18) * ((100vw - 320px) / (1920 - 320)));
+
+        &:last-child {
+          border-right: none;
+          padding-right: unset;
+        }
+
+        &:nth-child(2) {
+          @include max(1199.98px) {
+            border-right: none;
+            padding-right: unset;
+          }
+        }
+
+        @include max(664px) {
+          border-right: none;
+          padding-right: 0;
+        }
+      }
+    }
+  }
+
+  .service-box {
+    display: flex;
+    gap: calc(5px + (10 - 5) * ((100vw - 320px) / (1920 - 320)));
+
+    svg {
+      fill: transparent;
+      stroke: rgba(var(--primary-color), 1);
+      @include pseudowh($width: 29px, $height: 29px);
+    }
+
+    > div {
+      width: calc(100% - 29px - 10px);
+    }
+
+    h5 {
+      font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+      margin-bottom: calc(3px + (5 - 3) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: 500;
+    }
+
+    p {
+      color: rgba(var(--white), 0.5);
+      font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      body.dark & {
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+}
+
+.service-section-2 {
+  background-color: #f4faf9;
+  color: rgba(var(--title-color), 1);
+  border-radius: 5px;
+  padding: calc(14px + (25 - 14) * ((100vw - 320px) / (1920 - 320)))
+    calc(14px + (30 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+  body.dark & {
+    background-color: #032a27;
+  }
+
+  .service-list {
+    > * {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+      gap: calc(14px + (36 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      @include max(1770px) {
+        grid-template-columns: repeat(2, auto);
+      }
+
+      @include max(664px) {
+        grid-template-columns: auto;
+      }
+
+      li {
+        position: relative;
+        border-right: 1px solid rgba(var(--primary-color3), 0.2);
+        padding-right: calc(18px + (36 - 18) * ((100vw - 320px) / (1920 - 320)));
+
+        [dir='rtl'] & {
+          border-left: 1px solid rgba(var(--primary-color3), 0.2);
+          border-right: unset;
+          padding-left: calc(18px + (36 - 18) * ((100vw - 320px) / (1920 - 320)));
+          padding-right: unset;
+        }
+
+        &:nth-child(even) {
+          @include max(1770px) {
+            border-right: none;
+            padding-right: unset;
+
+            [dir='rtl'] & {
+              border-left: unset;
+              padding-left: unset;
+            }
+          }
+        }
+
+        &:last-child {
+          border-right: none;
+          padding-right: unset;
+
+          [dir='rtl'] & {
+            border-left: unset;
+            padding-left: unset;
+          }
+        }
+
+        @include max(664px) {
+          border-right: none;
+          padding-right: 0;
+
+          [dir='rtl'] & {
+            border-left: unset;
+            padding-left: unset;
+          }
+        }
+      }
+    }
+  }
+
+  .service-box {
+    display: flex;
+    gap: calc(7px + (10 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+    svg {
+      color: rgba(var(--primary-color3), 1);
+      fill: transparent;
+      @include pseudowh(
+        $width: calc(28px + (37 - 28) * ((100vw - 320px) / (1920 - 320))),
+        $height: calc(28px + (37 - 28) * ((100vw - 320px) / (1920 - 320)))
+      );
+
+      body.dark & {
+        fill: rgba(255, 255, 255, 1);
+      }
+    }
+
+    > div {
+      width: calc(
+        100% - calc(28px + (37 - 28) * ((100vw - 320px) / (1920 - 320))) - calc(
+            7px + (10 - 7) * ((100vw - 320px) / (1920 - 320))
+          )
+      );
+    }
+
+    h5 {
+      font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+      margin-bottom: calc(3px + (5 - 3) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: 500;
+    }
+
+    p {
+      margin-bottom: calc(-5px + (-3 - -5) * ((100vw - 320px) / (1920 - 320)));
+      color: rgba(var(--content-color), 0.8);
+      font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    }
+  }
+}
+
+.service-section-3 {
+  background-color: rgba(var(--light-gray), 1);
+  color: rgba(var(--title-color), 1);
+  padding: calc(8px + (18 - 8) * ((100vw - 320px) / (1920 - 320)))
+    calc(12px + (30 - 12) * ((100vw - 320px) / (1920 - 320)));
+
+  body.dark & {
+    background-color: rgba(var(--white), 1);
+  }
+
+  .service-box {
+    background: linear-gradient(180deg, rgba(var(--white), 1) 0%, rgba(var(--white), 0) 100%);
+    padding: calc(22px + (38 - 22) * ((100vw - 320px) / (1920 - 320)))
+      calc(9px + (13 - 9) * ((100vw - 320px) / (1920 - 320)))
+      calc(9px + (13 - 9) * ((100vw - 320px) / (1920 - 320)));
+    text-align: center;
+    @include flex_common;
+
+    body.dark & {
+      background: linear-gradient(180deg, #0f162c 0%, rgba(var(--white), 0) 100%);
+    }
+
+    svg {
+      fill: rgba(var(--title-color), 1);
+      @include pseudowh(
+        $width: calc(30px + (42 - 30) * ((100vw - 320px) / (1920 - 320))),
+        $height: calc(30px + (42 - 30) * ((100vw - 320px) / (1920 - 320)))
+      );
+    }
+
+    .service-content {
+      padding-top: calc(8px + (13 - 8) * ((100vw - 320px) / (1920 - 320)));
+      text-transform: capitalize;
+
+      h4 {
+        font-size: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+        font-weight: 500;
+      }
+
+      h5 {
+        margin-top: calc(2px + (5 - 2) * ((100vw - 320px) / (1920 - 320)));
+        color: rgba(var(--content-color), 1);
+      }
+    }
+  }
+}

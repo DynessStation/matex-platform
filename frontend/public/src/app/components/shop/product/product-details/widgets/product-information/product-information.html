@@ -1,0 +1,37 @@
+<div class="about-item-box product-spacing border-top-space">
+  <div class="product-title">
+    <h4 class="sub-title">{{ 'Product info' | translate }}</h4>
+  </div>
+  <ul class="about-item-list">
+    @if (product()?.sku) {
+      <li>
+        <span>{{ 'SKU' | translate }}: </span>{{ product()?.sku }}
+      </li>
+    }
+
+    @if (product()?.unit) {
+      <li>
+        <span>{{ 'Unit' | translate }}: </span>{{ product()?.unit }}
+      </li>
+    }
+
+    @if (product()?.weight) {
+      <li>
+        <span>{{ 'Weight' | translate }}: </span>{{ product()?.weight }} {{ 'gms' }}
+      </li>
+    }
+
+    @if (product() && product()?.stock_status) {
+      <li>
+        <span>{{ 'Stock Status' | translate }}: </span>{{ product()?.stock_status }}
+      </li>
+    }
+
+    @if (product()?.quantity! > 0) {
+      <li>
+        <span>{{ 'Quantity' | translate }}: </span>{{ product()?.quantity }}
+        {{ 'Items Left' | translate }}
+      </li>
+    }
+  </ul>
+</div>

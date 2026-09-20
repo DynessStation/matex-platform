@@ -1,0 +1,9 @@
+<div class="light-bg-color light-sm-box">
+  <div class="title-2 title-2-sm slider-button-sm mb-3">
+    <h3>Recent Viewed Products</h3>
+  </div>
+  <app-categories
+    [categoryIds]="(themeOption$ | async)?.collection?.collection_categories_ids!"
+    [swiperOptions]="swiperOptions()!"
+  ></app-categories>
+</div>

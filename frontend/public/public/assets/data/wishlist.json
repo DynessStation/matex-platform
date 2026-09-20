@@ -1,0 +1,1155 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 108,
+      "name": "Peplum Tank Top",
+      "short_description": "Elevate your ensemble with our Peplum Tank Top. Crafted for style and comfort, this coordinated outfit effortlessly blends sophistication and versatility, perfect for any occasion.",
+      "description": "<p>\"Peplum Tank Top\" is the epitome of effortless chic. This versatile ensemble combines style and comfort seamlessly, offering a coordinated look that's perfect for any occasion. Crafted with precision, the fitted silhouette of both the top and bottom exudes sophistication while ensuring a flattering fit. The set is designed to hug your curves in all the right places, accentuating your natural shape with grace.</p><p>Whether you're headed to a casual brunch with friends or a formal event, the Peplum Tank Top transitions effortlessly from day to night. Pair it with sneakers for a relaxed vibe or dress it up with heels for a more polished appeal. The coordinating pieces make styling a breeze, allowing you to effortlessly elevate your look without the hassle of mixing and matching.</p><p>Made from high-quality materials, the Peplum Tank Top offers durability and comfort that lasts all day long. Its timeless design ensures that it remains a staple in your wardrobe for seasons to come, making it a must-have addition to any fashion-forward collection. Embrace sophistication and versatility with the Peplum Tank Top, your go-to ensemble for effortless elegance.</p>",
+      "type": "classified",
+      "unit": "1 Item",
+      "weight": 100,
+      "quantity": 60,
+      "price": 10,
+      "sale_price": 9.5,
+      "discount": 5,
+      "is_featured": 0,
+      "shipping_days": null,
+      "is_cod": 0,
+      "is_free_shipping": 0,
+      "is_sale_enable": 0,
+      "is_return": 1,
+      "is_trending": 1,
+      "is_approved": 1,
+      "is_external": 0,
+      "external_url": null,
+      "external_button_text": null,
+      "sale_starts_at": null,
+      "sale_expired_at": null,
+      "sku": "SP22",
+      "is_random_related_products": 0,
+      "stock_status": "in_stock",
+      "product_thumbnail_id": 991,
+      "size_chart_image_id": null,
+      "estimated_delivery_text": "Your order is likely to reach you within 8 days.",
+      "return_policy_text": "Hassle free returns within 7 Days.",
+      "safe_checkout": 1,
+      "secure_checkout": 1,
+      "social_share": 1,
+      "encourage_order": 1,
+      "encourage_view": 1,
+      "slug": "peplum-tank-top",
+      "status": 1,
+      "store_id": 7,
+      "created_by_id": "1",
+      "tax_id": 1,
+      "preview_type": "url",
+      "product_type": "physical",
+      "separator": null,
+      "is_licensable": 0,
+      "license_type": null,
+      "preview_url": null,
+      "watermark": 0,
+      "watermark_position": "center",
+      "brand_id": 20,
+      "watermark_image_id": null,
+      "wholesale_price_type": null,
+      "is_licensekey_auto": 0,
+      "preview_audio_file_id": null,
+      "preview_video_file_id": null,
+      "deleted_at": null,
+      "created_at": "2024-05-10T09:32:52.000000Z",
+      "updated_at": "2024-05-10T09:32:52.000000Z",
+      "orders_count": 0,
+      "reviews_count": 0,
+      "can_review": false,
+      "order_amount": 0,
+      "is_wishlist": true,
+      "rating_count": 3,
+      "review_ratings": [0, 0, 0, 0, 0],
+      "related_products": [],
+      "cross_sell_products": [],
+      "wholesales": [],
+      "variations": [
+        {
+          "id": 51,
+          "name": "Peplum Tank Top (Soft Aqua)",
+          "price": 10,
+          "quantity": 50,
+          "stock_status": "in_stock",
+          "sale_price": 9.5,
+          "discount": 5,
+          "sku": "SP23 (COPY)",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 991,
+          "product_id": 158,
+          "deleted_at": null,
+          "created_at": "2024-05-10T09:32:52.000000Z",
+          "updated_at": "2024-05-10T09:32:52.000000Z",
+          "variation_image": {
+            "id": 991,
+            "name": "Sport_1031",
+            "file_name": "Sport_1031.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-10T09:26:04.000000Z",
+            "asset_url": "assets/images/product/fashion_1-1-1.png",
+            "original_url": "assets/images/product/fashion_1-1-1.png"
+          },
+          "variation_galleries": [
+            {
+              "id": 993,
+              "name": "Sport_1033",
+              "file_name": "Sport_1033.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:26:04.000000Z",
+              "asset_url": "assets/images/product/fashion_1-1-1.png",
+              "original_url": "assets/images/product/fashion_1-1-1.png"
+            },
+            {
+              "id": 992,
+              "name": "Sport_1032",
+              "file_name": "Sport_1032.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:26:04.000000Z",
+              "asset_url": "assets/images/product/fashion_1-1-2.png",
+              "original_url": "assets/images/product/fashion_1-1-2.png"
+            },
+            {
+              "id": 991,
+              "name": "Sport_1031",
+              "file_name": "Sport_1031.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:26:04.000000Z",
+              "asset_url": "assets/images/product/fashion_1-1-3.png",
+              "original_url": "assets/images/product/fashion_1-1-3.png"
+            }
+          ],
+          "attribute_values": [
+            {
+              "id": 63,
+              "value": "Soft Aqua",
+              "hex_color": null,
+              "slug": "soft-aqua",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "51",
+                "attribute_value_id": "63"
+              }
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "name": "Peplum Tank Top (Mulberry)",
+          "price": 12,
+          "quantity": 60,
+          "stock_status": "in_stock",
+          "sale_price": 11.4,
+          "discount": 5,
+          "sku": "SP24 (COPY)",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 987,
+          "product_id": 158,
+          "deleted_at": null,
+          "created_at": "2024-05-10T09:32:52.000000Z",
+          "updated_at": "2024-05-10T09:32:52.000000Z",
+          "variation_image": {
+            "id": 987,
+            "name": "Sport_1021",
+            "file_name": "Sport_1021.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-10T09:25:48.000000Z",
+            "asset_url": "assets/images/product/fashion_1-2-1.png",
+            "original_url": "assets/images/product/fashion_1-2-1.png"
+          },
+          "variation_galleries": [
+            {
+              "id": 990,
+              "name": "Sport_1023",
+              "file_name": "Sport_1023.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:26:04.000000Z",
+              "asset_url": "assets/images/product/fashion_1-2-1.png",
+              "original_url": "assets/images/product/fashion_1-2-1.png"
+            },
+            {
+              "id": 988,
+              "name": "Sport_1022",
+              "file_name": "Sport_1022.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:25:48.000000Z",
+              "asset_url": "assets/images/product/fashion_1-2-2.png",
+              "original_url": "assets/images/product/fashion_1-2-2.png"
+            },
+            {
+              "id": 987,
+              "name": "Sport_1021",
+              "file_name": "Sport_1021.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:25:48.000000Z",
+              "asset_url": "assets/images/product/fashion_1-2-3.png",
+              "original_url": "assets/images/product/fashion_1-2-3.png"
+            }
+          ],
+          "attribute_values": [
+            {
+              "id": 64,
+              "value": "Mulberry",
+              "hex_color": null,
+              "slug": "mulberry",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "52",
+                "attribute_value_id": "64"
+              }
+            }
+          ]
+        },
+        {
+          "id": 53,
+          "name": "Peplum Tank Top (Charcoal Black)",
+          "price": 15,
+          "quantity": 60,
+          "stock_status": "in_stock",
+          "sale_price": 13.5,
+          "discount": 10,
+          "sku": "SP25 (COPY)",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 984,
+          "product_id": 158,
+          "deleted_at": null,
+          "created_at": "2024-05-10T09:32:52.000000Z",
+          "updated_at": "2024-05-10T09:32:52.000000Z",
+          "variation_image": {
+            "id": 984,
+            "name": "Sport_1011",
+            "file_name": "Sport_1011.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-10T09:25:48.000000Z",
+            "asset_url": "assets/images/product/fashion_1-3-1.png",
+            "original_url": "assets/images/product/fashion_1-3-1.png"
+          },
+          "variation_galleries": [
+            {
+              "id": 986,
+              "name": "Sport_1013",
+              "file_name": "Sport_1013.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:25:48.000000Z",
+              "asset_url": "assets/images/product/fashion_1-3-1.png",
+              "original_url": "assets/images/product/fashion_1-3-1.png"
+            },
+            {
+              "id": 985,
+              "name": "Sport_1012",
+              "file_name": "Sport_1012.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:25:48.000000Z",
+              "asset_url": "assets/images/product/fashion_1-3-2.png",
+              "original_url": "assets/images/product/fashion_1-3-2.png"
+            },
+            {
+              "id": 984,
+              "name": "Sport_1011",
+              "file_name": "Sport_1011.jpg",
+              "mime_type": "image/jpeg",
+              "disk": "public",
+              "created_by_id": "1",
+              "created_at": "2024-05-10T09:25:48.000000Z",
+              "asset_url": "assets/images/product/fashion_1-3-3.png",
+              "original_url": "assets/images/product/fashion_1-3-3.png"
+            }
+          ],
+          "attribute_values": [
+            {
+              "id": 60,
+              "value": "Charcoal Black",
+              "hex_color": null,
+              "slug": "charcoal-black",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "53",
+                "attribute_value_id": "60"
+              }
+            }
+          ]
+        }
+      ],
+      "product_thumbnail": {
+        "id": 991,
+        "name": "Sport_1031",
+        "disk": "public",
+        "file_name": "Sport_1031.jpg",
+        "mime_type": "image/jpeg",
+        "asset_url": "assets/images/product/fashion_1-1-1.png",
+        "original_url": "assets/images/product/fashion_1-1-1.png"
+      },
+      "product_galleries": [
+        {
+          "id": 991,
+          "name": "Sport_1031",
+          "disk": "public",
+          "file_name": "Sport_1031.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_1-1-1.png",
+          "original_url": "assets/images/product/fashion_1-1-1.png"
+        },
+        {
+          "id": 987,
+          "name": "Sport_1021",
+          "disk": "public",
+          "file_name": "Sport_1021.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_1-1-2.png",
+          "original_url": "assets/images/product/fashion_1-1-2.png"
+        },
+        {
+          "id": 984,
+          "name": "Sport_1011",
+          "disk": "public",
+          "file_name": "Sport_1011.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_1-1-3.png",
+          "original_url": "assets/images/product/fashion_1-1-3.png"
+        }
+      ],
+      "attributes": [
+        {
+          "id": 13,
+          "name": "Colour",
+          "style": "image",
+          "slug": "colour",
+          "status": 1,
+          "created_by_id": "1",
+          "created_at": "2024-05-04T05:43:59.000000Z",
+          "updated_at": "2024-05-04T05:43:59.000000Z",
+          "deleted_at": null,
+          "pivot": {
+            "product_id": "158",
+            "attribute_id": "13"
+          },
+          "attribute_values": [
+            {
+              "id": 48,
+              "value": "Burgundy",
+              "hex_color": null,
+              "slug": "burgundy",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 49,
+              "value": "Brown",
+              "hex_color": null,
+              "slug": "brown",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 50,
+              "value": "White",
+              "hex_color": null,
+              "slug": "white-2",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 60,
+              "value": "Charcoal Black",
+              "hex_color": null,
+              "slug": "charcoal-black",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 61,
+              "value": "Pink",
+              "hex_color": null,
+              "slug": "pink",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 62,
+              "value": "Purple",
+              "hex_color": null,
+              "slug": "purple-2",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 63,
+              "value": "Soft Aqua",
+              "hex_color": null,
+              "slug": "soft-aqua",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 64,
+              "value": "Mulberry",
+              "hex_color": null,
+              "slug": "mulberry",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 65,
+              "value": "Beige",
+              "hex_color": null,
+              "slug": "beige",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 66,
+              "value": "Black",
+              "hex_color": null,
+              "slug": "black-2",
+              "attribute_id": "13",
+              "created_by_id": "1",
+              "created_at": "2024-05-08T12:25:58.000000Z",
+              "updated_at": "2024-05-08T12:25:58.000000Z",
+              "deleted_at": null
+            }
+          ]
+        }
+      ],
+      "categories": [
+        {
+          "id": 22,
+          "name": "Girl's Fashion",
+          "slug": "girl's-fashion",
+          "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+          "status": 1,
+          "type": "product",
+          "category_image": null,
+          "category_icon": {
+            "id": 3790,
+            "name": "Baby Essentials",
+            "disk": "public",
+            "mime_type": "image/png",
+            "file_name": "Baby-Essentials.png",
+            "asset_url": "assets/images/category/6.png",
+            "original_url": "/storage/3790/Baby-Essentials.png"
+          },
+          "subcategories": []
+        }
+      ],
+      "tags": [
+        {
+          "id": 16,
+          "name": "Quick-drying",
+          "slug": "quick-drying",
+          "type": "product",
+          "description": "Experience swift moisture evaporation with our Quick-Drying solution! Ideal for busy lifestyles, our product ensures rapid absorption and fast drying, leaving fabrics, surfaces, or hair effortlessly fresh and dry in no time. Say goodbye to dampness and hello to instant comfort!",
+          "created_by_id": "1",
+          "status": 1,
+          "created_at": "2024-05-07T13:01:24.000000Z",
+          "updated_at": "2024-05-07T13:01:24.000000Z",
+          "deleted_at": null,
+          "blogs_count": 0,
+          "products_count": 11,
+          "pivot": {
+            "product_id": "158",
+            "tag_id": "16"
+          }
+        },
+        {
+          "id": 17,
+          "name": "Anti-odor",
+          "slug": "anti-odor",
+          "type": "product",
+          "description": "Combat unwanted odors effortlessly with our anti-odor solution. Say goodbye to unpleasant smells lingering in your home or workspace. Our advanced formula neutralizes odors at the source, leaving behind a fresh and inviting environment. Experience long-lasting freshness with ease.",
+          "created_by_id": "1",
+          "status": 1,
+          "created_at": "2024-05-07T13:01:56.000000Z",
+          "updated_at": "2024-05-07T13:01:56.000000Z",
+          "deleted_at": null,
+          "blogs_count": 0,
+          "products_count": 11,
+          "pivot": {
+            "product_id": "158",
+            "tag_id": "17"
+          }
+        },
+        {
+          "id": 18,
+          "name": "Moisture-wicking",
+          "slug": "moisture-wicking",
+          "type": "product",
+          "description": "Experience ultimate comfort with our moisture-wicking apparel, designed to keep you dry and cool during intense workouts or busy days. Engineered with advanced fabric technology, our garments efficiently pull moisture away from your skin, ensuring you stay fresh and focused, no matter the activity.",
+          "created_by_id": "1",
+          "status": 1,
+          "created_at": "2024-05-07T13:02:28.000000Z",
+          "updated_at": "2024-05-07T13:02:28.000000Z",
+          "deleted_at": null,
+          "blogs_count": 0,
+          "products_count": 9,
+          "pivot": {
+            "product_id": "158",
+            "tag_id": "18"
+          }
+        }
+      ],
+      "brand": {
+        "id": 20,
+        "name": "Thrive Athletica",
+        "slug": "thrive-athletica",
+        "status": 1,
+        "brand_image": null,
+        "brand_banner": null
+      },
+      "store": {
+        "id": 7,
+        "store_name": "Fit Gear Central",
+        "slug": "fit-gear-central",
+        "product_images": [
+          "/storage/927/Sport_1133.jpg",
+          "/storage/1192/Sport_21.jpg",
+          "/storage/1144/Sport_832.jpg"
+        ],
+        "order_amount": 0,
+        "rating_count": 0,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": null,
+        "country": null,
+        "state": null,
+        "reviews": []
+      },
+      "reviews": [],
+      "similar_products": [],
+      "cross_products": []
+    },
+    {
+      "id": 109,
+      "name": "Scarlet Stunner",
+      "short_description": "Scarlet Stunner: A bold and captivating fragrance that leaves a lasting impression. With vibrant notes of citrus, spicy florals, and warm vanilla, it's an irresistible scent for the confident and adventurous.",
+      "description": "<p>Scarlet Stunner, the epitome of glamour encapsulated in a single product. Whether you're preparing for a night out on the town or seeking to captivate attention at a daytime event, this revolutionary beauty essential promises to redefine your look with its unparalleled vibrancy and lasting allure.Scarlet Stunner isn't just another lipstick; it's a statement piece for the modern trendsetter.</p><p>Crafted with precision and infused with a blend of high-quality ingredients, each shade delivers an intense burst of color that demands attention from across the room. From the sultry depths of crimson to the audacious brilliance of scarlet, our carefully curated palette offers a spectrum of shades to suit every mood and occasion.What sets Scarlet Stunner apart is its exceptional longevity. Say goodbye to frequent touch-ups and hello to a seamless, all-day radiance. Whether you're sipping cocktails with friends or dazzling the crowds on the dance floor, our advanced formula ensures that your look remains flawless from dawn till dusk.But Scarlet Stunner isn't just about aesthetics; it's about empowerment. With each application, you'll feel a surge of confidence coursing through your veins, emboldening you to embrace your individuality and express yourself without reservation. Whether you're a seasoned makeup aficionado or a novice exploring the possibilities of self-expression, Scarlet Stunner welcomes you to a world of limitless creativity and unbridled passion.And the best part? Scarlet Stunner isn't just a beauty product; it's a lifestyle. Join our vibrant community of Scarlet Stunners from around the globe as we celebrate the art of self-expression and empower each other to shine brighter than ever before.</p><p>From exclusive tutorials to behind-the-scenes access, our platform offers a wealth of resources to help you unlock your full potential and unleash your inner diva.So why settle for ordinary when you can be extraordinary? Elevate your look, ignite your confidence, and unleash your inner stunner with Scarlet Stunner. The world is your stage\u00e2\u20ac\u201dstep into the spotlight and let your beauty shine!</p>",
+      "type": "classified",
+      "unit": "1 Item",
+      "weight": 34,
+      "quantity": 20,
+      "price": 20,
+      "sale_price": 19,
+      "discount": 5,
+      "is_featured": 0,
+      "shipping_days": null,
+      "is_cod": 0,
+      "is_free_shipping": 1,
+      "is_sale_enable": 0,
+      "is_return": 0,
+      "is_trending": 0,
+      "is_approved": 1,
+      "is_external": 0,
+      "external_url": null,
+      "external_button_text": null,
+      "sale_starts_at": null,
+      "sale_expired_at": null,
+      "sku": "FASH10",
+      "is_random_related_products": 0,
+      "stock_status": "in_stock",
+      "product_thumbnail_id": 95,
+      "size_chart_image_id": null,
+      "estimated_delivery_text": "Your order is likely to reach you within 8 days.",
+      "return_policy_text": "Hassle free 7 days return might be available.",
+      "safe_checkout": 1,
+      "secure_checkout": 1,
+      "social_share": 1,
+      "encourage_order": 1,
+      "encourage_view": 1,
+      "slug": "scarlet-stunner",
+      "status": 1,
+      "store_id": 4,
+      "created_by_id": "1",
+      "tax_id": 1,
+      "preview_type": "url",
+      "product_type": "physical",
+      "separator": null,
+      "is_licensable": 0,
+      "license_type": null,
+      "preview_url": null,
+      "watermark": 0,
+      "watermark_position": "center",
+      "brand_id": 6,
+      "watermark_image_id": null,
+      "wholesale_price_type": null,
+      "is_licensekey_auto": 0,
+      "preview_audio_file_id": null,
+      "preview_video_file_id": null,
+      "deleted_at": null,
+      "created_at": "2024-06-26T06:14:38.000000Z",
+      "updated_at": "2024-05-15T10:31:06.000000Z",
+      "orders_count": 0,
+      "reviews_count": 0,
+      "can_review": false,
+      "order_amount": 0,
+      "is_wishlist": true,
+      "rating_count": 4,
+      "review_ratings": [0, 0, 0, 0, 0],
+      "related_products": [],
+      "cross_sell_products": [],
+      "wholesales": [],
+      "variations": [
+        {
+          "id": 71,
+          "name": "Scarlet Stunner (S)",
+          "price": 20,
+          "quantity": 10,
+          "stock_status": "in_stock",
+          "sale_price": 19,
+          "discount": 5,
+          "sku": "FASH101",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 95,
+          "product_id": 18,
+          "deleted_at": null,
+          "created_at": "2024-05-15T10:31:06.000000Z",
+          "updated_at": "2024-05-15T10:31:06.000000Z",
+          "variation_image": {
+            "id": 95,
+            "name": "fashion_91",
+            "file_name": "fashion_91.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-04T12:25:40.000000Z",
+            "asset_url": "assets/images/product/fashion_2-1.png",
+            "original_url": "assets/images/product/fashion_2-1.png"
+          },
+          "variation_galleries": [],
+          "attribute_values": [
+            {
+              "id": 51,
+              "value": "S",
+              "hex_color": null,
+              "slug": "s",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "71",
+                "attribute_value_id": "51"
+              }
+            }
+          ]
+        },
+        {
+          "id": 72,
+          "name": "Scarlet Stunner (M)",
+          "price": 22,
+          "quantity": 10,
+          "stock_status": "in_stock",
+          "sale_price": 20.9,
+          "discount": 5,
+          "sku": "FASH102",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 95,
+          "product_id": 18,
+          "deleted_at": null,
+          "created_at": "2024-05-15T10:31:06.000000Z",
+          "updated_at": "2024-05-15T10:31:06.000000Z",
+          "variation_image": {
+            "id": 95,
+            "name": "fashion_91",
+            "file_name": "fashion_91.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-04T12:25:40.000000Z",
+            "asset_url": "assets/images/product/fashion_2-1.png",
+            "original_url": "assets/images/product/fashion_2-1.png"
+          },
+          "variation_galleries": [],
+          "attribute_values": [
+            {
+              "id": 52,
+              "value": "M",
+              "hex_color": null,
+              "slug": "m",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "72",
+                "attribute_value_id": "52"
+              }
+            }
+          ]
+        },
+        {
+          "id": 73,
+          "name": "Scarlet Stunner (L)",
+          "price": 24,
+          "quantity": 20,
+          "stock_status": "in_stock",
+          "sale_price": 22.8,
+          "discount": 5,
+          "sku": "FASH103",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 95,
+          "product_id": 18,
+          "deleted_at": null,
+          "created_at": "2024-05-15T10:31:06.000000Z",
+          "updated_at": "2024-05-15T10:31:06.000000Z",
+          "variation_image": {
+            "id": 95,
+            "name": "fashion_91",
+            "file_name": "fashion_91.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-04T12:25:40.000000Z",
+            "asset_url": "assets/images/product/fashion_2-1.png",
+            "original_url": "assets/images/product/fashion_2-1.png"
+          },
+          "variation_galleries": [],
+          "attribute_values": [
+            {
+              "id": 53,
+              "value": "L",
+              "hex_color": null,
+              "slug": "l",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "73",
+                "attribute_value_id": "53"
+              }
+            }
+          ]
+        },
+        {
+          "id": 76,
+          "name": "Scarlet Stunner (XL)",
+          "price": 25,
+          "quantity": 0,
+          "stock_status": "out_of_stock",
+          "sale_price": 22.5,
+          "discount": 10,
+          "sku": "FASH104",
+          "status": 1,
+          "variation_options": null,
+          "preview_url": null,
+          "separator": null,
+          "is_digital": null,
+          "is_licensable": 0,
+          "is_licensekey_auto": 0,
+          "variation_image_id": 95,
+          "product_id": 18,
+          "deleted_at": null,
+          "created_at": "2024-05-15T10:41:14.000000Z",
+          "updated_at": "2024-05-15T10:41:14.000000Z",
+          "variation_image": {
+            "id": 95,
+            "name": "fashion_91",
+            "file_name": "fashion_91.jpg",
+            "mime_type": "image/jpeg",
+            "disk": "public",
+            "created_by_id": "1",
+            "created_at": "2024-05-04T12:25:40.000000Z",
+            "asset_url": "assets/images/product/fashion_2-1.png",
+            "original_url": "assets/images/product/fashion_2-1.png"
+          },
+          "variation_galleries": [],
+          "attribute_values": [
+            {
+              "id": 54,
+              "value": "XL",
+              "hex_color": null,
+              "slug": "xl",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null,
+              "pivot": {
+                "variation_id": "76",
+                "attribute_value_id": "54"
+              }
+            }
+          ]
+        }
+      ],
+      "product_thumbnail": {
+        "id": 95,
+        "name": "fashion_91",
+        "disk": "public",
+        "file_name": "fashion_91.jpg",
+        "mime_type": "image/jpeg",
+        "asset_url": "assets/images/product/fashion_2-1.png",
+        "original_url": "assets/images/product/fashion_2-1.png"
+      },
+      "product_galleries": [
+        {
+          "id": 97,
+          "name": "fashion_93",
+          "disk": "public",
+          "file_name": "fashion_93.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_2-1.png",
+          "original_url": "assets/images/product/fashion_2-1.png"
+        },
+        {
+          "id": 96,
+          "name": "fashion_92",
+          "disk": "public",
+          "file_name": "fashion_92.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_2-2.png",
+          "original_url": "assets/images/product/fashion_2-2.png"
+        },
+        {
+          "id": 95,
+          "name": "fashion_91",
+          "disk": "public",
+          "file_name": "fashion_91.jpg",
+          "mime_type": "image/jpeg",
+          "asset_url": "assets/images/product/fashion_2-3.png",
+          "original_url": "assets/images/product/fashion_2-3.png"
+        }
+      ],
+      "attributes": [
+        {
+          "id": 14,
+          "name": "Size",
+          "style": "circle",
+          "slug": "size",
+          "status": 1,
+          "created_by_id": "1",
+          "created_at": "2024-05-04T05:43:59.000000Z",
+          "updated_at": "2024-05-15T10:27:05.000000Z",
+          "deleted_at": null,
+          "pivot": {
+            "product_id": "18",
+            "attribute_id": "14"
+          },
+          "attribute_values": [
+            {
+              "id": 51,
+              "value": "S",
+              "hex_color": null,
+              "slug": "s",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 52,
+              "value": "M",
+              "hex_color": null,
+              "slug": "m",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 53,
+              "value": "L",
+              "hex_color": null,
+              "slug": "l",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 54,
+              "value": "XL",
+              "hex_color": null,
+              "slug": "xl",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            },
+            {
+              "id": 55,
+              "value": "XXL",
+              "hex_color": null,
+              "slug": "xxl",
+              "attribute_id": "14",
+              "created_by_id": "1",
+              "created_at": "2024-05-04T05:43:59.000000Z",
+              "updated_at": "2024-05-04T05:43:59.000000Z",
+              "deleted_at": null
+            }
+          ]
+        }
+      ],
+      "categories": [
+        {
+          "id": 22,
+          "name": "Girl's Fashion",
+          "slug": "girl's-fashion",
+          "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+          "status": 1,
+          "type": "product",
+          "category_image": null,
+          "category_icon": {
+            "id": 3790,
+            "name": "Baby Essentials",
+            "disk": "public",
+            "mime_type": "image/png",
+            "file_name": "Baby-Essentials.png",
+            "asset_url": "assets/images/category/6.png",
+            "original_url": "/storage/3790/Baby-Essentials.png"
+          },
+          "subcategories": []
+        }
+      ],
+      "tags": [
+        {
+          "id": 7,
+          "name": "Casual",
+          "slug": "casual",
+          "type": "product",
+          "description": null,
+          "created_by_id": "1",
+          "status": 1,
+          "created_at": "2024-05-04T12:12:12.000000Z",
+          "updated_at": "2024-05-04T12:12:12.000000Z",
+          "deleted_at": null,
+          "blogs_count": 0,
+          "products_count": 16,
+          "pivot": {
+            "product_id": "18",
+            "tag_id": "7"
+          }
+        }
+      ],
+      "brand": {
+        "id": 6,
+        "name": "VogueVista",
+        "slug": "voguevista",
+        "status": 1,
+        "brand_image": null,
+        "brand_banner": null
+      },
+      "store": {
+        "id": 4,
+        "store_name": "Trendy Fashion",
+        "slug": "trendy-fashion",
+        "product_images": [
+          "/storage/21/fashion_331.jpg",
+          "/storage/33/fashion_21.jpg",
+          "/storage/45/fashion_41.jpg"
+        ],
+        "order_amount": 281,
+        "rating_count": 4.5,
+        "store_logo": null,
+        "store_cover": null,
+        "vendor": null,
+        "country": null,
+        "state": null,
+        "reviews": [
+          {
+            "id": 1,
+            "product_id": 16,
+            "consumer_id": 2,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 5,
+            "description": "\"Wow! This fashion product exceeded all my expectations! From the moment I opened the package, I could tell it was something special. The quality of the materials is outstanding, and the attention to detail in the craftsmanship is truly impressive. Not only does it look fabulous, but it feels incredibly comfortable too. I've received so many compliments whenever I wear it!",
+            "created_at": "2024-06-21T10:07:31.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 2,
+              "name": "john due",
+              "email": "john.customer@example.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 2,
+                "consumer_id": 2,
+                "balance": 8.46
+              },
+              "point": {
+                "id": 3,
+                "consumer_id": 2,
+                "balance": 1970
+              }
+            }
+          },
+          {
+            "id": 2,
+            "product_id": 15,
+            "consumer_id": 34,
+            "store_id": 4,
+            "review_image_id": null,
+            "rating": 4,
+            "description": "Product Quality Is Good As Expexpected",
+            "created_at": "2024-06-25T10:22:38.000000Z",
+            "review_image": null,
+            "consumer": {
+              "id": 34,
+              "name": "Rhoda Mayer",
+              "email": "rhoda@mail.com",
+              "profile_image_id": null,
+              "role": {
+                "id": 2,
+                "name": "consumer",
+                "guard_name": "web",
+                "system_reserve": "1"
+              },
+              "profile_image": null,
+              "wallet": {
+                "id": 5,
+                "consumer_id": 34,
+                "balance": 0
+              },
+              "point": {
+                "id": 6,
+                "consumer_id": 34,
+                "balance": 100
+              }
+            }
+          }
+        ]
+      },
+      "reviews": [],
+      "similar_products": [],
+      "cross_products": []
+    }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "per_page": 2,
+  "prev_page_url": null,
+  "to": 2,
+  "total": 2
+}

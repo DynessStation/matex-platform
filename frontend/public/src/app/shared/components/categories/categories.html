@@ -1,0 +1,37 @@
+@if (type() === 'default') {
+  <div class="category-box-slide">
+    <div class="swiper" #categorySwiperContainer>
+      <div class="swiper-wrapper">
+        @for (category of categories; track category.id) {
+          <div class="swiper-slide">
+            <a [routerLink]="['/category/' + category.slug]" class="category-box">
+              <img
+                [src]="category?.category_icon?.asset_url"
+                class="img-fluid"
+                [alt]="category?.name"
+              />
+              <h5>{{ category?.name }}</h5>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else if (type() === 'sub_category') {
+  <div class="left-banner-content">
+    @for (category of categories; track category.id) {
+      <div class="accessories-computer-box">
+        <h4 class="deal-title">{{ category?.name }}</h4>
+        @if (category?.subcategories?.length) {
+          <ul class="deal-list">
+            @for (subCategory of category?.subcategories; track subCategory?.id) {
+              <li>
+                <a [routerLink]="['/category/' + category.slug]">{{ subCategory?.name }}</a>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </div>
+}

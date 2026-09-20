@@ -1,0 +1,37 @@
+.location-search {
+  margin-bottom: 12px;
+}
+
+.location-search gmp-place-autocomplete {
+  display: block;
+
+  width: 100%;
+}
+
+.location-map {
+  width: 100%;
+
+  height: 420px;
+
+  overflow: hidden;
+
+  border: 1px solid #eee;
+
+  border-radius: 6px;
+}
+
+.location-message {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  height: 120px;
+
+  margin-bottom: 12px;
+
+  color: #888;
+
+  background: #fafafa;
+}

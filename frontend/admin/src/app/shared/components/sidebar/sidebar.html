@@ -1,0 +1,190 @@
+<div [class]="class()">
+  <!-- LOGO -->
+
+  <div class="logo-wrapper logo-wrapper-center">
+    @if ((setting$ | async)?.general?.light_logo_image) {
+      <a [routerLink]="['/dashboard']">
+        <img
+          class="img-fluid for-white"
+          [src]="(setting$ | async)?.general?.light_logo_image?.asset_url"
+          alt="logo"
+        />
+      </a>
+    } @else {
+      <a [routerLink]="['/dashboard']">
+        <h2 class="text-white">
+          {{ (setting$ | async)?.general?.site_name || 'Matex' }}
+        </h2>
+      </a>
+    }
+
+    @if ((setting$ | async)?.general?.tiny_logo_image) {
+      <img
+        class="img-fluid logo-sm"
+        [src]="(setting$ | async)?.general?.tiny_logo_image?.asset_url"
+        alt="logo"
+      />
+    } @else {
+      <h2 class="text-white logo-sm">MX</h2>
+    }
+
+    <div class="back-btn">
+      <i class="fa fa-angle-left"></i>
+    </div>
+
+    <div class="0-sidebar custom-sidebar" (click)="sidebarToggle()">
+      <i class="ri-menu-line"></i>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+
+  <app-search (searchChange)="filterMenu($event)" />
+
+  <!-- MENU -->
+
+  <nav class="sidebar-main">
+    <div class="left-arrow" id="left-arrow">
+      <i data-feather="arrow-left"></i>
+    </div>
+
+    <div id="sidebar-menu">
+      <ul class="sidebar-links" id="simple-bar">
+        <li class="back-btn"></li>
+
+        <ng-container
+          *ngTemplateOutlet="
+            recursiveMenu;
+            context: {
+              $implicit: filteredMenu,
+            }
+          "
+        />
+
+        <ng-template #recursiveMenu let-menus>
+          @for (menu of menus; track menu.id ?? menu.path ?? $index) {
+            <li
+              [class.sidebar-list]="menu.type === 'sub'"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{
+                exact: false,
+              }"
+            >
+              <!-- PARENT / SINGLE -->
+
+              @if (menu.type === 'sub') {
+                <a
+                  href="javascript:void(0)"
+                  [ngClass]="{
+                    'debar-link sidebar-title link-nav sidebar-link':
+                      menu.level === 1,
+                    activated: menu.children && menu.active,
+                  }"
+                  [routerLink]="menu.path"
+                  [queryParams]="menu.params"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{
+                    exact: true,
+                  }"
+                  (click)="
+                    menu.children?.length
+                      ? onItemSelected(menu)
+                      : closeSidebar()
+                  "
+                >
+                  <span>
+                    <div class="d-flex align-items-center">
+                      @if (menu.icon) {
+                        <i class="{{ menu.icon }}"></i>
+                      }
+
+                      <div class="sidebar-main-link">
+                        {{ menu.title ?? '' | translate }}
+                      </div>
+                    </div>
+
+                    @if (
+                      menu.badgeType &&
+                      menu.badgeValue !== '0' &&
+                      menu.badgeValue
+                    ) {
+                      <span [class]="menu.badgeType">
+                        {{ menu.badgeValue }}
+                      </span>
+                    }
+                  </span>
+
+                  @if (menu.children?.length) {
+                    <div class="according-menu">
+                      <i
+                        class="ri-{{
+                          menu.active ? 'arrow-down-s' : 'arrow-up-s'
+                        }}-line"
+                      ></i>
+                    </div>
+                  }
+                </a>
+              }
+
+              <!-- CHILD LINK -->
+
+              @if (menu.type === 'link') {
+                <a
+                  href="javascript:void(0)"
+                  [routerLink]="menu.path"
+                  [queryParams]="menu.params"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{
+                    exact: false,
+                  }"
+                  (click)="closeSidebar()"
+                >
+                  <div>
+                    {{ menu.title ?? '' | translate }}
+                  </div>
+
+                  @if (
+                    menu.badgeType && menu.badgeValue !== '0' && menu.badgeValue
+                  ) {
+                    <span [class]="menu.badgeType">
+                      {{ menu.badgeValue }}
+                    </span>
+                  }
+                </a>
+              }
+
+              <!-- CHILDREN -->
+
+              @if (menu.children?.length) {
+                <ul
+                  class="sidebar-submenu"
+                  [class.show]="menu.active"
+                  [class.active]="menu.active"
+                >
+                  <ng-container
+                    *ngTemplateOutlet="
+                      recursiveMenu;
+                      context: {
+                        $implicit: menu.children,
+                      }
+                    "
+                  />
+                </ul>
+              }
+            </li>
+          }
+        </ng-template>
+      </ul>
+
+      @if (showEmptyMessage) {
+        <div class="EmptyMessage text-center p-3 text-muted">
+          <div class="tt-dataset tt-dataset-0">
+            <div class="EmptyMessage">
+              {{ 'opps!!_There_are_no_result_found' | translate }}
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </nav>
+</div>

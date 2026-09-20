@@ -1,0 +1,200 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.4 Button CSS
+==========================**/
+.btn {
+  color: rgba(var(--title-color), 1);
+  padding: calc(10px + (13 - 10) * ((100vw - 320px) / (1920 - 320)))
+    calc(18px + (23 - 18) * ((100vw - 320px) / (1920 - 320)))
+    calc(7px + (10 - 7) * ((100vw - 320px) / (1920 - 320)));
+  border: none;
+  font-weight: 500;
+  font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+  position: relative;
+  z-index: 0;
+  transition: all 0.25s ease-in-out;
+  border-radius: 5px;
+
+  &-warning {
+    background-color: rgba(var(--primary-color), 1);
+    color: rgba(var(--white), 1);
+    border: 1px solid transparent;
+
+    &:hover {
+      color: rgba(var(--primary-color), 1);
+      border-color: rgba(var(--primary-color), 1);
+      background-color: transparent;
+    }
+  }
+
+  &-border-white {
+    border: 1px solid rgba(var(--white), 1);
+    color: rgba(var(--white), 1);
+    background-color: transparent;
+
+    &:hover {
+      background-color: rgba(var(--white), 1);
+      color: rgba(var(--title-color), 1);
+    }
+  }
+
+  &.theme-border {
+    border: 1px solid rgba(var(--primary-color), 1);
+    color: rgba(var(--primary-color), 1);
+    background-color: transparent;
+
+    &:hover {
+      background-color: rgba(var(--primary-color), 1);
+      color: #fff;
+    }
+  }
+
+  &-border {
+    border: 1px solid rgba(var(--primary-color), 1);
+    color: rgba(var(--primary-color), 1);
+    background-color: transparent;
+
+    &:hover {
+      color: #fff;
+      background-color: rgba(var(--primary-color), 1);
+    }
+  }
+
+  &-border-transparent {
+    border: 1px solid transparent;
+  }
+
+  &-danger {
+    background-color: rgba(var(--danger-color), 1);
+    outline: 1px solid rgba(var(--danger-color), 1);
+    color: #fff;
+    box-shadow: none;
+
+    &:hover,
+    &:focus,
+    &:focus-visible {
+      outline: 1px solid rgba(var(--danger-color), 1);
+      background-color: transparent;
+      color: rgba(var(--danger-color), 1);
+      box-shadow: none;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: 1px solid rgba(var(--danger-color), 1);
+    }
+  }
+
+  &-bg-theme {
+    background-color: rgba(var(--primary-color), 1);
+    color: #fff;
+    --Color: #fff;
+
+    &:hover {
+      color: #fff;
+      --Color: #fff;
+      background-color: rgba(var(--primary-color), 1);
+    }
+
+    &:first-child:active,
+    &:active,
+    &:focus-visible {
+      color: rgba(var(--primary-color), 1);
+      --Color: rgba(var(--primary-color), 1);
+      outline: 1px solid rgba(var(--primary-color), 1);
+      border: none;
+      background-color: transparent;
+    }
+
+    &.disabled,
+    &:disabled {
+      background-color: rgba(var(--primary-color), 1);
+      color: #fff;
+      opacity: var(--bs-btn-disabled-opacity);
+    }
+  }
+
+  &-load-more {
+    background-color: rgba(var(--primary-color), 1);
+    color: rgba(var(--white), 1);
+    padding-inline: calc(28px + (55 - 28) * ((100vw - 320px) / (1920 - 320)));
+    margin-top: calc(20px + (33 - 20) * ((100vw - 320px) / (1920 - 320)));
+    font-size: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+    border: 1px solid rgba(var(--primary-color), 1);
+
+    &:hover {
+      background-color: transparent;
+      border-color: rgba(var(--primary-color), 1);
+      color: rgba(var(--primary-color), 1);
+    }
+
+    &:disabled {
+      border-color: rgba(var(--primary-color), 1);
+      background-color: rgba(var(--primary-color), 1);
+      color: rgba(var(--white), 1);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.btn-2 {
+  padding: 10px 23px;
+  border: none;
+  font-weight: 500;
+  display: inline-block;
+  font-size: 16px;
+  color: rgba(var(--title-color), 1);
+  border-radius: 0;
+
+  &.btn-yellow {
+    background-color: rgba(var(--primary-color), 1);
+  }
+}
+
+.btn-sm {
+  font-weight: 400;
+  font-size: 14px;
+  padding: 6px 20px 5px;
+}
+
+.shop-btn {
+  padding: 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(var(--theme-blue2), 1);
+
+  &:hover {
+    color: rgba(var(--theme-blue2), 1);
+  }
+}
+
+.shop-btn-2 {
+  padding: 5px 14px;
+  font-weight: 500;
+  background-color: rgba(var(--primary-color), 1);
+  font-size: 14px;
+  color: rgba(var(--title-color), 1);
+}
+
+.btn-close {
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+.proceed-btn {
+  margin-top: calc(12px + (20 - 12) * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+  border-radius: calc(4px + (6 - 4) * ((100vw - 320px) / (1920 - 320)));
+  letter-spacing: calc(0.4px + (0.8 - 0.4) * ((100vw - 320px) / (1920 - 320)));
+  padding: calc(8px + (12 - 8) * ((100vw - 320px) / (1920 - 320)))
+    calc(14px + (20 - 14) * ((100vw - 320px) / (1920 - 320)))
+    calc(6px + (10 - 6) * ((100vw - 320px) / (1920 - 320)));
+  background-color: rgba(var(--primary-color), 1);
+  color: #fff;
+
+  &:hover {
+    background-color: rgba(var(--primary-color), 1);
+    color: #fff;
+  }
+}

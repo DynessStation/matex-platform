@@ -1,0 +1,28 @@
+<ul class="category-list custom-padding">
+  @for (number of numbers; track number; let i = $index) {
+    <li>
+      <div class="form-check category-list-box">
+        <input
+          type="checkbox"
+          class="form-check-input checkbox_animated"
+          id="rating-{{ numbers[numbers.length - i - 1] }}"
+          [value]="numbers[numbers.length - i - 1]"
+          [checked]="checked(numbers[numbers.length - i - 1].toString())"
+          (change)="applyFilter($event)"
+        />
+        <div class="form-check-label category-rating-box">
+          <div class="product-rating rating">
+            <ngb-rating [rate]="numbers[numbers.length - i - 1]">
+              <ng-template let-fill="fill" let-index="index">
+                <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+              </ng-template>
+            </ngb-rating>
+          </div>
+          <span class="text-content"
+            >({{ numbers[numbers.length - i - 1] }} {{ 'star' | translate }})</span
+          >
+        </div>
+      </div>
+    </li>
+  }
+</ul>

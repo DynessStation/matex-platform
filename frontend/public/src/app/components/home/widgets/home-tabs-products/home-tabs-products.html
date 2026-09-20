@@ -1,0 +1,57 @@
+<div class="title justify-content-between d-sm-flex d-block">
+  <h3>{{ tabSelection()?.tabs_product?.title }}</h3>
+  <ul class="nav nav-pills title-nav-pills mt-sm-0 mt-3">
+    @if (tabSelection()?.tabs_product?.tabs?.length) {
+      @for (item of tabSelection()?.tabs_product?.tabs; let i = $index; track item.tab) {
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="i === activeIndex()"
+            type="button"
+            (click)="setActiveIndex(i)"
+          >
+            {{ item.tab }}
+          </button>
+        </li>
+      }
+    }
+  </ul>
+</div>
+<div class="tab-content {{ class() }}">
+  @if (tabSelection()?.tabs_product?.tabs?.length) {
+    @for (item of tabSelection()?.tabs_product?.tabs; let i = $index; track item.tab) {
+      <div
+        class="tab-pane fade"
+        [class.show]="i === activeIndex()"
+        [class.active]="i === activeIndex()"
+      >
+        <div
+          class="swiper recommendations-slider slider-bottom-spacing"
+          #swiperContainer
+          [attr.data-swiper-id]="i"
+        >
+          <div class="swiper-wrapper">
+            @for (
+              slide of flattenProducts(item.product_ids, itemsPerSlide(), rows());
+              track $index
+            ) {
+              <div class="swiper-slide">
+                <div class="row g-3">
+                  @for (productId of slide; track productId) {
+                    <div class="col-12">
+                      <app-home-product
+                        [productIds]="[productId]"
+                        [style]="style()"
+                        [type]="type()"
+                      ></app-home-product>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,36 @@
+<ng-template #confirmationModal>
+  <div class="modal-body">
+    <i class="ri-question-line icon-box wo-bg"></i>
+
+    <h5 class="modal-title">
+      {{ modalTitleKey | translate: modalParams }}
+    </h5>
+
+    <p>
+      {{ modalMessageKey | translate: modalParams }}
+    </p>
+
+    <div class="button-box">
+      <!-- NO -->
+      <app-button
+        [class]="'btn-md fw-bold btn btn-outline'"
+        [spinner]="false"
+        [id]="'confirm_no_btn'"
+        [type]="'button'"
+        (click)="dismissModal()"
+      >
+        {{ 'no' | translate }}
+      </app-button>
+
+      <!-- YES -->
+      <app-button
+        [class]="'btn-theme btn-md fw-bold btn'"
+        [id]="'confirm_yes_btn'"
+        [type]="'button'"
+        (click)="confirm()"
+      >
+        {{ 'yes' | translate }}
+      </app-button>
+    </div>
+  </div>
+</ng-template>

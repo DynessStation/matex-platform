@@ -1,0 +1,60 @@
+@use '../utils/variables';
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.8 Light Gallery CSS
+==========================**/
+.lg-container {
+  font-family: variables.$br-hendrix;
+}
+
+.lg-backdrop {
+  background-color: rgba(var(--title-color), 0.95);
+  backdrop-filter: blur(3.5px);
+}
+
+.lg-outer {
+  &.lg-use-transition-for-zoom {
+    .lg-item {
+      &.lg-complete {
+        &.lg-zoomable {
+          .lg-img-wrap {
+            padding-bottom: 11px;
+          }
+        }
+      }
+    }
+  }
+
+  .lg-thumb-outer {
+    background-color: rgba(var(--title-color), 1);
+  }
+}
+
+.lg-zoom-in-out {
+  .lg-item {
+    opacity: 0;
+    will-change: transform, opacity;
+
+    &.lg-prev-slide {
+      transform: scale3d(2, 2, 2);
+    }
+
+    &.lg-next-slide {
+      transform: scale3d(0, 0, 0);
+    }
+
+    &.lg-current {
+      transform: scale3d(1, 1, 1);
+      opacity: 1;
+    }
+
+    &.lg-prev-slide,
+    &.lg-next-slide,
+    &.lg-current {
+      transition:
+        transform 1s cubic-bezier(0, 0, 0.25, 1) 0s,
+        opacity 1s ease 0s;
+    }
+  }
+}

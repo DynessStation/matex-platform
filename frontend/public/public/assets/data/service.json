@@ -1,0 +1,112 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 1,
+      "icon": "assets/svg/service.svg#return",
+      "name": "Free shipping & Return",
+      "description": "Free shipping on all orders over $99",
+      "status": 1
+    },
+    {
+      "id": 2,
+      "icon": "assets/svg/service.svg#dollar",
+      "name": "Money back guarantee",
+      "description": "100% money back guarantee",
+      "status": 1
+    },
+    {
+      "id": 3,
+      "icon": "assets/svg/service.svg#support",
+      "name": "Online Support 24/7",
+      "description": "help you provide 24/7 support in no time",
+      "status": 1
+    },
+    {
+      "id": 4,
+      "icon": "assets/svg/service.svg#payment",
+      "name": "Secure payment",
+      "description": "Secured via Secure Sockets Layer",
+      "status": 1
+    },
+    {
+      "id": 5,
+      "icon": "assets/svg/service-2.svg#shipping",
+      "name": "Free Shipping",
+      "description": "Free shipping when you spend $50.00",
+      "status": 1
+    },
+    {
+      "id": 6,
+      "icon": "assets/svg/service-2.svg#fresh",
+      "name": "Get Fresh Products",
+      "description": "Find a range of best online organic food",
+      "status": 1
+    },
+    {
+      "id": 7,
+      "icon": "assets/svg/service-2.svg#refund",
+      "name": "Moneyback Offer",
+      "description": "100 % secure payment and easy return",
+      "status": 1
+    },
+    {
+      "id": 8,
+      "icon": "assets/svg/service-2.svg#safe",
+      "name": "Safe Payment",
+      "description": "We are using secure payment methods",
+      "status": 1
+    },
+    {
+      "id": 9,
+      "icon": "assets/svg/service-3.svg#support",
+      "name": "Customer Support",
+      "description": "Need Assistance?",
+      "status": 1
+    },
+    {
+      "id": 10,
+      "icon": "assets/svg/service-3.svg#payment",
+      "name": "Secure Payment",
+      "description": "Safe 7 Fast",
+      "status": 1
+    },
+    {
+      "id": 11,
+      "icon": "assets/svg/service-3.svg#return",
+      "name": "Free Returns",
+      "description": "Easy & free",
+      "status": 1
+    },
+    {
+      "id": 12,
+      "icon": "assets/svg/service-3.svg#order",
+      "name": "Free delivery all order",
+      "description": "Easy & free",
+      "status": 1
+    }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "per_page": 46,
+  "prev_page_url": null,
+  "to": 46,
+  "total": 46
+}

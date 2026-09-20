@@ -1,0 +1,127 @@
+<section class="section-t-space product-frequently-section">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-12">
+        <div class="title">
+          <h3 class="fw-bold">Frequently bought together</h3>
+        </div>
+        <div class="frequently-box">
+          <ul class="frequently-image">
+            @for (crossSellProduct of crossSellProducts; let i = $index; track crossSellProduct) {
+              <li>
+                <div class="product-box-4 product-box-hover">
+                  <div class="product-image bg-white">
+                    <a [routerLink]="['/product', crossSellProduct!.slug]">
+                      <img
+                        [src]="
+                          crossSellProduct.selected_variant
+                            ? crossSellProduct.selected_variant.variation_image.asset_url
+                            : crossSellProduct?.product_thumbnail?.asset_url
+                        "
+                        class="img-fluid"
+                        [alt]="crossSellProduct.name"
+                        class="img-fluid"
+                      />
+                    </a>
+                  </div>
+                  <div class="product-content">
+                    @if (crossSellProduct?.brand) {
+                      <h6 class="sub-name">{{ crossSellProduct?.brand?.name }}</h6>
+                    }
+
+                    <a [routerLink]="['/product', crossSellProduct!.slug]" class="name">
+                      <h5>
+                        {{
+                          crossSellProduct.selected_variant
+                            ? crossSellProduct.selected_variant.name
+                            : crossSellProduct?.name
+                        }}
+                      </h5>
+                    </a>
+                    <ul class="rating">
+                      <ngb-rating [rate]="crossSellProduct?.rating_count || 0">
+                        <ng-template let-fill="fill" let-index="index">
+                          <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                        </ng-template>
+                      </ngb-rating>
+                    </ul>
+                    <h5 class="price">
+                      {{
+                        (crossSellProduct.selected_variant
+                          ? crossSellProduct.selected_variant.sale_price
+                          : crossSellProduct?.sale_price
+                        ) | currencySymbol
+                      }}
+                      <del>{{
+                        (crossSellProduct.selected_variant
+                          ? crossSellProduct.selected_variant.price
+                          : crossSellProduct?.price
+                        ) | currencySymbol
+                      }}</del>
+                    </h5>
+                  </div>
+                </div>
+              </li>
+              @if (i + 1 < crossSellProducts!.length) {
+                <li>
+                  <i class="ri-add-line"></i>
+                </li>
+              }
+            }
+          </ul>
+
+          <div class="frequently-detail">
+            @for (crossSellProduct of crossSellProducts; track crossSellProduct) {
+              <div class="form-check">
+                <input
+                  class="form-check-input checkbox_animated"
+                  type="checkbox"
+                  [checked]="isChecked(crossSellProduct?.id)"
+                  id="crosssell-{{ crossSellProduct?.id }}"
+                  value="{{
+                    selectedVariation &&
+                    selectedVariation.product_id === crossSellProduct.id &&
+                    crossSellProductsIds.includes(selectedVariation.product_id)
+                      ? selectedVariation.id
+                      : crossSellProduct?.id
+                  }}"
+                  (change)="select($event, crossSellProduct.id)"
+                />
+                <label class="form-check-label" for="checkbox1"
+                  >{{
+                    crossSellProduct.selected_variant
+                      ? crossSellProduct.selected_variant.name
+                      : crossSellProduct?.name
+                  }}
+                  -
+                  <span
+                    >${{
+                      crossSellProduct.selected_variant
+                        ? crossSellProduct.selected_variant.sale_price
+                        : crossSellProduct?.sale_price
+                    }}</span
+                  >
+                </label>
+              </div>
+            }
+
+            <div class="info-price-parent">
+              <h4>Chosen Product for</h4>
+              <h3 class="info-total">
+                <span id="price">{{ total | currencySymbol }}</span>
+              </h3>
+            </div>
+            <app-button
+              [class]="'btn btn-bg-theme'"
+              [id]="'addcartAllbtn'"
+              [disabled]="!total"
+              (click)="addToCartAll()"
+            >
+              {{ 'Buy this bundle' | translate }}
+            </app-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,67 @@
+<div class="dashboard-left-sidebar" [class.show]="accountService.isOpenMenu">
+  <button class="sidebar-close d-flex d-lg-none" (click)="closeMenu()">
+    <i class="ri-close-line"></i>
+  </button>
+  <div class="profile-box">
+    <div class="profile-contain">
+      <div class="profile-image">
+        <img src="assets/images/review/1.jpg" class="img-fluid update_img" alt="image" />
+      </div>
+
+      <div class="profile-name">
+        <h3>Kennedy Page</h3>
+        <h6 class="text-content">kennedy.page@gmail.com</h6>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-pills user-nav-pills">
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/dashboard']">
+        <i class="ri-home-line"></i> Dashboard</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/notifications']">
+        <i class="ri-notification-line"></i>Notifications</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/bank-details']">
+        <i class="ri-bank-line"></i> Bank Details</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/wallet']">
+        <i class="ri-wallet-line"></i>My Wallet</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/point']">
+        <i class="ri-coin-line"></i> Earning Points</a
+      >
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/order']">
+        <i class="ri-file-text-line"></i>My Orders</a
+      >
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/refund']">
+        <i class="ri-money-dollar-circle-line"></i>Refund History</a
+      >
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [routerLinkActive]="['active']" [routerLink]="['/account/addresses']">
+        <i class="ri-map-pin-line"></i>Saved Address</a
+      >
+    </li>
+  </ul>
+  <div class="logout-box">
+    <button class="logout-btn btn" (click)="logout()">
+      <i class="iconsax" icon-name="logout-2"></i>Log Out
+    </button>
+  </div>
+</div>

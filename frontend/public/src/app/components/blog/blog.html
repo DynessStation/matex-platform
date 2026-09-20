@@ -1,0 +1,206 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+@if (style === 'blog_no_sidebar') {
+  <section class="blog-section section-t-space">
+    <div class="custom-container">
+      <div class="row g-sm-4 g-3">
+        @for (blog of (paginateBlog$ | async); track blog.id) {
+          <div class="col-xl-4 col-md-6">
+            <div class="blog-box h-100 sticky-blog-box">
+              <div class="blog-image">
+                <a [routerLink]="['/blog/', blog?.slug]">
+                  <img
+                    [src]="
+                      blog?.blog_thumbnail
+                        ? blog?.blog_thumbnail?.asset_url
+                        : 'assets/images/blog.png'
+                    "
+                    [alt]="blog?.title"
+                    class="img-fluid"
+                    alt="image"
+                  />
+                </a>
+                @if (blog?.is_sticky) {
+                  <i class="ri-pushpin-fill pinned"></i>
+                }
+                <div class="blog-profile-box">
+                  <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                    @if (blog?.created_by?.profile_image) {
+                      <img class="img-fluid" [src]="blog.created_by.profile_image" alt="user" />
+                    } @else {
+                      <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
+                    }
+                  </a>
+                  <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                    <h5 class="name">{{ blog.created_by.name }}</h5>
+                    <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
+                  </a>
+                </div>
+              </div>
+
+              <div class="blog-contain">
+                <a [routerLink]="['/blog/', blog?.slug]">
+                  <h3>{{ blog.title }}</h3>
+                  <i class="ri-arrow-right-up-line"></i>
+                </a>
+                <p class="blog-desc">{{ blog.description }}</p>
+                <div class="product-tag">
+                  @for (tag of blog.tags; track tag) {
+                    <span class="badge-primary-color">{{ tag.name }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="blog-section section-t-space">
+    <div class="custom-container">
+      <div
+        class="row g-3 g-xl-4"
+        [class]="{
+          'g-xl-4': style === 'grid_view' || style === 'blog_3_grid',
+          'g-4': style === 'blog_list',
+          'g-3': style === 'grid_view' || style === 'blog_3_grid',
+        }"
+      >
+        <div class="col-12 m-xl-0" (click)="filterOpen()">
+          <div class="filter-button d-xl-none">
+            <a href="javascript:void(0)">
+              <i class="ri-equalizer-2-line"></i>
+              Filter Menu
+            </a>
+          </div>
+        </div>
+        <div
+          class="col-xxl-9 col-xl-8 col-12"
+          [class]="{
+            'order-lg-2': style === 'blog_3_grid' || style === 'grid_view',
+            'col-12': style === 'blog_3_grid',
+            'order-xl-2': style === 'blog_list',
+          }"
+        >
+          <div
+            class="row g-3 g-xl-4"
+            [class]="{
+              'g-sm-4 g-3': style === 'grid_view' || style === 'blog_list',
+              'g-4': style === 'blog_3_grid',
+            }"
+          >
+            @for (blog of (paginateBlog$ | async); track blog.id) {
+              <div
+                [ngClass]="{
+                  'col-xxl-4 col-xl-6 col-lg-4': style === 'blog_3_grid',
+                  'col-sm-6': style === 'blog_3_grid' || style === 'grid_view',
+                  'col-12 blog-list-box': style === 'blog_list',
+                }"
+              >
+                <div class="blog-box h-100 sticky-blog-box">
+                  <div class="blog-image">
+                    <a [routerLink]="['/blog/', blog?.slug]">
+                      <img
+                        [src]="
+                          blog?.blog_thumbnail
+                            ? blog?.blog_thumbnail?.asset_url
+                            : 'assets/images/blog.png'
+                        "
+                        [alt]="blog?.title"
+                        class="img-fluid"
+                        alt="image"
+                      />
+                    </a>
+                    @if (blog?.is_sticky) {
+                      <i class="ri-pushpin-fill pinned"></i>
+                    }
+                    @if (style !== 'blog_list') {
+                      <div class="blog-profile-box">
+                        <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                          @if (blog?.created_by?.profile_image) {
+                            <img
+                              class="img-fluid"
+                              [src]="blog.created_by.profile_image"
+                              alt="user"
+                            />
+                          } @else {
+                            <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
+                          }
+                        </a>
+                        <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                          <h5 class="name">{{ blog.created_by.name }}</h5>
+                          <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
+                        </a>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="blog-contain">
+                    <a [routerLink]="['/blog/', blog?.slug]">
+                      <h3>{{ blog.title }}</h3>
+                      <i class="ri-arrow-right-up-line"></i>
+                    </a>
+                    <p class="blog-desc">{{ blog.description }}</p>
+                    @if (style === 'blog_list') {
+                      <div class="blog-bottom-box">
+                        <div class="blog-profile-box">
+                          <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                            @if (blog?.created_by?.profile_image) {
+                              <img
+                                class="img-fluid"
+                                [src]="blog.created_by.profile_image"
+                                alt="user"
+                              />
+                            } @else {
+                              <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
+                            }
+                          </a>
+                          <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                            <h5 class="name">{{ blog.created_by.name }}</h5>
+                            <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
+                          </a>
+                        </div>
+                        <a [routerLink]="['/blog/', blog?.slug]" class="btn blog-button"
+                          >Read more <i class="iconsax" icon-name="arrow-right"></i
+                        ></a>
+                      </div>
+                    } @else {
+                      <div class="product-tag">
+                        @for (tag of blog.tags; track tag) {
+                          <span class="badge-primary-color">{{ tag.name }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="custom-pagination">
+            <ngb-pagination
+              [collectionSize]="((totalItems$ | async) || 0)"
+              [(page)]="filter['page']"
+              [pageSize]="filter['paginate']"
+              [maxSize]="5"
+              [rotate]="true"
+              [boundaryLinks]="true"
+              [ellipses]="false"
+              (pageChange)="setPaginate($event)"
+            >
+            </ngb-pagination>
+          </div>
+        </div>
+        <div class="col-xxl-3 col-xl-4 col-lg-5 order-lg-1">
+          <app-sidebar [showSidebar]="open" />
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter></app-home-newsletter>
+  </div>
+</section>

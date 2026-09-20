@@ -1,0 +1,26 @@
+<div class="show-button show-button-2">
+  <div class="top-filter-menu">
+    <div class="filter-button d-inline-block d-lg-none">
+      <a href="javascript:void(0)"><i class="ri-equalizer-2-line"></i> Filter Menu</a>
+    </div>
+    <div class="category-dropdown w-100">
+      <div class="seller-title">
+        <h4>Showing {{ stores()?.length }} Brands</h4>
+      </div>
+
+      <div class="dropdown-box">
+        <h5 class="text-content">Sort By :</h5>
+        <div class="dropdown">
+          <select2
+            class="custom-select"
+            [displaySearchStatus]="'hidden'"
+            [placeholder]="'Most Popular'"
+            [value]="filter()!['sortBy']"
+            [data]="sorting ? sorting : []"
+            (update)="sortByFilter($event)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

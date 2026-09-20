@@ -1,0 +1,163 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+@if (contactData) {
+  <div class="contact-section section-t-space">
+    <div class="custom-container">
+      <div class="contact-main-box">
+        <div class="row g-sm-4 g-3">
+          <div class="col-xxl-3 col-lg-4 col-md-5">
+            <div class="contact-wrapper">
+              <h3>{{ contactData.title }}</h3>
+              <p class="contact-desc">{{ contactData.description }}</p>
+              <p>{{ contactData.contact_email }}</p>
+              <p>{{ contactData.contact_number }}</p>
+              <h2 class="contact-title">{{ contactData.imageUrl }}</h2>
+            </div>
+          </div>
+          <div class="col-xxl-9 col-lg-8 col-md-7">
+            <form class="contact-right-box" [formGroup]="form">
+              <h3>{{ contactData.main_title }}</h3>
+              <p>
+                <span>"</span><span class="txt-danger-color"> * </span> <span>"</span
+                ><span class="ps-1">indicates required fields</span>
+              </p>
+              <div class="row g-md-4 g-3">
+                <div class="col-12 theme-form">
+                  <label for="contactUsName" class="form-label"
+                    >Name <span class="txt-danger-color">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="contactUsName"
+                    placeholder="First name"
+                    formControlName="name"
+                    [class]="{
+                      'is-invalid':
+                        form.controls['name'].touched && form.controls['name'].errors?.['required'],
+                      'is-valid': form.controls['name'].valid,
+                    }"
+                  />
+                  @if (
+                    form.controls['name'].touched && form.controls['name'].errors?.['required']
+                  ) {
+                    <div class="invalid-feedback">Name is Required</div>
+                  }
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-6 theme-form">
+                  <label for="contactUsEmail" class="form-label"
+                    >Email <span class="txt-danger-color">*</span></label
+                  >
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="contactUsEmail"
+                    placeholder="example@domain.com"
+                    formControlName="email"
+                    [class]="{
+                      'is-invalid':
+                        form.controls['email'].touched &&
+                        (form.controls['email'].errors?.['required'] ||
+                          form.controls['email'].errors?.['email']),
+                      'is-valid': form.controls['email'].valid,
+                    }"
+                  />
+                  @if (
+                    form.controls['email'].touched && form.controls['email'].errors?.['required']
+                  ) {
+                    <div class="invalid-feedback">Email is Required</div>
+                  }
+                  @if (form.controls['email'].errors?.['email']) {
+                    <div class="invalid-feedback">Invalid Email</div>
+                  }
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-6 theme-form">
+                  <label for="contactUsPhone" class="form-label"
+                    >Phone <span class="txt-danger-color">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="contactUsPhone"
+                    placeholder="Phone number"
+                    formControlName="phone"
+                    [class]="{
+                      'is-invalid':
+                        form.controls['phone'].touched &&
+                        form.controls['phone'].errors?.['required'],
+                      'is-valid': form.controls['phone'].valid,
+                    }"
+                  />
+                  @if (
+                    form.controls['phone'].touched && form.controls['phone'].errors?.['required']
+                  ) {
+                    <div class="invalid-feedback">Phone Number is Required</div>
+                  }
+                </div>
+                <div class="col-12 theme-form">
+                  <label class="form-label"
+                    >Select a topic <span class="txt-danger-color">*</span></label
+                  >
+                  <select2
+                    [data]="contactData.topic"
+                    placeholder="Choose Department"
+                    formControlName="select_topic"
+                    [class]="{
+                      'is-invalid':
+                        form.controls['select_topic'].touched &&
+                        form.controls['select_topic'].errors?.['required'],
+                      'is-valid': form.controls['select_topic'].valid,
+                    }"
+                  />
+
+                  @if (
+                    form.controls['select_topic'].touched &&
+                    form.controls['select_topic'].errors?.['required']
+                  ) {
+                    <div class="invalid-feedback">Topic is Required</div>
+                  }
+                </div>
+
+                <div class="col-12 theme-form">
+                  <label for="contactUsHelpMessage" class="form-label"
+                    >How can we help? <span class="txt-danger-color">*</span></label
+                  >
+                  <textarea
+                    class="form-control"
+                    rows="12"
+                    id="contactUsHelpMessage"
+                    placeholder="Description"
+                    formControlName="message"
+                    [class]="{
+                      'is-invalid':
+                        form.controls['message'].touched &&
+                        form.controls['message'].errors?.['required'],
+                      'is-valid': form.controls['message'].valid,
+                    }"
+                  ></textarea>
+                  @if (
+                    form.controls['message'].touched &&
+                    form.controls['message'].errors?.['required']
+                  ) {
+                    <div class="invalid-feedback">Description id Required</div>
+                  }
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn theme-bg-color text-white" (click)="submit()">
+                    Send message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

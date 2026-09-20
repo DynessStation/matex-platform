@@ -1,0 +1,8 @@
+<a
+  title="Add to Wishlist"
+  [ngClass]="[class(), product()?.is_wishlist ? 'show' : '']"
+  (click)="addToWishlist(product()!)"
+>
+  <i class="ri-heart-3-line"></i>
+  <span>Wishlist</span>
+</a>

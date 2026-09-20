@@ -1,0 +1,82 @@
+<div class="modal-content">
+  <div class="modal-header justify-content-between">
+    <h3 class="modal-title">Share Product Link</h3>
+    <app-button
+      [class]="'btn-close'"
+      [spinner]="false"
+      [id]="'profile_modal_close_btn'"
+      (click)="modalService.dismissAll('Cancel')"
+    >
+      <i class="ri-close-line"></i>
+    </app-button>
+  </div>
+  <div class="modal-body">
+    <div class="product-share-container">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="active === 1"
+            (click)="shareOnFacebook(product!.slug)"
+          >
+            <i class="ri-facebook-line"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="active === 2"
+            (click)="shareOnTwitter(product!.slug)"
+          >
+            <i class="ri-twitter-line"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="active === 3"
+            (click)="shareOnLinkedIn(product!.slug)"
+          >
+            <i class="ri-linkedin-line"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="active === 4"
+            (click)="shareOnWhatsApp(product!.slug)"
+          >
+            <i class="ri-whatsapp-line"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" (click)="shareViaEmail(product!.slug)">
+            <i class="ri-mail-line"></i>
+          </button>
+        </li>
+      </ul>
+
+      <form class="tab-content">
+        <div class="theme-form input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="exampleInputEmail1"
+            name="email"
+            readonly
+            [(ngModel)]="shareText"
+          />
+          <button
+            class="btn btn-bg-theme"
+            type="button"
+            id="button-addon1"
+            [disabled]="!shareText"
+            (click)="copyLink()"
+          >
+            Copy Link
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

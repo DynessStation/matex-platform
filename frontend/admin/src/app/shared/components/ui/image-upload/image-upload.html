@@ -1,0 +1,146 @@
+<ul class="image-select-list cursor-pointer">
+  <!--==================================================
+  ==== ADD MEDIA
+  ==================================================-->
+
+  <li
+    *hasPermission="'attachment.view'"
+    class="choosefile-input"
+    (click)="MediaModal()?.openModal()"
+  >
+    <div class="media-img-box">
+      <img
+        src="assets/images/add-image.png"
+        class="img-fluid add-icon"
+        alt="img"
+      />
+    </div>
+  </li>
+
+  <!--==================================================
+  ==== MULTIPLE ATTACHMENTS
+  ==================================================-->
+
+  @for (img of showImages; track img.id_attachment; let i = $index) {
+    <li>
+      @if (img) {
+        <div class="media-img-box">
+          @if (img.mime_type && img.mime_type.startsWith('image')) {
+            <img [src]="img.asset_url" alt="image" class="img-fluid" />
+          } @else {
+            <img
+              [src]="getMimeTypeImage(img.mime_type)"
+              class="img-fluid"
+              alt="image"
+            />
+          }
+
+          <a
+            href="javascript:void(0)"
+            class="remove-icon"
+            [id]="'remove-icon' + i"
+            (click)="remove(i, 'multiple')"
+          >
+            <i class="ri-close-line text-white"></i>
+          </a>
+        </div>
+
+        <h6>
+          {{ img.file_name }}
+        </h6>
+      }
+    </li>
+  }
+
+  <!--==================================================
+  ==== SINGLE ATTACHMENT
+  ==================================================-->
+
+  @if (showImage) {
+    <li>
+      <div class="media-img-box">
+        @if (showImage.mime_type && showImage.mime_type.startsWith('image')) {
+          <img [src]="showImage.asset_url" alt="image" class="img-fluid" />
+        } @else {
+          <img
+            [src]="getMimeTypeImage(showImage.mime_type)"
+            class="img-fluid"
+            alt="image"
+          />
+        }
+
+        <a
+          href="javascript:void(0)"
+          class="remove-icon"
+          (click)="remove(0, 'single')"
+        >
+          <i class="ri-close-line text-white"></i>
+        </a>
+      </div>
+
+      <h6>
+        {{ showImage.file_name }}
+      </h6>
+    </li>
+  }
+
+  <!--==================================================
+  ==== SINGLE URL
+  ==================================================-->
+
+  @if (showImageUrl) {
+    <li>
+      <div class="media-img-box">
+        @if (isVideoUrl(showImageUrl)) {
+          <img src="assets/images/video.png" class="img-fluid" alt="video" />
+        } @else {
+          <img
+            [src]="resolveMediaUrl(showImageUrl)"
+            alt="image"
+            class="img-fluid"
+          />
+        }
+
+        <a
+          href="javascript:void(0)"
+          class="remove-icon"
+          (click)="remove(0, 'single_image_url')"
+        >
+          <i class="ri-close-line text-white"></i>
+        </a>
+      </div>
+    </li>
+  }
+</ul>
+
+<!--==================================================
+==== HELP TEXT
+==================================================-->
+
+@if (helpText()) {
+  <p class="help-text">
+    {{ helpText() }}
+  </p>
+}
+
+<!--==================================================
+==== MEDIA MODAL
+==================================================-->
+
+<app-media-modal
+  [multipleImage]="multipleImage()"
+  [url]="url()"
+  [accept]="acceptList()"
+  [collection]="collection()"
+  [selectedImagesIds]="
+    showImage
+      ? showImage
+      : showImages.length
+        ? showImages
+        : showImageUrl
+          ? showImageUrl
+          : null
+  "
+  (selectImage)="selectImage($event)"
+  #mediaModal
+/>

@@ -1,0 +1,172 @@
+{
+  "home_section": {
+    "banner_1": {
+      "image_url": "assets/images/banner/30.jpg",
+      "redirection_type": "product",
+      "link": "fresh-white-cauliflower-head"
+    },
+    "banner_2": {
+      "image_url": "assets/images/banner/31.jpg",
+      "redirection_type": "product",
+      "link": "fresh-raspberries-6-oz"
+    }
+  },
+  "main_content": {
+    "left_banner_section": {
+      "categories": {
+        "status": true,
+        "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      },
+      "banner_1": {
+        "image_url": "assets/images/banner/32.jpg",
+        "redirection_type": "product",
+        "link": "rich-chocolate-hazelnut-spread"
+      },
+      "banner_2": {
+        "image_url": "assets/images/banner/33.jpg",
+        "redirection_type": "product",
+        "link": "naturally-sweet-seedless-dried-apricots"
+      },
+      "banner_3": {
+        "image_url": "assets/images/banner/37.png",
+        "redirection_type": "product",
+        "link": "fresh-white-cauliflower-head"
+      },
+      "offer_product": {
+        "status": true,
+        "product_id": 1
+      },
+      "banner_4": {
+        "image_url": "assets/images/banner/35.jpg",
+        "redirection_type": "product",
+        "link": "fresh-baked-chocolate-chip-cookies-pack"
+      },
+      "banner_5": {
+        "image_url": "assets/images/banner/36.jpg",
+        "redirection_type": "product",
+        "link": "fresh-green-bell-pepper"
+      },
+      "banner_6": {
+        "image_url": "assets/images/banner/38.jpg",
+        "redirection_type": "product",
+        "link": "rich-chocolate-hazelnut-spread"
+      },
+      "banner_7": {
+        "image_url": "assets/images/banner/39.jpg",
+        "redirection_type": "product",
+        "link": "fresh-white-cauliflower-head"
+      }
+    },
+    "right_product_section": {
+      "services": {
+        "status": true,
+        "service_ids": [5, 6, 7, 8]
+      },
+      "featured_products": {
+        "status": true,
+        "title": "Featured Products",
+        "product_ids": [
+          193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210,
+          211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222
+        ]
+      },
+      "full_width_banner": {
+        "image_url": "assets/images/banner/34.jpg",
+        "redirection_type": "product",
+        "link": "artisan-italian-dry-pasta"
+      },
+      "bestsellers_products": {
+        "status": true,
+        "title": "Bestsellers in previous week",
+        "products": [
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-1.jpg",
+              "redirection_type": "product",
+              "link": "fresh-raspberries-6-oz"
+            },
+            "products_ids": [193, 194, 195, 196]
+          },
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-2.jpg",
+              "redirection_type": "product",
+              "link": "naturally-sweet-seedless-dried-apricots"
+            },
+            "products_ids": [197, 198, 199, 200]
+          },
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-1.jpg",
+              "redirection_type": "product",
+              "link": "fresh-white-cauliflower-head"
+            },
+            "products_ids": [201, 202, 203, 204]
+          },
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-2.jpg",
+              "redirection_type": "product",
+              "link": "fresh-baked-chocolate-chip-cookies-pack"
+            },
+            "products_ids": [205, 206, 207, 208]
+          }
+        ]
+      },
+      "week_bestsellers_products": {
+        "status": true,
+        "title": "This week best seller",
+        "products": [
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-1.jpg",
+              "redirection_type": "product",
+              "link": "premium-roasted-whole-cashews"
+            },
+            "products_ids": [209, 210, 211, 212, 213, 214]
+          },
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-5.jpg",
+              "redirection_type": "product",
+              "link": "premium-alphonso-mango-nectar"
+            },
+            "products_ids": [215, 216, 217, 218, 219, 220]
+          },
+          {
+            "banner": {
+              "image_url": "assets/images/banner/product-banner-1.jpg",
+              "redirection_type": "product",
+              "link": "fresh-green-bell-pepper"
+            },
+            "products_ids": [221, 222, 193, 194, 195, 196]
+          }
+        ]
+      },
+      "three_column_banner": {
+        "status": true,
+        "banner_1": {
+          "image_url": "assets/images/banner/40.jpg",
+          "redirection_type": "product",
+          "link": "premium-raw-honey-wooden-dipper"
+        },
+        "banner_2": {
+          "image_url": "assets/images/banner/41.jpg",
+          "redirection_type": "product",
+          "link": "farm-fresh-brown-eggs-30-count-tray"
+        },
+        "banner_3": {
+          "image_url": "assets/images/banner/42.jpg",
+          "redirection_type": "product",
+          "link": "premium-ground-cinnamon-spice"
+        }
+      },
+      "brand": {
+        "status": true,
+        "brand_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      }
+    }
+  },
+  "products_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "slug": "organic-store"
+}

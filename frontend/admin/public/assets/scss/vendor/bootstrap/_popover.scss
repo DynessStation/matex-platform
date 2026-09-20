@@ -1,0 +1,202 @@
+@use './variables';
+@use './vendor/rfs';
+@use './mixins/reset-text';
+@use './mixins/border-radius';
+@use './mixins/box-shadow';
+
+.popover {
+  // scss-docs-start popover-css-vars
+  --#{variables.$prefix}popover-zindex: #{variables.$zindex-popover};
+  --#{variables.$prefix}popover-max-width: #{variables.$popover-max-width};
+  @include rfs.rfs(variables.$popover-font-size, --#{variables.$prefix}popover-font-size);
+  --#{variables.$prefix}popover-bg: #{variables.$popover-bg};
+  --#{variables.$prefix}popover-border-width: #{variables.$popover-border-width};
+  --#{variables.$prefix}popover-border-color: #{variables.$popover-border-color};
+  --#{variables.$prefix}popover-border-radius: #{variables.$popover-border-radius};
+  --#{variables.$prefix}popover-inner-border-radius: #{variables.$popover-inner-border-radius};
+  --#{variables.$prefix}popover-box-shadow: #{variables.$popover-box-shadow};
+  --#{variables.$prefix}popover-header-padding-x: #{variables.$popover-header-padding-x};
+  --#{variables.$prefix}popover-header-padding-y: #{variables.$popover-header-padding-y};
+  @include rfs.rfs(variables.$popover-header-font-size, --#{variables.$prefix}popover-header-font-size);
+  --#{variables.$prefix}popover-header-color: #{variables.$popover-header-color};
+  --#{variables.$prefix}popover-header-bg: #{variables.$popover-header-bg};
+  --#{variables.$prefix}popover-body-padding-x: #{variables.$popover-body-padding-x};
+  --#{variables.$prefix}popover-body-padding-y: #{variables.$popover-body-padding-y};
+  --#{variables.$prefix}popover-body-color: #{variables.$popover-body-color};
+  --#{variables.$prefix}popover-arrow-width: #{variables.$popover-arrow-width};
+  --#{variables.$prefix}popover-arrow-height: #{variables.$popover-arrow-height};
+  --#{variables.$prefix}popover-arrow-border: var(--#{variables.$prefix}popover-border-color);
+  // scss-docs-end popover-css-vars
+
+  z-index: var(--#{variables.$prefix}popover-zindex);
+  display: block;
+  max-width: var(--#{variables.$prefix}popover-max-width);
+  // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
+  // So reset our font and text properties to avoid inheriting weird values.
+  @include reset-text.reset-text();
+  @include rfs.font-size(var(--#{variables.$prefix}popover-font-size));
+  // Allow breaking very long words so they don't overflow the popover's bounds
+  word-wrap: break-word;
+  background-color: var(--#{variables.$prefix}popover-bg);
+  background-clip: padding-box;
+  border: var(--#{variables.$prefix}popover-border-width) solid var(--#{variables.$prefix}popover-border-color);
+  @include border-radius.border-radius(var(--#{variables.$prefix}popover-border-radius));
+  @include box-shadow.box-shadow(var(--#{variables.$prefix}popover-box-shadow));
+
+  .popover-arrow {
+    display: block;
+    width: var(--#{variables.$prefix}popover-arrow-width);
+    height: var(--#{variables.$prefix}popover-arrow-height);
+
+    &::before,
+    &::after {
+      position: absolute;
+      display: block;
+      content: "";
+      border-color: transparent;
+      border-style: solid;
+      border-width: 0;
+    }
+  }
+}
+
+.bs-popover-top {
+  > .popover-arrow {
+    bottom: calc(-1 * (var(--#{variables.$prefix}popover-arrow-height)) - var(--#{variables.$prefix}popover-border-width)); // stylelint-disable-line function-disallowed-list
+
+    &::before,
+    &::after {
+      border-width: var(--#{variables.$prefix}popover-arrow-height) calc(var(--#{variables.$prefix}popover-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+    }
+
+    &::before {
+      bottom: 0;
+      border-top-color: var(--#{variables.$prefix}popover-arrow-border);
+    }
+
+    &::after {
+      bottom: var(--#{variables.$prefix}popover-border-width);
+      border-top-color: var(--#{variables.$prefix}popover-bg);
+    }
+  }
+}
+
+/* rtl:begin:ignore */
+.bs-popover-end {
+  > .popover-arrow {
+    left: calc(-1 * (var(--#{variables.$prefix}popover-arrow-height)) - var(--#{variables.$prefix}popover-border-width)); // stylelint-disable-line function-disallowed-list
+    width: var(--#{variables.$prefix}popover-arrow-height);
+    height: var(--#{variables.$prefix}popover-arrow-width);
+
+    &::before,
+    &::after {
+      border-width: calc(var(--#{variables.$prefix}popover-arrow-width) * .5) var(--#{variables.$prefix}popover-arrow-height) calc(var(--#{variables.$prefix}popover-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+    }
+
+    &::before {
+      left: 0;
+      border-right-color: var(--#{variables.$prefix}popover-arrow-border);
+    }
+
+    &::after {
+      left: var(--#{variables.$prefix}popover-border-width);
+      border-right-color: var(--#{variables.$prefix}popover-bg);
+    }
+  }
+}
+
+/* rtl:end:ignore */
+
+.bs-popover-bottom {
+  > .popover-arrow {
+    top: calc(-1 * (var(--#{variables.$prefix}popover-arrow-height)) - var(--#{variables.$prefix}popover-border-width)); // stylelint-disable-line function-disallowed-list
+
+    &::before,
+    &::after {
+      border-width: 0 calc(var(--#{variables.$prefix}popover-arrow-width) * .5) var(--#{variables.$prefix}popover-arrow-height); // stylelint-disable-line function-disallowed-list
+    }
+
+    &::before {
+      top: 0;
+      border-bottom-color: var(--#{variables.$prefix}popover-arrow-border);
+    }
+
+    &::after {
+      top: var(--#{variables.$prefix}popover-border-width);
+      border-bottom-color: var(--#{variables.$prefix}popover-bg);
+    }
+  }
+
+  // This will remove the popover-header's border just below the arrow
+  .popover-header::before {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: block;
+    width: var(--#{variables.$prefix}popover-arrow-width);
+    margin-left: calc(-.5 * var(--#{variables.$prefix}popover-arrow-width)); // stylelint-disable-line function-disallowed-list
+    content: "";
+    border-bottom: var(--#{variables.$prefix}popover-border-width) solid var(--#{variables.$prefix}popover-header-bg);
+  }
+}
+
+/* rtl:begin:ignore */
+.bs-popover-start {
+  > .popover-arrow {
+    right: calc(-1 * (var(--#{variables.$prefix}popover-arrow-height)) - var(--#{variables.$prefix}popover-border-width)); // stylelint-disable-line function-disallowed-list
+    width: var(--#{variables.$prefix}popover-arrow-height);
+    height: var(--#{variables.$prefix}popover-arrow-width);
+
+    &::before,
+    &::after {
+      border-width: calc(var(--#{variables.$prefix}popover-arrow-width) * .5) 0 calc(var(--#{variables.$prefix}popover-arrow-width) * .5) var(--#{variables.$prefix}popover-arrow-height); // stylelint-disable-line function-disallowed-list
+    }
+
+    &::before {
+      right: 0;
+      border-left-color: var(--#{variables.$prefix}popover-arrow-border);
+    }
+
+    &::after {
+      right: var(--#{variables.$prefix}popover-border-width);
+      border-left-color: var(--#{variables.$prefix}popover-bg);
+    }
+  }
+}
+
+/* rtl:end:ignore */
+
+.bs-popover-auto {
+  &[data-popper-placement^="top"] {
+    @extend .bs-popover-top;
+  }
+  &[data-popper-placement^="right"] {
+    @extend .bs-popover-end;
+  }
+  &[data-popper-placement^="bottom"] {
+    @extend .bs-popover-bottom;
+  }
+  &[data-popper-placement^="left"] {
+    @extend .bs-popover-start;
+  }
+}
+
+// Offset the popover to account for the popover arrow
+.popover-header {
+  padding: var(--#{variables.$prefix}popover-header-padding-y) var(--#{variables.$prefix}popover-header-padding-x);
+  margin-bottom: 0; // Reset the default from Reboot
+  @include rfs.font-size(var(--#{variables.$prefix}popover-header-font-size));
+  color: var(--#{variables.$prefix}popover-header-color);
+  background-color: var(--#{variables.$prefix}popover-header-bg);
+  border-bottom: var(--#{variables.$prefix}popover-border-width) solid var(--#{variables.$prefix}popover-border-color);
+  @include border-radius.border-top-radius(var(--#{variables.$prefix}popover-inner-border-radius));
+
+  &:empty {
+    display: none;
+  }
+}
+
+.popover-body {
+  padding: var(--#{variables.$prefix}popover-body-padding-y) var(--#{variables.$prefix}popover-body-padding-x);
+  color: var(--#{variables.$prefix}popover-body-color);
+}

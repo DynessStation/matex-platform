@@ -1,0 +1,144 @@
+<div class="authentication-box signup-box">
+  <div class="auth-title">
+    <h4>Sign Up</h4>
+    <p>Welcome! To access your account, please enter your username and password.</p>
+  </div>
+  <app-alert />
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <input
+        type="name"
+        class="form-control"
+        id="name"
+        id="name"
+        formControlName="name"
+        placeholder="{{ 'name' | translate }}"
+        [class]="{
+          'is-invalid':
+            form.controls['name'].touched &&
+            (form.controls['name'].errors?.['required'] || form.controls['name'].errors?.['name']),
+          'is-valid': form.controls['name'].valid,
+        }"
+      />
+      @if (form.controls['name'].touched && form.controls['name'].errors?.['required']) {
+        <div class="invalid-feedback">{{ 'name_is_required' | translate }}</div>
+      }
+    </div>
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        id="email"
+        placeholder="{{ 'email' | translate }}"
+        formControlName="email"
+        [class]="{
+          'is-invalid':
+            form.controls['email'].touched &&
+            (form.controls['email'].errors?.['required'] ||
+              form.controls['email'].errors?.['email']),
+          'is-valid': form.controls['email'].valid,
+        }"
+      />
+      @if (form.controls['email'].touched && form.controls['email'].errors?.['required']) {
+        <div class="invalid-feedback">{{ 'email_is_required' | translate }}</div>
+      }
+      @if (form.controls['email'].touched && form.controls['email'].errors?.['email']) {
+        <div class="invalid-feedback">{{ 'invalid_email' | translate }}</div>
+      }
+    </div>
+    <div class="auth-box form-box mb-3">
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        formControlName="password"
+        placeholder="{{ 'enter_password' | translate }}"
+        [class]="{
+          'is-invalid':
+            form.controls['password'].touched &&
+            (form.controls['password'].errors?.['required'] ||
+              form.controls['password'].errors?.['password']),
+          'is-valid': form.controls['password'].valid,
+        }"
+      />
+
+      @if (form.controls['password'].touched && form.controls['password'].errors?.['required']) {
+        <div class="invalid-feedback">{{ 'password_is_required' | translate }}</div>
+      }
+    </div>
+    <div class="mb-3">
+      <div class="form-box">
+        <input
+          type="password"
+          class="form-control"
+          id="password_confirmation"
+          formControlName="password_confirmation"
+          placeholder="{{ 'password_confirmation' | translate }}"
+          [class]="{
+            'is-invalid':
+              form.controls['password_confirmation'].touched &&
+              (form.controls['password_confirmation'].errors?.['required'] ||
+                form.controls['password_confirmation'].errors?.['password_confirmation']),
+            'is-valid': form.controls['password_confirmation'].valid,
+          }"
+        />
+
+        @if (
+          form.controls['password_confirmation'].touched &&
+          form.controls['password_confirmation'].errors?.['required']
+        ) {
+          <div autocomplete="false" class="invalid-feedback">
+            {{ 'confirm_password_is_required' | translate }}
+          </div>
+        } @else if (passwordMatchError) {
+          <div class="invalid-feedback">{{ 'confirm_password_does_not_matched' | translate }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="forgot-box">
+      <div class="form-check">
+        <input
+          class="form-check-input check-box"
+          type="checkbox"
+          id="flexCheckDefault"
+          [formControl]="tnc"
+        />
+        <label
+          class="form-check-label"
+          for="flexCheckDefault"
+          [class.text-red]="this.tnc.errors?.['required']"
+        >
+          {{ 'i_agree_with' | translate }}
+          <span>{{ 'terms' | translate }}</span>
+          {{ 'and' | translate }}
+          <span>{{ 'privacy' | translate }}</span>
+        </label>
+      </div>
+    </div>
+    <app-button
+      [class]="'btn btn-bg-theme mt-3 w-100'"
+      [id]="'sign_up_btn'"
+      [disabled]="tnc.invalid || form.invalid"
+      [spinner]="true"
+      >{{ 'create_account' | translate }}</app-button
+    >
+    <div class="divider">
+      <span>{{ 'or' | translate }}</span>
+    </div>
+    <div class="social-link">
+      <a href="https://www.google.com/" class="btn w-100" target="_blank">
+        <img src="assets/images/inner-page/google.png" class="img-fluid" alt="image" />
+        <span>Sign up with google</span>
+      </a>
+      <a href="https://www.facebook.com/" class="btn w-100" target="_blank">
+        <img src="assets/images/inner-page/facebook.png" class="img-fluid" alt="image" />
+        <span>Sign up with facebook</span>
+      </a>
+    </div>
+    <h6 class="sign-up-next">
+      I am already member.
+      <button class="btn next-button2" (click)="action('login')">Sign in</button>
+    </h6>
+  </form>
+</div>

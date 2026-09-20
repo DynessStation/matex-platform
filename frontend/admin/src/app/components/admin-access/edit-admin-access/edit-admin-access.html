@@ -1,0 +1,18 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'admin_access.edit_title' | translate"
+>
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/admin-access'"
+      (retry)="retryDetail()"
+    />
+  } @else if (adminAccess$ | async; as adminAccess) {
+    <app-form-admin-access
+      [mode]="'edit'"
+      [data]="adminAccess"
+      (formSubmit)="submit($event)"
+    />
+  }
+</app-page-wrapper>

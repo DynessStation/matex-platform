@@ -1,0 +1,7 @@
+<ul>
+  @for (tag of tags() | slice: 27 : 31; track tag.id) {
+    <li>
+      <a [routerLink]="['/blogs']" [queryParams]="{ tag: tag?.slug }">{{ tag?.name }}</a>
+    </li>
+  }
+</ul>

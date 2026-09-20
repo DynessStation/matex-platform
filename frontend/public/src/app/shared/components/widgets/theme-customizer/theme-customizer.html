@@ -1,0 +1,11 @@
+<div class="lang-switch">
+  <button [class.active]="!mode" (click)="layoutMode()">
+    {{ mode ? 'Dark' : 'Light' }}
+    <i [class]="mode ? 'ri-moon-fill' : 'ri-sun-fill'"></i>
+  </button>
+
+  <button [class.active]="layoutDirection === 'rtl'" (click)="layoutType()">
+    {{ layoutDirection === 'rtl' ? 'LTR' : 'RTL' }}
+    <i [class]="layoutDirection === 'rtl' ? 'ri-text-direction-r' : 'ri-text-direction-l'"></i>
+  </button>
+</div>

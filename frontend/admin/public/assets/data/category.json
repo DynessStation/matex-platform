@@ -1,0 +1,539 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 1,
+      "name": "Electronic",
+      "slug": "electronic",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-1",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-1.png",
+        "asset_url": "assets/images/category/category-1.png",
+        "original_url": "assets/images/category/category-1.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 2,
+      "name": "Gadget",
+      "slug": "gadget",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-2",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-2.png",
+        "asset_url": "assets/images/category/category-2.png",
+        "original_url": "assets/images/category/category-2.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 51,
+      "name": "Phone",
+      "slug": "phone",
+      "description": null,
+      "category_image_id": null,
+      "category_icon_id": null,
+      "status": 1,
+      "meta_title": null,
+      "meta_description": null,
+      "category_meta_image_id": null,
+      "type": "product",
+      "commission_rate": 3,
+      "parent_id": 25,
+      "created_by_id": "1",
+      "created_at": "2024-05-10T06:30:35.000000Z",
+      "updated_at": "2024-05-10T06:30:35.000000Z",
+      "deleted_at": null,
+      "blogs_count": 0,
+      "products_count": 6,
+      "pivot": {
+        "product_id": "207",
+        "category_id": "51"
+      },
+      "category_image": null,
+      "category_meta_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-12",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-12.png",
+        "asset_url": "assets/images/category/category-12.png",
+        "original_url": "assets/images/category/category-12.png"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Toys",
+      "slug": "toys",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-11",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-11.png",
+        "asset_url": "assets/images/category/category-11.png",
+        "original_url": "assets/images/category/category-11.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 5,
+      "name": "Grocery",
+      "slug": "grocery",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-6",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-6.png",
+        "asset_url": "assets/images/category/category-6.png",
+        "original_url": "assets/images/category/category-6.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 6,
+      "name": "Man's Fashion",
+      "slug": "man's-fashion",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-5",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-5.png",
+        "asset_url": "assets/images/category/category-5.png",
+        "original_url": "assets/images/category/category-5.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 22,
+      "name": "Girl's Fashion",
+      "slug": "girl's-fashion",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "Baby Essentials",
+        "disk": "public",
+        "mime_type": "category-3",
+        "file_name": "category-3.png",
+        "asset_url": "assets/images/category/category-3.png",
+        "original_url": "assets/images/category/category-3.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 7,
+      "name": "Baby & Kids",
+      "slug": "baby-kids",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-4",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-4.png",
+        "asset_url": "assets/images/category/category-4.png",
+        "original_url": "assets/images/category/category-4.png"
+      },
+      "subcategories": [
+        {
+          "id": 146,
+          "name": "Babysuits",
+          "slug": "pendrives",
+          "category_icon": {
+            "asset_url": "assets/images/category/69.png"
+          }
+        },
+        {
+          "id": 147,
+          "name": "Hats",
+          "slug": "hats",
+          "category_icon": {
+            "asset_url": "assets/images/category/70.png"
+          }
+        },
+        {
+          "id": 148,
+          "name": "Tank Tops",
+          "slug": "tank-tops",
+          "category_icon": {
+            "asset_url": "assets/images/category/71.png"
+          }
+        },
+        {
+          "id": 149,
+          "name": "Pants",
+          "slug": "pants",
+          "category_icon": {
+            "asset_url": "assets/images/category/72.png"
+          }
+        },
+        {
+          "id": 149,
+          "name": "Sleep & Play",
+          "slug": "sleep-play",
+          "category_icon": {
+            "asset_url": "assets/images/category/73.png"
+          }
+        },
+        {
+          "id": 150,
+          "name": "Gowns",
+          "slug": "gowns",
+          "category_icon": {
+            "asset_url": "assets/images/category/74.png"
+          }
+        },
+        {
+          "id": 151,
+          "name": "Baby Washcloths & Towels",
+          "slug": "baby-washcloths--towels",
+          "category_icon": {
+            "asset_url": "assets/images/category/75.png"
+          }
+        },
+        {
+          "id": 152,
+          "name": "Shirt",
+          "slug": "shirt",
+          "category_icon": {
+            "asset_url": "assets/images/category/76.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Health & Wellness",
+      "slug": "health-&-wellness",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "Baby Essentials",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "Baby-Essentials.png",
+        "asset_url": "assets/images/category/8.png",
+        "original_url": "assets/images/category/8.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 10,
+      "name": "Home and Kitchen",
+      "slug": "home-and-Kitchen",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-9",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-9.png",
+        "asset_url": "assets/images/category/category-9.png",
+        "original_url": "assets/images/category/category-9.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 13,
+      "name": "Computers & Laptops",
+      "slug": "computers-&-laptops",
+      "description": "Explore our range of laptops, desktops, and computer components for work, play, and everything in between.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3800,
+        "name": "category-8",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-8.png",
+        "asset_url": "assets/images/category/category-8.png",
+        "original_url": "assets/images/category/category-8.png"
+      },
+      "subcategories": [
+        {
+          "id": 131,
+          "name": "Laptops",
+          "slug": "laptops",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/laptops.png"
+          }
+        },
+        {
+          "id": 132,
+          "name": "Desktops",
+          "slug": "desktops",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/desktops.png"
+          }
+        },
+        {
+          "id": 133,
+          "name": "PC Gaming",
+          "slug": "pc-gaming",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/pc-gaming.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Accessories",
+      "slug": "accessories",
+      "description": "Browse essential accessories including storage devices, laptop bags, and computer peripherals.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3801,
+        "name": "Accessories",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "Accessories.png",
+        "asset_url": "assets/images/category/14.png",
+        "original_url": "assets/images/category/14.png"
+      },
+      "subcategories": [
+        {
+          "id": 141,
+          "name": "Pendrives",
+          "slug": "pendrives",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/pendrive.png"
+          }
+        },
+        {
+          "id": 142,
+          "name": "External Hard Disks",
+          "slug": "external-hard-disks",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/external-hard-disk.png"
+          }
+        },
+        {
+          "id": 143,
+          "name": "Laptop Bags",
+          "slug": "laptop-bags",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/laptop-bag.png"
+          }
+        },
+        {
+          "id": 144,
+          "name": "Mouse",
+          "slug": "mouse",
+          "category_icon": {
+            "asset_url": "assets/images/subcategory/mouse.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Cosmetics",
+      "slug": "cosmetics",
+      "description": "Explore the world of cosmetics where beauty meets science and artistry. From skincare essentials to glamorous makeup trends, uncover the secrets behind flawless looks. Dive into product reviews, tutorials, and expert tips to enhance your natural beauty and express your unique style through the transformative power of cosmetics.",
+      "category_image_id": null,
+      "category_icon_id": null,
+      "category_icon": {
+        "id": 3801,
+        "name": "category-10",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-10.png",
+        "asset_url": "assets/images/category/category-10.png",
+        "original_url": "assets/images/category/category-10.png"
+      },
+      "status": 1,
+      "meta_title": "Cosmetics",
+      "meta_description": "Explore the world of cosmetics where beauty meets science and artistry. From skincare essentials to glamorous makeup trends, uncover the secrets behind flawless looks. Dive into product reviews, tutorials, and expert tips to enhance your natural beauty and express your unique style through the transformative power of cosmetics.",
+      "category_meta_image_id": null,
+      "type": "post",
+      "commission_rate": null,
+      "parent_id": null,
+      "created_by_id": "1",
+      "created_at": "2025-05-10T08:26:14.000000Z",
+      "updated_at": "2025-06-12T07:56:00.000000Z",
+      "deleted_at": null,
+      "blogs_count": 3,
+      "products_count": 0,
+      "category_image": null,
+      "category_meta_image": null,
+      "subcategories": [],
+      "parent": null
+    },
+    {
+      "id": 18,
+      "name": "Farm Fresh Produce",
+      "slug": "farm-fresh-produce",
+      "description": "Indulge in the vibrant flavors of farm-fresh produce with our enticing array of fruits and vegetables straight from the source. Discover the essence of freshness as we delve into the journey from soil to table, celebrating nature's bounty and the wholesome goodness it brings to your plate.",
+      "category_image_id": null,
+      "category_icon_id": null,
+      "status": 1,
+      "meta_title": "Farm Fresh Produce",
+      "meta_description": "Indulge in the vibrant flavors of farm-fresh produce with our enticing array of fruits and vegetables straight from the source. Discover the essence of freshness as we delve into the journey from soil to table, celebrating nature's bounty and the wholesome goodness it brings to your plate.",
+      "category_meta_image_id": null,
+      "type": "post",
+      "commission_rate": null,
+      "parent_id": null,
+      "created_by_id": "1",
+      "created_at": "2025-05-07T08:20:58.000000Z",
+      "updated_at": "2025-06-12T08:06:50.000000Z",
+      "deleted_at": null,
+      "blogs_count": 3,
+      "products_count": 0,
+      "category_image": null,
+      "category_meta_image": null,
+      "category_icon": null,
+      "subcategories": [],
+      "parent": null
+    },
+    {
+      "id": 19,
+      "name": "Fashion",
+      "slug": "fashion-2",
+      "description": "Fashion refers to the prevailing style or trend in clothing, accessories, footwear, makeup, and hairstyling that is popular at a particular time and place. It's a dynamic and ever-evolving aspect of culture that reflects social, economic, and cultural influences",
+      "category_image_id": null,
+      "category_icon_id": null,
+      "status": 1,
+      "meta_title": "Fashion",
+      "meta_description": "Fashion refers to the prevailing style or trend in clothing, accessories, footwear, makeup, and hairstyling that is popular at a particular time and place. It's a dynamic and ever-evolving aspect of culture that reflects social, economic, and cultural influences",
+      "category_meta_image_id": null,
+      "type": "post",
+      "commission_rate": null,
+      "parent_id": null,
+      "created_by_id": "1",
+      "created_at": "2025-05-06T04:36:55.000000Z",
+      "updated_at": "2025-06-12T07:55:07.000000Z",
+      "deleted_at": null,
+      "blogs_count": 7,
+      "products_count": 0,
+      "category_image": null,
+      "category_meta_image": null,
+      "category_icon": null,
+      "subcategories": [],
+      "parent": null
+    },
+    {
+      "id": 21,
+      "name": "Footwear",
+      "slug": "footwear",
+      "description": "Explore the world of footwear, where fashion meets function. From classic kicks to cutting-edge designs, discover the perfect pair to elevate any ensemble. Whether you're strolling the streets or strutting the runway, step into style with our curated collection of footwear trends, tips, and must-have staples.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "category-7",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "category-7.png",
+        "asset_url": "assets/images/category/category-7.png",
+        "original_url": "assets/images/category/category-7.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 234,
+      "name": "Watch",
+      "slug": "watch",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "Baby Essentials",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "Baby-Essentials.png",
+        "asset_url": "assets/images/category/8.png",
+        "original_url": "assets/images/category/8.png"
+      },
+      "subcategories": []
+    },
+    {
+      "id": 235,
+      "name": "Jewellery",
+      "slug": "jewellery",
+      "description": "Discover our selection of baby essentials, including soft blankets, gentle skincare, cozy clothing, and safe feeding gear. Designed for comfort and convenience, our products ensure your little one's needs are met with the utmost care. Start your parenting journey with the best in quality and safety.",
+      "status": 1,
+      "type": "product",
+      "category_image": null,
+      "category_icon": {
+        "id": 3790,
+        "name": "Baby Essentials",
+        "disk": "public",
+        "mime_type": "image/png",
+        "file_name": "Baby-Essentials.png",
+        "asset_url": "assets/images/category/category-13.png",
+        "original_url": "assets/images/category/category-13.png"
+      },
+      "subcategories": []
+    }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "per_page": 46,
+  "prev_page_url": null,
+  "to": 46,
+  "total": 46
+}

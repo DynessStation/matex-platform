@@ -1,0 +1,83 @@
+<div class="search-overlay" id="searchOverlay" [class.show]="menuService.isOpenSearch"></div>
+
+<form class="search-form">
+  <div class="input-group">
+    <div class="close-icon">
+      <i class="ri-close-fill" id="close-btn" (click)="closeSearch()"></i>
+    </div>
+
+    <div class="input-group-text">
+      <div class="dropdown" [class.show]="isCategoryOpen">
+        <button
+          class="btn dropdown-toggle"
+          type="button"
+          (click)="toggleCategory()"
+          [class.show]="isCategoryOpen"
+        >
+          <span>{{ selectedCategory }}</span>
+        </button>
+        <ul class="dropdown-menu" [class.show]="isCategoryOpen">
+          @if ((category$ | async)?.data?.length) {
+            @for (cat of (category$ | async)?.data; track cat.id) {
+              <li>
+                <a
+                  class="dropdown-item"
+                  [routerLink]="['/category/' + cat.slug]"
+                  (click)="selectCategory(cat.name)"
+                  >{{ cat?.name }}</a
+                >
+              </li>
+            }
+          }
+        </ul>
+      </div>
+    </div>
+
+    <input
+      id="searchInputBox"
+      type="search"
+      class="form-control"
+      placeholder="I'm searching for..."
+      (focus)="showResults()"
+      (blur)="hideResults()"
+      [formControl]="search"
+      autocomplete="off"
+    />
+
+    <button class="search-button btn">
+      <i class="ri-search-line"></i>
+    </button>
+  </div>
+
+  <div class="result-box" id="resultBox" [class.show]="menuService.isOpenSearch">
+    <div class="search-result-box search-border-box">
+      <div class="result-title mb-sm-3 mb-2">
+        <h4>Top Search</h4>
+      </div>
+      <ul class="result-list-box">
+        @if ((searchCategory$ | async)?.length) {
+          @for (category of (searchCategory$ | async); track category.id) {
+            <li>
+              <a [routerLink]="['/category/', category.slug]">
+                {{ category.name }}
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </div>
+
+    <div class="last-seen-search-box search-border-box">
+      <div class="result-title mb-sm-3 mb-2">
+        <h4>Recently Viewed</h4>
+      </div>
+      <ul class="search-list-box">
+        @if ((productBySearch$ | async)?.length) {
+          @for (product of (productBySearch$ | async); track product.id) {
+            <app-product-box [product]="product" [style]="'vertical'" />
+          }
+        }
+      </ul>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,21 @@
+<ul class="content-list">
+  <li>
+    <a [routerLink]="['/account/dashboard']">My Account</a>
+  </li>
+  <li>
+    <a [routerLink]="['/contact-us']">Contact Us</a>
+  </li>
+  <li>
+    <a [routerLink]="['/blogs']">Blog</a>
+  </li>
+  <li>
+    <a [routerLink]="['/wishlist']">Wishlist</a>
+  </li>
+  <li>
+    <a [routerLink]="['/cart']">Cart</a>
+  </li>
+  <li>
+    <a (click)="openLoginModal()">Log In</a>
+  </li>
+</ul>
+<app-login-modal #loginModal />

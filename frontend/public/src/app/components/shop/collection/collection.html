@@ -1,0 +1,46 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+@if (
+  layout === 'collection_3_grid' ||
+  layout === 'collection_4_grid' ||
+  layout === 'collection_list_view' ||
+  layout === 'collection_5_grid' ||
+  layout === 'collection_2_grid'
+) {
+  <app-collection-list [filter]="filter"></app-collection-list>
+} @else if (layout === 'collection_category_slider' || layout === 'collection_recent_product') {
+  <app-collection-category-slider [filter]="filter"></app-collection-category-slider>
+} @else if (layout === 'collection_banner') {
+  <app-collection-banner [filter]="filter"></app-collection-banner>
+} @else if (layout === 'collection_full_width') {
+  <app-collection-no-sidebar [filter]="filter"></app-collection-no-sidebar>
+} @else if (layout === 'collection_right_sidebar') {
+  <app-collection-right-sidebar [filter]="filter"></app-collection-right-sidebar>
+} @else if (layout === 'collection_left_sidebar') {
+  <app-collection-left-sidebar [filter]="filter" />
+} @else if (layout === 'collection_shop_list_infinite') {
+  <app-collection-shop-list-infinite [filter]="filter" />
+} @else if (layout === 'collection_product_infinite_scroll') {
+  <app-collection-product-infinite-scroll
+    [filter]="filter"
+  ></app-collection-product-infinite-scroll>
+} @else if (
+  layout === 'collection_3_grid_offcanvas' ||
+  layout === 'collection_4_grid_offcanvas' ||
+  layout === 'collection_5_grid_offcanvas' ||
+  layout === 'collection_2_grid_offcanvas' ||
+  layout === 'collection_list_view_offcanvas'
+) {
+  <app-collection-no-sidebar [filter]="filter"></app-collection-no-sidebar>
+}
+
+@if (layout === 'collection_recent_product') {
+  <app-collection-recent-product
+    [productIds]="(themeOptions$ | async)?.collection?.product_ids!"
+  ></app-collection-recent-product>
+}
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter></app-home-newsletter>
+  </div>
+</section>

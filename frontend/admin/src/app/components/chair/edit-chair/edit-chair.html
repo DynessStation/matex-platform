@@ -1,0 +1,15 @@
+<app-page-wrapper [title]="'chair.edit_title' | translate">
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/chair'"
+      (retry)="retryDetail()"
+    />
+  } @else if (chair$ | async; as chair) {
+    <app-form-chair
+      [mode]="'edit'"
+      [editData]="chair"
+      (formSubmit)="submit($event)"
+    />
+  }
+</app-page-wrapper>

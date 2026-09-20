@@ -1,0 +1,104 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+<section class="compare-section section-t-space">
+  <div class="custom-container">
+    <div class="compare-main-box">
+      @if ((compareItems$ | async)?.length) {
+        <div class="swiper compare-swiper" #swiperContainer>
+          <div class="swiper-wrapper">
+            @for (product of compareItems$ | async; track product.id) {
+              <div class="swiper-slide">
+                <div class="compare-part">
+                  <div class="img-section">
+                    <div class="image-box">
+                      <button
+                        type="button"
+                        class="btn close-btn"
+                        (click)="removeCompare(product.id)"
+                      >
+                        <i class="ri-close-line"></i>
+                      </button>
+                      <img
+                        [src]="
+                          product?.product_thumbnail
+                            ? product?.product_thumbnail?.asset_url
+                            : 'assets/images/placeholder/product.png'
+                        "
+                        class="img-fluid"
+                        [alt]="product?.name"
+                      />
+                    </div>
+                    <a href="javascript:void(0)">
+                      <h5>{{ product?.name }}</h5>
+                    </a>
+                  </div>
+
+                  <div class="detail-part">
+                    <div class="title-detail"><h5>Price</h5></div>
+                    <div class="inner-detail">
+                      <h4>{{ product.sale_price | currencySymbol }}</h4>
+                    </div>
+                  </div>
+
+                  <div class="detail-part">
+                    <div class="title-detail"><h5>Discount</h5></div>
+                    <div class="inner-detail">
+                      <h4>{{ product.discount ? product.discount : '-' }}</h4>
+                    </div>
+                  </div>
+
+                  <div class="detail-part">
+                    <div class="title-detail"><h5>Availability</h5></div>
+                    <div class="inner-detail">
+                      <h4>{{ product.stock_status }}</h4>
+                    </div>
+                  </div>
+
+                  <div class="detail-part">
+                    <div class="title-detail"><h5>Rating</h5></div>
+                    <div class="inner-detail">
+                      <div class="rating">
+                        <ngb-rating [rate]="product?.rating_count!">
+                          <ng-template let-fill="fill" let-index="index">
+                            <i class="ri-star-fill" [class.filled]="fill === 100"></i>
+                          </ng-template>
+                        </ngb-rating>
+                      </div>
+                      <span class="text-content rating-text"
+                        >({{ product.reviews_count }} Review)</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="detail-part">
+                    <div class="title-detail"><h5>Weight</h5></div>
+                    <div class="inner-detail">
+                      <h4>{{ product.weight ? product.weight : '-' }}</h4>
+                    </div>
+                  </div>
+
+                  <div class="btn-part">
+                    <a class="btn btn-solid" (click)="moveToCart(product)">Add to Cart</a>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <app-no-data
+          [class]="'no-data-added'"
+          [image]="'assets/svg/empty-items.svg'"
+          [text]="'no_item' | translate"
+          [description]="'no_compare_desc' | translate"
+        />
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter></app-home-newsletter>
+  </div>
+</section>

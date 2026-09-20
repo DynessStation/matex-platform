@@ -1,0 +1,25 @@
+@if (product) {
+  <div class="recently-product-box" [class.active]="popup_enable && show">
+    <button class="btn recent-close" (click)="closePopup()">
+      <i class="ri-close-line"></i>
+    </button>
+    <a [routerLink]="['/product/', product!.slug]">
+      <img
+        [src]="
+          product.product_thumbnail
+            ? product.product_thumbnail.original_url
+            : 'assets/images/placeholder/product.png'
+        "
+        class="img-fluid"
+        alt="Product Image"
+      />
+    </a>
+    <div class="recent-content">
+      <a [routerLink]="['/product/', product!.slug]">{{ product.name }}</a>
+      <h5 class="price">
+        {{ product.sale_price | currencySymbol }} <del>{{ product.price | currencySymbol }}</del>
+      </h5>
+      <h6 class="timer">{{ min }} minutes ago</h6>
+    </div>
+  </div>
+}

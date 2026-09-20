@@ -1,0 +1,69 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.2 Brand CSS
+==========================**/
+.brand-section {
+  .brand-box {
+    background-color: rgba(var(--white), 1);
+    padding: calc(12px + (18 - 12) * ((100vw - 320px) / (1920 - 320)))
+      calc(17px + (36 - 17) * ((100vw - 320px) / (1920 - 320)));
+    border-radius: calc(6px + (10 - 6) * ((100vw - 320px) / (1920 - 320)));
+    text-align: center;
+    border: 1px solid transparent;
+    transition: 0.3s ease-in-out;
+    @include flex_common;
+
+    &:hover {
+      border-color: rgba(var(--border-color), 1);
+      box-shadow: 0 0 10px rgba(54, 97, 79, 0.1);
+    }
+
+    img {
+      object-fit: contain;
+      @include pseudowh($width: 100%, $height: 50px);
+    }
+
+    h5 {
+      font-size: calc(18px + (20 - 18) * ((100vw - 320px) / (1920 - 320)));
+      color: rgba(var(--title-color), 1);
+    }
+  }
+}
+
+.brand-slider2 {
+  z-index: 0;
+
+  .brand-image-box {
+    @include pseudowh($width: 100%, $height: 80px);
+
+    img {
+      object-position: center;
+      @extend %img-contain;
+    }
+  }
+}
+
+.brand-section {
+  .brand-image-box {
+    background-color: rgba(var(--primary-color), 0.1);
+    display: block;
+    padding: 18px;
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      background-color: rgba(var(--primary-color), 1);
+
+      h5 {
+        color: #fff;
+      }
+    }
+
+    h5 {
+      font-size: 18px;
+      transition: all 0.2s ease-in-out;
+    }
+  }
+}

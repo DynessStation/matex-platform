@@ -1,0 +1,417 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    5.1 Dark CSS
+==========================**/
+
+body {
+  &.dark {
+    &.demo-3 {
+      background-color: rgba(2, 32, 30, 1);
+
+      .header-style-1 {
+        background-color: #032a27;
+
+        .main-dark-header {
+          .middle-header {
+            .search-form {
+              .input-group {
+                .input-group-text {
+                  background-color: #07544f;
+                }
+              }
+            }
+          }
+        }
+
+        .nav-light-header {
+          background-color: #032a27;
+        }
+      }
+
+      header {
+        .offcanvas-header {
+          background-color: #032a27;
+        }
+      }
+
+      .result-box,
+      .footer-section-2 {
+        background-color: #0a2224;
+      }
+
+      .service-section {
+        background-color: #032a27;
+      }
+
+      .quick-view-modal {
+        .right-box-contain {
+          .qty-stock-box {
+            .qty-box {
+              background-color: rgba(var(--base-gray), 0.45);
+            }
+          }
+        }
+      }
+    }
+
+    &.demo-4 {
+      background-color: #0f162c;
+
+      .header-style-1 {
+        .main-dark-header {
+          .middle-header {
+            .search-form {
+              .input-group {
+                .input-group-text {
+                  background-color: #383e50;
+                }
+
+                .form-control {
+                  background-color: rgba(255, 255, 255, 0.1);
+                }
+              }
+            }
+          }
+        }
+
+        .nav-light-header {
+          background-color: rgba(94, 98, 120, 0.102);
+        }
+
+        .offcanvas-header {
+          background-color: #0f162c;
+        }
+      }
+
+      .offcanvas {
+        &.category-fixed-box {
+          .category-header {
+            background-color: #0f162c;
+            box-shadow: none;
+          }
+
+          .category-menu-list {
+            &::-webkit-scrollbar-track {
+              background-color: #1a232e;
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background-color: #374658;
+            }
+
+            &::-webkit-scrollbar {
+              background-color: #1a232e;
+            }
+          }
+        }
+
+        .product-box-list {
+          .vertical-product-box {
+            .product-image {
+              background-color: rgba(var(--light-gray), 1);
+            }
+          }
+        }
+
+        &.cart-offcanvas {
+          .offcanvas-header {
+            background-color: rgba(var(--light-gray), 1);
+          }
+
+          .offcanvas-body {
+            .cart-product-box {
+              .total-price-box {
+                background-color: rgba(var(--light-gray), 1);
+              }
+            }
+          }
+        }
+      }
+
+      .recently-product-box {
+        img {
+          background-color: #0f162c;
+        }
+      }
+
+      .quick-view-modal {
+        .left-box-contain {
+          .quick-slider-product-box {
+            .slider-image {
+              background-color: rgba(var(--light-gray), 1);
+            }
+          }
+
+          .quick-thumbnail-product-box {
+            .image-box {
+              background-color: rgba(var(--light-gray), 1);
+            }
+          }
+        }
+
+        .right-box-contain {
+          .qty-stock-box {
+            .qty-box {
+              background-color: rgba(var(--light-gray), 1);
+            }
+          }
+        }
+      }
+
+      .authentication-modal {
+        .authentication-box {
+          .auth-form {
+            .form-control {
+              background-color: #0f162c;
+            }
+
+            .social-link {
+              a {
+                background-color: #0f162c;
+              }
+            }
+          }
+        }
+      }
+
+      header {
+        .main-dark-header {
+          .middle-header {
+            .search-form {
+              .input-group {
+                .input-group-text {
+                  .dropdown {
+                    .dropdown-menu {
+                      li {
+                        .dropdown-item {
+                          &:hover {
+                            background-color: rgba(94, 98, 120, 0.102);
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .navbar-expand-xl {
+          .dropdown-menu {
+            @include min(1200px) {
+              box-shadow:
+                -1px 0 10px 0 rgba(22, 30, 52, 0.33),
+                5px 20px 40px 0 rgba(22, 30, 52, 0.33);
+              background-color: rgb(22, 30, 52);
+
+              .sub-dropdown-hover {
+                .sub-menu {
+                  background-color: rgb(22, 30, 52);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      @include max(1399.98px) {
+        .dropdown-box {
+          .review-dropdown {
+            .dropdown-title {
+              background-color: rgba(var(--light-gray), 1);
+
+              .btn-close {
+                background-color: transparent;
+              }
+            }
+          }
+        }
+      }
+
+      .add_to_cart {
+        .offcanvas-body {
+          .cart-product-box {
+            .product-box-list {
+              .vertical-product-box {
+                .product-image {
+                  background-color: rgba(var(--light-gray), 1);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .recent-product-section {
+        .recent-product-box,
+        .category-box {
+          img {
+            background-color: rgba(var(--white), 1);
+          }
+        }
+      }
+    }
+
+    &.demo-5 {
+      header {
+        .offcanvas-header {
+          background-color: #1c1a3b;
+        }
+      }
+    }
+
+    &.demo-6 {
+      .quick-view-modal {
+        .modal-custom-size {
+          .left-box-contain {
+            .quick-slider-product-box {
+              .view-image {
+                background-color: rgba(48, 52, 56, 0.6);
+              }
+            }
+
+            .quick-thumbnail-product-box {
+              .image-box {
+                background-color: rgba(48, 52, 56, 0.6);
+              }
+            }
+          }
+
+          .right-box-contain {
+            .hurry-up-box {
+              .progress {
+                background-color: rgba(48, 52, 56, 0.6);
+              }
+            }
+
+            .qty-stock-box {
+              .qty-box {
+                background-color: rgba(48, 52, 56, 0.6);
+              }
+            }
+          }
+        }
+      }
+
+      .result-box {
+        .last-seen-search-box {
+          .search-list-box {
+            li {
+              a {
+                background-color: rgba(var(--content-color), 0.05);
+              }
+            }
+          }
+        }
+      }
+
+      .category-full-box {
+        .category-header {
+          background-color: #303438;
+        }
+
+        .category-menu-list {
+          &.category-bg-color {
+            background-color: #303438;
+
+            @include max(1399.98px) {
+              background-color: transparent;
+            }
+          }
+
+          .sub-menu-list {
+            li {
+              .sub-category-box {
+                &:hover {
+                  background-color: #303438;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .footer-section {
+        background-color: rgba(32, 35, 38, 1) !important;
+      }
+
+      header {
+        .offcanvas-header {
+          background-color: #303438;
+        }
+      }
+
+      .dropdown-box {
+        .review-dropdown {
+          .dropdown-title {
+            @include max(1399.98px) {
+              background-color: #303438;
+            }
+          }
+        }
+      }
+
+      .product-box-list {
+        .vertical-product-box {
+          .product-image {
+            background-color: #303438;
+          }
+        }
+      }
+
+      .offcanvas {
+        &.cart-offcanvas {
+          .offcanvas-header {
+            background-color: #303438;
+          }
+
+          .offcanvas-body {
+            .cart-product-box {
+              .total-price-box {
+                background-color: #303438;
+              }
+            }
+          }
+        }
+
+        &.category-fixed-box {
+          .category-header {
+            background-color: #303438;
+          }
+
+          .category-menu-list {
+            .sub-menu-list {
+              li {
+                &:hover {
+                  background-color: #303438;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .recent-product-box {
+        img {
+          background-color: #303438;
+        }
+      }
+
+      .alert-box {
+        background-color: #303438;
+      }
+    }
+
+    .header-style-1 {
+      .navbar-nav {
+        .dropdown-menu {
+          .product-box-4 {
+            background-color: rgba(var(--base-gray), 1);
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,282 @@
+<section class="home-section baby-home-section">
+  <div class="custom-container">
+    <div class="row g-lg-4 g-3 custom-row8">
+      <div class="custom-col-xl-3 col-xl-3 d-xl-block d-none">
+        <app-home-banner
+          [image]="data()?.home_section?.left_banner"
+          [className]="'banner-box h-100 b-top'"
+          [imageClass]="'bg-img'"
+        ></app-home-banner>
+      </div>
+      <div class="custom-col-xl-6 ratio_69 col-xl-5 col-md-8">
+        <app-home-banner
+          [image]="data()?.home_section?.center_banner"
+          [className]="'banner-box'"
+          [imageClass]="'bg-img img-fluid'"
+          [bgImage]="true"
+        ></app-home-banner>
+      </div>
+      <div class="custom-col-xl-3 col-xl-3 col-md-4">
+        <div class="row h-100">
+          <div class="col-md-12 col-sm-6 right-banner-1">
+            <app-home-banner
+              [image]="data()?.home_section?.right_banner?.top_banner"
+              [className]="'banner-box h-100 b-top'"
+              [imageClass]="'bg-img img-fluid'"
+            ></app-home-banner>
+          </div>
+          <div class="col-md-12 col-sm-6 mt-md-4 right-banner-2 mt-sm-0 mt-3">
+            <app-home-banner
+              [image]="data()?.home_section?.right_banner?.bottom_banner"
+              [className]="'banner-box h-100 b-top'"
+              [imageClass]="'bg-img img-fluid'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space product-banner-section">
+  <div class="custom-container">
+    <div class="custom-row3 row">
+      <div class="custom-col-xxl-3 h-100">
+        <app-home-banner
+          [image]="data()?.left_banner"
+          [className]="'banner-box h-100 b-top'"
+          [imageClass]="'bg-img img-fluid'"
+        ></app-home-banner>
+      </div>
+
+      <div class="custom-col-xxl-9">
+        <div class="title title-flex justify-content-between">
+          <h3 class="d-block">New Arrivals for Newborns</h3>
+          <app-button
+            [buttonLink]="data()?.arrivals_product?.button_link!"
+            [buttonText]="data()?.arrivals_product?.button_text!"
+          />
+        </div>
+
+        <app-home-product
+          [productIds]="data()?.arrivals_product?.product_ids?.slice(0, 12)"
+          [col]="'col-xl-2 col-md-3 col-sm-4 col-6'"
+          [style]="'product_box_four'"
+        ></app-home-product>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <app-home-banner [image]="data()?.full_width_banner"></app-home-banner>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <app-home-category
+      [categoryIds]="data()?.category_section?.category_ids!"
+      [type]="'category_box_two'"
+      [option]="categorySliderOption"
+    ></app-home-category>
+    <div class="swiper-pagination"></div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="row g-3">
+      <div class="col-xxl-4 col-sm-6">
+        <app-home-banner [image]="data()?.three_column_banner?.banner_1"></app-home-banner>
+      </div>
+
+      <div class="col-xxl-4 col-sm-6">
+        <app-home-banner [image]="data()?.three_column_banner?.banner_2"></app-home-banner>
+      </div>
+
+      <div class="col-xxl-4 col-sm-6">
+        <app-home-banner [image]="data()?.three_column_banner?.banner_3"></app-home-banner>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="custom-row4 row g-sm-3 g-2">
+      <div class="custom-col-xxl-4 col-xl-4 d-xl-block d-none">
+        <div class="row custom-row5 h-100">
+          <div class="custom-col-xxl-7">
+            <div class="row h-100">
+              <div class="col-12">
+                <app-home-banner
+                  [image]="data()?.banner_with_tabs_product?.banner_top"
+                  [className]="'banner-box h-100 hover-effect'"
+                ></app-home-banner>
+              </div>
+
+              <div class="col-12 mt-3">
+                <app-home-banner
+                  [image]="data()?.banner_with_tabs_product?.banner_bottom"
+                  [className]="'banner-box h-100 b-left hover-effect'"
+                ></app-home-banner>
+              </div>
+            </div>
+          </div>
+          <div class="custom-col-xxl-3 d-xxl-block d-none">
+            <app-home-banner
+              [image]="data()?.banner_with_tabs_product?.banner_portrait"
+              [className]="'banner-box h-100 hover-effect'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+      <div class="custom-col-xxl-8 col-xl-8">
+        <app-home-tabs-products
+          [tabSelection]="data()?.banner_with_tabs_product!"
+          [style]="'column'"
+          [type]="'product_box_four'"
+          [itemsPerSlide]="5"
+          [rows]="2"
+        ></app-home-tabs-products>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space banner-newsletter-section">
+  <div class="custom-container">
+    <div class="banner-box">
+      <img src="assets/images/banner/newslatter.png" class="img-fluid newsletter-img" alt="image" />
+      <div class="main-banner-box">
+        <span class="circle"></span>
+        <span class="circle-2"></span>
+        <div class="star">
+          <span class="star-1">
+            <i class="ri-star-fill"></i>
+          </span>
+          <span class="star-2">
+            <i class="ri-star-fill"></i>
+          </span>
+          <span class="star-3">
+            <i class="ri-star-fill"></i>
+          </span>
+        </div>
+        <div class="banner-content">
+          <h3>Subscribe for Exclusive <span>Sales & News</span></h3>
+          <form class="newsletter-form">
+            <h5>Subscribe for the weekly newsletter for all the latest updates</h5>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Email address" />
+              <button class="input-group-text btn newsletter-form-button">Subscribe</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="swiper banner-slider3" #bannerSwiperContainer>
+      <div class="swiper-wrapper">
+        @for (banner of data()?.banners_slider?.banners; track banner) {
+          <div class="swiper-slide">
+            <app-home-banner [image]="banner"></app-home-banner>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <app-home-category
+      [categoryIds]="data()?.category_section_two?.category_ids!"
+      [type]="'category_box_three'"
+      [option]="categorySliderOption"
+    ></app-home-category>
+  </div>
+</section>
+
+<section class="section-t-space shopping-section">
+  <div class="custom-container">
+    <div class="banner-box">
+      <app-home-banner
+        [image]="data()?.discount_banner"
+        [imageClass]="'img-fluid shipping-img'"
+      ></app-home-banner>
+    </div>
+  </div>
+</section>
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="title title-flex justify-content-between">
+      <h3 class="d-block">{{ data()?.feature_product?.title }}</h3>
+      @if (data()?.feature_product?.button_text) {
+        <app-button
+          [buttonLink]="data()?.feature_product?.button_link!"
+          [buttonText]="data()?.feature_product?.button_text!"
+        />
+      }
+    </div>
+    <div class="row g-sm-3 g-2 custom-row6">
+      <div class="custom-col-xxl-5 col-xl-4 col-6">
+        <div class="row g-md-4 g-3">
+          <app-home-product
+            [productIds]="
+              data()
+                ?.feature_product?.product_ids?.slice(
+                  0,
+                  (data()?.feature_product?.product_ids?.length || 0) / 2
+                )
+                ?.slice(0, 6)
+            "
+            [col]="'col-xxl-4 col-xl-6 col-lg-4 col-sm-6'"
+            [style]="'product_box_four'"
+          >
+          </app-home-product>
+        </div>
+      </div>
+
+      <div class="custom-col-xxl-2 col-xl-4 d-xl-block d-none">
+        <app-home-banner
+          [image]="data()?.feature_product?.banner"
+          [className]="'banner-box h-100 b-top rounded-3'"
+          [bgImage]="true"
+        ></app-home-banner>
+      </div>
+
+      <div class="custom-col-xxl-5 col-xl-4 col-6">
+        <div class="row g-sm-4 g-3">
+          <app-home-product
+            [productIds]="
+              data()
+                ?.feature_product?.product_ids?.slice(
+                  (data()?.feature_product?.product_ids?.length || 0) / 2
+                )
+                ?.slice(0, 6)
+            "
+            [col]="'col-xxl-4 col-xl-6 col-lg-4 col-sm-6'"
+            [style]="'product_box_four'"
+          >
+          </app-home-product>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space brand-section">
+  <div class="custom-container">
+    <app-home-brand
+      [brandIds]="data()?.brand?.brand_ids!"
+      [className]="'brand-image-box'"
+    ></app-home-brand>
+  </div>
+</section>

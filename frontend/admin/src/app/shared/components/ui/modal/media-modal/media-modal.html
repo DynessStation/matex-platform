@@ -1,0 +1,119 @@
+<ng-template #mediaModal let-modal>
+  <div class="modal-header">
+    <h2>
+      {{ 'media_ui.insert_media' | translate }}
+    </h2>
+
+    <app-button
+      [class]="'btn btn-close'"
+      [spinner]="false"
+      [id]="'media_close_btn'"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <i class="ri-close-line"></i>
+    </app-button>
+  </div>
+
+  <div class="modal-body">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+      @if (selectMedia()) {
+        <li [ngbNavItem]="'select'">
+          <a ngbNavLink>
+            {{ 'media_ui.select_file' | translate }}
+          </a>
+
+          <ng-template ngbNavContent>
+            <app-media-box
+              [multiple]="multipleImage()"
+              [url]="url()"
+              [accept]="accept()"
+              [collection]="collection()"
+              [selectedImages]="selectedImages"
+              [deleteAction]="false"
+              (setImage)="setImage($event)"
+            />
+          </ng-template>
+        </li>
+      }
+
+      <li [ngbNavItem]="'upload'" *hasPermission="'attachment.create'">
+        <a ngbNavLink>
+          {{ 'media_ui.upload_new' | translate }}
+        </a>
+
+        <ng-template ngbNavContent>
+          <div
+            class="content-section drop-files-sec"
+            ngx-dropzone
+            [accept]="accept().join(',')"
+            [multiple]="multipleImage()"
+            (change)="onSelect($event)"
+          >
+            <ngx-dropzone-label>
+              <div>
+                <h2>
+                  {{ 'media_ui.drop_files_here' | translate }}
+                </h2>
+              </div>
+            </ngx-dropzone-label>
+
+            @for (file of files; track file) {
+              @if (file && file.type.startsWith('image')) {
+                <ngx-dropzone-image-preview
+                  ngProjectAs="
+                    ngx-dropzone-preview
+                  "
+                  [file]="file"
+                  [removable]="true"
+                  (removed)="onRemove(file)"
+                >
+                  <ngx-dropzone-label>
+                    {{ file.name }}
+                    ({{ file.type }})
+                  </ngx-dropzone-label>
+                </ngx-dropzone-image-preview>
+              } @else {
+                <ngx-dropzone-preview
+                  [removable]="true"
+                  (removed)="onRemove(file)"
+                >
+                  <ngx-dropzone-label>
+                    {{ file.name }}
+                    ({{ file.type }})
+                  </ngx-dropzone-label>
+                </ngx-dropzone-preview>
+              }
+            }
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+
+  <div class="modal-footer">
+    <div class="left-part"></div>
+
+    <div class="right-part">
+      @if (active === 'upload') {
+        <app-button
+          *hasPermission="'attachment.create'"
+          [class]="'align-items-center btn btn-theme d-flex'"
+          [id]="'media_upload_btn'"
+          (click)="addMedia(nav)"
+        >
+          {{ 'media_ui.upload_new' | translate }}
+        </app-button>
+      } @else {
+        <app-button
+          [class]="'align-items-center btn btn-theme d-flex'"
+          [id]="'media_insert_btn'"
+          (click)="selectedMedia(modal)"
+        >
+          {{ 'media_ui.insert_media' | translate }}
+        </app-button>
+      }
+    </div>
+  </div>
+</ng-template>

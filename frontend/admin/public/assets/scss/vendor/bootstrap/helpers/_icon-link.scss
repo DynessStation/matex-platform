@@ -1,0 +1,28 @@
+@use './../variables';
+@use './../mixins/transition';
+
+.icon-link {
+  display: inline-flex;
+  gap: variables.$icon-link-gap;
+  align-items: center;
+  text-decoration-color: rgba(var(--#{variables.$prefix}link-color-rgb), var(--#{variables.$prefix}link-opacity, .5));
+  text-underline-offset: variables.$icon-link-underline-offset;
+  backface-visibility: hidden;
+
+  > .bi {
+    flex-shrink: 0;
+    width: variables.$icon-link-icon-size;
+    height: variables.$icon-link-icon-size;
+    fill: currentcolor;
+    @include transition.transition(variables.$icon-link-icon-transition);
+  }
+}
+
+.icon-link-hover {
+  &:hover,
+  &:focus-visible {
+    > .bi {
+      transform: var(--#{variables.$prefix}icon-link-transform, variables.$icon-link-icon-transform);
+    }
+  }
+}

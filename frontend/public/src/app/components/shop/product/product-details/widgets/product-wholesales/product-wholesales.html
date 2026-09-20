@@ -1,0 +1,26 @@
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{{ 'Min Qty' | translate }}</th>
+        <th>{{ 'Max Qty' | translate }}</th>
+        <th>{{ product?.wholesale_price_type === 'fixed' ? 'Unit Price' : 'Percentage' }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (wholesale of product?.wholesales; track wholesale) {
+        <tr>
+          <td>{{ wholesale.min_qty }}</td>
+          <td>{{ wholesale.max_qty }}</td>
+          <td>
+            {{
+              product?.wholesale_price_type === 'fixed'
+                ? (wholesale.value | currencySymbol)
+                : wholesale.value + '% Off'
+            }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

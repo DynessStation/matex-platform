@@ -1,0 +1,84 @@
+@if (user$ | async; as user) {
+  <li class="profile-nav onhover-dropdown pe-0 me-0">
+    <!--==================================================
+    ==== PROFILE HEADER
+    ==================================================-->
+
+    <div class="media profile-media" (click)="clickHeaderOnMobile()">
+      <!--==================================================
+      ==== PHOTO
+      ==================================================-->
+
+      @if (user.profile_photo?.asset_url) {
+        <div class="profile-img">
+          <img
+            class="user-profile rounded-circle"
+            [src]="user.profile_photo?.asset_url"
+            [alt]="user.name"
+          />
+        </div>
+      } @else {
+        <!--==================================================
+        ==== INITIAL
+        ==================================================-->
+
+        <div class="user-round">
+          <h4>
+            {{ user.name?.charAt(0)?.toUpperCase() || 'A' }}
+          </h4>
+        </div>
+      }
+
+      <!--==================================================
+      ==== USER INFO
+      ==================================================-->
+
+      <div class="user-name-hide media-body">
+        <span>
+          {{ user.name }}
+        </span>
+
+        <p class="mb-0 font-roboto">
+          {{ user.access?.access_name }}
+
+          <i class="middle ri-arrow-down-s-line"></i>
+        </p>
+      </div>
+    </div>
+
+    <!--==================================================
+    ==== DROPDOWN
+    ==================================================-->
+
+    <ul class="profile-dropdown onhover-show-div" [class.active]="active">
+      <li>
+        <a [routerLink]="['/account']">
+          <i class="ri-user-line"></i>
+
+          <span>
+            {{ 'auth_ui.my_account' | translate }}
+          </span>
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="javascript:void(0)"
+          (click)="ConfirmationModal()?.openModal('')"
+        >
+          <i class="ri-logout-box-line"></i>
+
+          <span>
+            {{ 'auth_ui.logout' | translate }}
+          </span>
+        </a>
+      </li>
+    </ul>
+  </li>
+}
+
+<!--==================================================
+==== LOGOUT CONFIRMATION
+==================================================-->
+
+<app-confirmation-modal #confirmationModal (confirmed)="logout()" />

@@ -1,0 +1,58 @@
+<div class="footer-title-2">
+  <h4>Contact Info</h4>
+</div>
+<ul class="footer-content-list">
+  <li>
+    <a href="tel:{{ data()?.footer?.support_number }}" class="content-box">
+      <svg class="content-color">
+        <use xlink:href="assets/svg/footer-icon.svg#contact"></use>
+      </svg>
+      <h4>{{ data()?.footer?.support_number }}</h4>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0)" class="content-box">
+      <div class="footer-content-icon">
+        <svg class="content-color">
+          <use xlink:href="assets/svg/footer-icon.svg#location"></use>
+        </svg>
+      </div>
+      <h5>{{ data()?.footer?.about_address }}</h5>
+    </a>
+  </li>
+  <li>
+    <a href="mailto:{{ data()?.footer?.about_email }}" class="content-box">
+      <div class="footer-content-icon">
+        <svg class="content-color">
+          <use xlink:href="assets/svg/footer-icon.svg#mail"></use>
+        </svg>
+      </div>
+      <h5>{{ data()?.footer?.about_email }}</h5>
+    </a>
+  </li>
+</ul>
+<div class="social-icon-box">
+  <h5 class="content-color">Stay Connected :</h5>
+  <ul class="social-icon-list">
+    <li>
+      <a href="{{ data()?.footer?.facebook }}" target="_blank">
+        <i class="ri-facebook-fill"></i>
+      </a>
+    </li>
+    <li>
+      <a href="{{ data()?.footer?.twitter }}" target="_blank">
+        <i class="ri-twitter-x-line"></i>
+      </a>
+    </li>
+    <li>
+      <a href="{{ data()?.footer?.instagram }}" target="_blank">
+        <i class="ri-instagram-fill"></i>
+      </a>
+    </li>
+    <li>
+      <a href="{{ data()?.footer?.pinterest }}" target="_blank">
+        <i class="ri-pinterest-fill"></i>
+      </a>
+    </li>
+  </ul>
+</div>

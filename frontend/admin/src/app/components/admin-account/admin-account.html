@@ -1,0 +1,43 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'admin_account.title' | translate"
+>
+  <!--==================================================
+  ==== CREATE BUTTON
+  ==================================================-->
+
+  <div
+    class="d-flex flex-wrap gap-2"
+    *hasPermission="'admin_account.create'"
+    button
+  >
+    <a
+      [routerLink]="['/admin-account/create']"
+      class="align-items-center btn btn-theme"
+    >
+      <i class="ri-add-line"></i>
+
+      {{ 'admin_account.add' | translate }}
+    </a>
+  </div>
+
+  <!--==================================================
+  ==== TABLE
+  ==================================================-->
+
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [actionMode]="'dropdown'"
+    [externalPermissions]="(authPermissions$ | async) ?? []"
+    [externalAllAccess]="(isAllAccess$ | async) ?? false"
+    (tableChanged)="onTableChange($event)"
+    (action)="onActionClicked($event)"
+  />
+</app-page-wrapper>
+
+<!--==================================================
+==== CONFIRMATION MODAL
+==================================================-->
+
+<app-confirmation-modal #confirmationModal (confirmed)="onConfirmed($event)" />

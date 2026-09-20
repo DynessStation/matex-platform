@@ -1,0 +1,36 @@
+<div class="product-box-5 productMain">
+  <div class="product-content">
+    <h6>
+      <a [routerLink]="['/brand', product()?.brand?.slug]">{{ product()?.brand?.name }}</a>
+    </h6>
+    <a [routerLink]="['/product/' + product()?.slug]">
+      <h5 class="name productName">{{ product()?.name }}</h5>
+    </a>
+  </div>
+  <div class="product-image">
+    <a [routerLink]="['/product/' + product()?.slug]">
+      <img
+        [src]="product()?.product_thumbnail?.asset_url!"
+        class="img-fluid productImage"
+        [alt]="product()?.name"
+      />
+    </a>
+    <ul class="product-option">
+      <li>
+        <app-wishlist [product]="product()" [class]="'wishlistProduct'" />
+      </li>
+      <li>
+        <app-compare [product]="product()!" />
+      </li>
+      <li>
+        <app-quick-view [product]="product()" [quickViewStyle]="'icon'" />
+      </li>
+    </ul>
+  </div>
+  <div class="product-content">
+    <h5 class="price">
+      {{ product()?.sale_price | currencySymbol }}
+      <del>{{ product()?.price | currencySymbol }}</del>
+    </h5>
+  </div>
+</div>

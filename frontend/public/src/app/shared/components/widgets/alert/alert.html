@@ -1,0 +1,45 @@
+@if (alert['type'] === 'error') {
+  <div class="alert alert-danger login-alert" role="alert">
+    <i class="ri-error-warning-line"></i> {{ alert['message'] }}
+  </div>
+} @else if (alert['type'] === 'success') {
+  <div class="alert alert-success login-alert" role="alert">
+    <i class="ri-check-line"></i>{{ alert['message'] }}
+  </div>
+}
+@if (type() === 'add-wishlist' && product) {
+  <div
+    id="alertBox"
+    class="alert-box"
+    [ngClass]="alertClass"
+    [style.display]="showAlert ? 'block' : 'none'"
+    [style.opacity]="showAlert ? '1' : '0'"
+    [style.transform]="showAlert ? 'translateY(0)' : 'translateY(-20px)'"
+    (mouseenter)="onHover(true)"
+    (mouseleave)="onHover(false)"
+  >
+    <div class="alert-message">
+      <h4>{{ alertTitle }}</h4>
+
+      <div class="alert-image">
+        <img [src]="product.product_thumbnail.asset_url" alt="Product" class="img-fluid" />
+        <h5>{{ product.name }}</h5>
+      </div>
+    </div>
+
+    <div class="alert-progressbar"></div>
+
+    <div class="button-group">
+      <button class="remove-wishlist btn" (click)="addToWishlist(product)">
+        {{ product.is_wishlist ? 'Remove Wishlist' : 'Add to Wishlist' }}
+      </button>
+
+      <app-product-cart-button
+        [product]="product"
+        [type]="'addCart'"
+        [class]="'add-cart-btn btn'"
+        (click)="closeAlert()"
+      />
+    </div>
+  </div>
+}

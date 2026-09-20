@@ -1,0 +1,18 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'admin_permission.edit_title' | translate"
+>
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/admin-permission'"
+      (retry)="retryDetail()"
+    />
+  } @else if (adminPermission$ | async; as adminPermission) {
+    <app-form-admin-permission
+      [mode]="'edit'"
+      [editData]="adminPermission"
+      (formSubmit)="submit($event)"
+    />
+  }
+</app-page-wrapper>

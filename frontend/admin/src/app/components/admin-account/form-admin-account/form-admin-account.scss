@@ -1,0 +1,219 @@
+.phone-control-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.phone-code-wrapper {
+  flex: 0 0 125px;
+  width: 125px;
+  min-width: 125px;
+}
+
+.phone-number-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-helper {
+  display: block;
+  margin-top: 5px;
+  color: #777;
+  font-size: 13px;
+}
+
+.form-error {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.all-access-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #ddd;
+  border-radius: 6px;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  .all-access-content {
+    flex: 1;
+
+    small {
+      display: block;
+      margin-top: 3px;
+      color: #777;
+    }
+  }
+
+  &.active {
+    border-color: var(--theme-color, #ff9f00);
+  }
+}
+
+.password-wrapper {
+  position: relative;
+
+  .form-control {
+    padding-right: 48px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    font-size: 20px;
+    line-height: 1;
+
+    transform: translateY(-50%);
+
+    cursor: pointer;
+  }
+}
+
+.password-strength {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 9px;
+
+  .strength-bars {
+    display: flex;
+
+    gap: 5px;
+
+    width: 170px;
+
+    span {
+      flex: 1;
+
+      height: 5px;
+
+      border-radius: 10px;
+
+      background: #e5e5e5;
+
+      transition: background-color 0.2s ease;
+    }
+  }
+
+  .strength-label {
+    font-weight: 500;
+  }
+
+  &[data-strength='weak'] {
+    .strength-bars {
+      span:nth-child(1) {
+        background: #dc3545;
+      }
+    }
+
+    .strength-label {
+      color: #dc3545;
+    }
+  }
+
+  &[data-strength='normal'] {
+    .strength-bars {
+      span:nth-child(1),
+      span:nth-child(2) {
+        background: #ffc107;
+      }
+    }
+
+    .strength-label {
+      color: #b68a00;
+    }
+  }
+
+  &[data-strength='strong'] {
+    .strength-bars {
+      span {
+        background: #198754;
+      }
+    }
+
+    .strength-label {
+      color: #198754;
+    }
+  }
+}
+
+.password-requirements {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #777;
+  font-size: 13px;
+}
+
+.form-submit-wrapper {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 28px;
+}
+
+@media (max-width: 575.98px) {
+  .phone-control-row {
+    flex-direction: column;
+  }
+
+  .phone-code-wrapper {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .all-access-card {
+    align-items: flex-start;
+  }
+}
+
+//==================================================
+//==== SELECT LOCAL LOADER
+//==================================================
+
+.select-loading-wrapper {
+  position: relative;
+
+  select2 {
+    display: block;
+    width: 100%;
+  }
+}
+
+.select-local-loader {
+  position: absolute;
+  top: 50%;
+  right: 42px;
+  z-index: 10;
+
+  width: 16px;
+  height: 16px;
+
+  margin-top: -8px;
+
+  pointer-events: none;
+}

@@ -1,0 +1,45 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+@if (layout === 'product_thumbnail') {
+  <app-product-thumbnail
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-thumbnail>
+} @else if (layout === 'product_images') {
+  <app-product-image
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-image>
+} @else if (layout === 'product_slider') {
+  <app-product-slider
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-slider>
+} @else if (layout === 'product_sticky') {
+  <app-product-sticky
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-sticky>
+} @else if (layout === 'product_full_width') {
+  <app-product-full-width
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-full-width>
+} @else if (layout === 'product_light_box_image') {
+  <app-product-light-box-image
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-light-box-image>
+} @else if (layout === 'product_zoom') {
+  <app-product-zoom
+    [product]="product"
+    [option]="themeOptions$ | async"
+    [layout]="layout"
+  ></app-product-zoom>
+}
+<app-related-product [product]="product"></app-related-product>

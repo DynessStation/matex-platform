@@ -1,0 +1,23 @@
+<div class="location-picker">
+  <div #autocompleteContainer class="location-search"></div>
+
+  @if (loading) {
+    <div class="location-message">
+      {{ 'location_picker_ui.loading' | translate }}
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-warning mb-3">
+      {{ error | translate }}
+    </div>
+  }
+
+  <div #mapContainer class="location-map" [class.d-none]="error"></div>
+
+  @if (!error) {
+    <small class="text-muted d-block mt-2">
+      {{ 'location_picker_ui.help' | translate }}
+    </small>
+  }
+</div>

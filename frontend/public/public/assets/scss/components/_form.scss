@@ -1,0 +1,407 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.6 form scss
+  ==========================**/
+/* Input auto-fill */
+.input-group {
+  .btn {
+    z-index: unset;
+  }
+}
+
+.was-validated .form-control:valid,
+.form-control.is-valid {
+  background-size: calc(15px + (19 - 15) * ((100vw - 320px) / (1920 - 320)));
+  padding-right: 36px;
+}
+
+.invalid-feedback {
+  color: rgba(var(--primary-color2), 1);
+  font-size: calc(13px + (14 - 13) * ((100vw - 320px) / (1920 - 320)));
+}
+
+input[type='search' i]::-webkit-search-cancel-button {
+  appearance: none;
+  background-image: url(../../svg/close-line.svg);
+  @include pseudowh($width: 18px, $height: 18px);
+
+  body.dark & {
+    filter: invert(1);
+  }
+}
+
+.was-validated :valid ~ .valid-feedback,
+.was-validated :valid ~ .valid-tooltip,
+.is-valid ~ .valid-feedback,
+.is-valid ~ .valid-tooltip {
+  display: inline-block;
+}
+
+.invalid-tooltip,
+.valid-tooltip {
+  z-index: 1;
+  position: static;
+  inset: unset;
+}
+
+.input-group {
+  > .form-control,
+  > .form-floating {
+    &:focus,
+    &:focus,
+    &:focus-within {
+      z-index: unset;
+    }
+  }
+}
+
+.was-validated .form-control:invalid:focus,
+.form-control.is-invalid:focus,
+.was-validated .form-control:valid:focus,
+.form-control.is-valid:focus,
+.was-validated .form-check-input:invalid:focus,
+.form-check-input.is-invalid:focus,
+.was-validated .form-check-input:valid:focus,
+.form-check-input.is-valid:focus {
+  box-shadow: unset;
+}
+
+.was-validated .form-control:valid:focus,
+.form-control.is-valid:focus {
+  border-color: rgba(var(--theme-green), 1);
+}
+
+.was-validated .form-check-input:valid:focus,
+.form-check-input.is-valid:focus {
+  &::after {
+    border-color: rgba(var(--theme-green), 1);
+  }
+}
+
+.was-validated .form-check-input:invalid:focus,
+.form-check-input.is-invalid:focus {
+  &::after {
+    border-color: rgba(var(--danger-color), 1);
+  }
+}
+
+.was-validated .form-control:invalid:focus,
+.form-control.is-invalid:focus {
+  border-color: rgba(var(--danger-color), 1);
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+  background-image: none;
+  border-color: rgba(var(--danger-color), 1);
+}
+
+.was-validated.form-box .form-control:valid {
+  background-image: none;
+  border-color: rgba(var(--theme-green), 1);
+  position: relative;
+}
+
+.was-validated {
+  .position-relative {
+    .form-control {
+      background: none;
+
+      &:valid {
+        ~ div {
+          position: absolute;
+          right: 13px;
+          top: 12px;
+
+          &::after {
+            content: '\eb7b';
+            color: rgba(var(--theme-green), 1);
+            font-size: 17px;
+            font-weight: 600;
+            @include font;
+          }
+        }
+      }
+
+      &:invalid {
+        ~ div {
+          position: absolute;
+          right: 13px;
+          top: 12px;
+
+          &::after {
+            content: '\eb99';
+            color: rgba(var(--danger-color), 1);
+            font-size: 17px;
+            font-weight: 600;
+            @include font;
+          }
+        }
+      }
+    }
+  }
+}
+
+.valid-tooltip,
+.invalid-tooltip {
+  background-color: transparent;
+  padding: 0;
+  z-index: unset;
+}
+
+.valid-tooltip {
+  color: rgba(var(--theme-green), 1);
+}
+
+.invalid-tooltip {
+  color: rgba(var(--danger-color), 1);
+}
+
+.was-validated .input-group > .form-control:not(:focus):invalid,
+.input-group > .form-control:not(:focus).is-invalid,
+.was-validated .input-group > .form-select:not(:focus):invalid,
+.input-group > .form-select:not(:focus).is-invalid,
+.was-validated .input-group > .form-floating:not(:focus-within):invalid,
+.input-group > .form-floating:not(:focus-within).is-invalid {
+  z-index: 0;
+}
+
+input {
+  &[type='number'] {
+    appearance: textfield;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  &:-webkit-autofill {
+    &,
+    &:hover,
+    &:focus,
+    &:active {
+      color: rgba(var(--title-color), 1) !important;
+      -webkit-text-fill-color: rgba(var(--title-color), 1) !important;
+      box-shadow: 0 0 0 1000px rgba(var(--base-gray), 1) inset !important;
+      background-clip: text !important;
+    }
+  }
+}
+
+form {
+  .form-check-input {
+    outline: 0;
+
+    &:active {
+      filter: unset;
+    }
+
+    &:focus {
+      box-shadow: unset;
+    }
+
+    &:checked {
+      background-color: transparent;
+      border-color: transparent;
+    }
+  }
+}
+
+.theme-form {
+  .form-label {
+    font-size: calc(14px + (18 - 14) * ((100vw - 320px) / (1920 - 320)));
+    color: rgba(var(--content-color), 1);
+    font-weight: 500;
+    margin-bottom: calc(2px + (4 - 2) * ((100vw - 320px) / (1920 - 320)));
+
+    span {
+      color: rgba(var(--danger-color), 1);
+    }
+  }
+
+  .input-group-text {
+    color: rgba(var(--title-color), 1);
+    border-color: rgba(var(--border-color), 1);
+    background-color: rgba(var(--base-gray), 1);
+  }
+
+  .form-control,
+  .form-select {
+    padding: calc(10px + (12 - 10) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (14 - 12) * ((100vw - 320px) / (1920 - 320)));
+    font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: 400;
+    color: rgba(var(--title-color), 1);
+    background-color: rgba(var(--white), 1);
+    border-radius: 5px;
+    border: 1px solid rgba(var(--border-color), 1);
+
+    [dir='rtl'] & {
+      text-align: right;
+    }
+
+    &:focus {
+      border-color: rgba(var(--title-color), 0.18);
+    }
+
+    &::placeholder {
+      color: rgba(var(--content-color), 0.8);
+    }
+  }
+
+  textarea.form-select {
+    &::-webkit-scrollbar-track {
+      border-radius: 100px;
+      background-color: #f2f3f7;
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+      background-color: #f2f3f7;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 100px;
+      background-color: rgba(var(--theme-blue-dark), 0.7);
+    }
+  }
+
+  .suggestion-text {
+    font-size: calc(13px + (14 - 13) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: 400;
+    color: rgba(var(--content-color), 1);
+    line-height: 1.5;
+    margin-top: calc(5px + (7 - 5) * ((100vw - 320px) / (1920 - 320)));
+    display: block;
+  }
+}
+
+.form-box {
+  .form-control,
+  .form-select {
+    padding: 13px;
+    border: unset;
+    font-size: 16px;
+    background-color: rgba(var(--base-gray), 1);
+  }
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  [dir='rtl'] & {
+    position: absolute;
+  }
+
+  body.dark & {
+    filter: invert(1);
+  }
+}
+
+.form-select {
+  body.dark & {
+    background-image: url(../../images/select-arrow.svg);
+  }
+}
+
+.theme-checkbox {
+  min-height: unset;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(7px + (10 - 7) * ((100vw - 320px) / (1920 - 320)));
+
+  .form-check-input {
+    cursor: pointer;
+    background-color: transparent;
+    position: relative;
+    border: none;
+    box-shadow: none;
+    float: unset;
+    margin: -3px 0 0 0;
+    filter: unset;
+    @include pseudowh($width: 18px, $height: 18px);
+
+    &:before {
+      transition: transform 0.4s cubic-bezier(0.45, 1.8, 0.5, 0.75);
+      transform: rotate(-45deg) scale(0, 0);
+      left: 4px;
+      top: 5px;
+      z-index: 1;
+      border: 2px solid rgba(var(--primary-color), 1);
+      border-top-style: none;
+      border-right-style: none;
+      @include pos;
+      @include pseudowh($width: 10px, $height: 5px);
+    }
+
+    &:after {
+      top: 0;
+      left: 0;
+      border: 1px solid rgba(var(--content-color), 0.2);
+      cursor: pointer;
+      background-color: rgba(var(--white), 1);
+      border-radius: 4px;
+      @include pos;
+      @include pseudowh($width: 18px, $height: 18px);
+    }
+
+    &:checked {
+      background-color: transparent;
+
+      &:before {
+        transform: rotate(-45deg) scale(1, 1);
+      }
+    }
+  }
+
+  .form-check-label {
+    font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+    color: rgba(var(--content-color), 1);
+    font-weight: 400;
+    cursor: pointer;
+  }
+}
+
+.checkbox_animated {
+  cursor: pointer;
+  position: relative;
+  margin-right: 16px;
+  height: 100%;
+  border: none;
+  box-shadow: none;
+  @include pseudowh($width: 18px, $height: 18px);
+
+  &:before {
+    transition: transform 0.4s cubic-bezier(0.45, 1.8, 0.5, 0.75);
+    transform: rotate(-45deg) scale(0, 0);
+    left: 4px;
+    top: 5px;
+    z-index: 1;
+    border: 2px solid rgba(var(--primary-color), 1);
+    border-top-style: none;
+    border-right-style: none;
+    @include pos;
+    @include pseudowh($width: 10px, $height: 5px);
+  }
+
+  &:after {
+    top: 0;
+    left: 0;
+    border: 1px solid rgba(var(--content-color), 0.2);
+    cursor: pointer;
+    background-color: rgba(var(--white), 1);
+    @include pos;
+    @include pseudowh;
+  }
+
+  &:checked {
+    background-color: transparent;
+
+    &:before {
+      transform: rotate(-45deg) scale(1, 1);
+    }
+  }
+}

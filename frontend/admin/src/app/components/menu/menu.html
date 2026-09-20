@@ -1,0 +1,32 @@
+<div class="row">
+  <div class="col-xl-4 p-0">
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'menu'">
+      @if (type() === 'edit') {
+        <div button>
+          <div ngbDropdown class="d-inline-block dropdown-box">
+            <button type="button" class="btn btn-sm btn-light-bg" ngbDropdownToggle>
+              {{ 'action' | translate }}
+            </button>
+            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+              @if (type() === 'edit') {
+                <button ngbDropdownItem (click)="create()">
+                  {{ 'create' | translate }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      <app-menu-tree
+        [data]="(menu$ | async)?.data?.length ? (menu$ | async)?.data : []"
+        [recursionKey]="'child'"
+        [type]="'menu'"
+        />
+    </app-page-wrapper>
+  </div>
+  <div class="col-xl-8 p-0">
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'menu'">
+      <app-form-menu [type]="type()" />
+    </app-page-wrapper>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+@if (data?.seller?.home_section?.status) {
+  <section class="boost-marketing-section section-t-space section-b-space">
+    <div class="custom-container">
+      <div class="row g-md-4 g-3 justify-content-between">
+        <div class="col-lg-6 order-lg-0 order-1">
+          <div class="marketing-contain">
+            <h2>{{ data?.seller?.home_section?.title }}</h2>
+            <p>{{ data?.seller?.home_section?.description }}</p>
+            <div class="btn-group">
+              <button class="btn theme-bg-color text-light" [routerLink]="['/']">
+                {{ data?.seller?.home_section?.button_text }}
+              </button>
+              <button class="btn bg-white ms-2">Watch a demo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xxl-5 col-lg-6 order-lg-1 order-0">
+          <div class="marketing-image">
+            <img [src]="data?.seller?.home_section?.image" class="img-fluid" alt="image" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data?.seller?.why_selling?.status) {
+  <section class="sell-theme-section section-block-space">
+    <div class="custom-container">
+      <div class="seller-title">
+        <h3>{{ data?.seller?.why_selling?.title }}</h3>
+        <p>{{ data?.seller?.why_selling?.description }}</p>
+      </div>
+      <div class="row g-md-4 g-3 justify-content-center">
+        @for (benefits of data?.seller?.why_selling?.seller_benefits; track benefits) {
+          <div class="col-xxl-3 col-lg-4 col-md-6">
+            <div class="sell-box">
+              <svg>
+                <use [attr.xlink:href]="benefits.icon"></use>
+              </svg>
+              <h4>{{ benefits.title }}</h4>
+              <p>{{ benefits.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}
+@if (data?.seller?.seller_stories?.status) {
+  <section class="testimonial-section section-b-space">
+    <div class="custom-container">
+      <div class="row g-md-4 g-3">
+        <div class="col-xxl-4">
+          <div class="testimonial-title">
+            <h2>{{ data?.seller?.seller_stories?.title }}</h2>
+            <p>{{ data?.seller?.seller_stories?.description }}</p>
+            <div>
+              <button class="slider-btn slidePrev-btn">
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              <button class="slider-btn slideNext-btn">
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-xxl-8">
+          <div class="swiper testimonial-swiper" #swiperContainer>
+            <div class="swiper-wrapper">
+              @for (review of data?.seller?.seller_stories?.review; track review) {
+                <div class="swiper-slide">
+                  <div class="testimonial-card">
+                    <svg>
+                      <use [attr.xlink:href]="review.icon"></use>
+                    </svg>
+                    <p>{{ review.message }}</p>
+                    <div class="testimonial-user">
+                      <img [src]="review.image" alt="user" class="img-fluid" />
+                      <div>
+                        <h4>{{ review.name }}</h4>
+                        <h6>{{ review.designation }}</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data?.seller?.selling_steps?.status) {
+  <section class="sell-theme-section-2 section-block-space">
+    <div class="custom-container">
+      <div class="seller-main-box">
+        <div class="seller-title">
+          <h3>{{ data?.seller?.selling_steps?.title }}</h3>
+          <p>{{ data?.seller?.selling_steps?.description }}</p>
+        </div>
+        <div class="swiper sell-slider" #sellingStepsSwiperContainer>
+          <div class="swiper-wrapper">
+            @for (steps of data?.seller?.selling_steps?.sell_steps; track steps) {
+              <div class="swiper-slide">
+                <div class="sell-box">
+                  <div class="top-box">
+                    <div class="contain-text">
+                      <h5>{{ steps.step_number }}</h5>
+                      <h4>{{ steps.title }}</h4>
+                    </div>
+                  </div>
+                  <p>{{ steps.description }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

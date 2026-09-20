@@ -1,0 +1,51 @@
+<div class="filter-overlay" id="filterOverlay" [class.show]="showSidebar"></div>
+
+<div class="left-sidebar-box" [class.show]="showSidebar">
+  <button class="back-button" (click)="closeSidebar()">
+    <i class="ri-arrow-left-line"></i> Back
+  </button>
+  <div class="accordion left-accordion-box" id="accordionPanelsStayOpenExample" ngbAccordion>
+    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+      <h2 class="accordion-header" id="panelsStayOpen-headingOne" ngbAccordionHeader>
+        <button class="accordion-button" type="button" ngbAccordionButton>
+          Recent Post <i class="iconsax" icon-name="chevron-down"></i>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse show" ngbAccordionCollapse>
+        <div class="accordion-body" ngbAccordionBody>
+          <app-blog-recent-post [blogs]="(resentBlog$ | async) || []" />
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+      <h2 class="accordion-header" id="panelsStayOpen-headingTwo" ngbAccordionHeader>
+        <button class="accordion-button collapsed" type="button" ngbAccordionButton>
+          Category <i class="iconsax" icon-name="chevron-down"></i>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse collapse show" ngbAccordionCollapse>
+        <div class="accordion-body" ngbAccordionBody>
+          <div class="category-list-box">
+            <app-blog-category [data]="(category$ | async)?.data || []" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+      <h2 class="accordion-header" id="panelsStayOpen-headingThree" ngbAccordionHeader>
+        <button class="accordion-button collapsed" type="button" ngbAccordionButton>
+          Product Tags <i class="iconsax" icon-name="chevron-down"></i>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse collapse show" ngbAccordionCollapse>
+        <div class="accordion-body" ngbAccordionBody>
+          <div class="product-tags-box">
+            <app-blog-tag [tags]="(tag$ | async)?.data || []" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

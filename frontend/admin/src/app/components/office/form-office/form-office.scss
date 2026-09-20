@@ -1,0 +1,292 @@
+//==================================================
+//==== NAV
+//==================================================
+
+.office-nav {
+  margin-bottom: 0;
+}
+
+.office-tab-content {
+  min-height: 500px;
+
+  padding: 24px 0;
+}
+
+//==================================================
+//==== SWITCH
+//==================================================
+
+.office-switch-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.office-switch-label {
+  margin: 0;
+
+  line-height: 1.4;
+
+  cursor: pointer;
+}
+
+//==================================================
+//==== OPERATING HOURS
+//==================================================
+
+.operating-hours {
+  border: 1px solid #eee;
+
+  border-radius: 6px;
+}
+
+.operating-day {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 220px)
+    minmax(0, 1fr);
+
+  gap: 24px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.operating-day:last-child {
+  border-bottom: 0;
+}
+
+.operating-day-name {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+//==================================================
+//==== OPERATING RANGE
+//==================================================
+
+.operating-ranges {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 12px;
+}
+
+.operating-range {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  width: fit-content;
+
+  max-width: 100%;
+}
+
+.operating-time {
+  flex: 0 0 auto;
+}
+
+.operating-time-separator {
+  flex: 0 0 auto;
+
+  margin-inline: 2px;
+}
+
+.operating-range-delete {
+  flex: 0 0 42px;
+
+  width: 42px;
+
+  min-width: 42px;
+
+  height: 42px;
+
+  padding: 0 !important;
+
+  color: var(--bs-danger) !important;
+}
+
+//==================================================
+//==== MEDIA
+//==================================================
+
+.office-media-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.office-media-item {
+  display: grid;
+
+  grid-template-columns:
+    140px
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  padding: 14px;
+
+  border: 1px solid #eee;
+
+  border-radius: 6px;
+}
+
+.office-media-item img {
+  width: 140px;
+
+  height: 100px;
+
+  object-fit: cover;
+
+  border-radius: 5px;
+}
+
+.office-media-content {
+  min-width: 0;
+}
+
+.office-media-empty {
+  padding: 50px 20px;
+
+  border: 1px dashed #ddd;
+
+  color: #999;
+
+  text-align: center;
+}
+
+.office-media-action {
+  min-width: 38px;
+}
+
+.office-media-delete {
+  color: var(--bs-danger) !important;
+}
+
+//==================================================
+//==== FOOTER
+//==================================================
+
+.office-form-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 20px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #eee;
+}
+
+//==================================================
+//==== TIME PICKER THEME
+//==================================================
+
+:host ::ng-deep ngb-timepicker {
+  .btn-link,
+  .ngb-tp-chevron {
+    color: var(--theme-color) !important;
+  }
+
+  .btn-link:hover,
+  .btn-link:focus {
+    color: var(--theme-color) !important;
+
+    opacity: 0.8;
+  }
+}
+
+//==================================================
+//==== DARK MODE
+//==================================================
+
+:host-context(body.dark-only) {
+  .operating-hours,
+  .operating-day,
+  .office-media-item,
+  .office-form-footer {
+    border-color: #404040;
+  }
+
+  .office-media-empty {
+    border-color: #404040;
+
+    color: #aaa;
+  }
+}
+
+.operating-range-add {
+  width: fit-content;
+
+  margin-top: 2px;
+}
+
+//==================================================
+//==== RESPONSIVE
+//==================================================
+
+@media (max-width: 767px) {
+  .operating-day {
+    grid-template-columns: 1fr;
+  }
+
+  .operating-range {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    width: 100%;
+
+    flex-wrap: nowrap;
+  }
+
+  .operating-time {
+    flex: 0 1 auto;
+
+    min-width: 0;
+  }
+
+  .operating-time-separator {
+    flex: 0 0 auto;
+
+    margin-inline: 0;
+  }
+
+  .operating-range-delete {
+    flex: 0 0 38px;
+
+    width: 38px;
+
+    min-width: 38px;
+
+    height: 38px;
+  }
+
+  .office-media-item {
+    grid-template-columns: 1fr;
+  }
+
+  .office-media-item img {
+    width: 100%;
+
+    height: 180px;
+  }
+}

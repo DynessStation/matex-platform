@@ -1,0 +1,303 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    2.1 Accordion CSS
+==========================**/
+.custom-accordion {
+  display: grid;
+  gap: 13px;
+
+  .accordion-item {
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid rgba(var(--content-color), 0.1);
+
+    .accordion-header {
+      .accordion-button {
+        background-color: rgba(var(--white), 1);
+        box-shadow: unset;
+        padding: 20px 24px;
+        z-index: 0;
+        font-size: 20px;
+        color: rgba(var(--title-color), 1);
+        font-weight: 500;
+        border-radius: 8px;
+
+        &::after {
+          content: '\ea4e';
+          background: unset;
+          color: rgba(var(--title-color), 0.8);
+          @include font;
+          @include pseudowh($width: auto, $height: unset);
+        }
+      }
+    }
+
+    .accordion-body {
+      padding: 0 24px 20px;
+    }
+  }
+}
+
+.delivery-accordion {
+  margin-top: 12px;
+
+  > .accordion-item {
+    border: unset;
+    background-color: unset;
+
+    > .accordion-header {
+      .accordion-button {
+        padding: 0;
+        text-decoration: underline;
+        background-color: transparent;
+        color: rgba(var(--title-color), 1);
+        box-shadow: unset;
+        align-items: center;
+        justify-content: space-between;
+
+        &::after {
+          content: unset;
+        }
+
+        &:not(.collapsed) {
+          i {
+            transform: rotate(-180deg);
+          }
+        }
+
+        i {
+          transition: transform 0.2s ease-in-out;
+        }
+      }
+    }
+
+    > .accordion-collapse {
+      > .accordion-body {
+        padding: 9px 0 0;
+
+        .delivery-accordion-box {
+          margin-top: 7px;
+
+          .accordion-item {
+            border-radius: 0;
+            border: unset;
+
+            .accordion-button {
+              background-color: rgba(var(--base-gray), 1);
+              color: rgba(var(--content-color), 1);
+              border-radius: 0;
+              z-index: 0;
+              box-shadow: unset;
+              justify-content: space-between;
+
+              &::after {
+                content: unset;
+              }
+
+              &:not(.collapsed) {
+                i {
+                  transform: rotate(-180deg);
+                }
+              }
+
+              i {
+                transition: transform 0.2s ease-in-out;
+              }
+            }
+
+            .accordion-body {
+              padding: 10px 20px 15px;
+              border: 1px solid rgba(var(--content-color), 0.1);
+              border-top: 0;
+
+              textarea {
+                &.form-control {
+                  padding: 13px;
+                  border: unset;
+                  font-size: calc(15px + (17 - 15) * ((100vw - 320px) / (1920 - 320)));
+                  border-radius: 0px;
+                  background-color: rgba(var(--base-gray), 1);
+                  color: rgba(var(--content-color), 1);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.checkout-payment-accordion {
+  .accordion-item {
+    background-color: rgba(var(--base-gray), 1);
+    color: rgba(var(--title-color), 1);
+    border: 1px solid rgba(var(--border-color), 1);
+    border-radius: calc(6px + (9 - 6) * ((100vw - 320px) / (1920 - 320)));
+    position: relative;
+    overflow: hidden;
+
+    body.dark & {
+      background-color: rgba(19, 25, 33, 0.45);
+    }
+
+    &:has(.accordion-header .form-check .form-check-input:checked) {
+      &::before {
+        top: 0;
+        left: 0;
+        border-left: 3px solid rgba(var(--primary-color), 1);
+        @include pos;
+        @include pseudowh($width: 3px, $height: 100%);
+
+        [dir='rtl'] & {
+          left: unset;
+          right: 0;
+        }
+      }
+
+      .accordion-header {
+        .form-check {
+          .form-check-label {
+            .circle {
+              &::before {
+                border-color: rgba(var(--primary-color), 1);
+              }
+
+              &::after {
+                transform: translate(-50%, -50%) scale(1);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    + .accordion-item {
+      margin-top: 11px;
+    }
+
+    .accordion-header {
+      padding: 0;
+      position: relative;
+      cursor: pointer;
+
+      .form-check {
+        padding: calc(14px + (24 - 14) * ((100vw - 320px) / (1920 - 320)));
+        min-height: unset;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        float: unset;
+        margin: 0;
+        position: relative;
+
+        .form-check-input {
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0;
+          visibility: hidden;
+          float: unset;
+          margin: 0;
+          @include pseudowh;
+        }
+
+        .form-check-label {
+          display: flex;
+          line-height: 1;
+          align-items: center;
+          gap: calc(10px + (12 - 10) * ((100vw - 320px) / (1920 - 320)));
+          font-size: calc(15px + (16 - 15) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--content-color), 1);
+          font-weight: 400;
+          width: 100%;
+          cursor: pointer;
+
+          .circle {
+            float: unset;
+            margin: 0;
+            border: none;
+            position: relative;
+            background-image: none;
+            background-color: transparent;
+            box-shadow: none;
+            filter: none;
+            background-color: rgba(var(--white), 1);
+            border-radius: 100%;
+            margin-top: calc(-1.5px + (-4 - -1.5) * ((100vw - 320px) / (1920 - 320)));
+            @include pseudowh(
+              $width: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320))),
+              $height: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)))
+            );
+
+            &::before {
+              border-radius: 100%;
+              border: 1px solid rgba(var(--border-color), 1);
+              @include pos;
+              @include center(both);
+              @include pseudowh(
+                $width: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320))),
+                $height: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)))
+              );
+            }
+
+            &::after {
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) scale(0);
+              border-radius: 100%;
+              background-color: rgba(var(--primary-color), 1);
+              transition: all 0.2s ease-in-out;
+              @include pos;
+              @include pseudowh(
+                $width: calc(10px + (11 - 10) * ((100vw - 320px) / (1920 - 320))),
+                $height: calc(10px + (11 - 10) * ((100vw - 320px) / (1920 - 320)))
+              );
+            }
+
+            &:checked {
+              &::before {
+                border-color: rgba(var(--primary-color), 1);
+              }
+
+              &::after {
+                transform: translate(-50%, -50%) scale(1);
+              }
+
+              ~ .form-check-label {
+                color: rgba(var(--title-color), 1);
+              }
+            }
+          }
+
+          a {
+            text-decoration: underline;
+            color: rgba(var(--title-color), 1);
+          }
+        }
+      }
+    }
+
+    .accordion-body {
+      padding: 0 calc(14px + (24 - 14) * ((100vw - 320px) / (1920 - 320)))
+        calc(14px + (24 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      p {
+        color: rgba(var(--content-color), 0.9);
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+        i {
+          color: rgba(var(--title-color), 1);
+          font-size: 21px;
+          line-height: 1;
+        }
+
+        span {
+          text-decoration: underline;
+          color: rgba(var(--title-color), 1);
+        }
+      }
+    }
+  }
+}

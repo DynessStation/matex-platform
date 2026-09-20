@@ -1,0 +1,194 @@
+{
+  "categories": {
+    "status": true,
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+  },
+  "home_selection": {
+    "banner_1": {
+      "image_url": "assets/images/banner/17.jpg",
+      "redirection_type": "product",
+      "link": "apple-iphone-16"
+    },
+    "banner_2": {
+      "image_url": "assets/images/banner/18.jpg",
+      "redirection_type": "product",
+      "link": "classic-design-gps-fitness-smartwatch"
+    },
+    "banner_3": {
+      "image_url": "assets/images/banner/19.jpg",
+      "redirection_type": "product",
+      "link": "sonos-speaker"
+    },
+    "banner_4": {
+      "image_url": "assets/images/banner/20.jpg",
+      "redirection_type": "product",
+      "link": "stripped-bodycon-dress"
+    }
+  },
+  "deal_product": {
+    "status": true,
+    "title": "Top Flash Deal on Fashion",
+    "sub_title": "Up to 60% Off",
+    "product_ids": [111, 112, 113, 114, 115, 116],
+    "button_text": "See all top fashion",
+    "button_link": "/collections"
+  },
+  "sale_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/21.jpg",
+      "redirection_type": "product",
+      "link": "scarlet-stunner"
+    }
+  },
+  "most_wishes_product": {
+    "status": true,
+    "title": "Most Wishes for Mobile and laptop",
+    "sub_title": "Up to 20% Off",
+    "product_ids": [117, 118, 123, 120, 121, 122],
+    "button_text": "See all most wishes",
+    "button_link": "/collections"
+  },
+  "most_wishes_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/22.jpg",
+      "redirection_type": "product",
+      "link": "apple-iphone-16"
+    }
+  },
+  "summer_sale_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/23.jpg",
+      "redirection_type": "product",
+      "link": "essential-cream-crewneck-sweatshirt"
+    }
+  },
+  "feature_brand_banner": {
+    "status": true,
+    "title": "Featured Brands",
+    "feature_banner": [
+      {
+        "image_url": "assets/images/banner/24.jpg",
+        "redirection_type": "product",
+        "link": "mini-split-inverter-air-conditioner-system"
+      },
+      {
+        "image_url": "assets/images/banner/25.jpg",
+        "redirection_type": "product",
+        "link": "smart-counter-depth-french-door-refrigerator"
+      },
+      {
+        "image_url": "assets/images/banner/26.jpg",
+        "redirection_type": "product",
+        "link": "ultra-slim-bezel-less-monitor-with-modern-stand"
+      },
+      {
+        "image_url": "assets/images/banner/27.jpg",
+        "redirection_type": "product",
+        "link": "keratin-smooth-professional-shampoo"
+      }
+    ],
+    "button_text": "See all features",
+    "button_link": "/collections"
+  },
+  "sports_healthcare_categories": {
+    "status": true,
+    "title": "Sports, Healthcare & More",
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+    "button_text": "See all healthcare product",
+    "button_link": "/collections"
+  },
+  "sports_healthcare_categories_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/28.jpg",
+      "redirection_type": "product",
+      "link": "cute-bear-silicone-straw-sippy-cup"
+    }
+  },
+  "product_section": {
+    "more_item": {
+      "status": true,
+      "title": "More Items to Consider",
+      "product_ids": [123, 112]
+    },
+    "shopping_continue": {
+      "status": true,
+      "title": "Keep Shopping Continue",
+      "product_ids": [124, 111]
+    },
+    "new_collection": {
+      "status": true,
+      "title": "New collection from local shops near you",
+      "category_ids": [1, 2, 3, 4],
+      "button_link": "/collections"
+    },
+    "electronic_device": {
+      "status": true,
+      "title": "all Electronic device for home & Office",
+      "category_ids": [1, 2, 3, 4],
+      "button_link": "/collections"
+    }
+  },
+  "beauty_food_product": {
+    "status": true,
+    "title": "Beauty, Food, grocery & more",
+    "product_ids": [125, 126, 127, 128, 129, 130],
+    "button_text": "See all beauty product",
+    "button_link": "/collections"
+  },
+  "beauty_food_product_banner": {
+    "banner": {
+      "image_url": "assets/images/banner/29.jpg",
+      "redirection_type": "product",
+      "link": "fresh-green-bell-pepper"
+    }
+  },
+  "browsing_history": {
+    "status": true,
+    "title": "Your Browsing History",
+    "sub_title": "View or edit your browsing history",
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "button_text": "See all history",
+    "button_link": "/collections"
+  },
+  "tags": {
+    "status": true,
+    "title": "Hot Tag:",
+    "tags_ids": [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+    ],
+    "tags_path": "/collections"
+  },
+  "banner_section": {
+    "banner": [
+      {
+        "image_url": "assets/images/banner/94.jpg",
+        "redirection_type": "product",
+        "link": "classic-design-gps-fitness-smartwatch"
+      },
+      {
+        "image_url": "assets/images/banner/95.jpg",
+        "redirection_type": "product",
+        "link": "true-wireless-bluetooth-earbuds-charging-case"
+      },
+      {
+        "image_url": "assets/images/banner/96.jpg",
+        "redirection_type": "product",
+        "link": "apple-iphone-16"
+      },
+      {
+        "image_url": "assets/images/banner/97.jpg",
+        "redirection_type": "product",
+        "link": "stripped-bodycon-dress"
+      }
+    ]
+  },
+  "services": {
+    "status": true,
+    "service_ids": [1, 2, 3, 4]
+  },
+  "products_ids": [
+    111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
+    130
+  ],
+  "slug": "mega-mart"
+}

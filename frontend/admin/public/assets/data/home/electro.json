@@ -1,0 +1,228 @@
+{
+  "categories": {
+    "status": true,
+    "category_ids": [1, 2, 3, 4, 5, 6, 7]
+  },
+  "home_selection": {
+    "main_banner": {
+      "image_url": "assets/images/banner/59.jpg",
+      "redirection_type": "product",
+      "link": "stripped-bodycon-dress"
+    },
+    "sub_banner_1": {
+      "image_url": "assets/images/banner/60.jpg",
+      "redirection_type": "product",
+      "link": "11inch-tablet-magnetic-folio-keyboard"
+    },
+    "sub_banner_2": {
+      "image_url": "assets/images/banner/61.jpg",
+      "redirection_type": "product",
+      "link": "13inch-ultra-thin-performance-laptop"
+    },
+    "sub_banner_3": {
+      "image_url": "assets/images/banner/62.jpg",
+      "redirection_type": "product",
+      "link": "premium-14inch-productivity-laptop-silver"
+    }
+  },
+  "daily_deal": {
+    "status": true,
+    "title": "Daily deal",
+    "product_ids": [111]
+  },
+  "banner_1": {
+    "image_url": "assets/images/banner/63.jpg",
+    "redirection_type": "product",
+    "link": "apple-iphone-16"
+  },
+  "banner_2": {
+    "image_url": "assets/images/banner/64.jpg",
+    "redirection_type": "product",
+    "link": "gentle-moisturizing-baby-body-wash"
+  },
+  "browse_by_categories": {
+    "title": "Browse by categories",
+    "status": true,
+    "category_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "recommendations_tabs_product": {
+    "status": true,
+    "tabs_product": {
+      "title": "Recommendations",
+      "tabs": [
+        {
+          "tab": "All",
+          "product_ids": [111, 112, 113, 114, 115, 116, 117, 118, 134, 120]
+        },
+        {
+          "tab": "TV & Audio",
+          "product_ids": [121, 122, 123, 124, 125, 126, 127, 128, 129, 130]
+        },
+        {
+          "tab": "Laptop",
+          "product_ids": [131, 132, 133, 134, 135, 136, 137, 138, 139, 115]
+        }
+      ]
+    }
+  },
+  "recommendations_for_you_tabs_product": {
+    "status": true,
+    "tabs_product": {
+      "title": "Recommended for you",
+      "tabs": [
+        {
+          "tab": "New Arrivals",
+          "product_ids": [140, 131, 132, 133, 134, 135, 136, 137, 138, 139, 130, 129]
+        },
+        {
+          "tab": "Top 20",
+          "product_ids": [111, 112, 113, 114, 115, 116, 117, 118, 120, 121, 122, 123]
+        },
+        {
+          "tab": "Most Popular",
+          "product_ids": [125, 124, 133, 135, 120, 118, 114, 111, 136, 178, 140, 137]
+        },
+        {
+          "tab": "Best Rated",
+          "product_ids": [115, 111, 128, 130, 140, 135, 137, 116, 118, 131, 112, 117]
+        },
+        {
+          "tab": "on Sales",
+          "product_ids": [125, 124, 126, 128, 116, 115, 114, 111, 131, 132, 136, 137]
+        }
+      ]
+    }
+  },
+  "best_seller": {
+    "status": true,
+    "title": "Best seller",
+    "product_ids": [111, 112, 113, 114, 115, 116, 117, 118]
+  },
+  "best_seller_banner": {
+    "banner_1": {
+      "image_url": "assets/images/banner/65.jpg",
+      "redirection_type": "product",
+      "link": "classic-design-gps-fitness-smartwatch"
+    },
+    "banner_2": {
+      "image_url": "assets/images/banner/66.jpg",
+      "redirection_type": "product",
+      "link": "premium-alphonso-mango-nectar"
+    }
+  },
+  "feature_brand_banner": {
+    "status": true,
+    "title": "Featured Brands",
+    "feature_banner": [
+      {
+        "image_url": "assets/images/banner/24.jpg",
+        "redirection_type": "product",
+        "link": "mini-split-inverter-air-conditioner-system"
+      },
+      {
+        "image_url": "assets/images/banner/25.jpg",
+        "redirection_type": "product",
+        "link": "premium-alphonso-mango-nectar"
+      },
+      {
+        "image_url": "assets/images/banner/26.jpg",
+        "redirection_type": "product",
+        "link": "ultra-slim-bezel-less-monitor-with-modern-stand"
+      },
+      {
+        "image_url": "assets/images/banner/27.jpg",
+        "redirection_type": "product",
+        "link": "gentle-moisturizing-baby-body-wash"
+      }
+    ],
+    "button_text": "See all deals",
+    "button_link": "/collection"
+  },
+  "banner_with_tabs_product": {
+    "status": true,
+    "banner_top": {
+      "image_url": "assets/images/banner/67.jpg",
+      "redirection_type": "product",
+      "link": "lightweight-wired-on-ear-headphones"
+    },
+    "banner_bottom": {
+      "image_url": "assets/images/banner/68.jpg",
+      "redirection_type": "product",
+      "link": "dolphin-ride-on-toy-teether-set"
+    },
+    "tabs_product": {
+      "title": "Recommendations",
+      "tabs": [
+        {
+          "tab": "Top 20",
+          "product_ids": [111, 112, 113, 114, 115]
+        },
+        {
+          "tab": "Audio & Video",
+          "product_ids": [116, 117, 118, 126, 120]
+        },
+        {
+          "tab": "Laptop",
+          "product_ids": [121, 122, 123, 124, 125]
+        }
+      ]
+    }
+  },
+  "new_trending_laptop": {
+    "status": true,
+    "title": "New & trending laptops",
+    "feature_banner": [
+      {
+        "image_url": "assets/images/banner/69.jpg",
+        "redirection_type": "product",
+        "link": "macbook-pro"
+      },
+      {
+        "image_url": "assets/images/banner/70.jpg",
+        "redirection_type": "product",
+        "link": "11inch-tablet-magnetic-folio-keyboard"
+      },
+      {
+        "image_url": "assets/images/banner/71.jpg",
+        "redirection_type": "product",
+        "link": "13inch-ultra-thin-performance-laptop"
+      },
+      {
+        "image_url": "assets/images/banner/72.jpg",
+        "redirection_type": "product",
+        "link": "premium-14inch-productivity-laptop-silver"
+      },
+      {
+        "image_url": "assets/images/banner/69.jpg",
+        "redirection_type": "product",
+        "link": "11inch-tablet-magnetic-folio-keyboard"
+      }
+    ]
+  },
+  "buy_guide_choice": {
+    "status": true,
+    "title": "Buying guides to help you discover the right choice",
+    "product_ids": [111, 112, 130, 115, 116, 135, 125, 124, 123, 136]
+  },
+  "offer_section_banner": {
+    "banner_1": {
+      "image_url": "assets/images/banner/73.jpg",
+      "redirection_type": "product",
+      "link": "classic-design-gps-fitness-smartwatch"
+    },
+    "banner_2": {
+      "image_url": "assets/images/banner/74.jpg",
+      "redirection_type": "product",
+      "link": "ultra-slim-bezel-less-monitor-with-modern-stand"
+    }
+  },
+  "tags": {
+    "status": true,
+    "title": "Hot Tag:",
+    "tags_ids": [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+    ]
+  },
+  "products_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  "slug": "electro"
+}

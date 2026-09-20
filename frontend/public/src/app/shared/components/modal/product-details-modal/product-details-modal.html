@@ -1,0 +1,149 @@
+<div class="modal-content">
+  <div class="modal-body">
+    <app-button
+      [type]="'button'"
+      [class]="'btn-close'"
+      [id]="'product_detail_close_modal_btn'"
+      [spinner]="false"
+      (click)="modal.close('Cross click')"
+    >
+      <i class="ri-close-line"></i>
+    </app-button>
+    <div class="row g-sm-4 g-3">
+      <div class="col-md-6">
+        <div class="left-box-contain">
+          <div class="swiper quick-main-slider quick-slider-product-box" #swiperContainer2>
+            <div class="swiper-wrapper">
+              @if (
+                product.product_galleries?.length ||
+                (selectedVariation && selectedVariation.variation_galleries.length)
+              ) {
+                @for (
+                  image of selectedVariation && selectedVariation.variation_galleries.length
+                    ? selectedVariation && selectedVariation.variation_galleries
+                    : product.product_galleries;
+                  track image
+                ) {
+                  <div class="swiper-slide">
+                    <div class="slider-image">
+                      @if (videType.includes(image?.mime_type!)) {
+                        <video class="w-100" controls>
+                          <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                        </video>
+                      } @else if (audioType.includes(image?.mime_type!)) {
+                        <audio controls>
+                          <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                        </audio>
+                      } @else {
+                        <img
+                          [src]="image ? image.asset_url : 'assets/images/placeholder/product.png'"
+                          class="img-fluid"
+                          [alt]="product.name"
+                        />
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+            <div class="swiper-button-next">
+              <i class="ri-arrow-right-s-line"></i>
+            </div>
+            <div class="swiper-button-prev">
+              <i class="ri-arrow-left-s-line"></i>
+            </div>
+          </div>
+
+          <div class="swiper quick-thumbnail-product-box quick-thumbnail-slider" #swiperContainer>
+            <div class="swiper-wrapper">
+              @if (
+                product.product_galleries?.length ||
+                (selectedVariation && selectedVariation.variation_galleries.length)
+              ) {
+                @for (
+                  image of selectedVariation && selectedVariation.variation_galleries.length
+                    ? selectedVariation && selectedVariation.variation_galleries
+                    : product.product_galleries;
+                  track image
+                ) {
+                  <div class="swiper-slide">
+                    <div class="image-box">
+                      @if (videType.includes(image?.mime_type!)) {
+                        <video class="w-100" controls>
+                          <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                        </video>
+                      } @else if (audioType.includes(image?.mime_type!)) {
+                        <audio controls>
+                          <source [src]="image ? image.asset_url : ''" [type]="image?.mime_type" />
+                        </audio>
+                      } @else {
+                        <img
+                          [src]="image ? image.asset_url : 'assets/images/placeholder/product.png'"
+                          class="img-fluid"
+                          [alt]="product.name"
+                        />
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="product-right-box">
+          <div class="right-box-contain">
+            <app-product-details
+              [product]="product"
+              [selectedVariation]="selectedVariation ? selectedVariation : product"
+            />
+            <app-product-content
+              [product]="product"
+              (selectedVariant)="selectedVariant($event)"
+              [variant_hover]="false"
+            ></app-product-content>
+
+            <div class="qty-stock-box">
+              <div class="qty-box h-100 qty-container quantity-box-2">
+                <app-button
+                  [id]="'quantity-left-minus' + product.id"
+                  [class]="'btn qty-btn qty-btn-minus'"
+                  [iconClass]="'ri-subtract-line'"
+                  [spinner]="false"
+                  (click)="updateQuantity(-1)"
+                >
+                </app-button>
+                <input
+                  type="number"
+                  name="qty"
+                  class="qty-input form-control input-qty"
+                  [value]="productQty"
+                />
+                <app-button
+                  [id]="'quantity-left-plus' + product.id"
+                  [class]="'btn qty-btn qty-btn-plus'"
+                  [iconClass]="'ri-add-line'"
+                  [spinner]="false"
+                  (click)="updateQuantity(1)"
+                >
+                </app-button>
+              </div>
+              <app-button
+                [class]="'btn buy-btn theme-border fw-500'"
+                [id]="'addcartbtnVariation' + product.id"
+                [spinner]="true"
+                [type]="'button'"
+                (click)="addToCart(product)"
+              >
+                <i class="ri-shopping-bag-line"></i>
+                {{ 'Add to bag' | translate }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

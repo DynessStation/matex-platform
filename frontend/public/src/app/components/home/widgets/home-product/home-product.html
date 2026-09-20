@@ -1,0 +1,196 @@
+@if (style() === 'minimal') {
+  <div class="row g-3">
+    @for (product of products; track product; let i = $index) {
+      <div [ngClass]="i < 3 ? 'col-xxl-4 col-lg-6 col-sm-4 col-6' : 'col-6'">
+        <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+      </div>
+    }
+  </div>
+} @else if (style() === 'column') {
+  @for (product of products; track product) {
+    <app-product-box [product]="product" [productBoxStyle]="type()"></app-product-box>
+  }
+} @else if (style() === 'column_four') {
+  @for (product of products; track product) {
+    <li>
+      <div class="vertical-sm-product">
+        <a [routerLink]="['/product', product?.slug]" class="product-image">
+          <img [src]="product?.product_thumbnail?.asset_url" class="img-fluid" alt="image" />
+        </a>
+        <div class="product-content">
+          <h6>
+            <a [routerLink]="['/brand', product?.brand?.slug]">{{ product?.brand?.name }}</a>
+          </h6>
+          <a [routerLink]="['/product', product?.slug]">
+            <h6 class="name">{{ product?.name }}</h6>
+          </a>
+          <h6 class="price price-sm">
+            {{ product?.sale_price | currencySymbol }}
+            <del>{{ product?.price | currencySymbol }}</del>
+          </h6>
+        </div>
+      </div>
+    </li>
+  }
+} @else if (style() === 'product_box_two' && type() === 'column') {
+  @for (product of products; track product) {
+    <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+  }
+} @else if (style() === 'product_box_three') {
+  <div class="swiper category-slider" #categorySwiperContainer>
+    <div class="swiper-wrapper">
+      @for (product of products; track product) {
+        <div class="swiper-slide">
+          <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (style() === '2_column_slider') {
+  <div class="swiper slider-2 slider-pagination" #columnSwiperContainer>
+    <div class="swiper-wrapper">
+      @for (
+        chunk of chunkProducts(productIds() | slice: 0 : productIds()?.length, 2);
+        let i = $index;
+        track $index
+      ) {
+        <div class="swiper-slide">
+          <ul class="top-trending-product-list">
+            @for (productId of chunk; track productId) {
+              <app-home-product
+                [productIds]="[productId]"
+                [style]="'column'"
+                [type]="'horizontal'"
+              ></app-home-product>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+} @else if (style() === 'column_slider') {
+  <div
+    class="swiper product-box-slider product-six-slider slider-bottom-spacing"
+    #columnSwiperContainer
+  >
+    <div class="swiper-wrapper">
+      @for (
+        chunk of chunkProducts(productIds() | slice: 0 : productIds()?.length, 2);
+        let i = $index;
+        track $index
+      ) {
+        <div class="swiper-slide">
+          <div class="row">
+            @for (productId of chunk; track productId) {
+              <div class="col-12">
+                <app-home-product
+                  [productIds]="[productId]"
+                  [style]="'product_box_two'"
+                  [type]="'column'"
+                ></app-home-product>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (style() === 'column_slider_three') {
+  <div class="swiper product-six-slider slider-bottom-spacing" #columnSwiperContainer>
+    <div class="swiper-wrapper">
+      @for (
+        chunk of chunkProducts(productIds() | slice: 0 : productIds()?.length, 2);
+        let i = $index;
+        track $index
+      ) {
+        <div class="swiper-slide">
+          <div class="row">
+            @for (productId of chunk; track productId) {
+              <div class="col-12">
+                <app-home-product
+                  [productIds]="[productId]"
+                  [type]="'product_box_one'"
+                  [style]="'column'"
+                ></app-home-product>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (style() === 'column_slider_four') {
+  <div class="swiper best-seller-slider" #columnSwiperContainer>
+    <div class="swiper-wrapper">
+      @for (
+        chunk of chunkProducts(productIds() | slice: 0 : productIds()?.length, 4);
+        let i = $index;
+        track $index
+      ) {
+        <div class="swiper-slide">
+          <ul class="recommendations-product-list-2 recommendations-border">
+            @for (productId of chunk; track productId) {
+              <app-home-product
+                [productIds]="[productId]"
+                [style]="'column_four'"
+              ></app-home-product>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (style() === 'product-slider') {
+  <div class="swiper recent-product-slider" #productSliderSwiperOption>
+    <div class="swiper-wrapper">
+      @for (product of products; track product) {
+        <div class="swiper-slide">
+          <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (style() === 'product-slider-two') {
+  <div class="swiper discover-product-slider" #productSliderTwoSwiperOption>
+    <div class="swiper-wrapper">
+      @for (product of products; track product) {
+        <div class="swiper-slide">
+          <a [routerLink]="['/product/' + product?.slug]" class="discover-product-box">
+            <div class="product-image">
+              <img
+                [src]="product?.product_thumbnail?.asset_url"
+                [alt]="product?.name"
+                class="img-fluid"
+              />
+            </div>
+            <div class="product-name">
+              <h5>{{ product?.name }}</h5>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (type() === 'trending-product') {
+  <div
+    class="swiper seller-top-trending product-box-slider slider-bottom-spacing"
+    #trendingProductSwiperContainer
+  >
+    <div class="swiper-wrapper">
+      @for (product of products; track product) {
+        <div class="swiper-slide">
+          <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="row g-sm-4 g-3">
+    @for (product of products; track product) {
+      <div [class]="col()">
+        <app-product-box [product]="product" [productBoxStyle]="style()"></app-product-box>
+      </div>
+    }
+  </div>
+}

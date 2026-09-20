@@ -1,0 +1,77 @@
+/*! -----------------------------------------------------------------------------------
+    Template Name: Kartify Admin
+    Template URI: https://angular.pixelstrap.com/kartify
+    Description: This is Angular Admin theme
+    Author: Pixelstrap
+    Author URI: https://themeforest.net/user/pixelstrap
+----------------------------------------------------------------------------------- !*/
+
+/* ---------------------
+	*** utils ***
+-----------------------*/
+@use 'utils/variables';
+@use 'utils/breakpoints';
+@use 'utils/mixins';
+
+/* ---------------------
+	*** base ***
+-----------------------*/
+@use 'base/reset';
+@use 'base/typography';
+
+/* ---------------------
+	*** components ***
+-----------------------*/
+@use 'components/alert';
+@use 'components/badge';
+@use 'components/breadcrumb';
+@use 'components/buttons';
+@use 'components/card';
+@use 'components/country-flag';
+@use 'components/dropdown';
+@use 'components/forms';
+@use 'components/loader';
+@use 'components/label';
+@use 'components/modal';
+@use 'components/pagination';
+@use 'components/radio';
+@use 'components/switch';
+@use 'components/tab';
+@use 'components/table';
+@use 'components/tree';
+
+/* ---------------------
+	*** layout ***
+-----------------------*/
+@use 'layout/footer';
+@use 'layout/header';
+@use 'layout/navs';
+@use 'layout/product';
+@use 'layout/rtl';
+@use 'layout/search';
+@use 'layout/select2';
+@use 'layout/sidebar';
+@use 'layout/skeleton-loader';
+
+/* ---------------------
+	*** pages ***
+-----------------------*/
+@use 'pages/checkout';
+@use 'pages/errorpage';
+@use 'pages/dashboard';
+@use 'pages/login';
+@use 'pages/media';
+@use 'pages/notification';
+@use 'pages/order-tracking';
+@use 'pages/pos';
+@use 'pages/shipping';
+@use 'pages/theme-option';
+@use 'pages/wallet';
+
+/* ---------------------
+	*** themes ***
+-----------------------*/
+@use 'themes/dark';
+@use 'themes/dark-sidebar';
+@use 'themes/update';
+@use 'themes/responsive';

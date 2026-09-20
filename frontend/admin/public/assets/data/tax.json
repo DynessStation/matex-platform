@@ -1,0 +1,38 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 1,
+      "name": "Sales Tex",
+      "rate": "5.00",
+      "status": 1,
+      "created_by_id": "1",
+      "created_at": "2025-05-02T09:26:57.000000Z",
+      "updated_at": "2025-05-02T09:26:57.000000Z",
+      "deleted_at": null
+    }
+  ],
+  "from": 1,
+  "last_page": 1,
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "per_page": 1,
+  "prev_page_url": null,
+  "to": 1,
+  "total": 1
+}

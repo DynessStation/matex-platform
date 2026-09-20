@@ -1,0 +1,6 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+<section class="section-b-space ckeditor-content">
+  <div class="container">
+    <div [innerHTML]="(selectedPage$ | async)?.content"></div>
+  </div>
+</section>

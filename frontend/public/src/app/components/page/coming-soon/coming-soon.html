@@ -1,0 +1,38 @@
+@if (themeOption$ | async) {
+  <section class="coming-soon-section">
+    <div class="container-fluid h-100 p-0">
+      <div class="row g-0 h-100">
+        <div class="col-xl-6 h-100">
+          <div class="coming-soon-contain">
+            <a [routerLink]="['/']" class="coming-soon-logo">
+              <img
+                [src]="(themeOption$ | async)?.coming_soon?.theme_logo"
+                class="img-fluid"
+                alt="logo"
+              />
+            </a>
+            <h2>{{ (themeOption$ | async)?.coming_soon?.title }}</h2>
+            <p>{{ (themeOption$ | async)?.coming_soon?.description }}</p>
+            <div class="counter-box" id="countdown">
+              <app-timer [type]="'timer-three'" />
+            </div>
+
+            <div class="form-group form-box">
+              <input type="email" class="form-control" placeholder="Enter your email" />
+              <button class="btn">{{ (themeOption$ | async)?.coming_soon?.button_text }}</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 d-xl-block d-none">
+          <div class="coming-soon-image">
+            <img
+              [src]="(themeOption$ | async)?.coming_soon?.image_url"
+              class="img-fluid"
+              alt="image"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}

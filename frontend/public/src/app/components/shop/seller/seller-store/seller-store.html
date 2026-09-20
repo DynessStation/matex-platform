@@ -1,0 +1,37 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+@if (style === 'seller_grid' || style === 'seller_list') {
+  <section class="seller-section section-t-space">
+    <div class="custom-container">
+      <app-stores [filter]="filter" [style]="style" />
+    </div>
+  </section>
+
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+}
+@if (style === 'seller_grid_2' || style === 'seller_list_2') {
+  <section class="section-t-space shop-section">
+    <div class="custom-container">
+      <div class="row">
+        <div class="col-custom-3">
+          <div class="left-box">
+            <app-store-filter [filter]="filter" />
+          </div>
+        </div>
+        <div class="col-custom-9">
+          <app-stores [filter]="filter" [style]="style" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+}

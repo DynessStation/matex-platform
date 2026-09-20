@@ -1,0 +1,51 @@
+<div class="dashboard-order">
+  <div class="title d-block">
+    <h3>My Orders History</h3>
+  </div>
+
+  <div class="order-contain">
+    @if ((order$ | async)?.data?.length) {
+      <div class="table-responsive dashboard-order-table">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order Number</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Payment Status</th>
+              <th>Payment Method</th>
+              <th>Option</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of (order$ | async)?.data; track order; let i = $index) {
+              <tr>
+                <td>#{{ order.order_number }}</td>
+                <td>{{ order?.created_at | date: 'dd MMM yyyy hh:mm:a' }}</td>
+                <td class="txt-primary-color fw-500">{{ order?.total | currencySymbol }}</td>
+                <td>
+                  <div class="badge bg-{{ order?.payment_status?.toLowerCase() }} custom-badge">
+                    <span>{{ order?.payment_status | titlecase }}</span>
+                  </div>
+                </td>
+                <td>{{ order?.payment_method?.toUpperCase() }}</td>
+                <td>
+                  <a [routerLink]="['/account/order/details', order.order_number]">
+                    <i class="ri-eye-line"></i>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <app-no-data
+        [class]="'no-data-added'"
+        [image]="'assets/svg/empty-items.svg'"
+        [text]="'no_order' | translate"
+        [description]="'no_order_yet' | translate"
+      />
+    }
+  </div>
+</div>

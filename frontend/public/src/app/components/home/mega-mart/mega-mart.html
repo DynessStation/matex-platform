@@ -1,0 +1,344 @@
+@if (data()?.categories?.status) {
+  <section class="mt-20">
+    <div class="custom-container">
+      <div class="category-bg-color">
+        <app-home-category
+          [categoryIds]="data()?.categories?.category_ids!"
+          [option]="swiperOption"
+        ></app-home-category>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="custom-row row">
+      <div class="custom-xxl-2 col-xl-3 d-xl-block d-none">
+        <app-home-banner
+          [image]="data()?.home_selection?.banner_1"
+          [className]="'banner-box h-100 hover-effect'"
+          [imageClass]="'bg-img b-left'"
+          [bgImage]="true"
+        ></app-home-banner>
+      </div>
+      <div class="custom-xxl-7 col-xl-6 col-md-8 d-md-block d-none">
+        <app-home-banner
+          [image]="data()?.home_selection?.banner_2"
+          [className]="'banner-box h-100 hover-effect'"
+          [imageClass]="'bg-img b-left'"
+          [bgImage]="true"
+        ></app-home-banner>
+      </div>
+      <div class="custom-xxl-3 col-xl-3 col-md-4">
+        <div class="row custom-row ratio_50">
+          <div class="col-md-12 col-sm-6">
+            <app-home-banner
+              [image]="data()?.home_selection?.banner_3"
+              [className]="'banner-box b-left hover-effect'"
+              [imageClass]="'bg-img b-left'"
+              [bgImage]="true"
+            ></app-home-banner>
+          </div>
+          <div class="col-md-12 col-sm-6 pt-md-3 pt-sm-0 pt-3">
+            <app-home-banner
+              [image]="data()?.home_selection?.banner_4"
+              [className]="'banner-box b-left hover-effect'"
+              [imageClass]="'bg-img'"
+              [bgImage]="true"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+@if (data()?.deal_product?.status && data()?.deal_product?.product_ids?.length) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3>
+            {{ data()?.deal_product?.title }} <span>({{ data()?.deal_product?.sub_title }})</span>
+          </h3>
+          <app-button
+            [buttonLink]="data()?.deal_product?.button_link!"
+            [buttonText]="data()?.deal_product?.button_text!"
+          />
+        </div>
+        <div class="row g-3">
+          <div class="col-xl-9">
+            <app-home-product
+              [productIds]="data()?.deal_product?.product_ids!"
+              [style]="'product_box_three'"
+            ></app-home-product>
+          </div>
+          <div class="col-xl-3 d-xl-block d-none">
+            <app-home-banner
+              [image]="data()?.sale_banner?.banner"
+              [className]="'banner-box h-100'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+@if (data()?.most_wishes_product?.status && data()?.most_wishes_product?.product_ids?.length) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3>
+            {{ data()?.most_wishes_product?.title }}
+            <span>({{ data()?.most_wishes_product?.sub_title }})</span>
+          </h3>
+          <app-button
+            [buttonLink]="data()?.most_wishes_product?.button_link!"
+            [buttonText]="data()?.most_wishes_product?.button_text!"
+          />
+        </div>
+        <div class="row g-3">
+          <div class="col-xl-9">
+            <app-home-product
+              [productIds]="data()?.most_wishes_product?.product_ids!"
+              [style]="'product_box_three'"
+            ></app-home-product>
+          </div>
+          <div class="col-xl-3 d-xl-block d-none">
+            <app-home-banner
+              [image]="data()?.most_wishes_banner?.banner"
+              [className]="'banner-box h-100 hover-effect'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+@if (data()?.summer_sale_banner?.banner) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <app-home-banner
+        [image]="data()?.summer_sale_banner?.banner"
+        [className]="'banner-box-16'"
+      ></app-home-banner>
+    </div>
+  </section>
+}
+@if (data()?.feature_brand_banner?.status) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3 class="d-block">{{ data()?.feature_brand_banner?.title }}</h3>
+          <app-button
+            [buttonLink]="data()?.feature_brand_banner?.button_link!"
+            [buttonText]="data()?.feature_brand_banner?.button_text!"
+          />
+        </div>
+        <div class="swiper banner-slider" #bannerSwiperContainer>
+          <div class="swiper-wrapper">
+            @for (feature of data()?.feature_brand_banner?.feature_banner; track feature) {
+              <div class="swiper-slide">
+                <app-home-banner [image]="feature" [className]="'banner-box-17'"></app-home-banner>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+@if (
+  data()?.sports_healthcare_categories?.status &&
+  data()?.sports_healthcare_categories?.product_ids?.length
+) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3>{{ data()?.sports_healthcare_categories?.title }}</h3>
+          <app-button
+            [buttonLink]="data()?.sports_healthcare_categories?.button_link!"
+            [buttonText]="data()?.sports_healthcare_categories?.button_text!"
+          />
+        </div>
+        <div class="row g-3">
+          <div class="col-xl-3 d-xl-block d-none">
+            <app-home-banner
+              [image]="data()?.sports_healthcare_categories_banner?.banner"
+              [className]="'banner-box-14 h-100'"
+            ></app-home-banner>
+          </div>
+          <div class="col-xl-9">
+            <app-home-product
+              [productIds]="data()?.sports_healthcare_categories?.product_ids!"
+              [style]="'product_box_three'"
+            ></app-home-product>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+<section class="section-t-space">
+  <div class="custom-container">
+    <div class="row g-sm-4 g-3">
+      @if (data()?.product_section?.more_item) {
+        <div class="col-xxl-3 col-md-6">
+          <div class="light-bg-color">
+            <div class="title-2">
+              <h3>{{ data()?.product_section?.more_item?.title }}</h3>
+            </div>
+            <app-home-deal-products
+              [type]="'product-gallery'"
+              [productIds]="data()?.product_section?.more_item?.product_ids!"
+            />
+          </div>
+        </div>
+      }
+      @if (data()?.product_section?.shopping_continue) {
+        <div class="col-xxl-3 col-md-6">
+          <div class="light-bg-color">
+            <div class="title-2">
+              <h3>{{ data()?.product_section?.shopping_continue?.title }}</h3>
+            </div>
+            <app-home-deal-products
+              [type]="'single-product'"
+              [productIds]="data()?.product_section?.shopping_continue?.product_ids!"
+            />
+          </div>
+        </div>
+      }
+      @if (data()?.product_section?.new_collection) {
+        <div class="col-xxl-3 col-md-6">
+          <div class="light-bg-color">
+            <div class="title-2">
+              <h3>{{ data()?.product_section?.new_collection?.title }}</h3>
+            </div>
+            <app-home-category
+              [type]="'two-column-category'"
+              [categoryIds]="data()?.product_section?.new_collection?.category_ids!"
+            ></app-home-category>
+          </div>
+        </div>
+      }
+      @if (data()?.product_section?.electronic_device) {
+        <div class="col-xxl-3 col-md-6">
+          <div class="light-bg-color">
+            <div class="title-2">
+              <h3>{{ data()?.product_section?.electronic_device?.title }}</h3>
+            </div>
+            <app-home-category
+              [type]="'two-column-category'"
+              [categoryIds]="data()?.product_section?.electronic_device?.category_ids!"
+            ></app-home-category>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+@if (data()?.beauty_food_product?.status && data()?.beauty_food_product?.product_ids?.length) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3>{{ data()?.beauty_food_product?.title }}</h3>
+          <app-button
+            [buttonLink]="data()?.beauty_food_product?.button_link!"
+            [buttonText]="data()?.beauty_food_product?.button_text!"
+          />
+        </div>
+        <div class="row g-3">
+          <div class="col-xl-9">
+            <app-home-product
+              [productIds]="data()?.beauty_food_product?.product_ids!"
+              [style]="'product_box_three'"
+            ></app-home-product>
+          </div>
+          <div class="col-xl-3 d-xl-block d-none">
+            <app-home-banner
+              [image]="data()?.beauty_food_product_banner?.banner"
+              [className]="'banner-box h-100'"
+            ></app-home-banner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+@if (data()?.browsing_history?.status) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2 title-flex justify-content-between">
+          <h3>
+            {{ data()?.browsing_history?.title }}
+            <span class="small-title">({{ data()?.browsing_history?.sub_title }})</span>
+          </h3>
+          <app-button
+            [buttonLink]="data()?.browsing_history?.button_link!"
+            [buttonText]="data()?.browsing_history?.button_text!"
+          />
+        </div>
+        <app-home-category
+          [categoryIds]="data()?.categories?.category_ids!"
+          [option]="browsingSwiperOption"
+        ></app-home-category>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data()?.tags?.status) {
+  <section class="section-t-space d-md-block d-none">
+    <div class="custom-container">
+      <div class="light-bg-color">
+        <div class="title-2">
+          <h3>{{ data()?.tags?.title }}</h3>
+        </div>
+        <ul class="hot-tag-list">
+          <app-home-tags [tagsIds]="data()?.tags?.tags_ids!"></app-home-tags>
+        </ul>
+      </div>
+    </div>
+  </section>
+}
+
+@if (data()?.banner_section) {
+  <section class="section-t-space banner-section">
+    <div class="custom-container">
+      <div class="banner-row">
+        <div class="swiper product-banner-slider" #bannerSectionSwiperContainer>
+          <div class="swiper-wrapper">
+            @for (banner of data()?.banner_section?.banner; track banner) {
+              <div class="swiper-slide">
+                <app-home-banner [image]="banner" [className]="'wow fadeInUp'"></app-home-banner>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="section-block-space">
+  <div class="custom-container">
+    <app-home-newsletter [type]="'newsletter-two'"></app-home-newsletter>
+  </div>
+</section>
+
+@if (data()?.services?.status) {
+  <section class="section-block-space service-section">
+    <div class="custom-container">
+      <ul class="service-list">
+        <app-home-service [serviceIds]="data()?.services?.service_ids!"></app-home-service>
+      </ul>
+    </div>
+  </section>
+}

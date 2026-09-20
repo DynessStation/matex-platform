@@ -1,0 +1,62 @@
+/**=====================
+    3.7 Mobile Menu CSS
+==========================**/
+.mobile-menu {
+  position: fixed;
+  bottom: 0;
+  padding: 15px 10px 10px;
+  width: 100%;
+  background-color: rgba(var(--white), 1);
+  z-index: 4;
+  overflow: hidden;
+  box-shadow: 0 -3px 10px 0px rgba(var(--black), 0.08);
+
+  ul {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+
+    li {
+      width: 100%;
+      text-align: center;
+
+      a {
+        display: block;
+        color: rgba(var(--title-color), 1);
+
+        &.active {
+          transition: 0.3s ease;
+          position: relative;
+
+          i {
+            color: rgba(var(--primary-color), 1);
+          }
+
+          span {
+            color: rgba(var(--primary-color), 1);
+          }
+        }
+
+        &.active,
+        &:hover {
+          color: rgba(var(--title-color), 1);
+        }
+
+        i {
+          display: block;
+          margin: 0 auto;
+          font-size: calc(20px + (22 - 20) * ((100vw - 320px) / (1920 - 320)));
+          color: rgba(var(--content-color), 1);
+          line-height: 1;
+        }
+
+        span {
+          display: inline-block;
+          color: rgba(var(--content-color), 0.8);
+          line-height: 1;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+}

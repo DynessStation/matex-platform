@@ -1,0 +1,49 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    3.6 Home CSS
+==========================**/
+.home-section {
+  padding-top: calc(8px + (20 - 8) * ((100vw - 320px) / (1920 - 320)));
+
+  .custom-home-row {
+    .custom-xxl-3 {
+      @include min(1400px) {
+        width: 23.55%;
+      }
+    }
+
+    .custom-xxl-9 {
+      @include min(1400px) {
+        width: calc(100% - 23.55%);
+      }
+    }
+  }
+}
+
+.baby-home-section {
+  @include max(767.98px) {
+    .banner-box {
+      background: none !important;
+
+      img {
+        display: block !important;
+      }
+
+      &::before {
+        content: none;
+      }
+    }
+  }
+
+  .right-banner-1,
+  .right-banner-2 {
+    @include max(575.98px) {
+      .banner-box {
+        img {
+          aspect-ratio: 23/20;
+        }
+      }
+    }
+  }
+}

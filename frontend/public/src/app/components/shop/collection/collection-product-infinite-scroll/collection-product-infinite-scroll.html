@@ -1,0 +1,25 @@
+<section class="section-t-space shop-section">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-custom-3">
+        <div class="left-box" [class.show]="layoutService.offCanvasFilterMenu">
+          <app-collection-sidebar [filter]="filter()"></app-collection-sidebar>
+        </div>
+      </div>
+
+      <div class="col-custom-9">
+        @if (bannerImageUrl) {
+          <a href="javascript:void()" class="banner-main-box mb-4">
+            <div class="banner-image">
+              <img [src]="bannerImageUrl" class="img-fluid" alt="image" />
+            </div>
+          </a>
+        }
+        <app-collection-products
+          [filter]="filter()!"
+          [infiniteScroll]="true"
+        ></app-collection-products>
+      </div>
+    </div>
+  </div>
+</section>

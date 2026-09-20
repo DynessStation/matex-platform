@@ -1,0 +1,98 @@
+<div class="dashboard-home">
+  <div class="title d-block">
+    <h3>Welcome Back Kennedy Page</h3>
+    <p class="mt-2 fw-normal">
+      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque, optio laudantium obcaecati
+      quae vero deleniti distinctio nesciunt ad facere vitae voluptates. Minima necessitatibus animi
+      sed optio recusandae mollitia dolores suscipit!
+    </p>
+  </div>
+  <div class="row g-md-4 g-3">
+    <div class="col-md-4">
+      <div class="counter-box">
+        <div class="icon-box">
+          <i class="iconsax" icon-name="wallet-4"></i>
+        </div>
+        <div>
+          <h5>{{ 'balance' | translate }}</h5>
+          <h3>
+            {{ ((user$ | async)?.wallet ? (user$ | async)?.wallet?.balance : 0) | currencySymbol }}
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="counter-box">
+        <div class="icon-box">
+          <i class="iconsax" icon-name="coins-2"></i>
+        </div>
+        <div>
+          <h5>{{ 'total_points' | translate }}</h5>
+          <h3>{{ (user$ | async)?.point ? (user$ | async)?.point?.balance : 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="counter-box">
+        <div class="icon-box">
+          <i class="iconsax" icon-name="package"></i>
+        </div>
+        <div>
+          <h5>{{ 'total_orders' | translate }}</h5>
+          <h3>{{ (user$ | async)?.orders_count ? (user$ | async)?.orders_count : 0 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="box-account box-info">
+    <div class="box-head">
+      <h4>{{ 'account_information' | translate }}</h4>
+    </div>
+    <div class="box">
+      <ul class="box-content">
+        <li>
+          <h6>{{ 'name' | translate }}: {{ (user$ | async)?.name | titlecase }}</h6>
+        </li>
+        <li>
+          <h6>
+            {{ 'phone' | translate }}: +{{ (user$ | async)?.country_code }}
+            {{ (user$ | async)?.phone }}
+          </h6>
+        </li>
+
+        @if (address) {
+          <li>
+            <h6>
+              {{ 'address' | translate }}: {{ address.street }} {{ address.city }},
+              {{ address.state.name }}, {{ address.country.name }}
+              {{ address.pincode }}
+            </h6>
+          </li>
+        }
+      </ul>
+    </div>
+    <div class="box mt-3">
+      <div class="box-head">
+        <h4>{{ 'login_details' | translate }}</h4>
+      </div>
+      <div class="row g-sm-4 g-2">
+        <div class="col-sm-6">
+          <div class="box-address-box">
+            <h6>
+              {{ 'email' | translate }} : <span>{{ (user$ | async)?.email }}</span>
+            </h6>
+            <a href="javascript:void(0)" (click)="openModal('profile')">{{ 'edit' | translate }}</a>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="box-address-box">
+            <h6>{{ 'password' | translate }} : <span>●●●●●●</span></h6>
+            <a href="javascript:void(0)" (click)="openModal('password')">{{
+              'edit' | translate
+            }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

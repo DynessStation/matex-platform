@@ -1,0 +1,18 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'office.edit_title' | translate"
+>
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/office'"
+      (retry)="retryDetail()"
+    />
+  } @else if (office$ | async; as office) {
+    <app-form-office
+      [mode]="'edit'"
+      [editData]="office"
+      (formSubmit)="submit($event)"
+    />
+  }
+</app-page-wrapper>

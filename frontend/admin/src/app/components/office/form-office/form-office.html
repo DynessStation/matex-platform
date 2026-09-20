@@ -1,0 +1,648 @@
+<form
+  class="theme-form theme-form-2 mega-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs office-nav">
+    <!-- GENERAL -->
+
+    <li [ngbNavItem]="'general'">
+      <button ngbNavLink type="button">
+        {{ 'office.general' | translate }}
+      </button>
+
+      <ng-template ngbNavContent>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <label class="form-label">
+              {{ 'office.code' | translate }} *
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="office_code"
+              placeholder="HO-BGR"
+              [class.is-invalid]="
+                form.controls.office_code.touched &&
+                form.controls.office_code.invalid
+              "
+            />
+            @if (
+              form.controls.office_code.touched &&
+              form.controls.office_code.errors?.['required']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.code_required' | translate }}
+              </div>
+            }
+
+            @if (
+              form.controls.office_code.touched &&
+              form.controls.office_code.errors?.['pattern']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.code_pattern' | translate }}
+              </div>
+            }
+
+            @if (
+              form.controls.office_code.touched &&
+              form.controls.office_code.errors?.['maxlength']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.code_max_length' | translate }}
+              </div>
+            }
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label"> {{ 'office.name' | translate }} *</label>
+
+            <input
+              class="form-control"
+              formControlName="office_name"
+              [placeholder]="'office.name_placeholder' | translate"
+              [class.is-invalid]="
+                form.controls.office_name.touched &&
+                form.controls.office_name.invalid
+              "
+            />
+
+            @if (
+              form.controls.office_name.touched &&
+              form.controls.office_name.errors?.['required']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.name_required' | translate }}
+              </div>
+            }
+
+            @if (
+              form.controls.office_name.touched &&
+              form.controls.office_name.errors?.['maxlength']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.name_max_length' | translate }}
+              </div>
+            }
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.description' | translate }}
+            </label>
+
+            <textarea
+              rows="5"
+              class="form-control"
+              formControlName="office_description"
+              [placeholder]="'office.description_placeholder' | translate"
+            ></textarea>
+          </div>
+        </div>
+      </ng-template>
+    </li>
+
+    <!-- LOCATION -->
+
+    <li [ngbNavItem]="'location'">
+      <button ngbNavLink type="button">
+        {{ 'office.location' | translate }}
+      </button>
+
+      <ng-template ngbNavContent>
+        <app-location-picker
+          [value]="locationValue"
+          (locationChange)="locationChanged($event)"
+        />
+
+        <div class="row g-3 mt-2">
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.address' | translate }}
+            </label>
+
+            <input class="form-control" formControlName="address" readonly />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label"> {{ 'office.city' | translate }} </label>
+
+            <input class="form-control" formControlName="city" readonly />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              {{ 'office.province' | translate }}
+            </label>
+
+            <input class="form-control" formControlName="province" readonly />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">
+              {{ 'office.postal_code' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="postal_code"
+              readonly
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">
+              {{ 'office.latitude' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              [value]="form.controls.lat.value ?? ''"
+              readonly
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">
+              {{ 'office.longitude' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              [value]="form.controls.lng.value ?? ''"
+              readonly
+            />
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="office-switch-row mb-3">
+          <label class="switch">
+            <input
+              id="attendance_enabled"
+              type="checkbox"
+              formControlName="attendance_enabled"
+            />
+
+            <span class="switch-state"></span>
+          </label>
+
+          <label class="office-switch-label" for="attendance_enabled">
+            {{ 'office.enable_attendance_geofence' | translate }}
+          </label>
+        </div>
+
+        @if (form.controls.attendance_enabled.value) {
+          <div class="col-md-4">
+            <label class="form-label">
+              {{ 'office.attendance_radius' | translate }}
+            </label>
+
+            <div class="input-group">
+              <input
+                type="number"
+                min="1"
+                class="form-control"
+                formControlName="attendance_radius_meter"
+                [class.is-invalid]="
+                  form.controls.attendance_radius_meter.touched &&
+                  form.controls.attendance_enabled.value &&
+                  (form.controls.attendance_radius_meter.value === null ||
+                    form.controls.attendance_radius_meter.value <= 0)
+                "
+              />
+
+              <span class="input-group-text">
+                {{ 'office.meter' | translate }}
+              </span>
+            </div>
+            @if (
+              form.controls.attendance_radius_meter.touched &&
+              form.controls.attendance_enabled.value &&
+              (form.controls.attendance_radius_meter.value === null ||
+                form.controls.attendance_radius_meter.value <= 0)
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.attendance_radius_positive' | translate }}
+              </div>
+            }
+          </div>
+        }
+      </ng-template>
+    </li>
+
+    <!-- CONTACT -->
+
+    <li [ngbNavItem]="'contact'">
+      <button ngbNavLink type="button">
+        {{ 'office.contact' | translate }}
+      </button>
+
+      <ng-template ngbNavContent>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <label class="form-label"> {{ 'office.email' | translate }} </label>
+
+            <input
+              type="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="
+                form.controls.email.touched && form.controls.email.invalid
+              "
+            />
+            @if (
+              form.controls.email.touched &&
+              form.controls.email.errors?.['email']
+            ) {
+              <div class="text-danger form-error">
+                {{ 'office.validation.email_invalid' | translate }}
+              </div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label"> {{ 'office.phone' | translate }} </label>
+
+            <input class="form-control" formControlName="phone" />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.website_url' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="website_url"
+              placeholder="https://..."
+            />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.google_business_url' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="google_business_url"
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+      </ng-template>
+    </li>
+
+    <!-- HOURS -->
+
+    <li [ngbNavItem]="'hours'">
+      <button ngbNavLink type="button">
+        {{ 'office.operating_hours' | translate }}
+      </button>
+
+      <ng-template ngbNavContent>
+        @if (scheduleError) {
+          <div class="alert alert-danger">
+            {{ scheduleError }}
+          </div>
+        }
+
+        <div class="operating-hours">
+          @for (day of operatingDays; track day.day_of_week) {
+            <div class="operating-day">
+              <!-- DAY -->
+
+              <div class="operating-day-name">
+                <strong>
+                  {{ weekdayLabel(day.day_of_week) }}
+                </strong>
+
+                <div class="office-switch-row">
+                  <label class="switch switch-sm">
+                    <input
+                      type="checkbox"
+                      [checked]="!day.is_closed"
+                      (change)="toggleDay(day)"
+                    />
+
+                    <span class="switch-state"></span>
+                  </label>
+
+                  <span class="office-switch-label">
+                    {{
+                      (day.is_closed ? 'office.closed' : 'office.open')
+                        | translate
+                    }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- TIME RANGES -->
+
+              <div class="operating-ranges">
+                @if (!day.is_closed) {
+                  @for (range of day.ranges; track $index) {
+                    <div class="operating-range">
+                      <!-- OPEN -->
+
+                      <div class="operating-time">
+                        <ngb-timepicker
+                          [(ngModel)]="range.open_time"
+                          [ngModelOptions]="{
+                            standalone: true,
+                          }"
+                          [meridian]="localization.useMeridian()"
+                          [seconds]="false"
+                          [spinners]="true"
+                          [hourStep]="1"
+                          [minuteStep]="5"
+                        />
+                      </div>
+
+                      <!-- SEPARATOR -->
+
+                      <span class="operating-time-separator"> - </span>
+
+                      <!-- CLOSE -->
+
+                      <div class="operating-time">
+                        <ngb-timepicker
+                          [(ngModel)]="range.close_time"
+                          [ngModelOptions]="{
+                            standalone: true,
+                          }"
+                          [meridian]="localization.useMeridian()"
+                          [seconds]="false"
+                          [spinners]="true"
+                          [hourStep]="1"
+                          [minuteStep]="5"
+                        />
+                      </div>
+
+                      <!-- DELETE -->
+
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-light-bg operating-range-delete"
+                        [title]="'office.remove_time_range' | translate"
+                        (click)="removeRange(day, $index)"
+                      >
+                        <i class="ri-delete-bin-line"></i>
+                      </button>
+                    </div>
+                  }
+
+                  <!-- ADD RANGE -->
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-theme operating-range-add"
+                    (click)="addRange(day)"
+                  >
+                    <i class="ri-add-line"></i>
+
+                    {{ 'office.add_time_range' | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </ng-template>
+    </li>
+
+    <!-- MEDIA -->
+
+    <li *hasPermission="'attachment.view'" [ngbNavItem]="'media'">
+      <button ngbNavLink type="button">{{ 'office.media' | translate }}</button>
+
+      <ng-template ngbNavContent>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="mb-1">{{ 'office.gallery' | translate }}</h5>
+
+            <small class="text-muted">
+              {{ 'office.gallery_help' | translate }}
+            </small>
+          </div>
+
+          <button type="button" class="btn btn-theme" (click)="openMedia()">
+            <i class="ri-image-add-line"></i>
+
+            {{ 'office.select_media' | translate }}
+          </button>
+        </div>
+
+        @if (officeMedia.length) {
+          <div class="office-media-list">
+            @for (
+              media of officeMedia;
+              track media.attachment.id_attachment;
+              let index = $index
+            ) {
+              <div class="office-media-item">
+                <img
+                  [src]="media.attachment.asset_url"
+                  [alt]="'office.media_alt' | translate"
+                />
+
+                <div class="office-media-content">
+                  <div class="d-flex justify-content-between gap-3">
+                    <div>
+                      <strong>
+                        {{ media.attachment.original_name }}
+                      </strong>
+
+                      @if (media.attachment_role === 'cover') {
+                        <span class="badge bg-warning ms-2">
+                          {{ 'office.cover' | translate }}
+                        </span>
+                      }
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light-bg office-media-action office-media-delete"
+                      [title]="'office.remove_media' | translate"
+                      (click)="removeMedia(index)"
+                    >
+                      <i class="ri-delete-bin-line"></i>
+                    </button>
+                  </div>
+
+                  <input
+                    class="form-control mt-3"
+                    [placeholder]="'office.caption' | translate"
+                    [value]="media.caption"
+                    (input)="updateCaption(index, $any($event.target).value)"
+                  />
+
+                  <div class="d-flex flex-wrap gap-3 align-items-center mt-3">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-theme"
+                      [disabled]="media.attachment_role === 'cover'"
+                      (click)="setCover(index)"
+                    >
+                      {{ 'office.set_cover' | translate }}
+                    </button>
+
+                    <div class="office-switch-row">
+                      <label class="switch switch-sm">
+                        <input
+                          type="checkbox"
+                          [checked]="media.is_public"
+                          (change)="
+                            updateMediaPublic(
+                              index,
+                              $any($event.target).checked
+                            )
+                          "
+                        />
+
+                        <span class="switch-state"></span>
+                      </label>
+
+                      <span class="office-switch-label">
+                        {{ 'office.public' | translate }}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light-bg office-media-action"
+                      [disabled]="index === 0"
+                      (click)="moveMedia(index, -1)"
+                    >
+                      <i class="ri-arrow-up-line"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light-bg office-media-action"
+                      [disabled]="index === officeMedia.length - 1"
+                      (click)="moveMedia(index, 1)"
+                    >
+                      <i class="ri-arrow-down-line"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="office-media-empty">
+            {{ 'office.no_media_selected' | translate }}
+          </div>
+        }
+      </ng-template>
+    </li>
+
+    <!-- PUBLICATION -->
+
+    <li [ngbNavItem]="'publication'">
+      <button ngbNavLink type="button">
+        {{ 'office.publication' | translate }}
+      </button>
+
+      <ng-template ngbNavContent>
+        <div class="office-switch-row mb-4">
+          <label class="switch">
+            <input id="is_public" type="checkbox" formControlName="is_public" />
+
+            <span class="switch-state"></span>
+          </label>
+
+          <label class="office-switch-label" for="is_public">
+            {{ 'office.show_publicly' | translate }}
+          </label>
+        </div>
+
+        @if (form.controls.is_public.value) {
+          <div class="row g-4">
+            <div class="col-md-8">
+              <label class="form-label">
+                {{ 'office.public_slug' | translate }}
+              </label>
+
+              <input
+                class="form-control"
+                formControlName="public_slug"
+                placeholder="kantor-pusat-bogor"
+              />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">
+                {{ 'office.sort_order' | translate }}
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                class="form-control"
+                formControlName="public_sort_order"
+              />
+            </div>
+          </div>
+        }
+
+        <hr class="my-4" />
+
+        <div class="row g-4">
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.google_place_id' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="google_place_id"
+              readonly
+            />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              {{ 'office.google_maps_url' | translate }}
+            </label>
+
+            <input
+              class="form-control"
+              formControlName="google_maps_url"
+              readonly
+            />
+          </div>
+        </div>
+      </ng-template>
+    </li>
+  </ul>
+
+  <div [ngbNavOutlet]="nav" class="office-tab-content"></div>
+
+  <div class="office-form-footer">
+    <app-button
+      [id]="'office_submit_btn'"
+      [type]="'submit'"
+      [class]="'btn btn-theme'"
+    >
+      {{
+        (mode() === 'create' ? 'office.create' : 'office.update') | translate
+      }}
+    </app-button>
+  </div>
+</form>
+
+<app-media-modal
+  #mediaModal
+  [selectMedia]="true"
+  [multipleImage]="true"
+  [url]="false"
+  [accept]="officeMediaAccept"
+  [collection]="'office_media'"
+  [selectedImagesIds]="selectedMedia"
+  (selectImage)="selectMedia($event)"
+/>

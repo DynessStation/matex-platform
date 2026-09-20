@@ -1,0 +1,59 @@
+<app-breadcrumb [breadcrumb]="breadcrumb" />
+
+<section class="search-section section-t-space">
+  <div class="custom-container">
+    <div class="row">
+      <div class="col-xl-5 col-lg-7 col-md-10 m-auto">
+        <div class="search-box theme-form input-group">
+          <span class="input-group-text" id="basic-addon1">
+            <i class="ri-search-line"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="{{ 'Search product' | translate }}"
+            [formControl]="search"
+          />
+        </div>
+      </div>
+      <div class="col-12 mt-5">
+        <div class="title d-block text-center">
+          <h3>Need some inspiration?</h3>
+        </div>
+
+        <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-2 g-sm-4 g-3">
+          @if (paginateProduct$ | async; as products) {
+            @for (product of products; track product) {
+              <div class="col pro-bg-white">
+                <app-product-box-one [product]="product"></app-product-box-one>
+              </div>
+            }
+          }
+        </div>
+        @if (totalItems$ | async; as totalItems) {
+          <nav class="custom-pagination">
+            <ul class="pagination justify-content-center">
+              <ngb-pagination
+                [collectionSize]="totalItems"
+                [page]="filter.get('page')?.value!"
+                [pageSize]="filter.get('paginate')?.value!"
+                [maxSize]="5"
+                [rotate]="true"
+                [boundaryLinks]="true"
+                [ellipses]="false"
+                (pageChange)="pageChanged($event)"
+              >
+              </ngb-pagination>
+            </ul>
+          </nav>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-block-space newsletter-section">
+  <div class="custom-container">
+    <app-home-newsletter />
+  </div>
+</section>

@@ -1,0 +1,5 @@
+@for (tag of tags; track tag.id) {
+  <li [class]="class()">
+    <a [routerLink]="['/collections']">{{ tag.name }}</a>
+  </li>
+}

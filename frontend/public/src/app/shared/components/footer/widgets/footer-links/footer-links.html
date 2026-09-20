@@ -1,0 +1,7 @@
+<ul class="footer-list">
+  @for (link of section(); track link) {
+    <li>
+      <a [routerLink]="link.value">{{ link.name }}</a>
+    </li>
+  }
+</ul>

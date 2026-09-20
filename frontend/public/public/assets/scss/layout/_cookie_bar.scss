@@ -1,0 +1,300 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    3.3 Cookie Bar CSS
+==========================**/
+.cookie-bar-section {
+  max-width: 620px;
+  width: 100%;
+  padding-inline: 15px;
+  position: fixed;
+  bottom: calc(15px + (20 - 15) * ((100vw - 320px) / (1920 - 320)));
+  z-index: 9;
+  transition: all 0.3s ease-in-out;
+  @include center(horizontal);
+
+  .cookie-bar-box {
+    box-shadow: 0px 12px 24px -6px rgba(96, 96, 96, 0.149);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    background-color: rgba(var(--white), 1);
+    padding: 13px;
+
+    @include max(500px) {
+      flex-direction: column;
+      align-items: unset;
+    }
+  }
+
+  svg {
+    min-width: 36px;
+    background-color: rgba(var(--primary-color), 0.1);
+    fill: rgba(var(--primary-color), 1);
+    padding: 6px;
+    border-radius: 8px;
+    @include pseudowh($width: 36px, $height: 36px);
+  }
+
+  p {
+    color: rgba(var(--content-color), 1);
+  }
+
+  .cookie-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .btn {
+      padding: 6px 10px 4px;
+      font-size: 14px;
+
+      &.allow-btn {
+        background-color: rgba(var(--primary-color), 1);
+        color: #fff;
+      }
+
+      &.decline-btn {
+        background-color: rgba(var(--light-gray), 1);
+        color: rgba(var(--content-color), 1);
+        font-weight: 400;
+      }
+    }
+  }
+
+  &.cookie-bar-full {
+    width: 100%;
+    max-width: 902px;
+
+    .cookie-bar-box {
+      border-radius: 6px;
+      justify-content: center;
+      background-color: rgba(var(--light-gray), 1);
+      border: 1px solid rgba(var(--border-color), 1);
+      padding: 13px;
+
+      @include max(500px) {
+        flex-direction: column;
+        align-items: unset;
+      }
+
+      svg {
+        min-width: 32px;
+        background-color: transparent;
+        fill: rgba(var(--primary-color), 1);
+        padding: 0;
+        border-radius: 0;
+        @include pseudowh($width: 32px, $height: 32px);
+      }
+    }
+  }
+
+  &.cookie-bar-3 {
+    width: 100%;
+    max-width: 467px;
+
+    @include max(575.98px) {
+      max-width: 300px;
+      padding: 0;
+      bottom: 80px;
+      right: 15px;
+      transform: unset;
+      left: unset;
+    }
+
+    .cookie-bar-box {
+      border-radius: 100px;
+      justify-content: center;
+      background-color: rgba(var(--light-gray), 1);
+      border: none;
+      padding: 13px;
+
+      @include max(575.98px) {
+        background-color: rgba(var(--white), 1);
+        border-radius: 7px;
+        display: block;
+        padding: 14px;
+      }
+
+      svg {
+        min-width: 60px;
+        background-color: #363d4d;
+        border-radius: 100%;
+        padding: 12px;
+        margin: -14px 0px -14px -25px;
+        @include pseudowh($width: 60px, $height: 60px);
+
+        [dir='rtl'] & {
+          margin-inline: -25px 0;
+        }
+
+        @include max(575.98px) {
+          background-color: transparent;
+          padding: 0;
+          margin: 0;
+          min-width: 42px;
+          @include pseudowh($width: 42px, $height: 42px);
+
+          [dir='rtl'] & {
+            margin: 0;
+          }
+        }
+      }
+
+      p {
+        @include max(575.98px) {
+          margin-top: 7px;
+          font-size: 14px;
+        }
+      }
+
+      .cookie-buttons {
+        .allow-btn {
+          background-color: transparent;
+          color: rgba(var(--title-color), 1);
+          padding: 0;
+
+          @include max(575.98px) {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+          }
+
+          i {
+            line-height: 1;
+            font-size: calc(18px + (20 - 18) * ((100vw - 320px) / (1920 - 320)));
+          }
+        }
+      }
+    }
+  }
+}
+
+.cookie-bar-box1 {
+  max-width: 360px;
+  width: 100%;
+  padding-inline: calc(15px + (20 - 15) * ((100vw - 320px) / (1920 - 320)));
+  position: fixed;
+  bottom: calc(15px + (20 - 15) * ((100vw - 320px) / (1920 - 320)));
+  right: 0;
+  z-index: 9;
+  transition: all 0.3s ease-in-out;
+
+  .cookie-bar-box {
+    display: block;
+    border-radius: 10px;
+    background-color: rgba(var(--light-gray), 1);
+    padding: calc(14px + (24 - 14) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (24 - 12) * ((100vw - 320px) / (1920 - 320)));
+    box-shadow: 0px 0px 1px 0px #6060601a;
+    border: 1px solid rgba(var(--border-color), 1);
+  }
+
+  h4 {
+    font-size: calc(15px + (17 - 15) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  p {
+    margin-top: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)));
+    color: rgba(var(--content-color), 1);
+  }
+
+  .cookie-buttons {
+    gap: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)));
+    margin-top: calc(12px + (18 - 12) * ((100vw - 320px) / (1920 - 320)));
+    @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+    .btn {
+      padding: 8px calc(14px + (20 - 14) * ((100vw - 320px) / (1920 - 320))) 6px;
+      font-size: calc(14px + (15 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      &.allow-btn {
+        background-color: rgba(var(--primary-color), 1);
+        color: #fff;
+      }
+
+      &.decline-btn {
+        background-color: rgba(var(--primary-color), 0.1);
+        color: rgba(var(--primary-color), 1);
+      }
+    }
+  }
+}
+
+.cookie-bar-box2 {
+  max-width: 360px;
+  width: 100%;
+  padding-inline: calc(15px + (20 - 15) * ((100vw - 320px) / (1920 - 320)));
+  position: fixed;
+  bottom: calc(15px + (20 - 15) * ((100vw - 320px) / (1920 - 320)));
+  right: 0;
+  z-index: 9;
+  transition: all 0.3s ease-in-out;
+
+  .cookie-bar-box {
+    display: block;
+    overflow: hidden;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    background-color: rgba(var(--light-gray), 1);
+    padding: calc(14px + (24 - 14) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (24 - 12) * ((100vw - 320px) / (1920 - 320)));
+    box-shadow: 0px 0px 1px 0px #6060601a;
+    border: 1px solid rgba(var(--border-color), 1);
+  }
+
+  svg {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    transform: rotate(-55deg);
+    opacity: 0.6;
+    z-index: -1;
+    @include pseudowh($width: 70px, $height: 70px);
+  }
+
+  h4 {
+    font-size: calc(15px + (17 - 15) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  p {
+    margin-top: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)));
+    color: rgba(var(--content-color), 1);
+  }
+
+  .cookie-buttons {
+    gap: calc(8px + (10 - 8) * ((100vw - 320px) / (1920 - 320)));
+    margin-top: calc(12px + (18 - 12) * ((100vw - 320px) / (1920 - 320)));
+    @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+    .btn {
+      width: 100%;
+      padding: 8px calc(14px + (20 - 14) * ((100vw - 320px) / (1920 - 320))) 6px;
+      font-size: calc(14px + (15 - 14) * ((100vw - 320px) / (1920 - 320)));
+
+      &.allow-btn {
+        background-color: rgba(var(--primary-color), 1);
+        color: #fff;
+      }
+
+      &.decline-btn {
+        background-color: rgba(var(--primary-color), 0.1);
+        color: rgba(var(--primary-color), 1);
+      }
+    }
+  }
+}
+
+.cookie {
+  &.hide {
+    bottom: -50px;
+    opacity: 0;
+    visibility: hidden;
+  }
+}

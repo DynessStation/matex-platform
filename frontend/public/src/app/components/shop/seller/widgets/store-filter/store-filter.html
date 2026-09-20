@@ -1,0 +1,58 @@
+<div class="left-box">
+  <div class="shop-left-sidebar">
+    <button class="btn back-button"><i class="ri-arrow-left-line"></i> Back</button>
+    @if (filters.length) {
+      <div class="filter-category-2">
+        <div class="filter-title">
+          <h2>Filters</h2>
+          <a href="javascript:void(0)" (click)="clear()">Clear All</a>
+        </div>
+        <ul>
+          @for (filter of filters; track filter) {
+            <li>
+              <a href="javascript:void(0)"
+                >{{ filter | textConverter }}
+                <i class="ri-close-line close-icon" (click)="remove(filter)"></i>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    <div class="accordion custom-accordion-2" ngbAccordion>
+      <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+        <h2 class="accordion-header" ngbAccordionHeader>
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span>Categories</span>
+          </button>
+        </h2>
+        <div
+          id="panelsStayOpen-collapseTwo"
+          class="accordion-collapse collapse show"
+          ngbAccordionCollapse
+        >
+          <div class="accordion-body" ngbAccordionBody>
+            <app-store-category [filter]="filter" />
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item" ngbAccordionItem [collapsed]="false">
+        <h2 class="accordion-header" ngbAccordionHeader>
+          <button class="accordion-button" type="button" ngbAccordionButton>
+            <span>Customer Review</span>
+          </button>
+        </h2>
+        <div
+          id="panelsStayOpen-collapseFive"
+          class="accordion-collapse collapse show"
+          ngbAccordionCollapse
+        >
+          <div class="accordion-body" ngbAccordionBody>
+            <app-store-rating [filter]="filter" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

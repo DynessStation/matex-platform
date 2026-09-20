@@ -1,0 +1,54 @@
+@use '../utils/mixin/common' as *;
+
+/**=====================
+    4.2 Checkout CSS
+==========================**/
+.return-login-section {
+  .return-box {
+    padding: calc(12px + (8 - 12) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (8 - 12) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (8 - 12) * ((100vw - 320px) / (1920 - 320)))
+      calc(12px + (19 - 12) * ((100vw - 320px) / (1920 - 320)));
+    background-color: rgba(var(--white), 1);
+    overflow: hidden;
+    border-radius: 5px;
+    position: relative;
+    flex-wrap: wrap;
+    gap: 10px;
+    @include flex_common($dis: flex, $align: center, $justify: space-between);
+
+    [dir='rtl'] & {
+      padding-left: calc(12px + (8 - 12) * ((100vw - 320px) / (1920 - 320)));
+      padding-right: calc(12px + (19 - 12) * ((100vw - 320px) / (1920 - 320)));
+    }
+
+    &::before {
+      top: 0;
+      left: 0;
+      background-color: rgba(var(--primary-color), 1);
+      @include pos;
+      @include pseudowh($width: 2px, $height: 100%);
+
+      [dir='rtl'] & {
+        left: unset;
+        right: 0;
+      }
+    }
+
+    h5 {
+      font-size: calc(16px + (18 - 16) * ((100vw - 320px) / (1920 - 320)));
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: 0.3px;
+    }
+
+    .btn {
+      background-color: rgba(var(--primary-color), 1);
+      color: #fff;
+      padding: calc(8px + (13 - 8) * ((100vw - 320px) / (1920 - 320)))
+        calc(14px + (23 - 14) * ((100vw - 320px) / (1920 - 320)))
+        calc(5px + (10 - 5) * ((100vw - 320px) / (1920 - 320)));
+      font-size: calc(15px + (18 - 15) * ((100vw - 320px) / (1920 - 320)));
+    }
+  }
+}

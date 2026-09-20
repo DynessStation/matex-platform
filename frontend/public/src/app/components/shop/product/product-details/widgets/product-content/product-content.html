@@ -1,0 +1,86 @@
+@if (product()!.attributes.length) {
+  <div class="product-package product-spacing">
+    <app-variant-attributes
+      [product]="product()!"
+      [attributes]="product()!.attributes! || []"
+      (selectVariation)="selectVariation($event!)"
+      [variant_hover]="false"
+    ></app-variant-attributes>
+  </div>
+}
+
+<!-- Wholesales Product -->
+@if (product()?.wholesales?.length) {
+  <app-product-wholesales [product]="product()"></app-product-wholesales>
+  <h4>
+    {{ 'Total Price' | translate }}:
+    <span class="theme-color">{{ totalPrice | currencySymbol }}</span>
+  </h4>
+}
+@if (product() && product()?.quantity && product()?.quantity! <= 10) {
+  <div class="hurry-up-box">
+    <div class="left-progressbar">
+      <h5>
+        There are just <span class="theme-color">{{ product()?.quantity }}</span> left in stock, so
+        please act immediately.
+      </h5>
+      <div
+        role="progressbar"
+        class="progress"
+        [class]="{
+          'danger-progress': product()?.quantity! <= 2,
+          'warning-progress': product()?.quantity! >= 3 && product()?.quantity! <= 7,
+        }"
+      >
+        <div
+          class="progress-bar progress-bar-striped progress-bar-animated"
+          [style.width]="(product()?.quantity! * 100) / 10 + '%'"
+        ></div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (product()?.size_chart_image || (policy && product()?.is_return)) {
+  <ul class="size-delivery-info">
+    @if (product()?.size_chart_image && product()?.size_chart_image?.asset_url) {
+      <li>
+        <button
+          type="button"
+          class="btn"
+          (click)="openModal('sizeChart', product()?.size_chart_image!)"
+        >
+          <i class="ri-ruler-line"></i>
+          <span>Size Chart</span>
+        </button>
+      </li>
+    }
+
+    @if (policy && product()?.is_return) {
+      <li>
+        <button type="button" class="btn" (click)="openModal('delivery', policy)">
+          <i class="ri-truck-line"></i>
+          <span>Delivery & Return</span>
+        </button>
+      </li>
+    }
+    <li>
+      <button type="button" class="btn" (click)="openModal('question', product()!)">
+        <i class="ri-questionnaire-line"></i>
+        <span>Ask a question</span>
+      </button>
+    </li>
+  </ul>
+}
+@if (product()?.is_wishlist) {
+  <div class="buy-box compare-box">
+    <app-wishlist [product]="product()!" />
+
+    <app-compare [product]="product()!" />
+  </div>
+}
+
+<!-- Sale -->
+@if (product()?.is_sale_enable) {
+  <app-timer [title]="'Sales Ends In'" [type]="'timer-five'"> </app-timer>
+}

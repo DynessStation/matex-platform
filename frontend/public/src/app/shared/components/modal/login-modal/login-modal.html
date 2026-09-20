@@ -1,0 +1,28 @@
+<ng-template #loginModal let-modal>
+  <div class="modal-body p-0">
+    <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()">
+      <i class="ri-close-fill"></i>
+    </button>
+    @if (activeForm === 'login') {
+      <app-login (activeForm)="nextForm($event)" />
+    }
+    @if (activeForm === 'email') {
+      <app-forgot-password (activeForm)="nextForm($event)" />
+    }
+    @if (activeForm === 'otp') {
+      <app-otp (activeForm)="nextForm($event)" [type]="'email'" />
+    }
+    @if (activeForm === 'updatePassword') {
+      <app-update-password (activeForm)="nextForm($event)" />
+    }
+    @if (activeForm === 'register') {
+      <app-register (activeForm)="nextForm($event)" />
+    }
+    @if (activeForm === 'withNumber') {
+      <app-login-with-number (activeForm)="nextForm($event)" />
+    }
+    @if (activeForm === 'numberOtp') {
+      <app-otp (activeForm)="nextForm($event)" [type]="'number'" />
+    }
+  </div>
+</ng-template>

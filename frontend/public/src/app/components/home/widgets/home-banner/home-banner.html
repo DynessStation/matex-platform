@@ -1,0 +1,38 @@
+@if (
+  (image()?.redirection_type === 'product' || image()?.redirection_type === 'category') &&
+  image()?.link
+) {
+  <a [routerLink]="['/', image()?.redirection_type, image()?.link]" class="{{ className() }}">
+    @if (bgImage()) {
+      <div
+        class="bg-size h-100"
+        [style.background-image]="
+          'url(' +
+          (image()?.image_url ? image()?.image_url : 'assets/images/placeholder/product.png') +
+          ')'
+        "
+      >
+        <ng-content></ng-content>
+      </div>
+    } @else {
+      <img src="{{ image()?.image_url }}" class="{{ imageClass() }}" alt="image" />
+    }
+  </a>
+} @else {
+  <a href="javascript:void(0)" class="{{ className() }}">
+    @if (bgImage()) {
+      <div
+        class="bg-size h-100"
+        [style.background-image]="
+          'url(' +
+          (image()?.image_url ? image()?.image_url : 'assets/images/placeholder/product.png') +
+          ')'
+        "
+      >
+        <ng-content></ng-content>
+      </div>
+    } @else {
+      <img src="{{ image()?.image_url }}" class="{{ imageClass() }}" alt="image" />
+    }
+  </a>
+}

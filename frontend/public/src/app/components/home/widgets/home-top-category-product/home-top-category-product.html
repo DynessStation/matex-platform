@@ -1,0 +1,16 @@
+<div class="row g-sm-4 g-3">
+  @for (catProduct of categoryProducts(); track catProduct?.title) {
+    <div class="col-xl-4 col-md-6">
+      <div class="light-bg-color">
+        <div class="title d-block">
+          <h3>{{ catProduct?.title }}</h3>
+        </div>
+
+        <app-home-product
+          [productIds]="catProduct.product_ids!"
+          [style]="'minimal'"
+        ></app-home-product>
+      </div>
+    </div>
+  }
+</div>
