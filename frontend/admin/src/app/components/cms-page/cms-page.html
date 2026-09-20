@@ -1,7 +1,98 @@
-<div class="card">
-  <div class="card-body">
-    <h5 class="mb-0">
-      {{ 'pages' | translate }}
-    </h5>
-  </div>
-</div>
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'cms_page.title'">
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [emitInitialChange]="false"
+    [externalPermissions]="(authPermissions$ | async) ?? []"
+    [externalAllAccess]="(isAllAccess$ | async) ?? false"
+    (tableChanged)="onTableChange($event)"
+  >
+    <!--==================================================-->
+    <!--==== FILTER TOGGLE ===============================-->
+    <!--==================================================-->
+
+    <div filter class="top-panel-selection">
+      <button
+        type="button"
+        class="align-items-center btn d-flex h-100 fs-5 px-3 py-1"
+        [class.btn-theme]="openFilterPanel"
+        [class.btn-light-bg]="!openFilterPanel"
+        (click)="openFilter()"
+        title="{{ 'cms_page.advanced_filter' | translate }}"
+      >
+        <i class="ri-filter-3-line"></i>
+      </button>
+    </div>
+
+    <!--==================================================-->
+    <!--==== ADVANCED FILTER =============================-->
+    <!--==================================================-->
+
+    @if (openFilterPanel) {
+      <div advanceFilter class="show-box mb-4 d-block product-category-option">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+          <div class="row g-sm-4 g-3">
+            <!-- STATUS -->
+
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              @if (isBrowser) {
+                <select2
+                  class="custom-select d-block"
+                  [data]="statuses"
+                  [placeholder]="'cms_page.select_status' | translate"
+                  [noResultMessage]="'common_ui.no_data_found' | translate"
+                  formControlName="status"
+                  resettable
+                />
+              }
+            </div>
+
+            <!-- VISIBILITY -->
+
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              @if (isBrowser) {
+                <select2
+                  class="custom-select d-block"
+                  [data]="visibilities"
+                  [placeholder]="'cms_page.select_visibility' | translate"
+                  [noResultMessage]="'common_ui.no_data_found' | translate"
+                  formControlName="visibility"
+                  resettable
+                />
+              }
+            </div>
+
+            <!-- TYPE -->
+
+            <div class="col-xl-3 col-lg-4 col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="type"
+                placeholder="{{ 'cms_page.type_placeholder' | translate }}"
+              />
+            </div>
+
+            <!-- BUTTON -->
+
+            <div
+              class="col-xl-3 col-lg-12 d-flex justify-content-end align-items-start gap-2"
+            >
+              <button
+                type="button"
+                class="btn btn-light-bg"
+                (click)="resetFilters()"
+              >
+                {{ 'cms_page.reset_filter' | translate }}
+              </button>
+
+              <button type="submit" class="btn btn-theme">
+                {{ 'cms_page.apply_filter' | translate }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+  </app-table>
+</app-page-wrapper>

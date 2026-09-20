@@ -7,7 +7,7 @@ export interface ITableConfig<T extends IBaseRow = IBaseRow> {
 }
 
 export interface IBaseRow {
-  id: number;
+  id: number | string;
 }
 
 export interface ITableColumn {

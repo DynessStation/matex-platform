@@ -1785,5 +1785,34 @@
   },
   "common_ui": {
     "no_data_found": "No data found"
+  },
+  "cms_page": {
+    "title": "Pages",
+    "page_title": "Title",
+    "key": "Key",
+    "type": "Type",
+    "status": "Status",
+    "visibility": "Visibility",
+    "translations": "Translations",
+    "updated": "Updated",
+
+    "advanced_filter": "Advanced Filter",
+    "select_status": "Select status",
+    "select_visibility": "Select visibility",
+    "type_placeholder": "Type, e.g. standard",
+    "apply_filter": "Apply Filter",
+    "reset_filter": "Reset",
+
+    "status_draft": "Draft",
+    "status_scheduled": "Scheduled",
+    "status_published": "Published",
+    "status_expired": "Expired",
+    "status_archived": "Archived",
+
+    "visibility_private": "Private",
+    "visibility_public": "Public",
+    "visibility_unlisted": "Unlisted",
+
+    "translation_summary": "{{published}}/{{total}} published"
   }
 }

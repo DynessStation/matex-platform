@@ -1785,5 +1785,34 @@
   },
   "common_ui": {
     "no_data_found": "Data tidak ditemukan"
+  },
+  "cms_page": {
+    "title": "Halaman",
+    "page_title": "Judul",
+    "key": "Key",
+    "type": "Tipe",
+    "status": "Status",
+    "visibility": "Visibilitas",
+    "translations": "Terjemahan",
+    "updated": "Diperbarui",
+
+    "advanced_filter": "Filter Lanjutan",
+    "select_status": "Pilih status",
+    "select_visibility": "Pilih visibilitas",
+    "type_placeholder": "Tipe, contoh: standard",
+    "apply_filter": "Terapkan Filter",
+    "reset_filter": "Reset",
+
+    "status_draft": "Draf",
+    "status_scheduled": "Terjadwal",
+    "status_published": "Dipublikasikan",
+    "status_expired": "Kedaluwarsa",
+    "status_archived": "Diarsipkan",
+
+    "visibility_private": "Privat",
+    "visibility_public": "Publik",
+    "visibility_unlisted": "Tidak Terdaftar",
+
+    "translation_summary": "{{published}}/{{total}} dipublikasikan"
   }
 }
