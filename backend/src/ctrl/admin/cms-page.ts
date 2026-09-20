@@ -856,6 +856,39 @@ const serializeJsonValue = (value: unknown): string | null => {
 };
 
 //==================================================
+//==== CMS PAGE AUDIT SORT
+//==================================================
+
+const sortCmsPageAuditTranslations = <T extends { locale: string }>(
+  items: T[],
+): T[] => {
+  return [...items].sort((a, b) => a.locale.localeCompare(b.locale));
+};
+
+const sortCmsPageAuditAttachments = <
+  T extends {
+    id_attachment: number;
+    role: string;
+    sort_order: number;
+    translations: { locale: string }[];
+  },
+>(
+  items: T[],
+): T[] => {
+  return [...items]
+    .map((item) => ({
+      ...item,
+      translations: sortCmsPageAuditTranslations(item.translations),
+    }))
+    .sort(
+      (a, b) =>
+        a.sort_order - b.sort_order ||
+        a.id_attachment - b.id_attachment ||
+        a.role.localeCompare(b.role),
+    );
+};
+
+//==================================================
 //==== SESSION HAS PERMISSION
 //==================================================
 
@@ -2387,15 +2420,17 @@ app.post(
 
           cms_page_unpublish_at: unpublishAt,
 
-          translations: normalizedTranslations.map((item) => ({
-            locale: item.locale,
+          translations: sortCmsPageAuditTranslations(
+            normalizedTranslations.map((item) => ({
+              locale: item.locale,
 
-            slug: item.slug,
+              slug: item.slug,
 
-            title: item.title,
+              title: item.title,
 
-            status: item.status,
-          })),
+              status: item.status,
+            })),
+          ),
 
           attachments: normalizedAttachments.map((item) => ({
             id_attachment: item.idAttachment,
@@ -2654,6 +2689,8 @@ app.put(
         cms_page_settings_json,
 
         translations,
+
+        attachments,
       } = req.body;
 
       //==================================================
@@ -3365,6 +3402,259 @@ app.put(
       }
 
       //==================================================
+      //==== ATTACHMENTS
+      //==================================================
+
+      const attachmentsProvided = attachments !== undefined;
+
+      const normalizedAttachments: {
+        idAttachment: number;
+
+        role: string;
+
+        sortOrder: number;
+
+        isPublic: 0 | 1;
+
+        translationsProvided: boolean;
+
+        translations: {
+          locale: string;
+
+          caption: string | null;
+
+          altText: string | null;
+        }[];
+      }[] = [];
+
+      if (attachmentsProvided) {
+        if (!Array.isArray(attachments)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_ATTACHMENTS_ARRAY_INVALID",
+            "CMS page attachments must be an array",
+          );
+        }
+
+        if (attachments.length > 30) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_ATTACHMENTS_LIMIT_EXCEEDED",
+            "Too many CMS page attachments",
+          );
+        }
+
+        const attachmentKeys = new Set<string>();
+
+        const singleRoles = new Set(["cover", "meta", "og", "hero"]);
+
+        const usedSingleRoles = new Set<string>();
+
+        for (const raw of attachments) {
+          const item = raw as CmsPageAttachmentInput;
+
+          const encodedId = String(item?.id_attachment ?? "").trim();
+
+          const decoded = keyhsid.idAttachment.decode(encodedId)[0];
+
+          const idAttachment = Number(decoded);
+
+          if (
+            !decoded ||
+            !Number.isInteger(idAttachment) ||
+            idAttachment <= 0
+          ) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_ATTACHMENT_ID_INVALID",
+              "Invalid CMS page attachment identifier",
+            );
+          }
+
+          const role = String(item?.role ?? "gallery")
+            .trim()
+            .toLowerCase();
+
+          if (
+            !role ||
+            role.length > 50 ||
+            !/^[a-z0-9][a-z0-9_-]*$/.test(role)
+          ) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_ATTACHMENT_ROLE_INVALID",
+              "Invalid CMS page attachment role",
+            );
+          }
+
+          const attachmentKey = `${idAttachment}:${role}`;
+
+          if (attachmentKeys.has(attachmentKey)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_ATTACHMENT_DUPLICATED",
+              "Duplicate CMS page attachment",
+            );
+          }
+
+          attachmentKeys.add(attachmentKey);
+
+          if (singleRoles.has(role)) {
+            if (usedSingleRoles.has(role)) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_ATTACHMENT_ROLE_DUPLICATED",
+                "Only one attachment is allowed for this CMS page attachment role",
+                {
+                  role,
+                },
+              );
+            }
+
+            usedSingleRoles.add(role);
+          }
+
+          const rawSortOrder = Number(item?.sort_order ?? 0);
+
+          const sortOrder =
+            Number.isInteger(rawSortOrder) && rawSortOrder >= 0
+              ? rawSortOrder
+              : 0;
+
+          const translationsProvided = item?.translations !== undefined;
+
+          const rawTranslations = item?.translations ?? [];
+
+          if (!Array.isArray(rawTranslations)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_ATTACHMENT_TRANSLATIONS_ARRAY_INVALID",
+              "CMS page attachment translations must be an array",
+            );
+          }
+
+          const mediaTranslations: {
+            locale: string;
+
+            caption: string | null;
+
+            altText: string | null;
+          }[] = [];
+
+          const mediaLocales = new Set<string>();
+
+          for (const rawTranslation of rawTranslations) {
+            const locale = String(rawTranslation?.locale ?? "").trim();
+
+            if (!isCmsPageLocale(locale)) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_ATTACHMENT_LOCALE_UNSUPPORTED",
+                "Unsupported CMS page attachment locale",
+                {
+                  locale,
+                },
+              );
+            }
+
+            if (mediaLocales.has(locale)) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_ATTACHMENT_TRANSLATION_DUPLICATED",
+                "Duplicate CMS page attachment translation",
+                {
+                  locale,
+                },
+              );
+            }
+
+            mediaLocales.add(locale);
+
+            const caption = nullableString(rawTranslation?.caption);
+
+            const altText = nullableString(rawTranslation?.alt_text);
+
+            if (caption && caption.length > 500) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_ATTACHMENT_CAPTION_TOO_LONG",
+                "CMS page attachment caption is too long",
+                {
+                  locale,
+                },
+              );
+            }
+
+            if (altText && altText.length > 500) {
+              await connection.rollback();
+
+              return sendError(
+                res,
+                400,
+                "CMS_PAGE_ATTACHMENT_ALT_TEXT_TOO_LONG",
+                "CMS page attachment alt text is too long",
+                {
+                  locale,
+                },
+              );
+            }
+
+            mediaTranslations.push({
+              locale,
+
+              caption,
+
+              altText,
+            });
+          }
+
+          normalizedAttachments.push({
+            idAttachment,
+
+            role,
+
+            sortOrder,
+
+            isPublic: normalizeFlag(item?.is_public, 1),
+
+            translationsProvided,
+
+            translations: mediaTranslations,
+          });
+        }
+      }
+
+      //==================================================
       //==== PUBLISH PERMISSION
       //==================================================
 
@@ -3391,6 +3681,31 @@ app.put(
             403,
             "CMS_PAGE_PUBLISH_ACCESS_DENIED",
             "Publish permission is required",
+          );
+        }
+      }
+
+      //==================================================
+      //==== ATTACHMENT PERMISSION
+      //==================================================
+
+      if (attachmentsProvided) {
+        const canViewAttachments = await sessionHasPermission(
+          connection,
+
+          scope,
+
+          "attachment.view",
+        );
+
+        if (!canViewAttachments) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            403,
+            "CMS_PAGE_ATTACHMENT_ACCESS_DENIED",
+            "Attachment access is required to modify CMS page media",
           );
         }
       }
@@ -3617,6 +3932,122 @@ app.put(
       }
 
       //==================================================
+      //==== VALIDATE ATTACHMENTS
+      //==================================================
+
+      if (attachmentsProvided && normalizedAttachments.length > 0) {
+        const attachmentIds = [
+          ...new Set(normalizedAttachments.map((item) => item.idAttachment)),
+        ];
+
+        const placeholders = attachmentIds.map(() => "?").join(",");
+
+        const [attachmentRows] = await connection.query(
+          `
+        SELECT
+          id_attachment
+
+        FROM attachment
+
+        WHERE id_attachment
+          IN (${placeholders})
+
+          AND id_master_comp = ?
+
+          AND collection_name =
+            'media_library'
+
+          AND attachment_status = 1
+
+          AND deleted_at IS NULL
+      `,
+          [...attachmentIds, scope.idMasterComp],
+        );
+
+        if ((attachmentRows as any[]).length !== attachmentIds.length) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_ATTACHMENT_NOT_AVAILABLE",
+            "One or more CMS page attachments are not available",
+          );
+        }
+      }
+
+      //==================================================
+      //==== CURRENT ATTACHMENTS
+      //==================================================
+
+      let currentAttachments: any[] = [];
+
+      let currentAttachmentTranslations: any[] = [];
+
+      if (attachmentsProvided) {
+        const [rows] = await connection.query(
+          `
+              SELECT
+                id_cms_page_attachment,
+
+                id_attachment,
+
+                cms_page_attachment_role,
+
+                cms_page_attachment_sort_order,
+
+                cms_page_attachment_is_public
+
+              FROM cms_page_attachment
+
+              WHERE id_cms_page = ?
+
+              ORDER BY
+                id_cms_page_attachment ASC
+
+              FOR UPDATE
+            `,
+          [idCmsPage],
+        );
+
+        currentAttachments = rows as any[];
+
+        const relationIds = currentAttachments.map((item) =>
+          Number(item.id_cms_page_attachment),
+        );
+
+        if (relationIds.length > 0) {
+          const placeholders = relationIds.map(() => "?").join(",");
+
+          const [translationRows] = await connection.query(
+            `
+          SELECT
+            id_cms_page_attachment,
+
+            cms_page_attachment_locale,
+
+            cms_page_attachment_caption,
+
+            cms_page_attachment_alt_text
+
+          FROM cms_page_attachment_i18n
+
+          WHERE id_cms_page_attachment
+            IN (${placeholders})
+
+          ORDER BY
+            id_cms_page_attachment ASC,
+
+            cms_page_attachment_locale ASC
+        `,
+            relationIds,
+          );
+
+          currentAttachmentTranslations = translationRows as any[];
+        }
+      }
+
+      //==================================================
       //==== BEFORE AUDIT
       //==================================================
 
@@ -3651,15 +4082,51 @@ app.put(
           currentPage.cms_page_settings_json,
         ),
 
-        translations: currentTranslations.map((item) => ({
-          locale: item.cms_page_locale,
+        translations: sortCmsPageAuditTranslations(
+          currentTranslations.map((item) => ({
+            locale: String(item.cms_page_locale),
 
-          slug: item.cms_page_slug,
+            slug: item.cms_page_slug,
 
-          title: item.cms_page_title,
+            title: item.cms_page_title,
 
-          status: Number(item.cms_page_i18n_status),
-        })),
+            status: Number(item.cms_page_i18n_status),
+          })),
+        ),
+
+        ...(attachmentsProvided
+          ? {
+              attachments: sortCmsPageAuditAttachments(
+                currentAttachments.map((item) => ({
+                  id_attachment: Number(item.id_attachment),
+
+                  role: String(item.cms_page_attachment_role),
+
+                  sort_order: Number(item.cms_page_attachment_sort_order ?? 0),
+
+                  is_public: Number(item.cms_page_attachment_is_public),
+
+                  translations: sortCmsPageAuditTranslations(
+                    currentAttachmentTranslations
+                      .filter(
+                        (translation) =>
+                          Number(translation.id_cms_page_attachment) ===
+                          Number(item.id_cms_page_attachment),
+                      )
+                      .map((translation) => ({
+                        locale: String(translation.cms_page_attachment_locale),
+
+                        caption:
+                          translation.cms_page_attachment_caption ?? null,
+
+                        alt_text:
+                          translation.cms_page_attachment_alt_text ?? null,
+                      })),
+                  ),
+                })),
+              ),
+            }
+          : {}),
       };
 
       //==================================================
@@ -3962,6 +4429,237 @@ app.put(
       );
 
       //==================================================
+      //==== SYNC ATTACHMENTS
+      //==================================================
+
+      if (attachmentsProvided) {
+        const existingRelations = new Map<string, any>();
+
+        for (const item of currentAttachments) {
+          existingRelations.set(
+            `${Number(item.id_attachment)}:${String(
+              item.cms_page_attachment_role,
+            )}`,
+            item,
+          );
+        }
+
+        const retainedRelationIds: number[] = [];
+
+        for (const media of normalizedAttachments) {
+          const relationKey = `${media.idAttachment}:${media.role}`;
+
+          const existing = existingRelations.get(relationKey);
+
+          let idRelation: number;
+
+          //==================================================
+          //==== EXISTING RELATION
+          //==================================================
+
+          if (existing) {
+            idRelation = Number(existing.id_cms_page_attachment);
+
+            await connection.query(
+              `
+          UPDATE cms_page_attachment
+
+          SET
+            cms_page_attachment_sort_order = ?,
+
+            cms_page_attachment_is_public = ?,
+
+            updated = NOW()
+
+          WHERE id_cms_page_attachment = ?
+
+            AND id_cms_page = ?
+        `,
+              [media.sortOrder, media.isPublic, idRelation, idCmsPage],
+            );
+          }
+
+          //==================================================
+          //==== NEW RELATION
+          //==================================================
+          else {
+            const [relationInsert] = await connection.query(
+              `
+            INSERT INTO cms_page_attachment
+            (
+              id_cms_page,
+
+              id_attachment,
+
+              cms_page_attachment_role,
+
+              cms_page_attachment_sort_order,
+
+              cms_page_attachment_is_public,
+
+              created,
+
+              updated
+            )
+            VALUES
+            (
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+
+              NOW(),
+
+              NOW()
+            )
+          `,
+              [
+                idCmsPage,
+
+                media.idAttachment,
+
+                media.role,
+
+                media.sortOrder,
+
+                media.isPublic,
+              ],
+            );
+
+            idRelation = Number((relationInsert as any).insertId);
+          }
+
+          retainedRelationIds.push(idRelation);
+
+          //==================================================
+          //==== ATTACHMENT TRANSLATIONS
+          //==================================================
+
+          if (media.translationsProvided) {
+            for (const translation of media.translations) {
+              await connection.query(
+                `
+            INSERT INTO cms_page_attachment_i18n
+            (
+              id_cms_page_attachment,
+
+              cms_page_attachment_locale,
+
+              cms_page_attachment_caption,
+
+              cms_page_attachment_alt_text,
+
+              created,
+
+              updated
+            )
+            VALUES
+            (
+              ?,
+              ?,
+              ?,
+              ?,
+
+              NOW(),
+
+              NOW()
+            )
+
+            ON DUPLICATE KEY UPDATE
+
+              cms_page_attachment_caption =
+                VALUES(
+                  cms_page_attachment_caption
+                ),
+
+              cms_page_attachment_alt_text =
+                VALUES(
+                  cms_page_attachment_alt_text
+                ),
+
+              updated = NOW()
+          `,
+                [
+                  idRelation,
+
+                  translation.locale,
+
+                  translation.caption,
+
+                  translation.altText,
+                ],
+              );
+            }
+
+            //==================================================
+            //==== REMOVE OMITTED MEDIA TRANSLATIONS
+            //==================================================
+
+            if (media.translations.length > 0) {
+              const localePlaceholders = media.translations
+                .map(() => "?")
+                .join(",");
+
+              await connection.query(
+                `
+            DELETE FROM
+              cms_page_attachment_i18n
+
+            WHERE id_cms_page_attachment = ?
+
+              AND cms_page_attachment_locale
+                NOT IN (
+                  ${localePlaceholders}
+                )
+          `,
+                [idRelation, ...media.translations.map((item) => item.locale)],
+              );
+            } else {
+              await connection.query(
+                `
+            DELETE FROM
+              cms_page_attachment_i18n
+
+            WHERE id_cms_page_attachment = ?
+          `,
+                [idRelation],
+              );
+            }
+          }
+        }
+
+        //==================================================
+        //==== REMOVE OMITTED ATTACHMENTS
+        //==================================================
+
+        if (retainedRelationIds.length > 0) {
+          const placeholders = retainedRelationIds.map(() => "?").join(",");
+
+          await connection.query(
+            `
+        DELETE FROM cms_page_attachment
+
+        WHERE id_cms_page = ?
+
+          AND id_cms_page_attachment
+            NOT IN (${placeholders})
+      `,
+            [idCmsPage, ...retainedRelationIds],
+          );
+        } else {
+          await connection.query(
+            `
+        DELETE FROM cms_page_attachment
+
+        WHERE id_cms_page = ?
+      `,
+            [idCmsPage],
+          );
+        }
+      }
+
+      //==================================================
       //==== AFTER AUDIT
       //==================================================
 
@@ -3994,15 +4692,43 @@ app.put(
 
         cms_page_settings_json: parseJsonValue(settingsJson),
 
-        translations: normalizedTranslations.map((item) => ({
-          locale: item.locale,
+        translations: sortCmsPageAuditTranslations(
+          normalizedTranslations.map((item) => ({
+            locale: item.locale,
 
-          slug: item.slug,
+            slug: item.slug,
 
-          title: item.title,
+            title: item.title,
 
-          status: item.status,
-        })),
+            status: item.status,
+          })),
+        ),
+
+        ...(attachmentsProvided
+          ? {
+              attachments: sortCmsPageAuditAttachments(
+                normalizedAttachments.map((item) => ({
+                  id_attachment: item.idAttachment,
+
+                  role: item.role,
+
+                  sort_order: item.sortOrder,
+
+                  is_public: item.isPublic,
+
+                  translations: sortCmsPageAuditTranslations(
+                    item.translations.map((translation) => ({
+                      locale: translation.locale,
+
+                      caption: translation.caption,
+
+                      alt_text: translation.altText,
+                    })),
+                  ),
+                })),
+              ),
+            }
+          : {}),
       };
 
       //==================================================

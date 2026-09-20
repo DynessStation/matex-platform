@@ -149,6 +149,39 @@ const getAttachmentReferences = async (
   }
 
   //==================================================
+  //==== CMS PAGE ATTACHMENT
+  //==================================================
+
+  const [cmsPageRows] = await executor.query(
+    `
+    SELECT
+      id_attachment,
+
+      COUNT(*) AS total
+
+    FROM cms_page_attachment
+
+    WHERE id_attachment IN (
+      ${placeholders}
+    )
+
+    GROUP BY
+      id_attachment
+  `,
+    ids,
+  );
+
+  for (const row of cmsPageRows as any[]) {
+    references.push({
+      idAttachment: Number(row.id_attachment),
+
+      source: "cms_page.attachment",
+
+      total: Number(row.total),
+    });
+  }
+
+  //==================================================
   //==== FUTURE REFERENCES
   //==================================================
   //
