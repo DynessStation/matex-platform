@@ -2467,6 +2467,1636 @@ app.post(
 );
 
 //==================================================
+//==== CMS PAGE - UPDATE
+//==================================================
+
+app.put(
+  "/api/v1/cms-page/:id",
+
+  verifyToken,
+
+  requirePermission("cms_page.update"),
+
+  async (
+    req: AuthRequest,
+
+    res: Response,
+  ) => {
+    let connection: any = null;
+
+    try {
+      //==================================================
+      //==== ID
+      //==================================================
+
+      const idCmsPage = decodeCmsPageId(req.params.id);
+
+      if (!idCmsPage) {
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_INVALID_ID",
+          "Invalid CMS page identifier",
+        );
+      }
+
+      //==================================================
+      //==== SESSION
+      //==================================================
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      //==================================================
+      //==== TRANSACTION
+      //==================================================
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      //==================================================
+      //==== CURRENT PAGE
+      //==================================================
+
+      const [pageRows] = await connection.query(
+        `
+            SELECT
+              id_cms_page,
+
+              id_master_comp,
+
+              id_parent_cms_page,
+
+              cms_page_key,
+
+              cms_page_type,
+
+              cms_page_template,
+
+              cms_page_content_mode,
+
+              cms_page_default_locale,
+
+              cms_page_status,
+
+              cms_page_visibility,
+
+              cms_page_is_system,
+
+              cms_page_is_featured,
+
+              cms_page_sort_order,
+
+              cms_page_publish_at,
+
+              cms_page_unpublish_at,
+
+              cms_page_settings_json,
+
+              id_created_by,
+
+              id_updated_by,
+
+              created,
+
+              updated
+
+            FROM cms_page
+
+            WHERE id_cms_page = ?
+
+              AND id_master_comp = ?
+
+              AND cms_page_deleted_at
+                IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idCmsPage, scope.idMasterComp],
+      );
+
+      const pages = pageRows as any[];
+
+      if (!pages.length) {
+        await connection.rollback();
+
+        return sendError(res, 404, "CMS_PAGE_NOT_FOUND", "CMS page not found");
+      }
+
+      const currentPage = pages[0];
+
+      //==================================================
+      //==== CURRENT TRANSLATIONS
+      //==================================================
+
+      const [currentTranslationRows] = await connection.query(
+        `
+            SELECT
+              cms_page_locale,
+
+              cms_page_slug,
+
+              cms_page_title,
+
+              cms_page_i18n_status
+
+            FROM cms_page_i18n
+
+            WHERE id_cms_page = ?
+
+              AND id_master_comp = ?
+
+            ORDER BY
+              cms_page_locale ASC
+          `,
+        [idCmsPage, scope.idMasterComp],
+      );
+
+      const currentTranslations = currentTranslationRows as any[];
+
+      //==================================================
+      //==== BODY
+      //==================================================
+
+      const {
+        id_parent_cms_page,
+
+        cms_page_key,
+
+        cms_page_type,
+
+        cms_page_template,
+
+        cms_page_content_mode,
+
+        cms_page_default_locale,
+
+        cms_page_status,
+
+        cms_page_visibility,
+
+        cms_page_is_system,
+
+        cms_page_is_featured,
+
+        cms_page_sort_order,
+
+        cms_page_publish_at,
+
+        cms_page_unpublish_at,
+
+        cms_page_settings_json,
+
+        translations,
+      } = req.body;
+
+      //==================================================
+      //==== KEY
+      //==================================================
+
+      const cleanKey = String(cms_page_key ?? currentPage.cms_page_key)
+        .trim()
+        .toLowerCase();
+
+      if (
+        !cleanKey ||
+        cleanKey.length > 100 ||
+        !/^[a-z0-9][a-z0-9_-]*$/.test(cleanKey)
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_KEY_INVALID",
+          "Invalid CMS page key",
+        );
+      }
+
+      //==================================================
+      //==== TYPE
+      //==================================================
+
+      const cleanType = String(cms_page_type ?? currentPage.cms_page_type)
+        .trim()
+        .toLowerCase();
+
+      if (
+        !cleanType ||
+        cleanType.length > 50 ||
+        !/^[a-z0-9][a-z0-9_-]*$/.test(cleanType)
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_TYPE_INVALID",
+          "Invalid CMS page type",
+        );
+      }
+
+      //==================================================
+      //==== TEMPLATE
+      //==================================================
+
+      const cleanTemplate =
+        cms_page_template === undefined
+          ? (currentPage.cms_page_template ?? null)
+          : nullableString(cms_page_template);
+
+      if (cleanTemplate && String(cleanTemplate).length > 100) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_TEMPLATE_TOO_LONG",
+          "CMS page template is too long",
+        );
+      }
+
+      //==================================================
+      //==== CONTENT MODE
+      //==================================================
+
+      const cleanContentMode = String(
+        cms_page_content_mode ?? currentPage.cms_page_content_mode,
+      )
+        .trim()
+        .toLowerCase();
+
+      if (!["html", "blocks", "hybrid"].includes(cleanContentMode)) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_CONTENT_MODE_INVALID",
+          "Invalid CMS page content mode",
+        );
+      }
+
+      //==================================================
+      //==== DEFAULT LOCALE
+      //==================================================
+
+      const defaultLocale = String(
+        cms_page_default_locale ?? currentPage.cms_page_default_locale,
+      ).trim();
+
+      if (!isCmsPageLocale(defaultLocale)) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_DEFAULT_LOCALE_UNSUPPORTED",
+          "Unsupported CMS page default locale",
+        );
+      }
+
+      //==================================================
+      //==== STATUS
+      //==================================================
+
+      const pageStatus =
+        cms_page_status === undefined
+          ? Number(currentPage.cms_page_status)
+          : Number(cms_page_status);
+
+      if (
+        !Number.isInteger(pageStatus) ||
+        !Object.values(CMS_PAGE_STATUS).includes(pageStatus as CmsPageStatus)
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_STATUS_INVALID",
+          "Invalid CMS page status",
+        );
+      }
+
+      //==================================================
+      //==== VISIBILITY
+      //==================================================
+
+      const visibility =
+        cms_page_visibility === undefined
+          ? Number(currentPage.cms_page_visibility)
+          : Number(cms_page_visibility);
+
+      if (
+        !Number.isInteger(visibility) ||
+        !Object.values(CMS_PAGE_VISIBILITY).includes(
+          visibility as CmsPageVisibility,
+        )
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_VISIBILITY_INVALID",
+          "Invalid CMS page visibility",
+        );
+      }
+
+      //==================================================
+      //==== FLAGS
+      //==================================================
+
+      const isSystem =
+        cms_page_is_system === undefined
+          ? (Number(currentPage.cms_page_is_system) as 0 | 1)
+          : normalizeFlag(cms_page_is_system, 0);
+
+      const isFeatured =
+        cms_page_is_featured === undefined
+          ? (Number(currentPage.cms_page_is_featured) as 0 | 1)
+          : normalizeFlag(cms_page_is_featured, 0);
+
+      const currentIsSystem = Number(currentPage.cms_page_is_system) as 0 | 1;
+
+      //==================================================
+      //==== SYSTEM PAGE STRUCTURE
+      //==================================================
+
+      if (currentIsSystem !== isSystem && scope.isAllAccess !== 1) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          403,
+          "CMS_PAGE_SYSTEM_ACCESS_DENIED",
+          "Full access is required to change CMS page system status",
+        );
+      }
+
+      //==================================================
+      //==== SORT ORDER
+      //==================================================
+
+      const sortOrder =
+        cms_page_sort_order === undefined
+          ? Number(currentPage.cms_page_sort_order ?? 0)
+          : Number(cms_page_sort_order);
+
+      if (!Number.isInteger(sortOrder) || sortOrder < 0) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_SORT_ORDER_INVALID",
+          "Invalid CMS page sort order",
+        );
+      }
+
+      //==================================================
+      //==== PUBLISH AT
+      //==================================================
+
+      let publishAt: Date | string | null =
+        currentPage.cms_page_publish_at ?? null;
+
+      if (cms_page_publish_at !== undefined) {
+        if (cms_page_publish_at === null || cms_page_publish_at === "") {
+          publishAt = null;
+        } else {
+          const parsedPublishAt = normalizeDateValue(cms_page_publish_at);
+
+          if (!parsedPublishAt) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_PUBLISH_AT_INVALID",
+              "Invalid CMS page publish date",
+            );
+          }
+
+          publishAt = parsedPublishAt;
+        }
+      }
+
+      //==================================================
+      //==== UNPUBLISH AT
+      //==================================================
+
+      let unpublishAt: Date | string | null =
+        currentPage.cms_page_unpublish_at ?? null;
+
+      if (cms_page_unpublish_at !== undefined) {
+        if (cms_page_unpublish_at === null || cms_page_unpublish_at === "") {
+          unpublishAt = null;
+        } else {
+          const parsedUnpublishAt = normalizeDateValue(cms_page_unpublish_at);
+
+          if (!parsedUnpublishAt) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_UNPUBLISH_AT_INVALID",
+              "Invalid CMS page unpublish date",
+            );
+          }
+
+          unpublishAt = parsedUnpublishAt;
+        }
+      }
+
+      if (
+        publishAt &&
+        unpublishAt &&
+        new Date(unpublishAt).getTime() <= new Date(publishAt).getTime()
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_PUBLISH_WINDOW_INVALID",
+          "Unpublish date must be after publish date",
+        );
+      }
+
+      if (
+        (publishAt || unpublishAt) &&
+        pageStatus !== CMS_PAGE_STATUS.PUBLISHED
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_SCHEDULE_STATUS_INVALID",
+          "Scheduled publication requires published page status",
+        );
+      }
+
+      //==================================================
+      //==== SETTINGS
+      //==================================================
+
+      let settingsJson: string | null =
+        currentPage.cms_page_settings_json ?? null;
+
+      if (cms_page_settings_json !== undefined) {
+        if (cms_page_settings_json === null) {
+          settingsJson = null;
+        } else {
+          if (
+            typeof cms_page_settings_json !== "object" ||
+            Array.isArray(cms_page_settings_json)
+          ) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_SETTINGS_INVALID",
+              "CMS page settings must be an object",
+            );
+          }
+
+          settingsJson = serializeJsonValue(cms_page_settings_json);
+        }
+      }
+
+      //==================================================
+      //==== TRANSLATIONS REQUIRED
+      //==================================================
+
+      if (!Array.isArray(translations) || translations.length === 0) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_TRANSLATIONS_REQUIRED",
+          "At least one CMS page translation is required",
+        );
+      }
+
+      if (translations.length > 20) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_TRANSLATIONS_LIMIT_EXCEEDED",
+          "Too many CMS page translations",
+        );
+      }
+
+      //==================================================
+      //==== NORMALIZE TRANSLATIONS
+      //==================================================
+
+      const normalizedTranslations: {
+        locale: string;
+
+        slug: string;
+
+        title: string;
+
+        excerpt: string | null;
+
+        content: string | null;
+
+        contentJson: string | null;
+
+        metaTitle: string | null;
+
+        metaDescription: string | null;
+
+        metaKeywords: string | null;
+
+        metaRobots: string | null;
+
+        canonicalUrl: string | null;
+
+        ogTitle: string | null;
+
+        ogDescription: string | null;
+
+        schemaJson: string | null;
+
+        status: CmsPageI18nStatus;
+      }[] = [];
+
+      const translationLocales = new Set<string>();
+
+      for (const raw of translations) {
+        const item = raw as CmsPageTranslationInput;
+
+        const locale = String(item?.locale ?? "").trim();
+
+        if (!isCmsPageLocale(locale)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_LOCALE_UNSUPPORTED",
+            "Unsupported CMS page translation locale",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (translationLocales.has(locale)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_DUPLICATED",
+            "Duplicate CMS page translation locale",
+            {
+              locale,
+            },
+          );
+        }
+
+        translationLocales.add(locale);
+
+        const title = String(item?.title ?? "").trim();
+
+        if (!title) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_TITLE_REQUIRED",
+            "CMS page translation title is required",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (title.length > 255) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_TITLE_TOO_LONG",
+            "CMS page translation title is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        const slug = slugify(nullableString(item?.slug) ?? title);
+
+        if (!slug || slug.length > 191) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_SLUG_INVALID",
+            "Invalid CMS page translation slug",
+            {
+              locale,
+            },
+          );
+        }
+
+        const excerpt = nullableString(item?.excerpt);
+
+        const content = typeof item?.content === "string" ? item.content : null;
+
+        const metaTitle = nullableString(item?.meta_title);
+
+        const metaDescription = nullableString(item?.meta_description);
+
+        const metaKeywords = nullableString(item?.meta_keywords);
+
+        const metaRobots = nullableString(item?.meta_robots);
+
+        const canonicalUrl = nullableString(item?.canonical_url);
+
+        const ogTitle = nullableString(item?.og_title);
+
+        const ogDescription = nullableString(item?.og_description);
+
+        if (metaTitle && metaTitle.length > 255) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_META_TITLE_TOO_LONG",
+            "CMS page meta title is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (metaDescription && metaDescription.length > 500) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_META_DESCRIPTION_TOO_LONG",
+            "CMS page meta description is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (metaKeywords && metaKeywords.length > 500) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_META_KEYWORDS_TOO_LONG",
+            "CMS page meta keywords are too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (metaRobots && metaRobots.length > 100) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_META_ROBOTS_TOO_LONG",
+            "CMS page meta robots value is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (
+          canonicalUrl &&
+          (canonicalUrl.length > 500 || !isValidHttpUrl(canonicalUrl))
+        ) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_CANONICAL_URL_INVALID",
+            "Invalid CMS page canonical URL",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (ogTitle && ogTitle.length > 255) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_OG_TITLE_TOO_LONG",
+            "CMS page Open Graph title is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (ogDescription && ogDescription.length > 500) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_OG_DESCRIPTION_TOO_LONG",
+            "CMS page Open Graph description is too long",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (
+          item?.content_json !== null &&
+          item?.content_json !== undefined &&
+          typeof item.content_json !== "object"
+        ) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_CONTENT_JSON_INVALID",
+            "CMS page content JSON must be an object or array",
+            {
+              locale,
+            },
+          );
+        }
+
+        if (
+          item?.schema_json !== null &&
+          item?.schema_json !== undefined &&
+          (typeof item.schema_json !== "object" ||
+            Array.isArray(item.schema_json))
+        ) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_SCHEMA_JSON_INVALID",
+            "CMS page schema JSON must be an object",
+            {
+              locale,
+            },
+          );
+        }
+
+        const translationStatus = Number(item?.status ?? 0);
+
+        if (
+          !Number.isInteger(translationStatus) ||
+          ![0, 1].includes(translationStatus)
+        ) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_TRANSLATION_STATUS_INVALID",
+            "Invalid CMS page translation status",
+            {
+              locale,
+            },
+          );
+        }
+
+        normalizedTranslations.push({
+          locale,
+
+          slug,
+
+          title,
+
+          excerpt,
+
+          content,
+
+          contentJson: serializeJsonValue(item?.content_json),
+
+          metaTitle,
+
+          metaDescription,
+
+          metaKeywords,
+
+          metaRobots,
+
+          canonicalUrl,
+
+          ogTitle,
+
+          ogDescription,
+
+          schemaJson: serializeJsonValue(item?.schema_json),
+
+          status: translationStatus as CmsPageI18nStatus,
+        });
+      }
+
+      //==================================================
+      //==== DEFAULT TRANSLATION
+      //==================================================
+
+      const defaultTranslation = normalizedTranslations.find(
+        (item) => item.locale === defaultLocale,
+      );
+
+      if (!defaultTranslation) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_DEFAULT_TRANSLATION_REQUIRED",
+          "Default locale translation is required",
+          {
+            locale: defaultLocale,
+          },
+        );
+      }
+
+      if (
+        pageStatus === CMS_PAGE_STATUS.PUBLISHED &&
+        defaultTranslation.status !== 1
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_DEFAULT_TRANSLATION_NOT_PUBLISHED",
+          "Default translation must be published before publishing the CMS page",
+        );
+      }
+
+      //==================================================
+      //==== PUBLISH PERMISSION
+      //==================================================
+
+      const usesPublication =
+        pageStatus === CMS_PAGE_STATUS.PUBLISHED ||
+        publishAt !== null ||
+        unpublishAt !== null ||
+        normalizedTranslations.some((item) => item.status === 1);
+
+      if (usesPublication) {
+        const canPublish = await sessionHasPermission(
+          connection,
+
+          scope,
+
+          "cms_page.publish",
+        );
+
+        if (!canPublish) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            403,
+            "CMS_PAGE_PUBLISH_ACCESS_DENIED",
+            "Publish permission is required",
+          );
+        }
+      }
+
+      //==================================================
+      //==== PARENT
+      //==================================================
+
+      let idParentCmsPage: number | null =
+        currentPage.id_parent_cms_page === null
+          ? null
+          : Number(currentPage.id_parent_cms_page);
+
+      if (id_parent_cms_page !== undefined) {
+        if (id_parent_cms_page === null || id_parent_cms_page === "") {
+          idParentCmsPage = null;
+        } else {
+          idParentCmsPage = decodeCmsPageId(id_parent_cms_page);
+
+          if (!idParentCmsPage) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_PARENT_INVALID_ID",
+              "Invalid parent CMS page identifier",
+            );
+          }
+        }
+      }
+
+      if (idParentCmsPage === idCmsPage) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "CMS_PAGE_PARENT_SELF_REFERENCE",
+          "CMS page cannot be its own parent",
+        );
+      }
+
+      //==================================================
+      //==== PARENT CHAIN
+      //==================================================
+
+      if (idParentCmsPage !== null) {
+        let currentParent: number | null = idParentCmsPage;
+
+        const visited = new Set<number>([idCmsPage]);
+
+        let depth = 0;
+
+        while (currentParent !== null) {
+          if (visited.has(currentParent)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_PARENT_CYCLE",
+              "CMS page parent would create a hierarchy cycle",
+            );
+          }
+
+          visited.add(currentParent);
+
+          depth += 1;
+
+          if (depth > 100) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_PARENT_DEPTH_EXCEEDED",
+              "CMS page hierarchy is too deep",
+            );
+          }
+
+          const [parentRows] = await connection.query(
+            `
+                SELECT
+                  id_parent_cms_page
+
+                FROM cms_page
+
+                WHERE id_cms_page = ?
+
+                  AND id_master_comp = ?
+
+                  AND cms_page_deleted_at
+                    IS NULL
+
+                LIMIT 1
+              `,
+            [currentParent, scope.idMasterComp],
+          );
+
+          const parentPages = parentRows as any[];
+
+          if (!parentPages.length) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              404,
+              "CMS_PAGE_PARENT_NOT_FOUND",
+              "Parent CMS page not found",
+            );
+          }
+
+          currentParent =
+            parentPages[0].id_parent_cms_page === null
+              ? null
+              : Number(parentPages[0].id_parent_cms_page);
+        }
+      }
+
+      //==================================================
+      //==== SYSTEM PAGE STRUCTURAL RULE
+      //==================================================
+
+      const structuralChanged =
+        cleanKey !== String(currentPage.cms_page_key) ||
+        cleanType !== String(currentPage.cms_page_type) ||
+        cleanTemplate !== (currentPage.cms_page_template ?? null) ||
+        cleanContentMode !== String(currentPage.cms_page_content_mode) ||
+        defaultLocale !== String(currentPage.cms_page_default_locale) ||
+        idParentCmsPage !==
+          (currentPage.id_parent_cms_page === null
+            ? null
+            : Number(currentPage.id_parent_cms_page));
+
+      if (
+        currentIsSystem === 1 &&
+        structuralChanged &&
+        scope.isAllAccess !== 1
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          403,
+          "CMS_PAGE_SYSTEM_STRUCTURE_ACCESS_DENIED",
+          "Full access is required to change system CMS page structure",
+        );
+      }
+
+      //==================================================
+      //==== UNIQUE KEY
+      //==================================================
+
+      const [keyRows] = await connection.query(
+        `
+            SELECT
+              id_cms_page
+
+            FROM cms_page
+
+            WHERE id_master_comp = ?
+
+              AND cms_page_key = ?
+
+              AND id_cms_page <> ?
+
+            LIMIT 1
+          `,
+        [scope.idMasterComp, cleanKey, idCmsPage],
+      );
+
+      if ((keyRows as any[]).length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          409,
+          "CMS_PAGE_KEY_EXISTS",
+          "CMS page key is already in use",
+        );
+      }
+
+      //==================================================
+      //==== UNIQUE SLUG
+      //==================================================
+
+      for (const translation of normalizedTranslations) {
+        const [slugRows] = await connection.query(
+          `
+              SELECT
+                id_cms_page_i18n
+
+              FROM cms_page_i18n
+
+              WHERE id_master_comp = ?
+
+                AND cms_page_locale = ?
+
+                AND cms_page_slug = ?
+
+                AND id_cms_page <> ?
+
+              LIMIT 1
+            `,
+          [scope.idMasterComp, translation.locale, translation.slug, idCmsPage],
+        );
+
+        if ((slugRows as any[]).length) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "CMS_PAGE_SLUG_EXISTS",
+            "CMS page slug is already in use for this locale",
+            {
+              locale: translation.locale,
+
+              slug: translation.slug,
+            },
+          );
+        }
+      }
+
+      //==================================================
+      //==== BEFORE AUDIT
+      //==================================================
+
+      const beforeAudit = {
+        id_parent_cms_page: currentPage.id_parent_cms_page,
+
+        cms_page_key: currentPage.cms_page_key,
+
+        cms_page_type: currentPage.cms_page_type,
+
+        cms_page_template: currentPage.cms_page_template,
+
+        cms_page_content_mode: currentPage.cms_page_content_mode,
+
+        cms_page_default_locale: currentPage.cms_page_default_locale,
+
+        cms_page_status: Number(currentPage.cms_page_status),
+
+        cms_page_visibility: Number(currentPage.cms_page_visibility),
+
+        cms_page_is_system: Number(currentPage.cms_page_is_system),
+
+        cms_page_is_featured: Number(currentPage.cms_page_is_featured),
+
+        cms_page_sort_order: Number(currentPage.cms_page_sort_order),
+
+        cms_page_publish_at: currentPage.cms_page_publish_at,
+
+        cms_page_unpublish_at: currentPage.cms_page_unpublish_at,
+
+        cms_page_settings_json: parseJsonValue(
+          currentPage.cms_page_settings_json,
+        ),
+
+        translations: currentTranslations.map((item) => ({
+          locale: item.cms_page_locale,
+
+          slug: item.cms_page_slug,
+
+          title: item.cms_page_title,
+
+          status: Number(item.cms_page_i18n_status),
+        })),
+      };
+
+      //==================================================
+      //==== UPDATE PAGE
+      //==================================================
+
+      await connection.query(
+        `
+          UPDATE cms_page
+
+          SET
+            id_parent_cms_page = ?,
+
+            cms_page_key = ?,
+
+            cms_page_type = ?,
+
+            cms_page_template = ?,
+
+            cms_page_content_mode = ?,
+
+            cms_page_default_locale = ?,
+
+            cms_page_status = ?,
+
+            cms_page_visibility = ?,
+
+            cms_page_is_system = ?,
+
+            cms_page_is_featured = ?,
+
+            cms_page_sort_order = ?,
+
+            cms_page_publish_at = ?,
+
+            cms_page_unpublish_at = ?,
+
+            cms_page_settings_json = ?,
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_cms_page = ?
+
+            AND id_master_comp = ?
+
+            AND cms_page_deleted_at
+              IS NULL
+        `,
+        [
+          idParentCmsPage,
+
+          cleanKey,
+
+          cleanType,
+
+          cleanTemplate,
+
+          cleanContentMode,
+
+          defaultLocale,
+
+          pageStatus,
+
+          visibility,
+
+          isSystem,
+
+          isFeatured,
+
+          sortOrder,
+
+          publishAt,
+
+          unpublishAt,
+
+          settingsJson,
+
+          scope.idAdminAcct,
+
+          idCmsPage,
+
+          scope.idMasterComp,
+        ],
+      );
+
+      //==================================================
+      //==== UPSERT TRANSLATIONS
+      //==================================================
+
+      for (const translation of normalizedTranslations) {
+        await connection.query(
+          `
+            INSERT INTO cms_page_i18n
+            (
+              id_cms_page,
+
+              id_master_comp,
+
+              cms_page_locale,
+
+              cms_page_slug,
+
+              cms_page_title,
+
+              cms_page_excerpt,
+
+              cms_page_content,
+
+              cms_page_content_json,
+
+              cms_page_meta_title,
+
+              cms_page_meta_description,
+
+              cms_page_meta_keywords,
+
+              cms_page_meta_robots,
+
+              cms_page_canonical_url,
+
+              cms_page_og_title,
+
+              cms_page_og_description,
+
+              cms_page_schema_json,
+
+              cms_page_i18n_status,
+
+              created,
+
+              updated
+            )
+            VALUES
+            (
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?,
+
+              NOW(),
+
+              NOW()
+            )
+
+            ON DUPLICATE KEY UPDATE
+
+              cms_page_slug =
+                VALUES(
+                  cms_page_slug
+                ),
+
+              cms_page_title =
+                VALUES(
+                  cms_page_title
+                ),
+
+              cms_page_excerpt =
+                VALUES(
+                  cms_page_excerpt
+                ),
+
+              cms_page_content =
+                VALUES(
+                  cms_page_content
+                ),
+
+              cms_page_content_json =
+                VALUES(
+                  cms_page_content_json
+                ),
+
+              cms_page_meta_title =
+                VALUES(
+                  cms_page_meta_title
+                ),
+
+              cms_page_meta_description =
+                VALUES(
+                  cms_page_meta_description
+                ),
+
+              cms_page_meta_keywords =
+                VALUES(
+                  cms_page_meta_keywords
+                ),
+
+              cms_page_meta_robots =
+                VALUES(
+                  cms_page_meta_robots
+                ),
+
+              cms_page_canonical_url =
+                VALUES(
+                  cms_page_canonical_url
+                ),
+
+              cms_page_og_title =
+                VALUES(
+                  cms_page_og_title
+                ),
+
+              cms_page_og_description =
+                VALUES(
+                  cms_page_og_description
+                ),
+
+              cms_page_schema_json =
+                VALUES(
+                  cms_page_schema_json
+                ),
+
+              cms_page_i18n_status =
+                VALUES(
+                  cms_page_i18n_status
+                ),
+
+              updated = NOW()
+          `,
+          [
+            idCmsPage,
+
+            scope.idMasterComp,
+
+            translation.locale,
+
+            translation.slug,
+
+            translation.title,
+
+            translation.excerpt,
+
+            translation.content,
+
+            translation.contentJson,
+
+            translation.metaTitle,
+
+            translation.metaDescription,
+
+            translation.metaKeywords,
+
+            translation.metaRobots,
+
+            translation.canonicalUrl,
+
+            translation.ogTitle,
+
+            translation.ogDescription,
+
+            translation.schemaJson,
+
+            translation.status,
+          ],
+        );
+      }
+
+      //==================================================
+      //==== REMOVE OMITTED TRANSLATIONS
+      //==================================================
+
+      const localePlaceholders = normalizedTranslations
+        .map(() => "?")
+        .join(",");
+
+      await connection.query(
+        `
+          DELETE FROM cms_page_i18n
+
+          WHERE id_cms_page = ?
+
+            AND id_master_comp = ?
+
+            AND cms_page_locale
+              NOT IN (
+                ${localePlaceholders}
+              )
+        `,
+        [
+          idCmsPage,
+
+          scope.idMasterComp,
+
+          ...normalizedTranslations.map((item) => item.locale),
+        ],
+      );
+
+      //==================================================
+      //==== AFTER AUDIT
+      //==================================================
+
+      const afterAudit = {
+        id_parent_cms_page: idParentCmsPage,
+
+        cms_page_key: cleanKey,
+
+        cms_page_type: cleanType,
+
+        cms_page_template: cleanTemplate,
+
+        cms_page_content_mode: cleanContentMode,
+
+        cms_page_default_locale: defaultLocale,
+
+        cms_page_status: pageStatus,
+
+        cms_page_visibility: visibility,
+
+        cms_page_is_system: isSystem,
+
+        cms_page_is_featured: isFeatured,
+
+        cms_page_sort_order: sortOrder,
+
+        cms_page_publish_at: publishAt,
+
+        cms_page_unpublish_at: unpublishAt,
+
+        cms_page_settings_json: parseJsonValue(settingsJson),
+
+        translations: normalizedTranslations.map((item) => ({
+          locale: item.locale,
+
+          slug: item.slug,
+
+          title: item.title,
+
+          status: item.status,
+        })),
+      };
+
+      //==================================================
+      //==== AUDIT
+      //==================================================
+
+      await writeAuditLog({
+        req,
+
+        connection,
+
+        writeMode: "strict",
+
+        idMasterComp: scope.idMasterComp,
+
+        eventCode: "cms_page.updated",
+
+        category: "data_change",
+
+        module: "cms_page",
+
+        action: "update",
+
+        actorType: "admin",
+
+        actorId: scope.idAdminAcct,
+
+        actorLabel: req.user?.alias ?? null,
+
+        entityType: "cms_page",
+
+        entityId: idCmsPage,
+
+        entityLabel: defaultTranslation.title,
+
+        before: beforeAudit,
+
+        after: afterAudit,
+
+        httpStatus: 200,
+      });
+
+      //==================================================
+      //==== COMMIT
+      //==================================================
+
+      await connection.commit();
+
+      //==================================================
+      //==== RESPONSE
+      //==================================================
+
+      return sendSuccess(
+        res,
+        200,
+        "CMS_PAGE_UPDATED",
+        "CMS page updated successfully",
+        {
+          id_cms_page: keyhsid.idCmsPage.encode(idCmsPage),
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      if ((error as any)?.code === "ER_DUP_ENTRY") {
+        return sendError(
+          res,
+          409,
+          "CMS_PAGE_ALREADY_EXISTS",
+          "CMS page key or slug is already in use",
+        );
+      }
+
+      console.error("Update CMS page error:", error);
+
+      return sendError(
+        res,
+        500,
+        "INTERNAL_SERVER_ERROR",
+        "Internal Server Error",
+      );
+    } finally {
+      if (connection) {
+        connection.release();
+      }
+    }
+  },
+);
+
+//==================================================
 //==== CMS PAGE - GET DETAIL
 //==================================================
 
