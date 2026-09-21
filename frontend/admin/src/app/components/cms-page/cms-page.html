@@ -1,14 +1,26 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'cms_page.title'">
-  <div button class="d-flex flex-wrap gap-2" *hasPermission="'cms_page.create'">
+  <div button class="d-flex flex-wrap gap-2">
     <a
+      *hasPermission="'cms_page.create'"
       [routerLink]="['/cms-page/create']"
-      class="align-items-center btn btn-theme"
+      class="align-items-center btn btn-theme d-flex"
     >
-      <i class="ri-add-line"></i>
+      <i class="ri-add-line me-1"></i>
 
       {{ 'cms_page.add' | translate }}
     </a>
+
+    <a
+      *hasPermission="'cms_page.view'"
+      [routerLink]="['/cms-page/trash']"
+      class="align-items-center btn btn-light-bg d-flex"
+    >
+      <i class="ri-delete-bin-6-line me-1"></i>
+
+      {{ 'cms_page.trash' | translate }}
+    </a>
   </div>
+
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"

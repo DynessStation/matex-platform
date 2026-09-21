@@ -1674,7 +1674,11 @@
 
     "trash_title": "Move to Trash?",
     "trash_message": "\"{{name}}\" will be moved to Trash and can be restored later.",
-    "trash_message_generic": "This item will be moved to Trash and can be restored later."
+    "trash_message_generic": "This item will be moved to Trash and can be restored later.",
+
+    "restore_title": "Restore Page?",
+    "restore_message": "\"{{name}}\" will be restored from Trash and returned as a Draft.",
+    "restore_message_generic": "This page will be restored from Trash and returned as a Draft."
   },
   "office": {
     "title": "Offices",
@@ -1985,6 +1989,12 @@
     "save_changes": "Save Changes",
 
     "move_to_trash_action": "Move to Trash",
+
+    "trash": "Trash",
+    "trash_title": "Page Trash",
+    "trash_help": "Pages moved to Trash are retained and can be restored.",
+    "deleted_at": "Deleted",
+    "restore_action": "Restore",
 
     "validation": {
       "key_required": "Page key is required.",

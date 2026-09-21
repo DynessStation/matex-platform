@@ -1674,7 +1674,11 @@
 
     "trash_title": "Pindahkan ke Sampah?",
     "trash_message": "\"{{name}}\" akan dipindahkan ke Sampah dan dapat dipulihkan kembali.",
-    "trash_message_generic": "Item ini akan dipindahkan ke Sampah dan dapat dipulihkan kembali."
+    "trash_message_generic": "Item ini akan dipindahkan ke Sampah dan dapat dipulihkan kembali.",
+
+    "restore_title": "Pulihkan Halaman?",
+    "restore_message": "\"{{name}}\" akan dipulihkan dari Sampah dan dikembalikan sebagai Draf.",
+    "restore_message_generic": "Halaman ini akan dipulihkan dari Sampah dan dikembalikan sebagai Draf."
   },
   "office": {
     "title": "Kantor",
@@ -1985,6 +1989,12 @@
     "save_changes": "Simpan Perubahan",
 
     "move_to_trash_action": "Pindahkan ke Sampah",
+
+    "trash": "Sampah",
+    "trash_title": "Sampah Halaman",
+    "trash_help": "Halaman yang dipindahkan ke Sampah tetap disimpan dan dapat dipulihkan kembali.",
+    "deleted_at": "Dihapus",
+    "restore_action": "Pulihkan",
 
     "validation": {
       "key_required": "Key halaman wajib diisi.",

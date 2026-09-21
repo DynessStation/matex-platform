@@ -50,6 +50,27 @@ export const cmsPageRoutes: Routes = [
   },
 
   //==================================================
+  //==== TRASH
+  //==================================================
+
+  {
+    path: 'trash',
+
+    canActivate: [PermissionGuard],
+
+    data: {
+      permission: 'cms_page.view',
+
+      titleKey: 'cms_page.trash_title',
+    },
+
+    loadComponent: () =>
+      import('./cms-page-trash/cms-page-trash').then(
+        (component) => component.CmsPageTrash,
+      ),
+  },
+
+  //==================================================
   //==== DETAIL
   //==================================================
 

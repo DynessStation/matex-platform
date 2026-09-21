@@ -197,6 +197,19 @@ export class ConfirmationModal {
         break;
 
       //==================================================
+      //==== RESTORE
+      //==================================================
+
+      case 'restore':
+        this.modalTitleKey = 'confirmation_ui.restore_title';
+
+        this.modalMessageKey = name
+          ? 'confirmation_ui.restore_message'
+          : 'confirmation_ui.restore_message_generic';
+
+        break;
+
+      //==================================================
       //==== DELETE
       //==================================================
 
