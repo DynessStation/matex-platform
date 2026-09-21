@@ -1,0 +1,102 @@
+<div class="cms-preview">
+  <!--==================================================-->
+  <!--==== TOOLBAR =====================================-->
+  <!--==================================================-->
+
+  <div class="cms-preview-toolbar">
+    <div>
+      <h5 class="mb-1">
+        {{ 'cms_page.preview' | translate }}
+      </h5>
+
+      <small class="text-muted">
+        {{ 'cms_page.preview_internal_notice' | translate }}
+      </small>
+    </div>
+
+    <div class="cms-preview-controls">
+      <!-- LOCALE -->
+
+      <select
+        class="form-select preview-locale"
+        [value]="selectedLocale"
+        (change)="onLocaleChange($event)"
+      >
+        @for (
+          translation of page.translations;
+          track translation.cms_page_locale
+        ) {
+          <option [value]="translation.cms_page_locale">
+            {{ translation.cms_page_locale }}
+          </option>
+        }
+      </select>
+
+      <!-- VIEWPORT -->
+
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-theme]="viewport === 'fit'"
+          [class.btn-light-bg]="viewport !== 'fit'"
+          (click)="setViewport('fit')"
+          [title]="'cms_page.preview_fit' | translate"
+        >
+          <i class="ri-layout-line"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-theme]="viewport === 'desktop'"
+          [class.btn-light-bg]="viewport !== 'desktop'"
+          (click)="setViewport('desktop')"
+          [title]="'cms_page.preview_desktop' | translate"
+        >
+          <i class="ri-computer-line"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-theme]="viewport === 'tablet'"
+          [class.btn-light-bg]="viewport !== 'tablet'"
+          (click)="setViewport('tablet')"
+          [title]="'cms_page.preview_tablet' | translate"
+        >
+          <i class="ri-tablet-line"></i>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-sm"
+          [class.btn-theme]="viewport === 'mobile'"
+          [class.btn-light-bg]="viewport !== 'mobile'"
+          (click)="setViewport('mobile')"
+          [title]="'cms_page.preview_mobile' | translate"
+        >
+          <i class="ri-smartphone-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--==================================================-->
+  <!--==== FRAME =======================================-->
+  <!--==================================================-->
+
+  <div class="cms-preview-stage">
+    <div class="cms-preview-device" [style.width]="viewportWidth">
+      @if (previewUrl) {
+        <iframe
+          class="cms-preview-frame"
+          [src]="previewUrl"
+          sandbox
+          referrerpolicy="no-referrer"
+          [attr.title]="'cms_page.preview_frame_title' | translate"
+        ></iframe>
+      }
+    </div>
+  </div>
+</div>

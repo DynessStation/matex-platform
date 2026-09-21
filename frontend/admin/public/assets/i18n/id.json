@@ -1832,6 +1832,14 @@
     "translation_published": "Dipublikasikan",
     "translation_draft": "Draf",
     "media": "Media",
-    "no_media": "Belum ada media"
+    "no_media": "Belum ada media",
+
+    "preview": "Pratinjau",
+    "preview_internal_notice": "Pratinjau internal. Status publik halaman tidak terpengaruh.",
+    "preview_fit": "Sesuaikan",
+    "preview_desktop": "Desktop",
+    "preview_tablet": "Tablet",
+    "preview_mobile": "Mobile",
+    "preview_frame_title": "Pratinjau halaman CMS"
   }
 }

@@ -1832,6 +1832,14 @@
     "translation_published": "Published",
     "translation_draft": "Draft",
     "media": "Media",
-    "no_media": "No media attached"
+    "no_media": "No media attached",
+
+    "preview": "Preview",
+    "preview_internal_notice": "Internal preview. The page public status is not affected.",
+    "preview_fit": "Fit",
+    "preview_desktop": "Desktop",
+    "preview_tablet": "Tablet",
+    "preview_mobile": "Mobile",
+    "preview_frame_title": "CMS page preview"
   }
 }
