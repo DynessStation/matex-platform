@@ -1,4 +1,12 @@
-import { Component, DestroyRef, effect, inject, input } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -13,6 +21,8 @@ import {
   ICmsPageDetail,
 } from '../../../shared/interface/cms-page.interface';
 
+import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
+
 type CmsPageLocale = 'id-ID' | 'en-US';
 //==================================================
 //==== COMPONENT
@@ -21,9 +31,11 @@ type CmsPageLocale = 'id-ID' | 'en-US';
 @Component({
   selector: 'app-form-cms-page',
 
-  imports: [ReactiveFormsModule, NgbModule, TranslateModule],
+  imports: [ReactiveFormsModule, NgbModule, TranslateModule, NgxEditorModule],
 
   templateUrl: './form-cms-page.html',
+
+  styleUrl: './form-cms-page.scss',
 })
 export class FormCmsPage {
   //==================================================
@@ -48,6 +60,28 @@ export class FormCmsPage {
   public activeTab = 'general';
 
   public activeLocale: CmsPageLocale = 'id-ID';
+
+  //==================================================
+  //==== CONTENT EDITOR
+  //==================================================
+
+  public readonly contentEditor = signal<Editor | null>(null);
+
+  public readonly contentEditorToolbar: Toolbar = [
+    ['bold', 'italic', 'underline', 'strike'],
+
+    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+
+    ['ordered_list', 'bullet_list'],
+
+    ['blockquote', 'horizontal_rule'],
+
+    ['link'],
+
+    ['align_left', 'align_center', 'align_right', 'align_justify'],
+
+    ['format_clear'],
+  ];
 
   public readonly supportedLanguages: {
     locale: CmsPageLocale;
@@ -158,6 +192,14 @@ export class FormCmsPage {
   //==================================================
 
   constructor() {
+    afterNextRender(() => {
+      this.contentEditor.set(new Editor());
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.contentEditor()?.destroy();
+    });
+
     // English belum otomatis dibuat pada page baru.
     this.translationForm('en-US').disable({
       emitEvent: false,

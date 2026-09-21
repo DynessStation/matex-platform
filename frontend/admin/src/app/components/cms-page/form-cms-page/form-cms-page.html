@@ -559,14 +559,33 @@
                           {{ 'cms_page.content' | translate }}
                         </label>
 
-                        <textarea
-                          class="form-control font-monospace"
-                          rows="12"
-                          formControlName="content"
-                          [placeholder]="
-                            'cms_page.content_placeholder' | translate
-                          "
-                        ></textarea>
+                        @if (contentEditor(); as editor) {
+                          <div class="cms-rich-editor">
+                            <div class="NgxEditor__Wrapper">
+                              <ngx-editor-menu
+                                [editor]="editor"
+                                [toolbar]="contentEditorToolbar"
+                              ></ngx-editor-menu>
+
+                              <ngx-editor
+                                [editor]="editor"
+                                formControlName="content"
+                                [placeholder]="
+                                  'cms_page.content_placeholder' | translate
+                                "
+                              ></ngx-editor>
+                            </div>
+                          </div>
+                        } @else {
+                          <textarea
+                            class="form-control"
+                            rows="8"
+                            formControlName="content"
+                            [placeholder]="
+                              'cms_page.content_placeholder' | translate
+                            "
+                          ></textarea>
+                        }
 
                         <small class="text-muted d-block mt-1">
                           {{ 'cms_page.content_help' | translate }}
