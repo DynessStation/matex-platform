@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -36,6 +37,9 @@ import {
   ICmsPageAttachment,
   ICmsPageDetail,
   ICmsPageTranslation,
+  ICmsPagePayload,
+  ICmsPagePublicationPayload,
+  ICmsPageSaveRequest,
 } from '../../../shared/interface/cms-page.interface';
 
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
@@ -118,6 +122,10 @@ export class FormCmsPage {
   readonly mode = input<'create' | 'edit'>('create');
 
   readonly editData = input<ICmsPageDetail | null>(null);
+
+  readonly saving = input(false);
+
+  readonly submitted = output<ICmsPageSaveRequest>();
 
   //==================================================
   //==== VIEW STATE
@@ -1361,6 +1369,214 @@ export class FormCmsPage {
 
   previewResultStatusKey(): string {
     return `cms_page.status_${this.previewPage?.effective_status ?? 'draft'}`;
+  }
+
+  //==================================================
+  //==== SAVE
+  //==================================================
+
+  submitForm(): void {
+    this.publicationValidationAttempted = true;
+
+    if (
+      this.publicationRequiresPublishedTranslation &&
+      !this.defaultTranslationPublished
+    ) {
+      this.activeTab = 'publication';
+
+      return;
+    }
+
+    if (this.publicationScheduleInvalid || this.publicationEndInvalid) {
+      this.activeTab = 'publication';
+
+      return;
+    }
+
+    const page = this.buildPreviewPage();
+
+    const payload: ICmsPagePayload = {
+      id_parent_cms_page: page.id_parent_cms_page,
+
+      cms_page_key: page.cms_page_key,
+
+      cms_page_type: page.cms_page_type,
+
+      cms_page_template: page.cms_page_template,
+
+      cms_page_content_mode: page.cms_page_content_mode,
+
+      cms_page_default_locale: page.cms_page_default_locale,
+
+      // Base save tidak mengubah lifecycle.
+      cms_page_status:
+        this.mode() === 'edit' ? (this.editData()?.cms_page_status ?? 0) : 0,
+
+      cms_page_visibility: page.cms_page_visibility,
+
+      cms_page_is_system: page.cms_page_is_system,
+
+      cms_page_is_featured: page.cms_page_is_featured,
+
+      cms_page_sort_order: page.cms_page_sort_order,
+
+      cms_page_publish_at:
+        this.mode() === 'edit'
+          ? (this.editData()?.cms_page_publish_at ?? null)
+          : null,
+
+      cms_page_unpublish_at:
+        this.mode() === 'edit'
+          ? (this.editData()?.cms_page_unpublish_at ?? null)
+          : null,
+
+      cms_page_settings_json: this.editData()?.cms_page_settings_json ?? null,
+
+      translations: page.translations.map((translation) => ({
+        locale: translation.cms_page_locale,
+
+        slug: translation.cms_page_slug,
+
+        title: translation.cms_page_title,
+
+        excerpt: translation.cms_page_excerpt,
+
+        content: translation.cms_page_content,
+
+        content_json: translation.cms_page_content_json,
+
+        meta_title: translation.cms_page_meta_title,
+
+        meta_description: translation.cms_page_meta_description,
+
+        meta_keywords: translation.cms_page_meta_keywords,
+
+        meta_robots: translation.cms_page_meta_robots,
+
+        canonical_url: translation.cms_page_canonical_url,
+
+        og_title: translation.cms_page_og_title,
+
+        og_description: translation.cms_page_og_description,
+
+        schema_json: translation.cms_page_schema_json,
+
+        status: translation.cms_page_i18n_status,
+      })),
+
+      attachments: page.attachments.map((attachment) => ({
+        id_attachment: attachment.id_attachment,
+
+        role: attachment.cms_page_attachment_role,
+
+        sort_order: attachment.cms_page_attachment_sort_order,
+
+        is_public: attachment.cms_page_attachment_is_public,
+
+        translations: attachment.translations.map((translation) => ({
+          locale: translation.cms_page_attachment_locale,
+
+          caption: translation.cms_page_attachment_caption,
+
+          alt_text: translation.cms_page_attachment_alt_text,
+        })),
+      })),
+    };
+
+    this.submitted.emit({
+      payload,
+
+      publicationActions: this.buildPublicationActions(),
+    });
+  }
+
+  private buildPublicationActions(): ICmsPagePublicationPayload[] {
+    const currentStatus = this.editData()?.effective_status ?? 'draft';
+
+    const unpublishAt = this.toPreviewIso(this.publicationUnpublishAt);
+
+    switch (this.publicationChoice) {
+      case 'current':
+        return [];
+
+      case 'draft':
+        if (this.mode() === 'create' || currentStatus === 'draft') {
+          return [];
+        }
+
+        if (currentStatus === 'scheduled') {
+          return [
+            {
+              action: 'cancel_schedule',
+            },
+          ];
+        }
+
+        if (currentStatus === 'published' || currentStatus === 'expired') {
+          return [
+            {
+              action: 'unpublish',
+            },
+          ];
+        }
+
+        if (currentStatus === 'archived') {
+          return [
+            {
+              action: 'restore',
+            },
+          ];
+        }
+
+        return [];
+
+      case 'archive':
+        if (this.mode() === 'create' || currentStatus === 'archived') {
+          return [];
+        }
+
+        return [
+          {
+            action: 'archive',
+          },
+        ];
+
+      case 'publish_now': {
+        const action: ICmsPagePublicationPayload = {
+          action: 'publish',
+
+          cms_page_unpublish_at: unpublishAt,
+        };
+
+        return currentStatus === 'archived'
+          ? [
+              {
+                action: 'restore',
+              },
+              action,
+            ]
+          : [action];
+      }
+
+      case 'schedule': {
+        const action: ICmsPagePublicationPayload = {
+          action: 'schedule',
+
+          cms_page_publish_at: this.toPreviewIso(this.publicationPublishAt),
+
+          cms_page_unpublish_at: unpublishAt,
+        };
+
+        return currentStatus === 'archived'
+          ? [
+              {
+                action: 'restore',
+              },
+              action,
+            ]
+          : [action];
+      }
+    }
   }
 
   //==================================================

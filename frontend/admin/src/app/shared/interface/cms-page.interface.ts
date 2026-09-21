@@ -384,6 +384,16 @@ export interface ICmsPagePayload {
 }
 
 //==================================================
+//==== FORM SAVE
+//==================================================
+
+export interface ICmsPageSaveRequest {
+  payload: ICmsPagePayload;
+
+  publicationActions: ICmsPagePublicationPayload[];
+}
+
+//==================================================
 //==== MUTATION RESPONSE
 //==================================================
 

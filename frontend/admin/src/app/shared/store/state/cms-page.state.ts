@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 
-import { tap } from 'rxjs';
+import { concatMap, from, map, of, switchMap, tap, last } from 'rxjs';
 
 import {
   ICmsPageDetail,
@@ -26,6 +26,7 @@ import {
   UpdateCmsPageAction,
   UpdateCmsPagePublicationAction,
   ClearCmsPageDetailAction,
+  SaveCmsPageAction,
 } from '../action/cms-page.action';
 
 //==================================================
@@ -38,6 +39,8 @@ export interface CmsPageStateModel {
   trash: ICmsPageTrashModel | null;
 
   selectedCmsPage: ICmsPageDetail | null;
+
+  lastSavedId: string | null;
 }
 
 //==================================================
@@ -53,6 +56,8 @@ export interface CmsPageStateModel {
     trash: null,
 
     selectedCmsPage: null,
+
+    lastSavedId: null,
   },
 })
 @Injectable()
@@ -80,6 +85,11 @@ export class CmsPageState {
   @Selector()
   static selectedCmsPage(state: CmsPageStateModel) {
     return state.selectedCmsPage;
+  }
+
+  @Selector()
+  static lastSavedId(state: CmsPageStateModel) {
+    return state.lastSavedId;
   }
 
   //==================================================
@@ -210,6 +220,63 @@ export class CmsPageState {
           );
         }),
       );
+  }
+
+  //==================================================
+  //==== SAVE
+  //==================================================
+
+  @Action(SaveCmsPageAction)
+  saveCmsPage(ctx: StateContext<CmsPageStateModel>, action: SaveCmsPageAction) {
+    ctx.patchState({
+      lastSavedId: null,
+    });
+
+    const baseRequest$ =
+      action.mode === 'create'
+        ? this.cmsPageService.createCmsPage(action.request.payload)
+        : this.cmsPageService.updateCmsPage(
+            action.id ?? '',
+            action.request.payload,
+          );
+
+    return baseRequest$.pipe(
+      switchMap((baseResult) => {
+        const id = baseResult.data.id_cms_page;
+
+        const publicationActions = action.request.publicationActions;
+
+        if (!publicationActions.length) {
+          return of({
+            id,
+            baseResult,
+          });
+        }
+
+        return from(publicationActions).pipe(
+          concatMap((payload) =>
+            this.cmsPageService.updatePublication(id, payload),
+          ),
+
+          last(),
+
+          map(() => ({
+            id,
+            baseResult,
+          })),
+        );
+      }),
+
+      tap(({ id, baseResult }) => {
+        ctx.patchState({
+          lastSavedId: id,
+        });
+
+        this.notificationService.showSuccess(
+          this.apiMessageService.resolveResponse(baseResult),
+        );
+      }),
+    );
   }
 
   //==================================================

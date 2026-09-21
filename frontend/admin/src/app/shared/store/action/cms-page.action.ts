@@ -3,6 +3,7 @@ import { Params } from '../../interface/core.interface';
 import {
   ICmsPagePayload,
   ICmsPagePublicationPayload,
+  ICmsPageSaveRequest,
 } from '../../interface/cms-page.interface';
 
 //==================================================
@@ -70,6 +71,22 @@ export class UpdateCmsPagePublicationAction {
     public id: string,
 
     public payload: ICmsPagePublicationPayload,
+  ) {}
+}
+
+//==================================================
+//==== SAVE
+//==================================================
+
+export class SaveCmsPageAction {
+  static readonly type = '[CMS Page] Save';
+
+  constructor(
+    public mode: 'create' | 'edit',
+
+    public id: string | null,
+
+    public request: ICmsPageSaveRequest,
   ) {}
 }
 
