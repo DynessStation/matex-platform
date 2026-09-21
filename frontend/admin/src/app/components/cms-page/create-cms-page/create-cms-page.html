@@ -13,5 +13,9 @@
     </a>
   </div>
 
-  <app-form-cms-page [mode]="'create'" />
+  <app-form-cms-page
+    [mode]="'create'"
+    [saving]="saving"
+    (submitted)="submit($event)"
+  />
 </app-page-wrapper>

@@ -20,6 +20,11 @@
       (retry)="retryDetail()"
     />
   } @else if (cmsPage$ | async; as page) {
-    <app-form-cms-page [mode]="'edit'" [editData]="page" />
+    <app-form-cms-page
+      [mode]="'edit'"
+      [editData]="page"
+      [saving]="saving"
+      (submitted)="submit($event)"
+    />
   }
 </app-page-wrapper>

@@ -4,23 +4,27 @@ import { Component, DestroyRef, inject } from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 
 import { Store } from '@ngxs/store';
 
-import { EMPTY, Observable, catchError, switchMap } from 'rxjs';
+import { EMPTY, Observable, catchError, finalize, switchMap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
 
 import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 
-import { ICmsPageDetail } from '../../../shared/interface/cms-page.interface';
+import {
+  ICmsPageDetail,
+  ICmsPageSaveRequest,
+} from '../../../shared/interface/cms-page.interface';
 
 import {
   ClearCmsPageDetailAction,
   GetCmsPageDetailAction,
+  SaveCmsPageAction,
 } from '../../../shared/store/action/cms-page.action';
 
 import { CmsPageState } from '../../../shared/store/state/cms-page.state';
@@ -58,6 +62,8 @@ export class EditCmsPage {
 
   private destroyRef = inject(DestroyRef);
 
+  private router = inject(Router);
+
   //==================================================
   //==== STATE
   //==================================================
@@ -69,6 +75,8 @@ export class EditCmsPage {
   public cmsPage$: Observable<ICmsPageDetail | null> = this.store.select(
     CmsPageState.selectedCmsPage,
   );
+
+  public saving = false;
 
   //==================================================
   //==== INIT
@@ -88,6 +96,36 @@ export class EditCmsPage {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
+  }
+
+  //==================================================
+  //==== SUBMIT
+  //==================================================
+
+  submit(request: ICmsPageSaveRequest): void {
+    if (!this.id || this.saving) {
+      return;
+    }
+
+    this.saving = true;
+
+    this.store
+      .dispatch(new SaveCmsPageAction('edit', this.id, request))
+      .pipe(
+        finalize(() => {
+          this.saving = false;
+        }),
+
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        complete: () => {
+          const savedId =
+            this.store.selectSnapshot(CmsPageState.lastSavedId) || this.id;
+
+          void this.router.navigate(['/cms-page', savedId]);
+        },
+      });
   }
 
   //==================================================
