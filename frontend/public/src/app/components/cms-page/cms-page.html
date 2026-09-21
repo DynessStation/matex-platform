@@ -1,0 +1,47 @@
+<main class="cms-page" [attr.lang]="locale()" [attr.aria-busy]="state() === 'loading'">
+  @if (page(); as page) {
+    <nav class="cms-languages" [attr.aria-label]="message('Bahasa', 'Language')">
+      <span class="cms-brand">MATEX</span>
+      @for (translation of page.translations; track translation.locale) {
+        <a [routerLink]="['/cms', translation.locale, translation.slug]"
+          [attr.hreflang]="translation.locale"
+          [attr.aria-current]="translation.locale === page.locale ? 'page' : null">
+          {{ translation.locale === 'id-ID' ? 'Indonesia' : 'English' }}
+        </a>
+      }
+    </nav>
+    @for (image of page.attachments; track $index) {
+      @if (image.role === 'hero') {
+        <img class="cms-hero" [src]="image.asset_url" [alt]="image.alt" fetchpriority="high" />
+      }
+    }
+    <header class="cms-header">
+      <h1>{{ page.title }}</h1>
+      @if (page.excerpt) { <p>{{ page.excerpt }}</p> }
+    </header>
+    <article class="cms-content" [innerHTML]="page.content"></article>
+    <div class="cms-gallery">
+      @for (image of page.attachments; track $index) {
+        @if (image.role === 'gallery') {
+          <figure>
+            <img [src]="image.asset_url" [alt]="image.alt" loading="lazy" />
+            @if (image.caption) { <figcaption>{{ image.caption }}</figcaption> }
+          </figure>
+        }
+      }
+    </div>
+  } @else {
+    <section class="cms-status" role="status">
+      <span class="cms-brand">MATEX</span>
+      @if (state() === 'loading') {
+        <p>{{ message('Memuat halaman…', 'Loading page…') }}</p>
+      } @else if (state() === 'missing') {
+        <h1>{{ message('Halaman tidak ditemukan', 'Page not found') }}</h1>
+        <p>{{ message('Halaman ini belum tersedia atau sudah tidak diterbitkan.', 'This page is unavailable or no longer published.') }}</p>
+      } @else {
+        <h1>{{ message('Halaman belum dapat dimuat', 'Unable to load this page') }}</h1>
+        <p>{{ message('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.') }}</p>
+      }
+    </section>
+  }
+</main>

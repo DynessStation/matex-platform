@@ -17,6 +17,7 @@ import fs from "fs";
 import path from "path";
 
 import storageConfig from "./config/storage.config";
+import publicCmsPage from "./ctrl/public/cms-page";
 
 import { requestContextMiddleware } from "./ctrl/middleware/request-context.middleware";
 
@@ -32,7 +33,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: (process.env.CORS_ORIGINS || "http://localhost:4200,http://localhost:4201").split(",").map(value => value.trim()),
 
     credentials: true,
 
@@ -75,6 +76,7 @@ app.use(requestContextMiddleware);
 app.use(cookieParser());
 
 app.use(express.json());
+app.use(publicCmsPage);
 
 //==================================================
 //==== AUTO LOAD ADMIN ROUTES

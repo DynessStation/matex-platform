@@ -23,6 +23,9 @@ import { ClearCart } from '../action/cart.action';
 export interface AuthStateModel {
   email: string;
   authenticated: boolean;
+  token: string | number;
+  access_token: string | null;
+  number: AuthNumberLoginState | null;
   permissions: string[];
 }
 
@@ -31,6 +34,9 @@ export interface AuthStateModel {
   defaults: {
     email: '',
     authenticated: false,
+    token: '',
+    access_token: null,
+    number: null,
     permissions: [],
   },
 })
@@ -43,14 +49,6 @@ export class AuthState {
     private modalService: NgbModal,
     private authService: AuthService,
   ) {}
-
-  ngxsOnInit(ctx: StateContext<AuthStateModel>) {
-    ctx.patchState({
-      email: 'john.customer@example.com',
-      token: '',
-      access_token: '115|laravel_sanctum_mp1jyyMyKeE4qVsD1bKrnSycnmInkFXXIrxKv49w49d2a2c5',
-    });
-  }
 
   @Selector()
   static accessToken(state: AuthStateModel): string | null {
@@ -126,6 +124,8 @@ export class AuthState {
   authClear(ctx: StateContext<AuthStateModel>) {
     ctx.patchState({
       email: '',
+      authenticated: false,
+      number: null,
       token: '',
       access_token: null,
       permissions: [],

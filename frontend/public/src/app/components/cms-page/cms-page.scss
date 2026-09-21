@@ -1,0 +1,28 @@
+:host { display: block; background: #fff; color: #252525; min-height: 100vh; }
+.cms-page { font-family: Inter, system-ui, sans-serif; line-height: 1.7; }
+.cms-languages { display: flex; align-items: center; justify-content: flex-end; gap: 20px; padding: 20px 24px; }
+.cms-brand { font-weight: 700; letter-spacing: .08em; margin-right: auto; }
+.cms-languages a { color: inherit; text-decoration: underline; }
+.cms-languages a[aria-current] { font-weight: 700; }
+.cms-hero { display: block; width: 100%; max-height: 520px; object-fit: cover; }
+.cms-header { max-width: 968px; margin: auto; padding: clamp(40px, 7vw, 88px) 24px 32px; text-align: center; }
+.cms-header h1 { font-size: clamp(32px, 6vw, 64px); line-height: 1.1; overflow-wrap: anywhere; }
+.cms-header p { max-width: 720px; margin: 24px auto 0; color: #666; font-size: clamp(16px, 2vw, 20px); }
+.cms-content { width: min(calc(100% - 48px), 920px); margin: auto; padding: 32px 0 80px; overflow-wrap: anywhere; }
+:host ::ng-deep .cms-content {
+  img { max-width: 100%; height: auto; }
+  h2, h3, h4 { line-height: 1.25; margin-top: 1.8em; }
+  p { margin: 0 0 1.2em; }
+  table, pre { display: block; max-width: 100%; overflow-x: auto; }
+  td, th { padding: 10px 12px; border: 1px solid #ddd; }
+  blockquote { margin: 32px 0; padding: 16px 24px; border-left: 4px solid #ddd; background: #f8f8f8; }
+}
+.cms-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; width: min(calc(100% - 48px), 1080px); margin: auto; padding-bottom: 80px; }
+.cms-gallery figure { margin: 0; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+.cms-gallery img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.cms-gallery figcaption { padding: 14px 16px; color: #666; }
+.cms-status { max-width: 760px; margin: auto; padding: 80px 24px; text-align: center; }
+@media (max-width: 640px) {
+  .cms-gallery { grid-template-columns: 1fr; }
+  .cms-content, .cms-gallery { width: calc(100% - 32px); }
+}

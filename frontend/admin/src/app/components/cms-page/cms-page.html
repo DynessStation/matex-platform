@@ -24,6 +24,7 @@
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
+    [actionMode]="'dropdown'"
     [emitInitialChange]="false"
     [externalPermissions]="(authPermissions$ | async) ?? []"
     [externalAllAccess]="(isAllAccess$ | async) ?? false"

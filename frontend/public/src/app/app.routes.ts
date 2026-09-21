@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { content } from './shared/routes/routes';
 
-export const routes: Routes = [
+const legacyRoutes: Routes = [
   {
     path: '',
     redirectTo: 'home',
@@ -22,5 +22,18 @@ export const routes: Routes = [
     path: 'maintenance',
     loadComponent: () =>
       import('./components/page/maintenance/maintenance').then((m) => m.Maintenance),
+  },
+];
+
+// MATEX CMS has its own shell; the template storefront remains isolated.
+export const routes: Routes = [
+  {
+    path: 'cms/:locale/:slug',
+    loadComponent: () => import('./components/cms-page/cms-page').then(m => m.CmsPage),
+  },
+  {
+    path: '',
+    loadComponent: () => import('./legacy-app').then(m => m.LegacyApp),
+    children: legacyRoutes,
   },
 ];

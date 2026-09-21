@@ -409,7 +409,7 @@
                       type="button"
                       class="action-dropdown-toggle"
                       ngbDropdownToggle
-                      aria-label="Account actions"
+                      [attr.aria-label]="'actions' | translate"
                       (click)="$event.stopPropagation()"
                     >
                       <i class="ri-more-2-fill"></i>
@@ -464,6 +464,8 @@
                         <li>
                           <a
                             href="javascript:void(0)"
+                            [attr.aria-label]="action.label | translate"
+                            [attr.title]="action.label | translate"
                             (click)="
                               handleRowAction(action, columnData, $event)
                             "
