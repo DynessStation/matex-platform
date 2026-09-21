@@ -121,9 +121,7 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
   //==== LOCALE
   //==================================================
 
-  onLocaleChange(event: Event): void {
-    const locale = (event.target as HTMLSelectElement).value;
-
+  selectLocale(locale: string): void {
     if (!locale || locale === this.selectedLocale) {
       return;
     }

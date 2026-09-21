@@ -1962,6 +1962,20 @@
     "select_date": "Select date",
     "clear_datetime": "Clear date and time",
 
+    "review_title": "Review Before Saving",
+    "review_help": "Review the page identity, languages, media, and publication settings before saving.",
+    "review_identity": "Page",
+    "review_main_title": "Primary Title",
+    "review_languages": "Languages & Content",
+    "review_publication": "Page Publication",
+    "review_publication_action": "Action",
+    "review_after_save": "After Saving",
+    "review_media_count": "Media Count",
+    "review_yes": "Yes",
+    "review_no": "No",
+    "review_draft_language_warning": "{{language}} is still in Draft. This language version will not be published yet.",
+    "back_publication": "Back to Publication",
+
     "validation": {
       "key_required": "Page key is required.",
       "key_pattern": "The key may only contain lowercase letters, numbers, hyphens, and underscores.",

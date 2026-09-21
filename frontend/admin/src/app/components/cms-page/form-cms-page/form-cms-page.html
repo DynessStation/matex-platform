@@ -12,6 +12,7 @@
           [(activeId)]="activeTab"
           class="nav-pills"
           orientation="vertical"
+          (navChange)="onNavChange($event)"
         >
           <!-- GENERAL -->
 
@@ -1742,11 +1743,335 @@
             </button>
 
             <ng-template ngbNavContent>
-              <div class="border rounded p-4">
-                <p class="text-muted mb-0">
-                  {{ 'cms_page.next_phase_notice' | translate }}
-                </p>
-              </div>
+              @if (previewPage; as page) {
+                <!--==================================================-->
+                <!--==== LIVE PREVIEW ================================-->
+                <!--==================================================-->
+
+                <app-cms-page-preview class="d-block mb-4" [page]="page" />
+
+                <!--==================================================-->
+                <!--==== REVIEW ======================================-->
+                <!--==================================================-->
+
+                <div class="border rounded p-4">
+                  <div class="mb-4">
+                    <h5 class="mb-1">
+                      {{ 'cms_page.review_title' | translate }}
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                      {{ 'cms_page.review_help' | translate }}
+                    </p>
+                  </div>
+
+                  <!-- WARNINGS -->
+
+                  @for (
+                    translation of previewDraftTranslations;
+                    track translation.cms_page_locale
+                  ) {
+                    <div class="alert alert-warning">
+                      <i class="ri-information-line me-1"></i>
+
+                      {{
+                        'cms_page.review_draft_language_warning'
+                          | translate
+                            : {
+                                language:
+                                  (previewLanguageLabelKey(
+                                    translation.cms_page_locale
+                                  ) | translate),
+                              }
+                      }}
+                    </div>
+                  }
+
+                  <!--==================================================-->
+                  <!--==== PAGE ========================================-->
+                  <!--==================================================-->
+
+                  <div class="border rounded p-3 mb-3">
+                    <h6 class="mb-3">
+                      {{ 'cms_page.review_identity' | translate }}
+                    </h6>
+
+                    <div class="row g-3">
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.key' | translate }}
+                        </small>
+
+                        <strong>{{ page.cms_page_key || '-' }}</strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.review_main_title' | translate }}
+                        </small>
+
+                        <strong>
+                          {{ previewDefaultTranslation?.cms_page_title || '-' }}
+                        </strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.default_locale' | translate }}
+                        </small>
+
+                        <strong>
+                          {{
+                            previewLanguageLabelKey(
+                              page.cms_page_default_locale
+                            ) | translate
+                          }}
+                          · {{ page.cms_page_default_locale }}
+                        </strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.visibility' | translate }}
+                        </small>
+
+                        <strong>
+                          {{
+                            'cms_page.visibility_' +
+                              previewVisibilityKey(page.cms_page_visibility)
+                              | translate
+                          }}
+                        </strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.featured' | translate }}
+                        </small>
+
+                        <strong>
+                          {{
+                            (page.cms_page_is_featured
+                              ? 'cms_page.review_yes'
+                              : 'cms_page.review_no'
+                            ) | translate
+                          }}
+                        </strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.review_media_count' | translate }}
+                        </small>
+
+                        <strong>{{ page.attachment_count }}</strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.media_hero' | translate }}
+                        </small>
+
+                        <strong>{{ previewHeroMediaName }}</strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.sort_order' | translate }}
+                        </small>
+
+                        <strong>{{ page.cms_page_sort_order }}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!--==================================================-->
+                  <!--==== LANGUAGES ===================================-->
+                  <!--==================================================-->
+
+                  <div class="border rounded p-3 mb-3">
+                    <h6 class="mb-3">
+                      {{ 'cms_page.review_languages' | translate }}
+                      ({{ page.translation_count }})
+                    </h6>
+
+                    <div class="row g-3">
+                      @for (
+                        translation of page.translations;
+                        track translation.cms_page_locale
+                      ) {
+                        <div class="col-xl-6">
+                          <div class="border rounded h-100 p-3">
+                            <div
+                              class="d-flex align-items-start justify-content-between gap-3 mb-3"
+                            >
+                              <div>
+                                <strong>
+                                  {{
+                                    previewLanguageLabelKey(
+                                      translation.cms_page_locale
+                                    ) | translate
+                                  }}
+                                </strong>
+
+                                <div class="text-muted small">
+                                  {{ translation.cms_page_locale }}
+
+                                  @if (
+                                    translation.cms_page_locale ===
+                                    page.cms_page_default_locale
+                                  ) {
+                                    ·
+                                    {{
+                                      'cms_page.default_language_badge'
+                                        | translate
+                                    }}
+                                  }
+                                </div>
+                              </div>
+
+                              <span
+                                class="badge"
+                                [class.bg-success]="
+                                  translation.cms_page_i18n_status === 1
+                                "
+                                [class.bg-secondary]="
+                                  translation.cms_page_i18n_status !== 1
+                                "
+                              >
+                                {{
+                                  (translation.cms_page_i18n_status === 1
+                                    ? 'cms_page.translation_published'
+                                    : 'cms_page.translation_draft'
+                                  ) | translate
+                                }}
+                              </span>
+                            </div>
+
+                            <div class="mb-2">
+                              <small class="text-muted d-block">
+                                {{ 'cms_page.translation_title' | translate }}
+                              </small>
+
+                              <strong>
+                                {{ translation.cms_page_title || '-' }}
+                              </strong>
+                            </div>
+
+                            <div>
+                              <small class="text-muted d-block">
+                                {{ 'cms_page.slug' | translate }}
+                              </small>
+
+                              <span>
+                                /{{ translation.cms_page_slug || '' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!--==================================================-->
+                  <!--==== PUBLICATION =================================-->
+                  <!--==================================================-->
+
+                  <div class="border rounded p-3">
+                    <h6 class="mb-3">
+                      {{ 'cms_page.review_publication' | translate }}
+                    </h6>
+
+                    <div class="row g-3">
+                      @if (mode() === 'edit') {
+                        <div class="col-xl-3 col-md-6">
+                          <small class="text-muted d-block">
+                            {{ 'cms_page.current_status' | translate }}
+                          </small>
+
+                          <strong>
+                            {{
+                              'cms_page.status_' +
+                                (editData()?.effective_status ?? 'draft')
+                                | translate
+                            }}
+                          </strong>
+                        </div>
+                      }
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.review_publication_action' | translate }}
+                        </small>
+
+                        <strong>
+                          {{ previewPublicationChoiceKey() | translate }}
+                        </strong>
+                      </div>
+
+                      <div class="col-xl-3 col-md-6">
+                        <small class="text-muted d-block">
+                          {{ 'cms_page.review_after_save' | translate }}
+                        </small>
+
+                        <strong>
+                          {{ previewResultStatusKey() | translate }}
+                        </strong>
+                      </div>
+
+                      @if (page.cms_page_publish_at) {
+                        <div class="col-xl-3 col-md-6">
+                          <small class="text-muted d-block">
+                            {{ 'cms_page.publish_at' | translate }}
+                          </small>
+
+                          <strong>
+                            {{
+                              page.cms_page_publish_at
+                                | date
+                                  : localization.dateTimeFormat()
+                                  : undefined
+                                  : localization.locale()
+                            }}
+                          </strong>
+                        </div>
+                      }
+
+                      @if (page.cms_page_unpublish_at) {
+                        <div class="col-xl-3 col-md-6">
+                          <small class="text-muted d-block">
+                            {{ 'cms_page.unpublish_at' | translate }}
+                          </small>
+
+                          <strong>
+                            {{
+                              page.cms_page_unpublish_at
+                                | date
+                                  : localization.dateTimeFormat()
+                                  : undefined
+                                  : localization.locale()
+                            }}
+                          </strong>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- NAVIGATION -->
+
+                  <div class="border-top mt-4 pt-4">
+                    <button
+                      type="button"
+                      class="btn btn-light-bg"
+                      (click)="activeTab = 'publication'"
+                    >
+                      <i class="ri-arrow-left-line me-1"></i>
+
+                      {{ 'cms_page.back_publication' | translate }}
+                    </button>
+                  </div>
+                </div>
+              }
             </ng-template>
           </li>
         </ul>

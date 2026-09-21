@@ -1962,6 +1962,20 @@
     "select_date": "Pilih tanggal",
     "clear_datetime": "Kosongkan tanggal dan waktu",
 
+    "review_title": "Ringkasan Sebelum Menyimpan",
+    "review_help": "Periksa kembali identitas halaman, bahasa, media, dan pengaturan publikasi sebelum menyimpan.",
+    "review_identity": "Halaman",
+    "review_main_title": "Judul Utama",
+    "review_languages": "Bahasa & Konten",
+    "review_publication": "Publikasi Halaman",
+    "review_publication_action": "Aksi",
+    "review_after_save": "Setelah Disimpan",
+    "review_media_count": "Jumlah Media",
+    "review_yes": "Ya",
+    "review_no": "Tidak",
+    "review_draft_language_warning": "{{language}} masih berstatus Draf. Versi bahasa ini belum akan dipublikasikan.",
+    "back_publication": "Kembali ke Publikasi",
+
     "validation": {
       "key_required": "Key halaman wajib diisi.",
       "key_pattern": "Key hanya boleh berisi huruf kecil, angka, tanda hubung, dan garis bawah.",

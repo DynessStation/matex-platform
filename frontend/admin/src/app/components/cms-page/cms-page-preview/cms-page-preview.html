@@ -17,20 +17,48 @@
     <div class="cms-preview-controls">
       <!-- LOCALE -->
 
-      <select
-        class="form-select preview-locale"
-        [value]="selectedLocale"
-        (change)="onLocaleChange($event)"
-      >
+      <div class="d-flex flex-wrap gap-1">
         @for (
           translation of page.translations;
           track translation.cms_page_locale
         ) {
-          <option [value]="translation.cms_page_locale">
-            {{ translation.cms_page_locale }}
-          </option>
+          <button
+            type="button"
+            class="btn btn-sm d-flex align-items-center gap-2"
+            [class.btn-theme]="selectedLocale === translation.cms_page_locale"
+            [class.btn-light-bg]="
+              selectedLocale !== translation.cms_page_locale
+            "
+            (click)="selectLocale(translation.cms_page_locale)"
+          >
+            <strong>
+              {{ translation.cms_page_locale === 'id-ID' ? 'ID' : 'EN' }}
+            </strong>
+
+            <span>
+              {{
+                (translation.cms_page_locale === 'id-ID'
+                  ? 'cms_page.language_indonesian'
+                  : 'cms_page.language_english'
+                ) | translate
+              }}
+            </span>
+
+            <span
+              class="badge"
+              [class.bg-success]="translation.cms_page_i18n_status === 1"
+              [class.bg-secondary]="translation.cms_page_i18n_status !== 1"
+            >
+              {{
+                (translation.cms_page_i18n_status === 1
+                  ? 'cms_page.translation_published'
+                  : 'cms_page.translation_draft'
+                ) | translate
+              }}
+            </span>
+          </button>
         }
-      </select>
+      </div>
 
       <!-- VIEWPORT -->
 

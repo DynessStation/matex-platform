@@ -23,14 +23,19 @@ import {
 import {
   NgbDateStruct,
   NgbModule,
+  NgbNavChangeEvent,
   NgbTimeStruct,
 } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateModule } from '@ngx-translate/core';
 
 import {
+  CmsPageEffectiveStatus,
   CmsPageI18nStatus,
+  CmsPageStatus,
+  ICmsPageAttachment,
   ICmsPageDetail,
+  ICmsPageTranslation,
 } from '../../../shared/interface/cms-page.interface';
 
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
@@ -47,6 +52,7 @@ import { AuthState } from '../../../shared/store/state/auth.state';
 
 import { hasPermissionAccess } from '../../../shared/utils/permission.util';
 import { LocalizationService } from '../../../shared/services/localization.service';
+import { CmsPagePreview } from '../cms-page-preview/cms-page-preview';
 
 type CmsPageLocale = 'id-ID' | 'en-US';
 
@@ -88,6 +94,7 @@ interface CmsPageMediaDraft {
     TranslateModule,
     NgxEditorModule,
     MediaModal,
+    CmsPagePreview,
   ],
 
   templateUrl: './form-cms-page.html',
@@ -119,6 +126,12 @@ export class FormCmsPage {
   public activeTab = 'general';
 
   public activeLocale: CmsPageLocale = 'id-ID';
+
+  //==================================================
+  //==== PREVIEW
+  //==================================================
+
+  public previewPage: ICmsPageDetail | null = null;
 
   //==================================================
   //==== MEDIA
@@ -980,11 +993,353 @@ export class FormCmsPage {
       return;
     }
 
+    this.refreshPreviewPage();
+
     this.activeTab = 'preview';
   }
 
   backFromPublication(): void {
     this.activeTab = this.canViewAttachments ? 'media' : 'seo';
+  }
+
+  //==================================================
+  //==== PREVIEW NAVIGATION
+  //==================================================
+
+  onNavChange(event: NgbNavChangeEvent): void {
+    if (event.nextId !== 'preview') {
+      return;
+    }
+
+    this.refreshPreviewPage();
+  }
+
+  //==================================================
+  //==== PREVIEW PAGE
+  //==================================================
+
+  private refreshPreviewPage(): void {
+    this.previewPage = this.buildPreviewPage();
+  }
+
+  private buildPreviewPage(): ICmsPageDetail {
+    const raw = this.form.getRawValue();
+
+    const source = this.editData();
+
+    const now = new Date().toISOString();
+
+    const translations: ICmsPageTranslation[] = this.supportedLanguages
+      .filter((language) => this.isLanguageEnabled(language.locale))
+      .map((language) => {
+        const group = this.translationForm(language.locale);
+
+        const value = group.getRawValue();
+
+        const existing = source?.translations.find(
+          (item) => item.cms_page_locale === language.locale,
+        );
+
+        const title = value.title.trim();
+
+        const slug = value.slug.trim() || this.slugify(title);
+
+        return {
+          cms_page_locale: language.locale,
+
+          cms_page_slug: slug,
+
+          cms_page_title: title,
+
+          cms_page_excerpt: value.excerpt.trim() || null,
+
+          cms_page_content: value.content || null,
+
+          cms_page_content_json: existing?.cms_page_content_json ?? null,
+
+          cms_page_meta_title: value.meta_title.trim() || null,
+
+          cms_page_meta_description: value.meta_description.trim() || null,
+
+          cms_page_meta_keywords: value.meta_keywords.trim() || null,
+
+          cms_page_meta_robots: value.meta_robots.trim() || null,
+
+          cms_page_canonical_url: value.canonical_url.trim() || null,
+
+          cms_page_og_title: value.og_title.trim() || null,
+
+          cms_page_og_description: value.og_description.trim() || null,
+
+          cms_page_schema_json: existing?.cms_page_schema_json ?? null,
+
+          cms_page_i18n_status: value.status,
+
+          created: existing?.created ?? now,
+
+          updated: now,
+        };
+      });
+
+    const attachments: ICmsPageAttachment[] = this.pageMedia.map(
+      (item, index) => {
+        const existing = source?.attachments.find(
+          (attachment) =>
+            attachment.id_attachment === item.attachment.id_attachment,
+        );
+
+        return {
+          ...item.attachment,
+
+          cms_page_attachment_role: item.role,
+
+          cms_page_attachment_sort_order: index,
+
+          cms_page_attachment_is_public: item.is_public ? 1 : 0,
+
+          translations: this.supportedLanguages
+            .filter((language) => this.isLanguageEnabled(language.locale))
+            .map((language) => {
+              const existingTranslation = existing?.translations.find(
+                (translation) =>
+                  translation.cms_page_attachment_locale === language.locale,
+              );
+
+              const mediaTranslation = item.translations[language.locale];
+
+              return {
+                cms_page_attachment_locale: language.locale,
+
+                cms_page_attachment_caption:
+                  mediaTranslation.caption.trim() || null,
+
+                cms_page_attachment_alt_text:
+                  mediaTranslation.alt_text.trim() || null,
+
+                created: existingTranslation?.created ?? now,
+
+                updated: now,
+              };
+            }),
+
+          created: existing?.created ?? item.attachment.created ?? now,
+
+          updated: now,
+        };
+      },
+    );
+
+    return {
+      id_cms_page: source?.id_cms_page ?? 'preview',
+
+      id_parent_cms_page: source?.id_parent_cms_page ?? null,
+
+      cms_page_key: raw.cms_page_key.trim(),
+
+      cms_page_type: raw.cms_page_type.trim(),
+
+      cms_page_template: raw.cms_page_template.trim() || null,
+
+      cms_page_content_mode: raw.cms_page_content_mode.trim(),
+
+      cms_page_default_locale: raw.cms_page_default_locale,
+
+      cms_page_status: this.previewCmsPageStatus(),
+
+      effective_status: this.previewEffectiveStatus(),
+
+      cms_page_visibility: Number(raw.cms_page_visibility) as 0 | 1 | 2,
+
+      cms_page_is_system:
+        source?.cms_page_is_system ?? (raw.cms_page_is_system ? 1 : 0),
+
+      cms_page_is_featured: raw.cms_page_is_featured ? 1 : 0,
+
+      cms_page_sort_order: Number(raw.cms_page_sort_order),
+
+      cms_page_publish_at: this.previewPublishAt(),
+
+      cms_page_unpublish_at: this.previewUnpublishAt(),
+
+      cms_page_settings_json: source?.cms_page_settings_json ?? null,
+
+      translations,
+
+      attachments,
+
+      translation_count: translations.length,
+
+      attachment_count: attachments.length,
+
+      created_by: source?.created_by ?? null,
+
+      updated_by: source?.updated_by ?? null,
+
+      created: source?.created ?? now,
+
+      updated: now,
+    };
+  }
+
+  //==================================================
+  //==== PREVIEW STATUS
+  //==================================================
+
+  private previewCmsPageStatus(): CmsPageStatus {
+    switch (this.publicationChoice) {
+      case 'publish_now':
+      case 'schedule':
+        return 1;
+
+      case 'archive':
+        return 2;
+
+      case 'draft':
+        return 0;
+
+      default:
+        return this.editData()?.cms_page_status ?? 0;
+    }
+  }
+
+  private previewEffectiveStatus(): CmsPageEffectiveStatus {
+    switch (this.publicationChoice) {
+      case 'publish_now':
+        return 'published';
+
+      case 'schedule':
+        return 'scheduled';
+
+      case 'archive':
+        return 'archived';
+
+      case 'draft':
+        return 'draft';
+
+      default:
+        return this.editData()?.effective_status ?? 'draft';
+    }
+  }
+
+  private previewPublishAt(): string | null {
+    if (this.publicationChoice === 'schedule') {
+      return this.toPreviewIso(this.publicationPublishAt);
+    }
+
+    if (this.publicationChoice === 'publish_now') {
+      return new Date().toISOString();
+    }
+
+    if (this.publicationChoice === 'current') {
+      return this.editData()?.cms_page_publish_at ?? null;
+    }
+
+    return null;
+  }
+
+  private previewUnpublishAt(): string | null {
+    if (
+      this.publicationChoice === 'publish_now' ||
+      this.publicationChoice === 'schedule'
+    ) {
+      return this.toPreviewIso(this.publicationUnpublishAt);
+    }
+
+    if (this.publicationChoice === 'current') {
+      return this.editData()?.cms_page_unpublish_at ?? null;
+    }
+
+    return null;
+  }
+
+  private toPreviewIso(value: string): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+
+  //==================================================
+  //==== PREVIEW SUMMARY
+  //==================================================
+
+  get previewDefaultTranslation(): ICmsPageTranslation | null {
+    if (!this.previewPage) {
+      return null;
+    }
+
+    return (
+      this.previewPage.translations.find(
+        (item) =>
+          item.cms_page_locale === this.previewPage?.cms_page_default_locale,
+      ) ??
+      this.previewPage.translations[0] ??
+      null
+    );
+  }
+
+  get previewDraftTranslations(): ICmsPageTranslation[] {
+    if (!this.previewPage || !this.publicationRequiresPublishedTranslation) {
+      return [];
+    }
+
+    return this.previewPage.translations.filter(
+      (item) =>
+        item.cms_page_locale !== this.previewPage?.cms_page_default_locale &&
+        item.cms_page_i18n_status === 0,
+    );
+  }
+
+  get previewHeroMediaName(): string {
+    return (
+      this.previewPage?.attachments.find(
+        (item) => item.cms_page_attachment_role === 'hero',
+      )?.original_name ?? '-'
+    );
+  }
+
+  previewLanguageLabelKey(locale: string): string {
+    return locale === 'en-US'
+      ? 'cms_page.language_english'
+      : 'cms_page.language_indonesian';
+  }
+
+  previewVisibilityKey(value: number): string {
+    if (value === 0) {
+      return 'private';
+    }
+
+    if (value === 2) {
+      return 'unlisted';
+    }
+
+    return 'public';
+  }
+
+  previewPublicationChoiceKey(): string {
+    switch (this.publicationChoice) {
+      case 'publish_now':
+        return 'cms_page.publication_publish_now';
+
+      case 'schedule':
+        return 'cms_page.publication_schedule';
+
+      case 'archive':
+        return 'cms_page.publication_archive';
+
+      case 'draft':
+        return 'cms_page.publication_draft';
+
+      default:
+        return 'cms_page.publication_keep_current';
+    }
+  }
+
+  previewResultStatusKey(): string {
+    return `cms_page.status_${this.previewPage?.effective_status ?? 'draft'}`;
   }
 
   //==================================================
