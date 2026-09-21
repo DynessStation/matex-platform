@@ -181,3 +181,107 @@
     grid-template-columns: 1fr;
   }
 }
+
+//==================================================
+//==== PUBLICATION DATE / TIME
+//==================================================
+
+.cms-publication-date-dropdown {
+  width: 100%;
+}
+
+.cms-publication-date-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  background: #f8f8f8;
+
+  border: 1px solid #efefef;
+  border-radius: 4px;
+
+  color: #444;
+  text-align: left;
+
+  transition: 0.2s ease;
+
+  &::after {
+    display: none;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: var(--theme-color);
+  }
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+
+  i {
+    font-size: 18px;
+    color: #6c757d;
+  }
+}
+
+.cms-publication-calendar {
+  padding: 0;
+
+  border: 1px solid #eee;
+  border-radius: 4px;
+
+  overflow: hidden;
+}
+
+.cms-publication-timepicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 112px;
+
+  padding: 8px 12px;
+
+  background: #f8f8f8;
+
+  border: 1px solid #efefef;
+  border-radius: 4px;
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+}
+
+:host ::ng-deep .cms-publication-timepicker {
+  ngb-timepicker {
+    .btn-link,
+    .ngb-tp-chevron {
+      color: var(--theme-color) !important;
+    }
+
+    .btn-link:hover,
+    .btn-link:focus {
+      color: var(--theme-color) !important;
+
+      opacity: 0.8;
+    }
+  }
+}
+
+:host-context(body.dark-only) {
+  .cms-publication-date-toggle,
+  .cms-publication-timepicker {
+    background: #262626;
+    border-color: #404040;
+    color: #ddd;
+  }
+
+  .cms-publication-calendar {
+    border-color: #404040;
+  }
+}

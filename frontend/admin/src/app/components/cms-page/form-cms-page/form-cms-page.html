@@ -1448,16 +1448,89 @@
                       *
                     </label>
 
-                    <input
-                      type="datetime-local"
-                      class="form-control"
-                      [(ngModel)]="publicationPublishAt"
-                      [ngModelOptions]="{ standalone: true }"
-                      [class.is-invalid]="
-                        publicationValidationAttempted &&
-                        publicationScheduleInvalid
-                      "
-                    />
+                    <div class="row g-3">
+                      <!-- DATE -->
+
+                      <div class="col-lg-7">
+                        <label class="form-label small text-muted">
+                          {{ 'cms_page.date_label' | translate }}
+                        </label>
+
+                        <div
+                          ngbDropdown
+                          #publishDateDropdown="ngbDropdown"
+                          class="cms-publication-date-dropdown custom-dp-dropdown"
+                          [autoClose]="'outside'"
+                        >
+                          <button
+                            type="button"
+                            ngbDropdownToggle
+                            class="cms-publication-date-toggle"
+                            [class.is-invalid]="
+                              publicationValidationAttempted &&
+                              publicationScheduleInvalid
+                            "
+                          >
+                            <span>
+                              @if (publicationPublishDate; as selectedDate) {
+                                {{
+                                  publicationDateValue(selectedDate)
+                                    | date
+                                      : localization.dateFormat()
+                                      : undefined
+                                      : localization.locale()
+                                }}
+                              } @else {
+                                {{ 'cms_page.select_date' | translate }}
+                              }
+                            </span>
+
+                            <i class="ri-calendar-line"></i>
+                          </button>
+
+                          <div ngbDropdownMenu class="cms-publication-calendar">
+                            <ngb-datepicker
+                              [(ngModel)]="publicationPublishDate"
+                              [ngModelOptions]="{ standalone: true }"
+                              [minDate]="publicationMinDate"
+                              [startDate]="
+                                publicationPublishDate ?? publicationMinDate
+                              "
+                              [outsideDays]="'hidden'"
+                              (ngModelChange)="syncPublicationPublishDateTime()"
+                              (dateSelect)="publishDateDropdown.close()"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- TIME -->
+
+                      <div class="col-lg-5">
+                        <label class="form-label small text-muted">
+                          {{ 'cms_page.time_label' | translate }}
+                        </label>
+
+                        <div
+                          class="cms-publication-timepicker"
+                          [class.is-invalid]="
+                            publicationValidationAttempted &&
+                            publicationScheduleInvalid
+                          "
+                        >
+                          <ngb-timepicker
+                            [(ngModel)]="publicationPublishTime"
+                            [ngModelOptions]="{ standalone: true }"
+                            [meridian]="localization.useMeridian()"
+                            [seconds]="false"
+                            [spinners]="true"
+                            [hourStep]="1"
+                            [minuteStep]="5"
+                            (ngModelChange)="syncPublicationPublishDateTime()"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
                     <small class="text-muted d-block mt-1">
                       {{ 'cms_page.schedule_publish_at_help' | translate }}
@@ -1490,15 +1563,103 @@
                       {{ 'cms_page.auto_unpublish_at' | translate }}
                     </label>
 
-                    <input
-                      type="datetime-local"
-                      class="form-control"
-                      [(ngModel)]="publicationUnpublishAt"
-                      [ngModelOptions]="{ standalone: true }"
-                      [class.is-invalid]="
-                        publicationValidationAttempted && publicationEndInvalid
-                      "
-                    />
+                    <div class="row g-3">
+                      <!-- DATE -->
+
+                      <div class="col-lg-7">
+                        <label class="form-label small text-muted">
+                          {{ 'cms_page.date_label' | translate }}
+                        </label>
+
+                        <div
+                          ngbDropdown
+                          #unpublishDateDropdown="ngbDropdown"
+                          class="cms-publication-date-dropdown custom-dp-dropdown"
+                          [autoClose]="'outside'"
+                        >
+                          <button
+                            type="button"
+                            ngbDropdownToggle
+                            class="cms-publication-date-toggle"
+                            [class.is-invalid]="
+                              publicationValidationAttempted &&
+                              publicationEndInvalid
+                            "
+                          >
+                            <span>
+                              @if (publicationUnpublishDate; as selectedDate) {
+                                {{
+                                  publicationDateValue(selectedDate)
+                                    | date
+                                      : localization.dateFormat()
+                                      : undefined
+                                      : localization.locale()
+                                }}
+                              } @else {
+                                {{ 'cms_page.select_date' | translate }}
+                              }
+                            </span>
+
+                            <i class="ri-calendar-line"></i>
+                          </button>
+
+                          <div ngbDropdownMenu class="cms-publication-calendar">
+                            <ngb-datepicker
+                              [(ngModel)]="publicationUnpublishDate"
+                              [ngModelOptions]="{ standalone: true }"
+                              [minDate]="publicationMinDate"
+                              [startDate]="
+                                publicationUnpublishDate ?? publicationMinDate
+                              "
+                              [outsideDays]="'hidden'"
+                              (ngModelChange)="
+                                syncPublicationUnpublishDateTime()
+                              "
+                              (dateSelect)="unpublishDateDropdown.close()"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- TIME -->
+
+                      <div class="col-lg-5">
+                        <label class="form-label small text-muted">
+                          {{ 'cms_page.time_label' | translate }}
+                        </label>
+
+                        <div
+                          class="cms-publication-timepicker"
+                          [class.is-invalid]="
+                            publicationValidationAttempted &&
+                            publicationEndInvalid
+                          "
+                        >
+                          <ngb-timepicker
+                            [(ngModel)]="publicationUnpublishTime"
+                            [ngModelOptions]="{ standalone: true }"
+                            [meridian]="localization.useMeridian()"
+                            [seconds]="false"
+                            [spinners]="true"
+                            [hourStep]="1"
+                            [minuteStep]="5"
+                            (ngModelChange)="syncPublicationUnpublishDateTime()"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    @if (publicationUnpublishDate || publicationUnpublishTime) {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-light-bg mt-2"
+                        (click)="clearPublicationUnpublish()"
+                      >
+                        <i class="ri-close-line me-1"></i>
+
+                        {{ 'cms_page.clear_datetime' | translate }}
+                      </button>
+                    }
 
                     <small class="text-muted d-block mt-1">
                       {{ 'cms_page.auto_unpublish_at_help' | translate }}

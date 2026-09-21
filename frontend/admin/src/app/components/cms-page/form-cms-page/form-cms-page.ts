@@ -20,7 +20,11 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDateStruct,
+  NgbModule,
+  NgbTimeStruct,
+} from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -138,6 +142,14 @@ export class FormCmsPage {
   public publicationUnpublishAt = '';
 
   public publicationValidationAttempted = false;
+
+  public publicationPublishDate: NgbDateStruct | null = null;
+
+  public publicationPublishTime: NgbTimeStruct | null = null;
+
+  public publicationUnpublishDate: NgbDateStruct | null = null;
+
+  public publicationUnpublishTime: NgbTimeStruct | null = null;
 
   //==================================================
   //==== CONTENT EDITOR
@@ -436,14 +448,9 @@ export class FormCmsPage {
       //==================================================
 
       this.publicationChoice = 'current';
+      this.patchPublicationDateTime('publish', data.cms_page_publish_at);
 
-      this.publicationPublishAt = this.toLocalDateTimeInput(
-        data.cms_page_publish_at,
-      );
-
-      this.publicationUnpublishAt = this.toLocalDateTimeInput(
-        data.cms_page_unpublish_at,
-      );
+      this.patchPublicationDateTime('unpublish', data.cms_page_unpublish_at);
 
       this.publicationValidationAttempted = false;
     });
@@ -871,12 +878,18 @@ export class FormCmsPage {
 
     this.publicationValidationAttempted = false;
 
-    if (choice !== 'schedule') {
+    if (choice === 'schedule') {
+      if (!this.publicationPublishAt) {
+        this.initializePublicationSchedule();
+      }
+    } else {
       this.publicationPublishAt = '';
+      this.publicationPublishDate = null;
+      this.publicationPublishTime = null;
     }
 
     if (choice === 'draft' || choice === 'archive') {
-      this.publicationUnpublishAt = '';
+      this.clearPublicationUnpublish();
     }
   }
 
@@ -900,6 +913,10 @@ export class FormCmsPage {
       return false;
     }
 
+    if (!this.publicationPublishDate || !this.publicationPublishTime) {
+      return true;
+    }
+
     if (!this.publicationPublishAt) {
       return true;
     }
@@ -914,8 +931,20 @@ export class FormCmsPage {
   }
 
   get publicationEndInvalid(): boolean {
-    if (!this.publicationUnpublishAt) {
+    const hasPartialValue =
+      this.publicationUnpublishDate !== null ||
+      this.publicationUnpublishTime !== null;
+
+    if (!hasPartialValue) {
       return false;
+    }
+
+    if (!this.publicationUnpublishDate || !this.publicationUnpublishTime) {
+      return true;
+    }
+
+    if (!this.publicationUnpublishAt) {
+      return true;
     }
 
     const unpublishAt = new Date(this.publicationUnpublishAt);
@@ -984,6 +1013,138 @@ export class FormCmsPage {
     const minute = String(date.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day}T${hour}:${minute}`;
+  }
+
+  publicationDateValue(value: NgbDateStruct | null): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    return new Date(value.year, value.month - 1, value.day, 0, 0, 0, 0);
+  }
+
+  get publicationMinDate(): NgbDateStruct {
+    const now = new Date();
+
+    return {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+      day: now.getDate(),
+    };
+  }
+
+  syncPublicationPublishDateTime(): void {
+    this.publicationPublishAt = this.composePublicationDateTime(
+      this.publicationPublishDate,
+      this.publicationPublishTime,
+    );
+  }
+
+  syncPublicationUnpublishDateTime(): void {
+    this.publicationUnpublishAt = this.composePublicationDateTime(
+      this.publicationUnpublishDate,
+      this.publicationUnpublishTime,
+    );
+  }
+
+  clearPublicationUnpublish(): void {
+    this.publicationUnpublishDate = null;
+    this.publicationUnpublishTime = null;
+    this.publicationUnpublishAt = '';
+  }
+
+  private initializePublicationSchedule(): void {
+    const date = new Date();
+
+    date.setSeconds(0, 0);
+
+    const currentMinute = date.getMinutes();
+
+    const nextMinute = Math.floor(currentMinute / 5) * 5 + 5;
+
+    date.setMinutes(nextMinute);
+
+    this.publicationPublishDate = this.dateToNgbDate(date);
+
+    this.publicationPublishTime = {
+      hour: date.getHours(),
+      minute: date.getMinutes(),
+      second: 0,
+    };
+
+    this.syncPublicationPublishDateTime();
+  }
+
+  private patchPublicationDateTime(
+    type: 'publish' | 'unpublish',
+    value: string | null,
+  ): void {
+    const localValue = this.toLocalDateTimeInput(value);
+
+    if (!localValue) {
+      if (type === 'publish') {
+        this.publicationPublishAt = '';
+        this.publicationPublishDate = null;
+        this.publicationPublishTime = null;
+      } else {
+        this.publicationUnpublishAt = '';
+        this.publicationUnpublishDate = null;
+        this.publicationUnpublishTime = null;
+      }
+
+      return;
+    }
+
+    const date = new Date(value!);
+
+    const dateStruct = this.dateToNgbDate(date);
+
+    const timeStruct: NgbTimeStruct = {
+      hour: date.getHours(),
+      minute: date.getMinutes(),
+      second: 0,
+    };
+
+    if (type === 'publish') {
+      this.publicationPublishAt = localValue;
+      this.publicationPublishDate = dateStruct;
+      this.publicationPublishTime = timeStruct;
+
+      return;
+    }
+
+    this.publicationUnpublishAt = localValue;
+    this.publicationUnpublishDate = dateStruct;
+    this.publicationUnpublishTime = timeStruct;
+  }
+
+  private composePublicationDateTime(
+    date: NgbDateStruct | null,
+    time: NgbTimeStruct | null,
+  ): string {
+    if (!date || !time) {
+      return '';
+    }
+
+    const year = String(date.year);
+
+    const month = String(date.month).padStart(2, '0');
+
+    const day = String(date.day).padStart(2, '0');
+
+    const hour = String(time.hour).padStart(2, '0');
+
+    const minute = String(time.minute).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hour}:${minute}`;
+  }
+
+  private dateToNgbDate(date: Date): NgbDateStruct {
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    };
   }
 
   //==================================================

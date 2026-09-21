@@ -1957,6 +1957,11 @@
     "back_media": "Kembali ke Media",
     "next_preview": "Lanjut ke Pratinjau",
 
+    "date_label": "Tanggal",
+    "time_label": "Waktu",
+    "select_date": "Pilih tanggal",
+    "clear_datetime": "Kosongkan tanggal dan waktu",
+
     "validation": {
       "key_required": "Key halaman wajib diisi.",
       "key_pattern": "Key hanya boleh berisi huruf kecil, angka, tanda hubung, dan garis bawah.",
