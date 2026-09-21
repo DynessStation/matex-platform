@@ -1908,6 +1908,7 @@
     "og_description": "Open Graph Description",
     "back_content": "Back to Content",
     "next_media": "Continue to Media",
+    "content_editor_help": "Use the editor to format the page content. Content will be stored as HTML.",
 
     "validation": {
       "key_required": "Page key is required.",

@@ -1908,6 +1908,7 @@
     "og_description": "Deskripsi Open Graph",
     "back_content": "Kembali ke Konten",
     "next_media": "Lanjut ke Media",
+    "content_editor_help": "Gunakan editor untuk mengatur isi halaman. Konten akan disimpan dalam format HTML.",
 
     "validation": {
       "key_required": "Key halaman wajib diisi.",
