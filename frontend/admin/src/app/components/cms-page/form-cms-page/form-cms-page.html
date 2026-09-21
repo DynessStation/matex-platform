@@ -614,9 +614,291 @@
 
             <ng-template ngbNavContent>
               <div class="border rounded p-4">
-                <p class="text-muted mb-0">
-                  {{ 'cms_page.next_phase_notice' | translate }}
-                </p>
+                <div class="mb-4">
+                  <h5 class="mb-1">
+                    {{ 'cms_page.seo_title' | translate }}
+                  </h5>
+
+                  <p class="text-muted mb-0">
+                    {{ 'cms_page.seo_help' | translate }}
+                  </p>
+                </div>
+
+                <!-- LANGUAGE -->
+
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                  @for (language of supportedLanguages; track language.locale) {
+                    @if (isLanguageEnabled(language.locale)) {
+                      <button
+                        type="button"
+                        class="btn d-flex align-items-center gap-2"
+                        [class.btn-theme]="activeLocale === language.locale"
+                        [class.btn-light-bg]="activeLocale !== language.locale"
+                        (click)="selectLanguage(language.locale)"
+                      >
+                        <span class="fw-semibold">
+                          {{ language.shortLabel }}
+                        </span>
+
+                        <span>
+                          {{ language.labelKey | translate }}
+                        </span>
+
+                        @if (isDefaultLocale(language.locale)) {
+                          <span class="badge bg-primary">
+                            {{ 'cms_page.default_language_badge' | translate }}
+                          </span>
+                        }
+                      </button>
+                    }
+                  }
+                </div>
+
+                <div [formGroup]="translationForm(activeLocale)">
+                  <!-- SEARCH PREVIEW -->
+
+                  <div class="border rounded p-3 mb-4">
+                    <small class="text-muted d-block mb-1">
+                      {{ 'cms_page.search_preview' | translate }}
+                    </small>
+
+                    <div class="text-primary fw-semibold fs-5">
+                      {{ seoPreviewTitle() }}
+                    </div>
+
+                    <div class="text-success small mb-1">
+                      {{ seoPreviewSlug() }}
+                    </div>
+
+                    <div class="text-muted">
+                      {{ seoPreviewDescription() }}
+                    </div>
+                  </div>
+
+                  <div class="row g-4">
+                    <!-- META TITLE -->
+
+                    <div class="col-12">
+                      <label class="form-label">
+                        {{ 'cms_page.meta_title' | translate }}
+                      </label>
+
+                      <input
+                        type="text"
+                        class="form-control"
+                        formControlName="meta_title"
+                        [placeholder]="
+                          'cms_page.meta_title_placeholder' | translate
+                        "
+                        [class.is-invalid]="
+                          translationForm(activeLocale).controls.meta_title
+                            .touched &&
+                          translationForm(activeLocale).controls.meta_title
+                            .invalid
+                        "
+                      />
+
+                      <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">
+                          {{ 'cms_page.meta_title_help' | translate }}
+                        </small>
+
+                        <small class="text-muted">
+                          {{
+                            translationForm(activeLocale).controls.meta_title
+                              .value.length
+                          }}/255
+                        </small>
+                      </div>
+                    </div>
+
+                    <!-- META DESCRIPTION -->
+
+                    <div class="col-12">
+                      <label class="form-label">
+                        {{ 'cms_page.meta_description' | translate }}
+                      </label>
+
+                      <textarea
+                        class="form-control"
+                        rows="3"
+                        formControlName="meta_description"
+                        [placeholder]="
+                          'cms_page.meta_description_placeholder' | translate
+                        "
+                        [class.is-invalid]="
+                          translationForm(activeLocale).controls
+                            .meta_description.touched &&
+                          translationForm(activeLocale).controls
+                            .meta_description.invalid
+                        "
+                      ></textarea>
+
+                      <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">
+                          {{ 'cms_page.meta_description_help' | translate }}
+                        </small>
+
+                        <small class="text-muted">
+                          {{
+                            translationForm(activeLocale).controls
+                              .meta_description.value.length
+                          }}/500
+                        </small>
+                      </div>
+                    </div>
+
+                    <!-- CANONICAL -->
+
+                    <div class="col-12">
+                      <label class="form-label">
+                        {{ 'cms_page.canonical_url' | translate }}
+                      </label>
+
+                      <input
+                        type="url"
+                        class="form-control"
+                        formControlName="canonical_url"
+                        placeholder="https://matex.co.id/tentang-kami"
+                        [class.is-invalid]="
+                          translationForm(activeLocale).controls.canonical_url
+                            .touched &&
+                          translationForm(activeLocale).controls.canonical_url
+                            .invalid
+                        "
+                      />
+
+                      <small class="text-muted d-block mt-1">
+                        {{ 'cms_page.canonical_url_help' | translate }}
+                      </small>
+
+                      @if (
+                        translationForm(activeLocale).controls.canonical_url
+                          .touched &&
+                        translationForm(activeLocale).controls.canonical_url
+                          .errors?.['pattern']
+                      ) {
+                        <div class="text-danger form-error">
+                          {{
+                            'cms_page.validation.canonical_url_invalid'
+                              | translate
+                          }}
+                        </div>
+                      }
+                    </div>
+
+                    <!-- ADVANCED -->
+
+                    <div class="col-12">
+                      <details class="border rounded p-3">
+                        <summary class="fw-semibold cursor-pointer">
+                          {{ 'cms_page.seo_advanced' | translate }}
+                        </summary>
+
+                        <p class="text-muted small mt-2">
+                          {{ 'cms_page.seo_advanced_help' | translate }}
+                        </p>
+
+                        <div class="row g-4 mt-1">
+                          <div class="col-md-6">
+                            <label class="form-label">
+                              {{ 'cms_page.meta_robots' | translate }}
+                            </label>
+
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="meta_robots"
+                              list="cmsPageRobots"
+                            />
+
+                            <datalist id="cmsPageRobots">
+                              <option value="index,follow"></option>
+                              <option value="noindex,follow"></option>
+                              <option value="index,nofollow"></option>
+                              <option value="noindex,nofollow"></option>
+                            </datalist>
+                          </div>
+
+                          <div class="col-md-6">
+                            <label class="form-label">
+                              {{ 'cms_page.meta_keywords' | translate }}
+                            </label>
+
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="meta_keywords"
+                              [placeholder]="
+                                'cms_page.meta_keywords_placeholder' | translate
+                              "
+                            />
+                          </div>
+
+                          <div class="col-12">
+                            <hr />
+
+                            <h6 class="mb-1">
+                              {{ 'cms_page.open_graph' | translate }}
+                            </h6>
+
+                            <p class="text-muted small mb-0">
+                              {{ 'cms_page.open_graph_help' | translate }}
+                            </p>
+                          </div>
+
+                          <div class="col-12">
+                            <label class="form-label">
+                              {{ 'cms_page.og_title' | translate }}
+                            </label>
+
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="og_title"
+                            />
+                          </div>
+
+                          <div class="col-12">
+                            <label class="form-label">
+                              {{ 'cms_page.og_description' | translate }}
+                            </label>
+
+                            <textarea
+                              class="form-control"
+                              rows="3"
+                              formControlName="og_description"
+                            ></textarea>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+
+                  <div
+                    class="d-flex justify-content-between align-items-center border-top mt-4 pt-4"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-light-bg"
+                      (click)="activeTab = 'content'"
+                    >
+                      <i class="ri-arrow-left-line me-1"></i>
+
+                      {{ 'cms_page.back_content' | translate }}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-theme"
+                      (click)="goToMedia()"
+                    >
+                      {{ 'cms_page.next_media' | translate }}
+
+                      <i class="ri-arrow-right-line ms-1"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             </ng-template>
           </li>

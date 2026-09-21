@@ -1886,6 +1886,28 @@
     "content_help": "Content is currently stored as HTML. We will add the visual editor after the main form flow is stable.",
     "back_general": "Back to General",
     "next_seo": "Continue to SEO",
+    "seo_title": "SEO",
+    "seo_help": "Control how this page is understood by search engines and when shared.",
+    "search_preview": "Search result preview",
+    "meta_title": "SEO Title",
+    "meta_title_placeholder": "Leave empty to use the page title",
+    "meta_title_help": "If empty, the page title will be used as the fallback.",
+    "meta_description": "SEO Description",
+    "meta_description_placeholder": "A short description of this page...",
+    "meta_description_help": "If empty, the page excerpt may be used as the fallback.",
+    "canonical_url": "Canonical URL",
+    "canonical_url_help": "Optional. Use this when the preferred URL differs from the current page address.",
+    "seo_advanced": "Advanced SEO Settings",
+    "seo_advanced_help": "These settings usually do not need to be changed unless there is a specific SEO requirement.",
+    "meta_robots": "Meta Robots",
+    "meta_keywords": "Keywords",
+    "meta_keywords_placeholder": "matex, latex, latex products",
+    "open_graph": "Social Sharing",
+    "open_graph_help": "Title and description that may be used when this page is shared on social media.",
+    "og_title": "Open Graph Title",
+    "og_description": "Open Graph Description",
+    "back_content": "Back to Content",
+    "next_media": "Continue to Media",
 
     "validation": {
       "key_required": "Page key is required.",
@@ -1894,7 +1916,8 @@
       "translation_title_required": "Page title is required.",
       "translation_title_max_length": "Page title cannot exceed 255 characters.",
       "slug_pattern": "The slug may only contain lowercase letters, numbers, and hyphens.",
-      "slug_max_length": "The slug cannot exceed 191 characters."
+      "slug_max_length": "The slug cannot exceed 191 characters.",
+      "canonical_url_invalid": "The canonical URL must use http:// or https://."
     }
   }
 }

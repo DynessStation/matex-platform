@@ -1886,6 +1886,28 @@
     "content_help": "Untuk sementara konten disimpan dalam format HTML. Editor visual akan kita pasang setelah alur form utama stabil.",
     "back_general": "Kembali ke Umum",
     "next_seo": "Lanjut ke SEO",
+    "seo_title": "SEO",
+    "seo_help": "Atur bagaimana halaman ini dikenali oleh mesin pencari dan saat dibagikan.",
+    "search_preview": "Pratinjau hasil pencarian",
+    "meta_title": "Judul SEO",
+    "meta_title_placeholder": "Kosongkan untuk menggunakan judul halaman",
+    "meta_title_help": "Jika kosong, judul halaman akan digunakan sebagai fallback.",
+    "meta_description": "Deskripsi SEO",
+    "meta_description_placeholder": "Ringkasan yang menjelaskan isi halaman...",
+    "meta_description_help": "Jika kosong, ringkasan halaman dapat digunakan sebagai fallback.",
+    "canonical_url": "URL Kanonis",
+    "canonical_url_help": "Opsional. Gunakan jika URL utama halaman berbeda dari alamat halaman saat ini.",
+    "seo_advanced": "Pengaturan SEO Lanjutan",
+    "seo_advanced_help": "Biasanya tidak perlu diubah kecuali ada kebutuhan SEO khusus.",
+    "meta_robots": "Meta Robots",
+    "meta_keywords": "Kata Kunci",
+    "meta_keywords_placeholder": "matex, latex, produk latex",
+    "open_graph": "Tampilan Saat Dibagikan",
+    "open_graph_help": "Judul dan deskripsi yang dapat digunakan ketika halaman dibagikan ke media sosial.",
+    "og_title": "Judul Open Graph",
+    "og_description": "Deskripsi Open Graph",
+    "back_content": "Kembali ke Konten",
+    "next_media": "Lanjut ke Media",
 
     "validation": {
       "key_required": "Key halaman wajib diisi.",
@@ -1894,7 +1916,8 @@
       "translation_title_required": "Judul halaman wajib diisi.",
       "translation_title_max_length": "Judul halaman maksimal 255 karakter.",
       "slug_pattern": "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.",
-      "slug_max_length": "Slug maksimal 191 karakter."
+      "slug_max_length": "Slug maksimal 191 karakter.",
+      "canonical_url_invalid": "URL kanonis harus menggunakan http:// atau https://."
     }
   }
 }

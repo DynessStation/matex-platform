@@ -88,6 +88,23 @@ export class FormCmsPage {
 
       content: [''],
 
+      meta_title: ['', [Validators.maxLength(255)]],
+
+      meta_description: ['', [Validators.maxLength(500)]],
+
+      meta_keywords: ['', [Validators.maxLength(500)]],
+
+      meta_robots: ['index,follow', [Validators.maxLength(100)]],
+
+      canonical_url: [
+        '',
+        [Validators.maxLength(500), Validators.pattern(/^https?:\/\/.+/i)],
+      ],
+
+      og_title: ['', [Validators.maxLength(255)]],
+
+      og_description: ['', [Validators.maxLength(500)]],
+
       status: [0 as CmsPageI18nStatus],
     });
   }
@@ -232,6 +249,20 @@ export class FormCmsPage {
 
             content: translation.cms_page_content ?? '',
 
+            meta_title: translation.cms_page_meta_title ?? '',
+
+            meta_description: translation.cms_page_meta_description ?? '',
+
+            meta_keywords: translation.cms_page_meta_keywords ?? '',
+
+            meta_robots: translation.cms_page_meta_robots ?? 'index,follow',
+
+            canonical_url: translation.cms_page_canonical_url ?? '',
+
+            og_title: translation.cms_page_og_title ?? '',
+
+            og_description: translation.cms_page_og_description ?? '',
+
             status: translation.cms_page_i18n_status,
           },
           {
@@ -322,6 +353,20 @@ export class FormCmsPage {
 
         content: '',
 
+        meta_title: '',
+
+        meta_description: '',
+
+        meta_keywords: '',
+
+        meta_robots: 'index,follow',
+
+        canonical_url: '',
+
+        og_title: '',
+
+        og_description: '',
+
         status: 0,
       },
       {
@@ -398,6 +443,83 @@ export class FormCmsPage {
     }
 
     this.activeTab = 'seo';
+  }
+
+  //==================================================
+  //==== SEO PREVIEW
+  //==================================================
+
+  seoPreviewTitle(): string {
+    const group = this.translationForm(this.activeLocale);
+
+    return (
+      group.controls.meta_title.value.trim() ||
+      group.controls.title.value.trim() ||
+      '-'
+    );
+  }
+
+  seoPreviewDescription(): string {
+    const group = this.translationForm(this.activeLocale);
+
+    return (
+      group.controls.meta_description.value.trim() ||
+      group.controls.excerpt.value.trim() ||
+      '-'
+    );
+  }
+
+  seoPreviewSlug(): string {
+    const slug = this.translationForm(
+      this.activeLocale,
+    ).controls.slug.value.trim();
+
+    return slug ? `/${slug}` : '/';
+  }
+
+  //==================================================
+  //==== NEXT MEDIA
+  //==================================================
+
+  goToMedia(): void {
+    let invalidLocale: CmsPageLocale | null = null;
+
+    this.supportedLanguages.forEach((language) => {
+      const group = this.translationForm(language.locale);
+
+      if (group.disabled) {
+        return;
+      }
+
+      group.controls.meta_title.markAsTouched();
+      group.controls.meta_description.markAsTouched();
+      group.controls.meta_keywords.markAsTouched();
+      group.controls.meta_robots.markAsTouched();
+      group.controls.canonical_url.markAsTouched();
+      group.controls.og_title.markAsTouched();
+      group.controls.og_description.markAsTouched();
+
+      if (
+        group.controls.meta_title.invalid ||
+        group.controls.meta_description.invalid ||
+        group.controls.meta_keywords.invalid ||
+        group.controls.meta_robots.invalid ||
+        group.controls.canonical_url.invalid ||
+        group.controls.og_title.invalid ||
+        group.controls.og_description.invalid
+      ) {
+        invalidLocale ??= language.locale;
+      }
+    });
+
+    if (invalidLocale) {
+      this.activeLocale = invalidLocale;
+      this.activeTab = 'seo';
+
+      return;
+    }
+
+    this.activeTab = 'media';
   }
 
   //==================================================
