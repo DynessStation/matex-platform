@@ -13,7 +13,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  ParamMap,
+  Router,
+  RouterModule,
+} from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -47,6 +52,8 @@ import { AuthState } from '../../shared/store/state/auth.state';
 
 import { CmsPageState } from '../../shared/store/state/cms-page.state';
 
+import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+
 //==================================================
 //==== COMPONENT
 //==================================================
@@ -57,10 +64,12 @@ import { CmsPageState } from '../../shared/store/state/cms-page.state';
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
+    RouterModule,
     TranslateModule,
     Select2Module,
     PageWrapper,
     Table,
+    HasPermissionDirective,
   ],
 
   templateUrl: './cms-page.html',

@@ -1840,6 +1840,11 @@
     "preview_desktop": "Desktop",
     "preview_tablet": "Tablet",
     "preview_mobile": "Mobile",
-    "preview_frame_title": "CMS page preview"
+    "preview_frame_title": "CMS page preview",
+
+    "create_title": "Create Page",
+    "edit_title": "Edit Page",
+    "add": "Add Page",
+    "form_preparing": "The page form is being prepared."
   }
 }

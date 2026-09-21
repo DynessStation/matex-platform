@@ -1,4 +1,14 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'cms_page.title'">
+  <div button class="d-flex flex-wrap gap-2" *hasPermission="'cms_page.create'">
+    <a
+      [routerLink]="['/cms-page/create']"
+      class="align-items-center btn btn-theme"
+    >
+      <i class="ri-add-line"></i>
+
+      {{ 'cms_page.add' | translate }}
+    </a>
+  </div>
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
