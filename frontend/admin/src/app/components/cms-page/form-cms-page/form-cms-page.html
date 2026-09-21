@@ -924,21 +924,312 @@
 
           <!-- MEDIA -->
 
-          <li [ngbNavItem]="'media'">
-            <button ngbNavLink type="button">
-              <i class="ri-image-line"></i>
+          @if (canViewAttachments) {
+            <li [ngbNavItem]="'media'">
+              <button ngbNavLink type="button">
+                <i class="ri-image-line"></i>
 
-              {{ 'cms_page.media' | translate }}
-            </button>
+                {{ 'cms_page.media' | translate }}
+              </button>
 
-            <ng-template ngbNavContent>
-              <div class="border rounded p-4">
-                <p class="text-muted mb-0">
-                  {{ 'cms_page.next_phase_notice' | translate }}
-                </p>
-              </div>
-            </ng-template>
-          </li>
+              <ng-template ngbNavContent>
+                <div class="border rounded p-4">
+                  <!--==================================================-->
+                  <!--==== HEADER =======================================-->
+                  <!--==================================================-->
+
+                  <div
+                    class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4"
+                  >
+                    <div>
+                      <h5 class="mb-1">
+                        {{ 'cms_page.media_title' | translate }}
+                      </h5>
+
+                      <p class="text-muted mb-0">
+                        {{ 'cms_page.media_help' | translate }}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-theme"
+                      (click)="openMedia()"
+                    >
+                      <i class="ri-image-add-line me-1"></i>
+
+                      {{ 'cms_page.select_media' | translate }}
+                    </button>
+                  </div>
+
+                  @if (pageMedia.length) {
+                    <!--==================================================-->
+                    <!--==== LANGUAGE =====================================-->
+                    <!--==================================================-->
+
+                    <div class="mb-4">
+                      <small class="text-muted d-block mb-2">
+                        {{ 'cms_page.media_language_help' | translate }}
+                      </small>
+
+                      <div class="d-flex flex-wrap gap-2">
+                        @for (
+                          language of supportedLanguages;
+                          track language.locale
+                        ) {
+                          @if (isLanguageEnabled(language.locale)) {
+                            <button
+                              type="button"
+                              class="btn d-flex align-items-center gap-2"
+                              [class.btn-theme]="
+                                activeLocale === language.locale
+                              "
+                              [class.btn-light-bg]="
+                                activeLocale !== language.locale
+                              "
+                              (click)="selectLanguage(language.locale)"
+                            >
+                              <span class="fw-semibold">
+                                {{ language.shortLabel }}
+                              </span>
+
+                              <span>
+                                {{ language.labelKey | translate }}
+                              </span>
+
+                              @if (isDefaultLocale(language.locale)) {
+                                <span class="badge bg-primary">
+                                  {{
+                                    'cms_page.default_language_badge'
+                                      | translate
+                                  }}
+                                </span>
+                              }
+                            </button>
+                          }
+                        }
+                      </div>
+                    </div>
+
+                    <!--==================================================-->
+                    <!--==== MEDIA LIST ===================================-->
+                    <!--==================================================-->
+
+                    <div class="cms-page-media-list">
+                      @for (
+                        media of pageMedia;
+                        track media.attachment.id_attachment;
+                        let index = $index
+                      ) {
+                        <div class="cms-page-media-item">
+                          <div class="cms-page-media-preview">
+                            <img
+                              [src]="media.attachment.asset_url"
+                              [alt]="
+                                media.translations[activeLocale].alt_text ||
+                                media.attachment.original_name
+                              "
+                            />
+
+                            @if (media.role === 'hero') {
+                              <span
+                                class="badge bg-warning cms-page-media-badge"
+                              >
+                                {{ 'cms_page.media_hero' | translate }}
+                              </span>
+                            }
+                          </div>
+
+                          <div class="cms-page-media-content">
+                            <div
+                              class="d-flex justify-content-between align-items-start gap-3"
+                            >
+                              <div class="text-truncate">
+                                <strong>
+                                  {{ media.attachment.original_name }}
+                                </strong>
+
+                                <div class="text-muted small">
+                                  {{
+                                    media.attachment.width
+                                      ? media.attachment.width +
+                                        ' × ' +
+                                        media.attachment.height
+                                      : media.attachment.mime_type
+                                  }}
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-light-bg cms-page-media-delete"
+                                [title]="'cms_page.remove_media' | translate"
+                                (click)="removeMedia(index)"
+                              >
+                                <i class="ri-delete-bin-line"></i>
+                              </button>
+                            </div>
+
+                            <div class="row g-3 mt-1">
+                              <div class="col-md-6">
+                                <label class="form-label">
+                                  {{ 'cms_page.media_caption' | translate }}
+                                </label>
+
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  [value]="
+                                    media.translations[activeLocale].caption
+                                  "
+                                  [placeholder]="
+                                    'cms_page.media_caption_placeholder'
+                                      | translate
+                                  "
+                                  (input)="
+                                    updateMediaTranslation(
+                                      index,
+                                      activeLocale,
+                                      'caption',
+                                      $any($event.target).value
+                                    )
+                                  "
+                                />
+                              </div>
+
+                              <div class="col-md-6">
+                                <label class="form-label">
+                                  {{ 'cms_page.media_alt_text' | translate }}
+                                </label>
+
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  [value]="
+                                    media.translations[activeLocale].alt_text
+                                  "
+                                  [placeholder]="
+                                    'cms_page.media_alt_text_placeholder'
+                                      | translate
+                                  "
+                                  (input)="
+                                    updateMediaTranslation(
+                                      index,
+                                      activeLocale,
+                                      'alt_text',
+                                      $any($event.target).value
+                                    )
+                                  "
+                                />
+
+                                <small class="text-muted d-block mt-1">
+                                  {{
+                                    'cms_page.media_alt_text_help' | translate
+                                  }}
+                                </small>
+                              </div>
+                            </div>
+
+                            <div
+                              class="d-flex flex-wrap align-items-center gap-3 mt-3"
+                            >
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-theme"
+                                [disabled]="media.role === 'hero'"
+                                (click)="setHero(index)"
+                              >
+                                <i class="ri-image-line me-1"></i>
+
+                                {{ 'cms_page.set_hero' | translate }}
+                              </button>
+
+                              <div class="d-flex align-items-center gap-2">
+                                <label class="switch switch-sm">
+                                  <input
+                                    type="checkbox"
+                                    [checked]="media.is_public"
+                                    (change)="
+                                      updateMediaPublic(
+                                        index,
+                                        $any($event.target).checked
+                                      )
+                                    "
+                                  />
+
+                                  <span class="switch-state"></span>
+                                </label>
+
+                                <span>
+                                  {{ 'cms_page.media_public' | translate }}
+                                </span>
+                              </div>
+
+                              <div class="ms-auto d-flex gap-2">
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-light-bg"
+                                  [disabled]="index === 0"
+                                  (click)="moveMedia(index, -1)"
+                                >
+                                  <i class="ri-arrow-up-line"></i>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-light-bg"
+                                  [disabled]="index === pageMedia.length - 1"
+                                  (click)="moveMedia(index, 1)"
+                                >
+                                  <i class="ri-arrow-down-line"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="cms-page-media-empty">
+                      <i class="ri-image-add-line fs-1 d-block mb-2"></i>
+
+                      <strong class="d-block mb-1">
+                        {{ 'cms_page.no_media_selected' | translate }}
+                      </strong>
+
+                      <span class="text-muted">
+                        {{ 'cms_page.media_empty_help' | translate }}
+                      </span>
+                    </div>
+                  }
+
+                  <div
+                    class="d-flex justify-content-between align-items-center border-top mt-4 pt-4"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-light-bg"
+                      (click)="activeTab = 'seo'"
+                    >
+                      <i class="ri-arrow-left-line me-1"></i>
+
+                      {{ 'cms_page.back_seo' | translate }}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-theme"
+                      (click)="goToPublication()"
+                    >
+                      {{ 'cms_page.next_publication' | translate }}
+
+                      <i class="ri-arrow-right-line ms-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+          }
 
           <!-- PUBLICATION -->
 
@@ -988,3 +1279,14 @@
     </div>
   </div>
 </form>
+
+<app-media-modal
+  #mediaModal
+  [selectMedia]="true"
+  [multipleImage]="true"
+  [url]="false"
+  [accept]="pageMediaAccept"
+  [collection]="'media_library'"
+  [selectedImagesIds]="selectedMedia"
+  (selectImage)="selectMedia($event)"
+/>

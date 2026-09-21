@@ -6,6 +6,7 @@ import {
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -23,7 +24,40 @@ import {
 
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
+import { Store } from '@ngxs/store';
+
+import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
+
+import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
+
+import { IAttachment } from '../../../shared/interface/attachment.interface';
+
+import { AuthState } from '../../../shared/store/state/auth.state';
+
+import { hasPermissionAccess } from '../../../shared/utils/permission.util';
+
 type CmsPageLocale = 'id-ID' | 'en-US';
+
+//==================================================
+//==== MEDIA DRAFT
+//==================================================
+
+interface CmsPageMediaTranslationDraft {
+  caption: string;
+
+  alt_text: string;
+}
+
+interface CmsPageMediaDraft {
+  attachment: IAttachment;
+
+  role: 'hero' | 'gallery';
+
+  is_public: boolean;
+
+  translations: Record<CmsPageLocale, CmsPageMediaTranslationDraft>;
+}
+
 //==================================================
 //==== COMPONENT
 //==================================================
@@ -31,7 +65,13 @@ type CmsPageLocale = 'id-ID' | 'en-US';
 @Component({
   selector: 'app-form-cms-page',
 
-  imports: [ReactiveFormsModule, NgbModule, TranslateModule, NgxEditorModule],
+  imports: [
+    ReactiveFormsModule,
+    NgbModule,
+    TranslateModule,
+    NgxEditorModule,
+    MediaModal,
+  ],
 
   templateUrl: './form-cms-page.html',
 
@@ -44,6 +84,7 @@ export class FormCmsPage {
 
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private store = inject(Store);
 
   //==================================================
   //==== INPUT
@@ -60,6 +101,16 @@ export class FormCmsPage {
   public activeTab = 'general';
 
   public activeLocale: CmsPageLocale = 'id-ID';
+
+  //==================================================
+  //==== MEDIA
+  //==================================================
+
+  readonly mediaModal = viewChild<MediaModal>('mediaModal');
+
+  public pageMedia: CmsPageMediaDraft[] = [];
+
+  public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
 
   //==================================================
   //==== CONTENT EDITOR
@@ -319,6 +370,39 @@ export class FormCmsPage {
       this.enableLanguage(defaultLocale);
 
       this.activeLocale = defaultLocale;
+
+      //==================================================
+      //==== PATCH MEDIA
+      //==================================================
+
+      this.pageMedia = data.attachments.map((item) => {
+        const translations = this.createEmptyMediaTranslations();
+
+        item.translations.forEach((translation) => {
+          const locale = this.parseLocale(
+            translation.cms_page_attachment_locale,
+          );
+
+          if (!locale) {
+            return;
+          }
+
+          translations[locale] = {
+            caption: translation.cms_page_attachment_caption ?? '',
+            alt_text: translation.cms_page_attachment_alt_text ?? '',
+          };
+        });
+
+        return {
+          attachment: item,
+
+          role: item.cms_page_attachment_role === 'hero' ? 'hero' : 'gallery',
+
+          is_public: item.cms_page_attachment_is_public === 1,
+
+          translations,
+        };
+      });
     });
   }
 
@@ -328,6 +412,35 @@ export class FormCmsPage {
 
   get isSystemPage(): boolean {
     return this.mode() === 'edit' && this.editData()?.cms_page_is_system === 1;
+  }
+
+  get canViewAttachments(): boolean {
+    return hasPermissionAccess(
+      'attachment.view',
+      this.store.selectSnapshot(AuthState.permissions) ?? [],
+      this.store.selectSnapshot(AuthState.isAllAccess) === true,
+    );
+  }
+
+  //==================================================
+  //==== EMPTY MEDIA TRANSLATIONS
+  //==================================================
+
+  private createEmptyMediaTranslations(): Record<
+    CmsPageLocale,
+    CmsPageMediaTranslationDraft
+  > {
+    return {
+      'id-ID': {
+        caption: '',
+        alt_text: '',
+      },
+
+      'en-US': {
+        caption: '',
+        alt_text: '',
+      },
+    };
   }
 
   //==================================================
@@ -561,7 +674,149 @@ export class FormCmsPage {
       return;
     }
 
-    this.activeTab = 'media';
+    this.activeTab = this.canViewAttachments ? 'media' : 'publication';
+  }
+
+  goToPublication(): void {
+    this.activeTab = 'publication';
+  }
+
+  //==================================================
+  //==== MEDIA
+  //==================================================
+
+  openMedia(): void {
+    this.mediaModal()?.openModal();
+  }
+
+  get selectedMedia(): IAttachment[] {
+    return this.pageMedia.map((item) => item.attachment);
+  }
+
+  selectMedia(selection: MediaSelection): void {
+    const selected = this.toAttachmentArray(selection);
+
+    const oldMap = new Map(
+      this.pageMedia.map((item) => [item.attachment.id_attachment, item]),
+    );
+
+    const hasHero = selected.some(
+      (attachment) => oldMap.get(attachment.id_attachment)?.role === 'hero',
+    );
+
+    let heroAssigned = hasHero;
+
+    this.pageMedia = selected.map((attachment) => {
+      const existing = oldMap.get(attachment.id_attachment);
+
+      if (existing) {
+        return existing;
+      }
+
+      const role: 'hero' | 'gallery' = !heroAssigned ? 'hero' : 'gallery';
+
+      if (role === 'hero') {
+        heroAssigned = true;
+      }
+
+      return {
+        attachment,
+
+        role,
+
+        is_public: true,
+
+        translations: this.createEmptyMediaTranslations(),
+      };
+    });
+  }
+
+  setHero(index: number): void {
+    this.pageMedia = this.pageMedia.map((item, currentIndex) => ({
+      ...item,
+
+      role: currentIndex === index ? 'hero' : 'gallery',
+    }));
+  }
+
+  removeMedia(index: number): void {
+    const wasHero = this.pageMedia[index]?.role === 'hero';
+
+    this.pageMedia.splice(index, 1);
+
+    this.pageMedia = [...this.pageMedia];
+
+    if (wasHero && this.pageMedia.length) {
+      this.setHero(0);
+    }
+  }
+
+  moveMedia(index: number, direction: -1 | 1): void {
+    const target = index + direction;
+
+    if (target < 0 || target >= this.pageMedia.length) {
+      return;
+    }
+
+    const next = [...this.pageMedia];
+
+    [next[index], next[target]] = [next[target], next[index]];
+
+    this.pageMedia = next;
+  }
+
+  updateMediaPublic(index: number, checked: boolean): void {
+    this.pageMedia[index] = {
+      ...this.pageMedia[index],
+
+      is_public: checked,
+    };
+
+    this.pageMedia = [...this.pageMedia];
+  }
+
+  updateMediaTranslation(
+    index: number,
+    locale: CmsPageLocale,
+    field: keyof CmsPageMediaTranslationDraft,
+    value: string,
+  ): void {
+    const item = this.pageMedia[index];
+
+    this.pageMedia[index] = {
+      ...item,
+
+      translations: {
+        ...item.translations,
+
+        [locale]: {
+          ...item.translations[locale],
+
+          [field]: value,
+        },
+      },
+    };
+
+    this.pageMedia = [...this.pageMedia];
+  }
+
+  private toAttachmentArray(selection: MediaSelection): IAttachment[] {
+    if (!selection) {
+      return [];
+    }
+
+    if (Array.isArray(selection)) {
+      return selection.filter(
+        (item): item is IAttachment =>
+          typeof item === 'object' && item !== null && 'id_attachment' in item,
+      );
+    }
+
+    if (typeof selection === 'object' && 'id_attachment' in selection) {
+      return [selection as IAttachment];
+    }
+
+    return [];
   }
 
   //==================================================
