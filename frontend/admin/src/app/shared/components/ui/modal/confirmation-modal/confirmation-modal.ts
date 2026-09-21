@@ -184,6 +184,19 @@ export class ConfirmationModal {
         break;
 
       //==================================================
+      //==== TRASH
+      //==================================================
+
+      case 'trash':
+        this.modalTitleKey = 'confirmation_ui.trash_title';
+
+        this.modalMessageKey = name
+          ? 'confirmation_ui.trash_message'
+          : 'confirmation_ui.trash_message_generic';
+
+        break;
+
+      //==================================================
       //==== DELETE
       //==================================================
 

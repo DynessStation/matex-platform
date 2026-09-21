@@ -1,5 +1,31 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'cms_page.detail_title'">
-  <div button>
+  <div button class="d-flex flex-wrap gap-2">
+    @if (cmsPage$ | async; as actionPage) {
+      <a
+        *hasPermission="'cms_page.update'"
+        [routerLink]="['/cms-page/edit', actionPage.id_cms_page]"
+        class="align-items-center btn btn-theme d-flex"
+      >
+        <i class="ri-edit-line me-1"></i>
+
+        {{ 'cms_page.edit_action' | translate }}
+      </a>
+
+      @if (actionPage.cms_page_is_system !== 1) {
+        <button
+          *hasPermission="'cms_page.delete'"
+          type="button"
+          class="align-items-center btn btn-outline-danger d-flex"
+          [disabled]="deleting"
+          (click)="moveToTrash(actionPage)"
+        >
+          <i class="ri-delete-bin-line me-1"></i>
+
+          {{ 'cms_page.move_to_trash_action' | translate }}
+        </button>
+      }
+    }
+
     <a
       [routerLink]="['/cms-page']"
       class="align-items-center btn btn-light-bg d-flex"
@@ -322,3 +348,5 @@
     }
   }
 </app-page-wrapper>
+
+<app-confirmation-modal #confirmationModal (confirmed)="onConfirmed($event)" />

@@ -1670,7 +1670,11 @@
 
     "delete_title": "Konfirmasi Hapus",
     "delete_message": "Apakah Anda yakin ingin menghapus \"{{name}}\"?",
-    "delete_message_generic": "Apakah Anda yakin ingin menghapus item ini?"
+    "delete_message_generic": "Apakah Anda yakin ingin menghapus item ini?",
+
+    "trash_title": "Pindahkan ke Sampah?",
+    "trash_message": "\"{{name}}\" akan dipindahkan ke Sampah dan dapat dipulihkan kembali.",
+    "trash_message_generic": "Item ini akan dipindahkan ke Sampah dan dapat dipulihkan kembali."
   },
   "office": {
     "title": "Kantor",
@@ -1979,6 +1983,8 @@
     "saving": "Menyimpan...",
     "create_page": "Buat Halaman",
     "save_changes": "Simpan Perubahan",
+
+    "move_to_trash_action": "Pindahkan ke Sampah",
 
     "validation": {
       "key_required": "Key halaman wajib diisi.",
