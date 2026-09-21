@@ -1935,7 +1935,10 @@
                                 [class.bg-success]="
                                   translation.cms_page_i18n_status === 1
                                 "
-                                [class.bg-secondary]="
+                                [class.bg-warning]="
+                                  translation.cms_page_i18n_status !== 1
+                                "
+                                [class.text-dark]="
                                   translation.cms_page_i18n_status !== 1
                                 "
                               >

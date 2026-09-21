@@ -1011,6 +1011,27 @@ export class FormCmsPage {
       return;
     }
 
+    this.publicationValidationAttempted = true;
+
+    if (
+      this.publicationRequiresPublishedTranslation &&
+      !this.defaultTranslationPublished
+    ) {
+      event.preventDefault();
+
+      this.activeTab = 'publication';
+
+      return;
+    }
+
+    if (this.publicationScheduleInvalid || this.publicationEndInvalid) {
+      event.preventDefault();
+
+      this.activeTab = 'publication';
+
+      return;
+    }
+
     this.refreshPreviewPage();
   }
 
