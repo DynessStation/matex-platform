@@ -34,7 +34,10 @@ import {
 
 import { Params } from '../../shared/interface/core.interface';
 
-import { ITableConfig } from '../../shared/interface/table.interface';
+import {
+  ITableClickedAction,
+  ITableConfig,
+} from '../../shared/interface/table.interface';
 
 import { LocalizationService } from '../../shared/services/localization.service';
 
@@ -201,6 +204,17 @@ export class CmsPage implements AfterViewInit {
         sortable: true,
 
         sort_direction: 'desc',
+      },
+    ],
+    rowActions: [
+      {
+        label: 'cms_page.view_detail',
+
+        actionToPerform: 'view',
+
+        icon: 'ri-eye-line',
+
+        permission: 'cms_page.view',
       },
     ],
 
@@ -621,5 +635,27 @@ export class CmsPage implements AfterViewInit {
     const result = Number(value);
 
     return [15, 25, 50, 100].includes(result) ? result : 15;
+  }
+
+  //==================================================
+  //==== ACTION
+  //==================================================
+
+  onActionClicked(action: ITableClickedAction): void {
+    if (action.actionToPerform === 'view') {
+      this.view(action.data as ICmsPage);
+    }
+  }
+
+  //==================================================
+  //==== VIEW DETAIL
+  //==================================================
+
+  view(data: ICmsPage): void {
+    if (!data?.id_cms_page) {
+      return;
+    }
+
+    void this.router.navigateByUrl(`/cms-page/${data.id_cms_page}`);
   }
 }

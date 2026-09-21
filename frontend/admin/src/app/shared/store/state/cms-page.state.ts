@@ -25,6 +25,7 @@ import {
   RestoreCmsPageAction,
   UpdateCmsPageAction,
   UpdateCmsPagePublicationAction,
+  ClearCmsPageDetailAction,
 } from '../action/cms-page.action';
 
 //==================================================
@@ -142,6 +143,17 @@ export class CmsPageState {
         });
       }),
     );
+  }
+
+  //==================================================
+  //==== CLEAR DETAIL
+  //==================================================
+
+  @Action(ClearCmsPageDetailAction)
+  clearCmsPageDetail(ctx: StateContext<CmsPageStateModel>) {
+    ctx.patchState({
+      selectedCmsPage: null,
+    });
   }
 
   //==================================================

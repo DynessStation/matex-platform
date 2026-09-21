@@ -1,0 +1,318 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'cms_page.detail_title'">
+  <div button>
+    <a
+      [routerLink]="['/cms-page']"
+      class="align-items-center btn btn-light-bg d-flex"
+    >
+      <i class="ri-arrow-left-line me-1"></i>
+
+      {{ 'cms_page.back_to_list' | translate }}
+    </a>
+  </div>
+
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/cms-page'"
+      (retry)="retryDetail()"
+    />
+  } @else if (cmsPage$ | async; as page) {
+    @if (displayTranslation(page); as translation) {
+      <!--==================================================-->
+      <!--==== HEADER ======================================-->
+      <!--==================================================-->
+
+      <div
+        class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4"
+      >
+        <div>
+          <h4 class="mb-1">
+            {{ translation.cms_page_title }}
+          </h4>
+
+          <div class="text-muted">
+            {{ page.cms_page_key }}
+
+            @if (translation.cms_page_slug) {
+              · /{{ translation.cms_page_slug }}
+            }
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-light text-dark">
+            {{ 'cms_page.status_' + page.effective_status | translate }}
+          </span>
+
+          <span class="badge bg-light text-dark">
+            {{
+              'cms_page.visibility_' + visibilityKey(page.cms_page_visibility)
+                | translate
+            }}
+          </span>
+
+          @if (page.cms_page_is_system) {
+            <span class="badge bg-secondary">
+              {{ 'cms_page.system_page' | translate }}
+            </span>
+          }
+
+          @if (page.cms_page_is_featured) {
+            <span class="badge bg-warning text-dark">
+              {{ 'cms_page.featured' | translate }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <!--==================================================-->
+      <!--==== OVERVIEW ====================================-->
+      <!--==================================================-->
+
+      <div class="border rounded p-3 mb-4">
+        <h6 class="mb-3">
+          {{ 'cms_page.overview' | translate }}
+        </h6>
+
+        <div class="row g-3">
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.key' | translate }}
+            </small>
+
+            <strong>{{ page.cms_page_key }}</strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.type' | translate }}
+            </small>
+
+            <strong>{{ humanize(page.cms_page_type) }}</strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.template' | translate }}
+            </small>
+
+            <strong>
+              {{ humanize(page.cms_page_template) }}
+            </strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.content_mode' | translate }}
+            </small>
+
+            <strong>
+              {{ humanize(page.cms_page_content_mode) }}
+            </strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.default_locale' | translate }}
+            </small>
+
+            <strong>{{ page.cms_page_default_locale }}</strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.sort_order' | translate }}
+            </small>
+
+            <strong>{{ page.cms_page_sort_order }}</strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.created' | translate }}
+            </small>
+
+            <strong>
+              {{
+                page.created
+                  | date
+                    : localization.dateTimeFormat()
+                    : undefined
+                    : localization.locale()
+              }}
+            </strong>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.updated' | translate }}
+            </small>
+
+            <strong>
+              {{
+                page.updated
+                  | date
+                    : localization.dateTimeFormat()
+                    : undefined
+                    : localization.locale()
+              }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <!--==================================================-->
+      <!--==== TRANSLATIONS ================================-->
+      <!--==================================================-->
+
+      <div class="border rounded p-3 mb-4">
+        <h6 class="mb-3">
+          {{ 'cms_page.translations' | translate }}
+          ({{ page.translation_count }})
+        </h6>
+
+        <div class="row g-3">
+          @for (item of page.translations; track item.cms_page_locale) {
+            <div class="col-xl-6">
+              <div class="border rounded h-100 p-3">
+                <div
+                  class="d-flex align-items-start justify-content-between gap-2 mb-2"
+                >
+                  <div>
+                    <strong>
+                      {{ item.cms_page_title }}
+                    </strong>
+
+                    <div class="text-muted small">
+                      {{ item.cms_page_locale }}
+                    </div>
+                  </div>
+
+                  <span
+                    class="badge"
+                    [class.bg-success]="item.cms_page_i18n_status === 1"
+                    [class.bg-secondary]="item.cms_page_i18n_status !== 1"
+                  >
+                    {{
+                      (item.cms_page_i18n_status === 1
+                        ? 'cms_page.translation_published'
+                        : 'cms_page.translation_draft'
+                      ) | translate
+                    }}
+                  </span>
+                </div>
+
+                <div class="small mb-2">/{{ item.cms_page_slug }}</div>
+
+                @if (item.cms_page_excerpt) {
+                  <p class="text-muted mb-0">
+                    {{ item.cms_page_excerpt }}
+                  </p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!--==================================================-->
+      <!--==== PUBLICATION =================================-->
+      <!--==================================================-->
+
+      <div class="border rounded p-3 mb-4">
+        <h6 class="mb-3">
+          {{ 'cms_page.publication' | translate }}
+        </h6>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.publish_at' | translate }}
+            </small>
+
+            <strong>
+              @if (page.cms_page_publish_at) {
+                {{
+                  page.cms_page_publish_at
+                    | date
+                      : localization.dateTimeFormat()
+                      : undefined
+                      : localization.locale()
+                }}
+              } @else {
+                -
+              }
+            </strong>
+          </div>
+
+          <div class="col-md-6">
+            <small class="text-muted d-block">
+              {{ 'cms_page.unpublish_at' | translate }}
+            </small>
+
+            <strong>
+              @if (page.cms_page_unpublish_at) {
+                {{
+                  page.cms_page_unpublish_at
+                    | date
+                      : localization.dateTimeFormat()
+                      : undefined
+                      : localization.locale()
+                }}
+              } @else {
+                -
+              }
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <!--==================================================-->
+      <!--==== MEDIA =======================================-->
+      <!--==================================================-->
+
+      <div class="border rounded p-3">
+        <h6 class="mb-3">
+          {{ 'cms_page.media' | translate }}
+          ({{ page.attachment_count }})
+        </h6>
+
+        @if (page.attachments.length) {
+          <div class="row g-3">
+            @for (
+              attachment of page.attachments;
+              track attachment.id_attachment
+            ) {
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="border rounded h-100 overflow-hidden">
+                  @if (attachment.mime_type.startsWith('image/')) {
+                    <img
+                      [src]="attachment.asset_url"
+                      [alt]="attachment.original_name"
+                      class="img-fluid w-100"
+                      style="height: 180px; object-fit: cover"
+                    />
+                  }
+
+                  <div class="p-3">
+                    <strong class="d-block text-truncate">
+                      {{ attachment.original_name }}
+                    </strong>
+
+                    <small class="text-muted">
+                      {{ humanize(attachment.cms_page_attachment_role) }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="text-muted">
+            {{ 'cms_page.no_media' | translate }}
+          </div>
+        }
+      </div>
+    }
+  }
+</app-page-wrapper>

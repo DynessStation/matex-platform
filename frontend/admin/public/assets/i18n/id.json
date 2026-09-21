@@ -1813,6 +1813,25 @@
     "visibility_public": "Publik",
     "visibility_unlisted": "Tidak Terdaftar",
 
-    "translation_summary": "{{published}}/{{total}} dipublikasikan"
+    "translation_summary": "{{published}}/{{total}} dipublikasikan",
+
+    "detail_title": "Detail Halaman",
+    "back_to_list": "Kembali ke Halaman",
+    "view_detail": "Lihat Detail",
+    "overview": "Informasi Halaman",
+    "template": "Template",
+    "content_mode": "Mode Konten",
+    "default_locale": "Bahasa Utama",
+    "sort_order": "Urutan",
+    "created": "Dibuat",
+    "publication": "Publikasi",
+    "publish_at": "Waktu Publikasi",
+    "unpublish_at": "Waktu Berakhir",
+    "system_page": "Halaman Sistem",
+    "featured": "Unggulan",
+    "translation_published": "Dipublikasikan",
+    "translation_draft": "Draf",
+    "media": "Media",
+    "no_media": "Belum ada media"
   }
 }

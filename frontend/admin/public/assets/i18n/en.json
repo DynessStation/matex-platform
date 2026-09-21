@@ -1813,6 +1813,25 @@
     "visibility_public": "Public",
     "visibility_unlisted": "Unlisted",
 
-    "translation_summary": "{{published}}/{{total}} published"
+    "translation_summary": "{{published}}/{{total}} published",
+
+    "detail_title": "Page Detail",
+    "back_to_list": "Back to Pages",
+    "view_detail": "View Detail",
+    "overview": "Page Information",
+    "template": "Template",
+    "content_mode": "Content Mode",
+    "default_locale": "Default Language",
+    "sort_order": "Sort Order",
+    "created": "Created",
+    "publication": "Publication",
+    "publish_at": "Publish At",
+    "unpublish_at": "Unpublish At",
+    "system_page": "System Page",
+    "featured": "Featured",
+    "translation_published": "Published",
+    "translation_draft": "Draft",
+    "media": "Media",
+    "no_media": "No media attached"
   }
 }

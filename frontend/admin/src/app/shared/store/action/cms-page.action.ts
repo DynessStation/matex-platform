@@ -92,3 +92,11 @@ export class RestoreCmsPageAction {
 
   constructor(public id: string) {}
 }
+
+//==================================================
+//==== CLEAR DETAIL
+//==================================================
+
+export class ClearCmsPageDetailAction {
+  static readonly type = '[CMS Page] Clear Detail';
+}

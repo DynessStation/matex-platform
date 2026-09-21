@@ -7,6 +7,31 @@ import { PermissionGuard } from '../../core/guard/permission.guard';
 //==================================================
 
 export const cmsPageRoutes: Routes = [
+  //==================================================
+  //==== DETAIL
+  //==================================================
+
+  {
+    path: ':id',
+
+    canActivate: [PermissionGuard],
+
+    data: {
+      permission: 'cms_page.view',
+
+      titleKey: 'cms_page.detail_title',
+    },
+
+    loadComponent: () =>
+      import('./cms-page-detail/cms-page-detail').then(
+        (component) => component.CmsPageDetail,
+      ),
+  },
+
+  //==================================================
+  //==== LIST
+  //==================================================
+
   {
     path: '',
 

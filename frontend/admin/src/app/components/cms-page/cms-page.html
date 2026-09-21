@@ -6,6 +6,8 @@
     [externalPermissions]="(authPermissions$ | async) ?? []"
     [externalAllAccess]="(isAllAccess$ | async) ?? false"
     (tableChanged)="onTableChange($event)"
+    (rowClicked)="view($event)"
+    (action)="onActionClicked($event)"
   >
     <!--==================================================-->
     <!--==== FILTER TOGGLE ===============================-->
