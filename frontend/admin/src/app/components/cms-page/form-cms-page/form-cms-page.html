@@ -290,13 +290,315 @@
 
             <ng-template ngbNavContent>
               <div class="border rounded p-4">
-                <h5>
-                  {{ 'cms_page.content_languages' | translate }}
-                </h5>
+                <div class="mb-4">
+                  <h5 class="mb-1">
+                    {{ 'cms_page.content_languages' | translate }}
+                  </h5>
 
-                <p class="text-muted mb-0">
-                  {{ 'cms_page.next_phase_notice' | translate }}
-                </p>
+                  <p class="text-muted mb-0">
+                    {{ 'cms_page.content_languages_help' | translate }}
+                  </p>
+                </div>
+
+                <!--==================================================-->
+                <!--==== LANGUAGE SELECTOR ============================-->
+                <!--==================================================-->
+
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                  @for (language of supportedLanguages; track language.locale) {
+                    <button
+                      type="button"
+                      class="btn d-flex align-items-center gap-2"
+                      [class.btn-theme]="activeLocale === language.locale"
+                      [class.btn-light-bg]="activeLocale !== language.locale"
+                      (click)="selectLanguage(language.locale)"
+                    >
+                      <span class="fw-semibold">
+                        {{ language.shortLabel }}
+                      </span>
+
+                      <span>
+                        {{ language.labelKey | translate }}
+                      </span>
+
+                      @if (isDefaultLocale(language.locale)) {
+                        <span class="badge bg-primary">
+                          {{ 'cms_page.default_language_badge' | translate }}
+                        </span>
+                      }
+
+                      @if (!isLanguageEnabled(language.locale)) {
+                        <span class="badge bg-light text-dark">
+                          {{ 'cms_page.not_added' | translate }}
+                        </span>
+                      }
+                    </button>
+                  }
+                </div>
+
+                <!--==================================================-->
+                <!--==== LANGUAGE NOT ENABLED ========================-->
+                <!--==================================================-->
+
+                @if (!isLanguageEnabled(activeLocale)) {
+                  <div class="border rounded p-4 text-center">
+                    <i class="ri-translate-2 fs-1 text-muted"></i>
+
+                    <h5 class="mt-3 mb-2">
+                      {{ 'cms_page.translation_not_added_title' | translate }}
+                    </h5>
+
+                    <p class="text-muted mb-3">
+                      {{ 'cms_page.translation_not_added_help' | translate }}
+                    </p>
+
+                    <button
+                      type="button"
+                      class="btn btn-theme"
+                      (click)="addLanguage(activeLocale)"
+                    >
+                      <i class="ri-add-line me-1"></i>
+
+                      {{ 'cms_page.add_translation' | translate }}
+                    </button>
+                  </div>
+                } @else {
+                  <!--==================================================-->
+                  <!--==== TRANSLATION FORM ============================-->
+                  <!--==================================================-->
+
+                  <div [formGroup]="translationForm(activeLocale)">
+                    <div
+                      class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"
+                    >
+                      <div>
+                        <h6 class="mb-1">
+                          {{
+                            activeLocale === 'id-ID'
+                              ? ('cms_page.language_indonesian' | translate)
+                              : ('cms_page.language_english' | translate)
+                          }}
+                        </h6>
+
+                        <small class="text-muted">
+                          {{ activeLocale }}
+                        </small>
+                      </div>
+
+                      <div class="d-flex align-items-center gap-2">
+                        @if (!isDefaultLocale(activeLocale)) {
+                          <button
+                            type="button"
+                            class="btn btn-light-danger"
+                            (click)="removeLanguage(activeLocale)"
+                          >
+                            <i class="ri-delete-bin-line me-1"></i>
+
+                            {{ 'cms_page.remove_translation' | translate }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="row g-4">
+                      <!-- TITLE -->
+
+                      <div class="col-md-8">
+                        <label class="form-label">
+                          {{ 'cms_page.translation_title' | translate }}
+                          *
+                        </label>
+
+                        <input
+                          type="text"
+                          class="form-control"
+                          formControlName="title"
+                          [placeholder]="
+                            'cms_page.translation_title_placeholder' | translate
+                          "
+                          [class.is-invalid]="
+                            translationForm(activeLocale).controls.title
+                              .touched &&
+                            translationForm(activeLocale).controls.title.invalid
+                          "
+                          (blur)="generateTranslationSlug(activeLocale)"
+                        />
+
+                        @if (
+                          translationForm(activeLocale).controls.title
+                            .touched &&
+                          translationForm(activeLocale).controls.title.errors?.[
+                            'required'
+                          ]
+                        ) {
+                          <div class="text-danger form-error">
+                            {{
+                              'cms_page.validation.translation_title_required'
+                                | translate
+                            }}
+                          </div>
+                        }
+
+                        @if (
+                          translationForm(activeLocale).controls.title
+                            .touched &&
+                          translationForm(activeLocale).controls.title.errors?.[
+                            'maxlength'
+                          ]
+                        ) {
+                          <div class="text-danger form-error">
+                            {{
+                              'cms_page.validation.translation_title_max_length'
+                                | translate
+                            }}
+                          </div>
+                        }
+                      </div>
+
+                      <!-- STATUS -->
+
+                      <div class="col-md-4">
+                        <label class="form-label">
+                          {{ 'cms_page.translation_status' | translate }}
+                        </label>
+
+                        <select class="form-select" formControlName="status">
+                          <option [ngValue]="0">
+                            {{ 'cms_page.status_draft' | translate }}
+                          </option>
+
+                          <option [ngValue]="1">
+                            {{ 'cms_page.status_published' | translate }}
+                          </option>
+                        </select>
+
+                        <small class="text-muted d-block mt-1">
+                          {{ 'cms_page.translation_status_help' | translate }}
+                        </small>
+                      </div>
+
+                      <!-- SLUG -->
+
+                      <div class="col-12">
+                        <label class="form-label">
+                          {{ 'cms_page.slug' | translate }}
+                        </label>
+
+                        <div class="input-group">
+                          <span class="input-group-text">/</span>
+
+                          <input
+                            type="text"
+                            class="form-control"
+                            formControlName="slug"
+                            placeholder="tentang-kami"
+                            [class.is-invalid]="
+                              translationForm(activeLocale).controls.slug
+                                .touched &&
+                              translationForm(activeLocale).controls.slug
+                                .invalid
+                            "
+                            (blur)="normalizeTranslationSlug(activeLocale)"
+                          />
+                        </div>
+
+                        <small class="text-muted d-block mt-1">
+                          {{ 'cms_page.slug_help' | translate }}
+                        </small>
+
+                        @if (
+                          translationForm(activeLocale).controls.slug.touched &&
+                          translationForm(activeLocale).controls.slug.errors?.[
+                            'pattern'
+                          ]
+                        ) {
+                          <div class="text-danger form-error">
+                            {{ 'cms_page.validation.slug_pattern' | translate }}
+                          </div>
+                        }
+
+                        @if (
+                          translationForm(activeLocale).controls.slug.touched &&
+                          translationForm(activeLocale).controls.slug.errors?.[
+                            'maxlength'
+                          ]
+                        ) {
+                          <div class="text-danger form-error">
+                            {{
+                              'cms_page.validation.slug_max_length' | translate
+                            }}
+                          </div>
+                        }
+                      </div>
+
+                      <!-- EXCERPT -->
+
+                      <div class="col-12">
+                        <label class="form-label">
+                          {{ 'cms_page.excerpt' | translate }}
+                        </label>
+
+                        <textarea
+                          class="form-control"
+                          rows="3"
+                          formControlName="excerpt"
+                          [placeholder]="
+                            'cms_page.excerpt_placeholder' | translate
+                          "
+                        ></textarea>
+
+                        <small class="text-muted d-block mt-1">
+                          {{ 'cms_page.excerpt_help' | translate }}
+                        </small>
+                      </div>
+
+                      <!-- CONTENT -->
+
+                      <div class="col-12">
+                        <label class="form-label">
+                          {{ 'cms_page.content' | translate }}
+                        </label>
+
+                        <textarea
+                          class="form-control font-monospace"
+                          rows="12"
+                          formControlName="content"
+                          [placeholder]="
+                            'cms_page.content_placeholder' | translate
+                          "
+                        ></textarea>
+
+                        <small class="text-muted d-block mt-1">
+                          {{ 'cms_page.content_help' | translate }}
+                        </small>
+                      </div>
+                    </div>
+
+                    <div
+                      class="d-flex justify-content-between align-items-center border-top mt-4 pt-4"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-light-bg"
+                        (click)="activeTab = 'general'"
+                      >
+                        <i class="ri-arrow-left-line me-1"></i>
+
+                        {{ 'cms_page.back_general' | translate }}
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-theme"
+                        (click)="goToSeo()"
+                      >
+                        {{ 'cms_page.next_seo' | translate }}
+
+                        <i class="ri-arrow-right-line ms-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
               </div>
             </ng-template>
           </li>

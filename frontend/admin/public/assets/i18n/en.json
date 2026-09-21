@@ -1862,11 +1862,39 @@
     "system_page_edit_notice": "This is a system page. The page key is locked to prevent internal references from breaking.",
     "next_content": "Continue to Content",
     "next_phase_notice": "This section will be completed in the next step.",
+    "edit_action": "Edit Page",
+    "content_languages_help": "Manage the title, page address, summary, and content for each language.",
+    "language_indonesian": "Bahasa Indonesia",
+    "language_english": "English",
+    "default_language_badge": "Default",
+    "not_added": "Not added",
+    "translation_not_added_title": "Translation has not been added",
+    "translation_not_added_help": "Add this language if the page should be available in this language.",
+    "add_translation": "Add Language",
+    "remove_translation": "Remove Language",
+    "translation_title": "Page Title",
+    "translation_title_placeholder": "Example: About MATEX",
+    "translation_status": "Language Status",
+    "translation_status_help": "This status only applies to this language version. The page publication status is managed in the Publication section.",
+    "slug": "Slug",
+    "slug_help": "The page address for this language. If left empty, the slug will be generated from the title.",
+    "excerpt": "Excerpt",
+    "excerpt_placeholder": "A short summary of this page...",
+    "excerpt_help": "Used as a content summary and may appear in page lists or cards.",
+    "content": "Page Content",
+    "content_placeholder": "Write the page content...",
+    "content_help": "Content is currently stored as HTML. We will add the visual editor after the main form flow is stable.",
+    "back_general": "Back to General",
+    "next_seo": "Continue to SEO",
 
     "validation": {
       "key_required": "Page key is required.",
       "key_pattern": "The key may only contain lowercase letters, numbers, hyphens, and underscores.",
-      "key_max_length": "Page key cannot exceed 100 characters."
+      "key_max_length": "Page key cannot exceed 100 characters.",
+      "translation_title_required": "Page title is required.",
+      "translation_title_max_length": "Page title cannot exceed 255 characters.",
+      "slug_pattern": "The slug may only contain lowercase letters, numbers, and hyphens.",
+      "slug_max_length": "The slug cannot exceed 191 characters."
     }
   }
 }

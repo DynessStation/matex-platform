@@ -225,6 +225,16 @@ export class CmsPage implements AfterViewInit {
 
         permission: 'cms_page.view',
       },
+
+      {
+        label: 'cms_page.edit_action',
+
+        actionToPerform: 'edit',
+
+        icon: 'ri-edit-line',
+
+        permission: 'cms_page.update',
+      },
     ],
 
     data: [],
@@ -651,8 +661,16 @@ export class CmsPage implements AfterViewInit {
   //==================================================
 
   onActionClicked(action: ITableClickedAction): void {
+    const data = action.data as ICmsPage;
+
     if (action.actionToPerform === 'view') {
-      this.view(action.data as ICmsPage);
+      this.view(data);
+
+      return;
+    }
+
+    if (action.actionToPerform === 'edit') {
+      this.edit(data);
     }
   }
 
@@ -666,5 +684,17 @@ export class CmsPage implements AfterViewInit {
     }
 
     void this.router.navigateByUrl(`/cms-page/${data.id_cms_page}`);
+  }
+
+  //==================================================
+  //==== EDIT
+  //==================================================
+
+  edit(data: ICmsPage): void {
+    if (!data?.id_cms_page) {
+      return;
+    }
+
+    void this.router.navigateByUrl(`/cms-page/edit/${data.id_cms_page}`);
   }
 }

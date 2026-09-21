@@ -1862,11 +1862,39 @@
     "system_page_edit_notice": "Ini adalah halaman sistem. Key halaman dikunci untuk mencegah referensi internal rusak.",
     "next_content": "Lanjut ke Konten",
     "next_phase_notice": "Bagian ini akan dilengkapi pada tahap berikutnya.",
+    "edit_action": "Edit Halaman",
+    "content_languages_help": "Kelola judul, alamat halaman, ringkasan, dan isi konten untuk setiap bahasa.",
+    "language_indonesian": "Bahasa Indonesia",
+    "language_english": "English",
+    "default_language_badge": "Utama",
+    "not_added": "Belum ditambahkan",
+    "translation_not_added_title": "Terjemahan belum ditambahkan",
+    "translation_not_added_help": "Tambahkan bahasa ini jika halaman perlu tersedia dalam bahasa tersebut.",
+    "add_translation": "Tambahkan Bahasa",
+    "remove_translation": "Hapus Bahasa",
+    "translation_title": "Judul Halaman",
+    "translation_title_placeholder": "Contoh: Tentang MATEX",
+    "translation_status": "Status Bahasa",
+    "translation_status_help": "Status ini hanya berlaku untuk versi bahasa ini. Status halaman utama diatur pada bagian Publikasi.",
+    "slug": "Slug",
+    "slug_help": "Alamat halaman untuk bahasa ini. Jika dikosongkan, slug akan dibuat dari judul.",
+    "excerpt": "Ringkasan",
+    "excerpt_placeholder": "Ringkasan singkat tentang halaman ini...",
+    "excerpt_help": "Digunakan sebagai ringkasan konten dan dapat ditampilkan pada daftar atau kartu halaman.",
+    "content": "Isi Halaman",
+    "content_placeholder": "Tulis isi halaman...",
+    "content_help": "Untuk sementara konten disimpan dalam format HTML. Editor visual akan kita pasang setelah alur form utama stabil.",
+    "back_general": "Kembali ke Umum",
+    "next_seo": "Lanjut ke SEO",
 
     "validation": {
       "key_required": "Key halaman wajib diisi.",
       "key_pattern": "Key hanya boleh berisi huruf kecil, angka, tanda hubung, dan garis bawah.",
-      "key_max_length": "Key halaman maksimal 100 karakter."
+      "key_max_length": "Key halaman maksimal 100 karakter.",
+      "translation_title_required": "Judul halaman wajib diisi.",
+      "translation_title_max_length": "Judul halaman maksimal 255 karakter.",
+      "slug_pattern": "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.",
+      "slug_max_length": "Slug maksimal 191 karakter."
     }
   }
 }
