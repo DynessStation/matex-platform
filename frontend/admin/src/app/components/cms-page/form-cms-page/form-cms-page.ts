@@ -9,9 +9,16 @@ import {
   viewChild,
 } from '@angular/core';
 
+import { DatePipe } from '@angular/common';
+
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -35,8 +42,12 @@ import { IAttachment } from '../../../shared/interface/attachment.interface';
 import { AuthState } from '../../../shared/store/state/auth.state';
 
 import { hasPermissionAccess } from '../../../shared/utils/permission.util';
+import { LocalizationService } from '../../../shared/services/localization.service';
 
 type CmsPageLocale = 'id-ID' | 'en-US';
+
+type CmsPagePublicationChoice =
+  'current' | 'draft' | 'publish_now' | 'schedule' | 'archive';
 
 //==================================================
 //==== MEDIA DRAFT
@@ -66,7 +77,9 @@ interface CmsPageMediaDraft {
   selector: 'app-form-cms-page',
 
   imports: [
+    DatePipe,
     ReactiveFormsModule,
+    FormsModule,
     NgbModule,
     TranslateModule,
     NgxEditorModule,
@@ -85,6 +98,7 @@ export class FormCmsPage {
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private store = inject(Store);
+  public readonly localization = inject(LocalizationService);
 
   //==================================================
   //==== INPUT
@@ -111,6 +125,19 @@ export class FormCmsPage {
   public pageMedia: CmsPageMediaDraft[] = [];
 
   public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
+
+  //==================================================
+  //==== PUBLICATION
+  //==================================================
+
+  public publicationChoice: CmsPagePublicationChoice =
+    this.mode() === 'edit' ? 'current' : 'draft';
+
+  public publicationPublishAt = '';
+
+  public publicationUnpublishAt = '';
+
+  public publicationValidationAttempted = false;
 
   //==================================================
   //==== CONTENT EDITOR
@@ -403,6 +430,22 @@ export class FormCmsPage {
           translations,
         };
       });
+
+      //==================================================
+      //==== PATCH PUBLICATION
+      //==================================================
+
+      this.publicationChoice = 'current';
+
+      this.publicationPublishAt = this.toLocalDateTimeInput(
+        data.cms_page_publish_at,
+      );
+
+      this.publicationUnpublishAt = this.toLocalDateTimeInput(
+        data.cms_page_unpublish_at,
+      );
+
+      this.publicationValidationAttempted = false;
     });
   }
 
@@ -817,6 +860,130 @@ export class FormCmsPage {
     }
 
     return [];
+  }
+
+  //==================================================
+  //==== PUBLICATION
+  //==================================================
+
+  selectPublicationChoice(choice: CmsPagePublicationChoice): void {
+    this.publicationChoice = choice;
+
+    this.publicationValidationAttempted = false;
+
+    if (choice !== 'schedule') {
+      this.publicationPublishAt = '';
+    }
+
+    if (choice === 'draft' || choice === 'archive') {
+      this.publicationUnpublishAt = '';
+    }
+  }
+
+  get defaultTranslationPublished(): boolean {
+    const locale =
+      this.parseLocale(this.form.controls.cms_page_default_locale.value) ??
+      'id-ID';
+
+    return this.translationForm(locale).controls.status.value === 1;
+  }
+
+  get publicationRequiresPublishedTranslation(): boolean {
+    return (
+      this.publicationChoice === 'publish_now' ||
+      this.publicationChoice === 'schedule'
+    );
+  }
+
+  get publicationScheduleInvalid(): boolean {
+    if (this.publicationChoice !== 'schedule') {
+      return false;
+    }
+
+    if (!this.publicationPublishAt) {
+      return true;
+    }
+
+    const publishAt = new Date(this.publicationPublishAt);
+
+    if (Number.isNaN(publishAt.getTime())) {
+      return true;
+    }
+
+    return publishAt.getTime() <= Date.now();
+  }
+
+  get publicationEndInvalid(): boolean {
+    if (!this.publicationUnpublishAt) {
+      return false;
+    }
+
+    const unpublishAt = new Date(this.publicationUnpublishAt);
+
+    if (Number.isNaN(unpublishAt.getTime())) {
+      return true;
+    }
+
+    let startAt = new Date();
+
+    if (this.publicationChoice === 'schedule' && this.publicationPublishAt) {
+      startAt = new Date(this.publicationPublishAt);
+    }
+
+    return unpublishAt.getTime() <= startAt.getTime();
+  }
+
+  goToPreview(): void {
+    this.publicationValidationAttempted = true;
+
+    if (
+      this.publicationRequiresPublishedTranslation &&
+      !this.defaultTranslationPublished
+    ) {
+      return;
+    }
+
+    if (this.publicationScheduleInvalid) {
+      return;
+    }
+
+    if (this.publicationEndInvalid) {
+      return;
+    }
+
+    this.activeTab = 'preview';
+  }
+
+  backFromPublication(): void {
+    this.activeTab = this.canViewAttachments ? 'media' : 'seo';
+  }
+
+  //==================================================
+  //==== DATETIME INPUT
+  //==================================================
+
+  private toLocalDateTimeInput(value: string | null): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const year = date.getFullYear();
+
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const hour = String(date.getHours()).padStart(2, '0');
+
+    const minute = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hour}:${minute}`;
   }
 
   //==================================================

@@ -1927,6 +1927,36 @@
     "back_seo": "Kembali ke SEO",
     "next_publication": "Lanjut ke Publikasi",
 
+    "publication_title": "Publikasi Halaman",
+    "publication_help": "Tentukan kapan halaman tersedia untuk pengunjung. Konten dapat tetap disimpan sebagai draf sebelum dipublikasikan.",
+    "current_status": "Status Saat Ini",
+
+    "publication_keep_current": "Jangan Ubah Status",
+    "publication_keep_current_help": "Simpan perubahan konten tanpa mengubah status publikasi halaman.",
+
+    "publication_draft": "Simpan sebagai Draf",
+    "publication_draft_help": "Halaman tidak ditampilkan kepada pengunjung.",
+
+    "publication_publish_now": "Publikasikan Sekarang",
+    "publication_publish_now_help": "Halaman akan tersedia segera setelah perubahan disimpan.",
+
+    "publication_schedule": "Jadwalkan Publikasi",
+    "publication_schedule_help": "Tentukan tanggal dan waktu halaman mulai dipublikasikan.",
+
+    "publication_archive": "Arsipkan Halaman",
+    "publication_archive_help": "Simpan halaman sebagai arsip dan hentikan publikasinya.",
+
+    "schedule_publish_at": "Mulai Publikasi",
+    "schedule_publish_at_help": "Gunakan waktu lokal Anda untuk menentukan kapan halaman mulai tersedia.",
+
+    "auto_unpublish_at": "Berhenti Publikasi",
+    "auto_unpublish_at_help": "Opsional. Halaman akan otomatis berhenti ditampilkan setelah waktu ini.",
+
+    "default_translation_publish_required": "Bahasa utama harus berstatus Dipublikasikan sebelum halaman dapat dipublikasikan atau dijadwalkan.",
+
+    "back_media": "Kembali ke Media",
+    "next_preview": "Lanjut ke Pratinjau",
+
     "validation": {
       "key_required": "Key halaman wajib diisi.",
       "key_pattern": "Key hanya boleh berisi huruf kecil, angka, tanda hubung, dan garis bawah.",
@@ -1935,7 +1965,9 @@
       "translation_title_max_length": "Judul halaman maksimal 255 karakter.",
       "slug_pattern": "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.",
       "slug_max_length": "Slug maksimal 191 karakter.",
-      "canonical_url_invalid": "URL kanonis harus menggunakan http:// atau https://."
+      "canonical_url_invalid": "URL kanonis harus menggunakan http:// atau https://.",
+      "schedule_future_required": "Waktu publikasi harus diisi dan berada di masa mendatang.",
+      "unpublish_after_publish": "Waktu berakhir harus setelah waktu mulai publikasi."
     }
   }
 }

@@ -1242,9 +1242,331 @@
 
             <ng-template ngbNavContent>
               <div class="border rounded p-4">
-                <p class="text-muted mb-0">
-                  {{ 'cms_page.next_phase_notice' | translate }}
-                </p>
+                <div class="mb-4">
+                  <h5 class="mb-1">
+                    {{ 'cms_page.publication_title' | translate }}
+                  </h5>
+
+                  <p class="text-muted mb-0">
+                    {{ 'cms_page.publication_help' | translate }}
+                  </p>
+                </div>
+
+                <!--==================================================-->
+                <!--==== CURRENT STATUS ===============================-->
+                <!--==================================================-->
+
+                @if (mode() === 'edit' && editData(); as page) {
+                  <div class="cms-publication-current mb-4">
+                    <div>
+                      <small class="text-muted d-block mb-1">
+                        {{ 'cms_page.current_status' | translate }}
+                      </small>
+
+                      <strong>
+                        {{
+                          'cms_page.status_' + page.effective_status | translate
+                        }}
+                      </strong>
+                    </div>
+
+                    @if (page.cms_page_publish_at) {
+                      <div>
+                        <small class="text-muted d-block mb-1">
+                          {{ 'cms_page.publish_at' | translate }}
+                        </small>
+
+                        <strong>
+                          {{
+                            page.cms_page_publish_at
+                              | date
+                                : localization.dateTimeFormat()
+                                : undefined
+                                : localization.locale()
+                          }}
+                        </strong>
+                      </div>
+                    }
+
+                    @if (page.cms_page_unpublish_at) {
+                      <div>
+                        <small class="text-muted d-block mb-1">
+                          {{ 'cms_page.unpublish_at' | translate }}
+                        </small>
+
+                        <strong>
+                          {{
+                            page.cms_page_unpublish_at
+                              | date
+                                : localization.dateTimeFormat()
+                                : undefined
+                                : localization.locale()
+                          }}
+                        </strong>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!--==================================================-->
+                <!--==== CHOICES ======================================-->
+                <!--==================================================-->
+
+                <div class="cms-publication-options">
+                  @if (mode() === 'edit') {
+                    <label
+                      class="cms-publication-option"
+                      [class.active]="publicationChoice === 'current'"
+                    >
+                      <input
+                        type="radio"
+                        name="publicationChoice"
+                        value="current"
+                        [checked]="publicationChoice === 'current'"
+                        (change)="selectPublicationChoice('current')"
+                      />
+
+                      <div>
+                        <strong>
+                          {{ 'cms_page.publication_keep_current' | translate }}
+                        </strong>
+
+                        <small>
+                          {{
+                            'cms_page.publication_keep_current_help' | translate
+                          }}
+                        </small>
+                      </div>
+                    </label>
+                  }
+
+                  <label
+                    class="cms-publication-option"
+                    [class.active]="publicationChoice === 'draft'"
+                  >
+                    <input
+                      type="radio"
+                      name="publicationChoice"
+                      value="draft"
+                      [checked]="publicationChoice === 'draft'"
+                      (change)="selectPublicationChoice('draft')"
+                    />
+
+                    <div>
+                      <strong>
+                        {{ 'cms_page.publication_draft' | translate }}
+                      </strong>
+
+                      <small>
+                        {{ 'cms_page.publication_draft_help' | translate }}
+                      </small>
+                    </div>
+                  </label>
+
+                  <label
+                    class="cms-publication-option"
+                    [class.active]="publicationChoice === 'publish_now'"
+                  >
+                    <input
+                      type="radio"
+                      name="publicationChoice"
+                      value="publish_now"
+                      [checked]="publicationChoice === 'publish_now'"
+                      (change)="selectPublicationChoice('publish_now')"
+                    />
+
+                    <div>
+                      <strong>
+                        {{ 'cms_page.publication_publish_now' | translate }}
+                      </strong>
+
+                      <small>
+                        {{
+                          'cms_page.publication_publish_now_help' | translate
+                        }}
+                      </small>
+                    </div>
+                  </label>
+
+                  <label
+                    class="cms-publication-option"
+                    [class.active]="publicationChoice === 'schedule'"
+                  >
+                    <input
+                      type="radio"
+                      name="publicationChoice"
+                      value="schedule"
+                      [checked]="publicationChoice === 'schedule'"
+                      (change)="selectPublicationChoice('schedule')"
+                    />
+
+                    <div>
+                      <strong>
+                        {{ 'cms_page.publication_schedule' | translate }}
+                      </strong>
+
+                      <small>
+                        {{ 'cms_page.publication_schedule_help' | translate }}
+                      </small>
+                    </div>
+                  </label>
+
+                  @if (mode() === 'edit') {
+                    <label
+                      class="cms-publication-option cms-publication-option-danger"
+                      [class.active]="publicationChoice === 'archive'"
+                    >
+                      <input
+                        type="radio"
+                        name="publicationChoice"
+                        value="archive"
+                        [checked]="publicationChoice === 'archive'"
+                        (change)="selectPublicationChoice('archive')"
+                      />
+
+                      <div>
+                        <strong>
+                          {{ 'cms_page.publication_archive' | translate }}
+                        </strong>
+
+                        <small>
+                          {{ 'cms_page.publication_archive_help' | translate }}
+                        </small>
+                      </div>
+                    </label>
+                  }
+                </div>
+
+                <!--==================================================-->
+                <!--==== SCHEDULE =====================================-->
+                <!--==================================================-->
+
+                @if (publicationChoice === 'schedule') {
+                  <div class="border rounded p-3 mt-4">
+                    <label class="form-label">
+                      {{ 'cms_page.schedule_publish_at' | translate }}
+                      *
+                    </label>
+
+                    <input
+                      type="datetime-local"
+                      class="form-control"
+                      [(ngModel)]="publicationPublishAt"
+                      [ngModelOptions]="{ standalone: true }"
+                      [class.is-invalid]="
+                        publicationValidationAttempted &&
+                        publicationScheduleInvalid
+                      "
+                    />
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.schedule_publish_at_help' | translate }}
+                    </small>
+
+                    @if (
+                      publicationValidationAttempted &&
+                      publicationScheduleInvalid
+                    ) {
+                      <div class="text-danger form-error">
+                        {{
+                          'cms_page.validation.schedule_future_required'
+                            | translate
+                        }}
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!--==================================================-->
+                <!--==== AUTO UNPUBLISH ===============================-->
+                <!--==================================================-->
+
+                @if (
+                  publicationChoice === 'publish_now' ||
+                  publicationChoice === 'schedule'
+                ) {
+                  <div class="border rounded p-3 mt-3">
+                    <label class="form-label">
+                      {{ 'cms_page.auto_unpublish_at' | translate }}
+                    </label>
+
+                    <input
+                      type="datetime-local"
+                      class="form-control"
+                      [(ngModel)]="publicationUnpublishAt"
+                      [ngModelOptions]="{ standalone: true }"
+                      [class.is-invalid]="
+                        publicationValidationAttempted && publicationEndInvalid
+                      "
+                    />
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.auto_unpublish_at_help' | translate }}
+                    </small>
+
+                    @if (
+                      publicationValidationAttempted && publicationEndInvalid
+                    ) {
+                      <div class="text-danger form-error">
+                        {{
+                          'cms_page.validation.unpublish_after_publish'
+                            | translate
+                        }}
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!--==================================================-->
+                <!--==== DEFAULT TRANSLATION BLOCKER ==================-->
+                <!--==================================================-->
+
+                @if (
+                  publicationRequiresPublishedTranslation &&
+                  !defaultTranslationPublished
+                ) {
+                  <div class="alert alert-warning mt-4 mb-0">
+                    <i class="ri-information-line me-1"></i>
+
+                    {{
+                      'cms_page.default_translation_publish_required'
+                        | translate
+                    }}
+                  </div>
+                }
+
+                <!--==================================================-->
+                <!--==== NAVIGATION ===================================-->
+                <!--==================================================-->
+
+                <div
+                  class="d-flex justify-content-between align-items-center border-top mt-4 pt-4"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-light-bg"
+                    (click)="backFromPublication()"
+                  >
+                    <i class="ri-arrow-left-line me-1"></i>
+
+                    {{
+                      (canViewAttachments
+                        ? 'cms_page.back_media'
+                        : 'cms_page.back_seo'
+                      ) | translate
+                    }}
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-theme"
+                    (click)="goToPreview()"
+                  >
+                    {{ 'cms_page.next_preview' | translate }}
+
+                    <i class="ri-arrow-right-line ms-1"></i>
+                  </button>
+                </div>
               </div>
             </ng-template>
           </li>

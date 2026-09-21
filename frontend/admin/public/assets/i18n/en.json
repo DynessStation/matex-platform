@@ -1927,6 +1927,36 @@
     "back_seo": "Back to SEO",
     "next_publication": "Continue to Publication",
 
+    "publication_title": "Page Publication",
+    "publication_help": "Choose when this page should be available to visitors. Content can remain as a draft until it is ready.",
+    "current_status": "Current Status",
+
+    "publication_keep_current": "Keep Current Status",
+    "publication_keep_current_help": "Save content changes without changing the page publication status.",
+
+    "publication_draft": "Save as Draft",
+    "publication_draft_help": "The page will not be available to visitors.",
+
+    "publication_publish_now": "Publish Now",
+    "publication_publish_now_help": "The page will become available as soon as the changes are saved.",
+
+    "publication_schedule": "Schedule Publication",
+    "publication_schedule_help": "Choose when the page should become available.",
+
+    "publication_archive": "Archive Page",
+    "publication_archive_help": "Move the page to the archive and stop publishing it.",
+
+    "schedule_publish_at": "Publish At",
+    "schedule_publish_at_help": "Use your local time to choose when the page should become available.",
+
+    "auto_unpublish_at": "Stop Publishing At",
+    "auto_unpublish_at_help": "Optional. The page will automatically stop being published after this time.",
+
+    "default_translation_publish_required": "The default language must be Published before the page can be published or scheduled.",
+
+    "back_media": "Back to Media",
+    "next_preview": "Continue to Preview",
+
     "validation": {
       "key_required": "Page key is required.",
       "key_pattern": "The key may only contain lowercase letters, numbers, hyphens, and underscores.",
@@ -1935,7 +1965,9 @@
       "translation_title_max_length": "Page title cannot exceed 255 characters.",
       "slug_pattern": "The slug may only contain lowercase letters, numbers, and hyphens.",
       "slug_max_length": "The slug cannot exceed 191 characters.",
-      "canonical_url_invalid": "The canonical URL must use http:// or https://."
+      "canonical_url_invalid": "The canonical URL must use http:// or https://.",
+      "schedule_future_required": "The publication time is required and must be in the future.",
+      "unpublish_after_publish": "The end time must be later than the publication start time."
     }
   }
 }
