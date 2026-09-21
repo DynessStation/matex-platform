@@ -3146,11 +3146,19 @@ app.put(
         `
             SELECT
               cms_page_locale,
-
               cms_page_slug,
-
               cms_page_title,
-
+              cms_page_excerpt,
+              cms_page_content,
+              cms_page_content_json,
+              cms_page_meta_title,
+              cms_page_meta_description,
+              cms_page_meta_keywords,
+              cms_page_meta_robots,
+              cms_page_canonical_url,
+              cms_page_og_title,
+              cms_page_og_description,
+              cms_page_schema_json,
               cms_page_i18n_status
 
             FROM cms_page_i18n
@@ -4602,6 +4610,28 @@ app.put(
 
             title: item.cms_page_title,
 
+            excerpt: item.cms_page_excerpt ?? null,
+
+            content: item.cms_page_content ?? null,
+
+            content_json: parseJsonValue(item.cms_page_content_json),
+
+            meta_title: item.cms_page_meta_title ?? null,
+
+            meta_description: item.cms_page_meta_description ?? null,
+
+            meta_keywords: item.cms_page_meta_keywords ?? null,
+
+            meta_robots: item.cms_page_meta_robots ?? null,
+
+            canonical_url: item.cms_page_canonical_url ?? null,
+
+            og_title: item.cms_page_og_title ?? null,
+
+            og_description: item.cms_page_og_description ?? null,
+
+            schema_json: parseJsonValue(item.cms_page_schema_json),
+
             status: Number(item.cms_page_i18n_status),
           })),
         ),
@@ -5211,6 +5241,28 @@ app.put(
             slug: item.slug,
 
             title: item.title,
+
+            excerpt: item.excerpt,
+
+            content: item.content,
+
+            content_json: parseJsonValue(item.contentJson),
+
+            meta_title: item.metaTitle,
+
+            meta_description: item.metaDescription,
+
+            meta_keywords: item.metaKeywords,
+
+            meta_robots: item.metaRobots,
+
+            canonical_url: item.canonicalUrl,
+
+            og_title: item.ogTitle,
+
+            og_description: item.ogDescription,
+
+            schema_json: parseJsonValue(item.schemaJson),
 
             status: item.status,
           })),
