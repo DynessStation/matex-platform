@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
 
+import { RouterModule } from '@angular/router';
+
 import { TranslateModule } from '@ngx-translate/core';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
+
+import { FormCmsPage } from '../form-cms-page/form-cms-page';
 
 //==================================================
 //==== COMPONENT
@@ -11,7 +15,7 @@ import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrappe
 @Component({
   selector: 'app-create-cms-page',
 
-  imports: [PageWrapper, TranslateModule],
+  imports: [RouterModule, TranslateModule, PageWrapper, FormCmsPage],
 
   templateUrl: './create-cms-page.html',
 })

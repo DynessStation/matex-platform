@@ -1845,6 +1845,28 @@
     "create_title": "Create Page",
     "edit_title": "Edit Page",
     "add": "Add Page",
-    "form_preparing": "The page form is being prepared."
+    "form_preparing": "The page form is being prepared.",
+
+    "form_general": "General",
+    "form_general_title": "Basic Information",
+    "form_general_help": "Configure the page identity and basic behavior. Language-specific content is managed in the next section.",
+    "content_languages": "Content & Languages",
+    "advanced_settings": "Advanced Settings",
+    "advanced_settings_help": "Technical page settings. These normally do not need to be changed.",
+    "key_help": "Internal page identifier. Use lowercase characters without spaces, e.g. about or company-profile.",
+    "default_locale_help": "The default language is used as a fallback when the requested language is unavailable.",
+    "visibility_help": "Public pages can be accessed by visitors. Private pages are internal, while unlisted pages are excluded from normal navigation.",
+    "sort_order_help": "Lower numbers can be used to place the page earlier.",
+    "featured_help": "Mark this page when it should be prioritized or highlighted.",
+    "template_help": "Leave empty when the page does not require a specific template.",
+    "system_page_edit_notice": "This is a system page. The page key is locked to prevent internal references from breaking.",
+    "next_content": "Continue to Content",
+    "next_phase_notice": "This section will be completed in the next step.",
+
+    "validation": {
+      "key_required": "Page key is required.",
+      "key_pattern": "The key may only contain lowercase letters, numbers, hyphens, and underscores.",
+      "key_max_length": "Page key cannot exceed 100 characters."
+    }
   }
 }

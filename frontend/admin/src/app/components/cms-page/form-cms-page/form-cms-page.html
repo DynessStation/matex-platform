@@ -1,0 +1,387 @@
+<form class="theme-form theme-form-2 mega-form" [formGroup]="form">
+  <div class="vertical-tabs">
+    <div class="row g-4">
+      <!--==================================================-->
+      <!--==== NAVIGATION ==================================-->
+      <!--==================================================-->
+
+      <div class="col-xl-3 col-lg-4">
+        <ul
+          ngbNav
+          #nav="ngbNav"
+          [(activeId)]="activeTab"
+          class="nav-pills"
+          orientation="vertical"
+        >
+          <!-- GENERAL -->
+
+          <li [ngbNavItem]="'general'">
+            <button ngbNavLink type="button">
+              <i class="ri-settings-3-line"></i>
+
+              {{ 'cms_page.form_general' | translate }}
+            </button>
+
+            <ng-template ngbNavContent>
+              <!--==================================================-->
+              <!--==== GENERAL ======================================-->
+              <!--==================================================-->
+
+              <div class="border rounded p-4">
+                <div class="mb-4">
+                  <h5 class="mb-1">
+                    {{ 'cms_page.form_general_title' | translate }}
+                  </h5>
+
+                  <p class="text-muted mb-0">
+                    {{ 'cms_page.form_general_help' | translate }}
+                  </p>
+                </div>
+
+                @if (isSystemPage) {
+                  <div class="alert alert-warning">
+                    <i class="ri-information-line me-1"></i>
+
+                    {{ 'cms_page.system_page_edit_notice' | translate }}
+                  </div>
+                }
+
+                <div class="row g-4">
+                  <!-- PAGE KEY -->
+
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      {{ 'cms_page.key' | translate }}
+                      *
+                    </label>
+
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="cms_page_key"
+                      placeholder="about"
+                      [readonly]="isSystemPage"
+                      [class.is-invalid]="
+                        form.controls.cms_page_key.touched &&
+                        form.controls.cms_page_key.invalid
+                      "
+                      (blur)="normalizePageKey()"
+                    />
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.key_help' | translate }}
+                    </small>
+
+                    @if (
+                      form.controls.cms_page_key.touched &&
+                      form.controls.cms_page_key.errors?.['required']
+                    ) {
+                      <div class="text-danger form-error">
+                        {{ 'cms_page.validation.key_required' | translate }}
+                      </div>
+                    }
+
+                    @if (
+                      form.controls.cms_page_key.touched &&
+                      form.controls.cms_page_key.errors?.['pattern']
+                    ) {
+                      <div class="text-danger form-error">
+                        {{ 'cms_page.validation.key_pattern' | translate }}
+                      </div>
+                    }
+
+                    @if (
+                      form.controls.cms_page_key.touched &&
+                      form.controls.cms_page_key.errors?.['maxlength']
+                    ) {
+                      <div class="text-danger form-error">
+                        {{ 'cms_page.validation.key_max_length' | translate }}
+                      </div>
+                    }
+                  </div>
+
+                  <!-- DEFAULT LANGUAGE -->
+
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      {{ 'cms_page.default_locale' | translate }}
+                      *
+                    </label>
+
+                    <select
+                      class="form-select"
+                      formControlName="cms_page_default_locale"
+                    >
+                      <option value="id-ID">Bahasa Indonesia</option>
+
+                      <option value="en-US">English</option>
+                    </select>
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.default_locale_help' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- VISIBILITY -->
+
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      {{ 'cms_page.visibility' | translate }}
+                    </label>
+
+                    <select
+                      class="form-select"
+                      formControlName="cms_page_visibility"
+                    >
+                      <option [ngValue]="1">
+                        {{ 'cms_page.visibility_public' | translate }}
+                      </option>
+
+                      <option [ngValue]="0">
+                        {{ 'cms_page.visibility_private' | translate }}
+                      </option>
+
+                      <option [ngValue]="2">
+                        {{ 'cms_page.visibility_unlisted' | translate }}
+                      </option>
+                    </select>
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.visibility_help' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- SORT ORDER -->
+
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      {{ 'cms_page.sort_order' | translate }}
+                    </label>
+
+                    <input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="cms_page_sort_order"
+                      [class.is-invalid]="
+                        form.controls.cms_page_sort_order.touched &&
+                        form.controls.cms_page_sort_order.invalid
+                      "
+                    />
+
+                    <small class="text-muted d-block mt-1">
+                      {{ 'cms_page.sort_order_help' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- FEATURED -->
+
+                  <div class="col-12">
+                    <div
+                      class="d-flex align-items-center justify-content-between border rounded p-3"
+                    >
+                      <div class="pe-3">
+                        <label
+                          class="form-label fw-semibold mb-1"
+                          for="cms_page_is_featured"
+                        >
+                          {{ 'cms_page.featured' | translate }}
+                        </label>
+
+                        <div class="text-muted small">
+                          {{ 'cms_page.featured_help' | translate }}
+                        </div>
+                      </div>
+
+                      <label class="switch">
+                        <input
+                          id="cms_page_is_featured"
+                          type="checkbox"
+                          formControlName="cms_page_is_featured"
+                        />
+
+                        <span class="switch-state"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- ADVANCED -->
+
+                  <div class="col-12">
+                    <details class="border rounded p-3">
+                      <summary class="fw-semibold cursor-pointer">
+                        {{ 'cms_page.advanced_settings' | translate }}
+                      </summary>
+
+                      <p class="text-muted small mt-2">
+                        {{ 'cms_page.advanced_settings_help' | translate }}
+                      </p>
+
+                      <div class="row g-4 mt-1">
+                        <!-- TYPE -->
+
+                        <div class="col-md-6">
+                          <label class="form-label">
+                            {{ 'cms_page.type' | translate }}
+                          </label>
+
+                          <input
+                            type="text"
+                            class="form-control"
+                            formControlName="cms_page_type"
+                            placeholder="standard"
+                            [class.is-invalid]="
+                              form.controls.cms_page_type.touched &&
+                              form.controls.cms_page_type.invalid
+                            "
+                          />
+                        </div>
+
+                        <!-- TEMPLATE -->
+
+                        <div class="col-md-6">
+                          <label class="form-label">
+                            {{ 'cms_page.template' | translate }}
+                          </label>
+
+                          <input
+                            type="text"
+                            class="form-control"
+                            formControlName="cms_page_template"
+                            placeholder="company-profile"
+                            [class.is-invalid]="
+                              form.controls.cms_page_template.touched &&
+                              form.controls.cms_page_template.invalid
+                            "
+                          />
+
+                          <small class="text-muted d-block mt-1">
+                            {{ 'cms_page.template_help' | translate }}
+                          </small>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end border-top mt-4 pt-4">
+                  <button
+                    type="button"
+                    class="btn btn-theme"
+                    (click)="goToContent()"
+                  >
+                    {{ 'cms_page.next_content' | translate }}
+
+                    <i class="ri-arrow-right-line ms-1"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </li>
+
+          <!-- CONTENT -->
+
+          <li [ngbNavItem]="'content'">
+            <button ngbNavLink type="button">
+              <i class="ri-translate-2"></i>
+
+              {{ 'cms_page.content_languages' | translate }}
+            </button>
+
+            <ng-template ngbNavContent>
+              <div class="border rounded p-4">
+                <h5>
+                  {{ 'cms_page.content_languages' | translate }}
+                </h5>
+
+                <p class="text-muted mb-0">
+                  {{ 'cms_page.next_phase_notice' | translate }}
+                </p>
+              </div>
+            </ng-template>
+          </li>
+
+          <!-- SEO -->
+
+          <li [ngbNavItem]="'seo'">
+            <button ngbNavLink type="button">
+              <i class="ri-search-eye-line"></i>
+
+              SEO
+            </button>
+
+            <ng-template ngbNavContent>
+              <div class="border rounded p-4">
+                <p class="text-muted mb-0">
+                  {{ 'cms_page.next_phase_notice' | translate }}
+                </p>
+              </div>
+            </ng-template>
+          </li>
+
+          <!-- MEDIA -->
+
+          <li [ngbNavItem]="'media'">
+            <button ngbNavLink type="button">
+              <i class="ri-image-line"></i>
+
+              {{ 'cms_page.media' | translate }}
+            </button>
+
+            <ng-template ngbNavContent>
+              <div class="border rounded p-4">
+                <p class="text-muted mb-0">
+                  {{ 'cms_page.next_phase_notice' | translate }}
+                </p>
+              </div>
+            </ng-template>
+          </li>
+
+          <!-- PUBLICATION -->
+
+          <li [ngbNavItem]="'publication'">
+            <button ngbNavLink type="button">
+              <i class="ri-send-plane-line"></i>
+
+              {{ 'cms_page.publication' | translate }}
+            </button>
+
+            <ng-template ngbNavContent>
+              <div class="border rounded p-4">
+                <p class="text-muted mb-0">
+                  {{ 'cms_page.next_phase_notice' | translate }}
+                </p>
+              </div>
+            </ng-template>
+          </li>
+
+          <!-- PREVIEW -->
+
+          <li [ngbNavItem]="'preview'">
+            <button ngbNavLink type="button">
+              <i class="ri-eye-line"></i>
+
+              {{ 'cms_page.preview' | translate }}
+            </button>
+
+            <ng-template ngbNavContent>
+              <div class="border rounded p-4">
+                <p class="text-muted mb-0">
+                  {{ 'cms_page.next_phase_notice' | translate }}
+                </p>
+              </div>
+            </ng-template>
+          </li>
+        </ul>
+      </div>
+
+      <!--==================================================-->
+      <!--==== CONTENT OUTLET ==============================-->
+      <!--==================================================-->
+
+      <div class="col-xl-9 col-lg-8">
+        <div [ngbNavOutlet]="nav"></div>
+      </div>
+    </div>
+  </div>
+</form>

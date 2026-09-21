@@ -1845,6 +1845,28 @@
     "create_title": "Buat Halaman",
     "edit_title": "Edit Halaman",
     "add": "Tambah Halaman",
-    "form_preparing": "Form halaman sedang disiapkan."
+    "form_preparing": "Form halaman sedang disiapkan.",
+
+    "form_general": "Umum",
+    "form_general_title": "Informasi Dasar",
+    "form_general_help": "Atur identitas dan perilaku dasar halaman. Konten setiap bahasa diatur pada bagian berikutnya.",
+    "content_languages": "Konten & Bahasa",
+    "advanced_settings": "Pengaturan Lanjutan",
+    "advanced_settings_help": "Pengaturan teknis halaman. Biasanya tidak perlu diubah.",
+    "key_help": "Identitas internal halaman. Gunakan huruf kecil tanpa spasi, contoh: about atau company-profile.",
+    "default_locale_help": "Bahasa utama digunakan sebagai fallback jika bahasa yang diminta belum tersedia.",
+    "visibility_help": "Halaman publik dapat diakses pengunjung. Privat hanya untuk penggunaan internal, sedangkan tidak terdaftar tidak ditampilkan pada navigasi umum.",
+    "sort_order_help": "Angka lebih kecil dapat digunakan untuk menempatkan halaman lebih awal.",
+    "featured_help": "Tandai jika halaman perlu diprioritaskan atau ditonjolkan.",
+    "template_help": "Kosongkan jika halaman tidak membutuhkan template khusus.",
+    "system_page_edit_notice": "Ini adalah halaman sistem. Key halaman dikunci untuk mencegah referensi internal rusak.",
+    "next_content": "Lanjut ke Konten",
+    "next_phase_notice": "Bagian ini akan dilengkapi pada tahap berikutnya.",
+
+    "validation": {
+      "key_required": "Key halaman wajib diisi.",
+      "key_pattern": "Key hanya boleh berisi huruf kecil, angka, tanda hubung, dan garis bawah.",
+      "key_max_length": "Key halaman maksimal 100 karakter."
+    }
   }
 }

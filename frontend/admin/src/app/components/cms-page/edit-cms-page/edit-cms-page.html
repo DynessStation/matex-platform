@@ -2,7 +2,24 @@
   [gridClass]="'col-sm-12'"
   [title]="'cms_page.edit_title' | translate"
 >
-  <p class="mb-0">
-    {{ 'cms_page.form_preparing' | translate }}
-  </p>
+  <div button>
+    <a
+      [routerLink]="['/cms-page']"
+      class="align-items-center btn btn-light-bg d-flex"
+    >
+      <i class="ri-arrow-left-line me-1"></i>
+
+      {{ 'cms_page.back_to_list' | translate }}
+    </a>
+  </div>
+
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/cms-page'"
+      (retry)="retryDetail()"
+    />
+  } @else if (cmsPage$ | async; as page) {
+    <app-form-cms-page [mode]="'edit'" [editData]="page" />
+  }
 </app-page-wrapper>
