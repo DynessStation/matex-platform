@@ -32,7 +32,7 @@ import { CmsPageState } from '../../../shared/store/state/cms-page.state';
 
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 
-import { CmsPagePreview } from './cms-page-preview';
+import { CmsPagePreview } from '../cms-page-preview/cms-page-preview';
 
 //==================================================
 //==== COMPONENT
