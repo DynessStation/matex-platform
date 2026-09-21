@@ -331,7 +331,8 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
               gap: 20px;
             }
 
-            .gallery-item {
+           .gallery-item {
+              margin: 0;
               overflow: hidden;
               border: 1px solid #eeeeee;
               border-radius: 12px;

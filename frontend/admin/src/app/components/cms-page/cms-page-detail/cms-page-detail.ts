@@ -32,6 +32,8 @@ import { CmsPageState } from '../../../shared/store/state/cms-page.state';
 
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 
+import { CmsPagePreview } from './cms-page-preview';
+
 //==================================================
 //==== COMPONENT
 //==================================================
@@ -46,6 +48,7 @@ import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.uti
     TranslateModule,
     PageWrapper,
     DetailErrorState,
+    CmsPagePreview,
   ],
 
   templateUrl: './cms-page-detail.html',
