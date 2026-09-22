@@ -1,252 +1,26 @@
 :host {
   display: block;
+}
+
+.matex-header {
   position: sticky;
   top: 0;
   z-index: 1020;
-}
-
-.matex-store-header {
   background: #ffffff;
-  box-shadow: 0 2px 12px rgba(23, 32, 51, 0.08);
+  border-bottom: 1px solid #e9ecef;
 }
 
-.matex-store-header__top {
-  min-height: 42px;
-  color: #ffffff;
-  background: #111923;
-}
-
-.matex-store-header__announcement {
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 13px;
-  text-align: center;
-
-  p {
-    margin: 0;
-  }
-}
-
-.matex-store-header__top-link {
-  a {
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 500;
-
-    &:hover {
-      color: #f59e0b;
-    }
-  }
-}
-
-.matex-store-header__main {
-  min-height: 86px;
+.matex-header__inner {
+  min-height: 72px;
   display: flex;
   align-items: center;
-  gap: 32px;
+  justify-content: space-between;
+  gap: 24px;
 }
 
-.matex-store-header__brand-area {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.matex-store-header__brand {
-  display: inline-flex;
-  align-items: center;
+.matex-header__brand {
   color: #172033;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-
-  &:hover {
-    color: #172033;
-  }
-}
-
-.matex-store-header__brand-mark {
-  width: 38px;
-  height: 42px;
-  margin-right: 2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  background: #f59e0b;
-  border-radius: 3px;
-}
-
-.matex-store-header__description {
-  flex: 1;
-  color: #667085;
-  font-size: 14px;
-}
-
-.matex-store-header__contact {
-  a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #172033;
-  }
-
-  i {
-    color: #f59e0b;
-    font-size: 30px;
-  }
-
-  span {
-    display: flex;
-    flex-direction: column;
-  }
-
-  small {
-    color: #667085;
-    font-size: 12px;
-  }
-
-  strong {
-    font-size: 14px;
-  }
-}
-
-.matex-store-header__navigation {
-  min-height: 58px;
-  display: flex;
-  align-items: stretch;
-  color: #ffffff;
-  background: #1f2c3d;
-}
-
-.matex-store-header__navigation .category-button {
-  min-width: 230px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #ffffff;
-  background: #f59e0b;
-  border: 0;
-  border-radius: 0;
-
-  &:hover {
-    color: #ffffff;
-    background: #e58e06;
-  }
-}
-
-.matex-store-header__navigation .header-nav-middle {
-  flex: 1;
-}
-
-.matex-store-header__menu {
-  height: 100%;
-  margin: 0;
-  padding: 0 28px;
-  display: flex;
-  align-items: center;
-  gap: clamp(20px, 2.5vw, 38px);
-  list-style: none;
-
-  a {
-    position: relative;
-    color: rgba(255, 255, 255, 0.88);
-    font-size: 15px;
-    font-weight: 500;
-
-    &:hover,
-    &.active {
-      color: #ffffff;
-    }
-
-    &.active::after {
-      position: absolute;
-      right: 0;
-      bottom: -19px;
-      left: 0;
-      height: 3px;
-      background: #f59e0b;
-      content: '';
-    }
-  }
-}
-
-.matex-store-header__marketplace {
-  min-height: 58px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 14px;
-
-  &:hover {
-    color: #ffffff;
-  }
-}
-
-.matex-store-header__menu-button {
-  padding: 0;
-  color: #172033;
-  background: transparent;
-  border: 0;
   font-size: 28px;
-}
-
-.matex-store-header__mobile-menu {
-  background: #1f2c3d;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-
-  ul {
-    margin: 0;
-    padding: 12px 0;
-    list-style: none;
-  }
-
-  a {
-    display: block;
-    padding: 12px 0;
-    color: rgba(255, 255, 255, 0.84);
-    font-weight: 500;
-
-    &:hover,
-    &.active {
-      color: #f59e0b;
-    }
-  }
-}
-
-@media (max-width: 1199.98px) {
-  .matex-store-header__top {
-    padding-inline: 24px;
-  }
-
-  .matex-store-header__main {
-    min-height: 72px;
-    justify-content: space-between;
-  }
-
-  .matex-store-header__description {
-    display: none;
-  }
-}
-
-@media (max-width: 767.98px) {
-  .matex-store-header__announcement,
-  .matex-store-header__top-link,
-  .matex-store-header__contact {
-    display: none;
-  }
-
-  .matex-store-header__top {
-    justify-content: flex-end;
-  }
-
-  .matex-store-header__brand {
-    font-size: 25px;
-  }
-
-  .matex-store-header__brand-mark {
-    width: 33px;
-    height: 37px;
-  }
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
