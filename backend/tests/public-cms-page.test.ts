@@ -93,6 +93,7 @@ test("unlisted response is noindex and strips internal fields and storage paths"
         cms_page_visibility: 2,
         cms_page_locale: "id-ID",
         cms_page_key: "about",
+        cms_page_template: "company-profile",
         cms_page_slug: "about",
         cms_page_title: "About",
         cms_page_content: "<p>Public</p>",
@@ -117,6 +118,7 @@ test("unlisted response is noindex and strips internal fields and storage paths"
   assert.equal(data.seo.robots, "noindex, nofollow");
   assert.equal(data.seo.title, "About");
   assert.equal(data.key, "about");
+  assert.equal(data.template, "company-profile");
   assert.equal(data.id_cms_page, undefined);
   assert.equal(data.cms_page_settings_json, undefined);
   assert.equal(data.attachments[0].storage_path, undefined);

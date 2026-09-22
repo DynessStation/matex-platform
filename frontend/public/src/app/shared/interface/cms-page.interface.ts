@@ -1,5 +1,6 @@
 export interface IPublicCmsPage {
   key: string;
+  template: string | null;
   locale: string;
   slug: string;
   title: string;

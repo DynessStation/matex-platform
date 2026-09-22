@@ -26,6 +26,7 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
       `
       SELECT p.id_cms_page,
         p.cms_page_key,
+        p.cms_page_template,
         p.cms_page_visibility,
         t.cms_page_locale, t.cms_page_slug, t.cms_page_title,
         t.cms_page_excerpt, t.cms_page_content, t.cms_page_meta_title,
@@ -83,6 +84,7 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
     // Explicit public projection: no internal IDs, drafts, settings or audit data.
     return sendSuccess(res, 200, "CMS_PAGE_FOUND", "Page loaded", {
       key: page.cms_page_key,
+      template: page.cms_page_template,
       locale: page.cms_page_locale,
       slug: page.cms_page_slug,
       title: page.cms_page_title,
