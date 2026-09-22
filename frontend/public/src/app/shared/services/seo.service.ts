@@ -20,6 +20,7 @@ import { PageState } from '../store/state/page.state';
 import { ProductState } from '../store/state/product.state';
 import { SettingState } from '../store/state/setting.state';
 import { ThemeOptionState } from '../store/state/theme-option.state';
+import { PublicPageContextService } from './public-page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,7 @@ export class SeoService {
   private titleService = inject(Title);
   private platformId = inject<Object>(PLATFORM_ID);
   private ngZone = inject(NgZone);
+  private publicPageContext = inject(PublicPageContextService);
 
   setting$: Observable<Values> = inject(Store).select(SettingState.setting) as Observable<Values>;
   themeOption$: Observable<Option> = inject(Store).select(
@@ -61,6 +63,9 @@ export class SeoService {
   public scoContent: any = {};
   public setting: Values;
   public isBrowser: boolean;
+  private isMatexPublicPage(): boolean {
+    return this.publicPageContext.active();
+  }
 
   constructor() {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -70,12 +75,12 @@ export class SeoService {
         .pipe(filter((event) => event instanceof NavigationEnd))
         .subscribe((event: any) => {
           this.path = event.url;
-          if (this.path.startsWith('/cms/')) {
+          if (this.isMatexPublicPage()) {
             clearTimeout(this.timeoutId);
             return;
           }
           document.addEventListener('visibilitychange', () => {
-            if (this.router.url.startsWith('/cms/')) return;
+            if (this.isMatexPublicPage()) return;
             this.messages = this.themeOption?.general?.taglines || [];
             this.ngZone.run(() => {
               this.updateSeo(this.path);
@@ -101,7 +106,7 @@ export class SeoService {
   }
 
   updateSeo(path: string) {
-    if (this.router.url.startsWith('/cms/')) return;
+    if (this.isMatexPublicPage()) return;
     if (path.includes('product')) {
       if (this.product) {
         this.scoContent = {
@@ -198,7 +203,7 @@ export class SeoService {
 
     if (this.themeOption?.general && this.themeOption?.general?.exit_tagline_enable) {
       document.addEventListener('visibilitychange', () => {
-        if (this.router.url.startsWith('/cms/')) return;
+        if (this.isMatexPublicPage()) return;
         this.messages = this.themeOption.general.taglines;
         this.ngZone.run(() => {
           this.isTabInFocus = !document.hidden;
@@ -233,7 +238,7 @@ export class SeoService {
   }
 
   customSCO() {
-    if (this.router.url.startsWith('/cms/')) return;
+    if (this.isMatexPublicPage()) return;
     const title = this.scoContent['og_title'];
     const description = this.scoContent['og_description'];
 
@@ -257,7 +262,7 @@ export class SeoService {
   }
 
   updateMessage() {
-    if (this.router.url.startsWith('/cms/')) return;
+    if (this.isMatexPublicPage()) return;
     // Clear the previous timeout
     clearTimeout(this.timeoutId);
 
