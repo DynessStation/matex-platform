@@ -1848,4 +1848,636 @@ app.post(
   },
 );
 
+//==================================================
+//==== WEB NAVIGATION ITEM - UPDATE
+//==================================================
+
+app.put(
+  "/api/v1/web-navigation/:id/items/:itemId",
+
+  verifyToken,
+
+  requirePermission("web_navigation.update"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      const idItem = decodeWebNavigationItemId(req.params.itemId);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      if (!idItem) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_ITEM_INVALID_ID",
+          "Invalid navigation item identifier",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      //==================================================
+      //==== NAVIGATION
+      //==================================================
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_name,
+
+              web_navigation_default_locale
+
+            FROM web_navigation
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_deleted_at IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const navigation = navigations[0];
+
+      //==================================================
+      //==== LOCK ALL ITEMS FOR PARENT VALIDATION
+      //==================================================
+
+      const [itemRows] = await connection.query(
+        `
+            SELECT
+              id_web_navigation_item,
+
+              id_parent_web_navigation_item,
+
+              id_cms_page,
+
+              web_navigation_item_key,
+
+              web_navigation_item_link_type,
+
+              web_navigation_item_target_blank,
+
+              web_navigation_item_icon,
+
+              web_navigation_item_badge_text,
+
+              web_navigation_item_badge_color,
+
+              web_navigation_item_sort_order,
+
+              web_navigation_item_status,
+
+              web_navigation_item_settings_json
+
+            FROM web_navigation_item
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_item_deleted_at
+                IS NULL
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigationItems = itemRows as any[];
+
+      const currentItem = navigationItems.find(
+        (item) => Number(item.id_web_navigation_item) === idItem,
+      );
+
+      if (!currentItem) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_ITEM_NOT_FOUND",
+          "Navigation item not found",
+        );
+      }
+
+      //==================================================
+      //==== INPUT
+      //==================================================
+
+      const normalized = normalizeNavigationItemInput(
+        req.body,
+        String(navigation.web_navigation_default_locale),
+      );
+
+      if (!normalized.success) {
+        await connection.rollback();
+
+        return sendError(res, 400, normalized.code, normalized.message);
+      }
+
+      const item = normalized.data;
+
+      //==================================================
+      //==== UNIQUE KEY
+      //==================================================
+
+      const duplicateKey = navigationItems.some(
+        (candidate) =>
+          Number(candidate.id_web_navigation_item) !== idItem &&
+          candidate.web_navigation_item_key === item.key,
+      );
+
+      if (duplicateKey) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          409,
+          "WEB_NAVIGATION_ITEM_KEY_EXISTS",
+          "Navigation item key is already in use",
+        );
+      }
+
+      //==================================================
+      //==== PARENT
+      //==================================================
+
+      let idParent: number | null = null;
+
+      const encodedParent = req.body?.id_parent_web_navigation_item;
+
+      if (
+        encodedParent !== null &&
+        encodedParent !== undefined &&
+        encodedParent !== ""
+      ) {
+        idParent = decodeWebNavigationItemId(encodedParent);
+
+        if (!idParent) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_PARENT_INVALID",
+            "Invalid parent navigation item identifier",
+          );
+        }
+
+        if (idParent === idItem) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_PARENT_SELF",
+            "A navigation item cannot be its own parent",
+          );
+        }
+
+        const parentExists = navigationItems.some(
+          (candidate) => Number(candidate.id_web_navigation_item) === idParent,
+        );
+
+        if (!parentExists) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_PARENT_NOT_FOUND",
+            "Parent navigation item was not found",
+          );
+        }
+
+        //==================================================
+        //==== CYCLE PROTECTION
+        //==================================================
+
+        const parentByItem = new Map<number, number | null>();
+
+        for (const candidate of navigationItems) {
+          parentByItem.set(
+            Number(candidate.id_web_navigation_item),
+
+            candidate.id_parent_web_navigation_item === null
+              ? null
+              : Number(candidate.id_parent_web_navigation_item),
+          );
+        }
+
+        let cursor: number | null = idParent;
+
+        const visited = new Set<number>([idItem]);
+
+        while (cursor !== null) {
+          if (visited.has(cursor)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "WEB_NAVIGATION_PARENT_CYCLE",
+              "Navigation item hierarchy would create a cycle",
+            );
+          }
+
+          visited.add(cursor);
+
+          cursor = parentByItem.get(cursor) ?? null;
+        }
+      }
+
+      //==================================================
+      //==== CMS PAGE
+      //==================================================
+
+      let idCmsPage: number | null = null;
+
+      const encodedCmsPage = req.body?.id_cms_page;
+
+      if (item.linkType === "cms_page") {
+        idCmsPage = decodeCmsPageId(encodedCmsPage);
+
+        if (!idCmsPage) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_CMS_PAGE_REQUIRED",
+            "A CMS page is required for this navigation item",
+          );
+        }
+
+        const [pageRows] = await connection.query(
+          `
+              SELECT id_cms_page
+
+              FROM cms_page
+
+              WHERE id_cms_page = ?
+
+                AND id_master_comp = ?
+
+                AND cms_page_deleted_at IS NULL
+
+              LIMIT 1
+            `,
+          [idCmsPage, scope.idMasterComp],
+        );
+
+        if (!(pageRows as any[]).length) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_CMS_PAGE_NOT_FOUND",
+            "CMS page was not found",
+          );
+        }
+      } else if (
+        encodedCmsPage !== null &&
+        encodedCmsPage !== undefined &&
+        encodedCmsPage !== ""
+      ) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_CMS_PAGE_NOT_ALLOWED",
+          "CMS page can only be used by a CMS page link",
+        );
+      }
+
+      //==================================================
+      //==== BEFORE TRANSLATIONS
+      //==================================================
+
+      const [beforeTranslationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_item_locale,
+
+              web_navigation_item_label,
+
+              web_navigation_item_path,
+
+              web_navigation_item_url,
+
+              web_navigation_item_i18n_status
+
+            FROM web_navigation_item_i18n
+
+            WHERE id_web_navigation_item = ?
+
+              AND id_master_comp = ?
+
+            ORDER BY web_navigation_item_locale
+          `,
+        [idItem, scope.idMasterComp],
+      );
+
+      const beforeTranslations = (beforeTranslationRows as any[]).map(
+        (translation) => ({
+          locale: translation.web_navigation_item_locale,
+
+          label: translation.web_navigation_item_label,
+
+          path: translation.web_navigation_item_path,
+
+          url: translation.web_navigation_item_url,
+
+          status: Number(translation.web_navigation_item_i18n_status),
+        }),
+      );
+
+      //==================================================
+      //==== UPDATE ITEM
+      //==================================================
+
+      await connection.query(
+        `
+          UPDATE web_navigation_item
+
+          SET
+            id_parent_web_navigation_item = ?,
+
+            id_cms_page = ?,
+
+            web_navigation_item_key = ?,
+
+            web_navigation_item_link_type = ?,
+
+            web_navigation_item_target_blank = ?,
+
+            web_navigation_item_icon = ?,
+
+            web_navigation_item_badge_text = ?,
+
+            web_navigation_item_badge_color = ?,
+
+            web_navigation_item_sort_order = ?,
+
+            web_navigation_item_status = ?,
+
+            web_navigation_item_settings_json = ?,
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_web_navigation_item = ?
+
+            AND id_web_navigation = ?
+
+            AND id_master_comp = ?
+
+            AND web_navigation_item_deleted_at
+              IS NULL
+        `,
+        [
+          idParent,
+          idCmsPage,
+          item.key,
+          item.linkType,
+          item.targetBlank,
+          item.icon,
+          item.badgeText,
+          item.badgeColor,
+          item.sortOrder,
+          item.status,
+          item.settingsJson,
+          scope.idAdminAcct,
+          idItem,
+          idNavigation,
+          scope.idMasterComp,
+        ],
+      );
+
+      //==================================================
+      //==== REPLACE TRANSLATIONS
+      //==================================================
+
+      await connection.query(
+        `
+          DELETE FROM web_navigation_item_i18n
+
+          WHERE id_web_navigation_item = ?
+
+            AND id_master_comp = ?
+        `,
+        [idItem, scope.idMasterComp],
+      );
+
+      for (const translation of item.translations) {
+        await connection.query(
+          `
+            INSERT INTO web_navigation_item_i18n
+            (
+              id_web_navigation_item,
+
+              id_master_comp,
+
+              web_navigation_item_locale,
+
+              web_navigation_item_label,
+
+              web_navigation_item_path,
+
+              web_navigation_item_url,
+
+              web_navigation_item_i18n_status,
+
+              created,
+
+              updated
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+          `,
+          [
+            idItem,
+            scope.idMasterComp,
+            translation.locale,
+            translation.label,
+            translation.path,
+            translation.url,
+            translation.status,
+          ],
+        );
+      }
+
+      //==================================================
+      //==== AUDIT
+      //==================================================
+
+      const defaultTranslation = item.translations.find(
+        (translation) =>
+          translation.locale === navigation.web_navigation_default_locale,
+      );
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation_item.updated",
+        category: "data_change",
+        module: "web_navigation",
+        action: "update",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation_item",
+        entityId: idItem,
+        entityLabel: defaultTranslation?.label ?? item.key,
+        before: {
+          id_web_navigation: idNavigation,
+
+          id_parent_web_navigation_item:
+            currentItem.id_parent_web_navigation_item === null
+              ? null
+              : Number(currentItem.id_parent_web_navigation_item),
+
+          id_cms_page:
+            currentItem.id_cms_page === null
+              ? null
+              : Number(currentItem.id_cms_page),
+
+          key: currentItem.web_navigation_item_key,
+
+          link_type: currentItem.web_navigation_item_link_type,
+
+          target_blank: Number(currentItem.web_navigation_item_target_blank),
+
+          icon: currentItem.web_navigation_item_icon,
+
+          badge_text: currentItem.web_navigation_item_badge_text,
+
+          badge_color: currentItem.web_navigation_item_badge_color,
+
+          sort_order: Number(currentItem.web_navigation_item_sort_order),
+
+          status: Number(currentItem.web_navigation_item_status),
+
+          settings: parseJsonValue(
+            currentItem.web_navigation_item_settings_json,
+          ),
+
+          translations: beforeTranslations,
+        },
+        after: {
+          id_web_navigation: idNavigation,
+
+          id_parent_web_navigation_item: idParent,
+
+          id_cms_page: idCmsPage,
+
+          key: item.key,
+
+          link_type: item.linkType,
+
+          target_blank: item.targetBlank,
+
+          icon: item.icon,
+
+          badge_text: item.badgeText,
+
+          badge_color: item.badgeColor,
+
+          sort_order: item.sortOrder,
+
+          status: item.status,
+
+          settings: item.settings,
+
+          translations: item.translations,
+        },
+        metadata: {
+          navigation_name: navigation.web_navigation_name,
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        "WEB_NAVIGATION_ITEM_UPDATED",
+        "Navigation item updated successfully",
+        {
+          id_web_navigation_item: keyhsid.idWebNavigationItem.encode(idItem),
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      if ((error as any)?.code === "ER_DUP_ENTRY") {
+        return sendError(
+          res,
+          409,
+          "WEB_NAVIGATION_ITEM_ALREADY_EXISTS",
+          "Navigation item key or translation is already in use",
+        );
+      }
+
+      console.error("[Web Navigation] Failed to update navigation item", error);
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_ITEM_UPDATE_FAILED",
+        "Unable to update navigation item",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
 export default app;
