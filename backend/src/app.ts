@@ -18,6 +18,7 @@ import path from "path";
 
 import storageConfig from "./config/storage.config";
 import publicCmsPage from "./ctrl/public/cms-page";
+import publicNavigation from "./ctrl/public/navigation";
 
 import { requestContextMiddleware } from "./ctrl/middleware/request-context.middleware";
 
@@ -33,7 +34,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: (process.env.CORS_ORIGINS || "http://localhost:4200,http://localhost:4201").split(",").map(value => value.trim()),
+    origin: (
+      process.env.CORS_ORIGINS || "http://localhost:4200,http://localhost:4201"
+    )
+      .split(",")
+      .map((value) => value.trim()),
 
     credentials: true,
 
@@ -76,13 +81,13 @@ app.use(requestContextMiddleware);
 app.use(cookieParser());
 
 app.use(express.json());
-app.use(publicCmsPage);
 
 //==================================================
-//==== AUTO LOAD ADMIN ROUTES
+//==== AUTO LOAD ADMIN AND PUBLIC ROUTES
 //==================================================
 
 const adminFolder = path.join(__dirname, "ctrl", "admin");
+const publicFolder = path.join(__dirname, "ctrl", "public");
 
 if (fs.existsSync(adminFolder)) {
   const files = fs.readdirSync(adminFolder);
@@ -114,6 +119,36 @@ if (fs.existsSync(adminFolder)) {
   });
 } else {
   console.warn(`[Folder tidak ditemukan]: ${adminFolder}`);
+}
+
+if (fs.existsSync(publicFolder)) {
+  const files = fs.readdirSync(publicFolder);
+
+  files.forEach((file) => {
+    if (file.endsWith(".ts") || file.endsWith(".js")) {
+      const routeName = path.parse(file).name;
+      const routePath = `./ctrl/public/${routeName}`;
+
+      try {
+        const routeModule = require(routePath);
+        const router = routeModule.default || routeModule;
+
+        if (typeof router === "function") {
+          app.use(router);
+
+          console.log(`[Auto-Load] Berhasil memuat rute: public/${file}`);
+        } else {
+          console.warn(
+            `[Auto-Load] Lewati ${file}: Bukan fungsi middleware Express.`,
+          );
+        }
+      } catch (error) {
+        console.error(`[Auto-Load] Gagal memuat rute dari ${file}:`, error);
+      }
+    }
+  });
+} else {
+  console.warn(`[Folder tidak ditemukan]: ${publicFolder}`);
 }
 
 //==================================================
