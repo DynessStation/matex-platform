@@ -16,7 +16,23 @@
       </button>
     </div>
     <div class="offcanvas-body" [class.show]="menuService.mainMenuToggle">
-      @if (menuService.skeletonLoader) {
+      @if (items(); as publicItems) {
+        <ul class="navbar-nav {{ navClass() }}">
+          @for (item of publicItems; track item.path) {
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                [routerLink]="item.path"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                (click)="mainMenuClose()"
+              >
+                {{ item.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      } @else if (menuService.skeletonLoader) {
         <ul class="skeleton-menu navbar-nav">
           <li></li>
           <li></li>

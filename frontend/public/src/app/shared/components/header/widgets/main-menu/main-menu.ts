@@ -17,6 +17,12 @@ import { ProductState } from '../../../../store/state/product.state';
 import { NoData } from '../../../no-data/no-data';
 import { ProductBox } from '../../../product-box/product-box';
 
+export interface PublicMenuItem {
+  label: string;
+  path: string;
+  exact?: boolean;
+}
+
 @Component({
   selector: 'app-main-menu',
   imports: [
@@ -38,6 +44,7 @@ export class MainMenu {
   menuProduct$: Observable<Product[]> = inject(Store).select(ProductState.menuProducts);
 
   readonly navClass = input<string>();
+  readonly items = input<readonly PublicMenuItem[] | null>(null);
   private cd = inject(ChangeDetectorRef);
 
   public menu: Menu[] = [];
@@ -73,9 +80,13 @@ export class MainMenu {
     private router: Router,
     public menuService: MenuService,
     @Inject(PLATFORM_ID) private platformId: Object,
-  ) { }
+  ) {}
 
   ngOnInit() {
+    if (this.items()) {
+      this.menuService.skeletonLoader = false;
+      return;
+    }
     this.menu$.subscribe((menu) => {
       const productIds = Array.from(new Set(this.concatDynamicProductKeys(menu, 'product_ids')));
 
