@@ -1,50 +1,54 @@
 @if (page(); as page) {
-  <app-breadcrumb [breadcrumb]="breadcrumb()" />
+  @if (page.template === 'home') {
+    <app-cms-home [page]="page" />
+  } @else {
+    <app-breadcrumb [breadcrumb]="breadcrumb()" />
 
-  <section class="cms-page-section section-t-space section-b-space" [attr.lang]="locale()">
-    <div class="custom-container">
-      <div class="top-about-content">
-        <h2>{{ page.title }}</h2>
+    <section class="cms-page-section section-t-space section-b-space" [attr.lang]="locale()">
+      <div class="custom-container">
+        <div class="top-about-content">
+          <h2>{{ page.title }}</h2>
 
-        @if (page.excerpt) {
-          <p>{{ page.excerpt }}</p>
-        }
-      </div>
+          @if (page.excerpt) {
+            <p>{{ page.excerpt }}</p>
+          }
+        </div>
 
-      @for (image of page.attachments; track $index) {
-        @if (image.role === 'hero') {
-          <div class="cms-hero-wrapper">
-            <img
-              class="cms-hero img-fluid"
-              [src]="image.asset_url"
-              [alt]="image.alt"
-              fetchpriority="high"
-            />
-          </div>
-        }
-      }
-
-      @if (page.content) {
-        <article class="cms-content section-t-space" [innerHTML]="page.content"></article>
-      }
-
-      <div class="row g-sm-4 g-3 section-t-space">
         @for (image of page.attachments; track $index) {
-          @if (image.role === 'gallery') {
-            <div class="col-md-6">
-              <figure class="cms-gallery-item">
-                <img [src]="image.asset_url" [alt]="image.alt" class="img-fluid" loading="lazy" />
-
-                @if (image.caption) {
-                  <figcaption>{{ image.caption }}</figcaption>
-                }
-              </figure>
+          @if (image.role === 'hero') {
+            <div class="cms-hero-wrapper">
+              <img
+                class="cms-hero img-fluid"
+                [src]="image.asset_url"
+                [alt]="image.alt"
+                fetchpriority="high"
+              />
             </div>
           }
         }
+
+        @if (page.content) {
+          <article class="cms-content section-t-space" [innerHTML]="page.content"></article>
+        }
+
+        <div class="row g-sm-4 g-3 section-t-space">
+          @for (image of page.attachments; track $index) {
+            @if (image.role === 'gallery') {
+              <div class="col-md-6">
+                <figure class="cms-gallery-item">
+                  <img [src]="image.asset_url" [alt]="image.alt" class="img-fluid" loading="lazy" />
+
+                  @if (image.caption) {
+                    <figcaption>{{ image.caption }}</figcaption>
+                  }
+                </figure>
+              </div>
+            }
+          }
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  }
 } @else {
   <section
     class="section-t-space section-b-space"
@@ -56,6 +60,7 @@
         <p>{{ message('Memuat halaman…', 'Loading page…') }}</p>
       } @else if (state() === 'missing') {
         <h2>{{ message('Halaman tidak ditemukan', 'Page not found') }}</h2>
+
         <p>
           {{
             message(
@@ -68,6 +73,7 @@
         <h2>
           {{ message('Halaman belum dapat dimuat', 'Unable to load this page') }}
         </h2>
+
         <p>
           {{ message('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.') }}
         </p>

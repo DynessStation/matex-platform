@@ -18,9 +18,11 @@ import { CmsPageService } from '../../shared/services/cms-page.service';
 import { Breadcrumb } from '../../shared/components/widgets/breadcrumb/breadcrumb';
 import { PublicPageContextService } from '../../shared/services/public-page-context.service';
 
+import { CmsHome } from '../cms-home/cms-home';
+
 @Component({
   selector: 'app-cms-page',
-  imports: [Breadcrumb],
+  imports: [Breadcrumb, CmsHome],
   templateUrl: './cms-page.html',
   styleUrl: './cms-page.scss',
 })

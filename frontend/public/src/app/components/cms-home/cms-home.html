@@ -1,0 +1,30 @@
+<section class="matex-home-hero" [attr.lang]="page().locale">
+  @if (hero(); as hero) {
+    <img
+      class="matex-home-hero__image"
+      [src]="hero.asset_url"
+      [alt]="hero.alt"
+      fetchpriority="high"
+    />
+  }
+
+  <div class="matex-home-hero__overlay"></div>
+
+  <div class="custom-container matex-home-hero__inner">
+    <div class="matex-home-hero__content">
+      <span class="matex-home-hero__eyebrow">MATEX</span>
+
+      <h1>{{ page().title }}</h1>
+
+      @if (page().excerpt) {
+        <p class="matex-home-hero__excerpt">
+          {{ page().excerpt }}
+        </p>
+      }
+
+      @if (page().content) {
+        <div class="matex-home-hero__body" [innerHTML]="page().content"></div>
+      }
+    </div>
+  </div>
+</section>
