@@ -3,19 +3,6 @@
 
   <section class="cms-page-section section-t-space section-b-space" [attr.lang]="locale()">
     <div class="custom-container">
-      <!-- TEMP: nanti locale switch kita pindahkan ke header MATEX -->
-      <div class="cms-language-switch d-flex justify-content-end gap-3 mb-4">
-        @for (translation of page.translations; track translation.locale) {
-          <a
-            [routerLink]="['/cms', translation.locale, translation.slug]"
-            [attr.hreflang]="translation.locale"
-            [attr.aria-current]="translation.locale === page.locale ? 'page' : null"
-          >
-            {{ translation.locale === 'id-ID' ? 'Indonesia' : 'English' }}
-          </a>
-        }
-      </div>
-
       <div class="top-about-content">
         <h2>{{ page.title }}</h2>
 

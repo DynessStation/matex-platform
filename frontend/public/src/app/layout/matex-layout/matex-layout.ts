@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -16,24 +16,31 @@ import { GetThemes } from '../../shared/store/action/theme.action';
 
 import { ThemeOptionState } from '../../shared/store/state/theme-option.state';
 
+import { PublicPageContextService } from '../../shared/services/public-page-context.service';
+
 @Component({
   selector: 'app-matex-layout',
   imports: [AsyncPipe, RouterOutlet, Header, Footer, BackToTop],
   templateUrl: './matex-layout.html',
   styleUrl: './matex-layout.scss',
 })
-export class MatexLayout {
+export class MatexLayout implements OnDestroy {
   private store = inject(Store);
+  private publicPageContext = inject(PublicPageContextService);
 
   themeOption$ = this.store.select(ThemeOptionState.themeOptions);
 
   constructor() {
-    // Data yang memang dibutuhkan komponen visual Kartify.
-    // Kita sengaja tidak membawa seluruh LegacyApp/Layout.
+    this.publicPageContext.activate();
+
     this.store.dispatch(new GetThemes());
     this.store.dispatch(new GetCurrencies({ status: 1 }));
     this.store.dispatch(new GetSettingOption());
     this.store.dispatch(new ThemeOptions());
     this.store.dispatch(new GetMenu());
+  }
+
+  ngOnDestroy(): void {
+    this.publicPageContext.deactivate();
   }
 }

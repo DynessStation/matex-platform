@@ -2,18 +2,6 @@
   display: block;
 }
 
-.cms-language-switch {
-  a {
-    color: inherit;
-    text-decoration: none;
-
-    &[aria-current='page'] {
-      font-weight: 600;
-      text-decoration: underline;
-    }
-  }
-}
-
 .cms-hero-wrapper {
   overflow: hidden;
 
