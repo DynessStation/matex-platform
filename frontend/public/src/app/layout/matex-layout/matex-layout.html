@@ -1,0 +1,7 @@
+<app-header [logo]="(themeOption$ | async)?.logo?.header_logo?.asset_url"></app-header>
+
+<router-outlet></router-outlet>
+
+<app-footer [logo]="(themeOption$ | async)?.logo?.footer_logo?.asset_url"></app-footer>
+
+<app-back-to-top />
