@@ -12,6 +12,10 @@ import { AuthRequest, verifyToken } from "../middleware/authJwt";
 
 import { requirePermission } from "../middleware/authPermission";
 
+import { isCmsPageLocale } from "../../config/cms-page.config";
+
+import { writeAuditLog } from "../../helper/audit-log.helper";
+
 const app = express();
 
 const { pool } = db;
@@ -120,6 +124,122 @@ const parseJsonValue = (value: unknown): unknown | null => {
   } catch {
     return null;
   }
+};
+
+type NavigationMetadataResult =
+  | {
+      success: true;
+      name: string;
+      location: string;
+      defaultLocale: string;
+      settingsJson: string | null;
+      settings: Record<string, unknown> | null;
+    }
+  | {
+      success: false;
+      code: string;
+      message: string;
+    };
+
+const normalizeNavigationKey = (value: unknown): string | null => {
+  const key = String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (!key || key.length > 100 || !/^[a-z0-9][a-z0-9_-]*$/.test(key)) {
+    return null;
+  }
+
+  return key;
+};
+
+const normalizeNavigationMetadata = (body: any): NavigationMetadataResult => {
+  const name = String(body?.web_navigation_name ?? "").trim();
+
+  if (!name || name.length > 255) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_NAME_INVALID",
+      message:
+        "Web navigation name is required and must not exceed 255 characters",
+    };
+  }
+
+  const location = String(body?.web_navigation_location ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (
+    !location ||
+    location.length > 50 ||
+    !/^[a-z0-9][a-z0-9_-]*$/.test(location)
+  ) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_LOCATION_INVALID",
+      message: "Invalid web navigation location",
+    };
+  }
+
+  const defaultLocale = String(
+    body?.web_navigation_default_locale ?? "",
+  ).trim();
+
+  if (!isCmsPageLocale(defaultLocale)) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_LOCALE_UNSUPPORTED",
+      message: "Unsupported default locale",
+    };
+  }
+
+  const rawSettings = body?.web_navigation_settings_json ?? null;
+
+  if (rawSettings === null || rawSettings === undefined || rawSettings === "") {
+    return {
+      success: true,
+      name,
+      location,
+      defaultLocale,
+      settingsJson: null,
+      settings: null,
+    };
+  }
+
+  let settings: unknown = rawSettings;
+
+  if (typeof rawSettings === "string") {
+    try {
+      settings = JSON.parse(rawSettings);
+    } catch {
+      return {
+        success: false,
+        code: "WEB_NAVIGATION_SETTINGS_INVALID",
+        message: "Web navigation settings must contain valid JSON",
+      };
+    }
+  }
+
+  if (
+    typeof settings !== "object" ||
+    settings === null ||
+    Array.isArray(settings)
+  ) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_SETTINGS_INVALID",
+      message: "Web navigation settings must be a JSON object",
+    };
+  }
+
+  return {
+    success: true,
+    name,
+    location,
+    defaultLocale,
+    settingsJson: JSON.stringify(settings),
+    settings: settings as Record<string, unknown>,
+  };
 };
 
 //==================================================
@@ -563,6 +683,749 @@ app.get(
         "WEB_NAVIGATION_UNAVAILABLE",
         "Unable to load web navigation",
       );
+    }
+  },
+);
+
+//==================================================
+//==== WEB NAVIGATION - CREATE
+//==================================================
+
+app.post(
+  "/api/v1/web-navigation",
+
+  verifyToken,
+
+  requirePermission("web_navigation.create"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      const key = normalizeNavigationKey(req.body?.web_navigation_key);
+
+      if (!key) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_KEY_INVALID",
+          "Invalid web navigation key",
+        );
+      }
+
+      const metadata = normalizeNavigationMetadata(req.body);
+
+      if (!metadata.success) {
+        return sendError(res, 400, metadata.code, metadata.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [existingRows] = await connection.query(
+        `
+          SELECT id_web_navigation
+
+          FROM web_navigation
+
+          WHERE id_master_comp = ?
+
+            AND web_navigation_key = ?
+
+          LIMIT 1
+
+          FOR UPDATE
+        `,
+        [scope.idMasterComp, key],
+      );
+
+      if ((existingRows as any[]).length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          409,
+          "WEB_NAVIGATION_KEY_EXISTS",
+          "Web navigation key is already in use",
+        );
+      }
+
+      const [insertResult] = await connection.query(
+        `
+          INSERT INTO web_navigation
+          (
+            id_master_comp,
+
+            web_navigation_key,
+
+            web_navigation_name,
+
+            web_navigation_location,
+
+            web_navigation_default_locale,
+
+            web_navigation_status,
+
+            web_navigation_settings_json,
+
+            id_created_by,
+
+            id_updated_by,
+
+            created,
+
+            updated
+          )
+          VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, NOW(), NOW())
+        `,
+        [
+          scope.idMasterComp,
+          key,
+          metadata.name,
+          metadata.location,
+          metadata.defaultLocale,
+          metadata.settingsJson,
+          scope.idAdminAcct,
+          scope.idAdminAcct,
+        ],
+      );
+
+      const idNavigation = Number((insertResult as any).insertId);
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation.created",
+        category: "data_change",
+        module: "web_navigation",
+        action: "create",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation",
+        entityId: idNavigation,
+        entityLabel: metadata.name,
+        after: {
+          key,
+          name: metadata.name,
+          location: metadata.location,
+          default_locale: metadata.defaultLocale,
+          status: 0,
+          settings: metadata.settings,
+        },
+        httpStatus: 201,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        201,
+        "WEB_NAVIGATION_CREATED",
+        "Web navigation created successfully",
+        {
+          id_web_navigation: keyhsid.idWebNavigation.encode(idNavigation),
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      if ((error as any)?.code === "ER_DUP_ENTRY") {
+        return sendError(
+          res,
+          409,
+          "WEB_NAVIGATION_KEY_EXISTS",
+          "Web navigation key is already in use",
+        );
+      }
+
+      console.error("[Web Navigation] Failed to create navigation", error);
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_CREATE_FAILED",
+        "Unable to create web navigation",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
+//==================================================
+//==== WEB NAVIGATION - UPDATE METADATA
+//==================================================
+
+app.put(
+  "/api/v1/web-navigation/:id",
+
+  verifyToken,
+
+  requirePermission("web_navigation.update"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      const metadata = normalizeNavigationMetadata(req.body);
+
+      if (!metadata.success) {
+        return sendError(res, 400, metadata.code, metadata.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_key,
+
+              web_navigation_name,
+
+              web_navigation_location,
+
+              web_navigation_default_locale,
+
+              web_navigation_status,
+
+              web_navigation_settings_json
+
+            FROM web_navigation
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_deleted_at IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const before = navigations[0];
+
+      await connection.query(
+        `
+          UPDATE web_navigation
+
+          SET
+            web_navigation_name = ?,
+
+            web_navigation_location = ?,
+
+            web_navigation_default_locale = ?,
+
+            web_navigation_settings_json = ?,
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_web_navigation = ?
+
+            AND id_master_comp = ?
+        `,
+        [
+          metadata.name,
+          metadata.location,
+          metadata.defaultLocale,
+          metadata.settingsJson,
+          scope.idAdminAcct,
+          idNavigation,
+          scope.idMasterComp,
+        ],
+      );
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation.updated",
+        category: "data_change",
+        module: "web_navigation",
+        action: "update",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation",
+        entityId: idNavigation,
+        entityLabel: metadata.name,
+        before: {
+          key: before.web_navigation_key,
+          name: before.web_navigation_name,
+          location: before.web_navigation_location,
+          default_locale: before.web_navigation_default_locale,
+          status: Number(before.web_navigation_status),
+          settings: parseJsonValue(before.web_navigation_settings_json),
+        },
+        after: {
+          key: before.web_navigation_key,
+          name: metadata.name,
+          location: metadata.location,
+          default_locale: metadata.defaultLocale,
+          status: Number(before.web_navigation_status),
+          settings: metadata.settings,
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        "WEB_NAVIGATION_UPDATED",
+        "Web navigation updated successfully",
+        {
+          id_web_navigation: keyhsid.idWebNavigation.encode(idNavigation),
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error("[Web Navigation] Failed to update navigation", error);
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_UPDATE_FAILED",
+        "Unable to update web navigation",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
+//==================================================
+//==== WEB NAVIGATION - ACTIVATE / DEACTIVATE
+//==================================================
+
+app.patch(
+  "/api/v1/web-navigation/:id/status",
+
+  verifyToken,
+
+  requirePermission("web_navigation.publish"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      const status = Number(req.body?.web_navigation_status);
+
+      if (status !== 0 && status !== 1) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_STATUS_INVALID",
+          "Web navigation status must be 0 or 1",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_key,
+
+              web_navigation_name,
+
+              web_navigation_status
+
+            FROM web_navigation
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_deleted_at IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const navigation = navigations[0];
+
+      await connection.query(
+        `
+          UPDATE web_navigation
+
+          SET
+            web_navigation_status = ?,
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_web_navigation = ?
+
+            AND id_master_comp = ?
+        `,
+        [status, scope.idAdminAcct, idNavigation, scope.idMasterComp],
+      );
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode:
+          status === 1
+            ? "web_navigation.activated"
+            : "web_navigation.deactivated",
+        category: "data_change",
+        module: "web_navigation",
+        action: status === 1 ? "publish" : "unpublish",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation",
+        entityId: idNavigation,
+        entityLabel: navigation.web_navigation_name,
+        before: {
+          status: Number(navigation.web_navigation_status),
+        },
+        after: {
+          status,
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        status === 1
+          ? "WEB_NAVIGATION_ACTIVATED"
+          : "WEB_NAVIGATION_DEACTIVATED",
+        status === 1
+          ? "Web navigation activated successfully"
+          : "Web navigation deactivated successfully",
+        {
+          id_web_navigation: keyhsid.idWebNavigation.encode(idNavigation),
+
+          status,
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error(
+        "[Web Navigation] Failed to change navigation status",
+        error,
+      );
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_STATUS_UPDATE_FAILED",
+        "Unable to change web navigation status",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
+//==================================================
+//==== WEB NAVIGATION - DELETE
+//==================================================
+
+app.delete(
+  "/api/v1/web-navigation/:id",
+
+  verifyToken,
+
+  requirePermission("web_navigation.delete"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              navigation.web_navigation_key,
+
+              navigation.web_navigation_name,
+
+              navigation.web_navigation_location,
+
+              navigation.web_navigation_status,
+
+              COUNT(item.id_web_navigation_item)
+                AS item_count
+
+            FROM web_navigation navigation
+
+            LEFT JOIN web_navigation_item item
+              ON item.id_web_navigation =
+                navigation.id_web_navigation
+
+              AND item.id_master_comp =
+                navigation.id_master_comp
+
+              AND item.web_navigation_item_deleted_at
+                IS NULL
+
+            WHERE navigation.id_web_navigation = ?
+
+              AND navigation.id_master_comp = ?
+
+              AND navigation.web_navigation_deleted_at
+                IS NULL
+
+            GROUP BY
+              navigation.id_web_navigation,
+
+              navigation.web_navigation_key,
+
+              navigation.web_navigation_name,
+
+              navigation.web_navigation_location,
+
+              navigation.web_navigation_status
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const navigation = navigations[0];
+
+      await connection.query(
+        `
+          UPDATE web_navigation_item
+
+          SET
+            web_navigation_item_status = 0,
+
+            web_navigation_item_deleted_at = NOW(),
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_web_navigation = ?
+
+            AND id_master_comp = ?
+
+            AND web_navigation_item_deleted_at IS NULL
+        `,
+        [scope.idAdminAcct, idNavigation, scope.idMasterComp],
+      );
+
+      await connection.query(
+        `
+          UPDATE web_navigation
+
+          SET
+            web_navigation_status = 0,
+
+            web_navigation_deleted_at = NOW(),
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_web_navigation = ?
+
+            AND id_master_comp = ?
+        `,
+        [scope.idAdminAcct, idNavigation, scope.idMasterComp],
+      );
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation.deleted",
+        category: "data_change",
+        module: "web_navigation",
+        action: "delete",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation",
+        entityId: idNavigation,
+        entityLabel: navigation.web_navigation_name,
+        before: {
+          key: navigation.web_navigation_key,
+          name: navigation.web_navigation_name,
+          location: navigation.web_navigation_location,
+          status: Number(navigation.web_navigation_status),
+          item_count: Number(navigation.item_count ?? 0),
+          deleted_at: null,
+        },
+        after: {
+          key: navigation.web_navigation_key,
+          name: navigation.web_navigation_name,
+          location: navigation.web_navigation_location,
+          status: 0,
+          item_count: Number(navigation.item_count ?? 0),
+          deleted_at: "set",
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        "WEB_NAVIGATION_DELETED",
+        "Web navigation deleted successfully",
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error("[Web Navigation] Failed to delete navigation", error);
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_DELETE_FAILED",
+        "Unable to delete web navigation",
+      );
+    } finally {
+      connection?.release();
     }
   },
 );
