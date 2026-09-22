@@ -16,4 +16,6 @@
   <app-header-five [data]="themeOption$ | async" [sticky]="sticky" [logo]="logo()" />
 }
 
-<app-mobile-menu></app-mobile-menu>
+@if (!publicPageContext.active()) {
+  <app-mobile-menu />
+}

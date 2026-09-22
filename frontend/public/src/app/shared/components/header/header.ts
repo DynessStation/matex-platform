@@ -13,6 +13,7 @@ import { BodyService } from '../../services/body.service';
 import { MobileMenu } from './widgets/mobile-menu/mobile-menu';
 import { ThemeOptionState } from '../../store/state/theme-option.state';
 import { ThemeState } from '../../store/state/theme.state';
+import { PublicPageContextService } from '../../services/public-page-context.service';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ import { ThemeState } from '../../store/state/theme.state';
   styleUrl: './header.scss',
 })
 export class Header {
+  public publicPageContext = inject(PublicPageContextService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
