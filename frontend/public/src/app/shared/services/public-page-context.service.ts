@@ -52,9 +52,17 @@ export class PublicPageContextService {
     });
   }
 
-  routeFor(translation: PublicPageTranslation): string[] {
-    // TEMP route.
-    // Nanti fungsi ini saja yang kita ubah ketika URL final aktif.
-    return ['/cms', translation.locale, translation.slug];
+  pathFor(locale: string, slug: string): string {
+    const encodedSlug = encodeURIComponent(slug);
+
+    if (locale === 'en-US') {
+      return `/en/${encodedSlug}`;
+    }
+
+    return `/${encodedSlug}`;
+  }
+
+  routeFor(translation: PublicPageTranslation): string {
+    return this.pathFor(translation.locale, translation.slug);
   }
 }

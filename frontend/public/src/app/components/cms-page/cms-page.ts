@@ -54,6 +54,16 @@ export class CmsPage {
     };
   });
 
+  private resolveLocale(routeLocale: string | null): 'id-ID' | 'en-US' {
+    const configuredLocale = this.route.snapshot.data['locale'];
+
+    if (configuredLocale === 'en-US' || routeLocale === 'en-US') {
+      return 'en-US';
+    }
+
+    return 'id-ID';
+  }
+
   constructor() {
     if (this.response) {
       const headers = new Headers(this.response.headers);
@@ -63,39 +73,49 @@ export class CmsPage {
     this.route.paramMap
       .pipe(
         tap((params) => {
-          this.locale.set(params.get('locale') === 'en-US' ? 'en-US' : 'id-ID');
+          const locale = this.resolveLocale(params.get('locale'));
+
+          this.locale.set(locale);
+
           this.publicPageContext.clearPage();
+
           this.clearSeo();
           this.title.setTitle('MATEX');
-          this.meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });
+
+          this.meta.updateTag({
+            name: 'robots',
+            content: 'noindex, nofollow',
+          });
         }),
         switchMap((params) =>
-          this.service.getPage(params.get('locale') || '', params.get('slug') || '').pipe(
-            timeout(15000),
-            tap((page) => {
-              this.state.set('ready');
+          this.service
+            .getPage(this.resolveLocale(params.get('locale')), params.get('slug') || '')
+            .pipe(
+              timeout(15000),
+              tap((page) => {
+                this.state.set('ready');
 
-              this.publicPageContext.setPage(page);
+                this.publicPageContext.setPage(page);
 
-              this.applySeo(page);
-            }),
-            catchError((error: HttpErrorResponse) => {
-              this.publicPageContext.clearPage();
+                this.applySeo(page);
+              }),
+              catchError((error: HttpErrorResponse) => {
+                this.publicPageContext.clearPage();
 
-              this.state.set(error.status === 404 ? 'missing' : 'error');
+                this.state.set(error.status === 404 ? 'missing' : 'error');
 
-              this.title.setTitle(
-                this.message('Halaman tidak tersedia', 'Page unavailable') + ' | MATEX',
-              );
+                this.title.setTitle(
+                  this.message('Halaman tidak tersedia', 'Page unavailable') + ' | MATEX',
+                );
 
-              if (this.response) {
-                this.response.status = error.status === 404 ? 404 : 503;
-              }
+                if (this.response) {
+                  this.response.status = error.status === 404 ? 404 : 503;
+                }
 
-              return of(null);
-            }),
-            startWith(null),
-          ),
+                return of(null);
+              }),
+              startWith(null),
+            ),
         ),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -112,7 +132,9 @@ export class CmsPage {
   }
 
   private pageUrl(locale: string, slug: string): string {
-    return `${environment.cmsSiteURL.replace(/\/$/, '')}/cms/${encodeURIComponent(locale)}/${encodeURIComponent(slug)}`;
+    const site = environment.cmsSiteURL.replace(/\/$/, '');
+
+    return `${site}${this.publicPageContext.pathFor(locale, slug)}`;
   }
 
   private applySeo(page: IPublicCmsPage): void {

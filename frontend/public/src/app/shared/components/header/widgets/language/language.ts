@@ -98,13 +98,9 @@ export class Language {
     return locale === 'id-ID' ? 'Indonesia' : 'English';
   }
 
-  languageFlag(locale: string): string {
-    return locale === 'id-ID' ? '🇮🇩' : '🇺🇸';
-  }
-
   selectCmsLanguage(translation: PublicPageTranslation): void {
     this.active = false;
 
-    void this.router.navigate(this.publicPageContext.routeFor(translation));
+    void this.router.navigateByUrl(this.publicPageContext.routeFor(translation));
   }
 }

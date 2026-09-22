@@ -25,21 +25,74 @@ const legacyRoutes: Routes = [
   },
 ];
 
-// MATEX CMS has its own shell; the template storefront remains isolated.
 export const routes: Routes = [
+  // ================================================
+  // Legacy CMS URLs
+  // Redirect ke public URL final.
+  // ================================================
+
   {
-    path: 'cms',
+    path: 'cms/id-ID/:slug',
+    redirectTo: '/:slug',
+    pathMatch: 'full',
+  },
+  {
+    path: 'cms/en-US/:slug',
+    redirectTo: '/en/:slug',
+    pathMatch: 'full',
+  },
+
+  // ================================================
+  // MATEX Public - English
+  // /en/about-us
+  // ================================================
+
+  {
+    path: 'en',
     loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
     children: [
       {
-        path: ':locale/:slug',
+        path: ':slug',
+        data: {
+          locale: 'en-US',
+        },
         loadComponent: () => import('./components/cms-page/cms-page').then((m) => m.CmsPage),
       },
     ],
   },
+
+  // ================================================
+  // Legacy Kartify
+  //
+  // Sengaja masih dipertahankan selama development
+  // supaya /home, /collections, dll tetap bisa
+  // dipakai sebagai referensi template.
+  // ================================================
+
   {
     path: '',
     loadComponent: () => import('./legacy-app').then((m) => m.LegacyApp),
     children: legacyRoutes,
+  },
+
+  // ================================================
+  // MATEX Public - Default Indonesian
+  //
+  // HARUS setelah legacy selama Kartify masih hidup,
+  // supaya /home, /cart, dll tidak dianggap CMS slug.
+  // ================================================
+
+  {
+    path: '',
+    loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
+    children: [
+      {
+        path: ':slug',
+        data: {
+          locale: 'id-ID',
+        },
+        loadComponent: () => import('./components/cms-page/cms-page').then((m) => m.CmsPage),
+      },
+    ],
   },
 ];

@@ -1,10 +1,6 @@
 <div class="dropdown theme-form-select" (clickOutside)="hideDropdown()">
   @if (publicPageContext.active()) {
     <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
-      <span>
-        {{ languageFlag(publicPageContext.page()?.locale || '') }}
-      </span>
-
       <span>{{ cmsLanguageLabel() }}</span>
     </button>
 
@@ -18,10 +14,6 @@
               (click)="selectCmsLanguage(translation)"
               [class.active]="translation.locale === page.locale"
             >
-              <span>
-                {{ languageFlag(translation.locale) }}
-              </span>
-
               <span>
                 {{ languageLabel(translation.locale) }}
               </span>
