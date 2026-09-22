@@ -5,6 +5,7 @@ import { IPublicCmsPage } from '../interface/cms-page.interface';
 export type PublicPageTranslation = IPublicCmsPage['translations'][number];
 
 interface PublicPageContext {
+  key: string;
   locale: string;
   slug: string;
   translations: PublicPageTranslation[];
@@ -46,13 +47,18 @@ export class PublicPageContextService {
     }
 
     this.pageState.set({
+      key: page.key,
       locale: page.locale,
       slug: page.slug,
       translations,
     });
   }
 
-  pathFor(locale: string, slug: string): string {
+  pathFor(locale: string, slug: string, key?: string): string {
+    if (key === 'home') {
+      return locale === 'en-US' ? '/en' : '/';
+    }
+
     const encodedSlug = encodeURIComponent(slug);
 
     if (locale === 'en-US') {
@@ -63,6 +69,6 @@ export class PublicPageContextService {
   }
 
   routeFor(translation: PublicPageTranslation): string {
-    return this.pathFor(translation.locale, translation.slug);
+    return this.pathFor(translation.locale, translation.slug, this.pageState()?.key);
   }
 }

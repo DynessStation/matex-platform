@@ -131,10 +131,10 @@ export class CmsPage {
     return this.locale() === 'en-US' ? en : id;
   }
 
-  private pageUrl(locale: string, slug: string): string {
+  private pageUrl(locale: string, slug: string, key?: string): string {
     const site = environment.cmsSiteURL.replace(/\/$/, '');
 
-    return `${site}${this.publicPageContext.pathFor(locale, slug)}`;
+    return `${site}${this.publicPageContext.pathFor(locale, slug, key)}`;
   }
 
   private applySeo(page: IPublicCmsPage): void {
@@ -143,7 +143,7 @@ export class CmsPage {
     for (const name of ['description', 'keywords', 'robots'] as const) {
       this.meta.updateTag({ name, content: page.seo[name] });
     }
-    const fallbackUrl = this.pageUrl(page.locale, page.slug);
+    const fallbackUrl = this.pageUrl(page.locale, page.slug, page.key);
     let canonical = fallbackUrl;
     try {
       const url = new URL(page.seo.canonical_url || fallbackUrl);
@@ -155,7 +155,7 @@ export class CmsPage {
     for (const translation of page.translations) {
       this.addLink(
         'alternate',
-        this.pageUrl(translation.locale, translation.slug),
+        this.pageUrl(translation.locale, translation.slug, page.key),
         translation.locale,
       );
     }

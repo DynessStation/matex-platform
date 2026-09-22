@@ -22,8 +22,11 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
   }
 
   try {
-    const [pages] = await pool.query<RowDataPacket[]>(`
-      SELECT p.id_cms_page, p.cms_page_visibility,
+    const [pages] = await pool.query<RowDataPacket[]>(
+      `
+      SELECT p.id_cms_page,
+        p.cms_page_key,
+        p.cms_page_visibility,
         t.cms_page_locale, t.cms_page_slug, t.cms_page_title,
         t.cms_page_excerpt, t.cms_page_content, t.cms_page_meta_title,
         t.cms_page_meta_description, t.cms_page_meta_keywords,
@@ -39,20 +42,27 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         AND (p.cms_page_publish_at IS NULL OR p.cms_page_publish_at <= NOW())
         AND (p.cms_page_unpublish_at IS NULL OR p.cms_page_unpublish_at > NOW())
       LIMIT 1
-    `, [company, locale, slug]);
+    `,
+      [company, locale, slug],
+    );
 
     const page = pages[0];
-    if (!page) return sendError(res, 404, "CMS_PAGE_NOT_FOUND", "Page not found");
+    if (!page)
+      return sendError(res, 404, "CMS_PAGE_NOT_FOUND", "Page not found");
 
-    const [translations] = await pool.query<RowDataPacket[]>(`
+    const [translations] = await pool.query<RowDataPacket[]>(
+      `
       SELECT cms_page_locale AS locale, cms_page_slug AS slug
       FROM cms_page_i18n
       WHERE id_cms_page = ? AND id_master_comp = ? AND cms_page_i18n_status = 1
         AND cms_page_locale IN ('id-ID', 'en-US')
       ORDER BY cms_page_locale
-    `, [page.id_cms_page, company]);
+    `,
+      [page.id_cms_page, company],
+    );
 
-    const [attachments] = await pool.query<RowDataPacket[]>(`
+    const [attachments] = await pool.query<RowDataPacket[]>(
+      `
       SELECT c.cms_page_attachment_role AS role, a.storage_path, a.name,
         i.cms_page_attachment_alt_text AS alt, i.cms_page_attachment_caption AS caption
       FROM cms_page_attachment c
@@ -66,10 +76,13 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         AND a.mime_type IN ('image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif')
         AND c.cms_page_attachment_role IN ('hero', 'gallery', 'og')
       ORDER BY c.cms_page_attachment_sort_order, c.id_cms_page_attachment
-    `, [locale, page.id_cms_page, company]);
+    `,
+      [locale, page.id_cms_page, company],
+    );
 
     // Explicit public projection: no internal IDs, drafts, settings or audit data.
     return sendSuccess(res, 200, "CMS_PAGE_FOUND", "Page loaded", {
+      key: page.cms_page_key,
       locale: page.cms_page_locale,
       slug: page.cms_page_slug,
       title: page.cms_page_title,
@@ -77,16 +90,26 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
       content: page.cms_page_content,
       seo: {
         title: page.cms_page_meta_title || page.cms_page_title,
-        description: page.cms_page_meta_description || page.cms_page_excerpt || "",
+        description:
+          page.cms_page_meta_description || page.cms_page_excerpt || "",
         keywords: page.cms_page_meta_keywords || "",
-        robots: Number(page.cms_page_visibility) === 2
-          ? "noindex, nofollow" : page.cms_page_meta_robots || "index, follow",
+        robots:
+          Number(page.cms_page_visibility) === 2
+            ? "noindex, nofollow"
+            : page.cms_page_meta_robots || "index, follow",
         canonical_url: page.cms_page_canonical_url,
-        og_title: page.cms_page_og_title || page.cms_page_meta_title || page.cms_page_title,
-        og_description: page.cms_page_og_description || page.cms_page_meta_description || page.cms_page_excerpt || "",
+        og_title:
+          page.cms_page_og_title ||
+          page.cms_page_meta_title ||
+          page.cms_page_title,
+        og_description:
+          page.cms_page_og_description ||
+          page.cms_page_meta_description ||
+          page.cms_page_excerpt ||
+          "",
       },
       translations,
-      attachments: attachments.map(item => ({
+      attachments: attachments.map((item) => ({
         role: item.role,
         asset_url: buildAttachmentUrl(item.storage_path),
         alt: item.alt ?? item.name ?? "",
