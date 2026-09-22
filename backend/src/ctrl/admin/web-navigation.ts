@@ -2480,4 +2480,704 @@ app.put(
   },
 );
 
+//==================================================
+//==== WEB NAVIGATION ITEM - DELETE BRANCH
+//==================================================
+
+app.delete(
+  "/api/v1/web-navigation/:id/items/:itemId",
+
+  verifyToken,
+
+  requirePermission("web_navigation.delete"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      const idItem = decodeWebNavigationItemId(req.params.itemId);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      if (!idItem) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_ITEM_INVALID_ID",
+          "Invalid navigation item identifier",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_name
+
+            FROM web_navigation
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_deleted_at IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const navigation = navigations[0];
+
+      const [itemRows] = await connection.query(
+        `
+            SELECT
+              id_web_navigation_item,
+
+              id_parent_web_navigation_item,
+
+              web_navigation_item_key,
+
+              web_navigation_item_link_type,
+
+              web_navigation_item_sort_order,
+
+              web_navigation_item_status
+
+            FROM web_navigation_item
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_item_deleted_at
+                IS NULL
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigationItems = itemRows as any[];
+
+      const target = navigationItems.find(
+        (item) => Number(item.id_web_navigation_item) === idItem,
+      );
+
+      if (!target) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_ITEM_NOT_FOUND",
+          "Navigation item not found",
+        );
+      }
+
+      const childrenByParent = new Map<number, number[]>();
+
+      for (const item of navigationItems) {
+        if (item.id_parent_web_navigation_item === null) {
+          continue;
+        }
+
+        const parentId = Number(item.id_parent_web_navigation_item);
+
+        const children = childrenByParent.get(parentId) ?? [];
+
+        children.push(Number(item.id_web_navigation_item));
+
+        childrenByParent.set(parentId, children);
+      }
+
+      const deletedIds: number[] = [];
+
+      const stack: number[] = [idItem];
+
+      const visited = new Set<number>();
+
+      while (stack.length) {
+        const currentId = stack.pop();
+
+        if (currentId === undefined || visited.has(currentId)) {
+          continue;
+        }
+
+        visited.add(currentId);
+
+        deletedIds.push(currentId);
+
+        for (const childId of childrenByParent.get(currentId) ?? []) {
+          stack.push(childId);
+        }
+      }
+
+      const deletedSet = new Set(deletedIds);
+
+      const deletedItems = navigationItems
+        .filter((item) => deletedSet.has(Number(item.id_web_navigation_item)))
+        .map((item) => ({
+          id_web_navigation_item: Number(item.id_web_navigation_item),
+
+          id_parent_web_navigation_item:
+            item.id_parent_web_navigation_item === null
+              ? null
+              : Number(item.id_parent_web_navigation_item),
+
+          key: item.web_navigation_item_key,
+
+          link_type: item.web_navigation_item_link_type,
+
+          sort_order: Number(item.web_navigation_item_sort_order),
+
+          status: Number(item.web_navigation_item_status),
+        }))
+        .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
+
+      const placeholders = deletedIds.map(() => "?").join(", ");
+
+      await connection.query(
+        `
+          UPDATE web_navigation_item
+
+          SET
+            web_navigation_item_status = 0,
+
+            web_navigation_item_deleted_at = NOW(),
+
+            id_updated_by = ?,
+
+            updated = NOW()
+
+          WHERE id_master_comp = ?
+
+            AND id_web_navigation = ?
+
+            AND id_web_navigation_item
+              IN (${placeholders})
+
+            AND web_navigation_item_deleted_at
+              IS NULL
+        `,
+        [scope.idAdminAcct, scope.idMasterComp, idNavigation, ...deletedIds],
+      );
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation_item.deleted",
+        category: "data_change",
+        module: "web_navigation",
+        action: "delete",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation_item",
+        entityId: idItem,
+        entityLabel: target.web_navigation_item_key,
+        before: {
+          items: deletedItems,
+        },
+        after: {
+          items: deletedItems.map((item) => ({
+            ...item,
+            status: 0,
+            deleted_at: "set",
+          })),
+        },
+        metadata: {
+          navigation_name: navigation.web_navigation_name,
+
+          deleted_item_count: deletedIds.length,
+
+          includes_descendants: deletedIds.length > 1,
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        "WEB_NAVIGATION_ITEM_DELETED",
+        "Navigation item branch deleted successfully",
+        {
+          deleted_item_count: deletedIds.length,
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error("[Web Navigation] Failed to delete navigation item", error);
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_ITEM_DELETE_FAILED",
+        "Unable to delete navigation item",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
+//==================================================
+//==== WEB NAVIGATION ITEM - BULK REORDER
+//==================================================
+
+app.put(
+  "/api/v1/web-navigation/:id/reorder-items",
+
+  verifyToken,
+
+  requirePermission("web_navigation.update"),
+
+  async (req: AuthRequest, res: Response) => {
+    let connection: any = null;
+
+    try {
+      const idNavigation = decodeNavigationId(req.params.id);
+
+      if (!idNavigation) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_INVALID_ID",
+          "Invalid web navigation identifier",
+        );
+      }
+
+      if (!Array.isArray(req.body?.items)) {
+        return sendError(
+          res,
+          400,
+          "WEB_NAVIGATION_REORDER_ITEMS_REQUIRED",
+          "Navigation items are required",
+        );
+      }
+
+      const scope = await getSessionScope(req);
+
+      if (!scope.success) {
+        return sendError(res, scope.status, scope.code, scope.message);
+      }
+
+      connection = await pool.getConnection();
+
+      await connection.beginTransaction();
+
+      const [navigationRows] = await connection.query(
+        `
+            SELECT
+              web_navigation_name
+
+            FROM web_navigation
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_deleted_at IS NULL
+
+            LIMIT 1
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const navigations = navigationRows as any[];
+
+      if (!navigations.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          404,
+          "WEB_NAVIGATION_NOT_FOUND",
+          "Web navigation not found",
+        );
+      }
+
+      const navigation = navigations[0];
+
+      const [currentRows] = await connection.query(
+        `
+            SELECT
+              id_web_navigation_item,
+
+              id_parent_web_navigation_item,
+
+              web_navigation_item_key,
+
+              web_navigation_item_sort_order
+
+            FROM web_navigation_item
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_item_deleted_at
+                IS NULL
+
+            FOR UPDATE
+          `,
+        [idNavigation, scope.idMasterComp],
+      );
+
+      const currentItems = currentRows as any[];
+
+      if (req.body.items.length !== currentItems.length) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          409,
+          "WEB_NAVIGATION_REORDER_INCOMPLETE",
+          "Reorder payload must contain every active navigation item",
+        );
+      }
+
+      const currentIds = new Set<number>(
+        currentItems.map((item) => Number(item.id_web_navigation_item)),
+      );
+
+      const normalizedItems: {
+        idItem: number;
+        idParent: number | null;
+        sortOrder: number;
+      }[] = [];
+
+      const suppliedIds = new Set<number>();
+
+      for (const rawItem of req.body.items) {
+        const normalizedId = decodeWebNavigationItemId(
+          rawItem?.id_web_navigation_item,
+        );
+
+        if (!normalizedId || !currentIds.has(normalizedId)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_REORDER_ITEM_INVALID",
+            "Reorder payload contains an invalid navigation item",
+          );
+        }
+
+        if (suppliedIds.has(normalizedId)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_REORDER_ITEM_DUPLICATE",
+            "Reorder payload contains a duplicate navigation item",
+          );
+        }
+
+        suppliedIds.add(normalizedId);
+
+        let idParent: number | null = null;
+
+        const encodedParent = rawItem?.id_parent_web_navigation_item;
+
+        if (
+          encodedParent !== null &&
+          encodedParent !== undefined &&
+          encodedParent !== ""
+        ) {
+          idParent = decodeWebNavigationItemId(encodedParent);
+
+          if (!idParent || !currentIds.has(idParent)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "WEB_NAVIGATION_REORDER_PARENT_INVALID",
+              "Reorder payload contains an invalid parent item",
+            );
+          }
+
+          if (idParent === normalizedId) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "WEB_NAVIGATION_REORDER_PARENT_SELF",
+              "A navigation item cannot be its own parent",
+            );
+          }
+        }
+
+        const sortOrder = Number(rawItem?.sort_order);
+
+        if (
+          !Number.isInteger(sortOrder) ||
+          sortOrder < 0 ||
+          sortOrder > 2147483647
+        ) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_REORDER_SORT_INVALID",
+            "Reorder payload contains an invalid sort order",
+          );
+        }
+
+        normalizedItems.push({
+          idItem: normalizedId,
+          idParent,
+          sortOrder,
+        });
+      }
+
+      for (const currentId of currentIds) {
+        if (!suppliedIds.has(currentId)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            409,
+            "WEB_NAVIGATION_REORDER_INCOMPLETE",
+            "Reorder payload must contain every active navigation item",
+          );
+        }
+      }
+
+      //==================================================
+      //==== UNIQUE ORDER WITHIN EACH PARENT
+      //==================================================
+
+      const siblingOrders = new Set<string>();
+
+      for (const item of normalizedItems) {
+        const siblingKey = `${item.idParent ?? "root"}:${item.sortOrder}`;
+
+        if (siblingOrders.has(siblingKey)) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            "WEB_NAVIGATION_REORDER_SORT_DUPLICATE",
+            "Sibling navigation items cannot share the same sort order",
+          );
+        }
+
+        siblingOrders.add(siblingKey);
+      }
+
+      //==================================================
+      //==== CYCLE PROTECTION
+      //==================================================
+
+      const parentByItem = new Map<number, number | null>();
+
+      for (const item of normalizedItems) {
+        parentByItem.set(item.idItem, item.idParent);
+      }
+
+      for (const item of normalizedItems) {
+        const visited = new Set<number>();
+
+        let cursor: number | null = item.idItem;
+
+        while (cursor !== null) {
+          if (visited.has(cursor)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "WEB_NAVIGATION_REORDER_CYCLE",
+              "Navigation item hierarchy contains a cycle",
+            );
+          }
+
+          visited.add(cursor);
+
+          cursor = parentByItem.get(cursor) ?? null;
+        }
+      }
+
+      const before = currentItems
+        .map((item) => ({
+          id_web_navigation_item: Number(item.id_web_navigation_item),
+
+          key: item.web_navigation_item_key,
+
+          id_parent_web_navigation_item:
+            item.id_parent_web_navigation_item === null
+              ? null
+              : Number(item.id_parent_web_navigation_item),
+
+          sort_order: Number(item.web_navigation_item_sort_order),
+        }))
+        .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
+
+      for (const item of normalizedItems) {
+        await connection.query(
+          `
+            UPDATE web_navigation_item
+
+            SET
+              id_parent_web_navigation_item = ?,
+
+              web_navigation_item_sort_order = ?,
+
+              id_updated_by = ?,
+
+              updated = NOW()
+
+            WHERE id_web_navigation_item = ?
+
+              AND id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_item_deleted_at
+                IS NULL
+          `,
+          [
+            item.idParent,
+            item.sortOrder,
+            scope.idAdminAcct,
+            item.idItem,
+            idNavigation,
+            scope.idMasterComp,
+          ],
+        );
+      }
+
+      const keyById = new Map<number, string>(
+        currentItems.map((item) => [
+          Number(item.id_web_navigation_item),
+
+          String(item.web_navigation_item_key),
+        ]),
+      );
+
+      const after = normalizedItems
+        .map((item) => ({
+          id_web_navigation_item: item.idItem,
+
+          key: keyById.get(item.idItem) ?? null,
+
+          id_parent_web_navigation_item: item.idParent,
+
+          sort_order: item.sortOrder,
+        }))
+        .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "web_navigation_items.reordered",
+        category: "data_change",
+        module: "web_navigation",
+        action: "reorder",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "web_navigation",
+        entityId: idNavigation,
+        entityLabel: navigation.web_navigation_name,
+        before: {
+          items: before,
+        },
+        after: {
+          items: after,
+        },
+        metadata: {
+          item_count: normalizedItems.length,
+        },
+        httpStatus: 200,
+      });
+
+      await connection.commit();
+
+      return sendSuccess(
+        res,
+        200,
+        "WEB_NAVIGATION_ITEMS_REORDERED",
+        "Navigation items reordered successfully",
+        {
+          item_count: normalizedItems.length,
+        },
+      );
+    } catch (error) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch {}
+      }
+
+      console.error(
+        "[Web Navigation] Failed to reorder navigation items",
+        error,
+      );
+
+      return sendError(
+        res,
+        500,
+        "WEB_NAVIGATION_REORDER_FAILED",
+        "Unable to reorder navigation items",
+      );
+    } finally {
+      connection?.release();
+    }
+  },
+);
+
 export default app;
