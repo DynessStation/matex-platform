@@ -33,12 +33,12 @@ export const routes: Routes = [
 
   {
     path: 'cms/id-ID/:slug',
-    redirectTo: ({ params }) => `/${params['slug']}`,
+    redirectTo: ({ params }) => (params['slug'] === 'home' ? '/' : `/${params['slug']}`),
     pathMatch: 'full',
   },
   {
     path: 'cms/en-US/:slug',
-    redirectTo: ({ params }) => `/en/${params['slug']}`,
+    redirectTo: ({ params }) => (params['slug'] === 'home' ? '/en' : `/en/${params['slug']}`),
     pathMatch: 'full',
   },
 
@@ -52,9 +52,40 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        data: {
+          locale: 'en-US',
+          slug: 'home',
+        },
+        loadComponent: () => import('./components/cms-page/cms-page').then((m) => m.CmsPage),
+      },
+      {
         path: ':slug',
         data: {
           locale: 'en-US',
+        },
+        loadComponent: () => import('./components/cms-page/cms-page').then((m) => m.CmsPage),
+      },
+    ],
+  },
+
+  // ================================================
+  // MATEX Public - Homepage Indonesia
+  // /
+  // ================================================
+
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        data: {
+          locale: 'id-ID',
+          slug: 'home',
         },
         loadComponent: () => import('./components/cms-page/cms-page').then((m) => m.CmsPage),
       },

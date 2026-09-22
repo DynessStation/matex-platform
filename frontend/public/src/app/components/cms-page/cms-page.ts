@@ -41,7 +41,7 @@ export class CmsPage {
   readonly breadcrumb = computed(() => {
     const page = this.page();
 
-    if (!page) return null;
+    if (!page || page.key === 'home') return null;
 
     return {
       title: page.title,
@@ -62,6 +62,16 @@ export class CmsPage {
     }
 
     return 'id-ID';
+  }
+
+  private resolveSlug(routeSlug: string | null): string {
+    const configuredSlug = this.route.snapshot.data['slug'];
+
+    if (typeof configuredSlug === 'string' && configuredSlug) {
+      return configuredSlug;
+    }
+
+    return routeSlug || '';
   }
 
   constructor() {
@@ -89,7 +99,7 @@ export class CmsPage {
         }),
         switchMap((params) =>
           this.service
-            .getPage(this.resolveLocale(params.get('locale')), params.get('slug') || '')
+            .getPage(this.resolveLocale(params.get('locale')), this.resolveSlug(params.get('slug')))
             .pipe(
               timeout(15000),
               tap((page) => {
