@@ -33,12 +33,12 @@ export const routes: Routes = [
 
   {
     path: 'cms/id-ID/:slug',
-    redirectTo: '/:slug',
+    redirectTo: ({ params }) => `/${params['slug']}`,
     pathMatch: 'full',
   },
   {
     path: 'cms/en-US/:slug',
-    redirectTo: '/en/:slug',
+    redirectTo: ({ params }) => `/en/${params['slug']}`,
     pathMatch: 'full',
   },
 
