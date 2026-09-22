@@ -24,6 +24,10 @@ const idAuditLog = new hashids("key_auditLog123", 8);
 
 const idCmsPage = new hashids("key_cmsPage123", 8);
 
+const idWebNavigation = new hashids("key_webNavigation123", 8);
+
+const idWebNavigationItem = new hashids("key_webNavigationItem123", 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -37,4 +41,6 @@ export default {
   idAdminPermission,
   idAuditLog,
   idCmsPage,
+  idWebNavigation,
+  idWebNavigationItem,
 };
