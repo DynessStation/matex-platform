@@ -2,32 +2,6 @@
   display: block;
 }
 
-.matex-header {
-  position: sticky;
-  top: 0;
-  z-index: 1020;
-  background: #ffffff;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.matex-header__inner {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.matex-header__brand {
-  color: #172033;
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-:host {
-  display: block;
-}
-
 .matex-public-header {
   position: sticky;
   top: 0;
