@@ -1,32 +1,114 @@
-<div class="row">
-  <div class="col-xl-4 p-0">
-    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'menu'">
-      @if (type() === 'edit') {
-        <div button>
-          <div ngbDropdown class="d-inline-block dropdown-box">
-            <button type="button" class="btn btn-sm btn-light-bg" ngbDropdownToggle>
-              {{ 'action' | translate }}
-            </button>
-            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
-              @if (type() === 'edit') {
-                <button ngbDropdownItem (click)="create()">
-                  {{ 'create' | translate }}
-                </button>
-              }
-            </div>
+@if (loading) {
+  <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+    <div class="d-flex justify-content-center py-5" aria-live="polite">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden"> Loading navigation </span>
+      </div>
+    </div>
+  </app-page-wrapper>
+} @else {
+  @if (primaryNavigation$ | async; as primary) {
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+      <div
+        class="d-flex flex-wrap align-items-center justify-content-between gap-3"
+      >
+        <div>
+          <h5 class="mb-1">
+            {{ primary.name }}
+          </h5>
+
+          <p class="text-content mb-0">
+            Menu utama untuk header website publik MATEX.
+          </p>
+        </div>
+
+        <span
+          class="badge"
+          [class.bg-success]="primary.status === 1"
+          [class.bg-warning]="primary.status === 0"
+        >
+          {{ primary.status === 1 ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+
+      <div class="row g-3 mt-3">
+        <div class="col-md-3 col-sm-6">
+          <div class="border rounded p-3 h-100">
+            <small class="text-content d-block"> Key </small>
+
+            <strong>{{ primary.key }}</strong>
           </div>
         </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="border rounded p-3 h-100">
+            <small class="text-content d-block"> Location </small>
+
+            <strong>
+              {{ primary.location }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="border rounded p-3 h-100">
+            <small class="text-content d-block"> Default language </small>
+
+            <strong>
+              {{ primary.default_locale }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="border rounded p-3 h-100">
+            <small class="text-content d-block"> Menu items </small>
+
+            <strong>
+              {{ primary.item_count }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      @if (selectedNavigation$ | async; as navigation) {
+        <div class="alert alert-light border mt-4 mb-0">
+          Navigation berhasil dimuat dari backend. Saat ini berisi
+          <strong>{{ navigation.items.length }}</strong>
+          item.
+        </div>
       }
-      <app-menu-tree
-        [data]="(menu$ | async)?.data?.length ? (menu$ | async)?.data : []"
-        [recursionKey]="'child'"
-        [type]="'menu'"
-        />
     </app-page-wrapper>
-  </div>
-  <div class="col-xl-8 p-0">
-    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'menu'">
-      <app-form-menu [type]="type()" />
+  } @else {
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+      <div class="text-center py-5">
+        <div
+          class="mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-light"
+          style="width: 72px; height: 72px"
+        >
+          <i class="ri-menu-2-line fs-2 text-primary"></i>
+        </div>
+
+        <h4>Primary Navigation belum dibuat</h4>
+
+        <p class="text-content mx-auto mb-0" style="max-width: 620px">
+          Primary Navigation menjadi sumber menu header website publik. Data
+          akan tetap terpisah berdasarkan company dan dapat diterjemahkan ke
+          Indonesia serta English.
+        </p>
+
+        <ng-container *hasPermission="'web_navigation.create'">
+          <app-button
+            [id]="'initialize_primary_navigation'"
+            [type]="'button'"
+            [class]="'btn btn-theme mt-4'"
+            [disabled]="creating"
+            (click)="initializePrimaryNavigation()"
+          >
+            Initialize Primary Navigation
+          </app-button>
+        </ng-container>
+      </div>
     </app-page-wrapper>
-  </div>
-</div>
+  }
+}
