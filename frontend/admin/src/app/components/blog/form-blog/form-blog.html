@@ -3,219 +3,677 @@
   [formGroup]="form"
   (ngSubmit)="submit()"
 >
-  <div class="card">
-    <div class="card-body">
-      <h4>Pengaturan Artikel</h4>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <app-form-fields label="Kunci internal" for="key" [required]="true"
-            ><input
-              class="form-control"
-              id="key"
-              formControlName="key"
-              placeholder="contoh: manfaat-latex-alami"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-3">
-          <app-form-fields label="Status" for="status" [required]="true"
-            ><select class="form-select" id="status" formControlName="status">
-              <option value="draft">Draft</option>
-              <option value="published">Dipublikasikan</option>
-              <option value="scheduled">Terjadwal</option>
-              <option value="archived">Diarsipkan</option>
-            </select></app-form-fields
-          >
-        </div>
-        <div class="col-lg-3 d-flex gap-3 align-items-center">
-          <label
-            ><input type="checkbox" formControlName="is_featured" />
-            Unggulan</label
-          ><label
-            ><input type="checkbox" formControlName="is_sticky" />
-            Sematkan</label
-          >
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="Mulai tayang" for="published_at"
-            ><input
-              class="form-control"
-              type="datetime-local"
-              formControlName="published_at"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="Berhenti tayang" for="unpublished_at"
-            ><input
-              class="form-control"
-              type="datetime-local"
-              formControlName="unpublished_at"
-          /></app-form-fields>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="vertical-tabs article-form">
+    <div class="row g-4">
+      <div class="col-xl-3 col-lg-4">
+        <ul
+          ngbNav
+          #nav="ngbNav"
+          [(activeId)]="activeTab"
+          class="nav-pills"
+          orientation="vertical"
+        >
+          <li [ngbNavItem]="'general'">
+            <button ngbNavLink type="button">
+              <i class="ri-settings-3-line"></i> Umum
+            </button>
+            <ng-template ngbNavContent>
+              <section class="article-panel">
+                <div class="article-heading">
+                  <h5>Pengaturan artikel</h5>
+                  <p>
+                    Identitas internal dan penanda artikel untuk pengelolaan
+                    konten.
+                  </p>
+                </div>
+                <div class="row g-4">
+                  <div class="col-md-7">
+                    <label class="form-label" for="key"
+                      >Kunci internal <span>*</span></label
+                    >
+                    <input
+                      id="key"
+                      class="form-control"
+                      formControlName="key"
+                      placeholder="contoh: manfaat-latex-alami"
+                      [class.is-invalid]="
+                        form.controls.key.touched && form.controls.key.invalid
+                      "
+                    />
+                    <small class="text-muted"
+                      >Dipakai sistem untuk mengenali artikel dan tidak tampil
+                      sebagai judul publik.</small
+                    >
+                    @if (
+                      form.controls.key.touched &&
+                      form.controls.key.errors?.['required']
+                    ) {
+                      <div class="invalid-feedback d-block">
+                        Kunci internal wajib diisi.
+                      </div>
+                    }
+                    @if (
+                      form.controls.key.touched &&
+                      form.controls.key.errors?.['pattern']
+                    ) {
+                      <div class="invalid-feedback d-block">
+                        Gunakan huruf kecil, angka, dan tanda hubung.
+                      </div>
+                    }
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Penanda artikel</label>
+                    <div class="article-checks">
+                      <label
+                        ><input type="checkbox" formControlName="is_featured" />
+                        <span
+                          ><strong>Unggulan</strong
+                          ><small
+                            >Tonjolkan pada blok artikel pilihan.</small
+                          ></span
+                        ></label
+                      >
+                      <label
+                        ><input type="checkbox" formControlName="is_sticky" />
+                        <span
+                          ><strong>Sematkan</strong
+                          ><small
+                            >Prioritaskan pada urutan daftar artikel.</small
+                          ></span
+                        ></label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="article-actions">
+                  <span></span
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('content')"
+                  >
+                    Lanjut ke Konten <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
 
-  <div class="card mt-4">
-    <div class="card-body">
-      <h4>Bahasa Indonesia</h4>
-      <div class="row g-3">
-        <div class="col-lg-5">
-          <app-form-fields label="Slug URL" for="id_slug" [required]="true"
-            ><input class="form-control" formControlName="id_slug"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-7">
-          <app-form-fields label="Judul" for="id_title" [required]="true"
-            ><input class="form-control" formControlName="id_title"
-          /></app-form-fields>
-        </div>
-      </div>
-      <app-form-fields label="Ringkasan" for="id_excerpt">
-        <textarea
-          class="form-control"
-          rows="3"
-          formControlName="id_excerpt"
-        ></textarea>
-      </app-form-fields>
-      <app-form-fields label="Isi artikel" for="id_body" [required]="true">
-        @if (browser && idEditor) {
-          <ngx-editor-menu [editor]="idEditor" /><ngx-editor
-            [editor]="idEditor"
-            formControlName="id_body"
-          />
-        }
-      </app-form-fields>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <app-form-fields label="Judul SEO" for="id_meta_title"
-            ><input class="form-control" formControlName="id_meta_title"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="Canonical URL" for="id_canonical_url"
-            ><input class="form-control" formControlName="id_canonical_url"
-          /></app-form-fields>
-        </div>
-      </div>
-      <app-form-fields label="Deskripsi SEO" for="id_meta_description">
-        <textarea
-          class="form-control"
-          rows="2"
-          formControlName="id_meta_description"
-        ></textarea>
-      </app-form-fields>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <app-form-fields label="Judul OG" for="id_og_title"
-            ><input class="form-control" formControlName="id_og_title"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="Deskripsi OG" for="id_og_description"
-            ><input class="form-control" formControlName="id_og_description"
-          /></app-form-fields>
-        </div>
-      </div>
-    </div>
-  </div>
+          <li [ngbNavItem]="'content'">
+            <button ngbNavLink type="button">
+              <i class="ri-translate-2"></i> Konten & Bahasa
+            </button>
+            <ng-template ngbNavContent>
+              <section class="article-panel">
+                <div class="article-heading">
+                  <h5>Konten & bahasa</h5>
+                  <p>
+                    Tulis versi Bahasa Indonesia dan English tanpa memenuhi
+                    layar dengan dua formulir sekaligus.
+                  </p>
+                </div>
+                <div class="article-language-tabs">
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'id'"
+                    (click)="activeLocale = 'id'"
+                  >
+                    <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
+                  </button>
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'en'"
+                    (click)="activeLocale = 'en'"
+                  >
+                    <strong>EN</strong> English
+                  </button>
+                </div>
+                @if (activeLocale === 'id') {
+                  <div class="row g-4">
+                    <div class="col-md-5">
+                      <label class="form-label" for="id_slug"
+                        >Slug URL <span>*</span></label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text">/artikel/</span
+                        ><input
+                          id="id_slug"
+                          class="form-control"
+                          formControlName="id_slug"
+                          [class.is-invalid]="
+                            form.controls.id_slug.touched &&
+                            form.controls.id_slug.invalid
+                          "
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-7">
+                      <label class="form-label" for="id_title"
+                        >Judul <span>*</span></label
+                      ><input
+                        id="id_title"
+                        class="form-control"
+                        formControlName="id_title"
+                        [class.is-invalid]="
+                          form.controls.id_title.touched &&
+                          form.controls.id_title.invalid
+                        "
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label" for="id_excerpt"
+                        >Ringkasan</label
+                      ><textarea
+                        id="id_excerpt"
+                        class="form-control"
+                        rows="3"
+                        formControlName="id_excerpt"
+                        placeholder="Ringkasan singkat untuk kartu dan daftar artikel"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label"
+                        >Isi artikel <span>*</span></label
+                      >
+                      @if (browser && idEditor) {
+                        <div
+                          class="article-rich-editor"
+                          [class.is-invalid]="
+                            form.controls.id_body.touched &&
+                            form.controls.id_body.invalid
+                          "
+                        >
+                          <ngx-editor-menu [editor]="idEditor" /><ngx-editor
+                            [editor]="idEditor"
+                            formControlName="id_body"
+                          />
+                        </div>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <div class="row g-4">
+                    <div class="col-md-5">
+                      <label class="form-label" for="en_slug"
+                        >URL slug <span>*</span></label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text">/en/article/</span
+                        ><input
+                          id="en_slug"
+                          class="form-control"
+                          formControlName="en_slug"
+                          [class.is-invalid]="
+                            form.controls.en_slug.touched &&
+                            form.controls.en_slug.invalid
+                          "
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-7">
+                      <label class="form-label" for="en_title"
+                        >Title <span>*</span></label
+                      ><input
+                        id="en_title"
+                        class="form-control"
+                        formControlName="en_title"
+                        [class.is-invalid]="
+                          form.controls.en_title.touched &&
+                          form.controls.en_title.invalid
+                        "
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label" for="en_excerpt">Excerpt</label
+                      ><textarea
+                        id="en_excerpt"
+                        class="form-control"
+                        rows="3"
+                        formControlName="en_excerpt"
+                        placeholder="Short summary for article cards and listings"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label"
+                        >Article body <span>*</span></label
+                      >
+                      @if (browser && enEditor) {
+                        <div
+                          class="article-rich-editor"
+                          [class.is-invalid]="
+                            form.controls.en_body.touched &&
+                            form.controls.en_body.invalid
+                          "
+                        >
+                          <ngx-editor-menu [editor]="enEditor" /><ngx-editor
+                            [editor]="enEditor"
+                            formControlName="en_body"
+                          />
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+                <div class="article-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('general')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali ke Umum</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('seo')"
+                  >
+                    Lanjut ke SEO <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
 
-  <div class="card mt-4">
-    <div class="card-body">
-      <h4>English</h4>
-      <div class="row g-3">
-        <div class="col-lg-5">
-          <app-form-fields label="URL slug" for="en_slug" [required]="true"
-            ><input class="form-control" formControlName="en_slug"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-7">
-          <app-form-fields label="Title" for="en_title" [required]="true"
-            ><input class="form-control" formControlName="en_title"
-          /></app-form-fields>
-        </div>
-      </div>
-      <app-form-fields label="Excerpt" for="en_excerpt">
-        <textarea
-          class="form-control"
-          rows="3"
-          formControlName="en_excerpt"
-        ></textarea>
-      </app-form-fields>
-      <app-form-fields label="Article body" for="en_body" [required]="true">
-        @if (browser && enEditor) {
-          <ngx-editor-menu [editor]="enEditor" /><ngx-editor
-            [editor]="enEditor"
-            formControlName="en_body"
-          />
-        }
-      </app-form-fields>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <app-form-fields label="SEO title" for="en_meta_title"
-            ><input class="form-control" formControlName="en_meta_title"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="Canonical URL" for="en_canonical_url"
-            ><input class="form-control" formControlName="en_canonical_url"
-          /></app-form-fields>
-        </div>
-      </div>
-      <app-form-fields label="SEO description" for="en_meta_description">
-        <textarea
-          class="form-control"
-          rows="2"
-          formControlName="en_meta_description"
-        ></textarea>
-      </app-form-fields>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <app-form-fields label="OG title" for="en_og_title"
-            ><input class="form-control" formControlName="en_og_title"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields label="OG description" for="en_og_description"
-            ><input class="form-control" formControlName="en_og_description"
-          /></app-form-fields>
-        </div>
-      </div>
-    </div>
-  </div>
+          <li [ngbNavItem]="'seo'">
+            <button ngbNavLink type="button">
+              <i class="ri-search-eye-line"></i> SEO
+            </button>
+            <ng-template ngbNavContent>
+              <section class="article-panel">
+                <div class="article-heading">
+                  <h5>SEO & tampilan saat dibagikan</h5>
+                  <p>
+                    Semua field di bagian ini opsional. Jika kosong, judul dan
+                    ringkasan artikel akan digunakan.
+                  </p>
+                </div>
+                <div class="article-language-tabs">
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'id'"
+                    (click)="activeLocale = 'id'"
+                  >
+                    <strong>ID</strong> Bahasa Indonesia
+                  </button>
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'en'"
+                    (click)="activeLocale = 'en'"
+                  >
+                    <strong>EN</strong> English
+                  </button>
+                </div>
+                @if (activeLocale === 'id') {
+                  <div class="row g-4">
+                    <div class="col-md-6">
+                      <label class="form-label">Judul SEO</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_meta_title"
+                        placeholder="Kosongkan untuk memakai judul artikel"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Canonical URL</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_canonical_url"
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Deskripsi SEO</label
+                      ><textarea
+                        class="form-control"
+                        rows="3"
+                        formControlName="id_meta_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Judul saat dibagikan</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_og_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Deskripsi saat dibagikan</label
+                      ><textarea
+                        class="form-control"
+                        rows="2"
+                        formControlName="id_og_description"
+                      ></textarea>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="row g-4">
+                    <div class="col-md-6">
+                      <label class="form-label">SEO title</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_meta_title"
+                        placeholder="Leave blank to use the article title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Canonical URL</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_canonical_url"
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">SEO description</label
+                      ><textarea
+                        class="form-control"
+                        rows="3"
+                        formControlName="en_meta_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Social sharing title</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_og_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label"
+                        >Social sharing description</label
+                      ><textarea
+                        class="form-control"
+                        rows="2"
+                        formControlName="en_og_description"
+                      ></textarea>
+                    </div>
+                  </div>
+                }
+                <div class="article-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('content')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali ke Konten</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('media')"
+                  >
+                    Lanjut ke Media <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
 
-  <div class="card mt-4">
-    <div class="card-body">
-      <h4>Media</h4>
-      <div class="row g-4">
-        <div class="col-lg-6">
-          <app-form-fields
-            label="Gambar utama"
-            for="thumbnail_id"
-            [required]="true"
-            ><app-image-upload
-              [multipleImage]="false"
-              [accept]="[mediaConfig.image]"
-              [image]="article?.thumbnail ?? null"
-              (selectedFiles)="media('thumbnail_id', $event)"
-          /></app-form-fields>
-        </div>
-        <div class="col-lg-6">
-          <app-form-fields
-            label="Gambar berbagi sosial (opsional)"
-            for="og_image_id"
-            ><app-image-upload
-              [multipleImage]="false"
-              [accept]="[mediaConfig.image]"
-              [image]="article?.og_image ?? null"
-              (selectedFiles)="media('og_image_id', $event)"
-          /></app-form-fields>
-        </div>
+          <li [ngbNavItem]="'media'">
+            <button ngbNavLink type="button">
+              <i class="ri-image-line"></i> Media
+            </button>
+            <ng-template ngbNavContent>
+              <section class="article-panel">
+                <div class="article-heading">
+                  <h5>Media artikel</h5>
+                  <p>
+                    Pilih gambar utama untuk daftar dan detail artikel. Gambar
+                    berbagi sosial dapat memakai gambar berbeda.
+                  </p>
+                </div>
+                <div class="row g-4">
+                  <div class="col-lg-6">
+                    <div
+                      class="article-media-box"
+                      [class.is-invalid]="
+                        form.controls.thumbnail_id.touched &&
+                        form.controls.thumbnail_id.invalid
+                      "
+                    >
+                      <label class="form-label"
+                        >Gambar utama <span>*</span></label
+                      ><small
+                        >Ditampilkan pada kartu, daftar, dan bagian atas
+                        artikel.</small
+                      ><app-image-upload
+                        [multipleImage]="false"
+                        [accept]="[mediaConfig.image]"
+                        [image]="article?.thumbnail ?? null"
+                        (selectedFiles)="media('thumbnail_id', $event)"
+                      />
+                    </div>
+                    @if (
+                      form.controls.thumbnail_id.touched &&
+                      form.controls.thumbnail_id.invalid
+                    ) {
+                      <div class="text-danger mt-2">
+                        Gambar utama wajib dipilih.
+                      </div>
+                    }
+                  </div>
+                  <div class="col-lg-6">
+                    <div class="article-media-box">
+                      <label class="form-label">Gambar berbagi sosial</label
+                      ><small
+                        >Opsional. Dipakai saat tautan dibagikan ke WhatsApp dan
+                        media sosial.</small
+                      ><app-image-upload
+                        [multipleImage]="false"
+                        [accept]="[mediaConfig.image]"
+                        [image]="article?.og_image ?? null"
+                        (selectedFiles)="media('og_image_id', $event)"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="article-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('seo')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali ke SEO</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('publication')"
+                  >
+                    Lanjut ke Publikasi <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
+
+          <li [ngbNavItem]="'publication'">
+            <button ngbNavLink type="button">
+              <i class="ri-send-plane-line"></i> Publikasi
+            </button>
+            <ng-template ngbNavContent>
+              <section class="article-panel">
+                <div class="article-heading">
+                  <h5>Publikasi artikel</h5>
+                  <p>
+                    Tentukan kapan artikel tersedia untuk pengunjung. Artikel
+                    tetap dapat disimpan sebagai draf.
+                  </p>
+                </div>
+                <div class="article-publication-options">
+                  <label [class.active]="form.controls.status.value === 'draft'"
+                    ><input
+                      type="radio"
+                      formControlName="status"
+                      value="draft"
+                      (change)="selectStatus('draft')"
+                    /><span
+                      ><strong>Simpan sebagai Draf</strong
+                      ><small
+                        >Artikel belum ditampilkan kepada pengunjung.</small
+                      ></span
+                    ></label
+                  >
+                  <label
+                    [class.active]="form.controls.status.value === 'published'"
+                    ><input
+                      type="radio"
+                      formControlName="status"
+                      value="published"
+                      (change)="selectStatus('published')"
+                    /><span
+                      ><strong>Publikasikan Sekarang</strong
+                      ><small
+                        >Artikel tersedia setelah perubahan disimpan.</small
+                      ></span
+                    ></label
+                  >
+                  <label
+                    [class.active]="form.controls.status.value === 'scheduled'"
+                    ><input
+                      type="radio"
+                      formControlName="status"
+                      value="scheduled"
+                      (change)="selectStatus('scheduled')"
+                    /><span
+                      ><strong>Jadwalkan Publikasi</strong
+                      ><small
+                        >Tentukan tanggal dan waktu artikel mulai tampil.</small
+                      ></span
+                    ></label
+                  >
+                  <label
+                    class="danger"
+                    [class.active]="form.controls.status.value === 'archived'"
+                    ><input
+                      type="radio"
+                      formControlName="status"
+                      value="archived"
+                      (change)="selectStatus('archived')"
+                    /><span
+                      ><strong>Arsipkan</strong
+                      ><small
+                        >Sembunyikan artikel dari situs publik.</small
+                      ></span
+                    ></label
+                  >
+                </div>
+                @if (form.controls.status.value === 'scheduled') {
+                  <div class="article-schedule-card">
+                    <h6>Mulai tayang</h6>
+                    <div class="row g-3">
+                      <div class="col-md-7">
+                        <label class="form-label">Tanggal <span>*</span></label>
+                        <div ngbDropdown class="article-date-dropdown">
+                          <button
+                            type="button"
+                            ngbDropdownToggle
+                            class="article-date-toggle"
+                            [class.is-invalid]="scheduledDateInvalid"
+                          >
+                            <span>{{ dateLabel(publishDate) }}</span
+                            ><i class="ri-calendar-line"></i>
+                          </button>
+                          <div ngbDropdownMenu>
+                            <ngb-datepicker
+                              [(ngModel)]="publishDate"
+                              [ngModelOptions]="{ standalone: true }"
+                              (dateSelect)="syncSchedule()"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-5">
+                        <label class="form-label">Waktu <span>*</span></label>
+                        <div
+                          class="article-timepicker"
+                          [class.is-invalid]="scheduledDateInvalid"
+                        >
+                          <ngb-timepicker
+                            [(ngModel)]="publishTime"
+                            [ngModelOptions]="{ standalone: true }"
+                            [spinners]="true"
+                            (ngModelChange)="syncSchedule()"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    @if (scheduledDateInvalid) {
+                      <div class="text-danger mt-2">
+                        Tanggal dan waktu mulai tayang wajib diisi.
+                      </div>
+                    }
+                  </div>
+                }
+                <div class="article-schedule-card">
+                  <div
+                    class="d-flex align-items-center justify-content-between mb-3"
+                  >
+                    <div>
+                      <h6 class="mb-1">Berhenti tayang</h6>
+                      <small class="text-muted"
+                        >Opsional. Artikel otomatis disembunyikan setelah waktu
+                        ini.</small
+                      >
+                    </div>
+                    @if (unpublishDate || unpublishTime) {
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-light"
+                        (click)="clearUnpublish()"
+                      >
+                        Hapus jadwal
+                      </button>
+                    }
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-7">
+                      <label class="form-label">Tanggal</label>
+                      <div ngbDropdown class="article-date-dropdown">
+                        <button
+                          type="button"
+                          ngbDropdownToggle
+                          class="article-date-toggle"
+                        >
+                          <span>{{ dateLabel(unpublishDate) }}</span
+                          ><i class="ri-calendar-line"></i>
+                        </button>
+                        <div ngbDropdownMenu>
+                          <ngb-datepicker
+                            [(ngModel)]="unpublishDate"
+                            [ngModelOptions]="{ standalone: true }"
+                            (dateSelect)="syncSchedule()"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label">Waktu</label>
+                      <div class="article-timepicker">
+                        <ngb-timepicker
+                          [(ngModel)]="unpublishTime"
+                          [ngModelOptions]="{ standalone: true }"
+                          [spinners]="true"
+                          (ngModelChange)="syncSchedule()"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="article-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('media')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali ke Media</button
+                  ><app-button id="article_save">{{
+                    type() === 'create' ? 'Simpan Artikel' : 'Perbarui Artikel'
+                  }}</app-button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
+        </ul>
       </div>
+      <div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
     </div>
-  </div>
-  <div class="mt-4">
-    <app-button id="article_save">{{
-      type() === 'create' ? 'Simpan Artikel' : 'Perbarui Artikel'
-    }}</app-button>
   </div>
 </form>

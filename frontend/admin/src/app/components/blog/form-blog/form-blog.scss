@@ -1,0 +1,295 @@
+.article-panel {
+  padding: 24px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.article-heading {
+  margin-bottom: 24px;
+
+  h5 {
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0;
+    color: #777;
+  }
+}
+
+.form-label {
+  margin-bottom: 8px;
+  font-weight: 600;
+
+  span {
+    color: var(--theme-color);
+  }
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+  min-height: 46px;
+}
+
+.article-checks {
+  display: grid;
+  gap: 10px;
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  input {
+    margin-top: 4px;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    margin-top: 2px;
+    color: #777;
+  }
+}
+
+.article-language-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+
+  button {
+    padding: 11px 18px;
+    background: #f7f7f7;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    color: #444;
+  }
+
+  button.active {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #fff;
+  }
+
+  strong {
+    margin-right: 6px;
+  }
+
+  span {
+    margin-left: 8px;
+    font-size: 11px;
+    opacity: 0.8;
+  }
+}
+
+.article-rich-editor {
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+}
+
+:host ::ng-deep .article-rich-editor {
+  .NgxEditor__MenuBar {
+    border: 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .NgxEditor {
+    min-height: 300px;
+    border: 0;
+  }
+
+  .NgxEditor__Content {
+    min-height: 300px;
+    padding: 16px;
+  }
+}
+
+.article-media-box {
+  height: 100%;
+  padding: 18px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+
+  > small {
+    display: block;
+    margin: -3px 0 16px;
+    color: #777;
+  }
+}
+
+.article-publication-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  label:hover,
+  label.active {
+    border-color: var(--theme-color);
+  }
+
+  label.active {
+    background: rgba(var(--theme-color-rgb), 0.05);
+  }
+
+  label.danger.active {
+    border-color: var(--bs-danger);
+  }
+
+  input {
+    margin-top: 4px;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    margin-top: 4px;
+    color: #777;
+  }
+}
+
+.article-schedule-card {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.article-date-dropdown {
+  width: 100%;
+}
+
+.article-date-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  background: #f8f8f8;
+  border: 1px solid #efefef;
+  border-radius: 4px;
+  color: #444;
+  text-align: left;
+
+  &::after {
+    display: none;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: var(--theme-color);
+  }
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+}
+
+.article-timepicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 112px;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border: 1px solid #efefef;
+  border-radius: 4px;
+
+  &.is-invalid {
+    border-color: var(--bs-danger);
+  }
+}
+
+:host ::ng-deep .article-timepicker {
+  .btn-link,
+  .ngb-tp-chevron {
+    color: var(--theme-color) !important;
+  }
+}
+
+.article-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+:host-context(body.dark-only) {
+  .article-panel,
+  .article-checks label,
+  .article-media-box,
+  .article-schedule-card,
+  .article-publication-options label,
+  .article-language-tabs,
+  .article-actions {
+    border-color: #404040;
+  }
+
+  .article-language-tabs button,
+  .article-date-toggle,
+  .article-timepicker {
+    background: #262626;
+    border-color: #404040;
+    color: #ddd;
+  }
+}
+
+@media (max-width: 767px) {
+  .article-panel {
+    padding: 18px;
+  }
+
+  .article-publication-options {
+    grid-template-columns: 1fr;
+  }
+
+  .article-language-tabs {
+    flex-direction: column;
+  }
+
+  .article-actions {
+    flex-direction: column-reverse;
+
+    .btn,
+    app-button {
+      width: 100%;
+    }
+  }
+}

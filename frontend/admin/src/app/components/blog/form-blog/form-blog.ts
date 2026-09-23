@@ -1,12 +1,21 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, inject, input, PLATFORM_ID } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+  NgbDateStruct,
+  NgbModule,
+  NgbTimeStruct,
+} from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Editor, NgxEditorModule } from 'ngx-editor';
 import { Button } from '../../../shared/components/ui/button/button';
-import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import { mediaConfig } from '../../../shared/data/media-config';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
@@ -28,9 +37,10 @@ import { BlogState } from '../../../shared/store/state/blog.state';
   imports: [
     CommonModule,
     TranslateModule,
+    FormsModule,
     ReactiveFormsModule,
+    NgbModule,
     NgxEditorModule,
-    FormFields,
     ImageUpload,
     Button,
   ],
@@ -49,6 +59,12 @@ export class FormBlog {
   article: IArticleDetail | null = null;
   idEditor?: Editor;
   enEditor?: Editor;
+  activeTab = 'general';
+  activeLocale: 'id' | 'en' = 'id';
+  publishDate: NgbDateStruct | null = null;
+  publishTime: NgbTimeStruct | null = null;
+  unpublishDate: NgbDateStruct | null = null;
+  unpublishTime: NgbTimeStruct | null = null;
   readonly form = this.fb.group({
     key: [
       '',
@@ -121,6 +137,8 @@ export class FormBlog {
           en_og_title: en?.og_title,
           en_og_description: en?.og_description,
         });
+        this.patchSchedule('publish', a.published_at);
+        this.patchSchedule('unpublish', a.unpublished_at);
       });
   }
   private localDate(value?: string | null) {
@@ -128,6 +146,48 @@ export class FormBlog {
   }
   media(control: 'thumbnail_id' | 'og_image_id', data: IAttachment) {
     this.form.controls[control].setValue(data?.id_attachment ?? '');
+    this.form.controls[control].markAsTouched();
+  }
+  setTab(tab: 'general' | 'content' | 'seo' | 'media' | 'publication') {
+    this.activeTab = tab;
+    if (this.browser) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  selectStatus(status: ArticleStatus) {
+    this.form.controls.status.setValue(status);
+    if (status === 'scheduled' && !this.publishDate) {
+      const date = new Date();
+      date.setMinutes(Math.ceil((date.getMinutes() + 1) / 5) * 5, 0, 0);
+      this.publishDate = this.dateToStruct(date);
+      this.publishTime = {
+        hour: date.getHours(),
+        minute: date.getMinutes(),
+        second: 0,
+      };
+      this.syncSchedule();
+    }
+  }
+  syncSchedule() {
+    this.form.controls.published_at.setValue(
+      this.composeDateTime(this.publishDate, this.publishTime),
+    );
+    this.form.controls.unpublished_at.setValue(
+      this.composeDateTime(this.unpublishDate, this.unpublishTime),
+    );
+  }
+  clearUnpublish() {
+    this.unpublishDate = null;
+    this.unpublishTime = null;
+    this.syncSchedule();
+  }
+  dateLabel(value: NgbDateStruct | null) {
+    if (!value) return 'Pilih tanggal';
+    return `${String(value.day).padStart(2, '0')}/${String(value.month).padStart(2, '0')}/${value.year}`;
+  }
+  get scheduledDateInvalid() {
+    return (
+      this.form.controls.status.value === 'scheduled' &&
+      (!this.publishDate || !this.publishTime)
+    );
   }
   private translation(
     locale: 'id-ID' | 'en-US',
@@ -150,8 +210,12 @@ export class FormBlog {
     };
   }
   submit() {
+    this.syncSchedule();
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.scheduledDateInvalid) {
+      this.activeTab = this.firstInvalidTab();
+      return;
+    }
     const v = this.form.getRawValue() as any;
     const payload: IArticlePayload = {
       key: v.key,
@@ -173,6 +237,52 @@ export class FormBlog {
     this.store
       .dispatch(action)
       .subscribe({ complete: () => void this.router.navigateByUrl('/blog') });
+  }
+  private firstInvalidTab() {
+    if (this.form.controls.key.invalid) return 'general';
+    if (
+      this.form.controls.id_slug.invalid ||
+      this.form.controls.id_title.invalid ||
+      this.form.controls.id_body.invalid ||
+      this.form.controls.en_slug.invalid ||
+      this.form.controls.en_title.invalid ||
+      this.form.controls.en_body.invalid
+    )
+      return 'content';
+    if (this.form.controls.thumbnail_id.invalid) return 'media';
+    return 'publication';
+  }
+  private patchSchedule(type: 'publish' | 'unpublish', value?: string | null) {
+    if (!value) return;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return;
+    const dateValue = this.dateToStruct(date);
+    const timeValue: NgbTimeStruct = {
+      hour: date.getHours(),
+      minute: date.getMinutes(),
+      second: 0,
+    };
+    if (type === 'publish') {
+      this.publishDate = dateValue;
+      this.publishTime = timeValue;
+    } else {
+      this.unpublishDate = dateValue;
+      this.unpublishTime = timeValue;
+    }
+  }
+  private composeDateTime(
+    date: NgbDateStruct | null,
+    time: NgbTimeStruct | null,
+  ) {
+    if (!date || !time) return '';
+    return `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}T${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
+  }
+  private dateToStruct(date: Date): NgbDateStruct {
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    };
   }
   ngOnDestroy() {
     this.idEditor?.destroy();
