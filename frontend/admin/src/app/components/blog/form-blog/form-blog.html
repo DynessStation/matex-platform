@@ -1,164 +1,221 @@
-<form class="theme-form theme-form-2 mega-form" [formGroup]="form" (ngSubmit)="submit()">
-  <app-form-fields [label]="'title'" [for]="'title'" [required]="true">
-    <input
-      class="form-control"
-      type="text"
-      placeholder="{{ 'enter_blog_title' | translate }}"
-      name="title"
-      formControlName="title"
-    />
-    @if(form.controls['title'].touched && form.controls['title'].errors?.['required']){
-    <div class="invalid-feedback">{{ 'title_is_required' | translate }}</div>
-    }
-  </app-form-fields>
-
-  <app-form-fields [label]="'description'" [for]="'desc'" [required]="false">
-    <textarea
-      class="form-control"
-      placeholder="{{ 'enter_blog_description' | translate }}"
-      formControlName="description"
-      rows="3"
-    ></textarea>
-  </app-form-fields>
-
-  <app-form-fields [label]="'content'" [for]="'content'" [required]="false">
-    <div class="custom-editor editor-checkbox">
-      <div class="form-check form-switch">
-        <input
-          class="form-check-input"
-          id="ckcheck"
-          type="checkbox"
-          name="isCodeEditor"
-          [(ngModel)]="isCodeEditor"
-          [ngModelOptions]="{standalone: true}"
-        />
-        <label for="ckcheck" class="cursor-pointer">
-          <span class="edit">
-            <i class="ri-edit-box-line"></i>
-          </span>
-          <span class="code">
-            <i class="ri-code-s-slash-line"></i>
-          </span>
-        </label>
+<form
+  class="theme-form theme-form-2 mega-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <div class="card">
+    <div class="card-body">
+      <h4>Pengaturan Artikel</h4>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-form-fields label="Kunci internal" for="key" [required]="true"
+            ><input
+              class="form-control"
+              id="key"
+              formControlName="key"
+              placeholder="contoh: manfaat-latex-alami"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-3">
+          <app-form-fields label="Status" for="status" [required]="true"
+            ><select class="form-select" id="status" formControlName="status">
+              <option value="draft">Draft</option>
+              <option value="published">Dipublikasikan</option>
+              <option value="scheduled">Terjadwal</option>
+              <option value="archived">Diarsipkan</option>
+            </select></app-form-fields
+          >
+        </div>
+        <div class="col-lg-3 d-flex gap-3 align-items-center">
+          <label
+            ><input type="checkbox" formControlName="is_featured" />
+            Unggulan</label
+          ><label
+            ><input type="checkbox" formControlName="is_sticky" />
+            Sematkan</label
+          >
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="Mulai tayang" for="published_at"
+            ><input
+              class="form-control"
+              type="datetime-local"
+              formControlName="published_at"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="Berhenti tayang" for="unpublished_at"
+            ><input
+              class="form-control"
+              type="datetime-local"
+              formControlName="unpublished_at"
+          /></app-form-fields>
+        </div>
       </div>
-      <div [ngClass]="!isCodeEditor ? 'd-none' : 'd-block'">
-        @if(isBrowser) {
-        <ngx-editor-menu [editor]="editor" />
-        <ngx-editor
-          [editor]="editor"
-          [placeholder]="'Type here...'"
-          formControlName="content"
-          [(ngModel)]="html"
-          (ngModelChange)="getData($event)"
-        />
-        }
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4>Bahasa Indonesia</h4>
+      <div class="row g-3">
+        <div class="col-lg-5">
+          <app-form-fields label="Slug URL" for="id_slug" [required]="true"
+            ><input class="form-control" formControlName="id_slug"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-7">
+          <app-form-fields label="Judul" for="id_title" [required]="true"
+            ><input class="form-control" formControlName="id_title"
+          /></app-form-fields>
+        </div>
       </div>
-      <div class="editor-textarea" [ngClass]="isCodeEditor ? 'd-none' : 'd-block'">
+      <app-form-fields label="Ringkasan" for="id_excerpt">
         <textarea
           class="form-control"
-          id="content"
-          placeholder="{{ 'enter_html_content' | translate }}"
           rows="3"
-          [formControl]="textArea"
-          (keyup)="getText($event)"
+          formControlName="id_excerpt"
         ></textarea>
-        <p class="mt-2">*{{'only_accept_html_tags' | translate}}</p>
+      </app-form-fields>
+      <app-form-fields label="Isi artikel" for="id_body" [required]="true">
+        @if (browser && idEditor) {
+          <ngx-editor-menu [editor]="idEditor" /><ngx-editor
+            [editor]="idEditor"
+            formControlName="id_body"
+          />
+        }
+      </app-form-fields>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-form-fields label="Judul SEO" for="id_meta_title"
+            ><input class="form-control" formControlName="id_meta_title"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="Canonical URL" for="id_canonical_url"
+            ><input class="form-control" formControlName="id_canonical_url"
+          /></app-form-fields>
+        </div>
+      </div>
+      <app-form-fields label="Deskripsi SEO" for="id_meta_description">
+        <textarea
+          class="form-control"
+          rows="2"
+          formControlName="id_meta_description"
+        ></textarea>
+      </app-form-fields>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-form-fields label="Judul OG" for="id_og_title"
+            ><input class="form-control" formControlName="id_og_title"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="Deskripsi OG" for="id_og_description"
+            ><input class="form-control" formControlName="id_og_description"
+          /></app-form-fields>
+        </div>
       </div>
     </div>
-  </app-form-fields>
+  </div>
 
-  <app-form-fields [label]="'thumbnail'" [for]="'image'" [required]="true">
-    <app-image-upload
-      [multipleImage]="false"
-      [accept]="[mediaConfig.image]"
-      [image]="(blog$ | async)?.blog_thumbnail"
-      (selectedFiles)="selectThumbnail($event)"
-    />
-
-    @if(form.controls['blog_thumbnail_id'].touched &&
-    form.controls['blog_thumbnail_id'].errors?.['required']){
-    <div class="invalid-feedback">{{ 'thumbnail_is_required' | translate }}</div>
-    }
-  </app-form-fields>
-
-  <app-form-fields [label]="'select_categories'" [for]="'category'" [required]="true">
-    <app-advance-dropdown
-      [position]="'top'"
-      [selectedOption]="selectedCategories"
-      [options]="(category$ | async )?.data?.length ? (category$ | async )?.data : []"
-      [subArrayKey]="'subcategories'"
-      (selectedItem)="selectCategoryItem($event)"
-    />
-
-    @if(form.controls['categories'].touched && form.controls['categories'].errors?.['required']){
-    <div class="invalid-feedback">{{ 'select_category_is_required' | translate }}</div>
-    }
-  </app-form-fields>
-
-  <app-form-fields [label]="'select_tags'" [for]="'tag'" [required]="false">
-    <app-advance-dropdown
-      [position]="'top'"
-      [selectedOption]="selectedTags"
-      [options]="(tag$ | async )?.data?.length ? (tag$ | async )?.data : []"
-      (selectedItem)="selectTagItem($event)"
-    />
-  </app-form-fields>
-
-  <app-form-fields [label]="'featured'" [for]="'is_featured'" [required]="false">
-    <div class="form-check form-switch ps-0">
-      <label class="switch">
-        <input type="checkbox" id="is_featured" formControlName="is_featured" />
-        <span class="switch-state"></span>
-      </label>
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4>English</h4>
+      <div class="row g-3">
+        <div class="col-lg-5">
+          <app-form-fields label="URL slug" for="en_slug" [required]="true"
+            ><input class="form-control" formControlName="en_slug"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-7">
+          <app-form-fields label="Title" for="en_title" [required]="true"
+            ><input class="form-control" formControlName="en_title"
+          /></app-form-fields>
+        </div>
+      </div>
+      <app-form-fields label="Excerpt" for="en_excerpt">
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="en_excerpt"
+        ></textarea>
+      </app-form-fields>
+      <app-form-fields label="Article body" for="en_body" [required]="true">
+        @if (browser && enEditor) {
+          <ngx-editor-menu [editor]="enEditor" /><ngx-editor
+            [editor]="enEditor"
+            formControlName="en_body"
+          />
+        }
+      </app-form-fields>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-form-fields label="SEO title" for="en_meta_title"
+            ><input class="form-control" formControlName="en_meta_title"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="Canonical URL" for="en_canonical_url"
+            ><input class="form-control" formControlName="en_canonical_url"
+          /></app-form-fields>
+        </div>
+      </div>
+      <app-form-fields label="SEO description" for="en_meta_description">
+        <textarea
+          class="form-control"
+          rows="2"
+          formControlName="en_meta_description"
+        ></textarea>
+      </app-form-fields>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-form-fields label="OG title" for="en_og_title"
+            ><input class="form-control" formControlName="en_og_title"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields label="OG description" for="en_og_description"
+            ><input class="form-control" formControlName="en_og_description"
+          /></app-form-fields>
+        </div>
+      </div>
     </div>
-  </app-form-fields>
+  </div>
 
-  <app-form-fields [label]="'sticky'" [for]="'is_sticky'" [required]="false">
-    <div class="form-check form-switch ps-0">
-      <label class="switch">
-        <input type="checkbox" id="is_sticky" formControlName="is_sticky" />
-        <span class="switch-state"></span>
-      </label>
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4>Media</h4>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <app-form-fields
+            label="Gambar utama"
+            for="thumbnail_id"
+            [required]="true"
+            ><app-image-upload
+              [multipleImage]="false"
+              [accept]="[mediaConfig.image]"
+              [image]="article?.thumbnail ?? null"
+              (selectedFiles)="media('thumbnail_id', $event)"
+          /></app-form-fields>
+        </div>
+        <div class="col-lg-6">
+          <app-form-fields
+            label="Gambar berbagi sosial (opsional)"
+            for="og_image_id"
+            ><app-image-upload
+              [multipleImage]="false"
+              [accept]="[mediaConfig.image]"
+              [image]="article?.og_image ?? null"
+              (selectedFiles)="media('og_image_id', $event)"
+          /></app-form-fields>
+        </div>
+      </div>
     </div>
-  </app-form-fields>
-
-  <app-form-fields [label]="'meta_title'" [for]="'meta_title'" [required]="false">
-    <input
-      class="form-control"
-      type="text"
-      placeholder="{{ 'enter_meta_title' | translate }}"
-      formControlName="meta_title"
-    />
-  </app-form-fields>
-
-  <app-form-fields [label]="'meta_description'" [for]="'meta_description'" [required]="false">
-    <textarea
-      class="form-control"
-      placeholder="{{ 'enter_meta_description' | translate }}"
-      formControlName="meta_description"
-      rows="3"
-    ></textarea>
-  </app-form-fields>
-
-  <app-form-fields [label]="'meta_image'" [for]="'meta_image'" [required]="false">
-    <app-image-upload
-      [accept]="[mediaConfig.image]"
-      [multipleImage]="false"
-      [image]="(blog$ | async)?.blog_meta_image"
-      (selectedFiles)="selectMetaImage($event)"
-    />
-  </app-form-fields>
-
-  <app-form-fields [label]="'status'" [for]="'status'" [required]="false">
-    <div class="form-check form-switch ps-0">
-      <label class="switch">
-        <input type="checkbox" id="status" formControlName="status" />
-        <span class="switch-state"></span>
-      </label>
-    </div>
-  </app-form-fields>
-
-  <app-button [id]="'blog_btn'">
-    {{ (type() === 'create' ? 'save_blog' : 'update_blog') | translate }}
-  </app-button>
+  </div>
+  <div class="mt-4">
+    <app-button id="article_save">{{
+      type() === 'create' ? 'Simpan Artikel' : 'Perbarui Artikel'
+    }}</app-button>
+  </div>
 </form>

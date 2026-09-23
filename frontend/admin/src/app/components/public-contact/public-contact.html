@@ -1,4 +1,7 @@
-<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'public_contact.title' | translate">
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'public_contact.title' | translate"
+>
   @if (loading) {
     <p>{{ 'loading' | translate }}...</p>
   } @else {
@@ -8,8 +11,14 @@
           <h4>{{ 'public_contact.channels' | translate }}</h4>
           <p>{{ 'public_contact.channels_help' | translate }}</p>
         </div>
-        <button type="button" class="btn btn-outline-theme" (click)="addChannel()" *hasPermission="'public_contact.update'">
-          <i class="ri-add-line"></i> {{ 'public_contact.add_channel' | translate }}
+        <button
+          type="button"
+          class="btn btn-outline-theme"
+          (click)="addChannel()"
+          *hasPermission="'public_contact.update'"
+        >
+          <i class="ri-add-line"></i>
+          {{ 'public_contact.add_channel' | translate }}
         </button>
       </div>
 
@@ -18,20 +27,100 @@
           <div class="card settings-card" [formGroupName]="index">
             <div class="card-body">
               <div class="card-heading">
-                <strong>{{ 'public_contact.channel' | translate }} {{ index + 1 }}</strong>
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="channels.removeAt(index)"><i class="ri-delete-bin-line"></i></button>
+                <strong
+                  >{{ 'public_contact.channel' | translate }}
+                  {{ index + 1 }}</strong
+                >
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="channels.removeAt(index)"
+                >
+                  <i class="ri-delete-bin-line"></i>
+                </button>
               </div>
               <div class="row g-3">
-                <div class="col-lg-4"><label>{{ 'public_contact.key' | translate }}</label><input class="form-control" formControlName="key" placeholder="whatsapp-sales" /></div>
-                <div class="col-lg-4"><label>{{ 'public_contact.type' | translate }}</label><select class="form-select" formControlName="type">@for (type of channelTypes; track type) {<option [value]="type">{{ type }}</option>}</select></div>
-                <div class="col-lg-4"><label>{{ 'public_contact.value' | translate }}</label><input class="form-control" formControlName="value" placeholder="+6285814180370" /></div>
-                <div class="col-lg-8"><label>{{ 'public_contact.url' | translate }}</label><input class="form-control" formControlName="url" placeholder="https://... (opsional)" /></div>
-                <div class="col-lg-2"><label>{{ 'public_contact.order' | translate }}</label><input class="form-control" type="number" min="0" formControlName="sort_order" /></div>
-                <div class="col-lg-2 checks"><label><input type="checkbox" formControlName="is_primary" /> {{ 'public_contact.primary' | translate }}</label><label><input type="checkbox" formControlName="is_public" /> {{ 'public_contact.public' | translate }}</label></div>
+                <div class="col-lg-4">
+                  <label>{{ 'public_contact.key' | translate }}</label
+                  ><input
+                    class="form-control"
+                    formControlName="key"
+                    placeholder="whatsapp-sales"
+                  />
+                </div>
+                <div class="col-lg-4">
+                  <label>{{ 'public_contact.type' | translate }}</label
+                  ><select class="form-select" formControlName="type">
+                    @for (type of channelTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-lg-4">
+                  <label>{{ 'public_contact.value' | translate }}</label
+                  ><input
+                    class="form-control"
+                    formControlName="value"
+                    placeholder="+6285814180370"
+                  />
+                </div>
+                <div class="col-lg-8">
+                  <label>{{ 'public_contact.url' | translate }}</label
+                  ><input
+                    class="form-control"
+                    formControlName="url"
+                    placeholder="https://... (opsional)"
+                    [readonly]="isDerivedChannel(channel.get('type')?.value)"
+                  /><small class="text-muted">
+                    @if (isDerivedChannel(channel.get('type')?.value)) {
+                      Tautan dibuat otomatis dari nilai kanal.
+                    }
+                  </small>
+                </div>
+                <div class="col-lg-2">
+                  <label>{{ 'public_contact.order' | translate }}</label
+                  ><input
+                    class="form-control"
+                    type="number"
+                    min="0"
+                    formControlName="sort_order"
+                  />
+                </div>
+                <div class="col-lg-2 checks">
+                  <label
+                    ><input type="checkbox" formControlName="is_primary" />
+                    {{ 'public_contact.primary' | translate }}</label
+                  ><label
+                    ><input type="checkbox" formControlName="is_public" />
+                    {{ 'public_contact.public' | translate }}</label
+                  >
+                </div>
               </div>
               <div formGroupName="translations" class="row g-3 language-row">
-                <div class="col-lg-6"><label>Label — Bahasa Indonesia</label><input class="form-control" formControlName="id_label" /><textarea class="form-control mt-2" rows="2" formControlName="id_description" placeholder="Keterangan opsional"></textarea></div>
-                <div class="col-lg-6"><label>Label — English</label><input class="form-control" formControlName="en_label" /><textarea class="form-control mt-2" rows="2" formControlName="en_description" placeholder="Optional description"></textarea></div>
+                <div class="col-lg-6">
+                  <label>Label — Bahasa Indonesia</label
+                  ><input
+                    class="form-control"
+                    formControlName="id_label"
+                  /><textarea
+                    class="form-control mt-2"
+                    rows="2"
+                    formControlName="id_description"
+                    placeholder="Keterangan opsional"
+                  ></textarea>
+                </div>
+                <div class="col-lg-6">
+                  <label>Label — English</label
+                  ><input
+                    class="form-control"
+                    formControlName="en_label"
+                  /><textarea
+                    class="form-control mt-2"
+                    rows="2"
+                    formControlName="en_description"
+                    placeholder="Optional description"
+                  ></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -39,29 +128,105 @@
       </div>
 
       <div class="settings-intro section-gap">
-        <div><h4>{{ 'public_contact.topics' | translate }}</h4><p>{{ 'public_contact.topics_help' | translate }}</p></div>
-        <button type="button" class="btn btn-outline-theme" (click)="addTopic()" *hasPermission="'public_contact.update'"><i class="ri-add-line"></i> {{ 'public_contact.add_topic' | translate }}</button>
+        <div>
+          <h4>{{ 'public_contact.topics' | translate }}</h4>
+          <p>{{ 'public_contact.topics_help' | translate }}</p>
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline-theme"
+          (click)="addTopic()"
+          *hasPermission="'public_contact.update'"
+        >
+          <i class="ri-add-line"></i>
+          {{ 'public_contact.add_topic' | translate }}
+        </button>
       </div>
       <div formArrayName="topics" class="settings-list">
+        @if (!topics.length) {
+          <div class="alert alert-warning">
+            Tambahkan minimal satu topik agar formulir kontak publik dapat
+            dikirim.
+          </div>
+        }
         @for (topic of topics.controls; track topic; let index = $index) {
-          <div class="card settings-card" [formGroupName]="index"><div class="card-body">
-            <div class="card-heading"><strong>{{ 'public_contact.topic' | translate }} {{ index + 1 }}</strong><button type="button" class="btn btn-sm btn-outline-danger" (click)="topics.removeAt(index)"><i class="ri-delete-bin-line"></i></button></div>
-            <div class="row g-3">
-              <div class="col-lg-4"><label>{{ 'public_contact.key' | translate }}</label><input class="form-control" formControlName="key" placeholder="general-inquiry" /></div>
-              <div class="col-lg-5"><label>{{ 'public_contact.recipient' | translate }}</label><input class="form-control" type="email" formControlName="recipient_email" /></div>
-              <div class="col-lg-2"><label>{{ 'public_contact.order' | translate }}</label><input class="form-control" type="number" min="0" formControlName="sort_order" /></div>
-              <div class="col-lg-1 checks"><label><input type="checkbox" formControlName="status" /> {{ 'public_contact.active' | translate }}</label></div>
+          <div class="card settings-card" [formGroupName]="index">
+            <div class="card-body">
+              <div class="card-heading">
+                <strong
+                  >{{ 'public_contact.topic' | translate }}
+                  {{ index + 1 }}</strong
+                ><button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="topics.removeAt(index)"
+                >
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+              <div class="row g-3">
+                <div class="col-lg-4">
+                  <label>{{ 'public_contact.key' | translate }}</label
+                  ><input
+                    class="form-control"
+                    formControlName="key"
+                    placeholder="general-inquiry"
+                  />
+                </div>
+                <div class="col-lg-5">
+                  <label>{{ 'public_contact.recipient' | translate }}</label
+                  ><input
+                    class="form-control"
+                    type="email"
+                    formControlName="recipient_email"
+                  />
+                </div>
+                <div class="col-lg-2">
+                  <label>{{ 'public_contact.order' | translate }}</label
+                  ><input
+                    class="form-control"
+                    type="number"
+                    min="0"
+                    formControlName="sort_order"
+                  />
+                </div>
+                <div class="col-lg-1 checks">
+                  <label
+                    ><input type="checkbox" formControlName="status" />
+                    {{ 'public_contact.active' | translate }}</label
+                  >
+                </div>
+              </div>
+              <div formGroupName="translations" class="row g-3 language-row">
+                <div class="col-lg-6">
+                  <label>Topik — Bahasa Indonesia</label
+                  ><input class="form-control" formControlName="id_label" />
+                </div>
+                <div class="col-lg-6">
+                  <label>Topic — English</label
+                  ><input class="form-control" formControlName="en_label" />
+                </div>
+              </div>
             </div>
-            <div formGroupName="translations" class="row g-3 language-row">
-              <div class="col-lg-6"><label>Topik — Bahasa Indonesia</label><input class="form-control" formControlName="id_label" /></div>
-              <div class="col-lg-6"><label>Topic — English</label><input class="form-control" formControlName="en_label" /></div>
-            </div>
-          </div></div>
+          </div>
         }
       </div>
 
-      <div class="office-note"><i class="ri-map-pin-line"></i><div><strong>{{ 'public_contact.locations' | translate }}</strong><p>{{ 'public_contact.locations_help' | translate }}</p><a routerLink="/office">{{ 'public_contact.manage_offices' | translate }} →</a></div></div>
-      <div *hasPermission="'public_contact.update'"><app-button [id]="'public_contact_save'">{{ 'public_contact.save' | translate }}</app-button></div>
+      <div class="office-note">
+        <i class="ri-map-pin-line"></i>
+        <div>
+          <strong>{{ 'public_contact.locations' | translate }}</strong>
+          <p>{{ 'public_contact.locations_help' | translate }}</p>
+          <a routerLink="/office"
+            >{{ 'public_contact.manage_offices' | translate }} →</a
+          >
+        </div>
+      </div>
+      <div *hasPermission="'public_contact.update'">
+        <app-button [id]="'public_contact_save'">{{
+          'public_contact.save' | translate
+        }}</app-button>
+      </div>
     </form>
   }
 </app-page-wrapper>

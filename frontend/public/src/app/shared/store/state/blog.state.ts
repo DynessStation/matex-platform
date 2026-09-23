@@ -63,7 +63,7 @@ export class BlogState {
   @Action(GetBlogsAction)
   getBlogs(ctx: StateContext<BlogStateModel>, action: GetBlogsAction) {
     this.blogService.skeletonLoader = true;
-    return this.blogService.getBlogs(action.payload).pipe(
+    return this.blogService.getBlogs(action.locale, action.payload).pipe(
       tap({
         next: (result) => {
           ctx.patchState({
@@ -84,18 +84,12 @@ export class BlogState {
   }
 
   @Action(GetBlogBySlugAction)
-  getBlogBySlug(ctx: StateContext<BlogStateModel>, { slug }: GetBlogBySlugAction) {
-    return this.blogService.getBlogs().pipe(
+  getBlogBySlug(ctx: StateContext<BlogStateModel>, action: GetBlogBySlugAction) {
+    const { slug } = action;
+    return this.blogService.getBlogBySlug(action.locale, slug).pipe(
       tap({
-        next: (results) => {
-          if (results && results.data) {
-            const state = ctx.getState();
-            const result = results.data.find((blog) => blog.slug == slug);
-            ctx.patchState({
-              ...state,
-              selectedBlog: result,
-            });
-          }
+        next: (result) => {
+          ctx.patchState({ selectedBlog: result });
         },
         error: (err) => {
           void this.router.navigate(['/404']);
@@ -107,7 +101,7 @@ export class BlogState {
 
   @Action(GetRecentBlogAction)
   getRecentBlogs(ctx: StateContext<BlogStateModel>, action: GetRecentBlogAction) {
-    return this.blogService.getBlogs(action.payload).pipe(
+    return this.blogService.getBlogs(action.locale, action.payload).pipe(
       tap({
         next: (result) => {
           ctx.patchState({
@@ -123,7 +117,7 @@ export class BlogState {
 
   @Action(GetSelectedBlogsAction)
   getSelectedBlogs(ctx: StateContext<BlogStateModel>, action: GetSelectedBlogsAction) {
-    return this.blogService.getBlogs(action.payload).pipe(
+    return this.blogService.getBlogs(action.locale, action.payload).pipe(
       tap({
         next: (result) => {
           ctx.patchState({

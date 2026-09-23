@@ -1,31 +1,55 @@
 import { IAttachment } from './attachment.interface';
-import { ICategory } from './category.interface';
-import { IPaginateModel } from './core.interface';
-import { ITag } from './tag.interface';
 
-export interface IBlogModel extends IPaginateModel {
-  data: IBlog[];
+export type ArticleStatus = 'draft' | 'published' | 'scheduled' | 'archived';
+export interface IArticleTranslation {
+  locale: 'id-ID' | 'en-US';
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  meta_title: string;
+  meta_description: string;
+  canonical_url: string;
+  og_title: string;
+  og_description: string;
+  schema_json: string;
+  status: 0 | 1;
 }
-
 export interface IBlog {
-  id: number;
+  id: string;
+  key: string;
   title: string;
   slug: string;
   description: string;
-  content: string;
-  status: boolean;
-  meta_title: string;
-  meta_description: string;
-  blog_thumbnail: IAttachment;
-  blog_thumbnail_id: number;
-  blog_meta_image_id: number;
-  blog_meta_image: IAttachment;
-  categories: ICategory[];
-  tags: ITag[];
+  status: ArticleStatus;
+  locale_status?: number;
   is_featured: boolean;
   is_sticky: boolean;
-  created_by_id: number;
+  published_at?: string | null;
+  unpublished_at?: string | null;
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string;
+  blog_thumbnail: IAttachment | null;
+}
+export interface IArticleDetail extends IBlog {
+  thumbnail: IAttachment | null;
+  og_image: IAttachment | null;
+  translations: IArticleTranslation[];
+}
+export interface IBlogModel {
+  data: IBlog[];
+  total: number;
+  current_page?: number;
+  per_page?: number;
+}
+export interface IArticlePayload {
+  key: string;
+  status: ArticleStatus;
+  is_featured: 0 | 1;
+  is_sticky: 0 | 1;
+  published_at: string | null;
+  unpublished_at: string | null;
+  thumbnail_id: string | null;
+  og_image_id: string | null;
+  translations: IArticleTranslation[];
 }

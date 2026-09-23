@@ -1,14 +1,30 @@
 <app-breadcrumb [breadcrumb]="breadcrumb" />
 
+@if ((totalItems$ | async) === 0) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <app-no-data
+        [class]="'no-data-added collection-no-data'"
+        [text]="locale === 'en-US' ? 'No articles yet' : 'Belum ada artikel'"
+        [description]="
+          locale === 'en-US'
+            ? 'Published articles will appear here.'
+            : 'Artikel yang sudah dipublikasikan akan tampil di sini.'
+        "
+      />
+    </div>
+  </section>
+}
+
 @if (style === 'blog_no_sidebar') {
   <section class="blog-section section-t-space">
     <div class="custom-container">
       <div class="row g-sm-4 g-3">
-        @for (blog of (paginateBlog$ | async); track blog.id) {
+        @for (blog of paginateBlog$ | async; track blog.id) {
           <div class="col-xl-4 col-md-6">
             <div class="blog-box h-100 sticky-blog-box">
               <div class="blog-image">
-                <a [routerLink]="['/blog/', blog?.slug]">
+                <a [routerLink]="[detailBase, blog?.slug]">
                   <img
                     [src]="
                       blog?.blog_thumbnail
@@ -24,14 +40,14 @@
                   <i class="ri-pushpin-fill pinned"></i>
                 }
                 <div class="blog-profile-box">
-                  <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                  <a [routerLink]="[detailBase, blog?.slug]" class="blog-image">
                     @if (blog?.created_by?.profile_image) {
                       <img class="img-fluid" [src]="blog.created_by.profile_image" alt="user" />
                     } @else {
                       <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
                     }
                   </a>
-                  <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                  <a [routerLink]="[detailBase, blog?.slug]" class="blog-name">
                     <h5 class="name">{{ blog.created_by.name }}</h5>
                     <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
                   </a>
@@ -39,7 +55,7 @@
               </div>
 
               <div class="blog-contain">
-                <a [routerLink]="['/blog/', blog?.slug]">
+                <a [routerLink]="[detailBase, blog?.slug]">
                   <h3>{{ blog.title }}</h3>
                   <i class="ri-arrow-right-up-line"></i>
                 </a>
@@ -90,7 +106,7 @@
               'g-4': style === 'blog_3_grid',
             }"
           >
-            @for (blog of (paginateBlog$ | async); track blog.id) {
+            @for (blog of paginateBlog$ | async; track blog.id) {
               <div
                 [ngClass]="{
                   'col-xxl-4 col-xl-6 col-lg-4': style === 'blog_3_grid',
@@ -100,7 +116,7 @@
               >
                 <div class="blog-box h-100 sticky-blog-box">
                   <div class="blog-image">
-                    <a [routerLink]="['/blog/', blog?.slug]">
+                    <a [routerLink]="[detailBase, blog?.slug]">
                       <img
                         [src]="
                           blog?.blog_thumbnail
@@ -117,7 +133,7 @@
                     }
                     @if (style !== 'blog_list') {
                       <div class="blog-profile-box">
-                        <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                        <a [routerLink]="[detailBase, blog?.slug]" class="blog-image">
                           @if (blog?.created_by?.profile_image) {
                             <img
                               class="img-fluid"
@@ -128,7 +144,7 @@
                             <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
                           }
                         </a>
-                        <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                        <a [routerLink]="[detailBase, blog?.slug]" class="blog-name">
                           <h5 class="name">{{ blog.created_by.name }}</h5>
                           <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
                         </a>
@@ -137,7 +153,7 @@
                   </div>
 
                   <div class="blog-contain">
-                    <a [routerLink]="['/blog/', blog?.slug]">
+                    <a [routerLink]="[detailBase, blog?.slug]">
                       <h3>{{ blog.title }}</h3>
                       <i class="ri-arrow-right-up-line"></i>
                     </a>
@@ -145,7 +161,7 @@
                     @if (style === 'blog_list') {
                       <div class="blog-bottom-box">
                         <div class="blog-profile-box">
-                          <a [routerLink]="['/blog/', blog?.slug]" class="blog-image">
+                          <a [routerLink]="[detailBase, blog?.slug]" class="blog-image">
                             @if (blog?.created_by?.profile_image) {
                               <img
                                 class="img-fluid"
@@ -156,12 +172,12 @@
                               <span class="name">{{ blog?.title?.charAt(0)?.toUpperCase() }}</span>
                             }
                           </a>
-                          <a [routerLink]="['/blog/', blog?.slug]" class="blog-name">
+                          <a [routerLink]="[detailBase, blog?.slug]" class="blog-name">
                             <h5 class="name">{{ blog.created_by.name }}</h5>
                             <h6>{{ blog?.created_at | date: 'dd MMM yyyy' }}</h6>
                           </a>
                         </div>
-                        <a [routerLink]="['/blog/', blog?.slug]" class="btn blog-button"
+                        <a [routerLink]="[detailBase, blog?.slug]" class="btn blog-button"
                           >Read more <i class="iconsax" icon-name="arrow-right"></i
                         ></a>
                       </div>
@@ -179,7 +195,7 @@
           </div>
           <div class="custom-pagination">
             <ngb-pagination
-              [collectionSize]="((totalItems$ | async) || 0)"
+              [collectionSize]="(totalItems$ | async) || 0"
               [(page)]="filter['page']"
               [pageSize]="filter['paginate']"
               [maxSize]="5"

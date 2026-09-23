@@ -1,7 +1,7 @@
 <div class="recent-post-box">
   @for (blog of blogs() | slice: 0 : 5; track blog.id) {
     <div class="recent-box">
-      <a [routerLink]="['/blog/', blog?.slug]" class="recent-image">
+      <a [routerLink]="[detailBase, blog?.slug]" class="recent-image">
         <img
           [src]="blog.blog_thumbnail ? blog.blog_thumbnail.asset_url : 'assets/images/blog.png'"
           [alt]="blog.title"
@@ -10,7 +10,7 @@
         />
       </a>
       <div class="recent-detail">
-        <a [routerLink]="['/blog/', blog?.slug]">
+        <a [routerLink]="[detailBase, blog?.slug]">
           <h5 class="recent-name">{{ blog.title }}</h5>
         </a>
         <p>{{ blog?.created_at | date: 'dd MMM yyyy hh:mm:a' }}</p>

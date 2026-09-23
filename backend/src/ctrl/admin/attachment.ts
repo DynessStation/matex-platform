@@ -181,6 +181,15 @@ const getAttachmentReferences = async (
     });
   }
 
+  const [articleRows] = await executor.query(
+    `SELECT id_attachment, COUNT(*) AS total FROM article_attachment
+     WHERE id_attachment IN (${placeholders}) GROUP BY id_attachment`,
+    ids,
+  );
+  for (const row of articleRows as any[]) {
+    references.push({ idAttachment: Number(row.id_attachment), source: "article.attachment", total: Number(row.total) });
+  }
+
   //==================================================
   //==== FUTURE REFERENCES
   //==================================================
@@ -190,7 +199,7 @@ const getAttachmentReferences = async (
   // Category image
   // Company logo
   // Office logo
-  // Blog thumbnail
+  // Article media handled above.
   //
   // Tambahkan checker di sini saat modulnya dibuat.
 

@@ -25,12 +25,10 @@ const safePublicUrl = (value: unknown): string | null => {
 };
 
 const channelUrl = (type: string, value: string, configured: unknown) => {
-  const explicit = safePublicUrl(configured);
-  if (explicit) return explicit;
   if (type === "whatsapp") return `https://wa.me/${value.replace(/\D/g, "")}`;
   if (type === "email") return `mailto:${value}`;
   if (type === "phone") return `tel:${value}`;
-  return null;
+  return safePublicUrl(configured);
 };
 
 router.get("/api/public/contact/:locale", async (req, res) => {

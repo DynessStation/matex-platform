@@ -56,7 +56,9 @@ const normalizeChannels = (value: unknown) => {
     const key = normalizePublicContentKey(item?.key);
     const type = item?.type;
     const channelValue = String(item?.value ?? "").trim();
-    const url = normalizeUrl(item?.url);
+    const url = ["whatsapp", "email", "phone"].includes(type)
+      ? null
+      : normalizeUrl(item?.url);
     const translations = normalizeTranslations(item?.translations);
     if (!key || key.length > 100 || seen.has(key) || !isPublicContactChannelType(type) ||
       !channelValue || channelValue.length > 500 || url === undefined || !translations)

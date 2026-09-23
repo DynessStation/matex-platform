@@ -108,7 +108,7 @@ export class SeoService {
         };
       }
       this.customSCO();
-    } else if (path.includes('blog')) {
+    } else if (path.includes('blog') || path.includes('artikel') || path.includes('article')) {
       if (this.blog) {
         this.scoContent = {
           ...this.scoContent,

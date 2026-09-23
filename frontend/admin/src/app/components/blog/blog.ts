@@ -11,7 +11,10 @@ import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
 import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
 import { IValues } from '../../shared/interface/setting.interface';
-import { ITableClickedAction, ITableConfig } from '../../shared/interface/table.interface';
+import {
+  ITableClickedAction,
+  ITableConfig,
+} from '../../shared/interface/table.interface';
 import {
   DeleteAllBlogAction,
   DeleteBlogAction,
@@ -23,7 +26,13 @@ import { SettingState } from '../../shared/store/state/setting.state';
 
 @Component({
   selector: 'app-blog',
-  imports: [TranslateModule, RouterModule, HasPermissionDirective, PageWrapper, Table],
+  imports: [
+    TranslateModule,
+    RouterModule,
+    HasPermissionDirective,
+    PageWrapper,
+    Table,
+  ],
   templateUrl: './blog.html',
   styleUrl: './blog.scss',
 })
@@ -34,7 +43,9 @@ export class Blog {
 
   blog$: Observable<IBlogModel> = inject(Store).select(BlogState.blog);
 
-  setting$: Observable<IValues> = inject(Store).select(SettingState.setting) as Observable<IValues>;
+  setting$: Observable<IValues> = inject(Store).select(
+    SettingState.setting,
+  ) as Observable<IValues>;
 
   public url: string;
 
@@ -47,7 +58,12 @@ export class Blog {
         type: 'image',
         placeholder: 'assets/images/product.png',
       },
-      { title: 'title', dataField: 'title', sortable: true, sort_direction: 'desc' },
+      {
+        title: 'title',
+        dataField: 'title',
+        sortable: true,
+        sort_direction: 'desc',
+      },
       {
         title: 'created_at',
         dataField: 'created_at',
@@ -55,15 +71,20 @@ export class Blog {
         sortable: true,
         sort_direction: 'desc',
       },
-      { title: 'status', dataField: 'status', type: 'switch' },
+      { title: 'status', dataField: 'status' },
     ],
     rowActions: [
-      { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'blog.edit' },
+      {
+        label: 'Edit',
+        actionToPerform: 'edit',
+        icon: 'ri-pencil-line',
+        permission: 'article.update',
+      },
       {
         label: 'Delete',
         actionToPerform: 'delete',
         icon: 'ri-delete-bin-line',
-        permission: 'blog.destroy',
+        permission: 'article.delete',
       },
       { label: 'View', actionToPerform: 'view', icon: 'ri-eye-line' },
     ],
@@ -72,7 +93,7 @@ export class Blog {
   };
 
   constructor() {
-    this.setting$.subscribe(setting => {
+    this.setting$.subscribe((setting) => {
       if (setting && setting.general) {
         this.url = setting.general.site_url;
       }
@@ -80,7 +101,7 @@ export class Blog {
   }
 
   ngOnInit() {
-    this.blog$.subscribe(blog => {
+    this.blog$.subscribe((blog) => {
       this.tableConfig.data = blog ? blog?.data : [];
       this.tableConfig.total = blog ? blog?.total : 0;
     });
@@ -110,7 +131,7 @@ export class Blog {
     this.store.dispatch(new DeleteBlogAction(data.id));
   }
 
-  deleteAll(ids: number[]) {
+  deleteAll(ids: string[]) {
     this.store.dispatch(new DeleteAllBlogAction(ids));
   }
 

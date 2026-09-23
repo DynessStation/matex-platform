@@ -14,5 +14,6 @@ export const BlogResolver: ResolveFn<Observable<unknown>> = (route, _state) => {
     throw new Error('Slug parameter is missing');
   }
 
-  return store.dispatch(new GetBlogBySlugAction(slug));
+  const locale = _state.url === '/en' || _state.url.startsWith('/en/') ? 'en-US' : 'id-ID';
+  return store.dispatch(new GetBlogBySlugAction(slug, locale));
 };

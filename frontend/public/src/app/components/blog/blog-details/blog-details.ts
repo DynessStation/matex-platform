@@ -36,6 +36,7 @@ export class BlogDetails {
 
   constructor() {
     this.blog$.subscribe((blog) => {
+      if (!blog) return;
       this.breadcrumb.items = [];
       this.breadcrumb.title = blog.title;
       this.breadcrumb.items.push(

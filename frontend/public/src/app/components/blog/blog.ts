@@ -17,10 +17,22 @@ import { GetBlogsAction } from '../../shared/store/action/blog.action';
 import { BlogState } from '../../shared/store/state/blog.state';
 import { ThemeOptionState } from '../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../home/widgets/home-newsletter/home-newsletter';
+import { PublicNavigationContextService } from '../../shared/services/public-navigation-context.service';
+import { NoData } from '../../shared/components/no-data/no-data';
 
 @Component({
   selector: 'app-blog',
-  imports: [Sidebar, RouterModule, NgbPagination, HomeNewsletter, Breadcrumb, DatePipe, NgClass, AsyncPipe],
+  imports: [
+    Sidebar,
+    RouterModule,
+    NgbPagination,
+    HomeNewsletter,
+    Breadcrumb,
+    DatePipe,
+    NgClass,
+    AsyncPipe,
+    NoData,
+  ],
   templateUrl: './blog.html',
   styleUrl: './blog.scss',
 })
@@ -30,6 +42,7 @@ export class Blog {
   blogService = inject(BlogService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private navigation = inject(PublicNavigationContextService);
   public isBrowser = false;
 
   blog$: Observable<IBlogModel> = inject(Store).select(BlogState.blog) as Observable<IBlogModel>;
@@ -58,14 +71,17 @@ export class Blog {
   public style: string = 'grid_view';
   public sidebar: string = 'left_sidebar';
   public open: boolean = false;
+  get detailBase(): string {
+    return this.navigation.locale() === 'en-US' ? '/en/article' : '/artikel';
+  }
+  get locale(): string {
+    return this.navigation.locale();
+  }
 
   private filterSubject = new BehaviorSubject(this.filter);
   public filter$ = this.filterSubject.asObservable();
 
-  public paginateBlog$: Observable<IBlog[]> = combineLatest([
-    this.blog$,
-    this.filter$
-  ]).pipe(
+  public paginateBlog$: Observable<IBlog[]> = combineLatest([this.blog$, this.filter$]).pipe(
     map(([res, filter]) => {
       const blogsArray = res?.data || [];
       return blogsArray
@@ -74,13 +90,12 @@ export class Blog {
           (filter.page - 1) * filter.paginate,
           (filter.page - 1) * filter.paginate + filter.paginate,
         );
-    })
+    }),
   );
 
-  public totalItems$: Observable<number> = this.blog$.pipe(map(blog => blog?.total || 0));
+  public totalItems$: Observable<number> = this.blog$.pipe(map((blog) => blog?.total || 0));
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-  }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -91,7 +106,7 @@ export class Blog {
       this.filter.page = params['page'] ? Number(params['page']) : 1;
 
       this.filterSubject.next({ ...this.filter });
-      this.store.dispatch(new GetBlogsAction(this.filter));
+      this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
 
       if (params['style']) {
         this.style = params['style'];
@@ -118,7 +133,7 @@ export class Blog {
   setPaginate(data: number) {
     this.filter.page = data;
     this.filterSubject.next({ ...this.filter });
-    this.store.dispatch(new GetBlogsAction(this.filter));
+    this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
 
     void this.router.navigate([], {
       relativeTo: this.route,
@@ -136,6 +151,9 @@ export class Blog {
 
   setBreadcrumb() {
     const layoutParam = this.route.snapshot.queryParamMap.get('style');
+    const title = this.navigation.locale() === 'en-US' ? 'Articles' : 'Artikel';
+    this.breadcrumb.title = title;
+    this.breadcrumb.items = [{ label: title, active: true }];
     if (layoutParam) {
       this.breadcrumb.title = layoutParam;
       this.breadcrumb.items = [{ label: layoutParam }];

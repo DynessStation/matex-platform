@@ -27,14 +27,8 @@
           <div class="blog-image-contain">
             <h2>{{ (blog$ | async)?.title }}</h2>
             <ul class="blog-list-box">
-              <li>Posted By: {{ (blog$ | async)?.created_by?.name }}</li>
-              <li>Published on {{ (blog$ | async)?.created_at | date: 'dd MMM yyyy hh:mm:a' }}</li>
-              <li>
-                <form>
-                  <input class="form-check-input" type="checkbox" id="checkBox" />
-                  <label for="checkBox" class="form-label">12 Appreciations</label>
-                </form>
-              </li>
+              <li>{{ (blog$ | async)?.created_by?.name }}</li>
+              <li>{{ (blog$ | async)?.created_at | date: 'dd MMM yyyy' }}</li>
             </ul>
           </div>
 
