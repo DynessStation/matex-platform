@@ -9,4 +9,5 @@ import { RouterModule } from '@angular/router';
 })
 export class Logo {
   readonly logo = input<string | null>();
+  readonly homePath = input<string>('/');
 }

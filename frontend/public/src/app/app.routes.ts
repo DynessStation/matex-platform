@@ -49,7 +49,7 @@ export const routes: Routes = [
 
   {
     path: 'en',
-    loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
+    loadComponent: () => import('./layout/layout').then((m) => m.Layout),
     children: [
       {
         path: '',
@@ -78,7 +78,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
+    loadComponent: () => import('./layout/layout').then((m) => m.Layout),
     children: [
       {
         path: '',
@@ -115,7 +115,7 @@ export const routes: Routes = [
 
   {
     path: '',
-    loadComponent: () => import('./layout/matex-layout/matex-layout').then((m) => m.MatexLayout),
+    loadComponent: () => import('./layout/layout').then((m) => m.Layout),
     children: [
       {
         path: ':slug',
