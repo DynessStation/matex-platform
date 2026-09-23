@@ -20,17 +20,17 @@
   </app-form-fields>
 
   <app-form-fields [label]="'Link Type'" [for]="'navigation_link_type'">
-    <select
-      id="navigation_link_type"
-      class="form-select"
-      formControlName="link_type"
-    >
-      @for (option of linkTypes; track option.value) {
-        <option [value]="option.value">
-          {{ option.label }}
-        </option>
-      }
-    </select>
+    @if (isBrowser) {
+      <select2
+        id="navigation_link_type"
+        class="custom-select"
+        [data]="linkTypes"
+        placeholder="Select link type"
+        formControlName="link_type"
+        noResultMessage="No link type found"
+        multiple="false"
+      />
+    }
   </app-form-fields>
 
   <app-form-fields
@@ -38,36 +38,33 @@
     [for]="'navigation_parent'"
     [required]="false"
   >
-    <select
-      id="navigation_parent"
-      class="form-select"
-      formControlName="parent_id"
-    >
-      <option [ngValue]="null">Root menu</option>
-
-      @for (item of parentItems; track item.id_web_navigation_item) {
-        <option [value]="item.id_web_navigation_item">
-          {{ itemTitle(item) }}
-        </option>
-      }
-    </select>
+    @if (isBrowser) {
+      <select2
+        id="navigation_parent"
+        class="custom-select"
+        [data]="parentOptions"
+        placeholder="Select parent item"
+        formControlName="parent_id"
+        noResultMessage="No menu item found"
+        multiple="false"
+      />
+    }
   </app-form-fields>
 
   @if (linkType === 'cms_page') {
     <app-form-fields [label]="'CMS Page'" [for]="'navigation_cms_page'">
-      <select
-        id="navigation_cms_page"
-        class="form-select"
-        formControlName="cms_page_id"
-      >
-        <option [ngValue]="null">Select CMS page</option>
-
-        @for (page of (cmsPages$ | async)?.data ?? []; track page.id_cms_page) {
-          <option [value]="page.id_cms_page">
-            {{ page.cms_page_title || page.cms_page_key }}
-          </option>
-        }
-      </select>
+      @if (isBrowser) {
+        <select2
+          id="navigation_cms_page"
+          class="custom-select"
+          [data]="(cmsPageOptions$ | async) ?? []"
+          placeholder="Select CMS page"
+          formControlName="cms_page_id"
+          noResultMessage="No CMS page found"
+          resettable
+          multiple="false"
+        />
+      }
 
       <p class="help-text">
         URL publik akan mengikuti slug dan bahasa dari CMS Page.
@@ -216,19 +213,17 @@
     [for]="'navigation_badge_color'"
     [required]="false"
   >
-    <select
-      id="navigation_badge_color"
-      class="form-select"
-      formControlName="badge_color"
-    >
-      <option value="">No badge color</option>
-
-      @for (color of badgeColors; track color) {
-        <option [value]="color">
-          {{ color }}
-        </option>
-      }
-    </select>
+    @if (isBrowser) {
+      <select2
+        id="navigation_badge_color"
+        class="custom-select"
+        [data]="badgeColorOptions"
+        placeholder="Select badge color"
+        formControlName="badge_color"
+        noResultMessage="No badge color found"
+        multiple="false"
+      />
+    }
   </app-form-fields>
 
   @if (linkType === 'external') {

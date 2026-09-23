@@ -1,6 +1,15 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
-import { Component, DestroyRef, inject, input, output } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  PLATFORM_ID,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+
+import { Select2Data, Select2Module } from 'ng-select2-component';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -13,7 +22,7 @@ import {
 
 import { Store } from '@ngxs/store';
 
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { Button } from '../../../shared/components/ui/button/button';
 
@@ -45,6 +54,7 @@ import { CmsPageState } from '../../../shared/store/state/cms-page.state';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    Select2Module,
     FormFields,
     Button,
     HasPermissionDirective,
@@ -73,10 +83,19 @@ export class FormMenu {
     CmsPageState.cmsPages,
   );
 
-  readonly linkTypes: {
-    value: WebNavigationItemLinkType;
-    label: string;
-  }[] = [
+  readonly cmsPageOptions$: Observable<Select2Data> = this.cmsPages$.pipe(
+    map((model) =>
+      (model?.data ?? []).map((page) => ({
+        value: page.id_cms_page,
+
+        label: page.cms_page_title ?? page.cms_page_key,
+      })),
+    ),
+  );
+
+  readonly isBrowser: boolean;
+
+  readonly linkTypes: Select2Data = [
     {
       value: 'cms_page',
       label: 'CMS Page',
@@ -95,12 +114,31 @@ export class FormMenu {
     },
   ];
 
-  readonly badgeColors = [
-    'bg-danger',
-    'bg-success',
-    'bg-warning',
-    'bg-info',
-    'bg-dark',
+  readonly badgeColorOptions: Select2Data = [
+    {
+      value: '',
+      label: 'No badge color',
+    },
+    {
+      value: 'bg-danger',
+      label: 'Danger',
+    },
+    {
+      value: 'bg-success',
+      label: 'Success',
+    },
+    {
+      value: 'bg-warning',
+      label: 'Warning',
+    },
+    {
+      value: 'bg-info',
+      label: 'Info',
+    },
+    {
+      value: 'bg-dark',
+      label: 'Dark',
+    },
   ];
 
   form: FormGroup = this.formBuilder.group({
@@ -115,9 +153,9 @@ export class FormMenu {
 
     link_type: ['cms_page', Validators.required],
 
-    parent_id: [null],
+    parent_id: [''],
 
-    cms_page_id: [null],
+    cms_page_id: [''],
 
     icon: [''],
 
@@ -145,6 +183,7 @@ export class FormMenu {
   submitting = false;
 
   constructor() {
+    this.isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
     this.form.controls['link_type'].valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -167,6 +206,21 @@ export class FormMenu {
 
   ngOnChanges(): void {
     this.populateForm();
+  }
+
+  get parentOptions(): Select2Data {
+    return [
+      {
+        value: '',
+        label: 'Root menu',
+      },
+
+      ...this.parentItems.map((item) => ({
+        value: item.id_web_navigation_item,
+
+        label: this.itemTitle(item),
+      })),
+    ];
   }
 
   get isEdit(): boolean {
@@ -379,9 +433,9 @@ export class FormMenu {
 
       link_type: item.link_type,
 
-      parent_id: item.id_parent_web_navigation_item,
+      parent_id: item.id_parent_web_navigation_item ?? '',
 
-      cms_page_id: item.id_cms_page,
+      cms_page_id: item.id_cms_page ?? '',
 
       icon: item.icon ?? '',
 
@@ -481,9 +535,9 @@ export class FormMenu {
 
       link_type: 'cms_page',
 
-      parent_id: null,
+      parent_id: '',
 
-      cms_page_id: null,
+      cms_page_id: '',
 
       icon: '',
 
