@@ -37,6 +37,7 @@ import { AdminAccountState } from './shared/store/state/admin-account.state';
 import { AdminPermissionState } from './shared/store/state/admin-permission.state';
 import { AdminAccessState } from './shared/store/state/admin-access.state';
 import { AttachmentState } from './shared/store/state/attachment.state';
+import { WebNavigationState } from './shared/store/state/web-navigation.state';
 import { AttributeState } from './shared/store/state/attribute.state';
 import { AuthState } from './shared/store/state/auth.state';
 import { BlogState } from './shared/store/state/blog.state';
@@ -163,6 +164,7 @@ export const appConfig: ApplicationConfig = {
         OfficeState,
         CmsPageState,
         AttachmentState,
+        WebNavigationState,
         AuditLogState,
         AttributeState,
         BlogState,
