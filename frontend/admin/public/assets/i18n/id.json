@@ -1,4 +1,22 @@
 {
+  "website": "Website",
+  "website_navigation": "Navigasi Website",
+  "contact_settings": "Pengaturan Kontak",
+  "faq_management": "FAQ",
+  "faq_admin": {
+    "title": "Pertanyaan Umum (FAQ)", "create": "Tambah FAQ", "edit": "Edit FAQ",
+    "question": "Pertanyaan", "answer": "Jawaban", "key": "Kunci FAQ",
+    "key_help": "Gunakan huruf kecil, angka, dan tanda hubung.", "order": "Urutan",
+    "translations": "Bahasa", "active": "Aktif", "save": "Simpan FAQ", "update": "Perbarui FAQ"
+  },
+  "public_contact": {
+    "title": "Pengaturan Kontak Publik", "channels": "Kanal Kontak", "channels_help": "Nomor, email, dan tautan yang tampil di website publik.",
+    "add_channel": "Tambah Kanal", "channel": "Kanal", "key": "Kunci", "type": "Jenis", "value": "Nilai", "url": "Tautan", "order": "Urutan",
+    "primary": "Utama", "public": "Publik", "topics": "Topik Pesan", "topics_help": "Pilihan topik pada formulir kontak dan email penerimanya.",
+    "add_topic": "Tambah Topik", "topic": "Topik", "recipient": "Email Penerima", "active": "Aktif", "locations": "Alamat dan Peta",
+    "locations_help": "Alamat, koordinat, tautan peta, dan jam operasional dikelola dari data Kantor agar tetap satu sumber.",
+    "manage_offices": "Kelola Kantor", "save": "Simpan Pengaturan Kontak"
+  },
   "activity_log": "Log Aktivitas",
   "audit_view": "Lihat",
   "audit_created": "Waktu",

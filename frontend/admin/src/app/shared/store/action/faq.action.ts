@@ -1,5 +1,5 @@
 import { Params } from '../../interface/core.interface';
-import { IFaq } from '../../interface/faq.interface';
+import { IFaqPayload } from '../../interface/faq.interface';
 
 export class GetFaqsAction {
   static readonly type = '[Faq] Get';
@@ -8,44 +8,36 @@ export class GetFaqsAction {
 
 export class CreateFaqAction {
   static readonly type = '[Faq] Create';
-  constructor(public payload: IFaq) {}
+  constructor(public payload: IFaqPayload) {}
 }
 
 export class EditFaqAction {
   static readonly type = '[Faq] Edit';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 export class UpdateFaqAction {
   static readonly type = '[Faq] Update';
   constructor(
-    public payload: IFaq,
-    public id: number,
+    public payload: IFaqPayload,
+    public id: string,
   ) {}
 }
 
 export class UpdateFaqStatusAction {
   static readonly type = '[Faq] Update Status';
   constructor(
-    public id: number,
-    public status: boolean,
-  ) {}
-}
-
-export class ApproveFaqStatusAction {
-  static readonly type = '[Faq] Approve Status';
-  constructor(
-    public id: number,
-    public status: boolean,
+    public id: string,
+    public status: 0 | 1,
   ) {}
 }
 
 export class DeleteFaqAction {
   static readonly type = '[Faq] Delete';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 export class DeleteAllFaqAction {
   static readonly type = '[Faq] Delete All';
-  constructor(public ids: number[]) {}
+  constructor(public ids: string[]) {}
 }

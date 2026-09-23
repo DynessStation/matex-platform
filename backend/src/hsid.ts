@@ -28,6 +28,12 @@ const idWebNavigation = new hashids("key_webNavigation123", 8);
 
 const idWebNavigationItem = new hashids("key_webNavigationItem123", 8);
 
+const idFaq = new hashids("key_faq123", 8);
+
+const idPublicContactChannel = new hashids("key_publicContactChannel123", 8);
+
+const idContactInquiryTopic = new hashids("key_contactInquiryTopic123", 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -43,4 +49,7 @@ export default {
   idCmsPage,
   idWebNavigation,
   idWebNavigationItem,
+  idFaq,
+  idPublicContactChannel,
+  idContactInquiryTopic,
 };

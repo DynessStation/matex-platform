@@ -5,44 +5,43 @@
     <div class="row g-sm-4 g-3">
       <div class="col-xxl-3 col-lg-4 col-md-5">
         <div class="faq-wrapper">
-          <h3>FAQs</h3>
+          <h3>{{ locale === 'en-US' ? 'Frequently Asked Questions' : 'Pertanyaan Umum' }}</h3>
           <p class="faq-desc">
-            Find answers to the most frequently asked questions about our services and products. If
-            you have any additional queries, please don't hesitate to reach out to our support team.
+            {{ locale === 'en-US' ? 'Find answers about our company, products, and services.' : 'Temukan jawaban seputar perusahaan, produk, dan layanan kami.' }}
           </p>
-          <p>contact@kartify.com</p>
-          <p>520-245-2465</p>
-          <h2 class="faq-title">FAQs</h2>
+          <h2 class="faq-title">FAQ</h2>
         </div>
       </div>
       <div class="col-xxl-9 col-lg-8 col-md-7">
-        @if ((faq$ | async)?.data?.length) {
+        @if ((faq$ | async); as faqs) {
+          @if (faqs.length) {
           <div class="accordion faq-accordion" ngbAccordion [closeOthers]="true">
-            @for (faq of (faq$ | async)?.data; track faq; let i = $index) {
+            @for (faq of faqs; track faq.key; let i = $index) {
               <div ngbAccordionItem [collapsed]="i !== 0">
                 <div ngbAccordionHeader>
                   <h5 class="accordion-header">
                     <button class="accordion-button" type="button" ngbAccordionButton>
-                      {{ faq.title }} <i class="iconsax" icon-name="chevron-down"></i>
+                      {{ faq.question }} <i class="iconsax" icon-name="chevron-down"></i>
                     </button>
                   </h5>
                 </div>
                 <div class="collapse show" ngbAccordionCollapse>
                   <div class="card-body" ngbAccordionBody>
                     <ng-template>
-                      <p>{{ faq.description }}</p>
+                      <p>{{ faq.answer }}</p>
                     </ng-template>
                   </div>
                 </div>
               </div>
             }
           </div>
-        } @else {
+          } @else {
           <app-no-data
             [class]="'no-data-added collection-no-data'"
             [text]="'no_faq' | translate"
             [description]="'no_faq_desc' | translate"
           ></app-no-data>
+          }
         }
       </div>
     </div>

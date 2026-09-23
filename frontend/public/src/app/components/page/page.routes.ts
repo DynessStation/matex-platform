@@ -12,6 +12,10 @@ export const page: Routes = [
     loadComponent: () => import('./faq/faq').then((m) => m.Faq),
   },
   {
+    path: 'en/faq',
+    loadComponent: () => import('./faq/faq').then((m) => m.Faq),
+  },
+  {
     path: 'about-us',
     loadComponent: () => import('./about-us/about-us').then((m) => m.AboutUs),
   },
@@ -29,6 +33,14 @@ export const page: Routes = [
   },
   {
     path: 'contact-us',
+    loadComponent: () => import('./contact-us/contact-us').then((m) => m.ContactUs),
+  },
+  {
+    path: 'kontak',
+    loadComponent: () => import('./contact-us/contact-us').then((m) => m.ContactUs),
+  },
+  {
+    path: 'en/contact-us',
     loadComponent: () => import('./contact-us/contact-us').then((m) => m.ContactUs),
   },
   {

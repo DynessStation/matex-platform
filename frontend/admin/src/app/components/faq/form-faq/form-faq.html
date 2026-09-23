@@ -1,39 +1,42 @@
 <form class="theme-form theme-form-2 mega-form" [formGroup]="form" (ngSubmit)="submit()">
-  <app-form-fields [label]="'title'" [for]="'title'" [required]="true">
-    <input
-      class="form-control"
-      type="text"
-      placeholder="{{ 'enter_title' | translate }}"
-      name="title"
-      formControlName="title"
-    />
-    @if(form.controls['title'].touched && form.controls['title'].errors?.['required']){
-    <div class="invalid-feedback">{{ 'title_is_required' | translate }}</div>
-    }
-  </app-form-fields>
-
-  <app-form-fields [label]="'description'" [for]="'description'" [required]="true">
-    <textarea
-      class="form-control"
-      placeholder="{{ 'enter_description' | translate }}"
-      formControlName="description"
-      rows="3"
-    ></textarea>
-    @if(form.controls['description'].touched && form.controls['description'].errors?.['required']){
-    <div class="invalid-feedback">{{ 'description_is_required' | translate }}</div>
-    }
-  </app-form-fields>
-
-  <app-form-fields [label]="'status'" [for]="'status'" [required]="false">
-    <div class="form-check form-switch ps-0">
-      <label class="switch">
-        <input type="checkbox" id="status" formControlName="status" />
-        <span class="switch-state"></span>
-      </label>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <app-form-fields [label]="'faq_admin.key'" [for]="'key'" [required]="true">
+        <input class="form-control" id="key" formControlName="key" placeholder="contoh: pengiriman-produk" />
+        @if (form.controls.key.touched && form.controls.key.invalid) {
+          <div class="invalid-feedback">{{ 'faq_admin.key_help' | translate }}</div>
+        }
+      </app-form-fields>
     </div>
-  </app-form-fields>
+    <div class="col-lg-4">
+      <app-form-fields [label]="'faq_admin.order'" [for]="'sort_order'" [required]="true">
+        <input class="form-control" id="sort_order" type="number" min="0" formControlName="sort_order" />
+      </app-form-fields>
+    </div>
+  </div>
 
-  <app-button [id]="'faq_btn'">
-    {{ (type() === 'create' ? 'save_faq' : 'update_faq') | translate }}
-  </app-button>
+  <div class="card mt-4"><div class="card-body">
+    <h4 class="mb-3">Bahasa Indonesia</h4>
+    <app-form-fields [label]="'faq_admin.question'" [for]="'id_question'" [required]="true">
+      <input class="form-control" id="id_question" formControlName="id_question" />
+    </app-form-fields>
+    <app-form-fields [label]="'faq_admin.answer'" [for]="'id_answer'" [required]="true">
+      <textarea class="form-control" id="id_answer" rows="6" formControlName="id_answer"></textarea>
+    </app-form-fields>
+  </div></div>
+
+  <div class="card mt-4"><div class="card-body">
+    <h4 class="mb-3">English</h4>
+    <app-form-fields [label]="'faq_admin.question'" [for]="'en_question'" [required]="true">
+      <input class="form-control" id="en_question" formControlName="en_question" />
+    </app-form-fields>
+    <app-form-fields [label]="'faq_admin.answer'" [for]="'en_answer'" [required]="true">
+      <textarea class="form-control" id="en_answer" rows="6" formControlName="en_answer"></textarea>
+    </app-form-fields>
+  </div></div>
+
+  <app-form-fields class="d-block mt-4" [label]="'faq_admin.active'" [for]="'status'">
+    <label class="switch"><input type="checkbox" id="status" formControlName="status" /><span class="switch-state"></span></label>
+  </app-form-fields>
+  <app-button [id]="'faq_btn'">{{ (type() === 'create' ? 'faq_admin.save' : 'faq_admin.update') | translate }}</app-button>
 </form>

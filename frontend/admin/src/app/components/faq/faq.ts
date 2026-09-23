@@ -29,14 +29,16 @@ export class Faq {
   private store = inject(Store);
   router = inject(Router);
 
-  faq$: Observable<IFaqModel> = inject(Store).select(FaqState.faq);
+  faq$: Observable<IFaqModel | null> = this.store.select(FaqState.faq);
 
   public tableConfig: ITableConfig = {
     columns: [
-      { title: 'title', dataField: 'title', sortable: true, sort_direction: 'desc' },
+      { title: 'faq_admin.question', dataField: 'question', sortable: true, sort_direction: 'asc' },
+      { title: 'faq_admin.key', dataField: 'key', sortable: true, sort_direction: 'asc' },
+      { title: 'faq_admin.translations', dataField: 'translation_label' },
       {
         title: 'created_at',
-        dataField: 'created_at',
+        dataField: 'created',
         type: 'date',
         sortable: true,
         sort_direction: 'desc',
@@ -44,12 +46,12 @@ export class Faq {
       { title: 'status', dataField: 'status', type: 'switch' },
     ],
     rowActions: [
-      { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'faq.edit' },
+      { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'faq.update' },
       {
         label: 'Delete',
         actionToPerform: 'delete',
         icon: 'ri-delete-bin-line',
-        permission: 'faq.destroy',
+        permission: 'faq.delete',
       },
     ],
     data: [] as IFaq[],
@@ -58,8 +60,11 @@ export class Faq {
 
   ngOnInit() {
     this.faq$.subscribe(faq => {
-      this.tableConfig.data = faq ? faq?.data : [];
-      this.tableConfig.total = faq ? faq?.total : 0;
+      this.tableConfig.data = (faq?.data ?? []).map(item => ({
+        ...item,
+        translation_label: item.translation_complete ? 'Indonesia + English' : 'Belum lengkap',
+      }));
+      this.tableConfig.total = faq?.pagination.total ?? 0;
     });
   }
 
@@ -86,7 +91,7 @@ export class Faq {
     this.store.dispatch(new DeleteFaqAction(data.id));
   }
 
-  deleteAll(ids: number[]) {
+  deleteAll(ids: string[]) {
     this.store.dispatch(new DeleteAllFaqAction(ids));
   }
 }

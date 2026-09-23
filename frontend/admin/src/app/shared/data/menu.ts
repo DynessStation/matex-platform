@@ -134,17 +134,17 @@ export const menu: ISidebar[] = [
   },
 
   //==================================================
-  //==== CONTENT
+  //==== WEBSITE
   //==================================================
 
   {
     id: 4,
 
-    title: 'content',
+    title: 'website',
 
     active: false,
 
-    icon: 'ri-file-text-line',
+    icon: 'ri-global-line',
 
     type: 'sub',
 
@@ -163,6 +163,30 @@ export const menu: ISidebar[] = [
         level: 2,
 
         permission: 'cms_page.view',
+      },
+      {
+        parent_id: 4,
+        title: 'website_navigation',
+        path: '/menu',
+        type: 'link',
+        level: 2,
+        permission: 'web_navigation.view',
+      },
+      {
+        parent_id: 4,
+        title: 'contact_settings',
+        path: '/public-contact',
+        type: 'link',
+        level: 2,
+        permission: 'public_contact.view',
+      },
+      {
+        parent_id: 4,
+        title: 'faq_management',
+        path: '/faq',
+        type: 'link',
+        level: 2,
+        permission: 'faq.view',
       },
     ],
   },

@@ -1,163 +1,58 @@
 <app-breadcrumb [breadcrumb]="breadcrumb" />
 
-@if (contactData) {
+@if (contact$ | async; as contact) {
   <div class="contact-section section-t-space">
     <div class="custom-container">
       <div class="contact-main-box">
         <div class="row g-sm-4 g-3">
           <div class="col-xxl-3 col-lg-4 col-md-5">
             <div class="contact-wrapper">
-              <h3>{{ contactData.title }}</h3>
-              <p class="contact-desc">{{ contactData.description }}</p>
-              <p>{{ contactData.contact_email }}</p>
-              <p>{{ contactData.contact_number }}</p>
-              <h2 class="contact-title">{{ contactData.imageUrl }}</h2>
+              <h3>{{ locale === 'en-US' ? 'Talk to our team' : 'Hubungi tim kami' }}</h3>
+              <p class="contact-desc">{{ locale === 'en-US' ? 'Choose the channel that is most convenient for you.' : 'Pilih kanal yang paling nyaman untuk Anda.' }}</p>
+              @for (channel of contact.channels; track channel.key) {
+                <div class="mb-3">
+                  <strong>{{ channel.label }}</strong><br />
+                  @if (channel.url) { <a [href]="channel.url" [target]="channel.type === 'email' || channel.type === 'phone' ? '_self' : '_blank'" rel="noopener">{{ channel.value }}</a> }
+                  @else { <span>{{ channel.value }}</span> }
+                  @if (channel.description) { <small class="d-block">{{ channel.description }}</small> }
+                </div>
+              }
             </div>
           </div>
           <div class="col-xxl-9 col-lg-8 col-md-7">
-            <form class="contact-right-box" [formGroup]="form">
-              <h3>{{ contactData.main_title }}</h3>
-              <p>
-                <span>"</span><span class="txt-danger-color"> * </span> <span>"</span
-                ><span class="ps-1">indicates required fields</span>
-              </p>
+            <form class="contact-right-box" [formGroup]="form" (ngSubmit)="submit()">
+              <h3>{{ locale === 'en-US' ? 'Send a message' : 'Kirim pesan' }}</h3>
               <div class="row g-md-4 g-3">
-                <div class="col-12 theme-form">
-                  <label for="contactUsName" class="form-label"
-                    >Name <span class="txt-danger-color">*</span></label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="contactUsName"
-                    placeholder="First name"
-                    formControlName="name"
-                    [class]="{
-                      'is-invalid':
-                        form.controls['name'].touched && form.controls['name'].errors?.['required'],
-                      'is-valid': form.controls['name'].valid,
-                    }"
-                  />
-                  @if (
-                    form.controls['name'].touched && form.controls['name'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">Name is Required</div>
-                  }
-                </div>
-                <div class="col-lg-6 col-md-12 col-sm-6 theme-form">
-                  <label for="contactUsEmail" class="form-label"
-                    >Email <span class="txt-danger-color">*</span></label
-                  >
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="contactUsEmail"
-                    placeholder="example@domain.com"
-                    formControlName="email"
-                    [class]="{
-                      'is-invalid':
-                        form.controls['email'].touched &&
-                        (form.controls['email'].errors?.['required'] ||
-                          form.controls['email'].errors?.['email']),
-                      'is-valid': form.controls['email'].valid,
-                    }"
-                  />
-                  @if (
-                    form.controls['email'].touched && form.controls['email'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">Email is Required</div>
-                  }
-                  @if (form.controls['email'].errors?.['email']) {
-                    <div class="invalid-feedback">Invalid Email</div>
-                  }
-                </div>
-                <div class="col-lg-6 col-md-12 col-sm-6 theme-form">
-                  <label for="contactUsPhone" class="form-label"
-                    >Phone <span class="txt-danger-color">*</span></label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="contactUsPhone"
-                    placeholder="Phone number"
-                    formControlName="phone"
-                    [class]="{
-                      'is-invalid':
-                        form.controls['phone'].touched &&
-                        form.controls['phone'].errors?.['required'],
-                      'is-valid': form.controls['phone'].valid,
-                    }"
-                  />
-                  @if (
-                    form.controls['phone'].touched && form.controls['phone'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">Phone Number is Required</div>
-                  }
-                </div>
-                <div class="col-12 theme-form">
-                  <label class="form-label"
-                    >Select a topic <span class="txt-danger-color">*</span></label
-                  >
-                  <select2
-                    [data]="contactData.topic"
-                    placeholder="Choose Department"
-                    formControlName="select_topic"
-                    [class]="{
-                      'is-invalid':
-                        form.controls['select_topic'].touched &&
-                        form.controls['select_topic'].errors?.['required'],
-                      'is-valid': form.controls['select_topic'].valid,
-                    }"
-                  />
-
-                  @if (
-                    form.controls['select_topic'].touched &&
-                    form.controls['select_topic'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">Topic is Required</div>
-                  }
-                </div>
-
-                <div class="col-12 theme-form">
-                  <label for="contactUsHelpMessage" class="form-label"
-                    >How can we help? <span class="txt-danger-color">*</span></label
-                  >
-                  <textarea
-                    class="form-control"
-                    rows="12"
-                    id="contactUsHelpMessage"
-                    placeholder="Description"
-                    formControlName="message"
-                    [class]="{
-                      'is-invalid':
-                        form.controls['message'].touched &&
-                        form.controls['message'].errors?.['required'],
-                      'is-valid': form.controls['message'].valid,
-                    }"
-                  ></textarea>
-                  @if (
-                    form.controls['message'].touched &&
-                    form.controls['message'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">Description id Required</div>
-                  }
-                </div>
-                <div class="col-auto">
-                  <button type="submit" class="btn theme-bg-color text-white" (click)="submit()">
-                    Send message
-                  </button>
-                </div>
+                <div class="col-12 theme-form"><label for="contactName" class="form-label">{{ locale === 'en-US' ? 'Name' : 'Nama' }} *</label><input id="contactName" class="form-control" formControlName="name" /></div>
+                <div class="col-sm-6 theme-form"><label for="contactEmail" class="form-label">Email</label><input id="contactEmail" type="email" class="form-control" formControlName="email" /></div>
+                <div class="col-sm-6 theme-form"><label for="contactPhone" class="form-label">{{ locale === 'en-US' ? 'Phone' : 'Telepon' }}</label><input id="contactPhone" type="tel" class="form-control" formControlName="phone" /></div>
+                @if (form.touched && form.hasError('contactRequired')) { <div class="col-12 text-danger">{{ locale === 'en-US' ? 'Enter an email or phone number.' : 'Isi email atau nomor telepon.' }}</div> }
+                <div class="col-12 theme-form"><label for="contactTopic" class="form-label">{{ locale === 'en-US' ? 'Topic' : 'Topik' }} *</label><select id="contactTopic" class="form-select" formControlName="topic_key"><option value="">{{ locale === 'en-US' ? 'Choose a topic' : 'Pilih topik' }}</option>@for (topic of contact.topics; track topic.key) {<option [value]="topic.key">{{ topic.label }}</option>}</select></div>
+                <div class="col-12 theme-form"><label for="contactMessage" class="form-label">{{ locale === 'en-US' ? 'How can we help?' : 'Apa yang bisa kami bantu?' }} *</label><textarea id="contactMessage" class="form-control" rows="8" formControlName="message"></textarea></div>
+                <div class="d-none"><label for="contactWebsite">Website</label><input id="contactWebsite" formControlName="website" tabindex="-1" autocomplete="off" /></div>
+                <div class="col-12"><label class="d-flex gap-2 align-items-start"><input type="checkbox" formControlName="consent" /><span>{{ locale === 'en-US' ? 'I agree that my information may be used to respond to this message.' : 'Saya setuju data saya digunakan untuk merespons pesan ini.' }}</span></label></div>
+                <div class="col-auto"><button type="submit" class="btn theme-bg-color text-white" [disabled]="submitting">{{ submitting ? (locale === 'en-US' ? 'Sending...' : 'Mengirim...') : (locale === 'en-US' ? 'Send message' : 'Kirim pesan') }}</button></div>
               </div>
             </form>
           </div>
         </div>
       </div>
+
+      @if (contact.offices.length) {
+        <div class="row g-4 section-t-space">
+          @for (office of contact.offices; track office.code) {
+            <div class="col-lg-6"><div class="contact-main-box h-100"><h4>{{ office.name }}</h4><p>{{ office.address }}, {{ office.city }}, {{ office.province }} {{ office.postal_code }}</p>@if (office.phone) {<p>{{ office.phone }}</p>}@if (mapUrl(office); as map) {<div class="ratio ratio-16x9 mb-3"><iframe [src]="map" [title]="office.name" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>}@if (office.google_maps_url) {<a class="btn btn-sm btn-outline-dark" [href]="office.google_maps_url" target="_blank" rel="noopener">{{ locale === 'en-US' ? 'Open map' : 'Buka peta' }}</a>}</div></div>
+          }
+        </div>
+      }
     </div>
   </div>
 }
 
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter />
-  </div>
-</section>
+@if (contact$ | async; as contact) {
+  @if (whatsapp(contact.channels); as channel) {
+    <a class="floating-whatsapp" [href]="channel.url" target="_blank" rel="noopener" [attr.aria-label]="channel.label"><i class="ri-whatsapp-line"></i></a>
+  }
+}
+
+<section class="section-block-space newsletter-section"><div class="custom-container"><app-home-newsletter /></div></section>

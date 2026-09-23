@@ -1,6 +1,6 @@
-<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'FAQ\'s'">
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'faq_admin.title' | translate">
   <div *hasPermission="'faq.create'" button>
-    <a [routerLink]="['/faq/create']" class="align-items-center btn btn-theme d-flex">
+    <a [routerLink]="['/faq/create']" class="align-items-center btn btn-theme d-flex gap-1">
       <i class="ri-add-line"></i> {{ 'add_faq' | translate }}
     </a>
   </div>

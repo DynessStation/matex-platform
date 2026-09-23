@@ -86,6 +86,15 @@ export const content: Routes = [
   },
 
   {
+    path: 'public-contact',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../components/public-contact/public-contact.routes').then(
+        routes => routes.publicContactRoutes,
+      ),
+  },
+
+  {
     path: 'account',
 
     loadChildren: () =>
