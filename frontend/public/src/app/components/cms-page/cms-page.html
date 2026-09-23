@@ -1,5 +1,5 @@
 @if (page(); as page) {
-  @if (page.template === 'home') {
+  @if (page.template === 'home' || page.template === 'gadget-home-v1') {
     <app-cms-home [page]="page" />
   } @else {
     <app-breadcrumb [breadcrumb]="breadcrumb()" />

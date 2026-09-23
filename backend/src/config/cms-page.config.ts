@@ -75,6 +75,27 @@ export const isCmsPageLocale = (value: string): value is CmsPageLocale => {
 };
 
 //==================================================
+//==== PUBLIC TEMPLATE CONTRACT
+//==================================================
+
+export const CMS_PAGE_TEMPLATE = {
+  GADGET_HOME: "home",
+  COMPANY_PROFILE: "company-profile",
+  CONTACT: "contact",
+  STANDARD: "standard",
+} as const;
+
+export const CMS_GADGET_HOME_ATTACHMENT_ROLES = [
+  "home_main",
+  "home_side_1",
+  "home_side_2",
+  "home_tile_1",
+  "home_tile_2",
+  "home_tile_3",
+  "home_tile_4",
+] as const;
+
+//==================================================
 //==== LIST
 //==================================================
 

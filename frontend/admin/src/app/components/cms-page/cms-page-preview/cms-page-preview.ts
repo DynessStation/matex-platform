@@ -191,6 +191,14 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
 
     const galleryHtml = this.buildGallery(translation.cms_page_locale);
 
+    const isGadgetHome = ['home', 'gadget-home-v1'].includes(
+      this.page.cms_page_template ?? '',
+    );
+
+    const gadgetHomeHtml = isGadgetHome
+      ? this.buildGadgetHome(translation.cms_page_locale)
+      : '';
+
     return `
       <!doctype html>
 
@@ -349,6 +357,52 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
               font-size: 14px;
             }
 
+            .gadget-grid {
+              display: grid;
+              grid-template-columns: 2fr 1fr;
+              background: #f4f5f7;
+            }
+
+            .gadget-main,
+            .gadget-side,
+            .gadget-tile {
+              position: relative;
+              overflow: hidden;
+              background: linear-gradient(135deg, #f7f7f7, #eceff3);
+            }
+
+            .gadget-main { min-height: 460px; }
+            .gadget-side { min-height: 230px; }
+
+            .gadget-side-column {
+              display: grid;
+              grid-template-rows: repeat(2, minmax(0, 1fr));
+            }
+
+            .gadget-tiles {
+              display: grid;
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .gadget-tile { aspect-ratio: 11 / 9; }
+
+            .gadget-main img,
+            .gadget-side img,
+            .gadget-tile img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+
+            .gadget-slot-label {
+              position: absolute;
+              inset: 50% auto auto 50%;
+              transform: translate(-50%, -50%);
+              color: #8a8f98;
+              font-size: 13px;
+              white-space: nowrap;
+            }
+
             @media (max-width: 640px) {
               .header {
                 padding-top: 36px;
@@ -362,13 +416,18 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
               .gallery-grid {
                 grid-template-columns: 1fr;
               }
+
+              .gadget-grid { grid-template-columns: 1fr; }
+              .gadget-side-column { display: none; }
+              .gadget-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+              .gadget-main { min-height: 360px; }
             }
           </style>
         </head>
 
         <body>
           <main class="page">
-            ${heroHtml}
+            ${isGadgetHome ? gadgetHomeHtml : heroHtml}
 
             <header class="header">
               <div class="header-inner">
@@ -382,10 +441,52 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
               ${content}
             </article>
 
-            ${galleryHtml}
+            ${isGadgetHome ? '' : galleryHtml}
           </main>
         </body>
       </html>
+    `;
+  }
+
+  private buildGadgetHome(locale: string): string {
+    const slot = (role: string, className: string, label: string): string => {
+      const attachment = this.page.attachments.find(
+        (item) =>
+          item.cms_page_attachment_role === role &&
+          item.cms_page_attachment_is_public === 1,
+      );
+
+      if (!attachment) {
+        return `<div class="${className}"><span class="gadget-slot-label">${label}</span></div>`;
+      }
+
+      const translation = attachment.translations.find(
+        (item) => item.cms_page_attachment_locale === locale,
+      );
+
+      const alt = this.escapeHtml(
+        translation?.cms_page_attachment_alt_text || attachment.name || '',
+      );
+
+      return `<div class="${className}"><img src="${this.escapeHtml(attachment.asset_url)}" alt="${alt}"></div>`;
+    };
+
+    return `
+      <section>
+        <div class="gadget-grid">
+          ${slot('home_main', 'gadget-main', 'Banner utama 8:5')}
+          <div class="gadget-side-column">
+            ${slot('home_side_1', 'gadget-side', 'Banner samping atas')}
+            ${slot('home_side_2', 'gadget-side', 'Banner samping bawah')}
+          </div>
+        </div>
+        <div class="gadget-tiles">
+          ${slot('home_tile_1', 'gadget-tile', 'Tile 1')}
+          ${slot('home_tile_2', 'gadget-tile', 'Tile 2')}
+          ${slot('home_tile_3', 'gadget-tile', 'Tile 3')}
+          ${slot('home_tile_4', 'gadget-tile', 'Tile 4')}
+        </div>
+      </section>
     `;
   }
 

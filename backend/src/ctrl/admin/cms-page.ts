@@ -2157,7 +2157,11 @@ app.post(
 
       const attachmentKeys = new Set<string>();
 
-      const singleRoles = new Set(["cover", "meta", "og", "hero"]);
+      const singleRoles = new Set([
+        "cover", "meta", "og", "hero",
+        "home_main", "home_side_1", "home_side_2",
+        "home_tile_1", "home_tile_2", "home_tile_3", "home_tile_4",
+      ]);
 
       const usedSingleRoles = new Set<string>();
 
@@ -3972,7 +3976,11 @@ app.put(
 
         const attachmentKeys = new Set<string>();
 
-        const singleRoles = new Set(["cover", "meta", "og", "hero"]);
+        const singleRoles = new Set([
+          "cover", "meta", "og", "hero",
+          "home_main", "home_side_1", "home_side_2",
+          "home_tile_1", "home_tile_2", "home_tile_3", "home_tile_4",
+        ]);
 
         const usedSingleRoles = new Set<string>();
 

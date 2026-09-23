@@ -1,11 +1,25 @@
 import { Router } from "express";
 import { RowDataPacket } from "mysql2";
 import { pool } from "../../db";
-import { isCmsPageLocale } from "../../config/cms-page.config";
+import {
+  CMS_GADGET_HOME_ATTACHMENT_ROLES,
+  isCmsPageLocale,
+} from "../../config/cms-page.config";
 import { buildAttachmentUrl } from "../../helper/attachment.helper";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 
 const router = Router();
+
+const parseJsonValue = (value: unknown): unknown | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value !== "string") return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+};
 
 // Public scope is deployment-owned. Never resolve it from a query, cookie or header.
 router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
@@ -29,7 +43,8 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         p.cms_page_template,
         p.cms_page_visibility,
         t.cms_page_locale, t.cms_page_slug, t.cms_page_title,
-        t.cms_page_excerpt, t.cms_page_content, t.cms_page_meta_title,
+        t.cms_page_excerpt, t.cms_page_content, t.cms_page_content_json,
+        t.cms_page_meta_title,
         t.cms_page_meta_description, t.cms_page_meta_keywords,
         t.cms_page_meta_robots, t.cms_page_canonical_url,
         t.cms_page_og_title, t.cms_page_og_description
@@ -39,7 +54,6 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
       WHERE p.id_master_comp = ? AND t.cms_page_locale = ? AND t.cms_page_slug = ?
         AND p.cms_page_deleted_at IS NULL AND p.cms_page_status = 1
         AND p.cms_page_visibility IN (1, 2) AND t.cms_page_i18n_status = 1
-        AND p.cms_page_content_mode = 'html'
         AND (p.cms_page_publish_at IS NULL OR p.cms_page_publish_at <= NOW())
         AND (p.cms_page_unpublish_at IS NULL OR p.cms_page_unpublish_at > NOW())
       LIMIT 1
@@ -75,10 +89,18 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         AND c.cms_page_attachment_is_public = 1
         AND a.attachment_status = 1 AND a.deleted_at IS NULL
         AND a.mime_type IN ('image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif')
-        AND c.cms_page_attachment_role IN ('hero', 'gallery', 'og')
+        AND c.cms_page_attachment_role IN (
+          'hero', 'gallery', 'og',
+          ${CMS_GADGET_HOME_ATTACHMENT_ROLES.map(() => "?").join(", ")}
+        )
       ORDER BY c.cms_page_attachment_sort_order, c.id_cms_page_attachment
     `,
-      [locale, page.id_cms_page, company],
+      [
+        locale,
+        page.id_cms_page,
+        company,
+        ...CMS_GADGET_HOME_ATTACHMENT_ROLES,
+      ],
     );
 
     // Explicit public projection: no internal IDs, drafts, settings or audit data.
@@ -90,6 +112,7 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
       title: page.cms_page_title,
       excerpt: page.cms_page_excerpt,
       content: page.cms_page_content,
+      content_json: parseJsonValue(page.cms_page_content_json),
       seo: {
         title: page.cms_page_meta_title || page.cms_page_title,
         description:

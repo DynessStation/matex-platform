@@ -76,7 +76,7 @@ interface CmsPageMediaTranslationDraft {
 interface CmsPageMediaDraft {
   attachment: IAttachment;
 
-  role: 'hero' | 'gallery';
+  role: string;
 
   is_public: boolean;
 
@@ -209,6 +209,25 @@ export class FormCmsPage {
       labelKey: 'cms_page.language_english',
       shortLabel: 'EN',
     },
+  ];
+
+  public readonly templateOptions = [
+    { value: 'standard', label: 'Standard page' },
+    { value: 'home', label: 'Gadget store home' },
+    { value: 'company-profile', label: 'Company profile' },
+    { value: 'contact', label: 'Contact page' },
+  ];
+
+  public readonly gadgetHomeMediaRoles = [
+    { value: 'home_main', label: 'Banner utama (8:5)' },
+    { value: 'home_side_1', label: 'Banner samping atas (8:5)' },
+    { value: 'home_side_2', label: 'Banner samping bawah (8:5)' },
+    { value: 'home_tile_1', label: 'Banner kotak 1 (11:9)' },
+    { value: 'home_tile_2', label: 'Banner kotak 2 (11:9)' },
+    { value: 'home_tile_3', label: 'Banner kotak 3 (11:9)' },
+    { value: 'home_tile_4', label: 'Banner kotak 4 (11:9)' },
+    { value: 'og', label: 'Open Graph / share image' },
+    { value: 'gallery', label: 'Galeri tambahan' },
   ];
 
   //==================================================
@@ -456,7 +475,11 @@ export class FormCmsPage {
         return {
           attachment: item,
 
-          role: item.cms_page_attachment_role === 'hero' ? 'hero' : 'gallery',
+          role:
+            this.isGadgetHomeTemplate &&
+            item.cms_page_attachment_role === 'hero'
+              ? 'home_main'
+              : item.cms_page_attachment_role || 'gallery',
 
           is_public: item.cms_page_attachment_is_public === 1,
 
@@ -491,6 +514,21 @@ export class FormCmsPage {
       this.store.selectSnapshot(AuthState.permissions) ?? [],
       this.store.selectSnapshot(AuthState.isAllAccess) === true,
     );
+  }
+
+  get isGadgetHomeTemplate(): boolean {
+    const template = this.form.controls.cms_page_template.value;
+    return template === 'home' || template === 'gadget-home-v1';
+  }
+
+  get mediaRoleOptions(): { value: string; label: string }[] {
+    if (this.isGadgetHomeTemplate) return this.gadgetHomeMediaRoles;
+
+    return [
+      { value: 'hero', label: 'Hero image' },
+      { value: 'gallery', label: 'Gallery' },
+      { value: 'og', label: 'Open Graph / share image' },
+    ];
   }
 
   //==================================================
@@ -771,11 +809,11 @@ export class FormCmsPage {
       this.pageMedia.map((item) => [item.attachment.id_attachment, item]),
     );
 
-    const hasHero = selected.some(
-      (attachment) => oldMap.get(attachment.id_attachment)?.role === 'hero',
+    const assignedRoles = new Set(
+      selected
+        .map((attachment) => oldMap.get(attachment.id_attachment)?.role)
+        .filter((role): role is string => Boolean(role)),
     );
-
-    let heroAssigned = hasHero;
 
     this.pageMedia = selected.map((attachment) => {
       const existing = oldMap.get(attachment.id_attachment);
@@ -784,11 +822,18 @@ export class FormCmsPage {
         return existing;
       }
 
-      const role: 'hero' | 'gallery' = !heroAssigned ? 'hero' : 'gallery';
+      const role = this.isGadgetHomeTemplate
+        ? (this.gadgetHomeMediaRoles.find(
+            (option) =>
+              option.value !== 'og' &&
+              option.value !== 'gallery' &&
+              !assignedRoles.has(option.value),
+          )?.value ?? 'gallery')
+        : assignedRoles.has('hero')
+          ? 'gallery'
+          : 'hero';
 
-      if (role === 'hero') {
-        heroAssigned = true;
-      }
+      assignedRoles.add(role);
 
       return {
         attachment,
@@ -810,6 +855,23 @@ export class FormCmsPage {
     }));
   }
 
+  updateMediaRole(index: number, role: string): void {
+    const uniqueRole = role !== 'gallery';
+
+    this.pageMedia = this.pageMedia.map((item, currentIndex) => {
+      if (currentIndex === index) return { ...item, role };
+      if (uniqueRole && item.role === role) return { ...item, role: 'gallery' };
+      return item;
+    });
+  }
+
+  mediaRoleLabel(role: string): string {
+    return (
+      this.mediaRoleOptions.find((option) => option.value === role)?.label ??
+      role
+    );
+  }
+
   removeMedia(index: number): void {
     const wasHero = this.pageMedia[index]?.role === 'hero';
 
@@ -817,7 +879,7 @@ export class FormCmsPage {
 
     this.pageMedia = [...this.pageMedia];
 
-    if (wasHero && this.pageMedia.length) {
+    if (wasHero && this.pageMedia.length && !this.isGadgetHomeTemplate) {
       this.setHero(0);
     }
   }
@@ -1325,7 +1387,9 @@ export class FormCmsPage {
   get previewHeroMediaName(): string {
     return (
       this.previewPage?.attachments.find(
-        (item) => item.cms_page_attachment_role === 'hero',
+        (item) =>
+          item.cms_page_attachment_role ===
+          (this.isGadgetHomeTemplate ? 'home_main' : 'hero'),
       )?.original_name ?? '-'
     );
   }

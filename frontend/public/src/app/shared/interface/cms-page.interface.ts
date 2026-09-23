@@ -6,6 +6,7 @@ export interface IPublicCmsPage {
   title: string;
   excerpt: string | null;
   content: string | null;
+  content_json: unknown | null;
   seo: {
     title: string;
     description: string;

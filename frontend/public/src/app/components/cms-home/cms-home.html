@@ -1,30 +1,73 @@
-<section class="matex-home-hero" [attr.lang]="page().locale">
-  @if (hero(); as hero) {
-    <img
-      class="matex-home-hero__image"
-      [src]="hero.asset_url"
-      [alt]="hero.alt"
-      fetchpriority="high"
-    />
-  }
+<section class="home-section cms-gadget-home" [attr.lang]="page().locale">
+  <div class="custom-container">
+    <div class="row g-0">
+      <div class="col-12" [class.col-xl-8]="hasSideBanners()" [class.col-xl-12]="!hasSideBanners()">
+        @if (mainBanner(); as banner) {
+          <figure class="banner-box b-left cms-gadget-home__banner cms-gadget-home__main">
+            <img [src]="banner.asset_url" [alt]="banner.alt" fetchpriority="high" />
+            @if (banner.caption) {
+              <figcaption>{{ banner.caption }}</figcaption>
+            }
+          </figure>
+        } @else {
+          <div class="banner-box b-left cms-gadget-home__placeholder cms-gadget-home__main"></div>
+        }
+      </div>
 
-  <div class="matex-home-hero__overlay"></div>
-
-  <div class="custom-container matex-home-hero__inner">
-    <div class="matex-home-hero__content">
-      <span class="matex-home-hero__eyebrow">MATEX</span>
-
-      <h1>{{ page().title }}</h1>
-
-      @if (page().excerpt) {
-        <p class="matex-home-hero__excerpt">
-          {{ page().excerpt }}
-        </p>
-      }
-
-      @if (page().content) {
-        <div class="matex-home-hero__body" [innerHTML]="page().content"></div>
+      @if (hasSideBanners()) {
+        <div class="col-xl-4 d-xl-block d-none">
+          <div class="row g-0 h-100">
+            <div class="col-12 h-50">
+              @if (sideBanner1(); as banner) {
+                <figure class="banner-box cms-gadget-home__banner">
+                  <img [src]="banner.asset_url" [alt]="banner.alt" />
+                </figure>
+              } @else {
+                <div class="banner-box cms-gadget-home__placeholder"></div>
+              }
+            </div>
+            <div class="col-12 h-50">
+              @if (sideBanner2(); as banner) {
+                <figure class="banner-box cms-gadget-home__banner">
+                  <img [src]="banner.asset_url" [alt]="banner.alt" />
+                </figure>
+              } @else {
+                <div class="banner-box cms-gadget-home__placeholder"></div>
+              }
+            </div>
+          </div>
+        </div>
       }
     </div>
+
+    @if (tiles().length) {
+      <div class="row g-0 cms-gadget-home__tiles">
+        @for (tile of tiles(); track tile.role) {
+          <div class="col-lg-3 col-sm-6">
+            <figure class="banner-box cms-gadget-home__banner cms-gadget-home__tile">
+              <img [src]="tile.asset_url" [alt]="tile.alt" loading="lazy" />
+              @if (tile.caption) {
+                <figcaption>{{ tile.caption }}</figcaption>
+              }
+            </figure>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<section class="section-t-space section-b-space cms-gadget-home__intro">
+  <div class="custom-container">
+    <div class="top-about-content">
+      <h1>{{ page().title }}</h1>
+      @if (page().excerpt) {
+        <p>{{ page().excerpt }}</p>
+      }
+    </div>
+
+    @if (page().content) {
+      <article class="cms-gadget-home__content" [innerHTML]="page().content"></article>
+    }
   </div>
 </section>

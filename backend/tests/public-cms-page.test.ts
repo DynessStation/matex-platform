@@ -97,6 +97,7 @@ test("unlisted response is noindex and strips internal fields and storage paths"
         cms_page_slug: "about",
         cms_page_title: "About",
         cms_page_content: "<p>Public</p>",
+        cms_page_content_json: JSON.stringify({ sections: ["intro"] }),
         cms_page_meta_robots: "index, follow",
         cms_page_settings_json: "private",
       },
@@ -119,12 +120,14 @@ test("unlisted response is noindex and strips internal fields and storage paths"
   assert.equal(data.seo.title, "About");
   assert.equal(data.key, "about");
   assert.equal(data.template, "company-profile");
+  assert.deepEqual(data.content_json, { sections: ["intro"] });
   assert.equal(data.id_cms_page, undefined);
   assert.equal(data.cms_page_settings_json, undefined);
   assert.equal(data.attachments[0].storage_path, undefined);
   assert.equal(data.attachments[0].alt, "Alt");
   assert.deepEqual(calls[1].params, [42, 7]);
-  assert.deepEqual(calls[2].params, ["id-ID", 42, 7]);
+  assert.deepEqual(calls[2].params.slice(0, 3), ["id-ID", 42, 7]);
+  assert.ok(calls[2].params.includes("home_main"));
   for (const clause of [
     "c.cms_page_attachment_is_public = 1",
     "a.attachment_status = 1",
