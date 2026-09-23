@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -9,11 +10,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-
-import { DatePipe } from '@angular/common';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import {
   FormBuilder,
   FormsModule,
@@ -27,9 +24,18 @@ import {
   NgbNavChangeEvent,
   NgbTimeStruct,
 } from '@ng-bootstrap/ng-bootstrap';
-
 import { TranslateModule } from '@ngx-translate/core';
+import { Store } from '@ngxs/store';
+import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
+import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
+import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
+import {
+  GADGET_HOME_MEDIA_RULES,
+  GadgetHomeMediaRule,
+  getGadgetHomeMediaRule,
+} from '../../../shared/data/gadget-home-media';
+import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   CmsPageEffectiveStatus,
   CmsPageI18nStatus,
@@ -41,21 +47,9 @@ import {
   ICmsPagePublicationPayload,
   ICmsPageSaveRequest,
 } from '../../../shared/interface/cms-page.interface';
-
-import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
-
-import { Store } from '@ngxs/store';
-
-import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
-
-import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
-
-import { IAttachment } from '../../../shared/interface/attachment.interface';
-
-import { AuthState } from '../../../shared/store/state/auth.state';
-
-import { hasPermissionAccess } from '../../../shared/utils/permission.util';
 import { LocalizationService } from '../../../shared/services/localization.service';
+import { AuthState } from '../../../shared/store/state/auth.state';
+import { hasPermissionAccess } from '../../../shared/utils/permission.util';
 import { CmsPagePreview } from '../cms-page-preview/cms-page-preview';
 
 type CmsPageLocale = 'id-ID' | 'en-US';
@@ -151,6 +145,8 @@ export class FormCmsPage {
 
   public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
 
+  public mediaValidationAttempted = false;
+
   //==================================================
   //==== PUBLICATION
   //==================================================
@@ -218,14 +214,13 @@ export class FormCmsPage {
     { value: 'contact', label: 'Contact page' },
   ];
 
+  public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
+
   public readonly gadgetHomeMediaRoles = [
-    { value: 'home_main', label: 'Banner utama (8:5)' },
-    { value: 'home_side_1', label: 'Banner samping atas (8:5)' },
-    { value: 'home_side_2', label: 'Banner samping bawah (8:5)' },
-    { value: 'home_tile_1', label: 'Banner kotak 1 (11:9)' },
-    { value: 'home_tile_2', label: 'Banner kotak 2 (11:9)' },
-    { value: 'home_tile_3', label: 'Banner kotak 3 (11:9)' },
-    { value: 'home_tile_4', label: 'Banner kotak 4 (11:9)' },
+    ...GADGET_HOME_MEDIA_RULES.map((rule) => ({
+      value: rule.value,
+      label: `${rule.label} (${rule.recommendedWidth} × ${rule.recommendedHeight})`,
+    })),
     { value: 'og', label: 'Open Graph / share image' },
     { value: 'gallery', label: 'Galeri tambahan' },
   ];
@@ -795,7 +790,7 @@ export class FormCmsPage {
   //==================================================
 
   openMedia(): void {
-    this.mediaModal()?.openModal();
+    void this.mediaModal()?.openModal();
   }
 
   get selectedMedia(): IAttachment[] {
@@ -869,6 +864,81 @@ export class FormCmsPage {
     return (
       this.mediaRoleOptions.find((option) => option.value === role)?.label ??
       role
+    );
+  }
+
+  gadgetHomeMediaRule(role: string): GadgetHomeMediaRule | null {
+    return getGadgetHomeMediaRule(role);
+  }
+
+  gadgetHomeMediaRequirement(rule: GadgetHomeMediaRule): string {
+    return `Rekomendasi ${rule.recommendedWidth} × ${rule.recommendedHeight}px · minimal ${rule.minWidth} × ${rule.minHeight}px`;
+  }
+
+  gadgetHomeMediaIssue(media: CmsPageMediaDraft): string | null {
+    const rule = getGadgetHomeMediaRule(media.role);
+
+    if (!rule) return null;
+
+    if (!this.pageMediaAccept.includes(media.attachment.mime_type)) {
+      return 'Format harus JPEG, PNG, atau WebP.';
+    }
+
+    const width = media.attachment.width;
+    const height = media.attachment.height;
+
+    if (!width || !height) {
+      return 'Dimensi gambar tidak terbaca. Unggah ulang gambar yang valid.';
+    }
+
+    if (width < rule.minWidth || height < rule.minHeight) {
+      return `Gambar terlalu kecil. Minimal ${rule.minWidth} × ${rule.minHeight}px.`;
+    }
+
+    const expectedRatio = rule.recommendedWidth / rule.recommendedHeight;
+    const actualRatio = width / height;
+    const ratioDifference =
+      Math.abs(actualRatio - expectedRatio) / expectedRatio;
+
+    if (ratioDifference > rule.ratioTolerance) {
+      return `Rasio gambar tidak sesuai slot. Gunakan rasio ${rule.recommendedWidth}:${rule.recommendedHeight}.`;
+    }
+
+    return null;
+  }
+
+  get gadgetHomeMissingMediaRules(): readonly GadgetHomeMediaRule[] {
+    if (!this.isGadgetHomeTemplate) return [];
+
+    const assignedRoles = new Set(
+      this.pageMedia
+        .filter((media) => media.is_public)
+        .map((media) => media.role),
+    );
+
+    return GADGET_HOME_MEDIA_RULES.filter(
+      (rule) => rule.required && !assignedRoles.has(rule.value),
+    );
+  }
+
+  get gadgetHomeMediaHasInvalidFiles(): boolean {
+    return (
+      this.isGadgetHomeTemplate &&
+      this.pageMedia.some((media) => this.gadgetHomeMediaIssue(media) !== null)
+    );
+  }
+
+  get gadgetHomeRequiresCompleteMedia(): boolean {
+    if (!this.isGadgetHomeTemplate) return false;
+
+    return ['published', 'scheduled'].includes(this.previewEffectiveStatus());
+  }
+
+  get gadgetHomeMediaBlocksSave(): boolean {
+    return (
+      this.gadgetHomeMediaHasInvalidFiles ||
+      (this.gadgetHomeRequiresCompleteMedia &&
+        this.gadgetHomeMissingMediaRules.length > 0)
     );
   }
 
@@ -1441,6 +1511,13 @@ export class FormCmsPage {
 
   submitForm(): void {
     this.publicationValidationAttempted = true;
+    this.mediaValidationAttempted = true;
+
+    if (this.gadgetHomeMediaBlocksSave) {
+      this.activeTab = 'media';
+
+      return;
+    }
 
     if (
       this.publicationRequiresPublishedTranslation &&

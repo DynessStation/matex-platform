@@ -971,6 +971,65 @@
                     </button>
                   </div>
 
+                  @if (isGadgetHomeTemplate) {
+                    <div class="cms-home-media-contract mb-4">
+                      <div class="d-flex align-items-start gap-2 mb-3">
+                        <i class="ri-layout-grid-line fs-5 text-theme"></i>
+                        <div>
+                          <strong>Ukuran media Home gadget-store</strong>
+                          <p class="text-muted small mb-0">
+                            Komposisi mengikuti slot asli template public.
+                            Ukuran rekomendasi memberi hasil paling tajam;
+                            ukuran minimal tetap wajib dipenuhi.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="cms-home-media-rule-grid">
+                        @for (rule of gadgetHomeMediaRules; track rule.value) {
+                          <div
+                            class="cms-home-media-rule"
+                            [class.is-assigned]="
+                              !gadgetHomeMissingMediaRules.includes(rule)
+                            "
+                          >
+                            <strong>{{ rule.label }}</strong>
+                            <span>{{ gadgetHomeMediaRequirement(rule) }}</span>
+                          </div>
+                        }
+                      </div>
+
+                      @if (gadgetHomeMissingMediaRules.length) {
+                        <div
+                          class="alert mb-0 mt-3"
+                          [class.alert-danger]="
+                            mediaValidationAttempted &&
+                            gadgetHomeRequiresCompleteMedia
+                          "
+                          [class.alert-warning]="
+                            !mediaValidationAttempted ||
+                            !gadgetHomeRequiresCompleteMedia
+                          "
+                        >
+                          <strong>Slot yang belum diisi:</strong>
+                          @for (
+                            rule of gadgetHomeMissingMediaRules;
+                            track rule.value;
+                            let last = $last
+                          ) {
+                            {{ rule.label }}{{ last ? '' : ', ' }}
+                          }
+                          @if (!gadgetHomeRequiresCompleteMedia) {
+                            <span>
+                              — boleh disimpan sebagai draft, tetapi harus
+                              lengkap sebelum dipublikasikan.
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+
                   @if (pageMedia.length) {
                     <!--==================================================-->
                     <!--==== LANGUAGE =====================================-->
@@ -1067,6 +1126,24 @@
                                       : media.attachment.mime_type
                                   }}
                                 </div>
+
+                                @if (gadgetHomeMediaRule(media.role); as rule) {
+                                  <div class="text-muted small mt-1">
+                                    {{ gadgetHomeMediaRequirement(rule) }}
+                                  </div>
+                                }
+
+                                @if (gadgetHomeMediaIssue(media); as issue) {
+                                  <div class="text-danger small mt-1">
+                                    <i class="ri-error-warning-line me-1"></i>
+                                    {{ issue }}
+                                  </div>
+                                } @else if (gadgetHomeMediaRule(media.role)) {
+                                  <div class="text-success small mt-1">
+                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                    Ukuran dan rasio sesuai slot.
+                                  </div>
+                                }
                               </div>
 
                               <button

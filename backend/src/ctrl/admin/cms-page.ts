@@ -7,6 +7,8 @@ import db = require("../../db");
 import keyhsid from "../../hsid";
 
 import {
+  CMS_GADGET_HOME_ATTACHMENT_ROLES,
+  CMS_GADGET_HOME_REQUIRED_ATTACHMENT_ROLES,
   CMS_PAGE_DEFAULT_LOCALE,
   CMS_PAGE_LIST_DEFAULT_LIMIT,
   CMS_PAGE_LIST_MAX_LIMIT,
@@ -18,6 +20,8 @@ import {
   CmsPageVisibility,
   isCmsPageLocale,
   isCmsPagePublicationAction,
+  isCmsGadgetHomeTemplate,
+  validateCmsGadgetHomeMedia,
 } from "../../config/cms-page.config";
 
 import {
@@ -46,6 +50,120 @@ import { buildAttachmentUrl } from "../../helper/attachment.helper";
 const app = express();
 
 const { pool } = db;
+
+type NormalizedAttachmentMedia = {
+  idAttachment: number;
+  role: string;
+  isPublic?: 0 | 1;
+};
+
+type AttachmentMediaRow = {
+  id_attachment: number;
+  mime_type: string;
+  width: number | null;
+  height: number | null;
+};
+
+type GadgetHomeMediaRow = AttachmentMediaRow & {
+  cms_page_attachment_role: string;
+};
+
+const validateGadgetHomeMediaSelection = (
+  template: string | null,
+  attachments: NormalizedAttachmentMedia[],
+  rows: AttachmentMediaRow[],
+  requireComplete: boolean,
+): { code: string; message: string; data?: unknown } | null => {
+  if (!isCmsGadgetHomeTemplate(template)) return null;
+
+  const assignedRoles = new Set(
+    attachments.filter((item) => item.isPublic !== 0).map((item) => item.role),
+  );
+
+  if (requireComplete) {
+    const missingRoles = CMS_GADGET_HOME_REQUIRED_ATTACHMENT_ROLES.filter(
+      (role) => !assignedRoles.has(role),
+    );
+
+    if (missingRoles.length) {
+      return {
+        code: "CMS_PAGE_HOME_MEDIA_REQUIRED",
+        message:
+          "Complete all required gadget-store Home media before publishing",
+        data: { missing_roles: missingRoles },
+      };
+    }
+  }
+
+  const mediaById = new Map(
+    rows.map((row) => [Number(row.id_attachment), row]),
+  );
+
+  for (const attachment of attachments) {
+    const media = mediaById.get(attachment.idAttachment);
+
+    if (!media) continue;
+
+    const issue = validateCmsGadgetHomeMedia(attachment.role, {
+      mimeType: String(media.mime_type),
+      width: media.width === null ? null : Number(media.width),
+      height: media.height === null ? null : Number(media.height),
+    });
+
+    if (issue) {
+      return {
+        ...issue,
+        data: {
+          role: attachment.role,
+          id_attachment: attachment.idAttachment,
+        },
+      };
+    }
+  }
+
+  return null;
+};
+
+const loadPublicGadgetHomeMedia = async (
+  connection: any,
+  idCmsPage: number,
+  idMasterComp: number,
+): Promise<GadgetHomeMediaRow[]> => {
+  const [rows] = await connection.query(
+    `
+      SELECT
+        cpa.id_attachment,
+
+        cpa.cms_page_attachment_role,
+
+        a.mime_type,
+
+        a.width,
+
+        a.height
+
+      FROM cms_page_attachment cpa
+
+      INNER JOIN attachment a
+        ON a.id_attachment = cpa.id_attachment
+
+      WHERE cpa.id_cms_page = ?
+
+        AND cpa.cms_page_attachment_is_public = 1
+
+        AND a.id_master_comp = ?
+
+        AND a.collection_name = 'media_library'
+
+        AND a.attachment_status = 1
+
+        AND a.deleted_at IS NULL
+    `,
+    [idCmsPage, idMasterComp],
+  );
+
+  return rows as GadgetHomeMediaRow[];
+};
 
 //==================================================
 //==== SESSION SCOPE
@@ -2158,9 +2276,11 @@ app.post(
       const attachmentKeys = new Set<string>();
 
       const singleRoles = new Set([
-        "cover", "meta", "og", "hero",
-        "home_main", "home_side_1", "home_side_2",
-        "home_tile_1", "home_tile_2", "home_tile_3", "home_tile_4",
+        "cover",
+        "meta",
+        "og",
+        "hero",
+        ...CMS_GADGET_HOME_ATTACHMENT_ROLES,
       ]);
 
       const usedSingleRoles = new Set<string>();
@@ -2369,6 +2489,8 @@ app.post(
       //==== ATTACHMENT PERMISSION
       //==================================================
 
+      let validatedAttachmentRows: AttachmentMediaRow[] = [];
+
       if (normalizedAttachments.length > 0) {
         const canViewAttachments = await sessionHasPermission(
           connection,
@@ -2530,7 +2652,13 @@ app.post(
         const [attachmentRows] = await connection.query(
           `
               SELECT
-                id_attachment
+                id_attachment,
+
+                mime_type,
+
+                width,
+
+                height
 
               FROM attachment
 
@@ -2559,6 +2687,27 @@ app.post(
             "One or more CMS page attachments are not available",
           );
         }
+
+        validatedAttachmentRows = attachmentRows as AttachmentMediaRow[];
+      }
+
+      const homeMediaIssue = validateGadgetHomeMediaSelection(
+        cleanTemplate,
+        normalizedAttachments,
+        validatedAttachmentRows,
+        pageStatus === CMS_PAGE_STATUS.PUBLISHED || publishAt !== null,
+      );
+
+      if (homeMediaIssue) {
+        await connection.rollback();
+
+        return sendError(
+          res,
+          400,
+          homeMediaIssue.code,
+          homeMediaIssue.message,
+          homeMediaIssue.data,
+        );
       }
 
       //==================================================
@@ -3977,9 +4126,11 @@ app.put(
         const attachmentKeys = new Set<string>();
 
         const singleRoles = new Set([
-          "cover", "meta", "og", "hero",
-          "home_main", "home_side_1", "home_side_2",
-          "home_tile_1", "home_tile_2", "home_tile_3", "home_tile_4",
+          "cover",
+          "meta",
+          "og",
+          "hero",
+          ...CMS_GADGET_HOME_ATTACHMENT_ROLES,
         ]);
 
         const usedSingleRoles = new Set<string>();
@@ -4463,6 +4614,8 @@ app.put(
       //==== VALIDATE ATTACHMENTS
       //==================================================
 
+      let validatedAttachmentRows: AttachmentMediaRow[] = [];
+
       if (attachmentsProvided && normalizedAttachments.length > 0) {
         const attachmentIds = [
           ...new Set(normalizedAttachments.map((item) => item.idAttachment)),
@@ -4473,7 +4626,13 @@ app.put(
         const [attachmentRows] = await connection.query(
           `
         SELECT
-          id_attachment
+          id_attachment,
+
+          mime_type,
+
+          width,
+
+          height
 
         FROM attachment
 
@@ -4500,6 +4659,61 @@ app.put(
             400,
             "CMS_PAGE_ATTACHMENT_NOT_AVAILABLE",
             "One or more CMS page attachments are not available",
+          );
+        }
+
+        validatedAttachmentRows = attachmentRows as AttachmentMediaRow[];
+      }
+
+      if (attachmentsProvided) {
+        const homeMediaIssue = validateGadgetHomeMediaSelection(
+          cleanTemplate,
+          normalizedAttachments,
+          validatedAttachmentRows,
+          pageStatus === CMS_PAGE_STATUS.PUBLISHED || publishAt !== null,
+        );
+
+        if (homeMediaIssue) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            homeMediaIssue.code,
+            homeMediaIssue.message,
+            homeMediaIssue.data,
+          );
+        }
+      } else if (
+        isCmsGadgetHomeTemplate(cleanTemplate) &&
+        (pageStatus === CMS_PAGE_STATUS.PUBLISHED || publishAt !== null)
+      ) {
+        const mediaRows = await loadPublicGadgetHomeMedia(
+          connection,
+          idCmsPage,
+          scope.idMasterComp,
+        );
+
+        const homeMediaIssue = validateGadgetHomeMediaSelection(
+          cleanTemplate,
+          mediaRows.map((media) => ({
+            idAttachment: Number(media.id_attachment),
+            role: String(media.cms_page_attachment_role),
+            isPublic: 1,
+          })),
+          mediaRows,
+          true,
+        );
+
+        if (homeMediaIssue) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            homeMediaIssue.code,
+            homeMediaIssue.message,
+            homeMediaIssue.data,
           );
         }
       }
@@ -5478,6 +5692,8 @@ app.post(
 
             cms_page_default_locale,
 
+            cms_page_template,
+
             cms_page_status,
 
             cms_page_publish_at,
@@ -5818,6 +6034,45 @@ app.post(
         nextPublishAt = null;
 
         nextUnpublishAt = null;
+      }
+
+      //==================================================
+      //==== GADGET HOME MEDIA CONTRACT
+      //==================================================
+
+      if (
+        (action === CMS_PAGE_PUBLICATION_ACTION.PUBLISH ||
+          action === CMS_PAGE_PUBLICATION_ACTION.SCHEDULE) &&
+        isCmsGadgetHomeTemplate(currentPage.cms_page_template)
+      ) {
+        const mediaRows = await loadPublicGadgetHomeMedia(
+          connection,
+          idCmsPage,
+          scope.idMasterComp,
+        );
+
+        const homeMediaIssue = validateGadgetHomeMediaSelection(
+          String(currentPage.cms_page_template),
+          mediaRows.map((media) => ({
+            idAttachment: Number(media.id_attachment),
+            role: String(media.cms_page_attachment_role),
+            isPublic: 1,
+          })),
+          mediaRows,
+          true,
+        );
+
+        if (homeMediaIssue) {
+          await connection.rollback();
+
+          return sendError(
+            res,
+            400,
+            homeMediaIssue.code,
+            homeMediaIssue.message,
+            homeMediaIssue.data,
+          );
+        }
       }
 
       //==================================================

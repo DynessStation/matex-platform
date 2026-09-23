@@ -19,6 +19,22 @@ The renderer includes title, excerpt, sanitized HTML, hero/gallery, localized ca
 
 JSON/block rendering and structured-data schema output remain outside this initial HTML renderer. Opening a page is a snapshot; an already-open tab does not automatically refresh at its expiry time.
 
+## Gadget-store Home media contract
+
+The public Home keeps the original Kartify `components/home/gadget` layout. CMS attachments replace the seven opening banner slots by role; no parallel Home component is introduced. The original template canvases define the recommended dimensions. Admin shows both the recommendation and the enforced minimum (50% of the original canvas).
+
+| Role          | Slot               | Recommended |    Minimum |
+| ------------- | ------------------ | ----------: | ---------: |
+| `home_main`   | Main banner        | 3528 × 1956 | 1764 × 978 |
+| `home_side_1` | Top side banner    |  1400 × 984 |  700 × 492 |
+| `home_side_2` | Bottom side banner |  1400 × 984 |  700 × 492 |
+| `home_tile_1` | Tile 1             |  1172 × 984 |  586 × 492 |
+| `home_tile_2` | Tile 2             |  1172 × 984 |  586 × 492 |
+| `home_tile_3` | Tile 3             |  1172 × 984 |  586 × 492 |
+| `home_tile_4` | Tile 4             |  1404 × 984 |  702 × 492 |
+
+JPEG, PNG, and WebP are accepted. The aspect ratio may differ by at most 5% from the original canvas. Draft pages may have empty required slots, but assigned media must already be valid. All seven roles must point to public media before a Home page can be published or scheduled. The Backend repeats these checks, so the rule cannot be bypassed by calling the API directly.
+
 ## Legacy boundary
 
 The old storefront bootstrap lives in `legacy-app.ts`, under the existing non-CMS routes. It is template code, not a verified MATEX commerce module. The CMS route uses its own shell and anonymous HTTP service, without template auth/error interceptors or shop data dispatches. Existing auth type mismatches were repaired and automatic demo account/token seeding removed so the public app builds cleanly.
@@ -30,7 +46,7 @@ From `backend`:
 ```text
 node node_modules/typescript/bin/tsc --noEmit
 node node_modules/typescript/bin/tsc --outDir dist/tests-build
-node --test dist/tests-build/tests/public-cms-page.test.js
+node --test dist/tests-build/tests/public-cms-page.test.js dist/tests-build/tests/cms-page-media-contract.test.js
 ```
 
 These HTTP contract tests stub the database query boundary. They verify tenant binding, SQL publication predicates, generic 404 responses, private-field projection, public-media filters and unlisted noindex. They do not replace integration testing against the deployment database.
