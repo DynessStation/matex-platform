@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx src/app.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:contracts",
+    "test:contracts": "tsc --outDir dist/tests-build && node --test dist/tests-build/tests/*.test.js"
   },
   "keywords": [],
   "author": "",
