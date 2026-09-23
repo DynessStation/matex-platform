@@ -1522,6 +1522,30 @@ app.post(
 
       const item = normalized.data;
 
+      await connection.query(
+        `
+            UPDATE web_navigation_item
+
+            SET
+              web_navigation_item_key = CONCAT(
+                LEFT(web_navigation_item_key, 80),
+                '__deleted_',
+                id_web_navigation_item
+              ),
+
+              updated = NOW()
+
+            WHERE id_web_navigation = ?
+
+              AND id_master_comp = ?
+
+              AND web_navigation_item_key = ?
+
+              AND web_navigation_item_deleted_at IS NOT NULL
+          `,
+        [idNavigation, scope.idMasterComp, item.key],
+      );
+
       let idParent: number | null = null;
 
       const encodedParent = req.body?.id_parent_web_navigation_item;
@@ -1646,13 +1670,17 @@ app.post(
 
             WHERE id_web_navigation = ?
 
+              AND id_master_comp = ?
+
               AND web_navigation_item_key = ?
+
+              AND web_navigation_item_deleted_at IS NULL
 
             LIMIT 1
 
             FOR UPDATE
           `,
-        [idNavigation, item.key],
+        [idNavigation, scope.idMasterComp, item.key],
       );
 
       if ((existingRows as any[]).length) {
@@ -2014,6 +2042,32 @@ app.put(
       }
 
       const item = normalized.data;
+
+      // Release a matching key held by an old soft-deleted item
+      // before validating and updating the active item.
+      await connection.query(
+        `
+          UPDATE web_navigation_item
+
+          SET
+            web_navigation_item_key = CONCAT(
+              LEFT(web_navigation_item_key, 80),
+              '__deleted_',
+              id_web_navigation_item
+            ),
+
+            updated = NOW()
+
+          WHERE id_web_navigation = ?
+
+            AND id_master_comp = ?
+
+            AND web_navigation_item_key = ?
+
+            AND web_navigation_item_deleted_at IS NOT NULL
+        `,
+        [idNavigation, scope.idMasterComp, item.key],
+      );
 
       //==================================================
       //==== UNIQUE KEY
