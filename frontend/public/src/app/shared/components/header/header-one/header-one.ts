@@ -11,12 +11,15 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngxs/store';
+import { combineLatest } from 'rxjs';
 
 import { HomeCategory } from '../../../../components/home/widgets/home-category/home-category';
 import { Wishlist } from '../../../../components/shop/wishlist/wishlist';
 import { Option } from '../../../interface/theme-option.interface';
 import { LayoutService } from '../../../services/layout.service';
 import { MenuService } from '../../../services/menu.service';
+import { ThemeState } from '../../../store/state/theme.state';
 import { Cart } from '../widgets/cart/cart';
 import { Currency } from '../widgets/currency/currency';
 import { Language } from '../widgets/language/language';
@@ -57,6 +60,7 @@ export class HeaderOne {
   public layoutService = inject(LayoutService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private store = inject(Store);
 
   readonly data = input<Option | null>();
   readonly logo = input<string | null>();
@@ -67,9 +71,11 @@ export class HeaderOne {
     const platformId = inject(PLATFORM_ID);
     this.isBrowser = isPlatformBrowser(platformId);
 
-    this.route.queryParams.subscribe((params) => {
-      this.isGadgetStore = params['theme'] === 'gadget-store';
-    });
+    combineLatest([this.route.queryParams, this.store.select(ThemeState.activeTheme)]).subscribe(
+      ([params, activeTheme]) => {
+        this.isGadgetStore = (params['theme'] || activeTheme) === 'gadget-store';
+      },
+    );
   }
 
   @HostListener('window:scroll', [])

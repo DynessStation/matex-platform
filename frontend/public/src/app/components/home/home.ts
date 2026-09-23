@@ -1,8 +1,9 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, finalize, map, switchMap, tap } from 'rxjs';
 
 import { BabyShop } from './baby-shop/baby-shop';
 import { Electro } from './electro/electro';
@@ -17,36 +18,35 @@ import { ThemeState } from '../../shared/store/state/theme.state';
 
 @Component({
   selector: 'app-home',
-  imports: [Gadget, MegaMart, OrganicStore, BabyShop, StyleTech, Electro],
+  imports: [AsyncPipe, Gadget, MegaMart, OrganicStore, BabyShop, StyleTech, Electro],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home {
-  homePage$: Observable<any> = inject(Store).select(ThemeState.homePage);
-  activeTheme$: Observable<string> = inject(Store).select(ThemeState.activeTheme);
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
 
-  public theme: string;
-  public homePage: any;
+  readonly view$ = combineLatest([
+    this.route.queryParamMap.pipe(map((params) => params.get('theme') || '')),
+    this.store.select(ThemeState.activeTheme),
+  ]).pipe(
+    map(([queryTheme, activeTheme]) => queryTheme || activeTheme),
+    filter((theme): theme is string => Boolean(theme)),
+    distinctUntilChanged(),
+    tap(() => this.themeOptionService.preloader.set(true)),
+    switchMap((theme) =>
+      this.store.dispatch(new GetHomePage(theme)).pipe(
+        map(() => ({
+          theme,
+          homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
+        })),
+        finalize(() => this.themeOptionService.preloader.set(false)),
+      ),
+    ),
+  );
 
   constructor(
-    private store: Store,
-    private route: ActivatedRoute,
     public layoutService: LayoutService,
     public themeOptionService: ThemeOptionService,
-  ) {
-    this.route.queryParams.subscribe((params) => {
-      this.themeOptionService.preloader.set(true);
-      this.activeTheme$.subscribe((theme) => {
-        this.theme = params['theme'] ? params['theme'] : theme;
-        if (this.theme) {
-          this.store
-            .dispatch(new GetHomePage(params['theme'] ? params['theme'] : theme))
-            .subscribe((data: any) => {
-              this.homePage = data?.theme?.homePage;
-              this.themeOptionService.preloader.set(false);
-            });
-        }
-      });
-    });
-  }
+  ) {}
 }

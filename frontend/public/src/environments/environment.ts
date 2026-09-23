@@ -1,5 +1,7 @@
 export const environment = {
   production: false,
-  baseURL: 'http://localhost:4200', // This represents the base URL for running our frontend project.
-  URL: 'http://localhost:4200/assets/data', // Change only the domain part, keeping "/api" intact
+  baseURL: 'http://localhost:4201', // Public frontend origin in local development.
+  URL: 'http://localhost:4201/assets/data',
+  cmsApiURL: 'http://127.0.0.1:3000/api/public',
+  cmsSiteURL: 'http://localhost:4201',
 };
