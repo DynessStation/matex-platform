@@ -26,7 +26,7 @@ import { ICmsPageModel } from '../../../shared/interface/cms-page.interface';
 import {
   IWebNavigationDetail,
   IWebNavigationItem,
-  IWebNavigationItemLinkType,
+  WebNavigationItemLinkType,
   IWebNavigationItemPayload,
 } from '../../../shared/interface/web-navigation.interface';
 
@@ -67,7 +67,7 @@ export class FormMenu {
   );
 
   readonly linkTypes: {
-    value: IWebNavigationItemLinkType;
+    value: WebNavigationItemLinkType;
     label: string;
   }[] = [
     {
@@ -166,7 +166,7 @@ export class FormMenu {
     return this.navigation()?.items ?? [];
   }
 
-  get linkType(): IWebNavigationItemLinkType {
+  get linkType(): WebNavigationItemLinkType {
     return this.form.controls['link_type'].value;
   }
 
