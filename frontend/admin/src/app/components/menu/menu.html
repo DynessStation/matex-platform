@@ -72,10 +72,25 @@
       </div>
 
       @if (selectedNavigation$ | async; as navigation) {
-        <div class="alert alert-light border mt-4 mb-0">
-          Navigation berhasil dimuat dari backend. Saat ini berisi
-          <strong>{{ navigation.items.length }}</strong>
-          item.
+        <div class="row g-4 mt-3">
+          <div class="col-xl-4">
+            <div class="border rounded p-3 h-100">
+              <h5 class="mb-2">Menu Structure</h5>
+
+              <p class="text-content mb-0">
+                Belum ada menu item. Tambahkan item pertama melalui form di
+                sebelah kanan.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-xl-8">
+            <div class="border rounded p-3">
+              <h5 class="mb-4">Add Menu Item</h5>
+
+              <app-form-menu [navigation]="navigation" />
+            </div>
+          </div>
         </div>
       }
     </app-page-wrapper>

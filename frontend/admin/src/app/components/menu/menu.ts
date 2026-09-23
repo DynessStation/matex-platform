@@ -25,10 +25,18 @@ import {
 
 import { WebNavigationState } from '../../shared/store/state/web-navigation.state';
 
+import { FormMenu } from './form-menu/form-menu';
+
 @Component({
   selector: 'app-menu',
 
-  imports: [CommonModule, PageWrapper, Button, HasPermissionDirective],
+  imports: [
+    CommonModule,
+    PageWrapper,
+    Button,
+    HasPermissionDirective,
+    FormMenu,
+  ],
 
   templateUrl: './menu.html',
 
