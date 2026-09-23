@@ -30,7 +30,7 @@ SwiperCore.use([Navigation, Pagination, Autoplay, EffectFade]);
 })
 export class HomeCategory {
   categoryIds = input<number[] | null>(null);
-  type = input<string>('category_box_one');
+  type = input<string>('category_list');
 
   readonly categorySwiperContainer = viewChild<ElementRef>('categorySwiperContainer');
 
@@ -104,6 +104,7 @@ export class HomeCategory {
   }
 
   close() {
+    console.log('close');
     this.layoutService.headerCategoryCanvasToggle = false;
   }
 }
