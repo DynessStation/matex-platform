@@ -18,20 +18,102 @@
     <div class="offcanvas-body" [class.show]="menuService.mainMenuToggle">
       @if (items(); as publicItems) {
         <ul class="navbar-nav {{ navClass() }}">
-          @for (item of publicItems; track item.path) {
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                [routerLink]="item.path"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                (click)="mainMenuClose()"
-              >
-                {{ item.label }}
-              </a>
+          <ng-container
+            *ngTemplateOutlet="
+              publicMenuLevel;
+              context: {
+                $implicit: publicItems,
+                depth: 0,
+              }
+            "
+          />
+        </ul>
+
+        <ng-template #publicMenuLevel let-menuItems let-depth="depth">
+          @for (item of menuItems; track item.key) {
+            <li class="nav-item" [class.dropdown]="item.children.length">
+              @if (item.children.length) {
+                <a
+                  href="javascript:void(0)"
+                  [class]="
+                    depth === 0 ? 'nav-link dropdown-toggle' : 'dropdown-item dropdown-toggle'
+                  "
+                  (click)="togglePublicMenu(item)"
+                >
+                  @if (item.icon) {
+                    <i [class]="item.icon"></i>
+                  }
+
+                  {{ item.label }}
+
+                  @if (item.badge) {
+                    <label class="menu-label {{ item.badge.color ?? '' }}">
+                      {{ item.badge.text }}
+                    </label>
+                  }
+                </a>
+
+                <ul class="dropdown-menu" [class.show]="item.active">
+                  <ng-container
+                    *ngTemplateOutlet="
+                      publicMenuLevel;
+                      context: {
+                        $implicit: item.children,
+                        depth: depth + 1,
+                      }
+                    "
+                  />
+                </ul>
+              } @else if (item.link_type === 'external' && item.url) {
+                <a
+                  [class]="depth === 0 ? 'nav-link' : 'dropdown-item'"
+                  [href]="item.url"
+                  [attr.target]="item.target_blank ? '_blank' : null"
+                  [attr.rel]="item.target_blank ? 'noopener noreferrer' : null"
+                  (click)="mainMenuClose()"
+                >
+                  @if (item.icon) {
+                    <i [class]="item.icon"></i>
+                  }
+
+                  {{ item.label }}
+
+                  @if (item.badge) {
+                    <label class="menu-label {{ item.badge.color ?? '' }}">
+                      {{ item.badge.text }}
+                    </label>
+                  }
+                </a>
+              } @else if (item.path) {
+                <a
+                  [class]="depth === 0 ? 'nav-link' : 'dropdown-item'"
+                  [routerLink]="item.path"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{
+                    exact: item.key === 'home',
+                  }"
+                  (click)="mainMenuClose()"
+                >
+                  @if (item.icon) {
+                    <i [class]="item.icon"></i>
+                  }
+
+                  {{ item.label }}
+
+                  @if (item.badge) {
+                    <label class="menu-label {{ item.badge.color ?? '' }}">
+                      {{ item.badge.text }}
+                    </label>
+                  }
+                </a>
+              } @else {
+                <span [class]="depth === 0 ? 'nav-link' : 'dropdown-item'">
+                  {{ item.label }}
+                </span>
+              }
             </li>
           }
-        </ul>
+        </ng-template>
       } @else if (menuService.skeletonLoader) {
         <ul class="skeleton-menu navbar-nav">
           <li></li>

@@ -24,3 +24,64 @@
   font-weight: 700;
   letter-spacing: 0.04em;
 }
+:host {
+  display: block;
+}
+
+.matex-public-header {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.matex-public-header .main-header {
+  min-height: 96px;
+}
+
+.matex-public-header .header-nav-middle {
+  flex: 1 1 auto;
+}
+
+.matex-public-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #172033;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.matex-public-header__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #ffffff;
+  background: var(--theme-color);
+  border-radius: 4px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+@media (max-width: 575.98px) {
+  .matex-public-header .middle-header {
+    display: none;
+  }
+
+  .matex-public-header .main-header {
+    min-height: 72px;
+  }
+
+  .matex-public-header__brand {
+    font-size: 23px;
+  }
+
+  .matex-public-header__mark {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+  }
+}

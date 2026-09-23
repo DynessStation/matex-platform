@@ -17,11 +17,7 @@ import { ProductState } from '../../../../store/state/product.state';
 import { NoData } from '../../../no-data/no-data';
 import { ProductBox } from '../../../product-box/product-box';
 
-export interface PublicMenuItem {
-  label: string;
-  path: string;
-  exact?: boolean;
-}
+import { IPublicNavigationItem } from '../../../../interface/public-navigation.interface';
 
 @Component({
   selector: 'app-main-menu',
@@ -44,7 +40,7 @@ export class MainMenu {
   menuProduct$: Observable<Product[]> = inject(Store).select(ProductState.menuProducts);
 
   readonly navClass = input<string>();
-  readonly items = input<readonly PublicMenuItem[] | null>(null);
+  readonly items = input<readonly IPublicNavigationItem[] | null>(null);
   private cd = inject(ChangeDetectorRef);
 
   public menu: Menu[] = [];
@@ -113,6 +109,10 @@ export class MainMenu {
         });
       });
     });
+  }
+
+  togglePublicMenu(item: IPublicNavigationItem): void {
+    item.active = !item.active;
   }
 
   setActiveCategory(i: number, megaMenu: Menu) {
