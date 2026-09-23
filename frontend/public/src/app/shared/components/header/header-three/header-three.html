@@ -1,5 +1,5 @@
 <header class="header-style-1" [ngClass]="stick && sticky() ? 'sticky-header' : ''">
-  <div class="top-header custom-container">
+  <div class="top-header custom-container theme-header">
     <div class="left-header">
       <div class="dropdown-box">
         <ul>
@@ -33,7 +33,7 @@
       <app-top-bar-menu></app-top-bar-menu>
     </div>
   </div>
-  <div class="main-header custom-container">
+  <div class="main-dark-header custom-container">
     <div class="left-header">
       <button
         class="navbar-toggler d-xl-none d-inline navbar-menu-button"
@@ -95,21 +95,17 @@
     </div>
   </div>
 
-  <div class="nav-header custom-container d-flex">
-    <div class="category-header d-sm-flex d-none">
-      @if (isGadgetStore) {
-        <button class="btn category-button" (click)="toggleCategories()">
-          <i class="ri-menu-line"></i>
-          <span>Shop By Categories</span>
-        </button>
-      } @else if (!isGadgetStore) {
-        <span class="btn category-button" (click)="toggleCategoriesOffcanvas()">
-          <i class="ri-menu-line"></i>
-          <span>Shop By Categories</span>
-        </span>
-      }
-
-      @if (layoutService.headerCategoryCanvasToggle && !isGadgetStore) {
+  <div class="nav-light-header custom-container d-flex">
+    <div class="category-header d-sm-block d-none">
+      <span class="btn category-button" (click)="toggleCategories()">
+        <i class="ri-menu-line"></i>
+        <span>Shop By Categories</span>
+      </span>
+      <button class="btn category-button d-none" (click)="toggleCategories()">
+        <i class="ri-menu-line"></i>
+        <span>Shop By Categories</span>
+      </button>
+      @if (layoutService.headerCategoryCanvasToggle) {
         <div
           class="category-fixed-box offcanvas offcanvas-start"
           [class.show]="layoutService.headerCategoryCanvasToggle"
@@ -117,7 +113,7 @@
           <app-home-category [type]="'category_list'"></app-home-category>
         </div>
         <div
-          (click)="toggleCategoriesOffcanvas()"
+          (click)="toggleCategories()"
           class="offcanvas-backdrop fade"
           [class.show]="layoutService.headerCategoryCanvasToggle"
         ></div>
@@ -125,10 +121,10 @@
     </div>
 
     <div class="header-nav-middle">
-      <app-main-menu></app-main-menu>
+      <app-main-menu [navClass]="'navbar-nav-dark'"></app-main-menu>
     </div>
 
-    <div class="recent-header">
+    <div class="recent-light-header d-sm-flex d-none">
       <ul class="product-viwer">
         <li class="order-tracking d-xxl-inline-block d-none">
           <a [routerLink]="['/order/tracking']" class="product-link">Order Tracking</a>

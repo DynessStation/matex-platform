@@ -17,8 +17,6 @@ import { ProductState } from '../../../../store/state/product.state';
 import { NoData } from '../../../no-data/no-data';
 import { ProductBox } from '../../../product-box/product-box';
 
-import { IPublicNavigationItem } from '../../../../interface/public-navigation.interface';
-
 @Component({
   selector: 'app-main-menu',
   imports: [
@@ -40,7 +38,6 @@ export class MainMenu {
   menuProduct$: Observable<Product[]> = inject(Store).select(ProductState.menuProducts);
 
   readonly navClass = input<string>();
-  readonly items = input<readonly IPublicNavigationItem[] | null>(null);
   private cd = inject(ChangeDetectorRef);
 
   public menu: Menu[] = [];
@@ -76,13 +73,9 @@ export class MainMenu {
     private router: Router,
     public menuService: MenuService,
     @Inject(PLATFORM_ID) private platformId: Object,
-  ) {}
+  ) { }
 
   ngOnInit() {
-    if (this.items()) {
-      this.menuService.skeletonLoader = false;
-      return;
-    }
     this.menu$.subscribe((menu) => {
       const productIds = Array.from(new Set(this.concatDynamicProductKeys(menu, 'product_ids')));
 
@@ -109,10 +102,6 @@ export class MainMenu {
         });
       });
     });
-  }
-
-  togglePublicMenu(item: IPublicNavigationItem): void {
-    item.active = !item.active;
   }
 
   setActiveCategory(i: number, megaMenu: Menu) {

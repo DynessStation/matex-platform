@@ -1,4 +1,4 @@
-<header class="header-style-1" [ngClass]="stick && sticky() ? 'sticky-header' : ''">
+<header class="header-style-2" [ngClass]="stick && sticky() ? 'sticky-header' : ''">
   <div class="top-header custom-container">
     <div class="left-header">
       <div class="dropdown-box">
@@ -20,11 +20,12 @@
     <div class="middle-header">
       <div class="middle-content">
         <p>
-          <span
-            >FREE RETURNS. STANDARD SHIPPING ORDERS $99+
-            <br />
-            FREE RETURNS. STANDARD SHIPPING ORDERS $99+</span
-          >
+          <span>
+            <b class="text-yellow-color">FREE RETURNS.</b> STANDARD SHIPPING ORDERS
+            <b class="text-yellow-color">$99+</b> <br />
+            <b class="text-yellow-color">FREE RETURNS.</b> STANDARD SHIPPING ORDERS
+            <b class="text-yellow-color">$99+</b>
+          </span>
         </p>
       </div>
     </div>
@@ -33,6 +34,7 @@
       <app-top-bar-menu></app-top-bar-menu>
     </div>
   </div>
+
   <div class="main-header custom-container">
     <div class="left-header">
       <button
@@ -41,7 +43,7 @@
         data-bs-toggle="offcanvas"
         data-bs-target="#primaryMenu"
       >
-        <span class="navbar-toggler-icon">
+        <span class="navbar-toggler-icon title-color">
           <i class="ri-menu-line" (click)="mainMenuOpen()"></i>
         </span>
       </button>
@@ -95,21 +97,23 @@
     </div>
   </div>
 
-  <div class="nav-header custom-container d-flex">
-    <div class="category-header d-sm-flex d-none">
-      @if (isGadgetStore) {
-        <button class="btn category-button" (click)="toggleCategories()">
-          <i class="ri-menu-line"></i>
-          <span>Shop By Categories</span>
-        </button>
-      } @else if (!isGadgetStore) {
-        <span class="btn category-button" (click)="toggleCategoriesOffcanvas()">
-          <i class="ri-menu-line"></i>
-          <span>Shop By Categories</span>
-        </span>
-      }
-
-      @if (layoutService.headerCategoryCanvasToggle && !isGadgetStore) {
+  <div class="nav-header custom-container">
+    <div class="category-header category-space-header d-sm-flex d-none">
+      <a
+        class="btn category-button category-button-2 category-yellow-bg d-xxl-none d-flex d-block"
+        (click)="toggleCategories()"
+      >
+        <i class="ri-menu-line"></i>
+        <span>Shop By Categories</span>
+      </a>
+      <a
+        class="btn category-button categoryButton category-yellow-bg d-xxl-flex d-none"
+        (click)="toggleCategories()"
+      >
+        <i class="ri-menu-line"></i>
+        <span>Shop By Categories</span>
+      </a>
+      @if (layoutService.headerCategoryCanvasToggle) {
         <div
           class="category-fixed-box offcanvas offcanvas-start"
           [class.show]="layoutService.headerCategoryCanvasToggle"
@@ -117,7 +121,7 @@
           <app-home-category [type]="'category_list'"></app-home-category>
         </div>
         <div
-          (click)="toggleCategoriesOffcanvas()"
+          (click)="toggleCategories()"
           class="offcanvas-backdrop fade"
           [class.show]="layoutService.headerCategoryCanvasToggle"
         ></div>
@@ -125,7 +129,7 @@
     </div>
 
     <div class="header-nav-middle">
-      <app-main-menu></app-main-menu>
+      <app-main-menu [navClass]="'navbar-nav-dark'"></app-main-menu>
     </div>
 
     <div class="recent-header">

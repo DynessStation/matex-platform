@@ -1,9 +1,14 @@
-<app-header-one />
+<app-theme-customizer />
 
-<main>
-  <router-outlet />
-</main>
-
-<app-footer [logo]="'assets/images/logo/1-dark.svg'" />
-
+@if (themeOptionService.preloader()) {
+  <app-loader></app-loader>
+}
+<app-header [logo]="setLogo().header_logo"></app-header>
+<router-outlet></router-outlet>
+<app-footer [logo]="setLogo().footer_logo"></app-footer>
 <app-back-to-top />
+
+<app-recent-purchase-popup />
+
+<app-alert [type]="'add-wishlist'" />
+<app-sticky-checkout [product]="product" />

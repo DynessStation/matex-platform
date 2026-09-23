@@ -3,7 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { filter, Observable } from 'rxjs';
+import { Observable, filter } from 'rxjs';
 
 import { ContactInfo } from './widgets/contact-info/contact-info';
 import { FooterAppStoreLink } from './widgets/footer-app-store-link/footer-app-store-link';
@@ -36,41 +36,63 @@ export class Footer {
 
   readonly logo = input<string>();
 
-  path: string;
-  activeTheme: string;
-  footerClass = 'footer-section';
-  themeOptions: Option;
+  public path: string;
+  public activeTheme: string;
+  public footerClass: string = 'footer-section';
 
-  active: Record<string, boolean> = {
+  public themeOptions: Option;
+
+  public active: { [key: string]: boolean } = {
     information: false,
     our_service: false,
     my_account: false,
   };
 
   constructor() {
+    // Load theme options
     this.themeOption$.subscribe((option) => (this.themeOptions = option));
 
+    // Get url query ?theme=
     this.route.queryParams.subscribe((params) => {
       this.path = params['theme'];
       this.setFooter();
     });
 
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.activeTheme$.subscribe((theme) => {
-        this.activeTheme = theme;
-
-        if (!this.path) this.path = this.activeTheme;
-
+    // Listen on navigation end (inner page changes)
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      this.activeTheme$.subscribe((res) => {
+        this.activeTheme = res;
+        if (!this.path) {
+          this.path = this.activeTheme; // theme from store if query param missing
+        }
         this.setFooter();
       });
     });
   }
 
-  toggle(value: string): void {
+  toggle(value: string) {
     this.active[value] = !this.active[value];
   }
 
-  setFooter(): void {
+  setFooter() {
+    // Default footer
     this.footerClass = 'footer-section';
+
+    if (!this.path) return;
+
+    switch (this.path) {
+      case 'mega-mart':
+      case 'organic-store':
+        this.footerClass = 'footer-section-2';
+        break;
+
+      case 'baby-shop':
+        this.footerClass = 'footer-section title-bg-color';
+        break;
+
+      default:
+        this.footerClass = 'footer-section';
+        break;
+    }
   }
 }

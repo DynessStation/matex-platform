@@ -8,7 +8,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
@@ -28,8 +28,7 @@ import { TopBarMenu } from '../widgets/top-bar-menu/top-bar-menu';
 import { UserProfile } from '../widgets/user-profile/user-profile';
 
 @Component({
-  selector: 'app-header-one',
-  standalone: true,
+  selector: 'app-header-three',
   imports: [
     Language,
     Currency,
@@ -37,54 +36,47 @@ import { UserProfile } from '../widgets/user-profile/user-profile';
     TopBarMenu,
     Logo,
     Search,
-    MainMenu,
-    Cart,
-    Wishlist,
     UserProfile,
+    Wishlist,
+    Cart,
+    MainMenu,
+    HomeCategory,
     RouterLink,
     NgClass,
-    HomeCategory,
   ],
-  providers: [],
-  templateUrl: './header-one.html',
-  styleUrl: './header-one.scss',
+  templateUrl: './header-three.html',
+  styleUrl: './header-three.scss',
 })
-export class HeaderOne {
-  public isBrowser = false;
-  public stick = false;
+export class HeaderThree {
+  public isBrowser: boolean;
+  public stick: boolean = false;
 
-  public menuService = inject(MenuService);
-  public layoutService = inject(LayoutService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  menuService = inject(MenuService);
 
   readonly data = input<Option | null>();
   readonly logo = input<string | null>();
   readonly sticky = input<boolean | number>();
-  public isGadgetStore = false;
 
-  constructor() {
+  constructor(public layoutService: LayoutService) {
     const platformId = inject(PLATFORM_ID);
-    this.isBrowser = isPlatformBrowser(platformId);
 
-    this.route.queryParams.subscribe((params) => {
-      this.isGadgetStore = params['theme'] === 'gadget-store';
-    });
+    this.isBrowser = isPlatformBrowser(platformId);
   }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    if (!this.isBrowser) return;
-
-    let y = window.scrollY || 0;
-    this.stick = y >= 50 && window.innerWidth > 400;
+    if (this.isBrowser) {
+      let number =
+        window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      if (number >= 50 && window.innerWidth > 400) {
+        this.stick = true;
+      } else {
+        this.stick = false;
+      }
+    }
   }
 
   toggleCategories() {
-    this.layoutService.headerCategoryCanvasToggle = !this.layoutService.headerCategoryCanvasToggle;
-  }
-
-  toggleCategoriesOffcanvas() {
     this.layoutService.headerCategoryCanvasToggle = !this.layoutService.headerCategoryCanvasToggle;
   }
 

@@ -11,7 +11,6 @@ import { AuthService } from '../../shared/services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { AuthClear } from '../../shared/store/action/auth.action';
 import { SettingState } from '../../shared/store/state/setting.state';
-import { PUBLIC_CMS_REQUEST } from './public-cms.context';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -32,7 +31,6 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    if (req.context.get(PUBLIC_CMS_REQUEST)) return next.handle(req);
     // If Maintenance Mode On
     if (this.isMaintenanceModeOn) {
       this.ngZone.run(() => {

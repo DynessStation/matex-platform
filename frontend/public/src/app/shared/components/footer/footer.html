@@ -1,42 +1,42 @@
 @if (themeOptions) {
   <footer [ngClass]="footerClass">
     <div class="custom-container">
-      <div class="main-footer">
+      <div class="main-footer" [class.light-b-bottom]="this.path === 'baby-shop'">
         <div class="row g-sm-4 g-3">
           <div class="col-xl-3 col-md-5 col-sm-7">
-            <app-contact-info [data]="themeOptions" />
+            <app-contact-info [data]="themeOptions"></app-contact-info>
           </div>
 
           <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('information')">
             <div class="footer-title" [class.active]="active['information']">
               <h4>Information</h4>
             </div>
-            <app-footer-links [section]="themeOptions.footer.information" />
+            <app-footer-links [section]="themeOptions.footer.information"></app-footer-links>
           </div>
 
           <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('our_service')">
             <div class="footer-title" [class.active]="active['our_service']">
               <h4>Our Services</h4>
             </div>
-            <app-footer-links [section]="themeOptions.footer.our_service" />
+            <app-footer-links [section]="themeOptions.footer.our_service"></app-footer-links>
           </div>
 
           <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('my_account')">
             <div class="footer-title" [class.active]="active['my_account']">
               <h4>My Account</h4>
             </div>
-            <app-footer-links [section]="themeOptions.footer.my_account" />
+            <app-footer-links [section]="themeOptions.footer.my_account"></app-footer-links>
           </div>
 
           <div class="col-xl-3 col-lg-4 col-md-5 col-sm-4">
-            <app-footer-app-store-link [data]="themeOptions" />
+            <app-footer-app-store-link [data]="themeOptions"></app-footer-app-store-link>
           </div>
         </div>
       </div>
 
       <div class="sub-footer">
-        <app-footer-logo [logo]="logo()" />
-        <app-footer-payment-options [data]="themeOptions" />
+        <app-footer-logo [logo]="logo()"></app-footer-logo>
+        <app-footer-payment-options [data]="themeOptions"></app-footer-payment-options>
       </div>
     </div>
   </footer>

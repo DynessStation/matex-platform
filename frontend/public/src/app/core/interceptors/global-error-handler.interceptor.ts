@@ -6,7 +6,6 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { ErrorService } from '../../shared/services/error.service';
 import { LoggingService } from '../../shared/services/logging.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { PUBLIC_CMS_REQUEST } from './public-cms.context';
 
 @Injectable()
 export class GlobalErrorHandlerInterceptor implements HttpInterceptor {
@@ -17,7 +16,6 @@ export class GlobalErrorHandlerInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    if (request.context.get(PUBLIC_CMS_REQUEST)) return next.handle(request);
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         // Handle HTTP errors here

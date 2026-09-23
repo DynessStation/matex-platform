@@ -1,50 +1,22 @@
 <div class="dropdown theme-form-select" (clickOutside)="hideDropdown()">
-  @if (publicPageContext.active()) {
-    <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
-      <span>{{ cmsLanguageLabel() }}</span>
-    </button>
+  <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
+    <img [src]="selectedLanguage.icon" class="img-fluid" alt="image" />
+    <span>{{ selectedLanguage.language }}</span>
+  </button>
 
-    <ul class="dropdown-menu dropdown-menu-end" [class.show]="active">
-      @if (publicPageContext.page(); as page) {
-        @for (translation of page.translations; track translation.locale) {
-          <li>
-            <a
-              class="dropdown-item"
-              href="javascript:void(0)"
-              (click)="selectCmsLanguage(translation)"
-              [class.active]="translation.locale === page.locale"
-            >
-              <span>
-                {{ languageLabel(translation.locale) }}
-              </span>
-            </a>
-          </li>
-        }
-      }
-    </ul>
-  } @else {
-    <!-- Legacy Kartify -->
-    <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
-      <img [src]="selectedLanguage.icon" class="img-fluid" alt="image" />
-
-      <span>{{ selectedLanguage.language }}</span>
-    </button>
-
-    <ul class="dropdown-menu dropdown-menu-end" [class.show]="active">
-      @for (language of languages; track language.language) {
-        <li>
-          <a
-            class="dropdown-item"
-            href="javascript:void(0)"
-            (click)="selectLanguage(language)"
-            [class.active]="language.code === selectedLanguage.code"
-          >
-            <img [src]="language.icon" class="img-fluid" alt="image" />
-
-            <span>{{ language.language }}</span>
-          </a>
-        </li>
-      }
-    </ul>
-  }
+  <ul class="dropdown-menu dropdown-menu-end" [class.show]="active">
+    @for (language of languages; track language.language) {
+      <li>
+        <a
+          class="dropdown-item"
+          href="javascript:void(0)"
+          (click)="selectLanguage(language)"
+          [class.active]="language.code === selectedLanguage.code"
+        >
+          <img [src]="language.icon" class="img-fluid" alt="image" />
+          <span> {{ language.language }}</span>
+        </a>
+      </li>
+    }
+  </ul>
 </div>
