@@ -75,12 +75,22 @@
         <div class="row g-4 mt-3">
           <div class="col-xl-4">
             <div class="border rounded p-3 h-100">
-              <h5 class="mb-2">Menu Structure</h5>
+              <h5 class="mb-3">Menu Structure</h5>
 
-              <p class="text-content mb-0">
-                Belum ada menu item. Tambahkan item pertama melalui form di
-                sebelah kanan.
-              </p>
+              @if (navigationTree$ | async; as menuTree) {
+                @if (menuTree.length) {
+                  <app-menu-tree
+                    [data]="menuTree"
+                    (deleteItem)="deleteMenuItem($event)"
+                    (reorderItems)="reorderMenuItems($event)"
+                  />
+                } @else {
+                  <p class="text-content mb-0">
+                    Belum ada menu item. Tambahkan item pertama melalui form di
+                    sebelah kanan.
+                  </p>
+                }
+              }
             </div>
           </div>
 

@@ -1,148 +1,197 @@
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+
 import { CommonModule } from '@angular/common';
-import { Component, inject, viewChild, input } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+
+import { Component, input, output, viewChild } from '@angular/core';
+
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
-import { Store } from '@ngxs/store';
+
+import { Button } from '../../../shared/components/ui/button/button';
 
 import { DeleteModal } from '../../../shared/components/ui/modal/delete-modal/delete-modal';
+
 import { NoData } from '../../../shared/components/ui/no-data/no-data';
+
 import { HasPermissionDirective } from '../../../shared/directive/has-permission.directive';
-import { ICategory } from '../../../shared/interface/category.interface';
-import { IMenu } from '../../../shared/interface/menu.interface';
-import { DeleteMenuAction, UpdateSortMenuAction } from '../../../shared/store/action/menu.action';
-import { Button } from './../../../shared/components/ui/button/button';
+
+import {
+  IWebNavigationReorderItem,
+  IWebNavigationTreeItem,
+} from '../../../shared/interface/web-navigation.interface';
 
 @Component({
   selector: 'app-menu-tree',
+
   imports: [
     CommonModule,
-    NoData,
-    TranslateModule,
-    FormsModule,
     ReactiveFormsModule,
     DragDropModule,
-    RouterModule,
+    TranslateModule,
     DeleteModal,
+    NoData,
     HasPermissionDirective,
     Button,
   ],
+
   templateUrl: './menu-tree.html',
+
   styleUrl: './menu-tree.scss',
 })
 export class MenuTree {
-  private store = inject(Store);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-
   readonly DeleteModal = viewChild<DeleteModal>('deleteModal');
 
-  readonly type = input<string>(undefined);
-  readonly data = input<IMenu[]>(undefined);
-  readonly recursionKey = input<string>(undefined);
-  readonly displayKey = input<string>('title');
-  readonly categoryType = input<string | null>('product');
+  readonly data = input<IWebNavigationTreeItem[]>([]);
 
-  public treeSearch = new FormControl('');
-  public dataToShow: IMenu[] = [];
-  public showChildrenNode: boolean = true;
-  public id: number;
+  readonly deleteItem = output<IWebNavigationTreeItem>();
+
+  readonly reorderItems = output<IWebNavigationReorderItem[]>();
+
+  readonly treeSearch = new FormControl('', {
+    nonNullable: true,
+  });
+
+  treeData: IWebNavigationTreeItem[] = [];
+
+  dataToShow: IWebNavigationTreeItem[] = [];
 
   constructor() {
-    this.treeSearch.valueChanges.subscribe(data => {
-      if (data) {
-        this.dataToShow = [];
-        this.data().forEach(item => {
-          this.hasValue(item) && this.dataToShow.push(item);
+    this.treeSearch.valueChanges.subscribe((value) => {
+      this.applySearch(value);
+    });
+  }
+
+  ngOnChanges(): void {
+    this.treeData = this.cloneItems(this.data());
+
+    this.applySearch(this.treeSearch.value);
+  }
+
+  onShowChildrenNode(node: IWebNavigationTreeItem): void {
+    node.show = !node.show;
+  }
+
+  confirmDelete(item: IWebNavigationTreeItem): void {
+    this.DeleteModal()?.openModal('delete', item);
+  }
+
+  delete(actionType: string, item: IWebNavigationTreeItem): void {
+    if (actionType !== 'delete') {
+      return;
+    }
+
+    this.deleteItem.emit(item);
+  }
+
+  drop(
+    event: CdkDragDrop<IWebNavigationTreeItem[]>,
+    items: IWebNavigationTreeItem[],
+  ): void {
+    if (
+      this.treeSearch.value.trim() ||
+      event.previousContainer !== event.container
+    ) {
+      return;
+    }
+
+    moveItemInArray(items, event.previousIndex, event.currentIndex);
+
+    this.normalizeSortOrder(this.treeData);
+
+    this.dataToShow = this.treeData;
+  }
+
+  saveChanges(): void {
+    if (this.treeSearch.value.trim()) {
+      return;
+    }
+
+    this.normalizeSortOrder(this.treeData);
+
+    this.reorderItems.emit(this.buildReorderPayload(this.treeData));
+  }
+
+  private applySearch(value: string): void {
+    const query = value.trim().toLowerCase();
+
+    if (!query) {
+      this.dataToShow = this.treeData;
+
+      return;
+    }
+
+    this.dataToShow = this.filterItems(this.treeData, query);
+  }
+
+  private filterItems(
+    items: IWebNavigationTreeItem[],
+    query: string,
+  ): IWebNavigationTreeItem[] {
+    const result: IWebNavigationTreeItem[] = [];
+
+    for (const item of items) {
+      const children = this.filterItems(item.child, query);
+
+      const matches =
+        item.title.toLowerCase().includes(query) ||
+        item.key.toLowerCase().includes(query);
+
+      if (matches || children.length) {
+        result.push({
+          ...item,
+
+          child: children,
+
+          show: true,
         });
-      } else {
-        this.dataToShow = this.data();
       }
-    });
-  }
-
-  ngOnInit() {
-    this.route.params.subscribe(params => (this.id = params['id']));
-  }
-
-  onShowChildrenNode(node: IMenu) {
-    node['show'] = !node['show'];
-  }
-
-  delete(actionType: string, data: ICategory) {
-    this.store.dispatch(new DeleteMenuAction(data.id!)).subscribe({
-      complete: () => {
-        void this.router.navigateByUrl('/menu');
-      },
-    });
-  }
-
-  ngOnChanges() {
-    this.dataToShow = this.data();
-    this.addKey(this.dataToShow);
-  }
-
-  addKey(data: IMenu[]) {
-    data.forEach(item => {
-      item['show'] = true;
-      this.addKey(item.child);
-    });
-  }
-
-  hasValue(item: IMenu) {
-    let valueToReturn = false;
-    if (item[this.displayKey()].toLowerCase().includes(this.treeSearch?.value?.toLowerCase())) {
-      valueToReturn = true;
     }
-    item[this.recursionKey()]?.length &&
-      item[this.recursionKey()].forEach((child: IMenu) => {
-        if (this.hasValue(child)) {
-          valueToReturn = true;
-        }
-      });
-    return valueToReturn;
+
+    return result;
   }
 
-  drop(event: CdkDragDrop<IMenu[]>, items: IMenu[]) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(items, event.previousIndex, event.currentIndex);
-      this.updateShortNumbers(items);
-    }
+  private cloneItems(
+    items: IWebNavigationTreeItem[],
+  ): IWebNavigationTreeItem[] {
+    return items.map((item) => ({
+      ...item,
+
+      child: this.cloneItems(item.child),
+
+      show: true,
+    }));
   }
 
-  updateShortNumbers(items: any[]) {
+  private normalizeSortOrder(items: IWebNavigationTreeItem[]): void {
     items.forEach((item, index) => {
-      item.short = index + 1;
-      if (item.subtasks) {
-        this.updateShortNumbers(item.subtasks);
-      }
+      item.sort_order = index;
+
+      this.normalizeSortOrder(item.child);
     });
   }
 
-  saveChanges() {
-    this.filterJson(this.dataToShow);
-    this.store.dispatch(new UpdateSortMenuAction({ menus: this.filterJson(this.dataToShow) }));
-  }
+  private buildReorderPayload(
+    items: IWebNavigationTreeItem[],
+    parentId: string | null = null,
+    result: IWebNavigationReorderItem[] = [],
+  ): IWebNavigationReorderItem[] {
+    items.forEach((item, index) => {
+      result.push({
+        id_web_navigation_item: item.id_web_navigation_item,
 
-  filterJson(obj: any): any {
-    if (Array.isArray(obj)) {
-      return obj.map((item, index) => {
-        item['sort'] = index;
-        return this.filterJson(item);
+        id_parent_web_navigation_item: parentId,
+
+        sort_order: index,
       });
-    } else if (typeof obj === 'object') {
-      const newObj: any = {};
-      newObj['id'] = obj['id'];
-      newObj['parent_id'] = obj['parent_id'];
-      newObj['sort'] = obj['sort'];
-      if (Array.isArray(obj['child'])) {
-        newObj['child'] = this.filterJson(obj['child']);
-      }
-      return newObj;
-    } else {
-      return obj;
-    }
+
+      this.buildReorderPayload(item.child, item.id_web_navigation_item, result);
+    });
+
+    return result;
   }
 }

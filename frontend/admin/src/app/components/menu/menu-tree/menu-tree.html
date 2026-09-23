@@ -1,82 +1,116 @@
 <div class="theme-tree-box">
   <i class="fas fa-yin-yang"></i>
-  <input class="form-control" placeholder="{{ 'search' | translate }}" [formControl]="treeSearch" />
-  @if(dataToShow?.length){
+
+  <input
+    class="form-control"
+    type="search"
+    placeholder="Cari menu..."
+    [formControl]="treeSearch"
+  />
+
+  @if (dataToShow.length) {
     <ul class="tree-main-ul">
       <li class="cursor-pointer">
         <div>
           <i class="tree-icon folder-icon" role="presentation"></i>
-          <span class="me-auto">{{ 'menu' | translate }}</span>
-          <app-button
-            [class]="'btn btn-sm me-2 ms-auto btn-theme'"
-            (click)="saveChanges()"
-            [type]="'submit'"
-            [spinner]="true"
-            [id]="'update_menu'"
-            >{{'save_changes'| translate}}</app-button
+
+          <span class="me-auto"> Primary Navigation </span>
+
+          <ng-container *hasPermission="'web_navigation.update'">
+            <app-button
+              [class]="'btn btn-sm me-2 ms-auto btn-theme'"
+              [type]="'button'"
+              [id]="'save_navigation_order'"
+              [disabled]="!!treeSearch.value.trim()"
+              (click)="saveChanges()"
             >
-          </div>
-          <ng-container cdkDropListGroup>
-            <ng-container *ngTemplateOutlet="renderMenuLevel; context: { $implicit: dataToShow }" />
+              Save order
+            </app-button>
           </ng-container>
+        </div>
 
-          <ng-template #renderMenuLevel let-items>
-            <ul cdkDropList class="menu-level" (cdkDropListDropped)="drop($event, items)">
-              @for(node of items; track node.id){
-                <li class="cursor-pointer" [class.inside-ul]="node.child && node.child.length" cdkDrag>
-                  <div>
-                    @if(node.child && node.child.length){
-                      <i
-                        class="file-icon ri-arrow-down-s-line ms-0"
-                        role="presentation"
-                        (click)="onShowChildrenNode(node)"
-                      ></i>
+        <ng-container cdkDropListGroup>
+          <ng-container
+            *ngTemplateOutlet="
+              renderMenuLevel;
+              context: { $implicit: dataToShow }
+            "
+          />
+        </ng-container>
+
+        <ng-template #renderMenuLevel let-items>
+          <ul
+            cdkDropList
+            class="menu-level"
+            (cdkDropListDropped)="drop($event, items)"
+          >
+            @for (node of items; track node.id_web_navigation_item) {
+              <li
+                class="cursor-pointer"
+                [class.inside-ul]="node.child.length"
+                cdkDrag
+                [cdkDragDisabled]="!!treeSearch.value.trim()"
+              >
+                <div>
+                  @if (node.child.length) {
+                    <i
+                      class="file-icon ri-arrow-down-s-line ms-0"
+                      role="button"
+                      [class.ri-arrow-right-s-line]="!node.show"
+                      [class.ri-arrow-down-s-line]="node.show"
+                      (click)="onShowChildrenNode(node)"
+                    ></i>
+                  }
+
+                  <span class="me-auto">
+                    {{ node.title }}
+
+                    @if (node.status === 0) {
+                      <small class="badge bg-warning ms-2"> Inactive </small>
                     }
-                    <span [class]="node.id === id ? 'active' : ''"
-                      >{{ node[displayKey()] || node?.title}}</span
+                  </span>
+
+                  <div class="tree-options">
+                    <ng-container *hasPermission="'web_navigation.delete'">
+                      <a
+                        href="javascript:void(0)"
+                        title="Delete menu item"
+                        (click)="confirmDelete(node)"
                       >
-                      <div class="tree-options">
-                        <a
-                          href="javascript:void(0)"
-                          *hasPermission="'category.edit'"
-                          [routerLink]="['/menu/edit', node?.id]"
-                          >
-                          <i class="ri-pencil-line text-success"></i>
-                        </a>
-                        <a
-                          href="javascript:void(0)"
-                          *hasPermission="'category.destroy'"
-                          (click)="DeleteModal().openModal('delete', node)"
-                          >
-                          <i class="ri-delete-bin-7-line text-danger"></i>
-                        </a>
-                      </div>
-                      <i
-                        class="tree-icon file-icon"
-                        role="presentation"
-                        (click)="onShowChildrenNode(node)"
-                      ></i>
-                    </div>
-                    @if (node.child && node.child.length && node?.show) {
-                      <ng-container
-                        *ngTemplateOutlet="renderMenuLevel; context: { $implicit: node.child }"
-                        />
-                    }
-                  </li>
-                }
-              </ul>
-            </ng-template>
-          </li>
-        </ul>
-      }
-    </div>
-    @if (!dataToShow?.length) {
-      <app-no-data
-        [class]="'no-data-added category-no-data'"
-        [image]="'assets/svg/no-category.png'"
-        [text]="'no_menu_found'"
-        />
-    }
+                        <i class="ri-delete-bin-7-line text-danger"></i>
+                      </a>
+                    </ng-container>
+                  </div>
 
-    <!-- Delete Modal -->
-    <app-delete-modal #deleteModal (deleteItem)="delete($event.actionToPerform,$event.data)" />
+                  <i class="tree-icon file-icon" role="presentation"></i>
+                </div>
+
+                @if (node.child.length && node.show) {
+                  <ng-container
+                    *ngTemplateOutlet="
+                      renderMenuLevel;
+                      context: { $implicit: node.child }
+                    "
+                  />
+                }
+              </li>
+            }
+          </ul>
+        </ng-template>
+      </li>
+    </ul>
+  }
+</div>
+
+@if (!dataToShow.length) {
+  <app-no-data
+    [class]="'no-data-added category-no-data'"
+    [image]="'assets/svg/no-category.png'"
+    [text]="'no_menu_found'"
+  />
+}
+
+<app-delete-modal
+  #deleteModal
+  (deleteItem)="delete($event.actionToPerform, $event.data)"
+/>

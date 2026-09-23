@@ -91,6 +91,14 @@ export interface IWebNavigationItem {
   updated: string;
 }
 
+export interface IWebNavigationTreeItem extends IWebNavigationItem {
+  title: string;
+
+  child: IWebNavigationTreeItem[];
+
+  show: boolean;
+}
+
 export interface IWebNavigationDetail {
   id_web_navigation: string;
 
