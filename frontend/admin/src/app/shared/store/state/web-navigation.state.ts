@@ -256,11 +256,19 @@ export class WebNavigationState {
         );
       }),
 
-      switchMap(() => this.service.getNavigationDetail(action.navigationId)),
+      switchMap(() =>
+        forkJoin({
+          list: this.service.getNavigations(),
 
-      tap((response) => {
+          detail: this.service.getNavigationDetail(action.navigationId),
+        }),
+      ),
+
+      tap(({ list, detail }) => {
         ctx.patchState({
-          selectedNavigation: response.data,
+          navigations: list.data.navigations,
+
+          selectedNavigation: detail.data,
         });
       }),
     );
@@ -302,11 +310,19 @@ export class WebNavigationState {
         );
       }),
 
-      switchMap(() => this.service.getNavigationDetail(action.navigationId)),
+      switchMap(() =>
+        forkJoin({
+          list: this.service.getNavigations(),
 
-      tap((response) => {
+          detail: this.service.getNavigationDetail(action.navigationId),
+        }),
+      ),
+
+      tap(({ list, detail }) => {
         ctx.patchState({
-          selectedNavigation: response.data,
+          navigations: list.data.navigations,
+
+          selectedNavigation: detail.data,
         });
       }),
     );
@@ -324,11 +340,19 @@ export class WebNavigationState {
         );
       }),
 
-      switchMap(() => this.service.getNavigationDetail(action.navigationId)),
+      switchMap(() =>
+        forkJoin({
+          list: this.service.getNavigations(),
 
-      tap((response) => {
+          detail: this.service.getNavigationDetail(action.navigationId),
+        }),
+      ),
+
+      tap(({ list, detail }) => {
         ctx.patchState({
-          selectedNavigation: response.data,
+          navigations: list.data.navigations,
+
+          selectedNavigation: detail.data,
         });
       }),
     );
