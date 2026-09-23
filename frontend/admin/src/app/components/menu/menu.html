@@ -81,6 +81,10 @@
                 @if (menuTree.length) {
                   <app-menu-tree
                     [data]="menuTree"
+                    [selectedItemId]="
+                      editingItem?.id_web_navigation_item ?? null
+                    "
+                    (editItem)="editMenuItem($event)"
                     (deleteItem)="deleteMenuItem($event)"
                     (reorderItems)="reorderMenuItems($event)"
                   />
@@ -96,9 +100,16 @@
 
           <div class="col-xl-8">
             <div class="border rounded p-3">
-              <h5 class="mb-4">Add Menu Item</h5>
+              <h5 class="mb-4">
+                {{ editingItem ? 'Edit Menu Item' : 'Add Menu Item' }}
+              </h5>
 
-              <app-form-menu [navigation]="navigation" />
+              <app-form-menu
+                [navigation]="navigation"
+                [item]="editingItem"
+                (completed)="finishEditing()"
+                (cancelled)="finishEditing()"
+              />
             </div>
           </div>
         </div>

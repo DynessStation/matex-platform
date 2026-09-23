@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 
-import { Component, DestroyRef, inject, input } from '@angular/core';
+import { Component, DestroyRef, inject, input, output } from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -32,11 +32,12 @@ import {
 
 import { GetCmsPagesAction } from '../../../shared/store/action/cms-page.action';
 
-import { CreateWebNavigationItemAction } from '../../../shared/store/action/web-navigation.action';
+import {
+  CreateWebNavigationItemAction,
+  UpdateWebNavigationItemAction,
+} from '../../../shared/store/action/web-navigation.action';
 
 import { CmsPageState } from '../../../shared/store/state/cms-page.state';
-
-import { WebNavigationState } from '../../../shared/store/state/web-navigation.state';
 
 @Component({
   selector: 'app-form-menu',
@@ -61,6 +62,12 @@ export class FormMenu {
   private destroyRef = inject(DestroyRef);
 
   readonly navigation = input<IWebNavigationDetail | null>(null);
+
+  readonly item = input<IWebNavigationItem | null>(null);
+
+  readonly completed = output<void>();
+
+  readonly cancelled = output<void>();
 
   readonly cmsPages$: Observable<ICmsPageModel | null> = this.store.select(
     CmsPageState.cmsPages,
@@ -159,7 +166,45 @@ export class FormMenu {
   }
 
   ngOnChanges(): void {
-    this.resetSortOrder();
+    this.populateForm();
+  }
+
+  get isEdit(): boolean {
+    return this.item() !== null;
+  }
+
+  get parentItems(): IWebNavigationItem[] {
+    const currentItem = this.item();
+
+    if (!currentItem) {
+      return this.items;
+    }
+
+    const excludedIds = new Set<string>([currentItem.id_web_navigation_item]);
+
+    let changed = true;
+
+    while (changed) {
+      changed = false;
+
+      for (const candidate of this.items) {
+        const parentId = candidate.id_parent_web_navigation_item;
+
+        if (
+          parentId &&
+          excludedIds.has(parentId) &&
+          !excludedIds.has(candidate.id_web_navigation_item)
+        ) {
+          excludedIds.add(candidate.id_web_navigation_item);
+
+          changed = true;
+        }
+      }
+    }
+
+    return this.items.filter(
+      (candidate) => !excludedIds.has(candidate.id_web_navigation_item),
+    );
   }
 
   get items(): IWebNavigationItem[] {
@@ -189,6 +234,8 @@ export class FormMenu {
   submit(): void {
     const navigation = this.navigation();
 
+    const currentItem = this.item();
+
     if (!navigation || this.submitting) {
       return;
     }
@@ -203,8 +250,21 @@ export class FormMenu {
 
     const value = this.form.getRawValue();
 
+    const parentId = value.parent_id || null;
+
+    const idTranslation = currentItem?.translations.find(
+      (translation) => translation.locale === 'id-ID',
+    );
+
+    const enTranslation = currentItem?.translations.find(
+      (translation) => translation.locale === 'en-US',
+    );
+
+    const parentChanged =
+      currentItem?.id_parent_web_navigation_item !== parentId;
+
     const payload: IWebNavigationItemPayload = {
-      id_parent_web_navigation_item: value.parent_id || null,
+      id_parent_web_navigation_item: parentId,
 
       id_cms_page:
         this.linkType === 'cms_page' ? value.cms_page_id || null : null,
@@ -214,7 +274,7 @@ export class FormMenu {
       web_navigation_item_link_type: this.linkType,
 
       web_navigation_item_target_blank:
-        this.linkType === 'external' ? value.target_blank === true : false,
+        this.linkType === 'external' && value.target_blank === true,
 
       web_navigation_item_icon: String(value.icon ?? '').trim() || null,
 
@@ -224,11 +284,14 @@ export class FormMenu {
       web_navigation_item_badge_color:
         String(value.badge_color ?? '').trim() || null,
 
-      web_navigation_item_sort_order: navigation.items.length,
+      web_navigation_item_sort_order:
+        currentItem && !parentChanged
+          ? currentItem.sort_order
+          : this.nextSortOrder(parentId),
 
       web_navigation_item_status: value.status === true ? 1 : 0,
 
-      web_navigation_item_settings_json: null,
+      web_navigation_item_settings_json: currentItem?.settings ?? null,
 
       translations: [
         {
@@ -242,7 +305,7 @@ export class FormMenu {
           url:
             this.linkType === 'external' ? String(value.id_url).trim() : null,
 
-          status: 1,
+          status: idTranslation?.status ?? 1,
         },
         {
           locale: 'en-US',
@@ -255,31 +318,105 @@ export class FormMenu {
           url:
             this.linkType === 'external' ? String(value.en_url).trim() : null,
 
-          status: 1,
+          status: enTranslation?.status ?? 1,
         },
       ],
     };
 
     this.submitting = true;
 
-    this.store
-      .dispatch(
-        new CreateWebNavigationItemAction(
+    const request = currentItem
+      ? new UpdateWebNavigationItemAction(
+          navigation.id_web_navigation,
+          currentItem.id_web_navigation_item,
+          payload,
+        )
+      : new CreateWebNavigationItemAction(
           navigation.id_web_navigation,
           payload,
-        ),
-      )
-      .subscribe({
-        complete: () => {
-          this.submitting = false;
+        );
 
+    this.store.dispatch(request).subscribe({
+      complete: () => {
+        this.submitting = false;
+
+        if (!currentItem) {
           this.resetForm();
-        },
+        }
 
-        error: () => {
-          this.submitting = false;
-        },
-      });
+        this.completed.emit();
+      },
+
+      error: () => {
+        this.submitting = false;
+      },
+    });
+  }
+
+  cancel(): void {
+    this.cancelled.emit();
+  }
+
+  private populateForm(): void {
+    const item = this.item();
+
+    if (!item) {
+      this.resetForm();
+
+      return;
+    }
+
+    const idTranslation = item.translations.find(
+      (translation) => translation.locale === 'id-ID',
+    );
+
+    const enTranslation = item.translations.find(
+      (translation) => translation.locale === 'en-US',
+    );
+
+    this.form.reset({
+      key: item.key,
+
+      link_type: item.link_type,
+
+      parent_id: item.id_parent_web_navigation_item,
+
+      cms_page_id: item.id_cms_page,
+
+      icon: item.icon ?? '',
+
+      badge_text: item.badge_text ?? '',
+
+      badge_color: item.badge_color ?? '',
+
+      target_blank: item.target_blank,
+
+      status: item.status === 1,
+
+      id_label: idTranslation?.label ?? '',
+
+      en_label: enTranslation?.label ?? '',
+
+      id_path: idTranslation?.path ?? '',
+
+      en_path: enTranslation?.path ?? '',
+
+      id_url: idTranslation?.url ?? '',
+
+      en_url: enTranslation?.url ?? '',
+    });
+
+    this.applyTargetValidators();
+  }
+
+  private nextSortOrder(parentId: string | null): number {
+    const siblingOrders = this.items
+      .filter(
+        (candidate) => candidate.id_parent_web_navigation_item === parentId,
+      )
+      .map((candidate) => candidate.sort_order);
+
+    return siblingOrders.length ? Math.max(...siblingOrders) + 1 : 0;
   }
 
   private applyTargetValidators(): void {
@@ -372,20 +509,5 @@ export class FormMenu {
     });
 
     this.applyTargetValidators();
-
-    this.resetSortOrder();
-  }
-
-  private resetSortOrder(): void {
-    const latest = this.store.selectSnapshot(
-      WebNavigationState.selectedNavigation,
-    );
-
-    if (
-      latest &&
-      latest.id_web_navigation === this.navigation()?.id_web_navigation
-    ) {
-      return;
-    }
   }
 }

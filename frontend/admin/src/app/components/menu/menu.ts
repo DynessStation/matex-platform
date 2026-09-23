@@ -73,6 +73,8 @@ export class Menu {
       map((navigation) => this.buildNavigationTree(navigation)),
     );
 
+  editingItem: IWebNavigationItem | null = null;
+
   loading = true;
 
   creating = false;
@@ -129,6 +131,12 @@ export class Menu {
       WebNavigationState.selectedNavigation,
     );
 
+    if (
+      this.editingItem?.id_web_navigation_item === item.id_web_navigation_item
+    ) {
+      this.editingItem = null;
+    }
+
     if (!navigation) {
       return;
     }
@@ -139,6 +147,22 @@ export class Menu {
         item.id_web_navigation_item,
       ),
     );
+  }
+
+  editMenuItem(item: IWebNavigationTreeItem): void {
+    const navigation = this.store.selectSnapshot(
+      WebNavigationState.selectedNavigation,
+    );
+
+    this.editingItem =
+      navigation?.items.find(
+        (candidate) =>
+          candidate.id_web_navigation_item === item.id_web_navigation_item,
+      ) ?? null;
+  }
+
+  finishEditing(): void {
+    this.editingItem = null;
   }
 
   reorderMenuItems(items: IWebNavigationReorderItem[]): void {

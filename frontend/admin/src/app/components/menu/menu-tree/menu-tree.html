@@ -62,7 +62,12 @@
                     ></i>
                   }
 
-                  <span class="me-auto">
+                  <span
+                    class="me-auto"
+                    [class.active]="
+                      node.id_web_navigation_item === selectedItemId()
+                    "
+                  >
                     {{ node.title }}
 
                     @if (node.status === 0) {
@@ -71,6 +76,15 @@
                   </span>
 
                   <div class="tree-options">
+                    <ng-container *hasPermission="'web_navigation.update'">
+                      <a
+                        href="javascript:void(0)"
+                        title="Edit menu item"
+                        (click)="edit(node)"
+                      >
+                        <i class="ri-pencil-line text-success"></i>
+                      </a>
+                    </ng-container>
                     <ng-container *hasPermission="'web_navigation.delete'">
                       <a
                         href="javascript:void(0)"

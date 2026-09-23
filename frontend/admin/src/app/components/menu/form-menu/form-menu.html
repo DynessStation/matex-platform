@@ -45,7 +45,7 @@
     >
       <option [ngValue]="null">Root menu</option>
 
-      @for (item of items; track item.id_web_navigation_item) {
+      @for (item of parentItems; track item.id_web_navigation_item) {
         <option [value]="item.id_web_navigation_item">
           {{ itemTitle(item) }}
         </option>
@@ -264,9 +264,28 @@
     </div>
   </app-form-fields>
 
-  <ng-container *hasPermission="'web_navigation.create'">
-    <app-button [id]="'create_navigation_item'" [disabled]="submitting">
-      Save Menu Item
-    </app-button>
-  </ng-container>
+  <div class="d-flex flex-wrap gap-2">
+    @if (isEdit) {
+      <ng-container *hasPermission="'web_navigation.update'">
+        <app-button [id]="'update_navigation_item'" [disabled]="submitting">
+          Update Menu Item
+        </app-button>
+      </ng-container>
+
+      <button
+        class="btn btn-outline-theme"
+        type="button"
+        [disabled]="submitting"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+    } @else {
+      <ng-container *hasPermission="'web_navigation.create'">
+        <app-button [id]="'create_navigation_item'" [disabled]="submitting">
+          Save Menu Item
+        </app-button>
+      </ng-container>
+    }
+  </div>
 </form>

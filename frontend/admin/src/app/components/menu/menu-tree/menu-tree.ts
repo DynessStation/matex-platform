@@ -50,6 +50,10 @@ export class MenuTree {
 
   readonly deleteItem = output<IWebNavigationTreeItem>();
 
+  readonly editItem = output<IWebNavigationTreeItem>();
+
+  readonly selectedItemId = input<string | null>(null);
+
   readonly reorderItems = output<IWebNavigationReorderItem[]>();
 
   readonly treeSearch = new FormControl('', {
@@ -86,6 +90,10 @@ export class MenuTree {
     }
 
     this.deleteItem.emit(item);
+  }
+
+  edit(item: IWebNavigationTreeItem): void {
+    this.editItem.emit(item);
   }
 
   drop(
