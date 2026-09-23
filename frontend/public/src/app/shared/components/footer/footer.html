@@ -1,60 +1,43 @@
-<footer class="footer-section">
-  <div class="custom-container">
-    <div class="main-footer">
-      <div class="row g-sm-4 g-3">
-        <div class="col-xl-4 col-md-6">
-          <app-footer-logo
-            [logo]="'assets/images/logo/1-dark.svg'"
-            [homePath]="navigation.homePath()"
-          />
-
-          <p class="mt-3 mb-0">PT Matex Indo Abadi</p>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-          <div class="footer-title">
-            <h4>Menu</h4>
+@if (themeOptions) {
+  <footer [ngClass]="footerClass">
+    <div class="custom-container">
+      <div class="main-footer">
+        <div class="row g-sm-4 g-3">
+          <div class="col-xl-3 col-md-5 col-sm-7">
+            <app-contact-info [data]="themeOptions" />
           </div>
 
-          <div class="footer-content">
-            <ul>
-              <ng-container
-                *ngTemplateOutlet="footerMenu; context: { $implicit: navigation.primaryItems() }"
-              />
-            </ul>
+          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('information')">
+            <div class="footer-title" [class.active]="active['information']">
+              <h4>Information</h4>
+            </div>
+            <app-footer-links [section]="themeOptions.footer.information" />
+          </div>
+
+          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('our_service')">
+            <div class="footer-title" [class.active]="active['our_service']">
+              <h4>Our Services</h4>
+            </div>
+            <app-footer-links [section]="themeOptions.footer.our_service" />
+          </div>
+
+          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('my_account')">
+            <div class="footer-title" [class.active]="active['my_account']">
+              <h4>My Account</h4>
+            </div>
+            <app-footer-links [section]="themeOptions.footer.my_account" />
+          </div>
+
+          <div class="col-xl-3 col-lg-4 col-md-5 col-sm-4">
+            <app-footer-app-store-link [data]="themeOptions" />
           </div>
         </div>
       </div>
+
+      <div class="sub-footer">
+        <app-footer-logo [logo]="logo()" />
+        <app-footer-payment-options [data]="themeOptions" />
+      </div>
     </div>
-
-    <div class="sub-footer">
-      <p>© {{ year }} PT Matex Indo Abadi</p>
-    </div>
-  </div>
-</footer>
-
-<ng-template #footerMenu let-items>
-  @for (item of items; track item.key) {
-    <li>
-      @if (item.link_type === 'external' && item.url) {
-        <a
-          [href]="item.url"
-          [attr.target]="item.target_blank ? '_blank' : null"
-          [attr.rel]="item.target_blank ? 'noopener noreferrer' : null"
-        >
-          {{ item.label }}
-        </a>
-      } @else if (item.path) {
-        <a [routerLink]="item.path">{{ item.label }}</a>
-      } @else {
-        <span>{{ item.label }}</span>
-      }
-
-      @if (item.children.length) {
-        <ul>
-          <ng-container *ngTemplateOutlet="footerMenu; context: { $implicit: item.children }" />
-        </ul>
-      }
-    </li>
-  }
-</ng-template>
+  </footer>
+}
