@@ -26,6 +26,7 @@ import {
   GetWebNavigationDetailAction,
   GetWebNavigationsAction,
   ReorderWebNavigationItemsAction,
+  UpdateWebNavigationStatusAction,
 } from '../../shared/store/action/web-navigation.action';
 
 import { WebNavigationState } from '../../shared/store/state/web-navigation.state';
@@ -78,6 +79,8 @@ export class Menu {
   loading = true;
 
   creating = false;
+
+  changingStatus = false;
 
   ngOnInit(): void {
     this.loadPrimaryNavigation();
@@ -262,6 +265,39 @@ export class Menu {
 
         finalize(() => {
           this.loading = false;
+        }),
+      )
+      .subscribe();
+  }
+
+  canActivateNavigation(): boolean {
+    const navigation = this.store.selectSnapshot(
+      WebNavigationState.selectedNavigation,
+    );
+
+    return navigation?.items.some((item) => item.status === 1) ?? false;
+  }
+
+  toggleNavigationStatus(navigation: IWebNavigationSummary): void {
+    if (this.changingStatus) {
+      return;
+    }
+
+    if (navigation.status === 0 && !this.canActivateNavigation()) {
+      return;
+    }
+
+    this.changingStatus = true;
+
+    this.store
+      .dispatch(
+        new UpdateWebNavigationStatusAction(navigation.id_web_navigation, {
+          web_navigation_status: navigation.status === 1 ? 0 : 1,
+        }),
+      )
+      .pipe(
+        finalize(() => {
+          this.changingStatus = false;
         }),
       )
       .subscribe();

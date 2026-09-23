@@ -9,19 +9,7 @@
 } @else {
   @if (primaryNavigation$ | async; as primary) {
     <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
-      <div
-        class="d-flex flex-wrap align-items-center justify-content-between gap-3"
-      >
-        <div>
-          <h5 class="mb-1">
-            {{ primary.name }}
-          </h5>
-
-          <p class="text-content mb-0">
-            Menu utama untuk header website publik MATEX.
-          </p>
-        </div>
-
+      <div class="d-flex flex-wrap align-items-center gap-2">
         <span
           class="badge"
           [class.bg-success]="primary.status === 1"
@@ -29,6 +17,26 @@
         >
           {{ primary.status === 1 ? 'Active' : 'Inactive' }}
         </span>
+
+        <ng-container *hasPermission="'web_navigation.publish'">
+          <app-button
+            [id]="'toggle_navigation_status'"
+            [type]="'button'"
+            [spinner]="true"
+            [class]="
+              primary.status === 1
+                ? 'btn btn-sm btn-outline-danger'
+                : 'btn btn-sm btn-theme'
+            "
+            [disabled]="
+              changingStatus ||
+              (primary.status === 0 && !canActivateNavigation())
+            "
+            (click)="toggleNavigationStatus(primary)"
+          >
+            {{ primary.status === 1 ? 'Deactivate' : 'Activate' }}
+          </app-button>
+        </ng-container>
       </div>
 
       <div class="row g-3 mt-3">
@@ -70,6 +78,17 @@
           </div>
         </div>
       </div>
+
+      @if (primary.status === 0) {
+        <div class="alert alert-warning mt-3 mb-0" role="status">
+          Navigation belum tampil di website publik. Pastikan tujuan setiap item
+          sudah benar sebelum diaktifkan.
+        </div>
+      } @else {
+        <div class="alert alert-success mt-3 mb-0" role="status">
+          Navigation aktif dan dapat dibaca oleh website publik.
+        </div>
+      }
 
       @if (selectedNavigation$ | async; as navigation) {
         <div class="row g-4 mt-3">
