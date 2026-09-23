@@ -540,6 +540,60 @@
                         }
                       </div>
 
+                      @if (isGadgetHomeTemplate) {
+                        <div class="col-12">
+                          <div class="cms-home-section-contract">
+                            <div class="mb-3">
+                              <h6 class="mb-1">Bagian halaman Home</h6>
+                              <p class="text-muted mb-0">
+                                Tentukan bagian yang boleh tampil untuk bahasa
+                                ini. Bagian yang membutuhkan sumber data
+                                terverifikasi sebaiknya tetap nonaktif sampai
+                                data MATEX tersedia.
+                              </p>
+                            </div>
+
+                            <div class="cms-home-section-grid">
+                              @for (
+                                section of homeSectionOptions;
+                                track section.key
+                              ) {
+                                <label class="cms-home-section-option">
+                                  <div
+                                    class="d-flex justify-content-between gap-3"
+                                  >
+                                    <div>
+                                      <strong>{{ section.label }}</strong>
+                                      <small>{{ section.description }}</small>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-0">
+                                      <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        role="switch"
+                                        [(ngModel)]="
+                                          homeSectionVisibility[activeLocale][
+                                            section.key
+                                          ]
+                                        "
+                                        [ngModelOptions]="{ standalone: true }"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  @if (section.requiresVerifiedData) {
+                                    <span class="badge bg-light text-dark mt-2">
+                                      Memerlukan sumber data terverifikasi
+                                    </span>
+                                  }
+                                </label>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      }
+
                       <!-- EXCERPT -->
 
                       <div class="col-12">
@@ -976,7 +1030,7 @@
                       <div class="d-flex align-items-start gap-2 mb-3">
                         <i class="ri-layout-grid-line fs-5 text-theme"></i>
                         <div>
-                          <strong>Ukuran media Home gadget-store</strong>
+                          <strong>Ukuran media Home</strong>
                           <p class="text-muted small mb-0">
                             Komposisi mengikuti slot asli template public.
                             Ukuran rekomendasi memberi hasil paling tajam;

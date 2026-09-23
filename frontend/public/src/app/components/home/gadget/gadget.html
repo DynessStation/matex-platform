@@ -209,7 +209,7 @@
   </section>
 }
 
-@if (data()?.trending_deals_section) {
+@if (data()?.trending_deals_section?.status) {
   <section class="mt-20">
     <div class="custom-container">
       <div class="row g-3">
@@ -301,8 +301,10 @@
     </div>
   </section>
 }
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter></app-home-newsletter>
-  </div>
-</section>
+@if (data()?.newsletter?.status !== false) {
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter></app-home-newsletter>
+    </div>
+  </section>
+}

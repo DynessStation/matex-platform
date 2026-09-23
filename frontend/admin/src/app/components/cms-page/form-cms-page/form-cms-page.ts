@@ -57,6 +57,22 @@ type CmsPageLocale = 'id-ID' | 'en-US';
 type CmsPagePublicationChoice =
   'current' | 'draft' | 'publish_now' | 'schedule' | 'archive';
 
+const HOME_SECTION_KEYS = [
+  'sale_product',
+  'top_product_by_categories',
+  'two_column_banner',
+  'categories',
+  'banner_with_tabs_product',
+  'offers_product',
+  'trending_deals_section',
+  'offer_banner',
+  'tags',
+  'newsletter',
+] as const;
+
+type HomeSectionKey = (typeof HOME_SECTION_KEYS)[number];
+type HomeSectionVisibility = Record<HomeSectionKey, boolean>;
+
 //==================================================
 //==== MEDIA DRAFT
 //==================================================
@@ -209,12 +225,85 @@ export class FormCmsPage {
 
   public readonly templateOptions = [
     { value: 'standard', label: 'Standard page' },
-    { value: 'home', label: 'Gadget store home' },
+    { value: 'home', label: 'Home utama' },
     { value: 'company-profile', label: 'Company profile' },
     { value: 'contact', label: 'Contact page' },
   ];
 
   public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
+
+  public readonly homeSectionOptions: readonly {
+    key: HomeSectionKey;
+    label: string;
+    description: string;
+    requiresVerifiedData: boolean;
+  }[] = [
+    {
+      key: 'sale_product',
+      label: 'Promo kilat',
+      description: 'Daftar produk dan penghitung waktu promo.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'top_product_by_categories',
+      label: 'Produk pilihan per kategori',
+      description: 'Kelompok produk unggulan berdasarkan kategori.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'two_column_banner',
+      label: 'Dua banner promosi',
+      description: 'Dua banner tambahan di bawah bagian produk awal.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'categories',
+      label: 'Kategori pilihan',
+      description: 'Daftar kategori yang ditonjolkan pada Home.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'banner_with_tabs_product',
+      label: 'Rekomendasi produk',
+      description: 'Banner dan tab berisi kelompok produk rekomendasi.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'offers_product',
+      label: 'Penawaran pilihan',
+      description: 'Kumpulan kartu penawaran pada bagian tengah halaman.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'trending_deals_section',
+      label: 'Produk populer dan promo',
+      description: 'Gabungan produk populer, promo, dan kategori terkait.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'offer_banner',
+      label: 'Banner lebar',
+      description: 'Banner promosi selebar area konten.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'tags',
+      label: 'Tag populer',
+      description: 'Kumpulan tag untuk membantu penelusuran konten.',
+      requiresVerifiedData: true,
+    },
+    {
+      key: 'newsletter',
+      label: 'Langganan informasi',
+      description: 'Formulir pendaftaran pembaruan melalui email.',
+      requiresVerifiedData: true,
+    },
+  ];
+
+  public homeSectionVisibility: Record<CmsPageLocale, HomeSectionVisibility> = {
+    'id-ID': this.createHomeSectionVisibility(),
+    'en-US': this.createHomeSectionVisibility(),
+  };
 
   public readonly gadgetHomeMediaRoles = [
     ...GADGET_HOME_MEDIA_RULES.map((rule) => ({
@@ -378,6 +467,10 @@ export class FormCmsPage {
 
       this.resetTranslationForm('id-ID');
       this.resetTranslationForm('en-US');
+      this.homeSectionVisibility = {
+        'id-ID': this.createHomeSectionVisibility(),
+        'en-US': this.createHomeSectionVisibility(),
+      };
 
       this.translationForm('id-ID').disable({
         emitEvent: false,
@@ -435,6 +528,10 @@ export class FormCmsPage {
           {
             emitEvent: false,
           },
+        );
+
+        this.homeSectionVisibility[locale] = this.readHomeSectionVisibility(
+          translation.cms_page_content_json,
         );
       });
 
@@ -524,6 +621,47 @@ export class FormCmsPage {
       { value: 'gallery', label: 'Gallery' },
       { value: 'og', label: 'Open Graph / share image' },
     ];
+  }
+
+  private createHomeSectionVisibility(): HomeSectionVisibility {
+    return Object.fromEntries(
+      HOME_SECTION_KEYS.map((key) => [key, false]),
+    ) as HomeSectionVisibility;
+  }
+
+  private readHomeSectionVisibility(content: unknown): HomeSectionVisibility {
+    const visibility = this.createHomeSectionVisibility();
+    if (!this.isRecord(content)) return visibility;
+
+    for (const key of HOME_SECTION_KEYS) {
+      const section = content[key];
+      if (this.isRecord(section) && typeof section['status'] === 'boolean') {
+        visibility[key] = section['status'];
+      }
+    }
+
+    return visibility;
+  }
+
+  private buildHomeContentJson(
+    locale: CmsPageLocale,
+    existing: unknown,
+  ): Record<string, unknown> {
+    const content = this.isRecord(existing) ? { ...existing } : {};
+
+    for (const key of HOME_SECTION_KEYS) {
+      const current = this.isRecord(content[key]) ? content[key] : {};
+      content[key] = {
+        ...current,
+        status: this.homeSectionVisibility[locale][key],
+      };
+    }
+
+    return content;
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
   //==================================================
@@ -1216,7 +1354,12 @@ export class FormCmsPage {
 
           cms_page_content: value.content || null,
 
-          cms_page_content_json: existing?.cms_page_content_json ?? null,
+          cms_page_content_json: this.isGadgetHomeTemplate
+            ? this.buildHomeContentJson(
+                language.locale,
+                existing?.cms_page_content_json,
+              )
+            : (existing?.cms_page_content_json ?? null),
 
           cms_page_meta_title: value.meta_title.trim() || null,
 

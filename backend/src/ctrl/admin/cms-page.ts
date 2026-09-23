@@ -21,6 +21,7 @@ import {
   isCmsPageLocale,
   isCmsPagePublicationAction,
   isCmsGadgetHomeTemplate,
+  validateCmsGadgetHomeContent,
   validateCmsGadgetHomeMedia,
 } from "../../config/cms-page.config";
 
@@ -88,8 +89,7 @@ const validateGadgetHomeMediaSelection = (
     if (missingRoles.length) {
       return {
         code: "CMS_PAGE_HOME_MEDIA_REQUIRED",
-        message:
-          "Complete all required gadget-store Home media before publishing",
+        message: "Complete all required Home media before publishing",
         data: { missing_roles: missingRoles },
       };
     }
@@ -2128,6 +2128,20 @@ app.post(
           );
         }
 
+        if (isCmsGadgetHomeTemplate(cleanTemplate)) {
+          const contentIssue = validateCmsGadgetHomeContent(item?.content_json);
+
+          if (contentIssue) {
+            return sendError(
+              res,
+              400,
+              contentIssue.code,
+              contentIssue.message,
+              { locale, ...(contentIssue.data as object | undefined) },
+            );
+          }
+        }
+
         if (
           item?.schema_json !== null &&
           item?.schema_json !== undefined &&
@@ -3965,6 +3979,22 @@ app.put(
               locale,
             },
           );
+        }
+
+        if (isCmsGadgetHomeTemplate(cleanTemplate)) {
+          const contentIssue = validateCmsGadgetHomeContent(item?.content_json);
+
+          if (contentIssue) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              contentIssue.code,
+              contentIssue.message,
+              { locale, ...(contentIssue.data as object | undefined) },
+            );
+          }
         }
 
         if (

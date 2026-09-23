@@ -191,6 +191,62 @@ export const isCmsGadgetHomeTemplate = (
 ): boolean =>
   template === CMS_PAGE_TEMPLATE.GADGET_HOME || template === "gadget-home-v1";
 
+export const CMS_GADGET_HOME_SECTION_KEYS = [
+  "sale_product",
+  "top_product_by_categories",
+  "two_column_banner",
+  "categories",
+  "banner_with_tabs_product",
+  "offers_product",
+  "trending_deals_section",
+  "offer_banner",
+  "tags",
+  "newsletter",
+] as const;
+
+export const validateCmsGadgetHomeContent = (
+  content: unknown,
+): { code: string; message: string; data?: unknown } | null => {
+  if (content === null || content === undefined) return null;
+
+  if (typeof content !== "object" || Array.isArray(content)) {
+    return {
+      code: "CMS_PAGE_HOME_CONTENT_INVALID",
+      message: "Home page content must be an object",
+    };
+  }
+
+  const record = content as Record<string, unknown>;
+
+  for (const key of CMS_GADGET_HOME_SECTION_KEYS) {
+    const section = record[key];
+    if (section === undefined) continue;
+
+    if (
+      typeof section !== "object" ||
+      section === null ||
+      Array.isArray(section)
+    ) {
+      return {
+        code: "CMS_PAGE_HOME_SECTION_INVALID",
+        message: `Home page section ${key} must be an object`,
+        data: { section: key },
+      };
+    }
+
+    const status = (section as Record<string, unknown>).status;
+    if (status !== undefined && typeof status !== "boolean") {
+      return {
+        code: "CMS_PAGE_HOME_SECTION_STATUS_INVALID",
+        message: `Home page section ${key} status must be boolean`,
+        data: { section: key },
+      };
+    }
+  }
+
+  return null;
+};
+
 export const validateCmsGadgetHomeMedia = (
   role: string,
   media: { mimeType: string; width: number | null; height: number | null },

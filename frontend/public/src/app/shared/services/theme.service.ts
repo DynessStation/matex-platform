@@ -12,6 +12,19 @@ import { BannerLink, GadgetTheme, ThemesModel } from '../interface/theme.interfa
   providedIn: 'root',
 })
 export class ThemeService {
+  private readonly cmsHomeSectionDefaults = {
+    sale_product: { status: false },
+    top_product_by_categories: { status: false },
+    two_column_banner: { status: false },
+    categories: { status: false },
+    banner_with_tabs_product: { status: false },
+    offers_product: { status: false },
+    trending_deals_section: { status: false },
+    offer_banner: { status: false },
+    tags: { status: false },
+    newsletter: { status: false },
+  };
+
   constructor(
     private http: HttpClient,
     private cmsPageService: CmsPageService,
@@ -38,7 +51,8 @@ export class ThemeService {
 
   private mergeGadgetHome(template: GadgetTheme, page: IPublicCmsPage): GadgetTheme {
     const content = this.isRecord(page.content_json) ? page.content_json : {};
-    const merged = this.mergeObjects(template, content) as unknown as GadgetTheme;
+    const safeTemplate = this.mergeObjects(template, this.cmsHomeSectionDefaults);
+    const merged = this.mergeObjects(safeTemplate, content) as unknown as GadgetTheme;
 
     merged.slug = 'gadget-store';
 

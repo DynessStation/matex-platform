@@ -145,6 +145,7 @@ export interface GadgetTheme {
   tags: Tags;
   offers_product: OffersProduct;
   trending_deals_section: TrendingDealsSection;
+  newsletter?: { status: boolean };
   slug: string;
   products_ids?: number[];
 }

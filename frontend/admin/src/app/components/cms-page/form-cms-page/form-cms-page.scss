@@ -33,6 +33,35 @@
 //==== MEDIA
 //==================================================
 
+.cms-home-section-contract {
+  padding: 16px;
+
+  background: rgba(var(--theme-color-rgb), 0.04);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.18);
+  border-radius: 6px;
+}
+
+.cms-home-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cms-home-section-option {
+  padding: 12px;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+
+  cursor: pointer;
+
+  small {
+    display: block;
+    margin-top: 3px;
+    color: #777;
+  }
+}
+
 .cms-page-media-list {
   display: flex;
   flex-direction: column;
@@ -131,6 +160,7 @@
 }
 
 @media (max-width: 767px) {
+  .cms-home-section-grid,
   .cms-home-media-rule-grid {
     grid-template-columns: 1fr;
   }
