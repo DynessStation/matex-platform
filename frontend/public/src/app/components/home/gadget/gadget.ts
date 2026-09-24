@@ -1,105 +1,120 @@
-import { NgClass } from '@angular/common';
-import { ChangeDetectorRef, Component, input } from '@angular/core';
+import { AsyncPipe, DatePipe } from '@angular/common';
+import { Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
-import { Button } from '../../../shared/components/button/button';
-import { Timer } from '../../../shared/components/widgets/timer/timer';
+import { Attachment } from '../../../shared/interface/attachment.interface';
+import { IBlog } from '../../../shared/interface/blog.interface';
+import { Category } from '../../../shared/interface/category.interface';
+import { Product } from '../../../shared/interface/product.interface';
 import { GadgetTheme } from '../../../shared/interface/theme.interface';
-import { LayoutService } from '../../../shared/services/layout.service';
+import { BlogService } from '../../../shared/services/blog.service';
+import { CategoryService } from '../../../shared/services/category.service';
+import { ProductService } from '../../../shared/services/product.service';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { ThemeOptionService } from '../../../shared/services/theme-option.service';
-import { GetCategories } from '../../../shared/store/action/category.action';
-import { GetProductByIds } from '../../../shared/store/action/product.action';
-import { GetTags } from '../../../shared/store/action/tag.action';
 import { HomeBanner } from '../widgets/home-banner/home-banner';
-import { HomeCategory } from '../widgets/home-category/home-category';
-import { HomeDealProducts } from '../widgets/home-deal-products/home-deal-products';
 import { HomeNewsletter } from '../widgets/home-newsletter/home-newsletter';
-import { HomeProduct } from '../widgets/home-product/home-product';
-import { HomeTabsProducts } from '../widgets/home-tabs-products/home-tabs-products';
-import { HomeTags } from '../widgets/home-tags/home-tags';
-import { HomeTopCategoryProduct } from '../widgets/home-top-category-product/home-top-category-product';
+
+interface HomeContent {
+  categories: Category[];
+  products: Product[];
+  articles: IBlog[];
+}
 
 @Component({
   selector: 'app-gadget',
-  imports: [
-    HomeBanner,
-    HomeProduct,
-    HomeTopCategoryProduct,
-    HomeCategory,
-    HomeTabsProducts,
-    HomeTags,
-    HomeNewsletter,
-    HomeDealProducts,
-    Timer,
-    Button,
-    NgClass,
-  ],
+  imports: [AsyncPipe, DatePipe, HomeBanner, HomeNewsletter, RouterLink],
   templateUrl: './gadget.html',
   styleUrl: './gadget.scss',
 })
 export class Gadget {
+  private categoryService = inject(CategoryService);
+  private productService = inject(ProductService);
+  private blogService = inject(BlogService);
+  private navigation = inject(PublicNavigationContextService);
+  private themeOptionService = inject(ThemeOptionService);
+
   data = input<GadgetTheme>();
   slug = input<string>();
 
-  constructor(
-    public layoutService: LayoutService,
-    public themeOptionService: ThemeOptionService,
-    private store: Store,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  readonly content$ = this.navigation.locale$.pipe(
+    switchMap((locale) =>
+      forkJoin({
+        categories: this.categoryService
+          .getCategories({ status: 1 })
+          .pipe(catchError(() => of({ data: [], total: 0 }))),
+        products: this.productService
+          .getProducts({ status: 1 })
+          .pipe(catchError(() => of({ data: [], total: 0 }))),
+        articles: this.blogService
+          .getBlogs(locale, { page: 1, paginate: 3 })
+          .pipe(catchError(() => of({ data: [], total: 0 }))),
+      }),
+    ),
+    map(({ categories, products, articles }): HomeContent => ({
+      categories: [...categories.data]
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.is_featured)) - Number(Boolean(a.is_featured)) ||
+            Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0),
+        )
+        .slice(0, 6),
+      products: [...products.data]
+        .sort((a, b) => Number(Boolean(b.is_featured)) - Number(Boolean(a.is_featured)))
+        .slice(0, 8),
+      articles: [...articles.data]
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.is_featured)) - Number(Boolean(a.is_featured)) ||
+            Date.parse(b.created_at ?? '') - Date.parse(a.created_at ?? ''),
+        )
+        .slice(0, 3),
+    })),
+    tap(() => this.themeOptionService.preloader.set(false)),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
 
-  ngOnInit() {
-    if (this.data()?.slug === this.slug()) {
-      // Get Products
-      let getProducts$;
-      if (this.data()?.products_ids?.length) {
-        getProducts$ = this.store.dispatch(
-          new GetProductByIds({
-            status: 1,
-            approve: 1,
-            ids: this.data()?.products_ids?.join(','),
-            paginate: this.data()?.products_ids?.length,
-          }),
-        );
-      } else {
-        getProducts$ = of(null);
-      }
+  get locale(): string {
+    return this.navigation.locale();
+  }
 
-      // Get Category
-      let getCategory$;
-      if (this.data()?.categories?.category_ids?.length && this.data()?.categories?.status) {
-        getCategory$ = this.store.dispatch(
-          new GetCategories({
-            status: 1,
-            ids: this.data()?.categories?.category_ids?.join(','),
-          }),
-        );
-      } else {
-        getCategory$ = of(null);
-      }
+  get isEnglish(): boolean {
+    return this.locale === 'en-US';
+  }
 
-      // Get Tags
-      let getTag$;
-      if (this.data()?.tags?.tags_ids?.length && this.data()?.tags?.status) {
-        getTag$ = this.store.dispatch(
-          new GetTags({
-            status: 1,
-            ids: this.data()?.tags?.tags_ids?.join(','),
-          }),
-        );
-      } else {
-        getTag$ = of(null);
-      }
+  get catalogPath(): string {
+    return this.isEnglish ? '/en/catalog' : '/katalog';
+  }
 
-      // Skeleton Loader
-      forkJoin([getProducts$, getCategory$, getTag$]).subscribe({
-        complete: () => {
-          this.themeOptionService.preloader.set(false);
-          this.cdr.markForCheck();
-        },
-      });
-    }
+  get articlesPath(): string {
+    return this.isEnglish ? '/en/articles' : '/artikel';
+  }
+
+  categoryPath(slug: string): string {
+    return this.isEnglish ? `/en/category/${slug}` : `/kategori/${slug}`;
+  }
+
+  productPath(slug: string): string {
+    return this.isEnglish ? `/en/product/${slug}` : `/produk/${slug}`;
+  }
+
+  articlePath(slug: string): string {
+    return this.isEnglish ? `/en/article/${slug}` : `/artikel/${slug}`;
+  }
+
+  imageUrl(attachment: Attachment | null | undefined, fallback: string): string {
+    return attachment?.asset_url || attachment?.original_url || fallback;
+  }
+
+  displayPrice(product: Product): string | null {
+    if (product.price_visibility !== 'displayed' || !product.sale_price) return null;
+
+    return new Intl.NumberFormat(this.isEnglish ? 'en-US' : 'id-ID', {
+      style: 'currency',
+      currency: product.currency || 'IDR',
+      maximumFractionDigits: 0,
+    }).format(product.sale_price);
   }
 }

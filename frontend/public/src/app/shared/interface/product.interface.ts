@@ -45,6 +45,7 @@ export interface Product {
   variations: Variation[];
   stock_status: string;
   status: boolean;
+  is_featured?: boolean;
   is_external?: boolean;
   type?: string;
   external_url?: string;
