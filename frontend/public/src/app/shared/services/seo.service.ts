@@ -168,15 +168,20 @@ export class SeoService {
         };
       }
       this.customSCO();
-    } else if (path.includes('category')) {
+    } else if (path.includes('category') || path.includes('kategori')) {
       if (this.category) {
         this.scoContent = {
           ...this.scoContent,
           og_type: 'website',
-          url: window.location.href,
-          og_title: this.category?.meta_title || this.themeOption?.seo?.meta_title,
+          url: this.category?.canonical_url || window.location.href,
+          og_title:
+            this.category?.og_title ||
+            this.category?.meta_title ||
+            this.themeOption?.seo?.meta_title,
           og_description:
-            this.category?.meta_description || this.themeOption?.seo?.meta_description,
+            this.category?.og_description ||
+            this.category?.meta_description ||
+            this.themeOption?.seo?.meta_description,
           og_image:
             this.category?.category_meta_image?.original_url ||
             this.themeOption?.seo?.og_image?.original_url,

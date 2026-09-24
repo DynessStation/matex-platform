@@ -236,10 +236,9 @@ export class CategoryState {
 
   @Action(GetCategoryBySlug)
   getCategoryBySlug(ctx: StateContext<CategoryStateModel>, action: GetCategoryBySlug) {
-    return this.categoryService.getCategories().pipe(
+    return this.categoryService.getCategoryBySlug(action.slug).pipe(
       tap({
-        next: (results) => {
-          const result = results.data.find((category) => category.slug == action.slug);
+        next: (result) => {
           const state = ctx.getState();
           ctx.patchState({
             ...state,

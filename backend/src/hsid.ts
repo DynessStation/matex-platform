@@ -36,6 +36,8 @@ const idContactInquiryTopic = new hashids("key_contactInquiryTopic123", 8);
 
 const idArticle = new hashids("key_article123", 8);
 
+const idProductCategory = new hashids("key_productCategory123", 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -55,4 +57,5 @@ export default {
   idPublicContactChannel,
   idContactInquiryTopic,
   idArticle,
+  idProductCategory,
 };

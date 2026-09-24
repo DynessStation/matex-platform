@@ -56,11 +56,23 @@ export const shop: Routes = [
     },
   },
   {
-    path: 'category/:slug',
+    path: 'kategori/:slug',
     loadComponent: () => import('./category/category').then((m) => m.Category),
     resolve: {
       data: CategoryResolver,
     },
+  },
+  {
+    path: 'en/category/:slug',
+    loadComponent: () => import('./category/category').then((m) => m.Category),
+    resolve: {
+      data: CategoryResolver,
+    },
+  },
+  {
+    path: 'category/:slug',
+    redirectTo: 'kategori/:slug',
+    pathMatch: 'full',
   },
   {
     path: 'brand/:slug',

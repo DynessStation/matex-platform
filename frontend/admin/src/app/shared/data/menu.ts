@@ -190,6 +190,14 @@ export const menu: ISidebar[] = [
       },
       {
         parent_id: 4,
+        title: 'product_categories',
+        path: '/category',
+        type: 'link',
+        level: 2,
+        permission: 'product_category.view',
+      },
+      {
+        parent_id: 4,
         title: 'faq_management',
         path: '/faq',
         type: 'link',

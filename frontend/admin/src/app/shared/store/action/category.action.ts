@@ -1,4 +1,4 @@
-import { ICategory } from '../../interface/category.interface';
+import { ICategoryPayload } from '../../interface/category.interface';
 import { Params } from '../../interface/core.interface';
 
 export class GetCategoriesAction {
@@ -8,26 +8,26 @@ export class GetCategoriesAction {
 
 export class CreateCategoryAction {
   static readonly type = '[Category] Create';
-  constructor(public payload: ICategory) {}
+  constructor(public payload: ICategoryPayload) {}
 }
 
 export class EditCategoryAction {
   static readonly type = '[Category] Edit';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 export class UpdateCategoryAction {
   static readonly type = '[Category] Update';
   constructor(
-    public payload: ICategory,
-    public id: number,
+    public payload: ICategoryPayload,
+    public id: string,
   ) {}
 }
 
 export class DeleteCategoryAction {
   static readonly type = '[Category] Delete';
   constructor(
-    public id: number,
+    public id: string,
     public type: string | null,
   ) {}
 }

@@ -1,150 +1,106 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
-
-import { Store, Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
-
-import { ICategory } from '../../interface/category.interface';
+import { ICategory, ICategoryDetail } from '../../interface/category.interface';
+import { ApiMessageService } from '../../services/api-message.service';
 import { CategoryService } from '../../services/category.service';
 import { NotificationService } from '../../services/notification.service';
 import {
-  GetCategoriesAction,
   CreateCategoryAction,
-  EditCategoryAction,
-  UpdateCategoryAction,
   DeleteCategoryAction,
-  ExportCategoryAction,
-  ImportCategoryAction,
+  EditCategoryAction,
+  GetCategoriesAction,
+  UpdateCategoryAction,
 } from '../action/category.action';
 
-export class CategoryStateModel {
-  category = {
-    data: [] as ICategory[],
-    total: 0,
-  };
-  selectedCategory: ICategory | null;
+export interface CategoryStateModel {
+  category: { data: ICategory[]; total: number };
+  selectedCategory: ICategoryDetail | null;
 }
-
 @State<CategoryStateModel>({
   name: 'category',
-  defaults: {
-    category: {
-      data: [],
-      total: 0,
-    },
-    selectedCategory: null,
-  },
+  defaults: { category: { data: [], total: 0 }, selectedCategory: null },
 })
 @Injectable()
 export class CategoryState {
-  private store = inject(Store);
-  private router = inject(Router);
-  private notificationService = inject(NotificationService);
-  private categoryService = inject(CategoryService);
+  private service = inject(CategoryService);
+  private notes = inject(NotificationService);
+  private messages = inject(ApiMessageService);
 
-  @Selector()
-  static category(state: CategoryStateModel) {
+  @Selector() static category(state: CategoryStateModel) {
     return state.category;
   }
-
-  @Selector()
-  static categories(state: CategoryStateModel) {
-    return state.category.data.map(res => {
-      return {
-        label: res?.name,
-        value: res?.id,
-        data: {
-          name: res.name,
-          slug: res.slug,
-          image: res.category_icon ? res.category_icon.original_url : 'assets/images/category.png',
-        },
-      };
-    });
+  @Selector() static categories(state: CategoryStateModel) {
+    const flatten = (items: ICategory[]): ICategory[] =>
+      items.flatMap((item) => [item, ...flatten(item.subcategories ?? [])]);
+    return flatten(state.category.data).map((item) => ({
+      label: item.name,
+      value: item.id,
+      data: {
+        name: item.name,
+        slug: item.slug,
+        image: item.category_icon?.asset_url || 'assets/images/category.png',
+      },
+    }));
   }
-
-  @Selector()
-  static categoriesSlug(state: CategoryStateModel) {
-    return state.category.data.map(res => {
-      return {
-        label: res?.name,
-        value: res?.slug,
-        data: {
-          name: res.name,
-          slug: res.slug,
-          image: res.category_icon ? res.category_icon.original_url : 'assets/images/category.png',
-        },
-      };
-    });
+  @Selector() static categoriesSlug(state: CategoryStateModel) {
+    const flatten = (items: ICategory[]): ICategory[] =>
+      items.flatMap((item) => [item, ...flatten(item.subcategories ?? [])]);
+    return flatten(state.category.data).map((item) => ({
+      label: item.name,
+      value: item.slug,
+      data: { name: item.name, slug: item.slug },
+    }));
   }
-
-  @Selector()
-  static selectedCategory(state: CategoryStateModel) {
+  @Selector() static selectedCategory(state: CategoryStateModel) {
     return state.selectedCategory;
   }
 
   @Action(GetCategoriesAction)
-  getCategories(ctx: StateContext<CategoryStateModel>, action: GetCategoriesAction) {
-    return this.categoryService.getCategories(action.payload).pipe(
-      tap({
-        next: result => {
-          ctx.patchState({
-            category: {
-              data: result.data,
-              total: result?.total ? result?.total : result.data.length,
-            },
-          });
-        },
-        error: err => {
-          throw new Error(err?.error?.message);
-        },
-      }),
-    );
+  get(ctx: StateContext<CategoryStateModel>, action: GetCategoriesAction) {
+    return this.service
+      .getCategories(action.payload)
+      .pipe(tap((result) => ctx.patchState({ category: result })));
   }
-
-  @Action(CreateCategoryAction)
-  create(_ctx: StateContext<CategoryStateModel>, _action: CreateCategoryAction) {
-    // Create Category Logic Here
-  }
-
   @Action(EditCategoryAction)
-  edit(ctx: StateContext<CategoryStateModel>, { id }: EditCategoryAction) {
-    return this.categoryService.getCategories().pipe(
-      tap({
-        next: results => {
-          const state = ctx.getState();
-          const result = results.data.find(category => category.id == id);
-          ctx.patchState({
-            ...state,
-            selectedCategory: result,
-          });
-        },
-        error: err => {
-          throw new Error(err?.error?.message);
-        },
-      }),
-    );
+  edit(ctx: StateContext<CategoryStateModel>, action: EditCategoryAction) {
+    ctx.patchState({ selectedCategory: null });
+    return this.service
+      .getCategory(action.id)
+      .pipe(
+        tap((result) =>
+          ctx.patchState({ selectedCategory: result.data ?? null }),
+        ),
+      );
   }
-
+  @Action(CreateCategoryAction)
+  create(_: StateContext<CategoryStateModel>, action: CreateCategoryAction) {
+    return this.service
+      .create(action.payload)
+      .pipe(
+        tap((result) =>
+          this.notes.showSuccess(this.messages.resolveResponse(result)),
+        ),
+      );
+  }
   @Action(UpdateCategoryAction)
-  update(
-    _ctx: StateContext<CategoryStateModel>,
-    { payload: _payload, id: _id }: UpdateCategoryAction,
-  ) {
-    // Update Category Logic Here
+  update(_: StateContext<CategoryStateModel>, action: UpdateCategoryAction) {
+    return this.service
+      .update(action.id, action.payload)
+      .pipe(
+        tap((result) =>
+          this.notes.showSuccess(this.messages.resolveResponse(result)),
+        ),
+      );
   }
-
   @Action(DeleteCategoryAction)
-  delete(_ctx: StateContext<CategoryStateModel>, { id: _id, type: _type }: DeleteCategoryAction) {
-    // Delete Category Logic Here
-  }
-
-  @Action(ImportCategoryAction)
-  import(_ctx: StateContext<CategoryStateModel>, _action: ImportCategoryAction) {
-    // Import Category Logic Here
-  }
-
-  @Action(ExportCategoryAction)
-  export(_ctx: StateContext<CategoryStateModel>, _action: ExportCategoryAction) {
-    // Export Category Logic Here
+  delete(_: StateContext<CategoryStateModel>, action: DeleteCategoryAction) {
+    return this.service
+      .delete(action.id)
+      .pipe(
+        tap((result) =>
+          this.notes.showSuccess(this.messages.resolveResponse(result)),
+        ),
+      );
   }
 }

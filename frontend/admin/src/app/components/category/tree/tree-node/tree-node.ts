@@ -6,7 +6,10 @@ import { Store } from '@ngxs/store';
 import { DeleteModal } from '../../../../shared/components/ui/modal/delete-modal/delete-modal';
 import { HasPermissionDirective } from '../../../../shared/directive/has-permission.directive';
 import { ICategory } from '../../../../shared/interface/category.interface';
-import { DeleteCategoryAction } from '../../../../shared/store/action/category.action';
+import {
+  DeleteCategoryAction,
+  GetCategoriesAction,
+} from '../../../../shared/store/action/category.action';
 
 @Component({
   selector: 'app-tree-node',
@@ -27,18 +30,20 @@ export class TreeNode {
   readonly DeleteModal = viewChild<DeleteModal>('deleteModal');
 
   public showChildrenNode: boolean = true;
-  public id: number;
+  public id: string;
 
   ngOnInit() {
-    this.route.params.subscribe(params => (this.id = params['id']));
+    this.route.params.subscribe((params) => (this.id = params['id']));
   }
 
   delete(actionType: string, data: ICategory) {
-    this.store.dispatch(new DeleteCategoryAction(data.id!, data.type)).subscribe({
-      complete: () => {
-        if (data.type == 'post') void this.router.navigateByUrl('/blog/category');
-        else void this.router.navigateByUrl('/category');
-      },
-    });
+    this.store
+      .dispatch(new DeleteCategoryAction(data.id!, data.type))
+      .subscribe({
+        complete: () => {
+          this.store.dispatch(new GetCategoriesAction({ type: 'product' }));
+          if (this.id) void this.router.navigateByUrl('/category');
+        },
+      });
   }
 }

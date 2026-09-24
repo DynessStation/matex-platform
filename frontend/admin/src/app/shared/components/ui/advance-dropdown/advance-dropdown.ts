@@ -23,7 +23,7 @@ export class AdvanceDropdown {
   readonly displayKey = input<string>('name');
   readonly subArrayKey = input<string>(undefined);
   readonly options = input<any[]>(undefined);
-  readonly selectedOption = input<Number[]>(undefined);
+  readonly selectedOption = input<any[]>(undefined);
   readonly position = input<string>('bottom');
   readonly text = input<string>('select_option');
   readonly showImage = input<boolean>(true);
@@ -33,16 +33,16 @@ export class AdvanceDropdown {
   public isOpen = false;
   public optionsData: any[] = [];
   public selectedPills: any[] = [];
-  public selectedIds: number[] = [];
+  public selectedIds: any[] = [];
   public breadCrumbValues: any[] = [];
   public term = new FormControl('');
-  public parent: number[] = [];
+  public parent: any[] = [];
 
   constructor() {
     this.term.valueChanges.subscribe((data: any) => {
       if (data) {
         this.optionsData = [];
-        this.options().forEach(item => {
+        this.options().forEach((item) => {
           this.hasValue(item) && this.optionsData.push(item);
         });
       } else {
@@ -62,7 +62,7 @@ export class AdvanceDropdown {
       this.selectedPills = [];
       this.selectedIds = [];
     }
-    this.optionsData.map(categories => this.getParentIds(categories));
+    this.optionsData.map((categories) => this.getParentIds(categories));
   }
 
   getParentIds(data: ICategory) {
@@ -75,13 +75,8 @@ export class AdvanceDropdown {
   }
 
   getSelectedData(value: any) {
-    this.options().forEach(item => {
-      this.recursiveSelected(
-        item,
-        value.map(function (x: any) {
-          return parseInt(x);
-        }),
-      );
+    this.options().forEach((item) => {
+      this.recursiveSelected(item, value);
     });
   }
 
@@ -98,7 +93,11 @@ export class AdvanceDropdown {
 
   hasValue(item: IMenu) {
     let valueToReturn = false;
-    if (item[this.displayKey()].toLowerCase().includes(this.term?.value?.toLowerCase())) {
+    if (
+      item[this.displayKey()]
+        .toLowerCase()
+        .includes(this.term?.value?.toLowerCase())
+    ) {
       valueToReturn = true;
     }
     item[this.subArrayKey()]?.length &&
@@ -112,7 +111,8 @@ export class AdvanceDropdown {
 
   toggleDropdown(_event: Event) {
     this.isOpen = !this.isOpen;
-    let selector = this.dropdownContainer().nativeElement.querySelector('.dropdown-open');
+    let selector =
+      this.dropdownContainer().nativeElement.querySelector('.dropdown-open');
     if (this.position() == 'bottom') {
       selector.style.bottom = 'auto';
       selector.style.top = '100%';
@@ -149,7 +149,8 @@ export class AdvanceDropdown {
   subItemClicked(data: any) {
     this.isOpen = true;
     data[this.subArrayKey()]?.length && this.breadCrumbValues.push(data);
-    data[this.subArrayKey()]?.length && (this.optionsData = data[this.subArrayKey()]);
+    data[this.subArrayKey()]?.length &&
+      (this.optionsData = data[this.subArrayKey()]);
   }
 
   changeTo(data: any) {

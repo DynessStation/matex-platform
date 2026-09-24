@@ -1,0 +1,63 @@
+CREATE TABLE `product_category` (
+  `id_product_category` int NOT NULL AUTO_INCREMENT,
+  `id_master_comp` int NOT NULL,
+  `id_parent_product_category` int DEFAULT NULL,
+  `product_category_key` varchar(120) NOT NULL,
+  `product_category_status` varchar(20) NOT NULL DEFAULT 'draft',
+  `product_category_is_featured` tinyint(1) NOT NULL DEFAULT 0,
+  `product_category_sort_order` int NOT NULL DEFAULT 0,
+  `id_created_by` int DEFAULT NULL,
+  `id_updated_by` int DEFAULT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `product_category_deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_product_category`),
+  UNIQUE KEY `uq_product_category_id_company` (`id_product_category`,`id_master_comp`),
+  UNIQUE KEY `uq_product_category_company_key` (`id_master_comp`,`product_category_key`),
+  KEY `idx_product_category_parent` (`id_parent_product_category`,`id_master_comp`),
+  KEY `idx_product_category_public` (`id_master_comp`,`product_category_status`,`product_category_sort_order`),
+  CONSTRAINT `fk_product_category_company` FOREIGN KEY (`id_master_comp`) REFERENCES `master_comp` (`id_master_comp`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_category_parent` FOREIGN KEY (`id_parent_product_category`,`id_master_comp`) REFERENCES `product_category` (`id_product_category`,`id_master_comp`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_category_created_by` FOREIGN KEY (`id_created_by`) REFERENCES `admin_acct` (`id_admin_acct`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_category_updated_by` FOREIGN KEY (`id_updated_by`) REFERENCES `admin_acct` (`id_admin_acct`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `chk_product_category_status` CHECK (`product_category_status` IN ('draft','published','archived'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `product_category_i18n` (
+  `id_product_category_i18n` int NOT NULL AUTO_INCREMENT,
+  `id_product_category` int NOT NULL,
+  `id_master_comp` int NOT NULL,
+  `product_category_locale` varchar(20) NOT NULL,
+  `product_category_slug` varchar(255) NOT NULL,
+  `product_category_name` varchar(255) NOT NULL,
+  `product_category_description` text DEFAULT NULL,
+  `product_category_meta_title` varchar(255) DEFAULT NULL,
+  `product_category_meta_description` varchar(500) DEFAULT NULL,
+  `product_category_canonical_url` varchar(1000) DEFAULT NULL,
+  `product_category_og_title` varchar(255) DEFAULT NULL,
+  `product_category_og_description` varchar(500) DEFAULT NULL,
+  `product_category_i18n_status` tinyint(1) NOT NULL DEFAULT 1,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_product_category_i18n`),
+  UNIQUE KEY `uq_product_category_i18n_locale` (`id_product_category`,`product_category_locale`),
+  UNIQUE KEY `uq_product_category_i18n_slug` (`id_master_comp`,`product_category_locale`,`product_category_slug`),
+  CONSTRAINT `fk_product_category_i18n_parent` FOREIGN KEY (`id_product_category`,`id_master_comp`) REFERENCES `product_category` (`id_product_category`,`id_master_comp`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `product_category_attachment` (
+  `id_product_category_attachment` int NOT NULL AUTO_INCREMENT,
+  `id_product_category` int NOT NULL,
+  `id_master_comp` int NOT NULL,
+  `id_attachment` int NOT NULL,
+  `product_category_attachment_role` varchar(20) NOT NULL,
+  `product_category_attachment_sort_order` int NOT NULL DEFAULT 0,
+  `product_category_attachment_is_public` tinyint(1) NOT NULL DEFAULT 1,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_product_category_attachment`),
+  UNIQUE KEY `uq_product_category_attachment_role` (`id_product_category`,`product_category_attachment_role`,`product_category_attachment_sort_order`),
+  KEY `idx_product_category_attachment_media` (`id_attachment`),
+  CONSTRAINT `fk_product_category_attachment_parent` FOREIGN KEY (`id_product_category`,`id_master_comp`) REFERENCES `product_category` (`id_product_category`,`id_master_comp`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_category_attachment_media` FOREIGN KEY (`id_attachment`) REFERENCES `attachment` (`id_attachment`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `chk_product_category_attachment_role` CHECK (`product_category_attachment_role` IN ('image','icon','og'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

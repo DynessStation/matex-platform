@@ -1,30 +1,51 @@
 import { IAttachment } from './attachment.interface';
-import { IPaginateModel } from './core.interface';
 
-export interface ICategoryModel extends IPaginateModel {
-  data: ICategory[];
+export type ProductCategoryStatus = 'draft' | 'published' | 'archived';
+export interface ICategoryTranslation {
+  locale: 'id-ID' | 'en-US';
+  slug: string;
+  name: string;
+  description: string;
+  meta_title: string;
+  meta_description: string;
+  canonical_url: string;
+  og_title: string;
+  og_description: string;
+  status: 0 | 1;
 }
-
 export interface ICategory {
-  id: number;
+  id: any;
+  parent_id?: any;
+  key: string;
   name: string;
   slug: string;
   description: string;
   type: string;
-  parent_id?: number;
-  category_image?: IAttachment;
-  category_image_id?: number;
-  category_icon?: IAttachment;
-  category_icon_id?: number;
-  commission_rate?: number;
-  subcategories?: ICategory[];
-  category_meta_image_id: number;
-  category_meta_image: IAttachment;
-  meta_title: string;
-  meta_description: string;
-  status: boolean;
-  created_by_id?: number;
+  status: ProductCategoryStatus;
+  is_featured: boolean;
+  sort_order: number;
+  category_image: IAttachment | null;
+  category_icon: IAttachment | null;
+  category_meta_image?: IAttachment | null;
+  subcategories: ICategory[];
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string;
+}
+export interface ICategoryDetail extends ICategory {
+  translations: ICategoryTranslation[];
+}
+export interface ICategoryModel {
+  data: ICategory[];
+  total: number;
+}
+export interface ICategoryPayload {
+  key: string;
+  parent_id: string | null;
+  status: ProductCategoryStatus;
+  is_featured: 0 | 1;
+  sort_order: number;
+  image_id: string | null;
+  icon_id: string | null;
+  og_image_id: string | null;
+  translations: ICategoryTranslation[];
 }
