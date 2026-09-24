@@ -30,18 +30,22 @@ const hydrate = async (rows: RowDataPacket[], company: number, locale: string) =
   const [categories]=await pool.query<RowDataPacket[]>(`SELECT pc.id_product,c.id_product_category,i.product_category_name,i.product_category_slug FROM product_catalog_category pc JOIN product_category c ON c.id_product_category=pc.id_product_category AND c.id_master_comp=pc.id_master_comp JOIN product_category_i18n i ON i.id_product_category=c.id_product_category AND i.product_category_locale=? WHERE pc.id_product IN (${marks}) AND pc.id_master_comp=? AND c.product_category_status='published' ORDER BY pc.sort_order`,[locale,...ids,company]);
   const [prices]=await pool.query<RowDataPacket[]>(`SELECT * FROM product_catalog_price WHERE id_product IN (${marks}) AND id_master_comp=? AND product_price_is_active=1 AND (product_price_starts_at IS NULL OR product_price_starts_at<=NOW()) AND (product_price_ends_at IS NULL OR product_price_ends_at>=NOW()) ORDER BY product_price_sort_order`,[...ids,company]);
   const [markets]=await pool.query<RowDataPacket[]>(`SELECT * FROM product_catalog_marketplace WHERE id_product IN (${marks}) AND id_master_comp=? AND product_marketplace_is_active=1 ORDER BY product_marketplace_is_primary DESC,product_marketplace_sort_order`,[...ids,company]);
-  return rows.map((row)=>{const id=Number(row.id_product), productMedia=media.filter(x=>Number(x.id_product)===id), publicPrice=prices.find(x=>Number(x.id_product)===id&&x.product_price_is_public);return {
+  return rows.map((row)=>{const id=Number(row.id_product), productMedia=media.filter(x=>Number(x.id_product)===id), publicPrice=prices.find(x=>Number(x.id_product)===id&&x.product_price_is_public), primaryMarket=markets.find(x=>Number(x.id_product)===id);return {
     id,name:row.product_name,slug:row.product_slug,sku:row.product_sku,product_type:row.product_type,
     short_description:row.product_short_description??"",description:row.product_description??"",
     specifications:row.product_specifications_json??null,unit:row.product_unit??"",weight:row.product_weight_grams==null?null:Number(row.product_weight_grams),
+    manufacturer_code:row.product_manufacturer_code??null,country_origin:row.product_country_origin??null,
+    hs_code:row.product_hs_code??null,min_order_qty:Number(row.product_min_order_qty??1),
+    lead_time_days:row.product_lead_time_days==null?null:Number(row.product_lead_time_days),
     dimensions:{length_mm:row.product_length_mm==null?null:Number(row.product_length_mm),width_mm:row.product_width_mm==null?null:Number(row.product_width_mm),height_mm:row.product_height_mm==null?null:Number(row.product_height_mm)},
     stock_status:row.product_stock_status,quantity:row.product_manage_stock?Number(row.product_stock_quantity??0):0,
     manage_stock:Boolean(row.product_manage_stock),price_visibility:row.product_price_visibility,
-    price:row.product_price_visibility==="displayed"&&publicPrice?Number(publicPrice.product_price_amount):0,
+    price:row.product_price_visibility==="displayed"&&publicPrice?Number(publicPrice.product_price_compare_at??publicPrice.product_price_amount):0,
     sale_price:row.product_price_visibility==="displayed"&&publicPrice?Number(publicPrice.product_price_amount):0,
+    currency:publicPrice?.product_price_currency??"IDR",
     discount:0,rating:0,rating_count:0,reviews_count:0,status:true,is_featured:Boolean(row.product_is_featured),
-    internal_commerce_enabled:Boolean(row.product_internal_commerce_enabled),is_external:true,
-    external_url:markets.find(x=>Number(x.id_product)===id)?.product_marketplace_url??"",
+    internal_commerce_enabled:Boolean(row.product_internal_commerce_enabled),is_external:Boolean(primaryMarket),
+    external_url:primaryMarket?.product_marketplace_url??"",
     external_button_text:locale==="id-ID"?"Lihat di marketplace":"View on marketplace",
     product_thumbnail:(()=>{const x=productMedia.find(m=>m.product_attachment_role==="thumbnail");return x?image(x):null;})(),
     product_galleries:productMedia.filter(m=>m.product_attachment_role==="gallery").map(image),

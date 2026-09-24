@@ -1,6 +1,6 @@
 import { AsyncPipe, isPlatformBrowser } from '@angular/common';
 import { Component, HostListener, inject, PLATFORM_ID } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -53,14 +53,14 @@ export class Product {
   public isBrowser: boolean;
   private platformId = inject<Object>(PLATFORM_ID);
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private router: Router) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     this.product$.subscribe((product) => {
       if (!product) return;
       this.breadcrumb.items = [];
       this.breadcrumb.title = product.name;
       this.breadcrumb.items.push(
-        { label: 'Product', active: true },
+        { label: this.isEnglish ? 'Product' : 'Produk', active: true },
         { label: product.name, active: false },
       );
       this.product = product;
@@ -84,9 +84,13 @@ export class Product {
     this.setBreadcrumb();
   }
 
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
+
   @HostListener('window:scroll')
   onScroll() {
-    if (this.isBrowser) {
+    if (this.isBrowser && this.product?.internal_commerce_enabled && !this.product?.is_external) {
       if (window.scrollY > 50) {
         this.isScrollActive = true;
         document.body.classList.add('stickyCart');

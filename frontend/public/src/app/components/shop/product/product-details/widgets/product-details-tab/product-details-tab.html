@@ -3,7 +3,7 @@
     <div class="product-section-box m-0">
       <ul ngbNav #nav="ngbNav" class="nav-tabs custom-nav">
         <li ngbNavItem>
-          <a ngbNavLink>Description</a>
+          <a ngbNavLink>{{ isEnglish ? 'Description' : 'Deskripsi' }}</a>
           <ng-template ngbNavContent>
             @if (product()?.description) {
               <div
@@ -13,26 +13,20 @@
             }
           </ng-template>
         </li>
+        @if ((specifications | keyvalue).length) {
         <li ngbNavItem>
-          <a ngbNavLink>Review</a>
-          <ng-template ngbNavContent>
-            <app-product-review
-              [product]="product()"
-              [reviews]="(review$ | async)?.data || []"
-            ></app-product-review>
-          </ng-template>
-        </li>
-        <li ngbNavItem>
-          <a ngbNavLink>Q&A</a>
+          <a ngbNavLink>{{ isEnglish ? 'Specifications' : 'Spesifikasi' }}</a>
           <ng-template ngbNavContent>
             <div class="information-box">
-              <app-product-questions-answers
-                [product]="product()!"
-                [questionAnswers]="(question$ | async)?.data || []"
-              ></app-product-questions-answers>
+              <ul class="about-item-list">
+                @for (item of specifications | keyvalue; track item.key) {
+                  <li><strong>{{ item.key }}</strong><span>{{ item.value }}</span></li>
+                }
+              </ul>
             </div>
           </ng-template>
         </li>
+        }
       </ul>
 
       <div [ngbNavOutlet]="nav" class="mt-2 custom-tab"></div>

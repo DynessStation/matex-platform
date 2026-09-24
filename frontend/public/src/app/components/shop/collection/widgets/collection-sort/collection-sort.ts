@@ -48,7 +48,9 @@ export class CollectionSort {
   ];
 
   setGridClass = output<{ class: string; list_view: boolean }>();
+  filterChange = output<void>();
   public isBrowser = false;
+  public isEnglish = false;
 
   public sorting: Select2Data = [
     {
@@ -107,6 +109,17 @@ export class CollectionSort {
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    this.isEnglish = this.router.url === '/en' || this.router.url.startsWith('/en/');
+    this.sorting = [
+      { value: 'asc', label: this.isEnglish ? 'Newest first' : 'Terbaru' },
+      { value: 'a-z', label: 'A - Z' },
+      { value: 'z-a', label: 'Z - A' },
+      { value: 'low-high', label: this.isEnglish ? 'Lowest price' : 'Harga terendah' },
+      { value: 'high-low', label: this.isEnglish ? 'Highest price' : 'Harga tertinggi' },
+    ];
+    this.sortingItem = [10, 25, 50, 100].map((value) => ({
+      value: String(value), label: `${value} ${this.isEnglish ? 'products' : 'produk'}`,
+    }));
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -168,6 +181,9 @@ export class CollectionSort {
 
   // SortBy Filter
   sortByFilter(data: Select2UpdateEvent) {
+    this.filter()!['sortBy'] = data?.value ? String(data.value) : 'asc';
+    this.filter()!['page'] = 1;
+    this.filterChange.emit();
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
@@ -181,6 +197,8 @@ export class CollectionSort {
 
   sortProductsLength(data: Select2UpdateEvent) {
     this.filter()!['paginate'] = data.value ? data.value : this.filter()!['paginate'];
+    this.filter()!['page'] = 1;
+    this.filterChange.emit();
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {

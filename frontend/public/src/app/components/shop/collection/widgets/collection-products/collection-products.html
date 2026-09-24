@@ -2,6 +2,7 @@
   [filter]="filter()!"
   [gridCol]="gridCol()"
   (setGridClass)="setGridClass($event)"
+  (filterChange)="applyFilter()"
   [products]="(product$ | async)?.total"
 ></app-collection-sort>
 
@@ -18,6 +19,13 @@
     </div>
   }
 </div>
+
+@if (!productService.skeletonLoader && !paginateProduct.length) {
+  <div class="text-center py-5">
+    <h4>{{ isEnglish ? 'No products found' : 'Belum ada produk' }}</h4>
+    <p class="text-content mt-2">{{ isEnglish ? 'Products in this category will appear here.' : 'Produk pada kategori ini akan ditampilkan di sini.' }}</p>
+  </div>
+}
 
 @if (infiniteScroll() && !productService.skeletonLoader && (moreProduct$ | async)?.length) {
   <div class="load-more-sec">

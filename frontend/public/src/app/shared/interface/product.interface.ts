@@ -18,6 +18,7 @@ export interface Product {
   sku?: string;
   price: number;
   sale_price: number;
+  currency?: string;
   discount: number;
   rating: number;
   product_thumbnail: Attachment;
@@ -54,6 +55,11 @@ export interface Product {
   is_return?: number;
   unit?: string;
   weight?: string;
+  manufacturer_code?: string | null;
+  country_origin?: string | null;
+  hs_code?: string | null;
+  min_order_qty?: number;
+  lead_time_days?: number | null;
   estimated_delivery_text?: string;
   return_policy_text?: string;
   safe_checkout?: boolean;

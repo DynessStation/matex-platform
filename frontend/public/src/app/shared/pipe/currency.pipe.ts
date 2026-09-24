@@ -1,5 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { inject, Pipe, PipeTransform } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -14,6 +15,7 @@ import { SettingState } from '../store/state/setting.state';
 })
 export class CurrencySymbolPipe implements PipeTransform {
   private currencyPipe = inject(CurrencyPipe);
+  private router = inject(Router);
 
   selectedCurrency$: Observable<Currency> = inject(Store).select(
     SettingState.selectedCurrency,
@@ -30,11 +32,21 @@ export class CurrencySymbolPipe implements PipeTransform {
   transform(
     value: number | undefined,
     position: 'before_price' | 'after_price' | string = 'before_price',
+    currencyCode?: string,
   ): string | number {
     if (!value) {
       value = 0;
     }
     value = Number(value);
+    if (currencyCode) {
+      const locale = this.router.url === '/en' || this.router.url.startsWith('/en/') ? 'en-US' : 'id-ID';
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: currencyCode === 'IDR' ? 0 : 2,
+        maximumFractionDigits: currencyCode === 'IDR' ? 0 : 2,
+      }).format(value);
+    }
     value = value * this.selectedCurrency?.exchange_rate;
 
     this.symbol = this.selectedCurrency?.symbol;

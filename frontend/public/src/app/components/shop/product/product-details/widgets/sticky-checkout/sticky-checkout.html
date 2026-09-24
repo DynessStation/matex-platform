@@ -1,4 +1,4 @@
-@if (selectedVariation || product) {
+@if ((selectedVariation || product) && product.internal_commerce_enabled && !product.is_external) {
   <div class="sticky-bottom-cart">
     <div class="custom-container">
       <div class="cart-content">

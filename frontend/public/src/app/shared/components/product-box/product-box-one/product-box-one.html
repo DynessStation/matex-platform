@@ -1,32 +1,8 @@
 @if (product()) {
   <div class="product-box-4-main">
-    <div class="select-option-box" [class.show]="show">
-      <div class="select-box">
-        <div>
-          <app-variant-attributes
-            [product]="product()"
-            [attributes]="product()?.attributes || []"
-            (selectVariation)="selectedVariant($event!)"
-            [variant_hover]="false"
-          ></app-variant-attributes>
-
-          <app-cart-button
-            [product]="product()"
-            [selectedVariation]="selectedVariation"
-            [enableModal]="false"
-            [text]="'Add to Cart'"
-            (swipeVariants)="swipe($event)"
-            [class]="'btn add-cart-btn'"
-          ></app-cart-button>
-          <button class="close-btn btn" (click)="closeSwipe()">
-            <i class="ri-close-line"></i>
-          </button>
-        </div>
-      </div>
-    </div>
     <div class="productMain product-box-4">
       <div class="product-image">
-        <a [routerLink]="['/product/' + product()?.slug]">
+        <a [routerLink]="productLink">
           <img
             [src]="
               product()?.product_thumbnail
@@ -34,56 +10,30 @@
                 : 'assets/images/placeholder/product.png'
             "
             class="img-fluid productImage"
-            alt="image"
+            [alt]="product()?.name"
           />
         </a>
-        <div class="quick-view-button-box">
-          <app-quick-view [product]="product()" [quickViewStyle]="'text'" />
-        </div>
       </div>
-      <button class="btn wishlist-btn" (click)="removeWishlist(product()!.id)">
-        <i class="ri-delete-bin-line"></i>
-      </button>
       <div class="product-content">
-        <h6 class="sub-name productName" [routerLink]="['/brand', product()?.brand?.slug]">
-          {{ product()?.brand?.name }}
-        </h6>
-        <a [routerLink]="['/product', product()?.slug]" class="name">
+        <a [routerLink]="productLink" class="name">
           <h5>{{ product()?.name }}</h5>
         </a>
-        <div class="rating">
-          <ngb-rating [rate]="product()?.rating_count!">
-            <ng-template let-fill="fill" let-index="index">
-              <i class="ri-star-fill" [class.filled]="fill === 100"></i>
-            </ng-template>
-          </ngb-rating>
-        </div>
         <p class="product-details">
           {{ product()?.short_description }}
         </p>
-        <h5 class="price">
-          {{ product()?.sale_price | currencySymbol }}
-          <del>{{ product()?.price | currencySymbol }}</del>
-        </h5>
-        <div class="option-box">
-          <app-cart-button
-            [product]="product()"
-            [selectedVariation]="selectedVariation"
-            [enableModal]="true"
-            [text]="'Add to Cart'"
-            (swipeVariants)="swipe($event)"
-            [class]="'btn select-btn'"
-          ></app-cart-button>
-
-          <ul class="option-list">
-            <li>
-              <app-wishlist [product]="product()" [class]="'wishlistProduct'" />
-            </li>
-            <li>
-              <app-compare [product]="product()" [text]="'Compare'" />
-            </li>
-          </ul>
-        </div>
+        @if (product()?.price_visibility === 'displayed') {
+          <h5 class="price">
+            {{ product()?.sale_price | currencySymbol:'before_price':priceCurrency }}
+            @if (product()?.price && product()?.price !== product()?.sale_price) {
+              <del>{{ product()?.price | currencySymbol:'before_price':priceCurrency }}</del>
+            }
+          </h5>
+        } @else if (product()?.price_visibility === 'contact') {
+          <h5 class="price">{{ isEnglish ? 'Contact us for pricing' : 'Hubungi kami untuk harga' }}</h5>
+        }
+        <a [routerLink]="productLink" class="btn btn-solid rounded-3 mt-3">
+          {{ isEnglish ? 'View product' : 'Lihat produk' }}
+        </a>
       </div>
     </div>
   </div>

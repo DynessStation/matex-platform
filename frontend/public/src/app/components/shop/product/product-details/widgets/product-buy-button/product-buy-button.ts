@@ -1,7 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -32,13 +31,16 @@ export class ProductBuyButton {
   private store = inject(Store);
   setting$: Observable<Values | null> = this.store.select(SettingState.setting);
 
-  constructor(
-    private router: Router,
-    private modal: NgbModal,
-  ) {
+  constructor(private router: Router) {
     this.setting$.subscribe(
       (setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!),
     );
+  }
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
+  get priceCurrency() {
+    return this.product()?.currency || this.product()?.prices?.[0]?.currency || 'IDR';
   }
   updateQuantity(qty: number) {
     if (1 > this.productQty + qty) return;

@@ -37,6 +37,7 @@ export class CollectionProducts implements OnInit, OnDestroy {
   public productsArray: Product[] = [];
   public paginateProduct: Product[] = [];
   public scrollFilter: Params = { page: 1, paginate: 9 };
+  public isEnglish = false;
 
   private store = inject(Store);
   private route = inject(ActivatedRoute);
@@ -50,6 +51,7 @@ export class CollectionProducts implements OnInit, OnDestroy {
   moreProduct$: Observable<Product[]> = this.store.select(ProductState.moreProduct);
 
   ngOnInit() {
+    this.isEnglish = this.router.url === '/en' || this.router.url.startsWith('/en/');
     this.productSubscription = this.product$.subscribe((res) => {
       if (res) {
         this.productsArray = res.data;
@@ -125,14 +127,27 @@ export class CollectionProducts implements OnInit, OnDestroy {
 
   private updatePaginatedProducts() {
     const filter = this.filter();
-    if (!filter || !this.productsArray?.length) return;
+    if (!filter) return;
 
-    this.paginateProduct = this.productsArray
-      .map((product) => ({ ...product }))
+    const products = this.productsArray.map((product) => ({ ...product }));
+    const sortBy = filter['sortBy'];
+    products.sort((a, b) => {
+      if (sortBy === 'a-z') return a.name.localeCompare(b.name);
+      if (sortBy === 'z-a') return b.name.localeCompare(a.name);
+      if (sortBy === 'low-high') return Number(a.sale_price ?? 0) - Number(b.sale_price ?? 0);
+      if (sortBy === 'high-low') return Number(b.sale_price ?? 0) - Number(a.sale_price ?? 0);
+      return 0;
+    });
+    this.total = products.length;
+    this.paginateProduct = products
       .slice(
         (filter['page'] - 1) * filter['paginate'],
         (filter['page'] - 1) * filter['paginate'] + filter['paginate'],
       );
+  }
+
+  applyFilter() {
+    this.updatePaginatedProducts();
   }
 
   onScroll(value: number) {

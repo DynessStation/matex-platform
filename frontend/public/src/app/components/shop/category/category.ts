@@ -17,11 +17,10 @@ import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
 import { CollectionProducts } from '../collection/widgets/collection-products/collection-products';
-import { Sidebar } from '../collection/widgets/sidebar/sidebar';
 
 @Component({
   selector: 'app-category',
-  imports: [Sidebar, CollectionProducts, HomeNewsletter, Breadcrumb, AsyncPipe],
+  imports: [CollectionProducts, HomeNewsletter, Breadcrumb, AsyncPipe],
   templateUrl: './category.html',
   styleUrl: './category.scss',
 })

@@ -1,5 +1,5 @@
 <app-breadcrumb [breadcrumb]="breadcrumb" />
-@if (layout === 'product_thumbnail') {
+@if (product && layout === 'product_thumbnail') {
   <app-product-thumbnail
     [product]="product"
     [option]="themeOptions$ | async"
@@ -42,4 +42,13 @@
     [layout]="layout"
   ></app-product-zoom>
 }
-<app-related-product [product]="product"></app-related-product>
+@if (product) {
+  <app-related-product [product]="product"></app-related-product>
+} @else {
+  <section class="section-t-space section-b-space">
+    <div class="custom-container text-center py-5">
+      <h3>{{ isEnglish ? 'Product not found' : 'Produk tidak ditemukan' }}</h3>
+      <p class="text-content mt-2">{{ isEnglish ? 'The requested product is unavailable.' : 'Produk yang Anda cari belum tersedia.' }}</p>
+    </div>
+  </section>
+}

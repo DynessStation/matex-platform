@@ -38,14 +38,14 @@
       }
 
       <div class="d-flex align-items-center dropdown-box flex-wrap w-100">
-        <h5 class="text-content">Sort By :</h5>
+        <h5 class="text-content">{{ isEnglish ? 'Sort by:' : 'Urutkan:' }}</h5>
         <div class="filter-page-review">
           @if (isBrowser) {
             <div class="product-page-per-view">
               <select2
                 class="custom-select"
                 [displaySearchStatus]="'hidden'"
-                [placeholder]="'Sort'"
+                [placeholder]="isEnglish ? 'Sort' : 'Urutkan'"
                 [value]="filter()!['sortBy']"
                 [data]="sorting ? sorting : []"
                 (update)="sortByFilter($event)"
@@ -57,7 +57,7 @@
                 class="custom-select"
                 [displaySearchStatus]="'hidden'"
                 [value]="filter()!['paginate']"
-                [placeholder]="'Sort Item'"
+                [placeholder]="isEnglish ? 'Items per page' : 'Produk per halaman'"
                 [data]="sortingItem ? sortingItem : []"
                 (update)="sortProductsLength($event)"
               >

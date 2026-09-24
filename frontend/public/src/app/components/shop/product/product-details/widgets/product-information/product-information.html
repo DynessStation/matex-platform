@@ -1,6 +1,6 @@
 <div class="about-item-box product-spacing border-top-space">
   <div class="product-title">
-    <h4 class="sub-title">{{ 'Product info' | translate }}</h4>
+    <h4 class="sub-title">{{ isEnglish ? 'Product information' : 'Informasi produk' }}</h4>
   </div>
   <ul class="about-item-list">
     @if (product()?.sku) {
@@ -11,27 +11,35 @@
 
     @if (product()?.unit) {
       <li>
-        <span>{{ 'Unit' | translate }}: </span>{{ product()?.unit }}
+        <span>{{ isEnglish ? 'Unit' : 'Satuan' }}: </span>{{ product()?.unit }}
       </li>
     }
 
     @if (product()?.weight) {
       <li>
-        <span>{{ 'Weight' | translate }}: </span>{{ product()?.weight }} {{ 'gms' }}
+        <span>{{ isEnglish ? 'Weight' : 'Berat' }}: </span>{{ product()?.weight }} gram
       </li>
     }
 
     @if (product() && product()?.stock_status) {
       <li>
-        <span>{{ 'Stock Status' | translate }}: </span>{{ product()?.stock_status }}
+        <span>{{ isEnglish ? 'Availability' : 'Ketersediaan' }}: </span>{{ stockLabel(product()?.stock_status) }}
       </li>
     }
 
-    @if (product()?.quantity! > 0) {
+    @if (product()?.manage_stock && product()?.quantity! > 0) {
       <li>
-        <span>{{ 'Quantity' | translate }}: </span>{{ product()?.quantity }}
-        {{ 'Items Left' | translate }}
+        <span>{{ isEnglish ? 'Stock' : 'Stok' }}: </span>{{ product()?.quantity }} {{ product()?.unit }}
       </li>
+    }
+    @if (product()?.min_order_qty && product()?.min_order_qty! > 1) {
+      <li><span>{{ isEnglish ? 'Minimum order' : 'Minimum pemesanan' }}: </span>{{ product()?.min_order_qty }} {{ product()?.unit }}</li>
+    }
+    @if (product()?.lead_time_days != null) {
+      <li><span>{{ isEnglish ? 'Lead time' : 'Waktu proses' }}: </span>{{ product()?.lead_time_days }} {{ isEnglish ? 'days' : 'hari' }}</li>
+    }
+    @if (product()?.categories?.length) {
+      <li><span>{{ isEnglish ? 'Category' : 'Kategori' }}: </span>{{ product()?.categories?.[0]?.name }}</li>
     }
   </ul>
 </div>
