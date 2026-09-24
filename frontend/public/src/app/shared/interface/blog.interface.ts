@@ -17,10 +17,14 @@ export interface IBlog {
   status: boolean;
   meta_title: string;
   meta_description: string;
-  blog_thumbnail: Attachment;
+  canonical_url?: string;
+  og_title?: string;
+  og_description?: string;
+  schema_json?: Record<string, unknown> | null;
+  blog_thumbnail: Attachment | null;
   blog_thumbnail_id: number;
   blog_meta_image_id: number;
-  blog_meta_image: Attachment;
+  blog_meta_image: Attachment | null;
   categories: Category[];
   tags: Tag[];
   is_featured: boolean;

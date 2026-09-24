@@ -92,6 +92,7 @@ export class SeoService {
     this.category$.subscribe((blog) => (this.category = blog));
     this.themeOption$.subscribe((option) => {
       this.themeOption = option;
+      if (this.path) this.updateSeo(this.path);
     });
   }
 
@@ -99,6 +100,7 @@ export class SeoService {
     if (path.includes('product')) {
       if (this.product) {
         this.scoContent = {
+          og_type: 'website',
           url: window.location.href,
           og_title: this.product.meta_title || this.themeOption?.seo?.meta_title,
           og_description: this.product.meta_description || this.themeOption?.seo?.meta_description,
@@ -108,23 +110,41 @@ export class SeoService {
         };
       }
       this.customSCO();
-    } else if (path.includes('blog') || path.includes('artikel') || path.includes('article')) {
+    } else if (this.isArticleDetail(path)) {
       if (this.blog) {
         this.scoContent = {
           ...this.scoContent,
-          url: window.location.href,
-          og_title: this.blog?.meta_title || this.themeOption?.seo?.meta_title,
-          og_description: this.blog?.meta_description || this.themeOption?.seo?.meta_description,
+          url: this.blog?.canonical_url || window.location.href,
+          og_type: 'article',
+          og_title:
+            this.blog?.og_title || this.blog?.meta_title || this.themeOption?.seo?.meta_title,
+          og_description:
+            this.blog?.og_description ||
+            this.blog?.meta_description ||
+            this.themeOption?.seo?.meta_description,
           og_image:
             this.blog?.blog_meta_image?.original_url ||
             this.themeOption?.seo?.og_image?.original_url,
         };
         this.customSCO();
       }
+    } else if (this.isArticleList(path)) {
+      const english = path.split('?')[0].startsWith('/en/');
+      const label = english ? 'Articles' : 'Artikel';
+      const siteTitle = this.themeOption?.general?.site_title || 'MATEX';
+      this.scoContent = {
+        og_type: 'website',
+        url: window.location.href,
+        og_title: `${label} | ${siteTitle}`,
+        og_description: this.themeOption?.seo?.meta_description,
+        og_image: this.themeOption?.seo?.og_image?.original_url,
+      };
+      this.customSCO();
     } else if (path.includes('page')) {
       if (this.page) {
         this.scoContent = {
           ...this.scoContent,
+          og_type: 'website',
           url: window.location.href,
           og_title: this.page?.meta_title || this.themeOption?.seo?.meta_title,
           og_description: this.page?.meta_description || this.themeOption?.seo?.meta_description,
@@ -138,6 +158,7 @@ export class SeoService {
       if (this.brand) {
         this.scoContent = {
           ...this.scoContent,
+          og_type: 'website',
           url: window.location.href,
           og_title: this.brand?.meta_title || this.themeOption?.seo?.meta_title,
           og_description: this.brand?.meta_description || this.themeOption?.seo?.meta_description,
@@ -151,6 +172,7 @@ export class SeoService {
       if (this.category) {
         this.scoContent = {
           ...this.scoContent,
+          og_type: 'website',
           url: window.location.href,
           og_title: this.category?.meta_title || this.themeOption?.seo?.meta_title,
           og_description:
@@ -181,14 +203,14 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:image', content: this.scoContent['og_image'] });
 
     // Update Twitter Meta Tags
-    this.meta.updateTag({ property: 'twitter:card', content: 'summary_large_image' });
-    this.meta.updateTag({ property: 'twitter:url', content: this.scoContent['url'] });
-    this.meta.updateTag({ property: 'twitter:title', content: this.themeOption?.seo?.meta_title });
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:url', content: this.scoContent['url'] });
+    this.meta.updateTag({ name: 'twitter:title', content: this.themeOption?.seo?.meta_title });
     this.meta.updateTag({
-      property: 'twitter:description',
+      name: 'twitter:description',
       content: this.themeOption?.seo?.meta_description,
     });
-    this.meta.updateTag({ property: 'twitter:image', content: this.scoContent['og_image'] });
+    this.meta.updateTag({ name: 'twitter:image', content: this.scoContent['og_image'] });
 
     if (this.themeOption?.general && this.themeOption?.general?.exit_tagline_enable) {
       document.addEventListener('visibilitychange', () => {
@@ -234,18 +256,31 @@ export class SeoService {
     this.meta.updateTag({ name: 'description', content: description });
 
     // Update Facebook Meta Tags
-    this.meta.updateTag({ property: 'og:type', content: 'website' });
+    this.meta.updateTag({
+      property: 'og:type',
+      content: this.scoContent['og_type'] || 'website',
+    });
     this.meta.updateTag({ property: 'og:url', content: this.scoContent['url'] });
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:image', content: this.scoContent['og_image'] });
 
     // Update Twitter Meta Tags
-    this.meta.updateTag({ property: 'twitter:card', content: 'summary_large_image' });
-    this.meta.updateTag({ property: 'twitter:url', content: this.scoContent['url'] });
-    this.meta.updateTag({ property: 'twitter:title', content: title });
-    this.meta.updateTag({ property: 'twitter:description', content: description });
-    this.meta.updateTag({ property: 'twitter:image', content: this.scoContent['og_image'] });
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:url', content: this.scoContent['url'] });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+    this.meta.updateTag({ name: 'twitter:image', content: this.scoContent['og_image'] });
+  }
+
+  private isArticleDetail(path: string): boolean {
+    const pathname = path.split('?')[0].split('#')[0];
+    return /^\/(?:artikel|blog)\/[^/]+$/.test(pathname) || /^\/en\/article\/[^/]+$/.test(pathname);
+  }
+
+  private isArticleList(path: string): boolean {
+    const pathname = path.split('?')[0].split('#')[0];
+    return ['/artikel', '/articles', '/blogs', '/en/articles', '/en/blogs'].includes(pathname);
   }
 
   updateMessage() {

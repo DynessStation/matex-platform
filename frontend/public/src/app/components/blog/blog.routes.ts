@@ -4,7 +4,7 @@ import { BlogResolver } from '../../shared/resolver/blog.resolver';
 
 export const blog: Routes = [
   {
-    path: 'blogs',
+    path: 'artikel',
     loadComponent: () => import('./blog').then((m) => m.Blog),
   },
   {
@@ -12,12 +12,19 @@ export const blog: Routes = [
     loadComponent: () => import('./blog').then((m) => m.Blog),
   },
   {
+    path: 'blogs',
+    redirectTo: 'artikel',
+    pathMatch: 'full',
+  },
+  {
     path: 'en/blogs',
-    loadComponent: () => import('./blog').then((m) => m.Blog),
+    redirectTo: 'en/articles',
+    pathMatch: 'full',
   },
   {
     path: 'articles',
-    loadComponent: () => import('./blog').then((m) => m.Blog),
+    redirectTo: 'artikel',
+    pathMatch: 'full',
   },
   {
     path: 'blog/:slug',

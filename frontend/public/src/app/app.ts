@@ -1,6 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, DOCUMENT, inject, PLATFORM_ID } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 
 import { NgbRatingConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -23,7 +22,6 @@ import { ThemeOptionState } from './shared/store/state/theme-option.state';
   styleUrl: './app.scss',
 })
 export class App {
-  meta = inject(Meta);
   private store = inject(Store);
   seoService = inject(SeoService);
   private platformId = inject<Object>(PLATFORM_ID);
@@ -61,8 +59,6 @@ export class App {
 
     if (this.isBrowser) {
       this.themeOption$.subscribe((theme) => {
-        this.meta.updateTag({ name: 'title', content: theme?.seo?.meta_title || 'sdsff' });
-        this.meta.updateTag({ name: 'description', content: theme?.seo?.meta_description });
         // Set Mode
         if (theme?.general?.mode === 'dark') {
           document.body.classList.add(theme?.general && theme?.general?.mode);

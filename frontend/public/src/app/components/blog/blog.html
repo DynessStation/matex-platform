@@ -33,7 +33,6 @@
                     "
                     [alt]="blog?.title"
                     class="img-fluid"
-                    alt="image"
                   />
                 </a>
                 @if (blog?.is_sticky) {
@@ -87,7 +86,7 @@
           <div class="filter-button d-xl-none">
             <a href="javascript:void(0)">
               <i class="ri-equalizer-2-line"></i>
-              Filter Menu
+              {{ filterLabel }}
             </a>
           </div>
         </div>
@@ -125,7 +124,6 @@
                         "
                         [alt]="blog?.title"
                         class="img-fluid"
-                        alt="image"
                       />
                     </a>
                     @if (blog?.is_sticky) {
@@ -178,7 +176,7 @@
                           </a>
                         </div>
                         <a [routerLink]="[detailBase, blog?.slug]" class="btn blog-button"
-                          >Read more <i class="iconsax" icon-name="arrow-right"></i
+                          >{{ readMoreLabel }} <i class="iconsax" icon-name="arrow-right"></i
                         ></a>
                       </div>
                     } @else {

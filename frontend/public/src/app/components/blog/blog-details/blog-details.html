@@ -1,46 +1,56 @@
-<section class="blog-section section-t-space">
-  <div class="custom-container">
-    <div class="row g-xl-4 g-2">
-      <div class="col-12 m-xl-0" (click)="filterOpen()">
-        <div class="filter-button d-xl-none">
-          <a href="javascript:void(0)"><i class="ri-equalizer-2-line"></i> Filter Menu</a>
+@if (blog$ | async; as blog) {
+  <app-breadcrumb [breadcrumb]="breadcrumb" />
+
+  <section class="blog-section section-t-space" [attr.lang]="locale">
+    <div class="custom-container">
+      <div class="row g-xl-4 g-3">
+        <div class="col-12 m-xl-0" (click)="filterOpen()">
+          <div class="filter-button d-xl-none">
+            <button type="button">
+              <i class="ri-equalizer-2-line"></i>
+              {{ locale === 'en-US' ? 'Recent articles' : 'Artikel terbaru' }}
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="col-xxl-3 col-xl-4 col-lg-5">
-        <app-sidebar [showSidebar]="open" />
-      </div>
 
-      <div class="col-xxl-9 col-xl-8 ratio_45">
-        <div class="blog-deatils-box">
-          <div class="blog-detail-image mb-4">
-            <img
-              [src]="
-                (blog$ | async)?.blog_thumbnail
-                  ? (blog$ | async)?.blog_thumbnail?.asset_url
-                  : 'assets/images/blog.png'
-              "
-              class="img-fluid"
-              [alt]="(blog$ | async)?.title"
-              class="img-fluid"
-            />
-          </div>
-          <div class="blog-image-contain">
-            <h2>{{ (blog$ | async)?.title }}</h2>
-            <ul class="blog-list-box">
-              <li>{{ (blog$ | async)?.created_by?.name }}</li>
-              <li>{{ (blog$ | async)?.created_at | date: 'dd MMM yyyy' }}</li>
-            </ul>
-          </div>
+        <div class="col-xxl-3 col-xl-4 col-lg-5">
+          <app-sidebar [showSidebar]="open" />
+        </div>
 
-          <div class="blog-detail-contain" [innerHTML]="(blog$ | async)?.content"></div>
+        <div class="col-xxl-9 col-xl-8 ratio_45">
+          <article class="blog-deatils-box article-detail">
+            @if (blog.blog_thumbnail; as thumbnail) {
+              <figure class="blog-detail-image mb-4">
+                <img
+                  [src]="thumbnail.asset_url"
+                  class="img-fluid"
+                  [alt]="blog.title"
+                  fetchpriority="high"
+                />
+              </figure>
+            }
+
+            <header class="blog-image-contain">
+              <h1>{{ blog.title }}</h1>
+              <ul class="blog-list-box">
+                <li>{{ blog.created_by.name || 'MATEX' }}</li>
+                <li>{{ blog.created_at | date: 'dd MMM yyyy' }}</li>
+              </ul>
+              @if (blog.description) {
+                <p class="article-lead">{{ blog.description }}</p>
+              }
+            </header>
+
+            <div class="blog-detail-contain article-content" [innerHTML]="blog.content"></div>
+          </article>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter></app-home-newsletter>
-  </div>
-</section>
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+}

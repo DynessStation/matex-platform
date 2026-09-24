@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Sidebar } from './sidebar/sidebar';
@@ -65,9 +65,6 @@ export class Blog {
 
   public skeletonItems = Array.from({ length: 9 }, (_, index) => index);
   public totalItems: number = 0;
-  public blogsArray: IBlog[];
-  public paginateBlog: IBlog[];
-
   public style: string = 'grid_view';
   public sidebar: string = 'left_sidebar';
   public open: boolean = false;
@@ -77,21 +74,14 @@ export class Blog {
   get locale(): string {
     return this.navigation.locale();
   }
+  get filterLabel(): string {
+    return this.locale === 'en-US' ? 'Filter articles' : 'Filter artikel';
+  }
+  get readMoreLabel(): string {
+    return this.locale === 'en-US' ? 'Read more' : 'Baca selengkapnya';
+  }
 
-  private filterSubject = new BehaviorSubject(this.filter);
-  public filter$ = this.filterSubject.asObservable();
-
-  public paginateBlog$: Observable<IBlog[]> = combineLatest([this.blog$, this.filter$]).pipe(
-    map(([res, filter]) => {
-      const blogsArray = res?.data || [];
-      return blogsArray
-        .map((p) => ({ ...p }))
-        .slice(
-          (filter.page - 1) * filter.paginate,
-          (filter.page - 1) * filter.paginate + filter.paginate,
-        );
-    }),
-  );
+  public paginateBlog$: Observable<IBlog[]> = this.blog$.pipe(map((result) => result?.data || []));
 
   public totalItems$: Observable<number> = this.blog$.pipe(map((blog) => blog?.total || 0));
 
@@ -105,7 +95,6 @@ export class Blog {
       this.filter.tag = params['tag'] ? params['tag'] : '';
       this.filter.page = params['page'] ? Number(params['page']) : 1;
 
-      this.filterSubject.next({ ...this.filter });
       this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
 
       if (params['style']) {
@@ -132,7 +121,6 @@ export class Blog {
 
   setPaginate(data: number) {
     this.filter.page = data;
-    this.filterSubject.next({ ...this.filter });
     this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
 
     void this.router.navigate([], {

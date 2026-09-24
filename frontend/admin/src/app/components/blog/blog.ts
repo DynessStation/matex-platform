@@ -137,7 +137,10 @@ export class Blog {
 
   view(data: IBlog) {
     if (isPlatformBrowser(this.platformId)) {
-      window.open(this.url + '/blog/' + data.slug, '_blank');
+      window.open(
+        `${this.url.replace(/\/$/, '')}/artikel/${data.slug}`,
+        '_blank',
+      );
     }
   }
 }
