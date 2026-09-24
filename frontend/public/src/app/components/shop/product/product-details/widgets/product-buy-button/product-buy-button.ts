@@ -74,6 +74,11 @@ export class ProductBuyButton {
     }
   }
 
+  contactSales() {
+    const english = this.router.url === '/en' || this.router.url.startsWith('/en/');
+    void this.router.navigate([english ? '/en/contact-us' : '/contact-us']);
+  }
+
   wholesalePriceCal() {
     const product = this.product();
     const selectedVariation = this.selectedVariation();

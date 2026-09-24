@@ -1,4 +1,4 @@
-@if (!product()?.is_external) {
+@if (product()?.internal_commerce_enabled && !product()?.is_external) {
   <div class="product-buttons">
     <div class="qty-stock-box">
       <div class="qty-box h-100 qty-container quantity-box-2">
@@ -114,12 +114,20 @@
       </app-button>
     </div>
   </div>
-} @else {
+} @else if (product()?.external_url) {
   <app-button
     [id]="'externalBtn' + product()?.id"
     [class]="'btn btn-solid rounded-3'"
     (click)="externalProductLink(product()?.external_url!)"
   >
     {{ product()?.external_button_text ? product()?.external_button_text : 'Buy now' }}
+  </app-button>
+} @else {
+  <app-button
+    [id]="'contactBtn' + product()?.id"
+    [class]="'btn btn-solid rounded-3'"
+    (click)="contactSales()"
+  >
+    {{ 'Hubungi kami' }}
   </app-button>
 }

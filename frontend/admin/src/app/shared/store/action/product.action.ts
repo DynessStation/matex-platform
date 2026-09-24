@@ -1,5 +1,5 @@
 import { Params } from '../../interface/core.interface';
-import { IProduct } from '../../interface/product.interface';
+import { IProductPayload } from '../../interface/product.interface';
 
 export class GetProductsAction {
   static readonly type = '[Product] Get';
@@ -8,27 +8,27 @@ export class GetProductsAction {
 
 export class CreateProductAction {
   static readonly type = '[Product] Create';
-  constructor(public payload: IProduct) {}
+  constructor(public payload: IProductPayload) {}
 }
 
 export class EditProductAction {
   static readonly type = '[Product] Edit';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 export class UpdateProductAction {
   static readonly type = '[Product] Update';
   constructor(
-    public payload: IProduct,
-    public id: number,
+    public payload: IProductPayload,
+    public id: string,
   ) {}
 }
 
 export class UpdateProductStatusAction {
   static readonly type = '[Product] Update Status';
   constructor(
-    public id: number,
-    public status: boolean,
+    public id: string,
+    public status: string,
   ) {}
 }
 
@@ -42,7 +42,7 @@ export class ApproveProductStatusAction {
 
 export class DeleteProductAction {
   static readonly type = '[Product] Delete';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 export class DeleteAllProductAction {

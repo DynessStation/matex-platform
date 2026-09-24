@@ -25,6 +25,7 @@
   </h6>
 }
 <h2 class="name">{{ selectedVariation() ? selectedVariation()?.name : product()?.name }}</h2>
+@if (product()?.price_visibility === 'displayed') {
 <h3 class="product-price-2">
   {{
     (selectedVariation() ? selectedVariation()?.sale_price : product()?.sale_price) | currencySymbol
@@ -35,6 +36,9 @@
     }}</del>
   }
 </h3>
+} @else if (product()?.price_visibility === 'contact') {
+  <h3 class="product-price-2">Hubungi kami untuk harga</h3>
+}
 <div class="price-rating">
   <ul class="rating-review-sold-box">
     <li>

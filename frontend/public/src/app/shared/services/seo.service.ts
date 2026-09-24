@@ -97,13 +97,13 @@ export class SeoService {
   }
 
   updateSeo(path: string) {
-    if (path.includes('product')) {
+    if (path.includes('product') || path.includes('produk')) {
       if (this.product) {
         this.scoContent = {
           og_type: 'website',
-          url: window.location.href,
-          og_title: this.product.meta_title || this.themeOption?.seo?.meta_title,
-          og_description: this.product.meta_description || this.themeOption?.seo?.meta_description,
+          url: this.product.canonical_url || window.location.href,
+          og_title: this.product.og_title || this.product.meta_title || this.themeOption?.seo?.meta_title,
+          og_description: this.product.og_description || this.product.meta_description || this.themeOption?.seo?.meta_description,
           og_image:
             this.product.product_meta_image?.original_url ||
             this.themeOption?.seo?.og_image?.original_url,

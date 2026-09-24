@@ -13,7 +13,8 @@ export interface IProductModel extends IPaginateModel {
 }
 
 export interface IProduct {
-  id: number;
+  id: any;
+  key?: string;
   product_type: string;
   name: string;
   slug: string;
@@ -60,7 +61,7 @@ export interface IProduct {
   shipping_days: number;
   tax_id: number;
   tax: ITax;
-  status: boolean;
+  status: any;
   meta_title: string;
   meta_description: string;
   product_meta_image: IAttachment;
@@ -107,6 +108,56 @@ export interface IProduct {
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
+  translations?: IProductTranslation[];
+  prices?: IProductPrice[];
+  marketplaces?: IProductMarketplace[];
+  media?: Array<IAttachment & { role: ProductMediaRole; sort_order: number }>;
+  category_ids?: string[];
+  price_visibility?: ProductPriceVisibility;
+  manage_stock?: boolean;
+  stock_quantity?: number | null;
+  internal_commerce_enabled?: boolean;
+  manufacturer_code?: string;
+  barcode?: string;
+  country_origin?: string;
+  hs_code?: string;
+  length_mm?: number | null;
+  width_mm?: number | null;
+  height_mm?: number | null;
+  min_order_qty?: number;
+  lead_time_days?: number | null;
+  sort_order?: number;
+}
+
+export type ProductCatalogStatus = 'draft' | 'published' | 'archived';
+export type ProductPriceVisibility = 'displayed' | 'contact' | 'hidden';
+export type ProductMediaRole = 'thumbnail' | 'gallery' | 'og' | 'size_chart' | 'document';
+export interface IProductTranslation {
+  locale: 'id-ID' | 'en-US'; slug: string; name: string;
+  short_description: string; description: string; specifications: unknown;
+  meta_title: string; meta_description: string; canonical_url: string;
+  og_title: string; og_description: string; status: 0 | 1;
+}
+export interface IProductPrice {
+  id?: number; type: string; label: string | null; currency: string; amount: number;
+  compare_at: number | null; min_qty: number | null; max_qty: number | null;
+  starts_at?: string | null; ends_at?: string | null; is_public: boolean;
+  is_active: boolean; sort_order: number;
+}
+export interface IProductMarketplace {
+  id?: number; provider: string; label: string | null; url: string; sku: string | null;
+  price: number | null; currency: string; is_primary: boolean; is_active: boolean; sort_order: number;
+}
+export interface IProductPayload {
+  key: string; sku: string; product_type: 'physical' | 'service' | 'digital';
+  status: ProductCatalogStatus; unit: string | null; barcode: string | null;
+  manufacturer_code: string | null; country_origin: string | null; hs_code: string | null;
+  weight_grams: number | null; length_mm: number | null; width_mm: number | null; height_mm: number | null;
+  min_order_qty: number; lead_time_days: number | null; manage_stock: 0 | 1;
+  stock_quantity: number | null; stock_status: string; price_visibility: ProductPriceVisibility;
+  internal_commerce_enabled: 0 | 1; is_featured: 0 | 1; sort_order: number;
+  category_ids: string[]; media: Array<{ id: string; role: ProductMediaRole; sort_order: number }>;
+  prices: IProductPrice[]; marketplaces: IProductMarketplace[]; translations: IProductTranslation[];
 }
 
 export interface IWholesalePrice {

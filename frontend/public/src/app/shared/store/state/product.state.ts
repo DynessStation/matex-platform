@@ -254,11 +254,9 @@ export class ProductState {
   @Action(GetProductBySlug)
   getProductBySlug(ctx: StateContext<ProductStateModel>, { slug }: GetProductBySlug) {
     this.themeOptionService.preloader.set(true);
-    return this.productService.getProducts().pipe(
+    return this.productService.getProductBySlug(slug).pipe(
       tap({
-        next: (results) => {
-          const result = results.data.find((product: Product) => product!.slug == slug)!;
-
+        next: (result) => {
           result.related_products =
             result.related_products && result.related_products.length
               ? result.related_products
@@ -278,11 +276,7 @@ export class ProductState {
             }),
           );
 
-          const state = ctx.getState();
-          ctx.patchState({
-            ...state,
-            selectedProduct: result,
-          });
+          ctx.patchState({ selectedProduct: result });
         },
         complete: () => {
           this.themeOptionService.preloader.set(false);

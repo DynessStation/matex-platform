@@ -14,11 +14,21 @@ export const shop: Routes = [
     loadComponent: () => import('./collection/collection').then((m) => m.Collection),
   },
   {
-    path: 'product/:slug',
+    path: 'produk/:slug',
     component: Product,
     resolve: {
       data: ProductResolver,
     },
+  },
+  {
+    path: 'en/product/:slug',
+    component: Product,
+    resolve: { data: ProductResolver },
+  },
+  {
+    path: 'product/:slug',
+    redirectTo: 'produk/:slug',
+    pathMatch: 'full',
   },
   {
     path: 'cart',

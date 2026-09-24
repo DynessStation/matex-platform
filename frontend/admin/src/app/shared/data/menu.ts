@@ -198,6 +198,14 @@ export const menu: ISidebar[] = [
       },
       {
         parent_id: 4,
+        title: 'products',
+        path: '/product',
+        type: 'link',
+        level: 2,
+        permission: 'product.view',
+      },
+      {
+        parent_id: 4,
         title: 'faq_management',
         path: '/faq',
         type: 'link',
