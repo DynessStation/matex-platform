@@ -1,18 +1,22 @@
-import { Component, ViewChild } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
-import { LoginModal } from '../../../modal/login-modal/login-modal';
+import { PublicNavigationContextService } from '../../../../services/public-navigation-context.service';
 
 @Component({
   selector: 'app-top-bar-menu',
-  imports: [RouterModule, LoginModal],
+  imports: [RouterLink],
   templateUrl: './top-bar-menu.html',
   styleUrl: './top-bar-menu.scss',
 })
 export class TopBarMenu {
-  @ViewChild('loginModal') loginModal: LoginModal;
+  public navigation = inject(PublicNavigationContextService);
 
-  openLoginModal() {
-    void this.loginModal.openModal();
+  get articlePath(): string {
+    return this.navigation.locale() === 'en-US' ? '/en/articles' : '/artikel';
+  }
+
+  get contactPath(): string {
+    return this.navigation.locale() === 'en-US' ? '/en/contact-us' : '/kontak';
   }
 }

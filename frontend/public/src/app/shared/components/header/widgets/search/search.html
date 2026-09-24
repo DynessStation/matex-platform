@@ -1,83 +1,55 @@
-<div class="search-overlay" id="searchOverlay" [class.show]="menuService.isOpenSearch"></div>
+<div class="search-overlay" [class.show]="menuService.isOpenSearch" (click)="closeSearch()"></div>
 
-<form class="search-form">
+<form class="search-form" (ngSubmit)="submitSearch()">
   <div class="input-group">
     <div class="close-icon">
-      <i class="ri-close-fill" id="close-btn" (click)="closeSearch()"></i>
+      <i class="ri-close-fill" (click)="closeSearch()"></i>
     </div>
-
-    <div class="input-group-text">
-      <div class="dropdown" [class.show]="isCategoryOpen">
-        <button
-          class="btn dropdown-toggle"
-          type="button"
-          (click)="toggleCategory()"
-          [class.show]="isCategoryOpen"
-        >
-          <span>{{ selectedCategory }}</span>
-        </button>
-        <ul class="dropdown-menu" [class.show]="isCategoryOpen">
-          @if ((category$ | async)?.data?.length) {
-            @for (cat of (category$ | async)?.data; track cat.id) {
-              <li>
-                <a
-                  class="dropdown-item"
-                  [routerLink]="['/category/' + cat.slug]"
-                  (click)="selectCategory(cat.name)"
-                  >{{ cat?.name }}</a
-                >
-              </li>
-            }
-          }
-        </ul>
-      </div>
-    </div>
-
     <input
-      id="searchInputBox"
       type="search"
       class="form-control"
-      placeholder="I'm searching for..."
+      [placeholder]="placeholder"
       (focus)="showResults()"
-      (blur)="hideResults()"
       [formControl]="search"
       autocomplete="off"
     />
-
-    <button class="search-button btn">
+    <button class="search-button btn" type="submit" [attr.aria-label]="locale === 'en-US' ? 'Search' : 'Cari'">
       <i class="ri-search-line"></i>
     </button>
   </div>
 
-  <div class="result-box" id="resultBox" [class.show]="menuService.isOpenSearch">
-    <div class="search-result-box search-border-box">
-      <div class="result-title mb-sm-3 mb-2">
-        <h4>Top Search</h4>
-      </div>
-      <ul class="result-list-box">
-        @if ((searchCategory$ | async)?.length) {
-          @for (category of (searchCategory$ | async); track category.id) {
-            <li>
-              <a [routerLink]="['/category/', category.slug]">
-                {{ category.name }}
-              </a>
-            </li>
-          }
+  @if (results$ | async; as results) {
+    @if (menuService.isOpenSearch && results.term.length >= 2) {
+      <div class="result-box show public-search-results">
+        @if (results.products.length) {
+          <div class="search-result-box search-border-box">
+            <div class="result-title"><h4>{{ locale === 'en-US' ? 'Products' : 'Produk' }}</h4></div>
+            <ul class="result-list-box">
+              @for (product of results.products; track product.id) {
+                <li><a [routerLink]="productPath(product.slug)" (click)="closeSearch()">{{ product.name }}</a></li>
+              }
+            </ul>
+          </div>
         }
-      </ul>
-    </div>
-
-    <div class="last-seen-search-box search-border-box">
-      <div class="result-title mb-sm-3 mb-2">
-        <h4>Recently Viewed</h4>
-      </div>
-      <ul class="search-list-box">
-        @if ((productBySearch$ | async)?.length) {
-          @for (product of (productBySearch$ | async); track product.id) {
-            <app-product-box [product]="product" [style]="'vertical'" />
-          }
+        @if (results.articles.length) {
+          <div class="search-result-box search-border-box">
+            <div class="result-title"><h4>{{ locale === 'en-US' ? 'Articles' : 'Artikel' }}</h4></div>
+            <ul class="result-list-box">
+              @for (article of results.articles; track article.id) {
+                <li><a [routerLink]="articlePath(article.slug)" (click)="closeSearch()">{{ article.title }}</a></li>
+              }
+            </ul>
+          </div>
         }
-      </ul>
-    </div>
-  </div>
+        @if (!results.total) {
+          <div class="search-border-box empty-search-result">
+            {{ locale === 'en-US' ? 'No matching content found.' : 'Konten yang cocok belum ditemukan.' }}
+          </div>
+        }
+        <a class="view-all-search" [routerLink]="searchPath" [queryParams]="{ q: results.term }" (click)="closeSearch()">
+          {{ locale === 'en-US' ? 'View all results' : 'Lihat semua hasil' }}
+        </a>
+      </div>
+    }
+  }
 </form>

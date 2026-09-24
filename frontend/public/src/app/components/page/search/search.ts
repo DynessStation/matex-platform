@@ -1,110 +1,78 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
-import { Store } from '@ngxs/store';
-import { combineLatest, debounceTime, distinctUntilChanged, map, Observable, startWith, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap } from 'rxjs';
 
-import { ProductBoxOne } from '../../../shared/components/product-box/product-box-one/product-box-one';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
-import { Params } from '../../../shared/interface/core.interface';
-import { Product, ProductModel } from '../../../shared/interface/product.interface';
-import { GetProducts } from '../../../shared/store/action/product.action';
-import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
+import { PublicSearchService } from '../../../shared/services/public-search.service';
 
 @Component({
-  selector: 'app-search',
-  imports: [
-    ProductBoxOne,
-    FormsModule,
-    ReactiveFormsModule,
-    NgbModule,
-    Breadcrumb,
-    TranslateModule,
-    HomeNewsletter,
-    AsyncPipe,
-  ],
+  selector: 'app-search-page',
+  imports: [AsyncPipe, Breadcrumb, ReactiveFormsModule, RouterLink],
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })
 export class Search {
-  private store = inject(Store);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+  private publicSearch = inject(PublicSearchService);
+  public navigation = inject(PublicNavigationContextService);
 
-  product$ = this.store.select(state => state.product.product);
+  public search = new FormControl('', { nonNullable: true });
+  public breadcrumb: breadcrumb = { title: '', items: [] };
 
-  search = new FormControl('');
-
-  filter = new FormGroup({
-    page: new FormControl(1),
-    paginate: new FormControl(15),
-    search: new FormControl(''),
-    status: new FormControl(1)
-  });
-
-  totalItems$: Observable<number>;
-  paginateProduct$: Observable<Product[]>;
-
-  public breadcrumb: breadcrumb = {
-    title: 'Search',
-    items: [{ label: 'Search', active: true }]
-  };
+  readonly results$ = this.route.queryParamMap.pipe(
+    map((params) => (params.get('q') ?? params.get('search') ?? '').trim()),
+    distinctUntilChanged(),
+    switchMap((term) => this.publicSearch.search(term, this.navigation.locale(), 24)),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
 
   constructor() {
-    this.route.queryParams.subscribe(params => {
-      this.filter.patchValue({
-        search: params['search'] ? params['search'] : '',
-        page: params['page'] ? parseFloat(params['page']) : 1,
-        paginate: params['paginate'] ? parseFloat(params['paginate']) : 15,
-        status: 1
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.search.setValue(params.get('q') ?? params.get('search') ?? '', { emitEvent: false });
+      this.setBreadcrumb();
+    });
+
+    this.search.valueChanges
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((term) => {
+        void this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { q: term.trim() || null, search: null, page: null, paginate: null },
+          queryParamsHandling: 'merge',
+        });
       });
-
-      this.search.patchValue(this.filter.get('search')?.value ?? '', { emitEvent: false })
-    });
-
-    this.totalItems$ = this.product$.pipe(map(product => product?.total));
-
-    this.paginateProduct$ = combineLatest([this.product$, this.filter.valueChanges.pipe(startWith(this.filter.value))]).pipe(
-      map(([products, filter]) => {
-        if (!products?.data?.length) {
-          return [];
-        }
-        const page = filter?.page || 1;
-        const paginate = filter?.paginate || 15;
-        return products.data.slice((page - 1) * paginate, page * paginate)
-      }));
   }
 
-  ngOnInit() {
-    this.search.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged())
-      .subscribe((inputValue) => {
-        this.filter.patchValue({ search: inputValue, page: 1 });
-        this.updateURL();
-        this.store.dispatch(new GetProducts(this.filter.value as Params));
-      })
+  get locale(): string {
+    return this.navigation.locale();
   }
 
-  updateURL() {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        search: this.filter.value.search,
-        page: this.filter.value.page,
-        paginate: this.filter.value.paginate
-      },
-      queryParamsHandling: 'merge',
-    });
+  get placeholder(): string {
+    return this.locale === 'en-US' ? 'Search products and articles' : 'Cari produk dan artikel';
   }
 
-  pageChanged(page: number) {
-    this.filter.patchValue({ page: page });
-    this.updateURL();
+  productPath(slug: string): string {
+    return this.locale === 'en-US' ? `/en/product/${slug}` : `/produk/${slug}`;
+  }
+
+  articlePath(slug: string): string {
+    return this.locale === 'en-US' ? `/en/article/${slug}` : `/artikel/${slug}`;
+  }
+
+  imageUrl(item: { asset_url?: string; original_url?: string } | null | undefined): string {
+    return item?.asset_url || item?.original_url || 'assets/images/placeholder/1.png';
+  }
+
+  private setBreadcrumb() {
+    const title = this.locale === 'en-US' ? 'Search' : 'Pencarian';
+    this.breadcrumb = { title, items: [{ label: title, active: true }] };
   }
 }

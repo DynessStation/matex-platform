@@ -1,0 +1,17 @@
+.public-search-results {
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+}
+
+.empty-search-result {
+  color: rgba(var(--content-color), 1);
+  padding: 20px;
+}
+
+.view-all-search {
+  display: block;
+  padding: 14px 20px;
+  color: rgba(var(--theme-color), 1);
+  font-weight: 600;
+  text-align: center;
+}

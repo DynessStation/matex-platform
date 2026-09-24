@@ -14,6 +14,14 @@ export const shop: Routes = [
     loadComponent: () => import('./collection/collection').then((m) => m.Collection),
   },
   {
+    path: 'katalog',
+    loadComponent: () => import('./collection/collection').then((m) => m.Collection),
+  },
+  {
+    path: 'en/catalog',
+    loadComponent: () => import('./collection/collection').then((m) => m.Collection),
+  },
+  {
     path: 'produk/:slug',
     component: Product,
     resolve: {

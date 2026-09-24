@@ -1,52 +1,27 @@
 import { isPlatformBrowser, NgClass } from '@angular/common';
-import {
-  Component,
-  HostListener,
-  inject,
-  input,
-  PLATFORM_ID,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, HostListener, inject, input, PLATFORM_ID } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { Store } from '@ngxs/store';
-import { combineLatest } from 'rxjs';
-
-import { HomeCategory } from '../../../../components/home/widgets/home-category/home-category';
-import { Wishlist } from '../../../../components/shop/wishlist/wishlist';
 import { Option } from '../../../interface/theme-option.interface';
-import { LayoutService } from '../../../services/layout.service';
 import { MenuService } from '../../../services/menu.service';
-import { ThemeState } from '../../../store/state/theme.state';
-import { Cart } from '../widgets/cart/cart';
-import { Currency } from '../widgets/currency/currency';
 import { Language } from '../widgets/language/language';
 import { Logo } from '../widgets/logo/logo';
 import { MainMenu } from '../widgets/main-menu/main-menu';
 import { Search } from '../widgets/search/search';
-import { SocialMedia } from '../widgets/social-media/social-media';
 import { TopBarMenu } from '../widgets/top-bar-menu/top-bar-menu';
-import { UserProfile } from '../widgets/user-profile/user-profile';
+import { PublicNavigationContextService } from '../../../services/public-navigation-context.service';
 
 @Component({
   selector: 'app-header-one',
   standalone: true,
   imports: [
     Language,
-    Currency,
-    SocialMedia,
     TopBarMenu,
     Logo,
     Search,
     MainMenu,
-    Cart,
-    Wishlist,
-    UserProfile,
-    RouterLink,
     NgClass,
-    HomeCategory,
+    RouterLink,
   ],
   providers: [],
   templateUrl: './header-one.html',
@@ -57,25 +32,14 @@ export class HeaderOne {
   public stick = false;
 
   public menuService = inject(MenuService);
-  public layoutService = inject(LayoutService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private store = inject(Store);
+  public navigation = inject(PublicNavigationContextService);
 
   readonly data = input<Option | null>();
   readonly logo = input<string | null>();
   readonly sticky = input<boolean | number>();
-  public isGadgetStore = false;
-
   constructor() {
     const platformId = inject(PLATFORM_ID);
     this.isBrowser = isPlatformBrowser(platformId);
-
-    combineLatest([this.route.queryParams, this.store.select(ThemeState.activeTheme)]).subscribe(
-      ([params, activeTheme]) => {
-        this.isGadgetStore = (params['theme'] || activeTheme) === 'gadget-store';
-      },
-    );
   }
 
   @HostListener('window:scroll', [])
@@ -86,19 +50,6 @@ export class HeaderOne {
     this.stick = y >= 50 && window.innerWidth > 400;
   }
 
-  toggleCategories() {
-    this.layoutService.headerCategoryCanvasToggle = !this.layoutService.headerCategoryCanvasToggle;
-  }
-
-  toggleCategoriesOffcanvas() {
-    this.layoutService.headerCategoryCanvasToggle = !this.layoutService.headerCategoryCanvasToggle;
-  }
-
-  private offcanvas = inject(NgbOffcanvas);
-
-  @ViewChild('wishlistOffcanvas', { static: false })
-  wishlistOffcanvas!: TemplateRef<any>;
-
   mainMenuOpen() {
     this.menuService.mainMenuToggle = true;
   }
@@ -107,14 +58,11 @@ export class HeaderOne {
     this.menuService.isOpenSearch = true;
   }
 
-  openWishlist() {
-    this.offcanvas.open(this.wishlistOffcanvas, {
-      position: 'end',
-      panelClass: 'wishlist-offcanvas cart-offcanvas',
-    });
+  get catalogPath(): string {
+    return this.navigation.locale() === 'en-US' ? '/en/catalog' : '/katalog';
   }
 
-  closeWishlist() {
-    this.offcanvas.dismiss();
+  get catalogLabel(): string {
+    return this.navigation.locale() === 'en-US' ? 'Product Catalog' : 'Katalog Produk';
   }
 }

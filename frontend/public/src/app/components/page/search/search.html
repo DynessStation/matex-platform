@@ -1,59 +1,76 @@
 <app-breadcrumb [breadcrumb]="breadcrumb" />
 
-<section class="search-section section-t-space">
+<section class="search-section section-t-space section-b-space">
   <div class="custom-container">
-    <div class="row">
-      <div class="col-xl-5 col-lg-7 col-md-10 m-auto">
-        <div class="search-box theme-form input-group">
-          <span class="input-group-text" id="basic-addon1">
-            <i class="ri-search-line"></i>
-          </span>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="{{ 'Search product' | translate }}"
-            [formControl]="search"
-          />
-        </div>
-      </div>
-      <div class="col-12 mt-5">
-        <div class="title d-block text-center">
-          <h3>Need some inspiration?</h3>
-        </div>
-
-        <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-2 g-sm-4 g-3">
-          @if (paginateProduct$ | async; as products) {
-            @for (product of products; track product) {
-              <div class="col pro-bg-white">
-                <app-product-box-one [product]="product"></app-product-box-one>
-              </div>
-            }
-          }
-        </div>
-        @if (totalItems$ | async; as totalItems) {
-          <nav class="custom-pagination">
-            <ul class="pagination justify-content-center">
-              <ngb-pagination
-                [collectionSize]="totalItems"
-                [page]="filter.get('page')?.value!"
-                [pageSize]="filter.get('paginate')?.value!"
-                [maxSize]="5"
-                [rotate]="true"
-                [boundaryLinks]="true"
-                [ellipses]="false"
-                (pageChange)="pageChanged($event)"
-              >
-              </ngb-pagination>
-            </ul>
-          </nav>
-        }
-      </div>
+    <div class="public-search-input">
+      <i class="ri-search-line"></i>
+      <input type="search" class="form-control" [placeholder]="placeholder" [formControl]="search" autofocus />
     </div>
-  </div>
-</section>
 
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter />
+    @if (results$ | async; as results) {
+      @if (results.term.length < 2) {
+        <div class="search-state">
+          <h3>{{ locale === 'en-US' ? 'What are you looking for?' : 'Apa yang sedang Anda cari?' }}</h3>
+          <p>{{ locale === 'en-US' ? 'Enter at least two characters to search the catalog and articles.' : 'Masukkan minimal dua karakter untuk mencari katalog dan artikel.' }}</p>
+        </div>
+      } @else if (!results.total) {
+        <div class="search-state">
+          <h3>{{ locale === 'en-US' ? 'No results found' : 'Hasil belum ditemukan' }}</h3>
+          <p>{{ locale === 'en-US' ? 'Try a different product name, SKU, or topic.' : 'Coba nama produk, SKU, atau topik yang berbeda.' }}</p>
+        </div>
+      } @else {
+        <div class="search-summary">
+          {{ locale === 'en-US' ? 'Search results for' : 'Hasil pencarian untuk' }} <strong>“{{ results.term }}”</strong>
+        </div>
+
+        @if (results.products.length) {
+          <div class="result-section">
+            <div class="result-heading">
+              <h3>{{ locale === 'en-US' ? 'Products' : 'Produk' }}</h3>
+              <span>{{ results.products.length }}</span>
+            </div>
+            <div class="row row-cols-xl-4 row-cols-lg-3 row-cols-sm-2 row-cols-1 g-4">
+              @for (product of results.products; track product.id) {
+                <div class="col">
+                  <a class="public-result-card product-result" [routerLink]="productPath(product.slug)">
+                    <div class="result-media"><img [src]="imageUrl(product.product_thumbnail)" [alt]="product.name" /></div>
+                    <div class="result-copy">
+                      @if (product.sku) { <span class="result-kicker">SKU: {{ product.sku }}</span> }
+                      <h4>{{ product.name }}</h4>
+                      @if (product.short_description) { <p>{{ product.short_description }}</p> }
+                    </div>
+                  </a>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (results.articles.length) {
+          <div class="result-section">
+            <div class="result-heading">
+              <h3>{{ locale === 'en-US' ? 'Articles' : 'Artikel' }}</h3>
+              <span>{{ results.articles.length }}</span>
+            </div>
+            <div class="row row-cols-xl-3 row-cols-md-2 row-cols-1 g-4">
+              @for (article of results.articles; track article.id) {
+                <div class="col">
+                  <a class="public-result-card article-result" [routerLink]="articlePath(article.slug)">
+                    @if (article.blog_thumbnail) {
+                      <div class="result-media"><img [src]="imageUrl(article.blog_thumbnail)" [alt]="article.title" /></div>
+                    }
+                    <div class="result-copy">
+                      <span class="result-kicker">{{ locale === 'en-US' ? 'Article' : 'Artikel' }}</span>
+                      <h4>{{ article.title }}</h4>
+                      @if (article.description) { <p>{{ article.description }}</p> }
+                    </div>
+                  </a>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
   </div>
 </section>

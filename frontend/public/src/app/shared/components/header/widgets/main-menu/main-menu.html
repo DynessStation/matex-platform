@@ -1,240 +1,38 @@
 <div class="main-nav navbar navbar-expand-xl navbar-light navbar-sticky">
-  <div
-    class="offcanvas offcanvas-collapse order-xl-2"
-    id="primaryMenu"
-    [class.show]="menuService.mainMenuToggle"
-  >
+  <div class="offcanvas offcanvas-collapse order-xl-2" id="primaryMenu" [class.show]="menuService.mainMenuToggle">
     <div class="offcanvas-header navbar-shadow">
-      <h5>Menu</h5>
-      <button
-        class="btn-close lead"
-        type="button"
-        data-bs-dismiss="offcanvas"
-        (click)="mainMenuClose()"
-      >
-        <i class="ri-close-fill"></i>
-      </button>
+      <h5>{{ navigation.locale() === 'en-US' ? 'Menu' : 'Menu' }}</h5>
+      <button class="btn-close lead" type="button" (click)="close()"><i class="ri-close-fill"></i></button>
     </div>
     <div class="offcanvas-body" [class.show]="menuService.mainMenuToggle">
-      @if (menuService.skeletonLoader) {
-        <ul class="skeleton-menu navbar-nav">
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-      } @else {
-        <ul class="navbar-nav {{ navClass() }}">
-          <div
-            *ngTemplateOutlet="recursiveMenu; context: { $implicit: (menu$ | async)?.data }"
-          ></div>
-          <ng-template #recursiveMenu let-menus>
-            <ng-container>
-              @for (menu of menus; track menu.title) {
-                <li
-                  [ngClass]="[
-                    menu.link_type === 'sub' && menu.child ? 'nav-item dropdown' : '',
-                    menu.mega_menu ? 'mega-dropdown' : '',
-                  ]"
-                  [class.new-nav-item]="menu.badge_text"
-                >
-                  @if (menu.link_type === 'sub') {
-                    <a class="nav-link dropdown-toggle" (click)="toggle(menu)">
-                      {{ menu.title }}
-
-                      @if (menu.badge_text) {
-                        <label class="new-dropdown">{{ menu.badge_text }}</label>
-                      }
-                    </a>
-                  }
-                  @if (menu.link_type === 'link' && menu.is_target_blank === 0) {
-                    <a
-                      class="dropdown-item"
-                      [class.show]="menu.active"
-                      (click)="redirect(menu.path)"
-                    >
-                      {{ menu.title }}
-
-                      @if (menu.badge_text) {
-                        <label class="menu-label {{ menu.badge_color }}">{{
-                          menu.badge_text
-                        }}</label>
-                      }
-                    </a>
-                  }
-                  @if (menu.is_target_blank === 1) {
-                    <a
-                      class="dropdown-item"
-                      [class.show]="menu.active"
-                      target="_blank"
-                      href="{{ menu.path }}"
-                    >
-                      {{ menu.title }}
-
-                      @if (menu.badge_text) {
-                        <label class="new-dropdown menu-label {{ menu.badge_color }}">{{
-                          menu.badge_text
-                        }}</label>
-                      }
-                    </a>
-                  }
-                  @if (
-                    menu.mega_menu === 1 &&
-                    menu?.child?.length &&
-                    menu.mega_menu_type !== 'link_with_image'
-                  ) {
-                    <div class="dropdown-menu mega-menu" [class.show]="menu.active">
-                      @if (menu.mega_menu_type === 'category') {
-                        <div class="row gx-xl-5 gy-0">
-                          <div class="col-xl-3 border-right-color">
-                            <ul class="nav nav-tabs menu-nav-tabs">
-                              @for (megaMenu of menu.child; track megaMenu.title; let i = $index) {
-                                <li class="nav-item" role="presentation">
-                                  <button
-                                    class="nav-link shopBtn"
-                                    [class.active]="activeCategory === i"
-                                    (click)="setActiveCategory(i, megaMenu)"
-                                  >
-                                    <i class="ri-smartphone-line"></i>
-                                    <span>{{ megaMenu.title }}</span>
-                                    <i class="ri-arrow-right-long-line arrow"></i>
-                                  </button>
-                                </li>
-                              }
-                            </ul>
-                          </div>
-                          <div class="col-9 d-xl-block d-none">
-                            <div class="tab-content">
-                              @for (megaMenu of menu.child; track megaMenu; let i = $index) {
-                                <div
-                                  class="tab-pane fade"
-                                  [class.show]="activeCategory === i"
-                                  [class.active]="activeCategory === i"
-                                >
-                                  @if (filteredProducts.length) {
-                                    <div class="row">
-                                      @for (product of filteredProducts; track product.id) {
-                                        <div class="col-3">
-                                          <app-product-box
-                                            [product]="product"
-                                            [productBoxStyle]="'product_box_one'"
-                                          ></app-product-box>
-                                        </div>
-                                      }
-                                    </div>
-                                  }
-                                </div>
-                              }
-                            </div>
-                          </div>
-                        </div>
-                      } @else {
-                        <div class="row g-xl-4 g-2">
-                          @if (menu.mega_menu_type === 'side_banner') {
-                            @for (megaMenu of menu.child; track megaMenu) {
-                              <div class="col">
-                                <app-link-box [menu]="megaMenu"></app-link-box>
-                              </div>
-                            }
-                          }
-                          @if (menu.mega_menu_type === 'product_box') {
-                            <div class="col-xl-8">
-                              <div class="row g-xl-4 g-3 row-cols-xxl-5 row-cols-xl-3">
-                                @for (megaMenu of menu.child; track megaMenu) {
-                                  <div class="col">
-                                    <app-link-box [menu]="megaMenu"></app-link-box>
-                                  </div>
-                                }
-                              </div>
-                            </div>
-                          } @else {
-                            @for (megaMenu of menu.child; track megaMenu) {
-                              <div class="col-xl-3">
-                                <app-link-box [menu]="megaMenu"></app-link-box>
-                              </div>
-                            }
-                          }
-                          @if (menu.mega_menu_type === 'product_box') {
-                            <div class="col-4 d-xl-block d-none">
-                              <div class="menu-title">
-                                <h4>Top Selling Product</h4>
-                              </div>
-                              @if (menu.product_ids.length) {
-                                <div class="row">
-                                  @for (product of products | slice: 0 : 2; track product) {
-                                    <div class="col-6">
-                                      <app-product-box
-                                        [product]="product"
-                                        [productBoxStyle]="'product_box_one'"
-                                      ></app-product-box>
-                                    </div>
-                                  }
-                                </div>
-                              } @else {
-                                <app-no-data
-                                  [class]="'menu-no-data'"
-                                  [text]="'no_product' | translate"
-                                ></app-no-data>
-                              }
-                            </div>
-                          }
-                          @if (menu.mega_menu_type === 'bottom_banner') {
-                            <div class="col-12 d-xl-block d-none w-100">
-                              @if (menu && menu.banner_image) {
-                                <a class="menu-banner">
-                                  <img
-                                    [src]="menu?.banner_image?.asset_url"
-                                    class="img-fluid loaded"
-                                    alt=""
-                                  />
-                                </a>
-                              }
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  }
-                  @if (menu.mega_menu && menu.mega_menu_type === 'link_with_image') {
-                    <div class="dropdown-menu mega-menu" [class.show]="menu.active">
-                      <ul class="demo-list">
-                        @for (imageMenu of menu.child; track imageMenu.title) {
-                          <li>
-                            <a
-                              href="javascript:void(0)"
-                              class="dropdown-item text-center"
-                              (click)="redirect(imageMenu.path)"
-                            >
-                              @if (imageMenu.item_image) {
-                                <img
-                                  [src]="imageMenu.item_image.asset_url"
-                                  class="img-fluid"
-                                  [alt]="imageMenu.title"
-                                />
-                              }
-                              <h4>{{ imageMenu.title }}</h4>
-                            </a>
-                          </li>
-                        }
-                      </ul>
-                    </div>
-                  }
-                  @if (menu.child?.length && !menu.mega_menu) {
-                    <ul class="dropdown-menu" [class.show]="menu.active">
-                      <ng-container
-                        *ngTemplateOutlet="recursiveMenu; context: { $implicit: menu.child }"
-                      ></ng-container>
-                    </ul>
-                  }
-                </li>
-              }
-            </ng-container>
-          </ng-template>
-        </ul>
-      }
+      <ul class="navbar-nav {{ navClass() }}">
+        @for (item of items; track item.key) {
+          <li class="nav-item" [class.dropdown]="item.children.length">
+            @if (item.children.length) {
+              <a class="nav-link dropdown-toggle" (click)="toggle(item)">{{ item.label }}</a>
+              <ul class="dropdown-menu" [class.show]="item.active">
+                @for (child of item.children; track child.key) {
+                  <li>
+                    @if (child.link_type === 'external' && child.url) {
+                      <a class="dropdown-item" [href]="child.url" [target]="child.target_blank ? '_blank' : '_self'">{{ child.label }}</a>
+                    } @else if (child.path) {
+                      <a class="dropdown-item" [routerLink]="child.path" (click)="close()">{{ child.label }}</a>
+                    } @else {
+                      <span class="dropdown-item">{{ child.label }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else if (item.link_type === 'external' && item.url) {
+              <a class="nav-link" [href]="item.url" [target]="item.target_blank ? '_blank' : '_self'">{{ item.label }}</a>
+            } @else if (item.path) {
+              <a class="nav-link" [routerLink]="item.path" (click)="close()">{{ item.label }}</a>
+            } @else {
+              <span class="nav-link">{{ item.label }}</span>
+            }
+          </li>
+        }
+      </ul>
     </div>
   </div>
 </div>
