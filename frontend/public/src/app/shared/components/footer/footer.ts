@@ -1,98 +1,102 @@
-import { NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { Observable, filter } from 'rxjs';
+import { catchError, map, of, switchMap } from 'rxjs';
 
-import { ContactInfo } from './widgets/contact-info/contact-info';
-import { FooterAppStoreLink } from './widgets/footer-app-store-link/footer-app-store-link';
-import { FooterLinks } from './widgets/footer-links/footer-links';
-import { FooterLogo } from './widgets/footer-logo/footer-logo';
-import { FooterPaymentOptions } from './widgets/footer-payment-options/footer-payment-options';
-import { Option } from '../../interface/theme-option.interface';
-import { ThemeOptionState } from '../../store/state/theme-option.state';
-import { ThemeState } from '../../store/state/theme.state';
+import {
+  PublicContactChannel,
+  PublicContactData,
+  PublicOffice,
+} from '../../interface/public-content.interface';
+import { IPublicNavigationItem } from '../../interface/public-navigation.interface';
+import { PublicContentService } from '../../services/public-content.service';
+import { PublicNavigationContextService } from '../../services/public-navigation-context.service';
 
 @Component({
   selector: 'app-footer',
-  imports: [
-    ContactInfo,
-    FooterPaymentOptions,
-    FooterLogo,
-    FooterAppStoreLink,
-    FooterLinks,
-    NgClass,
-  ],
+  imports: [AsyncPipe, RouterLink],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
 export class Footer {
-  themeOption$: Observable<Option> = inject(Store).select(ThemeOptionState.themeOptions);
-  activeTheme$ = inject(Store).select(ThemeState.activeTheme);
-
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private content = inject(PublicContentService);
+  public navigation = inject(PublicNavigationContextService);
 
   readonly logo = input<string>();
+  public active: Record<string, boolean> = { company: false, explore: false, contact: false };
 
-  public path: string;
-  public activeTheme: string;
-  public footerClass: string = 'footer-section';
+  readonly contact$ = this.navigation.locale$.pipe(
+    switchMap((locale) =>
+      this.content.getContact(locale).pipe(
+        map((response) => response.data ?? this.emptyContact(locale)),
+        catchError(() => of(this.emptyContact(locale))),
+      ),
+    ),
+  );
+  readonly currentYear = new Date().getFullYear();
 
-  public themeOptions: Option;
-
-  public active: { [key: string]: boolean } = {
-    information: false,
-    our_service: false,
-    my_account: false,
-  };
-
-  constructor() {
-    // Load theme options
-    this.themeOption$.subscribe((option) => (this.themeOptions = option));
-
-    // Get url query ?theme=
-    this.route.queryParams.subscribe((params) => {
-      this.path = params['theme'];
-      this.setFooter();
-    });
-
-    // Listen on navigation end (inner page changes)
-    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
-      this.activeTheme$.subscribe((res) => {
-        this.activeTheme = res;
-        if (!this.path) {
-          this.path = this.activeTheme; // theme from store if query param missing
-        }
-        this.setFooter();
-      });
-    });
+  get locale(): string {
+    return this.navigation.locale();
   }
 
-  toggle(value: string) {
-    this.active[value] = !this.active[value];
+  get companyLinks(): IPublicNavigationItem[] {
+    return this.navigation.primaryItems().filter((item) => item.path || item.url);
   }
 
-  setFooter() {
-    // Default footer
-    this.footerClass = 'footer-section';
+  get quickLinks(): Array<{ label: string; path: string }> {
+    return this.locale === 'en-US'
+      ? [
+          { label: 'Product Catalog', path: '/en/catalog' },
+          { label: 'Articles', path: '/en/articles' },
+          { label: 'FAQ', path: '/en/faq' },
+          { label: 'Contact Us', path: '/en/contact-us' },
+        ]
+      : [
+          { label: 'Katalog Produk', path: '/katalog' },
+          { label: 'Artikel', path: '/artikel' },
+          { label: 'Pertanyaan Umum', path: '/faq' },
+          { label: 'Hubungi Kami', path: '/kontak' },
+        ];
+  }
 
-    if (!this.path) return;
+  get homePath(): string {
+    return this.locale === 'en-US' ? '/en' : '/';
+  }
 
-    switch (this.path) {
-      case 'mega-mart':
-      case 'organic-store':
-        this.footerClass = 'footer-section-2';
-        break;
+  get contactPath(): string {
+    return this.locale === 'en-US' ? '/en/contact-us' : '/kontak';
+  }
 
-      case 'baby-shop':
-        this.footerClass = 'footer-section title-bg-color';
-        break;
+  toggle(section: string) {
+    this.active[section] = !this.active[section];
+  }
 
-      default:
-        this.footerClass = 'footer-section';
-        break;
-    }
+  primaryOffice(data: PublicContactData | null): PublicOffice | null {
+    return data?.offices?.[0] ?? null;
+  }
+
+  primaryChannel(data: PublicContactData | null, type: string): PublicContactChannel | null {
+    const channels = data?.channels ?? [];
+    return channels.find((channel) => channel.type === type && channel.is_primary)
+      ?? channels.find((channel) => channel.type === type)
+      ?? null;
+  }
+
+  channelIcon(type: string): string {
+    const icons: Record<string, string> = {
+      whatsapp: 'ri-whatsapp-line',
+      phone: 'ri-phone-line',
+      email: 'ri-mail-line',
+      instagram: 'ri-instagram-line',
+      facebook: 'ri-facebook-fill',
+      linkedin: 'ri-linkedin-fill',
+      youtube: 'ri-youtube-line',
+    };
+    return icons[type] ?? 'ri-links-line';
+  }
+
+  private emptyContact(locale: string): PublicContactData {
+    return { locale, channels: [], topics: [], offices: [] };
   }
 }

@@ -1,43 +1,86 @@
-@if (themeOptions) {
-  <footer [ngClass]="footerClass">
-    <div class="custom-container">
-      <div class="main-footer" [class.light-b-bottom]="this.path === 'baby-shop'">
+<footer class="footer-section public-footer">
+  <div class="custom-container">
+    @if (contact$ | async; as contact) {
+      <div class="main-footer">
         <div class="row g-sm-4 g-3">
-          <div class="col-xl-3 col-md-5 col-sm-7">
-            <app-contact-info [data]="themeOptions"></app-contact-info>
-          </div>
-
-          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('information')">
-            <div class="footer-title" [class.active]="active['information']">
-              <h4>Information</h4>
+          <div class="col-xl-4 col-md-6">
+            <div class="footer-title-2">
+              <h4>{{ locale === 'en-US' ? 'Contact Information' : 'Informasi Kontak' }}</h4>
             </div>
-            <app-footer-links [section]="themeOptions.footer.information"></app-footer-links>
+            @if (primaryOffice(contact); as office) {
+              <ul class="footer-content-list canonical-contact-list">
+                <li>
+                  <a [routerLink]="contactPath" class="content-box">
+                    <svg class="content-color"><use xlink:href="assets/svg/footer-icon.svg#location"></use></svg>
+                    <h5>{{ office.address }}, {{ office.city }}, {{ office.province }} {{ office.postal_code }}</h5>
+                  </a>
+                </li>
+                @if (office.phone) {
+                  <li><a [href]="'tel:' + office.phone" class="content-box"><i class="ri-phone-line"></i><h5>{{ office.phone }}</h5></a></li>
+                }
+                @if (office.email) {
+                  <li><a [href]="'mailto:' + office.email" class="content-box"><i class="ri-mail-line"></i><h5>{{ office.email }}</h5></a></li>
+                }
+              </ul>
+            } @else {
+              <p class="footer-muted">{{ locale === 'en-US' ? 'Contact details are available on our contact page.' : 'Detail kontak tersedia pada halaman Hubungi Kami.' }}</p>
+            }
+
+            @if (contact.channels.length) {
+              <ul class="public-channel-list">
+                @for (channel of contact.channels; track channel.key) {
+                  @if (channel.url) {
+                    <li><a [href]="channel.url" target="_blank" rel="noopener" [attr.aria-label]="channel.label"><i [class]="channelIcon(channel.type)"></i></a></li>
+                  }
+                }
+              </ul>
+            }
           </div>
 
-          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('our_service')">
-            <div class="footer-title" [class.active]="active['our_service']">
-              <h4>Our Services</h4>
+          <div class="col-xl-3 col-md-3 col-sm-6" (click)="toggle('company')">
+            <div class="footer-title" [class.active]="active['company']"><h4>{{ locale === 'en-US' ? 'Company' : 'Perusahaan' }}</h4></div>
+            <ul class="footer-list">
+              @for (item of companyLinks; track item.key) {
+                <li>
+                  @if (item.link_type === 'external' && item.url) {
+                    <a [href]="item.url" [target]="item.target_blank ? '_blank' : '_self'" rel="noopener">{{ item.label }}</a>
+                  } @else if (item.path) {
+                    <a [routerLink]="item.path">{{ item.label }}</a>
+                  }
+                </li>
+              } @empty {
+                <li><a [routerLink]="homePath">{{ locale === 'en-US' ? 'Home' : 'Beranda' }}</a></li>
+                <li><a [routerLink]="contactPath">{{ locale === 'en-US' ? 'Contact Us' : 'Hubungi Kami' }}</a></li>
+              }
+            </ul>
+          </div>
+
+          <div class="col-xl-2 col-md-3 col-sm-6" (click)="toggle('explore')">
+            <div class="footer-title" [class.active]="active['explore']"><h4>{{ locale === 'en-US' ? 'Explore' : 'Jelajahi' }}</h4></div>
+            <ul class="footer-list">
+              @for (link of quickLinks; track link.path) { <li><a [routerLink]="link.path">{{ link.label }}</a></li> }
+            </ul>
+          </div>
+
+          <div class="col-xl-3 col-md-6">
+            <div class="footer-help-card">
+              <span>{{ locale === 'en-US' ? 'Need information?' : 'Butuh informasi?' }}</span>
+              <h4>{{ locale === 'en-US' ? 'Talk to the MATEX team' : 'Hubungi tim MATEX' }}</h4>
+              <p>{{ locale === 'en-US' ? 'Ask about products, specifications, or partnership opportunities.' : 'Tanyakan produk, spesifikasi, atau peluang kerja sama.' }}</p>
+              @if (primaryChannel(contact, 'whatsapp'); as whatsapp) {
+                <a class="btn theme-bg-color text-white" [href]="whatsapp.url" target="_blank" rel="noopener"><i class="ri-whatsapp-line"></i> {{ whatsapp.label }}</a>
+              } @else {
+                <a class="btn theme-bg-color text-white" [routerLink]="contactPath">{{ locale === 'en-US' ? 'Contact Us' : 'Hubungi Kami' }}</a>
+              }
             </div>
-            <app-footer-links [section]="themeOptions.footer.our_service"></app-footer-links>
-          </div>
-
-          <div class="col-lg-2 col-md-3 col-sm-4" (click)="toggle('my_account')">
-            <div class="footer-title" [class.active]="active['my_account']">
-              <h4>My Account</h4>
-            </div>
-            <app-footer-links [section]="themeOptions.footer.my_account"></app-footer-links>
-          </div>
-
-          <div class="col-xl-3 col-lg-4 col-md-5 col-sm-4">
-            <app-footer-app-store-link [data]="themeOptions"></app-footer-app-store-link>
           </div>
         </div>
       </div>
+    }
 
-      <div class="sub-footer">
-        <app-footer-logo [logo]="logo()"></app-footer-logo>
-        <app-footer-payment-options [data]="themeOptions"></app-footer-payment-options>
-      </div>
+    <div class="sub-footer">
+      <a [routerLink]="homePath" class="sub-footer-logo"><img [src]="logo() || 'assets/images/logo/1-dark.svg'" class="img-fluid" alt="MATEX" /></a>
+      <p class="footer-copyright">© {{ currentYear }} MATEX. {{ locale === 'en-US' ? 'All rights reserved.' : 'Seluruh hak dilindungi.' }}</p>
     </div>
-  </footer>
-}
+  </div>
+</footer>

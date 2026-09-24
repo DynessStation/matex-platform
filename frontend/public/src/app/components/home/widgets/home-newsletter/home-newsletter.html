@@ -1,62 +1,28 @@
-@if (type() === 'newsletter-two') {
-  <div class="newsletter-section-2">
-    <div class="row g-sm-4 g-3 align-items-center">
-      <div class="col-xl-7">
-        <ul class="newsletter-box-list">
-          <li>
-            <div class="newsletter-box d-block">
-              <h4>Newsletter Subscription</h4>
-              <h6>Register to get updates on promotions and coupons.</h6>
-            </div>
-          </li>
-          <li>
-            <div class="newsletter-box">
-              <svg>
-                <use xlink:href="assets/svg/discount.svg#discount"></use>
-              </svg>
-              <div>
-                <h4>Get <span>$20</span> Discount Now!</h4>
-                <h6>Hurry up! Just for first 50 subscribers today.</h6>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="col-xl-5">
-        <form class="newsletter-form">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Enter Your E-mail Address" />
-            <button class="input-group-text btn text-dark newsletter-form-button">Subscribe</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-} @else if (type() === 'default') {
-  <div class="newsletter-box">
-    <img src="assets/images/newsletter/1.svg" class="newsletter-1" alt="image" />
-    <img src="assets/images/newsletter/2.svg" class="newsletter-2" alt="image" />
-    <img src="assets/images/newsletter/3.svg" class="newsletter-3" alt="image" />
-    <div class="row g-3">
-      <div class="col-xl-6">
-        <div class="newsletter-content">
-          <svg>
-            <use xlink:href="assets/images/newsletter/newsletter-icon.svg#newsletter"></use>
-          </svg>
-          <div>
-            <h3>Subscribe to our newsletter</h3>
-            <h5>Get all the latest information on Events, sales and Offers</h5>
-          </div>
+<div class="newsletter-box public-contact-banner" [class.newsletter-section-2]="type() === 'newsletter-two'">
+  @if (type() === 'default') {
+    <img src="assets/images/newsletter/1.svg" class="newsletter-1" alt="" />
+    <img src="assets/images/newsletter/2.svg" class="newsletter-2" alt="" />
+    <img src="assets/images/newsletter/3.svg" class="newsletter-3" alt="" />
+  }
+  <div class="row g-3 align-items-center">
+    <div class="col-xl-7">
+      <div class="newsletter-content">
+        <svg><use xlink:href="assets/images/newsletter/newsletter-icon.svg#newsletter"></use></svg>
+        <div>
+          <h3>{{ locale === 'en-US' ? 'Need product information?' : 'Butuh informasi produk?' }}</h3>
+          <h5>{{ locale === 'en-US' ? 'Our team can help with specifications, availability, and partnership enquiries.' : 'Tim kami siap membantu spesifikasi, ketersediaan, dan pertanyaan kerja sama.' }}</h5>
         </div>
       </div>
-      <div class="col-xl-6">
-        <form class="newsletter-form">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Enter Your E-mail Address" />
-            <button class="input-group-text btn newsletter-form-button">Subscribe Now!</button>
-          </div>
-        </form>
-      </div>
+    </div>
+    <div class="col-xl-5">
+      @if (channels$ | async; as channels) {
+        <div class="public-contact-actions">
+          @if (whatsapp(channels); as channel) {
+            <a class="btn newsletter-form-button" [href]="channel.url" target="_blank" rel="noopener"><i class="ri-whatsapp-line"></i> {{ channel.label }}</a>
+          }
+          <a class="btn public-contact-secondary" [routerLink]="contactPath">{{ locale === 'en-US' ? 'Contact page' : 'Halaman kontak' }}</a>
+        </div>
+      }
     </div>
   </div>
-}
+</div>

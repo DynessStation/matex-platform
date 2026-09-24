@@ -1,0 +1,15 @@
+.public-contact-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+
+  .btn { align-items: center; display: inline-flex; gap: 7px; justify-content: center; min-height: 52px; padding: 12px 22px; }
+  .newsletter-form-button { background: rgba(var(--theme-color), 1); color: #fff; }
+  .public-contact-secondary { border: 1px solid rgba(255, 255, 255, .45); color: #fff; }
+}
+
+@media (max-width: 1199px) {
+  .public-contact-actions { justify-content: flex-start; }
+}

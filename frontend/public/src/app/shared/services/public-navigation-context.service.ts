@@ -13,7 +13,7 @@ export class PublicNavigationContextService {
   private router = inject(Router);
   private navigationService = inject(PublicNavigationService);
 
-  private readonly locale$ = this.router.events.pipe(
+  readonly locale$ = this.router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     startWith(null),
     map(() => this.localeFromUrl(this.router.url)),

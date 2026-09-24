@@ -1,0 +1,37 @@
+.public-footer {
+  .canonical-contact-list i { color: rgba(var(--theme-color), 1); font-size: 20px; min-width: 24px; }
+  .footer-muted { color: rgba(var(--content-color), 1); line-height: 1.6; }
+}
+
+.public-channel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+
+  a {
+    align-items: center;
+    border: 1px solid rgba(var(--border-color), 1);
+    border-radius: 50%;
+    color: rgba(var(--title-color), 1);
+    display: flex;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+}
+
+.footer-help-card {
+  background: rgba(var(--base-gray), 1);
+  padding: 24px;
+  span { color: rgba(var(--theme-color), 1); font-size: 13px; font-weight: 600; text-transform: uppercase; }
+  h4 { margin: 7px 0 10px; }
+  p { color: rgba(var(--content-color), 1); line-height: 1.55; }
+  .btn { margin-top: 4px; }
+}
+
+.footer-copyright { color: rgba(var(--content-color), 1); margin: 0; text-align: right; }
+
+@media (max-width: 575px) {
+  .footer-copyright { text-align: center; width: 100%; }
+}
