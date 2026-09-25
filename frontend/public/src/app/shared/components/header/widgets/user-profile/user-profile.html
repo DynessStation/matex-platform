@@ -1,16 +1,9 @@
-<a (click)="account()">
+<a
+  [routerLink]="['/coming-soon']"
+  [attr.aria-label]="
+    navigation.locale() === 'en-US' ? 'Account — coming soon' : 'Akun — segera hadir'
+  "
+  [attr.title]="navigation.locale() === 'en-US' ? 'Account — coming soon' : 'Akun — segera hadir'"
+>
   <i class="iconsax" icon-name="user-2"></i>
 </a>
-@if (!isLogin) {
-  <ul class="dropdown-list user-dropdown">
-    <li>
-      <a (click)="openLoginModal()">Log In</a>
-    </li>
-    <app-login-modal #loginModal />
-
-    <li>
-      <span>New customer?</span>
-      <a href="javascript:void(0)" class="btn signup-btn" (click)="goToRegister()">Start here.</a>
-    </li>
-  </ul>
-}

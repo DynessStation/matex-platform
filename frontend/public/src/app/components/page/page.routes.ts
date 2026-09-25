@@ -48,10 +48,30 @@ export const page: Routes = [
     loadComponent: () => import('./contact-us/contact-us').then((m) => m.ContactUs),
   },
   {
+    path: 'tentang-matex',
+    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
+    data: { locale: 'id-ID', slug: 'tentang-kami' },
+  },
+  {
+    path: 'en/about-matex',
+    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
+    data: { locale: 'en-US', slug: 'about-us' },
+  },
+  {
+    path: 'en/:slug',
+    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
+    data: { locale: 'en-US' },
+  },
+  {
     path: 'page/:slug',
     loadComponent: () => import('./page/page').then((m) => m.Page),
     resolve: {
       data: PageResolver,
     },
+  },
+  {
+    path: ':slug',
+    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
+    data: { locale: 'id-ID' },
   },
 ];

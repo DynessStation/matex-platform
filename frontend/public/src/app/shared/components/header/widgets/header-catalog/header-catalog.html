@@ -1,0 +1,63 @@
+<div class="catalog-canvas-header">
+  <div>
+    <span>{{ navigation.locale() === 'en-US' ? 'Product catalog' : 'Katalog produk' }}</span>
+    <h4>{{ navigation.locale() === 'en-US' ? 'Categories' : 'Kategori' }}</h4>
+  </div>
+  <button
+    class="btn-close lead"
+    type="button"
+    (click)="close()"
+    [attr.aria-label]="navigation.locale() === 'en-US' ? 'Close catalog' : 'Tutup katalog'"
+  >
+    <i class="ri-close-fill"></i>
+  </button>
+</div>
+
+@if (categories$ | async; as result) {
+  <nav
+    class="catalog-tree"
+    [attr.aria-label]="navigation.locale() === 'en-US' ? 'Product categories' : 'Kategori produk'"
+  >
+    @if (result.data.length) {
+      <ng-template #categoryTree let-categories>
+        <ul>
+          @for (category of categories; track category.id) {
+            <li>
+              <a [routerLink]="categoryPath(category)" (click)="close()">
+                @if (category.category_icon) {
+                  <img
+                    [src]="category.category_icon.asset_url || category.category_icon.original_url"
+                    [alt]="category.name"
+                  />
+                }
+                <span>{{ category.name }}</span>
+                @if (category.subcategories?.length) {
+                  <i class="ri-arrow-right-s-line"></i>
+                }
+              </a>
+              @if (category.subcategories?.length) {
+                <ng-container
+                  *ngTemplateOutlet="categoryTree; context: { $implicit: category.subcategories }"
+                />
+              }
+            </li>
+          }
+        </ul>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="categoryTree; context: { $implicit: result.data }" />
+    } @else {
+      <p class="catalog-empty">
+        {{
+          navigation.locale() === 'en-US'
+            ? 'No categories available yet.'
+            : 'Belum ada kategori yang tersedia.'
+        }}
+      </p>
+    }
+  </nav>
+}
+
+<a class="catalog-all" [routerLink]="catalogPath()" (click)="close()">
+  {{ navigation.locale() === 'en-US' ? 'View all products' : 'Lihat semua produk' }}
+  <i class="ri-arrow-right-line"></i>
+</a>

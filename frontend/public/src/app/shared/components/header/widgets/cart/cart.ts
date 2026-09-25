@@ -1,11 +1,12 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component, HostListener, inject, input } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, HostListener, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { CartAddOrUpdate, ICart } from '../../../../interface/cart.interface';
 import { Values } from '../../../../interface/setting.interface';
@@ -31,6 +32,7 @@ import { Button } from '../../../button/button';
 })
 export class Cart {
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
 
   cartItem$: Observable<ICart[]> = this.store.select(CartState.cartItems);
   cartTotal$: Observable<number> = this.store.select(CartState.cartTotal);
@@ -59,24 +61,26 @@ export class Cart {
       this.cart = this.cartStyle;
     });
 
-    // Calculation
-    this.cartTotal$.subscribe((total) => {
-      this.setting$.subscribe(
-        (setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!),
-      );
-      this.cartTotal = total;
-      this.shippingCal = (this.cartTotal * 100) / this.shippingFreeAmt;
-      if (this.shippingCal > 100) {
-        this.shippingCal = 100;
-        if (this.confetti == 0) {
-          this.confetti = 1;
-          setTimeout(() => {
-            this.confetti = 2;
-          }, 4500);
-        }
-      } else {
-        this.confetti = 0;
-      }
+    afterNextRender(() => {
+      combineLatest([this.cartTotal$, this.setting$])
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(([total, setting]) => {
+          this.shippingFreeAmt = Number(setting?.general?.min_order_free_shipping) || 0;
+          this.cartTotal = total;
+          this.shippingCal =
+            this.shippingFreeAmt > 0 ? (this.cartTotal * 100) / this.shippingFreeAmt : 0;
+          if (this.shippingCal > 100) {
+            this.shippingCal = 100;
+            if (this.confetti == 0) {
+              this.confetti = 1;
+              setTimeout(() => {
+                this.confetti = 2;
+              }, 4500);
+            }
+          } else {
+            this.confetti = 0;
+          }
+        });
     });
   }
 

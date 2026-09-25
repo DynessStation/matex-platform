@@ -7,36 +7,81 @@
         </ul>
       </div>
     </div>
-    <div class="right-header"><app-top-bar-menu /></div>
+    <div class="right-header"></div>
   </div>
 
   <div class="main-header custom-container">
     <div class="left-header">
-      <button class="navbar-toggler d-xl-none d-inline navbar-menu-button" type="button" (click)="mainMenuOpen()">
+      <button
+        class="navbar-toggler d-xl-none d-inline navbar-menu-button"
+        type="button"
+        (click)="mainMenuOpen()"
+      >
         <span class="navbar-toggler-icon"><i class="ri-menu-line"></i></span>
       </button>
       <app-logo [logo]="logo()" />
     </div>
-    <div class="middle-header searchInput" id="searchOffcanvas" [class.show]="menuService.isOpenSearch">
+    <div
+      class="middle-header searchInput"
+      id="searchOffcanvas"
+      [class.show]="menuService.isOpenSearch"
+    >
       <app-search />
     </div>
     <div class="right-header">
       <ul class="header-icon">
         <li>
-          <a href="javascript:void(0)" (click)="searchOpen()" [attr.aria-label]="navigation.locale() === 'en-US' ? 'Open search' : 'Buka pencarian'">
+          <a
+            href="javascript:void(0)"
+            (click)="searchOpen()"
+            [attr.aria-label]="navigation.locale() === 'en-US' ? 'Open search' : 'Buka pencarian'"
+          >
             <i class="iconsax search-btn" icon-name="search-normal-2"></i>
           </a>
         </li>
+        <li class="dropdown-box">
+          <app-user-profile />
+        </li>
+        <li>
+          <a
+            href="javascript:void(0)"
+            (click)="openWishlist()"
+            [attr.aria-label]="navigation.locale() === 'en-US' ? 'Open wishlist' : 'Buka wishlist'"
+          >
+            <i class="iconsax" icon-name="heart"></i>
+          </a>
+          <ng-template #wishlistOffcanvas>
+            <div class="offcanvas-header">
+              <h4>{{ navigation.locale() === 'en-US' ? 'Wishlist' : 'Favorit' }}</h4>
+              <button class="btn close-btn" type="button" (click)="closeWishlist()">
+                <i class="ri-close-fill"></i>
+              </button>
+            </div>
+            <app-wishlist [type]="'wishlistOffcanvas'" />
+          </ng-template>
+        </li>
+        <li><app-cart /></li>
       </ul>
     </div>
   </div>
 
   <div class="nav-header custom-container d-flex">
     <div class="category-header d-sm-flex d-none">
-      <a class="btn category-button" [routerLink]="catalogPath">
+      <button class="btn category-button" type="button" (click)="toggleCategories()">
         <i class="ri-menu-line"></i>
         <span>{{ catalogLabel }}</span>
-      </a>
+      </button>
+      @if (layoutService.headerCategoryCanvasToggle) {
+        <aside
+          class="category-fixed-box offcanvas offcanvas-start show"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-label]="catalogLabel"
+        >
+          <app-header-catalog />
+        </aside>
+        <div class="offcanvas-backdrop fade show" (click)="toggleCategories()"></div>
+      }
     </div>
     <div class="header-nav-middle"><app-main-menu /></div>
   </div>

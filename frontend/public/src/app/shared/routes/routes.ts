@@ -8,6 +8,10 @@ export const content: Routes = [
     loadChildren: () => import('../../components/home/home.routes').then((m) => m.home),
   },
   {
+    path: 'en',
+    loadComponent: () => import('../../components/home/home').then((m) => m.Home),
+  },
+  {
     path: 'account',
     loadChildren: () => import('../../components/account/account.routes').then((m) => m.account),
     canActivate: [AuthGuard],

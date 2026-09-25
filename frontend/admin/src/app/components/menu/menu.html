@@ -90,6 +90,29 @@
         </div>
       }
 
+      <div class="alert alert-light border mt-3 mb-0" role="note">
+        <div class="d-flex gap-3 align-items-start">
+          <i class="ri-information-line fs-4 text-primary"></i>
+          <div>
+            <strong>Struktur header publik</strong>
+            <p class="text-content mb-2">
+              Header menampilkan urutan Beranda, Tentang MATEX, Kategori,
+              Produk, Artikel, dan Hubungi. Gunakan key
+              <code>home</code>, <code>about</code>, <code>categories</code>,
+              <code>products</code>, <code>articles</code>, dan
+              <code>contact</code> untuk mengatur tujuan tautan Indonesia dan
+              English. Label header mengikuti bahasa situs agar tetap
+              konsisten.
+            </p>
+            <small class="text-content">
+              Isi dropdown Kategori dan Produk diambil otomatis dari data
+              katalog yang sudah dipublikasikan, sehingga tidak perlu dibuat
+              ulang sebagai anak menu manual.
+            </small>
+          </div>
+        </div>
+      </div>
+
       @if (selectedNavigation$ | async; as navigation) {
         <div class="row g-4 mt-3">
           <div class="col-xl-4">

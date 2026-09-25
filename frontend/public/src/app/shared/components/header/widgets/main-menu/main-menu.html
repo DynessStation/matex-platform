@@ -1,38 +1,98 @@
 <div class="main-nav navbar navbar-expand-xl navbar-light navbar-sticky">
-  <div class="offcanvas offcanvas-collapse order-xl-2" id="primaryMenu" [class.show]="menuService.mainMenuToggle">
+  <div
+    class="offcanvas offcanvas-collapse order-xl-2"
+    id="primaryMenu"
+    [class.show]="menuService.mainMenuToggle"
+  >
     <div class="offcanvas-header navbar-shadow">
-      <h5>{{ navigation.locale() === 'en-US' ? 'Menu' : 'Menu' }}</h5>
-      <button class="btn-close lead" type="button" (click)="close()"><i class="ri-close-fill"></i></button>
+      <h5>Menu</h5>
+      <button class="btn-close lead" type="button" (click)="close()">
+        <i class="ri-close-fill"></i>
+      </button>
     </div>
     <div class="offcanvas-body" [class.show]="menuService.mainMenuToggle">
-      <ul class="navbar-nav {{ navClass() }}">
-        @for (item of items; track item.key) {
-          <li class="nav-item" [class.dropdown]="item.children.length">
-            @if (item.children.length) {
-              <a class="nav-link dropdown-toggle" (click)="toggle(item)">{{ item.label }}</a>
-              <ul class="dropdown-menu" [class.show]="item.active">
-                @for (child of item.children; track child.key) {
-                  <li>
-                    @if (child.link_type === 'external' && child.url) {
-                      <a class="dropdown-item" [href]="child.url" [target]="child.target_blank ? '_blank' : '_self'">{{ child.label }}</a>
-                    } @else if (child.path) {
-                      <a class="dropdown-item" [routerLink]="child.path" (click)="close()">{{ child.label }}</a>
+      @if (items$ | async; as items) {
+        <ul class="navbar-nav {{ navClass() }}">
+          @for (item of items; track item.key) {
+            <li class="nav-item" [class.dropdown]="item.categories || item.products">
+              @if (item.categories || item.products) {
+                <a class="nav-link dropdown-toggle" role="button" (click)="toggle(item, items)">{{
+                  item.label
+                }}</a>
+                <div class="dropdown-menu public-data-menu" [class.show]="item.active">
+                  @if (item.categories) {
+                    @if (item.categories.length) {
+                      <ng-template #categoryTree let-categories>
+                        <ul class="category-tree">
+                          @for (category of categories; track category.id) {
+                            <li>
+                              <a [routerLink]="categoryPath(category)" (click)="close()">
+                                <span>{{ category.name }}</span>
+                                @if (category.subcategories?.length) {
+                                  <i class="ri-arrow-right-s-line"></i>
+                                }
+                              </a>
+                              @if (category.subcategories?.length) {
+                                <ng-container
+                                  *ngTemplateOutlet="
+                                    categoryTree;
+                                    context: { $implicit: category.subcategories }
+                                  "
+                                />
+                              }
+                            </li>
+                          }
+                        </ul>
+                      </ng-template>
+                      <ng-container
+                        *ngTemplateOutlet="categoryTree; context: { $implicit: item.categories }"
+                      />
                     } @else {
-                      <span class="dropdown-item">{{ child.label }}</span>
+                      <p class="menu-empty">
+                        {{
+                          navigation.locale() === 'en-US'
+                            ? 'No categories yet'
+                            : 'Belum ada kategori'
+                        }}
+                      </p>
                     }
-                  </li>
-                }
-              </ul>
-            } @else if (item.link_type === 'external' && item.url) {
-              <a class="nav-link" [href]="item.url" [target]="item.target_blank ? '_blank' : '_self'">{{ item.label }}</a>
-            } @else if (item.path) {
-              <a class="nav-link" [routerLink]="item.path" (click)="close()">{{ item.label }}</a>
-            } @else {
-              <span class="nav-link">{{ item.label }}</span>
-            }
-          </li>
-        }
-      </ul>
+                  }
+
+                  @if (item.products) {
+                    @if (item.products.length) {
+                      <div class="header-product-list">
+                        @for (product of item.products; track product.id) {
+                          <a [routerLink]="productPath(product)" (click)="close()">
+                            <img [src]="imageUrl(product)" [alt]="product.name" />
+                            <span>
+                              <strong>{{ product.name }}</strong>
+                              @if (product.sku) {
+                                <small>SKU {{ product.sku }}</small>
+                              }
+                            </span>
+                          </a>
+                        }
+                      </div>
+                    } @else {
+                      <p class="menu-empty">
+                        {{
+                          navigation.locale() === 'en-US' ? 'No products yet' : 'Belum ada produk'
+                        }}
+                      </p>
+                    }
+                  }
+                  <a class="view-all-link" [routerLink]="item.path" (click)="close()">
+                    {{ navigation.locale() === 'en-US' ? 'View all' : 'Lihat semua' }}
+                    <i class="ri-arrow-right-line"></i>
+                  </a>
+                </div>
+              } @else {
+                <a class="nav-link" [routerLink]="item.path" (click)="close()">{{ item.label }}</a>
+              }
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 </div>
