@@ -12,3 +12,22 @@
 .offcanvas-backdrop {
   z-index: 1050;
 }
+
+@media (max-width: 575.98px) {
+  .main-header {
+    gap: 10px;
+
+    .left-header .header-logo {
+      max-width: 150px;
+    }
+
+    .right-header .header-icon {
+      gap: 9px;
+
+      > li:nth-child(3),
+      > li:last-child {
+        display: block;
+      }
+    }
+  }
+}

@@ -5,31 +5,35 @@
     @if ((cartItem$ | async)?.length) {
       <div class="quick-box">
         <p>
-          <i class="ri-error-warning-line"></i> There is a limit on these things, so please check
-          out quickly! Someone else has already ordered the identical products.
+          <i class="ri-information-line"></i>
+          {{
+            isEnglish
+              ? 'Your cart is saved on this device. Open a product to choose an available purchase channel.'
+              : 'Keranjang tersimpan di perangkat ini. Buka produk untuk memilih kanal pembelian yang tersedia.'
+          }}
         </p>
-        <app-timer [type]="'timer-four'" />
       </div>
       <div class="row g-sm-4 g-3">
         <div class="col-12">
           <div class="cart-table2">
             <div class="table-title">
               <h2>
-                Cart <span>({{ (cartItem$ | async)?.length }})</span>
+                {{ isEnglish ? 'Cart' : 'Keranjang' }}
+                <span>({{ (cartItem$ | async)?.length }})</span>
               </h2>
               <button class="clear-btn btn" (click)="clearCart()">
-                <span>Clear All</span>
+                <span>{{ isEnglish ? 'Clear all' : 'Kosongkan' }}</span>
               </button>
             </div>
             <div class="table-responsive">
               <table class="table cart-table-box">
                 <tbody>
-                  @for (item of cartItem$ | async; track item) {
+                  @for (item of cartItem$ | async; track item.id) {
                     <tr class="table-row">
                       <td>
                         <div class="cart-box">
                           <div class="cart-image">
-                            <a [routerLink]="['/product/' + item.product.slug]">
+                            <a [routerLink]="productPath(item.product.slug)">
                               <img
                                 [src]="
                                   item?.variation && item?.variation?.variation_image
@@ -46,7 +50,7 @@
                             <i class="ri-heart-3-fill"></i>
                           </div>
                           <div class="cart-contain">
-                            <a [routerLink]="['/product/', item.product.slug]">
+                            <a [routerLink]="productPath(item.product.slug)">
                               <h4>
                                 {{ item?.variation ? item.variation.name : item?.product?.name }}
                               </h4>
@@ -54,7 +58,7 @@
                           </div>
                         </div>
                       </td>
-                      <td>
+                      <td [attr.data-label]="isEnglish ? 'Price' : 'Harga'">
                         <h5 class="price">
                           {{
                             (item?.variation
@@ -73,10 +77,10 @@
                           }
                         </h5>
                       </td>
-                      <td>
+                      <td [attr.data-label]="isEnglish ? 'Quantity' : 'Jumlah'">
                         <div class="quantity-box qty-container quantity-box-2">
                           <app-button
-                            [id]="'quantity-left-minus'"
+                            [id]="'quantity-left-minus' + item.product.id"
                             [class]="'btn qty-btn-minus'"
                             [iconClass]="'ri-subtract-line'"
                             [spinner]="false"
@@ -92,7 +96,7 @@
                           />
 
                           <app-button
-                            [id]="'quantity-left-minus'"
+                            [id]="'quantity-left-plus' + item.product.id"
                             [class]="'btn qty-btn-plus'"
                             [iconClass]="'ri-add-line'"
                             [spinner]="false"
@@ -100,7 +104,7 @@
                           ></app-button>
                         </div>
                       </td>
-                      <td>
+                      <td [attr.data-label]="'Subtotal'">
                         <h5 class="total txt-primary-color">
                           {{
                             item.quantity *
@@ -112,8 +116,13 @@
                           }}
                         </h5>
                       </td>
-                      <td>
-                        <button class="remove-row btn" (click)="delete(item.id)">
+                      <td class="remove-cell">
+                        <button
+                          class="remove-row btn"
+                          type="button"
+                          (click)="delete(item.id)"
+                          [attr.aria-label]="isEnglish ? 'Remove item' : 'Hapus produk'"
+                        >
                           <i class="iconsax" icon-name="trash"></i>
                         </button>
                       </td>
@@ -124,7 +133,7 @@
                   <tr>
                     <td colspan="3">
                       <div class="summery-header">
-                        <h3>Total (USD)</h3>
+                        <h3>{{ isEnglish ? 'Total' : 'Total' }}</h3>
                       </div>
                     </td>
                     <td colspan="2">
@@ -141,7 +150,9 @@
           </div>
 
           <div class="text-end">
-            <a class="btn proceed-btn" [routerLink]="['/checkout']">Proceed to checkout</a>
+            <a class="btn proceed-btn" [routerLink]="catalogPath">
+              {{ isEnglish ? 'Continue browsing products' : 'Lanjut lihat produk' }}
+            </a>
           </div>
         </div>
       </div>
@@ -150,8 +161,12 @@
         <app-no-data
           [class]="'no-data-added'"
           [image]="'assets/images/inner-page/empty-cart.svg#emptyCart'"
-          [text]="'No Item'"
-          [description]="'no_cart_item_desc' | translate"
+          [text]="isEnglish ? 'Your cart is empty' : 'Keranjang Anda masih kosong'"
+          [description]="
+            isEnglish
+              ? 'Products you add will be saved on this device.'
+              : 'Produk yang ditambahkan akan tersimpan di perangkat ini.'
+          "
         >
         </app-no-data>
       </div>

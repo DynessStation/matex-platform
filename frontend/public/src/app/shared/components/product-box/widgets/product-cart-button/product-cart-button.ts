@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { CartAddOrUpdate, ICart } from '../../../../interface/cart.interface';
 import { Product } from '../../../../interface/product.interface';
+import { PublicNavigationContextService } from '../../../../services/public-navigation-context.service';
 import { AddToCart } from '../../../../store/action/cart.action';
 import { CartState } from '../../../../store/state/cart.state';
 
@@ -16,6 +17,7 @@ import { CartState } from '../../../../store/state/cart.state';
 })
 export class ProductCartButton {
   private store = inject(Store);
+  public navigation = inject(PublicNavigationContextService);
   class = input<string>('btn cart-button');
 
   readonly product = input<Product>();
@@ -24,6 +26,10 @@ export class ProductCartButton {
   cartItem$: Observable<ICart[]> = inject(Store).select(CartState.cartItems);
 
   public cartItem: ICart | null;
+
+  get isEnglish(): boolean {
+    return this.navigation.locale() === 'en-US';
+  }
 
   ngOnInit() {
     this.cartItem$.subscribe((items) => {

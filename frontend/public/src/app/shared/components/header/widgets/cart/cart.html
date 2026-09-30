@@ -6,7 +6,11 @@
 ></div>
 
 <div class="position-relative" (click)="cart === 'cart_sidebar' && cartToggle(true)">
-  <button class="btn icon-btn">
+  <button
+    class="btn icon-btn"
+    type="button"
+    [attr.aria-label]="isEnglish ? 'Open cart' : 'Buka keranjang'"
+  >
     <i class="iconsax" icon-name="basket-2"></i>
   </button>
   @if ((cartItem$ | async)?.length) {
@@ -25,8 +29,13 @@
 >
   <div class="offcanvas-header">
     <div class="title-offcanvas">
-      <h4>Shopping Cart</h4>
-      <button class="btn close-btn" (click)="cartToggle(false)">
+      <h4>{{ isEnglish ? 'Shopping cart' : 'Keranjang' }}</h4>
+      <button
+        class="btn close-btn"
+        type="button"
+        (click)="cartToggle(false)"
+        [attr.aria-label]="isEnglish ? 'Close cart' : 'Tutup keranjang'"
+      >
         <i class="ri-close-fill"></i>
       </button>
     </div>
@@ -35,14 +44,16 @@
     <div class="cart-product-box">
       @if ((cartItem$ | async)?.length) {
         <div class="clear-box">
-          <a href="javascript:void(0)" (click)="clearCart()">{{ 'Clear cart' | translate }}</a>
+          <button class="btn clear-cart-button" type="button" (click)="clearCart()">
+            {{ isEnglish ? 'Clear cart' : 'Kosongkan keranjang' }}
+          </button>
         </div>
       }
       <ul class="product-box-list">
         @if ((cartItem$ | async)?.length) {
-          @for (item of cartItem$ | async; track item) {
+          @for (item of cartItem$ | async; track item.id) {
             <li class="vertical-product-box">
-              <a href="javascript:void(0)" class="product-image">
+              <a [routerLink]="productPath(item.product.slug)" class="product-image">
                 <img
                   [src]="
                     item?.variation && item?.variation?.variation_image
@@ -56,7 +67,7 @@
                 />
               </a>
               <div class="product-content">
-                <a href="javascript:void(0)">
+                <a [routerLink]="productPath(item.product.slug)">
                   <h5 class="name title-color">
                     {{ item?.variation ? item?.variation?.name : item?.product?.name }}
                   </h5>
@@ -108,15 +119,15 @@
                   </app-button>
                 </div>
               </div>
-              <app-button
-                [class]="'btn close-button'"
+              <button
+                class="btn close-button"
+                type="button"
                 [id]="'cart_item_delete_btn' + item.product.id"
-                [spinner]="false"
-                [iconClass]="'ri-delete-bin-line'"
                 (click)="delete(item.id)"
-                [label]="'dddd'"
+                [attr.aria-label]="isEnglish ? 'Remove item' : 'Hapus produk'"
               >
-              </app-button>
+                <i class="ri-delete-bin-line"></i>
+              </button>
             </li>
           }
         } @else {
@@ -124,39 +135,65 @@
             <svg>
               <use xlink:href="assets/images/inner-page/empty-cart.svg#emptyCart"></use>
             </svg>
-            <h4>Your cart is empty.</h4>
+            <h4>{{ isEnglish ? 'Your cart is empty.' : 'Keranjang Anda masih kosong.' }}</h4>
           </li>
         }
       </ul>
 
-      <div class="total-price-box">
-        <p class="free">
-          Almost there, add {{ shippingFreeAmt - cartTotal | currencySymbol }} more to get
-          <b>FREE SHIPPING!</b>
-        </p>
-        <div
-          class="progress"
-          [class]="{
-            'danger-progress': shippingCal <= 30,
-            'warning-progress': shippingCal >= 31 && shippingCal <= 80,
-          }"
-        >
-          <div
-            class="progress-bar progress-bar-striped progress-bar-animated"
-            [style.width]="shippingCal + '%'"
-          >
-            <i class="ri-truck-line"></i>
+      @if ((cartItem$ | async)?.length) {
+        <div class="total-price-box">
+          @if (hasFreeShippingTarget) {
+            <p class="free">
+              @if (reachedFreeShippingTarget) {
+                {{
+                  isEnglish
+                    ? 'This cart qualifies for free shipping.'
+                    : 'Keranjang ini memenuhi syarat gratis ongkir.'
+                }}
+              } @else {
+                {{ isEnglish ? 'Add' : 'Tambahkan' }}
+                <strong>{{ remainingShippingAmount | currencySymbol }}</strong>
+                {{
+                  isEnglish ? 'more to reach free shipping.' : 'lagi untuk mencapai gratis ongkir.'
+                }}
+              }
+            </p>
+            <div
+              class="progress"
+              [class]="{
+                'danger-progress': shippingCal <= 30,
+                'warning-progress': shippingCal >= 31 && shippingCal <= 80,
+              }"
+            >
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                [style.width]="shippingCal + '%'"
+              >
+                <i class="ri-truck-line"></i>
+              </div>
+            </div>
+          }
+          <h4 class="sub-total">
+            {{ isEnglish ? 'Subtotal' : 'Subtotal' }}
+            <span id="total-price">{{ (cartTotal$ | async)! | currencySymbol }}</span>
+          </h4>
+          <p class="tax-text">
+            {{
+              isEnglish
+                ? 'This cart is saved on this device. Purchase options are available on each product page.'
+                : 'Keranjang tersimpan di perangkat ini. Opsi pembelian tersedia di halaman masing-masing produk.'
+            }}
+          </p>
+          <div class="cart-btn-group">
+            <a [routerLink]="cartPath" class="btn check-out-button" (click)="cartToggle(false)">
+              {{ isEnglish ? 'View cart' : 'Lihat keranjang' }}
+            </a>
+            <a [routerLink]="catalogPath" class="btn cart-button" (click)="cartToggle(false)">
+              {{ isEnglish ? 'Continue browsing' : 'Lanjut lihat produk' }}
+            </a>
           </div>
         </div>
-        <h4 class="sub-total">
-          Subtotal <span id="total-price">{{ (cartTotal$ | async)! | currencySymbol }}</span>
-        </h4>
-        <p class="tax-text">Tax included <span>shipping</span>calculator at checkout.</p>
-        <div class="cart-btn-group">
-          <a [routerLink]="['/checkout']" class="btn check-out-button">Check Out</a>
-          <a [routerLink]="['/cart']" class="btn cart-button">View Cart</a>
-        </div>
-      </div>
+      }
     </div>
   </div>
 </div>

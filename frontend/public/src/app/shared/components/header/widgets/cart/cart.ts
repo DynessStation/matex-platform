@@ -11,8 +11,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { combineLatest, Observable } from 'rxjs';
 
@@ -21,6 +19,7 @@ import { Values } from '../../../../interface/setting.interface';
 import { Option } from '../../../../interface/theme-option.interface';
 import { CurrencySymbolPipe } from '../../../../pipe/currency.pipe';
 import { CartService } from '../../../../services/cart.service';
+import { PublicNavigationContextService } from '../../../../services/public-navigation-context.service';
 import {
   ClearCart,
   DeleteCart,
@@ -34,7 +33,7 @@ import { Button } from '../../../button/button';
 
 @Component({
   selector: 'app-cart',
-  imports: [AsyncPipe, Button, CurrencySymbolPipe, RouterLink, TranslateModule, AsyncPipe, NgClass],
+  imports: [AsyncPipe, Button, CurrencySymbolPipe, RouterLink, NgClass],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
 })
@@ -42,6 +41,7 @@ export class Cart {
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
   private changeDetector = inject(ChangeDetectorRef);
+  public navigation = inject(PublicNavigationContextService);
 
   cartItem$: Observable<ICart[]> = this.store.select(CartState.cartItems);
   cartTotal$: Observable<number> = this.store.select(CartState.cartTotal);
@@ -61,10 +61,7 @@ export class Cart {
   public loader: boolean = false;
   public width: number;
 
-  constructor(
-    public cartService: CartService,
-    private modal: NgbModal,
-  ) {
+  constructor(public cartService: CartService) {
     this.themeOption$.subscribe((option) => {
       this.cartStyle = option?.general?.cart_style;
       this.cart = this.cartStyle;
@@ -92,6 +89,34 @@ export class Cart {
           this.changeDetector.detectChanges();
         });
     });
+  }
+
+  get isEnglish(): boolean {
+    return this.navigation.locale() === 'en-US';
+  }
+
+  get cartPath(): string {
+    return this.isEnglish ? '/en/cart' : '/cart';
+  }
+
+  get catalogPath(): string {
+    return this.isEnglish ? '/en/catalog' : '/katalog';
+  }
+
+  get remainingShippingAmount(): number {
+    return Math.max(this.shippingFreeAmt - this.cartTotal, 0);
+  }
+
+  get hasFreeShippingTarget(): boolean {
+    return this.shippingFreeAmt > 0;
+  }
+
+  get reachedFreeShippingTarget(): boolean {
+    return this.hasFreeShippingTarget && this.cartTotal >= this.shippingFreeAmt;
+  }
+
+  productPath(slug: string): string {
+    return this.isEnglish ? `/en/product/${slug}` : `/produk/${slug}`;
   }
 
   @HostListener('window:resize', ['$event'])

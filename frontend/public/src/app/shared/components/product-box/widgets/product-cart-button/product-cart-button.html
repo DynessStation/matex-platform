@@ -1,8 +1,15 @@
 @if (type() === 'wishlist') {
-  <button class="btn cart-btn" (click)="addToCart(product()!, 1)">
-    <span>Move to cart</span>
+  <button
+    class="btn cart-btn"
+    type="button"
+    (click)="addToCart(product()!, 1)"
+    [attr.aria-label]="isEnglish ? 'Add product to cart' : 'Tambahkan produk ke keranjang'"
+  >
+    <span>{{ isEnglish ? 'Add to cart' : 'Tambah ke keranjang' }}</span>
   </button>
 }
 @if (type() === 'addCart') {
-  <button [class]="class()" (click)="addToCart(product()!, 1)">Add to cart</button>
+  <button [class]="class()" type="button" (click)="addToCart(product()!, 1)">
+    {{ isEnglish ? 'Add to cart' : 'Tambah ke keranjang' }}
+  </button>
 }
