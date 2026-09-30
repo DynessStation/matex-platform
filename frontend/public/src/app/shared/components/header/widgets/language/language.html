@@ -1,6 +1,14 @@
 <div class="dropdown theme-form-select" (clickOutside)="hideDropdown()">
   <button class="btn dropdown-toggle" type="button" (click)="openDropDown()">
-    <span class="language-flag">{{ navigation.locale() === 'en-US' ? '🇺🇸' : '🇮🇩' }}</span>
+    <img
+      [src]="
+        navigation.locale() === 'en-US'
+          ? 'assets/images/country/us.svg'
+          : 'assets/images/country/id.svg'
+      "
+      class="img-fluid"
+      alt="image"
+    />
     <span>{{ navigation.locale() === 'en-US' ? 'English' : 'Indonesia' }}</span>
   </button>
 
@@ -12,7 +20,7 @@
         (click)="selectLocale('id-ID')"
         [class.active]="navigation.locale() === 'id-ID'"
       >
-        <span class="language-flag">🇮🇩</span><span>Indonesia</span>
+        <img src="assets/images/country/id.svg" class="img-fluid" alt="image" /><span>Indo</span>
       </button>
     </li>
     <li>
@@ -22,7 +30,7 @@
         (click)="selectLocale('en-US')"
         [class.active]="navigation.locale() === 'en-US'"
       >
-        <span class="language-flag">🇺🇸</span><span>English</span>
+        <img src="assets/images/country/us.svg" class="img-fluid" alt="image" /><span>English</span>
       </button>
     </li>
   </ul>

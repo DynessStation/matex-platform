@@ -23,10 +23,26 @@ import { Search } from '../widgets/search/search';
 import { PublicNavigationContextService } from '../../../services/public-navigation-context.service';
 import { UserProfile } from '../widgets/user-profile/user-profile';
 
+//by me
+import { Currency } from '../widgets/currency/currency';
+import { SocialMedia } from '../widgets/social-media/social-media';
+
 @Component({
   selector: 'app-header-one',
   standalone: true,
-  imports: [Language, Logo, Search, MainMenu, HeaderCatalog, Wishlist, UserProfile, Cart, NgClass],
+  imports: [
+    Language,
+    Logo,
+    Search,
+    MainMenu,
+    HeaderCatalog,
+    Wishlist,
+    UserProfile,
+    Cart,
+    Currency,
+    SocialMedia,
+    NgClass,
+  ],
   providers: [],
   templateUrl: './header-one.html',
   styleUrl: './header-one.scss',
