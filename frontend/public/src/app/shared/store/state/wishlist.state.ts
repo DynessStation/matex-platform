@@ -1,11 +1,8 @@
-import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { tap } from 'rxjs';
 
 import { Product } from '../../interface/product.interface';
-import { WishlistService } from '../../services/wishlist.service';
 import { AddToWishlist, DeleteWishlist, GetWishlist } from '../action/wishlist.action';
 
 export class WishlistStateModel {
@@ -28,9 +25,6 @@ export class WishlistStateModel {
 })
 @Injectable()
 export class WishlistState {
-  router = inject(Router);
-  private wishlistService = inject(WishlistService);
-
   @Selector()
   static wishlistItems(state: WishlistStateModel) {
     return state.wishlist;
@@ -44,30 +38,27 @@ export class WishlistState {
   @Action(GetWishlist)
   getWishlistItems(ctx: StateContext<WishlistStateModel>) {
     const state = ctx.getState();
-    if (state.wishlist?.data?.length > 0) {
-      return;
-    }
-    return this.wishlistService.getWishlistItems().pipe(
-      tap({
-        next: (result) => {
-          ctx.patchState({
-            wishlist: {
-              data: result.data,
-              total: result?.total ? result?.total : result.data?.length,
-            },
-          });
-        },
-        error: (err) => {
-          throw new Error(err?.error?.message);
-        },
-      }),
+    const products = (state.wishlist?.data || []).filter(
+      (product, index, items) => items.findIndex((item) => item.id === product.id) === index,
     );
+
+    ctx.patchState({
+      wishlist: {
+        data: products,
+        total: products.length,
+      },
+      wishlistIds: products.map((product) => product.id),
+    });
   }
 
   @Action(AddToWishlist)
   add(ctx: StateContext<WishlistStateModel>, action: AddToWishlist) {
     const state = ctx.getState();
     const product = action.payload['product'];
+
+    if (!product || (state.wishlistIds || []).includes(product.id)) {
+      return;
+    }
 
     const updatedProducts = [...(state.wishlist?.data || []), product];
 
@@ -76,18 +67,20 @@ export class WishlistState {
         data: updatedProducts,
         total: updatedProducts.length,
       },
+      wishlistIds: updatedProducts.map((item) => item.id),
     });
   }
 
   @Action(DeleteWishlist)
   delete(ctx: StateContext<WishlistStateModel>, { id }: DeleteWishlist) {
     const state = ctx.getState();
-    let item = state.wishlist.data.filter((value) => value.id !== id);
+    const items = state.wishlist.data.filter((value) => value.id !== id);
     ctx.patchState({
       wishlist: {
-        data: item,
-        total: state.wishlist.total - 1,
+        data: items,
+        total: items.length,
       },
+      wishlistIds: items.map((item) => item.id),
     });
   }
 }

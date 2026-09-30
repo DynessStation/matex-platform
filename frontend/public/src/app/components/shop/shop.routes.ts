@@ -50,7 +50,6 @@ export const shop: Routes = [
   {
     path: 'wishlist',
     loadComponent: () => import('./wishlist/wishlist').then((m) => m.Wishlist),
-    canActivate: [AuthGuard],
   },
   {
     path: 'compare',

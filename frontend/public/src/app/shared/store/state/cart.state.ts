@@ -41,7 +41,7 @@ export class CartState {
   constructor(
     private cartService: CartService,
     private store: Store,
-  ) { }
+  ) {}
 
   ngxsOnInit(ctx: StateContext<CartStateModel>) {
     ctx.dispatch(new ToggleSidebarCart(false));
@@ -75,27 +75,15 @@ export class CartState {
 
   @Action(GetCartItems)
   getCartItems(ctx: StateContext<CartStateModel>) {
-    if (!this.store.selectSnapshot((state) => state.auth && state.auth.access_token)) {
-      return;
-    }
-    return this.cartService.getCartItems().pipe(
-      tap({
-        next: (result) => {
-          // Set Selected Variant
-          result.items.filter((item: Cart) => {
-            if (item?.variation) {
-              item.variation.selected_variation = item?.variation?.attribute_values
-                ?.map((values) => values.value)
-                ?.join('/');
-            }
-          });
-          ctx.patchState(result);
-        },
-        error: (err) => {
-          throw new Error(err?.error?.message);
-        },
-      }),
-    );
+    const state = ctx.getState();
+    const items = state.items || [];
+
+    ctx.patchState({
+      items,
+      total: items.reduce((total, item) => total + Number(item.sub_total || 0), 0),
+      is_digital_only:
+        items.length > 0 && items.every((item) => item.product?.product_type === 'digital'),
+    });
   }
 
   @Action(AddToCart)
@@ -109,18 +97,14 @@ export class CartState {
 
   @Action(AddToCartLocalStorage)
   addToLocalStorage(ctx: StateContext<CartStateModel>, action: AddToCartLocalStorage) {
-    let salePrice = action.payload.variation
+    const salePrice = action.payload.variation
       ? action.payload.variation.sale_price
-      : action.payload.product?.sale_price;
+      : action.payload.product?.sale_price || action.payload.product?.price || 0;
     let result: CartModel = {
       is_digital_only: false,
       items: [
         {
-          id: Number(
-            Math.floor(Math.random() * 10000)
-              .toString()
-              .padStart(4, '0'),
-          ), // Generate Random Id
+          id: Date.now() + Math.floor(Math.random() * 1000),
           quantity: action.payload.quantity,
           sub_total: salePrice ? salePrice * action.payload.quantity : 0,
           product: action.payload.product!,
@@ -165,9 +149,9 @@ export class CartState {
         } else if (state.items.find((item) => item.product_id == result.items[0].product_id)) {
           cart.forEach((item) => {
             if (item.product_id == result.items[0].product_id) {
-              const productQty = item?.product?.quantity;
+              const productQty = item?.product?.manage_stock ? item.product.quantity : null;
 
-              if (productQty < item?.quantity + action?.payload.quantity) {
+              if (productQty !== null && productQty < item?.quantity + action?.payload.quantity) {
                 return;
               }
 
@@ -226,9 +210,11 @@ export class CartState {
 
     const productQty = cart[index]?.variation
       ? cart[index]?.variation?.quantity
-      : cart[index]?.product?.quantity;
+      : cart[index]?.product?.manage_stock
+        ? cart[index]?.product?.quantity
+        : null;
 
-    if (productQty < cart[index]?.quantity + action?.payload.quantity) {
+    if (productQty !== null && productQty < cart[index]?.quantity + action?.payload.quantity) {
       return false;
     }
 
@@ -325,9 +311,11 @@ export class CartState {
 
     const productQty = cart[index]?.variation
       ? cart[index]?.variation?.quantity
-      : cart[index]?.product?.quantity;
+      : cart[index]?.product?.manage_stock
+        ? cart[index]?.product?.quantity
+        : null;
 
-    if (productQty < cart[index]?.quantity + action?.payload.quantity) {
+    if (productQty !== null && productQty < cart[index]?.quantity + action?.payload.quantity) {
       return false;
     }
 

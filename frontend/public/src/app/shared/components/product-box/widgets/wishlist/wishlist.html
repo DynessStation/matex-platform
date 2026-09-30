@@ -1,6 +1,6 @@
 <a
   title="Add to Wishlist"
-  [ngClass]="[class(), product()?.is_wishlist ? 'show' : '']"
+  [ngClass]="[class(), ((wishlistIds$ | async) ?? []).includes(product()!.id) ? 'show' : '']"
   (click)="addToWishlist(product()!)"
 >
   <i class="ri-heart-3-line"></i>

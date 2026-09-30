@@ -15,7 +15,6 @@ import { Product } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
 import { WishlistModel } from '../../../shared/interface/wishlist.interface';
 import { CurrencySymbolPipe } from '../../../shared/pipe/currency.pipe';
-import { WishlistService } from '../../../shared/services/wishlist.service';
 import { DeleteWishlist, GetWishlist } from '../../../shared/store/action/wishlist.action';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { WishlistState } from '../../../shared/store/state/wishlist.state';
@@ -39,7 +38,6 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
 })
 export class Wishlist {
   private store = inject(Store);
-  public wishlistService = inject(WishlistService);
   @Input() type: string = '';
 
   wishlistItems$: Observable<WishlistModel> = inject(Store).select(WishlistState.wishlistItems);
