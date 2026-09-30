@@ -34,10 +34,16 @@
       </ul>
       <div class="total-price-box">
         <p class="tax-text">
-          Now that you have products in your wishlist, remember to put them in your cart later.
+          {{
+            isEnglish
+              ? 'Your saved products are kept on this device.'
+              : 'Produk favorit Anda tersimpan di perangkat ini.'
+          }}
         </p>
         <div class="cart-btn-group">
-          <a class="btn check-out-button" [routerLink]="['/wishlist']">View Wishlist</a>
+          <a class="btn check-out-button" [routerLink]="wishlistPath">
+            {{ isEnglish ? 'View wishlist' : 'Lihat favorit' }}
+          </a>
         </div>
       </div>
     </div>
@@ -62,8 +68,8 @@
         <app-no-data
           [class]="'no-data-added'"
           [image]="'assets/images/inner-page/empty-cart.svg#emptyCart'"
-          [text]="'no_item' | translate"
-          [description]="'no_wishlist_item' | translate"
+          [text]="emptyTitle"
+          [description]="emptyDescription"
         />
       }
     </div>

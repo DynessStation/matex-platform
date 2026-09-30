@@ -1,5 +1,13 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { afterNextRender, Component, DestroyRef, HostListener, inject, input } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  HostListener,
+  inject,
+  input,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
@@ -33,6 +41,7 @@ import { Button } from '../../../button/button';
 export class Cart {
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
+  private changeDetector = inject(ChangeDetectorRef);
 
   cartItem$: Observable<ICart[]> = this.store.select(CartState.cartItems);
   cartTotal$: Observable<number> = this.store.select(CartState.cartTotal);
@@ -80,6 +89,7 @@ export class Cart {
           } else {
             this.confetti = 0;
           }
+          this.changeDetector.detectChanges();
         });
     });
   }

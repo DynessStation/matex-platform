@@ -52,6 +52,10 @@ export const shop: Routes = [
     loadComponent: () => import('./wishlist/wishlist').then((m) => m.Wishlist),
   },
   {
+    path: 'en/wishlist',
+    loadComponent: () => import('./wishlist/wishlist').then((m) => m.Wishlist),
+  },
+  {
     path: 'compare',
     loadComponent: () => import('./compare/compare').then((m) => m.Compare),
     canActivate: [AuthGuard],
