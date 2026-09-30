@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -7,7 +8,11 @@ import { Observable } from 'rxjs';
 
 import { Button } from '../../../../../../shared/components/button/button';
 import { Cart, CartAddOrUpdate } from '../../../../../../shared/interface/cart.interface';
-import { Product, Variation } from '../../../../../../shared/interface/product.interface';
+import {
+  Product,
+  ProductMarketplace,
+  Variation,
+} from '../../../../../../shared/interface/product.interface';
 import { Values } from '../../../../../../shared/interface/setting.interface';
 import { CurrencySymbolPipe } from '../../../../../../shared/pipe/currency.pipe';
 import { AddToCart } from '../../../../../../shared/store/action/cart.action';
@@ -15,7 +20,7 @@ import { SettingState } from '../../../../../../shared/store/state/setting.state
 
 @Component({
   selector: 'app-product-buy-button',
-  imports: [Button, CurrencySymbolPipe, TranslateModule],
+  imports: [Button, CurrencySymbolPipe, TranslateModule, NgClass],
   templateUrl: './product-buy-button.html',
   styleUrl: './product-buy-button.scss',
 })
@@ -81,6 +86,29 @@ export class ProductBuyButton {
     void this.router.navigate([english ? '/en/contact-us' : '/contact-us']);
   }
 
+  marketplaceProviderLabel(marketplace: ProductMarketplace): string {
+    const labels: Record<string, string> = {
+      shopee: 'Shopee',
+      tokopedia: 'Tokopedia',
+      'tiktok-shop': 'TikTok Shop',
+      lazada: 'Lazada',
+      blibli: 'Blibli',
+      website: this.isEnglish ? 'Official store' : 'Toko resmi',
+      other: this.isEnglish ? 'Other marketplace' : 'Marketplace lainnya',
+    };
+
+    return labels[marketplace.provider] ?? marketplace.provider;
+  }
+
+  marketplaceLabel(marketplace: ProductMarketplace): string | null {
+    const label = marketplace.label?.trim();
+    return label && label !== this.marketplaceProviderLabel(marketplace) ? label : null;
+  }
+
+  marketplaceClass(provider: string): string {
+    return `marketplace-${provider.replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'other'}`;
+  }
+
   wholesalePriceCal() {
     const product = this.product();
     const selectedVariation = this.selectedVariation();
@@ -108,7 +136,7 @@ export class ProductBuyButton {
 
   externalProductLink(link: string) {
     if (link) {
-      window.open(link, '_blank');
+      window.open(link, '_blank', 'noopener,noreferrer');
     }
   }
 }

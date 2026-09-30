@@ -48,7 +48,7 @@
         {{
           productQty *
             (selectedVariation() ? selectedVariation()?.sale_price : product()?.sale_price)!
-            | currencySymbol:'before_price':priceCurrency
+            | currencySymbol: 'before_price' : priceCurrency
         }}
       </h4>
     </div>
@@ -114,13 +114,76 @@
       </app-button>
     </div>
   </div>
+} @else if (product()?.marketplaces?.length) {
+  <section class="marketplace-purchase" aria-labelledby="marketplace-purchase-title">
+    <div class="marketplace-heading">
+      <h5 id="marketplace-purchase-title">
+        {{ isEnglish ? 'Choose where to buy' : 'Pilih tempat membeli' }}
+      </h5>
+      <p>
+        {{
+          isEnglish
+            ? 'You will continue to the selected marketplace to complete your purchase.'
+            : 'Anda akan melanjutkan ke marketplace pilihan untuk menyelesaikan pembelian.'
+        }}
+      </p>
+    </div>
+
+    <div class="marketplace-list">
+      @for (marketplace of product()?.marketplaces; track marketplace.provider + marketplace.url) {
+        <a
+          class="marketplace-link"
+          [ngClass]="marketplaceClass(marketplace.provider)"
+          [href]="marketplace.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="marketplace-icon" aria-hidden="true">
+            <i class="ri-store-2-line"></i>
+          </span>
+          <span class="marketplace-copy">
+            <span class="marketplace-name">
+              {{ marketplaceProviderLabel(marketplace) }}
+              @if (marketplace.is_primary) {
+                <small>{{ isEnglish ? 'Recommended' : 'Rekomendasi' }}</small>
+              }
+            </span>
+            @if (marketplaceLabel(marketplace); as label) {
+              <span class="marketplace-note">{{ label }}</span>
+            }
+            @if (marketplace.price !== null) {
+              <strong>
+                {{ marketplace.price | currencySymbol: 'before_price' : marketplace.currency }}
+              </strong>
+            } @else {
+              <span class="marketplace-note">
+                {{ isEnglish ? 'View price and availability' : 'Lihat harga dan ketersediaan' }}
+              </span>
+            }
+          </span>
+          <i class="ri-external-link-line marketplace-arrow" aria-hidden="true"></i>
+        </a>
+      }
+    </div>
+
+    <button class="marketplace-contact" type="button" (click)="contactSales()">
+      <i class="ri-question-line" aria-hidden="true"></i>
+      {{ isEnglish ? 'Need help choosing? Contact us' : 'Butuh bantuan memilih? Hubungi kami' }}
+    </button>
+  </section>
 } @else if (product()?.external_url) {
   <app-button
     [id]="'externalBtn' + product()?.id"
     [class]="'btn btn-solid rounded-3'"
     (click)="externalProductLink(product()?.external_url!)"
   >
-    {{ product()?.external_button_text ? product()?.external_button_text : (isEnglish ? 'View on marketplace' : 'Lihat di marketplace') }}
+    {{
+      product()?.external_button_text
+        ? product()?.external_button_text
+        : isEnglish
+          ? 'View on marketplace'
+          : 'Lihat di marketplace'
+    }}
   </app-button>
 } @else {
   <app-button

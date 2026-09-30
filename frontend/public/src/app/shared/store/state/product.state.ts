@@ -252,9 +252,9 @@ export class ProductState {
   }
 
   @Action(GetProductBySlug)
-  getProductBySlug(ctx: StateContext<ProductStateModel>, { slug }: GetProductBySlug) {
+  getProductBySlug(ctx: StateContext<ProductStateModel>, { slug, locale }: GetProductBySlug) {
     this.themeOptionService.preloader.set(true);
-    return this.productService.getProductBySlug(slug).pipe(
+    return this.productService.getProductBySlug(slug, locale).pipe(
       tap({
         next: (result) => {
           result.related_products =

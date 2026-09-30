@@ -76,13 +76,31 @@ export interface Product {
   price_visibility?: 'displayed' | 'contact' | 'hidden';
   manage_stock?: boolean;
   internal_commerce_enabled?: boolean;
-  marketplaces?: Array<{ provider: string; label: string | null; url: string; sku: string | null; price: number | null; currency: string; is_primary: boolean }>;
-  prices?: Array<{ type: string; label: string | null; currency: string; amount: number; compare_at: number | null; min_qty: number | null; max_qty: number | null }>;
+  marketplaces?: ProductMarketplace[];
+  prices?: Array<{
+    type: string;
+    label: string | null;
+    currency: string;
+    amount: number;
+    compare_at: number | null;
+    min_qty: number | null;
+    max_qty: number | null;
+  }>;
   specifications?: unknown;
   dimensions?: { length_mm: number | null; width_mm: number | null; height_mm: number | null };
   canonical_url?: string;
   og_title?: string;
   og_description?: string;
+}
+
+export interface ProductMarketplace {
+  provider: string;
+  label: string | null;
+  url: string;
+  sku: string | null;
+  price: number | null;
+  currency: string;
+  is_primary: boolean;
 }
 
 export interface PivotProduct {

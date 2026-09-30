@@ -6,9 +6,22 @@
 
 .repeater-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; }
 .repeater-heading h6 { margin:0; }
+.repeater-heading > div { min-width: 0; }
+.section-help { margin: 4px 0 0; color: #777; line-height: 1.45; }
 .repeater-card { position:relative; border:1px solid #e7e9ee; border-radius:8px; padding:20px 54px 20px 20px; margin-bottom:14px; background:#fff; }
 .remove-row { position:absolute; right:14px; top:14px; border:0; background:#fff1f1; color:#e64141; width:34px; height:34px; border-radius:6px; }
 .code-field { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.marketplace-card-heading { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.marketplace-card-heading span { padding:3px 8px; border-radius:999px; background:#f3f5f8; color:#666; font-size:12px; }
+.marketplace-flags { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-top:24px; }
+.marketplace-flags .category-check { min-width:0; padding-inline:10px; white-space:normal; }
+.field-help { display:block; margin-top:6px; color:#777; line-height:1.4; }
+.field-error { margin-top:6px; color:#e64141; font-size:12px; }
+.repeater-empty { display:flex; align-items:center; gap:14px; padding:20px; border:1px dashed #d9dde5; border-radius:8px; color:#777; }
+.repeater-empty > i { color:var(--theme-color); font-size:28px; }
+.repeater-empty div { display:flex; min-width:0; flex-direction:column; gap:3px; }
+.repeater-empty strong { color:#333; }
+.repeater-empty span { line-height:1.45; }
 .category-heading {
   margin-bottom: 24px;
   h5 {
@@ -102,6 +115,10 @@
     border-color: #404040;
     color: #ddd;
   }
+  .repeater-card { background:#1d1d1d; border-color:#404040; }
+  .marketplace-card-heading span { background:#2a2a2a; color:#bbb; }
+  .repeater-empty { border-color:#404040; }
+  .repeater-empty strong { color:#ddd; }
 }
 @media (max-width: 767px) {
   .category-panel {
@@ -117,4 +134,12 @@
       width: 100%;
     }
   }
+  .repeater-heading {
+    align-items:stretch;
+    flex-direction:column;
+    .btn { width:100%; }
+  }
+  .repeater-card { padding:18px 46px 18px 16px; }
+  .marketplace-flags { grid-template-columns:1fr; padding-top:0; }
+  .repeater-empty { align-items:flex-start; }
 }

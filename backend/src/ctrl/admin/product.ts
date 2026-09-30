@@ -87,7 +87,18 @@ const parsePayload = (body: any) => {
     isPrimary: item?.is_primary ? 1 : 0, isActive: item?.is_active === false ? 0 : 1,
     sortOrder: Math.max(0, Number(item?.sort_order) || index),
   }));
-  if (marketplaces.some((item: any) => !item.provider || !/^https?:\/\//i.test(item.url))) return null;
+  if (marketplaces.some((item: any) =>
+    !item.provider || !/^https?:\/\//i.test(item.url) ||
+    (item.price != null && item.price < 0) || item.currency.length !== 3)) return null;
+
+  for (const item of marketplaces) {
+    if (!item.isActive) item.isPrimary = 0;
+  }
+  const activeMarketplaces = marketplaces.filter((item: any) => item.isActive);
+  if (activeMarketplaces.filter((item: any) => item.isPrimary).length > 1) return null;
+  if (activeMarketplaces.length && !activeMarketplaces.some((item: any) => item.isPrimary)) {
+    activeMarketplaces[0].isPrimary = 1;
+  }
 
   return {
     key, sku, status, productType, stockStatus, priceVisibility, categoryIds, media, prices, marketplaces, translations,

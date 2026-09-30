@@ -15,7 +15,9 @@ export const ProductResolver: ResolveFn<boolean> = (route) => {
   }
 
   return store
-    .dispatch(new GetProductBySlug(slug))
+    .dispatch(
+      new GetProductBySlug(slug, route.routeConfig?.path?.startsWith('en/') ? 'en-US' : 'id-ID'),
+    )
     .toPromise()
     .then(() => true)
     .catch(() => false);
