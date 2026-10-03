@@ -19,7 +19,11 @@
                 <a class="nav-link dropdown-toggle" role="button" (click)="toggle(item, items)">{{
                   item.label
                 }}</a>
-                <div class="dropdown-menu public-data-menu" [class.show]="item.active">
+                <div
+                  class="dropdown-menu public-data-menu"
+                  [class.product-data-menu]="item.products"
+                  [class.show]="item.active"
+                >
                   @if (item.categories) {
                     @if (item.categories.length) {
                       <ng-template #categoryTree let-categories>
@@ -64,10 +68,25 @@
                         @for (product of item.products; track product.id) {
                           <a [routerLink]="productPath(product)" (click)="close()">
                             <img [src]="imageUrl(product)" [alt]="product.name" />
-                            <span>
-                              <strong>{{ product.name }}</strong>
-                              @if (product.sku) {
-                                <small>SKU {{ product.sku }}</small>
+                            <span class="header-product-copy">
+                              <strong [title]="product.name">{{ product.name }}</strong>
+                              @if (
+                                product.price_visibility === 'displayed' && product.sale_price > 0
+                              ) {
+                                <small class="header-product-price">
+                                  {{
+                                    product.sale_price
+                                      | currencySymbol: 'before_price' : product.currency
+                                  }}
+                                </small>
+                              } @else {
+                                <small class="header-product-price">
+                                  {{
+                                    navigation.locale() === 'en-US'
+                                      ? 'Contact for price'
+                                      : 'Hubungi untuk harga'
+                                  }}
+                                </small>
                               }
                             </span>
                           </a>
