@@ -1,85 +1,806 @@
-<form class="theme-form theme-form-2 mega-form" [formGroup]="form" (ngSubmit)="submit()">
-  <div class="vertical-tabs category-form"><div class="row g-4">
-    <div class="col-xl-3 col-lg-4"><ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-pills" orientation="vertical">
-      <li ngbNavItem="general"><button ngbNavLink type="button"><i class="ri-settings-3-line"></i> Umum</button><ng-template ngbNavContent>
-        <section class="category-panel"><div class="category-heading"><h5>Identitas produk</h5><p>Data internal, publikasi, kategori, stok, dan ukuran fisik.</p></div>
-          <div class="row g-4">
-            <div class="col-md-6"><label class="form-label">Kunci internal *</label><input class="form-control" formControlName="key" placeholder="contoh: topper-latex-natural" /></div>
-            <div class="col-md-6"><label class="form-label">SKU *</label><input class="form-control" formControlName="sku" placeholder="MTX-TOP-001" /></div>
-            <div class="col-md-4"><label class="form-label">Jenis</label><select class="form-select" formControlName="product_type"><option value="physical">Produk fisik</option><option value="service">Layanan</option><option value="digital">Digital</option></select></div>
-            <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" formControlName="status"><option value="draft">Draft</option><option value="published">Dipublikasikan</option><option value="archived">Diarsipkan</option></select></div>
-            <div class="col-md-4"><label class="form-label">Satuan</label><input class="form-control" formControlName="unit" placeholder="pcs, lembar, kg" /></div>
-            <div class="col-12"><label class="form-label">Kategori</label><app-advance-dropdown [selectSingle]="false" [selectedOption]="categoryIds" [options]="(categories$ | async)?.data ?? []" [subArrayKey]="'subcategories'" (selectedItem)="selectCategories($event)" /></div>
-            <div class="col-md-4"><label class="form-label">Barcode / GTIN</label><input class="form-control" formControlName="barcode" /></div>
-            <div class="col-md-4"><label class="form-label">Kode manufaktur</label><input class="form-control" formControlName="manufacturer_code" /></div>
-            <div class="col-md-4"><label class="form-label">HS code</label><input class="form-control" formControlName="hs_code" /></div>
-            <div class="col-md-4"><label class="form-label">Negara asal</label><input class="form-control" formControlName="country_origin" /></div>
-            <div class="col-md-2"><label class="form-label">Berat (gram)</label><input type="number" min="0" class="form-control" formControlName="weight_grams" /></div>
-            <div class="col-md-2"><label class="form-label">Panjang (mm)</label><input type="number" min="0" class="form-control" formControlName="length_mm" /></div>
-            <div class="col-md-2"><label class="form-label">Lebar (mm)</label><input type="number" min="0" class="form-control" formControlName="width_mm" /></div>
-            <div class="col-md-2"><label class="form-label">Tinggi (mm)</label><input type="number" min="0" class="form-control" formControlName="height_mm" /></div>
-            <div class="col-md-3"><label class="form-label">Minimum pesanan</label><input type="number" min="0" class="form-control" formControlName="min_order_qty" /></div>
-            <div class="col-md-3"><label class="form-label">Lead time (hari)</label><input type="number" min="0" class="form-control" formControlName="lead_time_days" /></div>
-            <div class="col-md-3"><label class="form-label">Status stok</label><select class="form-select" formControlName="stock_status"><option value="in_stock">Tersedia</option><option value="out_of_stock">Habis</option><option value="preorder">Pre-order</option><option value="made_to_order">Dibuat sesuai pesanan</option></select></div>
-            <div class="col-md-3"><label class="form-label">Jumlah stok</label><input type="number" min="0" class="form-control" formControlName="stock_quantity" /></div>
-            <div class="col-md-4"><label class="category-check"><input type="checkbox" formControlName="manage_stock" /> Kelola stok</label></div>
-            <div class="col-md-4"><label class="category-check"><input type="checkbox" formControlName="is_featured" /> Produk unggulan</label></div>
-            <div class="col-md-4"><label class="form-label">Urutan</label><input type="number" min="0" class="form-control" formControlName="sort_order" /></div>
-          </div><div class="category-actions"><span></span><button type="button" class="btn btn-primary" (click)="setTab('content')">Lanjut ke Konten <i class="ri-arrow-right-line"></i></button></div>
-        </section></ng-template></li>
-      <li ngbNavItem="content"><button ngbNavLink type="button"><i class="ri-translate-2"></i> Konten & Bahasa</button><ng-template ngbNavContent>
-        <section class="category-panel"><div class="category-heading"><h5>Konten produk</h5><p>Nama, uraian, dan spesifikasi dalam Bahasa Indonesia dan English.</p></div>
-          <div class="category-language-tabs"><button type="button" [class.active]="activeLocale==='id'" (click)="activeLocale='id'"><strong>ID</strong> Bahasa Indonesia <span>Utama</span></button><button type="button" [class.active]="activeLocale==='en'" (click)="activeLocale='en'"><strong>EN</strong> English</button></div>
-          @if(activeLocale==='id'){<div class="row g-4">
-            <div class="col-md-5"><label class="form-label">Slug URL *</label><div class="input-group"><span class="input-group-text">/produk/</span><input class="form-control" formControlName="id_slug" /></div></div><div class="col-md-7"><label class="form-label">Nama produk *</label><input class="form-control" formControlName="id_name" /></div>
-            <div class="col-12"><label class="form-label">Ringkasan</label><textarea rows="3" class="form-control" formControlName="id_short_description"></textarea></div><div class="col-12"><label class="form-label">Deskripsi lengkap</label><textarea rows="8" class="form-control" formControlName="id_description"></textarea></div><div class="col-12"><label class="form-label">Spesifikasi</label><textarea rows="5" class="form-control code-field" formControlName="id_specifications" placeholder='JSON opsional, contoh: {"Material":"Lateks alami"}'></textarea></div>
-          </div>}@else{<div class="row g-4">
-            <div class="col-md-5"><label class="form-label">URL slug *</label><div class="input-group"><span class="input-group-text">/en/product/</span><input class="form-control" formControlName="en_slug" /></div></div><div class="col-md-7"><label class="form-label">Product name *</label><input class="form-control" formControlName="en_name" /></div>
-            <div class="col-12"><label class="form-label">Summary</label><textarea rows="3" class="form-control" formControlName="en_short_description"></textarea></div><div class="col-12"><label class="form-label">Full description</label><textarea rows="8" class="form-control" formControlName="en_description"></textarea></div><div class="col-12"><label class="form-label">Specifications</label><textarea rows="5" class="form-control code-field" formControlName="en_specifications"></textarea></div>
-          </div>}<div class="category-actions"><button type="button" class="btn btn-light" (click)="setTab('general')"><i class="ri-arrow-left-line"></i> Kembali</button><button type="button" class="btn btn-primary" (click)="setTab('channels')">Lanjut ke Harga & Kanal <i class="ri-arrow-right-line"></i></button></div>
-        </section></ng-template></li>
-      <li ngbNavItem="channels"><button ngbNavLink type="button"><i class="ri-price-tag-3-line"></i> Harga & Kanal</button><ng-template ngbNavContent>
-        <section class="category-panel"><div class="category-heading"><h5>Harga dan kanal penjualan</h5><p>Harga publik dapat ditampilkan atau disembunyikan. Marketplace tetap berupa tautan resmi; commerce internal disiapkan tetapi belum diaktifkan.</p></div>
-          <div class="row g-4 mb-4"><div class="col-md-6"><label class="form-label">Tampilan harga publik</label><select class="form-select" formControlName="price_visibility"><option value="displayed">Tampilkan harga</option><option value="contact">Hubungi kami</option><option value="hidden">Sembunyikan</option></select></div><div class="col-md-6"><label class="category-check mt-4"><input type="checkbox" formControlName="internal_commerce_enabled" /> Aktifkan commerce internal <small>(belum untuk v1)</small></label></div></div>
-          <div class="repeater-heading"><h6>Daftar harga</h6><button type="button" class="btn btn-light" (click)="addPrice()"><i class="ri-add-line"></i> Tambah harga</button></div><div formArrayName="prices">@for(row of prices.controls;track $index){<div class="repeater-card" [formGroupName]="$index"><div class="row g-3"><div class="col-md-3"><label>Jenis harga</label><input class="form-control" formControlName="type" placeholder="end_user / wholesale" /></div><div class="col-md-3"><label>Label</label><input class="form-control" formControlName="label" /></div><div class="col-md-2"><label>Nominal</label><input type="number" min="0" class="form-control" formControlName="amount" /></div><div class="col-md-2"><label>Minimum qty</label><input type="number" min="0" class="form-control" formControlName="min_qty" /></div><div class="col-md-2"><label class="category-check mt-4"><input type="checkbox" formControlName="is_public" /> Publik</label></div></div><button type="button" class="remove-row" (click)="remove(prices,$index)"><i class="ri-delete-bin-line"></i></button></div>}</div>
-          <div class="repeater-heading mt-5">
-            <div><h6>Kanal pembelian marketplace</h6><p class="section-help">Tautan aktif ditampilkan di halaman produk sesuai urutan ini. Hanya satu kanal yang dapat menjadi rekomendasi utama.</p></div>
-            <button type="button" class="btn btn-light" (click)="addMarketplace()"><i class="ri-add-line"></i> Tambah kanal</button>
-          </div>
-          <div formArrayName="marketplaces">
-            @if (!marketplaces.length) {
-              <div class="repeater-empty"><i class="ri-store-2-line"></i><div><strong>Belum ada kanal marketplace</strong><span>Tambahkan tautan produk dari Shopee, Tokopedia, TikTok Shop, atau kanal resmi lainnya.</span></div></div>
-            }
-            @for(row of marketplaces.controls;track row; let index = $index){
-              <div class="repeater-card marketplace-card" [formGroupName]="index">
-                <div class="marketplace-card-heading"><strong>Kanal {{ index + 1 }}</strong><span>{{ row.get('is_active')?.value ? 'Aktif di publik' : 'Disembunyikan' }}</span></div>
-                <div class="row g-3">
-                  <div class="col-xl-3 col-md-5"><label class="form-label">Platform *</label><select class="form-select" formControlName="provider"><option value="shopee">Shopee</option><option value="tokopedia">Tokopedia</option><option value="tiktok-shop">TikTok Shop</option><option value="lazada">Lazada</option><option value="blibli">Blibli</option><option value="website">Toko resmi / website</option><option value="other">Lainnya</option></select></div>
-                  <div class="col-xl-5 col-md-7"><label class="form-label">Nama yang ditampilkan</label><input class="form-control" formControlName="label" placeholder="Opsional, contoh: MATEX Official Store" /><small class="field-help">Jika kosong, nama platform digunakan.</small></div>
-                  <div class="col-xl-4"><div class="marketplace-flags"><label class="category-check"><input type="checkbox" formControlName="is_primary" (change)="selectPrimaryMarketplace(index)" /> Rekomendasi utama</label><label class="category-check"><input type="checkbox" formControlName="is_active" (change)="toggleMarketplaceActive(index)" /> Tampilkan</label></div></div>
-                  <div class="col-12"><label class="form-label">Tautan produk *</label><input type="url" class="form-control" formControlName="url" placeholder="https://..." /><small class="field-help">Gunakan tautan langsung menuju produk, bukan halaman utama toko.</small>@if(row.get('url')?.invalid && row.get('url')?.touched){<div class="field-error">Masukkan tautan lengkap yang diawali http:// atau https://.</div>}</div>
-                  <div class="col-lg-5 col-md-6"><label class="form-label">SKU di marketplace</label><input class="form-control" formControlName="sku" placeholder="Opsional jika berbeda dari SKU internal" /></div>
-                  <div class="col-lg-4 col-md-4"><label class="form-label">Harga marketplace</label><input type="number" min="0" class="form-control" formControlName="price" placeholder="Opsional" /></div>
-                  <div class="col-lg-3 col-md-2"><label class="form-label">Mata uang</label><input class="form-control text-uppercase" maxlength="3" formControlName="currency" placeholder="IDR" /></div>
+<form
+  class="theme-form theme-form-2 mega-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <div class="vertical-tabs category-form">
+    <div class="row g-4">
+      <div class="col-xl-3 col-lg-4">
+        <ul
+          ngbNav
+          #nav="ngbNav"
+          [(activeId)]="activeTab"
+          class="nav-pills"
+          orientation="vertical"
+        >
+          <li ngbNavItem="general">
+            <button ngbNavLink type="button">
+              <i class="ri-settings-3-line"></i> Umum</button
+            ><ng-template ngbNavContent>
+              <section class="category-panel">
+                <div class="category-heading">
+                  <h5>Identitas produk</h5>
+                  <p>
+                    Data internal, publikasi, kategori, stok, dan ukuran fisik.
+                  </p>
                 </div>
-                <button type="button" class="remove-row" (click)="removeMarketplace(index)" aria-label="Hapus kanal marketplace"><i class="ri-delete-bin-line"></i></button>
-              </div>
-            }
-          </div>
-          <div class="category-actions"><button type="button" class="btn btn-light" (click)="setTab('content')"><i class="ri-arrow-left-line"></i> Kembali</button><button type="button" class="btn btn-primary" (click)="setTab('media')">Lanjut ke Media <i class="ri-arrow-right-line"></i></button></div>
-        </section></ng-template></li>
-      <li ngbNavItem="media"><button ngbNavLink type="button"><i class="ri-image-line"></i> Media</button><ng-template ngbNavContent>
-        <section class="category-panel"><div class="category-heading"><h5>Media produk</h5><p>Pilih gambar dari Pustaka Media. Gambar utama disarankan persegi; galeri dapat berisi beberapa sudut produk.</p></div><div class="row g-4">
-          <div class="col-md-6"><div class="category-media"><h6>Gambar utama</h6><small>Rekomendasi minimal 1000 × 1000px.</small><app-image-upload [multipleImage]="false" [accept]="[mediaConfig.image]" [image]="$any(media.thumbnail)" (selectedFiles)="selectMedia('thumbnail',$event)" /></div></div>
-          <div class="col-md-6"><div class="category-media"><h6>Gambar sosial</h6><small>Rekomendasi 1200 × 630px.</small><app-image-upload [multipleImage]="false" [accept]="[mediaConfig.image]" [image]="$any(media.og)" (selectedFiles)="selectMedia('og',$event)" /></div></div>
-          <div class="col-12"><div class="category-media"><h6>Galeri produk</h6><small>Pilih beberapa gambar dan atur urutannya dari Pustaka Media.</small><app-image-upload [multipleImage]="true" [accept]="[mediaConfig.image]" [images]="$any(media.gallery)" (selectedFiles)="selectMedia('gallery',$event)" /></div></div>
-        </div><div class="category-actions"><button type="button" class="btn btn-light" (click)="setTab('channels')"><i class="ri-arrow-left-line"></i> Kembali</button><button type="button" class="btn btn-primary" (click)="setTab('seo')">Lanjut ke SEO <i class="ri-arrow-right-line"></i></button></div></section>
-      </ng-template></li>
-      <li ngbNavItem="seo"><button ngbNavLink type="button"><i class="ri-search-eye-line"></i> SEO</button><ng-template ngbNavContent>
-        <section class="category-panel"><div class="category-heading"><h5>SEO & tampilan saat dibagikan</h5><p>Opsional; nama dan ringkasan produk menjadi nilai bawaan.</p></div><div class="category-language-tabs"><button type="button" [class.active]="activeLocale==='id'" (click)="activeLocale='id'"><strong>ID</strong> Bahasa Indonesia</button><button type="button" [class.active]="activeLocale==='en'" (click)="activeLocale='en'"><strong>EN</strong> English</button></div>
-          @if(activeLocale==='id'){<div class="row g-4"><div class="col-md-6"><label class="form-label">Judul SEO</label><input class="form-control" formControlName="id_meta_title" /></div><div class="col-md-6"><label class="form-label">Canonical URL</label><input class="form-control" formControlName="id_canonical_url" /></div><div class="col-12"><label class="form-label">Deskripsi SEO</label><textarea rows="3" class="form-control" formControlName="id_meta_description"></textarea></div><div class="col-md-6"><label class="form-label">Judul OG</label><input class="form-control" formControlName="id_og_title" /></div><div class="col-md-6"><label class="form-label">Deskripsi OG</label><textarea rows="2" class="form-control" formControlName="id_og_description"></textarea></div></div>}@else{<div class="row g-4"><div class="col-md-6"><label class="form-label">SEO title</label><input class="form-control" formControlName="en_meta_title" /></div><div class="col-md-6"><label class="form-label">Canonical URL</label><input class="form-control" formControlName="en_canonical_url" /></div><div class="col-12"><label class="form-label">SEO description</label><textarea rows="3" class="form-control" formControlName="en_meta_description"></textarea></div><div class="col-md-6"><label class="form-label">OG title</label><input class="form-control" formControlName="en_og_title" /></div><div class="col-md-6"><label class="form-label">OG description</label><textarea rows="2" class="form-control" formControlName="en_og_description"></textarea></div></div>}
-          <div class="category-actions"><button type="button" class="btn btn-light" (click)="setTab('media')"><i class="ri-arrow-left-line"></i> Kembali</button><app-button [id]="'product_btn'">{{type()==='edit'?'Perbarui Produk':'Simpan Produk'}}</app-button></div>
-        </section></ng-template></li>
-    </ul></div><div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
-  </div></div>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <label class="form-label">Kunci internal *</label
+                    ><input
+                      class="form-control"
+                      formControlName="key"
+                      placeholder="contoh: topper-latex-natural"
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">SKU *</label
+                    ><input
+                      class="form-control"
+                      formControlName="sku"
+                      placeholder="MTX-TOP-001"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Jenis</label
+                    ><select class="form-select" formControlName="product_type">
+                      <option value="physical">Produk fisik</option>
+                      <option value="service">Layanan</option>
+                      <option value="digital">Digital</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Status</label
+                    ><select class="form-select" formControlName="status">
+                      <option value="draft">Draft</option>
+                      <option value="published">Dipublikasikan</option>
+                      <option value="archived">Diarsipkan</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Satuan</label
+                    ><input
+                      class="form-control"
+                      formControlName="unit"
+                      placeholder="pcs, lembar, kg"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Kategori</label
+                    ><app-advance-dropdown
+                      [selectSingle]="false"
+                      [selectedOption]="categoryIds"
+                      [options]="(categories$ | async)?.data ?? []"
+                      [subArrayKey]="'subcategories'"
+                      (selectedItem)="selectCategories($event)"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Barcode / GTIN</label
+                    ><input class="form-control" formControlName="barcode" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Kode manufaktur</label
+                    ><input
+                      class="form-control"
+                      formControlName="manufacturer_code"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">HS code</label
+                    ><input class="form-control" formControlName="hs_code" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Negara asal</label
+                    ><input
+                      class="form-control"
+                      formControlName="country_origin"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Berat (gram)</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="weight_grams"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Panjang (mm)</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="length_mm"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Lebar (mm)</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="width_mm"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label">Tinggi (mm)</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="height_mm"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Minimum pesanan</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="min_order_qty"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Lead time (hari)</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="lead_time_days"
+                    />
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Status stok</label
+                    ><select class="form-select" formControlName="stock_status">
+                      <option value="in_stock">Tersedia</option>
+                      <option value="out_of_stock">Habis</option>
+                      <option value="preorder">Pre-order</option>
+                      <option value="made_to_order">
+                        Dibuat sesuai pesanan
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Jumlah stok</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="stock_quantity"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="category-check"
+                      ><input type="checkbox" formControlName="manage_stock" />
+                      Kelola stok</label
+                    >
+                  </div>
+                  <div class="col-md-4">
+                    <label class="category-check"
+                      ><input type="checkbox" formControlName="is_featured" />
+                      Produk unggulan</label
+                    >
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Urutan</label
+                    ><input
+                      type="number"
+                      min="0"
+                      class="form-control"
+                      formControlName="sort_order"
+                    />
+                  </div>
+                </div>
+                <div class="category-actions">
+                  <span></span
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('content')"
+                  >
+                    Lanjut ke Konten <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div></section
+            ></ng-template>
+          </li>
+          <li ngbNavItem="content">
+            <button ngbNavLink type="button">
+              <i class="ri-translate-2"></i> Konten & Bahasa</button
+            ><ng-template ngbNavContent>
+              <section class="category-panel">
+                <div class="category-heading">
+                  <h5>Konten produk</h5>
+                  <p>
+                    Nama, uraian, dan spesifikasi dalam Bahasa Indonesia dan
+                    English.
+                  </p>
+                </div>
+                <div class="category-language-tabs">
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'id'"
+                    (click)="activeLocale = 'id'"
+                  >
+                    <strong>ID</strong> Bahasa Indonesia
+                    <span>Utama</span></button
+                  ><button
+                    type="button"
+                    [class.active]="activeLocale === 'en'"
+                    (click)="activeLocale = 'en'"
+                  >
+                    <strong>EN</strong> English
+                  </button>
+                </div>
+                @if (activeLocale === 'id') {
+                  <div class="row g-4">
+                    <div class="col-md-5">
+                      <label class="form-label">Slug URL *</label>
+                      <div class="input-group">
+                        <span class="input-group-text">/produk/</span
+                        ><input
+                          class="form-control"
+                          formControlName="id_slug"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-7">
+                      <label class="form-label">Nama produk *</label
+                      ><input class="form-control" formControlName="id_name" />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Ringkasan</label
+                      ><textarea
+                        rows="3"
+                        class="form-control"
+                        formControlName="id_short_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Deskripsi lengkap</label
+                      ><textarea
+                        rows="8"
+                        class="form-control"
+                        formControlName="id_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Spesifikasi</label
+                      ><textarea
+                        rows="5"
+                        class="form-control code-field"
+                        formControlName="id_specifications"
+                        placeholder='JSON opsional, contoh: {"Material":"Lateks alami"}'
+                      ></textarea>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="row g-4">
+                    <div class="col-md-5">
+                      <label class="form-label">URL slug *</label>
+                      <div class="input-group">
+                        <span class="input-group-text">/en/product/</span
+                        ><input
+                          class="form-control"
+                          formControlName="en_slug"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-7">
+                      <label class="form-label">Product name *</label
+                      ><input class="form-control" formControlName="en_name" />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Summary</label
+                      ><textarea
+                        rows="3"
+                        class="form-control"
+                        formControlName="en_short_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Full description</label
+                      ><textarea
+                        rows="8"
+                        class="form-control"
+                        formControlName="en_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Specifications</label
+                      ><textarea
+                        rows="5"
+                        class="form-control code-field"
+                        formControlName="en_specifications"
+                      ></textarea>
+                    </div>
+                  </div>
+                }
+                <div class="category-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('general')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('channels')"
+                  >
+                    Lanjut ke Harga & Kanal <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div></section
+            ></ng-template>
+          </li>
+          <li ngbNavItem="channels">
+            <button ngbNavLink type="button">
+              <i class="ri-price-tag-3-line"></i> Harga & Kanal</button
+            ><ng-template ngbNavContent>
+              <section class="category-panel">
+                <div class="category-heading">
+                  <h5>Harga dan kanal penjualan</h5>
+                  <p>
+                    Harga publik dapat ditampilkan atau disembunyikan.
+                    Marketplace tetap berupa tautan resmi; commerce internal
+                    disiapkan tetapi belum diaktifkan.
+                  </p>
+                </div>
+                <div class="row g-4 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label">Tampilan harga publik</label
+                    ><select
+                      class="form-select"
+                      formControlName="price_visibility"
+                    >
+                      <option value="displayed">Tampilkan harga</option>
+                      <option value="contact">Hubungi kami</option>
+                      <option value="hidden">Sembunyikan</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="category-check mt-4"
+                      ><input
+                        type="checkbox"
+                        formControlName="internal_commerce_enabled"
+                      />
+                      Aktifkan commerce internal
+                      <small>(belum untuk v1)</small></label
+                    >
+                  </div>
+                </div>
+                <div class="repeater-heading">
+                  <h6>Daftar harga</h6>
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="addPrice()"
+                  >
+                    <i class="ri-add-line"></i> Tambah harga
+                  </button>
+                </div>
+                <div formArrayName="prices">
+                  @for (row of prices.controls; track $index) {
+                    <div class="repeater-card" [formGroupName]="$index">
+                      <div class="row g-3">
+                        <div class="col-md-3">
+                          <label>Jenis harga</label
+                          ><input
+                            class="form-control"
+                            formControlName="type"
+                            placeholder="end_user / wholesale"
+                          />
+                        </div>
+                        <div class="col-md-3">
+                          <label>Label</label
+                          ><input
+                            class="form-control"
+                            formControlName="label"
+                          />
+                        </div>
+                        <div class="col-md-2">
+                          <label>Nominal</label
+                          ><input
+                            type="number"
+                            min="0"
+                            class="form-control"
+                            formControlName="amount"
+                          />
+                        </div>
+                        <div class="col-md-2">
+                          <label>Minimum qty</label
+                          ><input
+                            type="number"
+                            min="0"
+                            class="form-control"
+                            formControlName="min_qty"
+                          />
+                        </div>
+                        <div class="col-md-2">
+                          <label class="category-check mt-4"
+                            ><input
+                              type="checkbox"
+                              formControlName="is_public"
+                            />
+                            Publik</label
+                          >
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="remove-row"
+                        (click)="remove(prices, $index)"
+                      >
+                        <i class="ri-delete-bin-line"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+                <div class="repeater-heading mt-5">
+                  <div>
+                    <h6>Kanal pembelian marketplace</h6>
+                    <p class="section-help">
+                      Tautan aktif ditampilkan di halaman produk sesuai urutan
+                      ini. Hanya satu kanal yang dapat menjadi rekomendasi
+                      utama.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="addMarketplace()"
+                  >
+                    <i class="ri-add-line"></i> Tambah kanal
+                  </button>
+                </div>
+                <div formArrayName="marketplaces">
+                  @if (!marketplaces.length) {
+                    <div class="repeater-empty">
+                      <i class="ri-store-2-line"></i>
+                      <div>
+                        <strong>Belum ada kanal marketplace</strong
+                        ><span
+                          >Tambahkan tautan produk dari Shopee, Tokopedia,
+                          TikTok Shop, atau kanal resmi lainnya.</span
+                        >
+                      </div>
+                    </div>
+                  }
+                  @for (
+                    row of marketplaces.controls;
+                    track row;
+                    let index = $index
+                  ) {
+                    <div
+                      class="repeater-card marketplace-card"
+                      [formGroupName]="index"
+                    >
+                      <div class="marketplace-card-heading">
+                        <strong>Kanal {{ index + 1 }}</strong
+                        ><span>{{
+                          row.get('is_active')?.value
+                            ? 'Aktif di publik'
+                            : 'Disembunyikan'
+                        }}</span>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col-xl-3 col-md-5">
+                          <label class="form-label">Platform *</label
+                          ><select
+                            class="form-select"
+                            formControlName="provider"
+                          >
+                            <option value="shopee">Shopee</option>
+                            <option value="tokopedia">Tokopedia</option>
+                            <option value="tiktok-shop">TikTok Shop</option>
+                            <option value="lazada">Lazada</option>
+                            <option value="blibli">Blibli</option>
+                            <option value="website">
+                              Toko resmi / website
+                            </option>
+                            <option value="other">Lainnya</option>
+                          </select>
+                        </div>
+                        <div class="col-xl-5 col-md-7">
+                          <label class="form-label">Nama yang ditampilkan</label
+                          ><input
+                            class="form-control"
+                            formControlName="label"
+                            placeholder="Opsional, contoh: MATEX Official Store"
+                          /><small class="field-help"
+                            >Jika kosong, nama platform digunakan.</small
+                          >
+                        </div>
+                        <div class="col-xl-4">
+                          <div class="marketplace-flags">
+                            <label class="category-check"
+                              ><input
+                                type="checkbox"
+                                formControlName="is_primary"
+                                (change)="selectPrimaryMarketplace(index)"
+                              />
+                              Rekomendasi utama</label
+                            ><label class="category-check"
+                              ><input
+                                type="checkbox"
+                                formControlName="is_active"
+                                (change)="toggleMarketplaceActive(index)"
+                              />
+                              Tampilkan</label
+                            >
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">Tautan produk *</label
+                          ><input
+                            type="url"
+                            class="form-control"
+                            formControlName="url"
+                            placeholder="https://..."
+                          /><small class="field-help"
+                            >Gunakan tautan langsung menuju produk, bukan
+                            halaman utama toko.</small
+                          >
+                          @if (
+                            row.get('url')?.invalid && row.get('url')?.touched
+                          ) {
+                            <div class="field-error">
+                              Masukkan tautan lengkap yang diawali http:// atau
+                              https://.
+                            </div>
+                          }
+                        </div>
+                        <div class="col-lg-5 col-md-6">
+                          <label class="form-label">SKU di marketplace</label
+                          ><input
+                            class="form-control"
+                            formControlName="sku"
+                            placeholder="Opsional jika berbeda dari SKU internal"
+                          />
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                          <label class="form-label">Harga marketplace</label
+                          ><input
+                            type="number"
+                            min="0"
+                            class="form-control"
+                            formControlName="price"
+                            placeholder="Opsional"
+                          />
+                        </div>
+                        <div class="col-lg-3 col-md-2">
+                          <label class="form-label">Mata uang</label
+                          ><input
+                            class="form-control text-uppercase"
+                            maxlength="3"
+                            formControlName="currency"
+                            placeholder="IDR"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="remove-row"
+                        (click)="removeMarketplace(index)"
+                        aria-label="Hapus kanal marketplace"
+                      >
+                        <i class="ri-delete-bin-line"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+                <div class="category-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('content')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('media')"
+                  >
+                    Lanjut ke Media <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div></section
+            ></ng-template>
+          </li>
+          <li ngbNavItem="media">
+            <button ngbNavLink type="button">
+              <i class="ri-image-line"></i> Media</button
+            ><ng-template ngbNavContent>
+              <section class="category-panel">
+                <div class="category-heading">
+                  <h5>Media produk</h5>
+                  <p>
+                    Pilih gambar dari Pustaka Media. Gambar utama disarankan
+                    persegi; galeri dapat berisi beberapa sudut produk.
+                  </p>
+                </div>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="category-media">
+                      <h6>Gambar utama</h6>
+                      <small>Rekomendasi minimal 1000 × 1000px.</small
+                      ><app-image-upload
+                        [multipleImage]="false"
+                        [accept]="[mediaConfig.image]"
+                        [image]="$any(media.thumbnail)"
+                        (selectedFiles)="selectMedia('thumbnail', $event)"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="category-media">
+                      <h6>Gambar sosial</h6>
+                      <small>Rekomendasi 1200 × 630px.</small
+                      ><app-image-upload
+                        [multipleImage]="false"
+                        [accept]="[mediaConfig.image]"
+                        [image]="$any(media.og)"
+                        (selectedFiles)="selectMedia('og', $event)"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="category-media">
+                      <h6>Galeri produk</h6>
+                      <small
+                        >Pilih beberapa gambar dan atur urutannya dari Pustaka
+                        Media.</small
+                      ><app-image-upload
+                        [multipleImage]="true"
+                        [accept]="[mediaConfig.image]"
+                        [images]="$any(media.gallery)"
+                        (selectedFiles)="selectMedia('gallery', $event)"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="category-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('channels')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali</button
+                  ><button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="setTab('seo')"
+                  >
+                    Lanjut ke SEO <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </section>
+            </ng-template>
+          </li>
+          <li ngbNavItem="seo">
+            <button ngbNavLink type="button">
+              <i class="ri-search-eye-line"></i> SEO</button
+            ><ng-template ngbNavContent>
+              <section class="category-panel">
+                <div class="category-heading">
+                  <h5>SEO & tampilan saat dibagikan</h5>
+                  <p>
+                    Opsional; nama dan ringkasan produk menjadi nilai bawaan.
+                  </p>
+                </div>
+                <div class="category-language-tabs">
+                  <button
+                    type="button"
+                    [class.active]="activeLocale === 'id'"
+                    (click)="activeLocale = 'id'"
+                  >
+                    <strong>ID</strong> Bahasa Indonesia</button
+                  ><button
+                    type="button"
+                    [class.active]="activeLocale === 'en'"
+                    (click)="activeLocale = 'en'"
+                  >
+                    <strong>EN</strong> English
+                  </button>
+                </div>
+                @if (activeLocale === 'id') {
+                  <div class="row g-4">
+                    <div class="col-md-6">
+                      <label class="form-label">Judul SEO</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_meta_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Canonical URL</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_canonical_url"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">Deskripsi SEO</label
+                      ><textarea
+                        rows="3"
+                        class="form-control"
+                        formControlName="id_meta_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Judul OG</label
+                      ><input
+                        class="form-control"
+                        formControlName="id_og_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Deskripsi OG</label
+                      ><textarea
+                        rows="2"
+                        class="form-control"
+                        formControlName="id_og_description"
+                      ></textarea>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="row g-4">
+                    <div class="col-md-6">
+                      <label class="form-label">SEO title</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_meta_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Canonical URL</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_canonical_url"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">SEO description</label
+                      ><textarea
+                        rows="3"
+                        class="form-control"
+                        formControlName="en_meta_description"
+                      ></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">OG title</label
+                      ><input
+                        class="form-control"
+                        formControlName="en_og_title"
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">OG description</label
+                      ><textarea
+                        rows="2"
+                        class="form-control"
+                        formControlName="en_og_description"
+                      ></textarea>
+                    </div>
+                  </div>
+                }
+                <div class="category-actions">
+                  <button
+                    type="button"
+                    class="btn btn-light"
+                    (click)="setTab('media')"
+                  >
+                    <i class="ri-arrow-left-line"></i> Kembali</button
+                  ><app-button [id]="'product_btn'">{{
+                    type() === 'edit' ? 'Perbarui Produk' : 'Simpan Produk'
+                  }}</app-button>
+                </div>
+              </section></ng-template
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
+    </div>
+  </div>
 </form>
