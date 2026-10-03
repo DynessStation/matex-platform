@@ -110,6 +110,8 @@ test("unlisted response is noindex and strips internal fields and storage paths"
         name: "Hero",
         alt: "Alt",
         caption: "Caption",
+        action_type: "external",
+        action_value: "https://example.com/catalog",
       },
     ],
   ];
@@ -125,6 +127,11 @@ test("unlisted response is noindex and strips internal fields and storage paths"
   assert.equal(data.cms_page_settings_json, undefined);
   assert.equal(data.attachments[0].storage_path, undefined);
   assert.equal(data.attachments[0].alt, "Alt");
+  assert.equal(data.attachments[0].action_type, "external");
+  assert.equal(
+    data.attachments[0].action_value,
+    "https://example.com/catalog",
+  );
   assert.deepEqual(calls[1].params, [42, 7]);
   assert.deepEqual(calls[2].params.slice(0, 3), ["id-ID", 42, 7]);
   assert.ok(calls[2].params.includes("home_main"));

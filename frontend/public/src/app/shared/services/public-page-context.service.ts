@@ -59,6 +59,16 @@ export class PublicPageContextService {
       return locale === 'en-US' ? '/en' : '/';
     }
 
+    const fixedRoutes: Record<string, { id: string; en: string }> = {
+      about: { id: '/tentang-matex', en: '/en/about-matex' },
+      terms: { id: '/syarat-ketentuan', en: '/en/terms-and-conditions' },
+      career: { id: '/karir', en: '/en/careers' },
+    };
+
+    if (key && fixedRoutes[key]) {
+      return locale === 'en-US' ? fixedRoutes[key].en : fixedRoutes[key].id;
+    }
+
     const encodedSlug = encodeURIComponent(slug);
 
     if (locale === 'en-US') {

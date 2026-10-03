@@ -1,8 +1,9 @@
 <app-page-wrapper
   [gridClass]="'col-sm-12'"
-  [title]="'cms_page.edit_title' | translate"
+  [title]="pageTitle | translate"
 >
-  <div button>
+  @if (!fixedKey) {
+    <div button>
     <a
       [routerLink]="['/cms-page']"
       class="align-items-center btn btn-light-bg d-flex"
@@ -11,12 +12,13 @@
 
       {{ 'cms_page.back_to_list' | translate }}
     </a>
-  </div>
+    </div>
+  }
 
   @if (detailErrorStatus !== null) {
     <app-detail-error-state
       [status]="detailErrorStatus"
-      [backUrl]="'/cms-page'"
+      [backUrl]="'/dashboard'"
       (retry)="retryDetail()"
     />
   } @else if (cmsPage$ | async; as page) {

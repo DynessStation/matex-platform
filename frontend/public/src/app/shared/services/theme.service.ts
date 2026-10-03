@@ -34,14 +34,17 @@ export class ThemeService {
     return this.http.get<ThemesModel>(`${environment.URL}/theme.json`);
   }
 
-  getHomePage(slug?: string): Observable<any> {
+  getHomePage(
+    slug?: string,
+    locale: 'id-ID' | 'en-US' = 'id-ID',
+  ): Observable<any> {
     const template$ = this.http.get(`${environment.URL}/home/${slug}.json`);
 
     if (slug !== 'gadget-store') return template$;
 
     return template$.pipe(
       switchMap((template) =>
-        this.cmsPageService.getPage('id-ID', 'home').pipe(
+        this.cmsPageService.getPage(locale, 'home').pipe(
           map((page) => this.mergeGadgetHome(template as GadgetTheme, page)),
           catchError(() => of(template)),
         ),
@@ -68,7 +71,12 @@ export class ThemeService {
 
     for (const attachment of page.attachments) {
       const banner = banners[attachment.role];
-      if (banner && attachment.asset_url) banner.image_url = attachment.asset_url;
+      if (!banner) continue;
+
+      if (attachment.asset_url) banner.image_url = attachment.asset_url;
+
+      banner.redirection_type = attachment.action_type;
+      banner.link = attachment.action_value ?? '';
     }
 
     return merged;

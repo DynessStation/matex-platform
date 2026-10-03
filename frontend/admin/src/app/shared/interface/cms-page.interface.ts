@@ -200,6 +200,15 @@ export interface ICmsPageAttachment extends IAttachment {
 
   cms_page_attachment_is_public: 0 | 1;
 
+  cms_page_attachment_action_type:
+    | 'none'
+    | 'internal'
+    | 'external'
+    | 'product'
+    | 'category';
+
+  cms_page_attachment_action_value: string | null;
+
   translations: ICmsPageAttachmentTranslation[];
 
   created: string;
@@ -341,6 +350,10 @@ export interface ICmsPageAttachmentPayload {
   sort_order?: number;
 
   is_public?: 0 | 1 | boolean;
+
+  action_type?: 'none' | 'internal' | 'external' | 'product' | 'category';
+
+  action_value?: string | null;
 
   translations?: ICmsPageAttachmentTranslationPayload[];
 }

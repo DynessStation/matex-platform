@@ -175,5 +175,9 @@ export interface CmsPageAttachmentInput {
 
   is_public?: number | boolean;
 
+  action_type?: "none" | "internal" | "external" | "product" | "category";
+
+  action_value?: string | null;
+
   translations?: CmsPageAttachmentTranslationInput[];
 }

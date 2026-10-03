@@ -615,9 +615,67 @@
                         </small>
                       </div>
 
+                      @if (isAboutTemplate) {
+                        <div class="col-12">
+                          <div class="border rounded p-3">
+                            <h6 class="mb-1">{{ 'about_highlights' | translate }}</h6>
+                            <p class="text-muted small mb-3">
+                              {{ 'about_highlights_help' | translate }}
+                            </p>
+
+                            <div class="row g-3">
+                              @for (
+                                feature of aboutFeatures[activeLocale];
+                                track $index;
+                                let featureIndex = $index
+                              ) {
+                                <div class="col-lg-4">
+                                  <div class="border rounded p-3 h-100">
+                                    <label class="form-label">
+                                      {{ 'about_highlight_title' | translate }} {{ featureIndex + 1 }}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      class="form-control mb-3"
+                                      [value]="feature.title"
+                                      (input)="
+                                        updateAboutFeature(
+                                          activeLocale,
+                                          featureIndex,
+                                          'title',
+                                          $any($event.target).value
+                                        )
+                                      "
+                                    />
+
+                                    <label class="form-label">
+                                      {{ 'about_highlight_description' | translate }}
+                                    </label>
+                                    <textarea
+                                      class="form-control"
+                                      rows="4"
+                                      [value]="feature.description"
+                                      (input)="
+                                        updateAboutFeature(
+                                          activeLocale,
+                                          featureIndex,
+                                          'description',
+                                          $any($event.target).value
+                                        )
+                                      "
+                                    ></textarea>
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      }
+
                       <!-- CONTENT -->
 
-                      <div class="col-12">
+                      @if (!isAboutTemplate) {
+                        <div class="col-12">
                         <label class="form-label">
                           {{ 'cms_page.content' | translate }}
                         </label>
@@ -653,7 +711,8 @@
                         <small class="text-muted d-block mt-1">
                           {{ 'cms_page.content_editor_help' | translate }}
                         </small>
-                      </div>
+                        </div>
+                      }
                     </div>
 
                     <div
@@ -1273,7 +1332,7 @@
                             <div
                               class="d-flex flex-wrap align-items-center gap-3 mt-3"
                             >
-                              @if (isGadgetHomeTemplate) {
+                              @if (isGadgetHomeTemplate || isAboutTemplate) {
                                 <div class="d-flex align-items-center gap-2">
                                   <label class="small text-muted mb-0"
                                     >Slot desain</label
@@ -1352,6 +1411,62 @@
                                 </button>
                               </div>
                             </div>
+
+                            @if (isGadgetHomeTemplate) {
+                              <div class="row g-3 mt-1">
+                                <div class="col-md-4">
+                                  <label class="form-label">
+                                    {{ 'home_banner_action' | translate }}
+                                  </label>
+                                  <select
+                                    class="form-select"
+                                    [value]="media.action_type"
+                                    (change)="
+                                      updateMediaActionType(
+                                        index,
+                                        $any($event.target).value
+                                      )
+                                    "
+                                  >
+                                    <option value="none">{{ 'home_banner_no_action' | translate }}</option>
+                                    <option value="internal">{{ 'home_banner_website_page' | translate }}</option>
+                                    <option value="product">{{ 'home_banner_product' | translate }}</option>
+                                    <option value="category">{{ 'home_banner_category' | translate }}</option>
+                                    <option value="external">{{ 'home_banner_external' | translate }}</option>
+                                  </select>
+                                </div>
+
+                                <div class="col-md-8">
+                                  <label class="form-label">
+                                    {{ 'home_banner_destination' | translate }}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    [disabled]="media.action_type === 'none'"
+                                    [value]="media.action_value"
+                                    [placeholder]="
+                                      media.action_type === 'external'
+                                        ? 'https://contoh.com/halaman'
+                                        : media.action_type === 'product'
+                                          ? 'slug-produk'
+                                          : media.action_type === 'category'
+                                            ? 'slug-kategori'
+                                            : '/tentang-matex'
+                                    "
+                                    (input)="
+                                      updateMediaActionValue(
+                                        index,
+                                        $any($event.target).value
+                                      )
+                                    "
+                                  />
+                                  <small class="text-muted d-block mt-1">
+                                    {{ 'home_banner_destination_help' | translate }}
+                                  </small>
+                                </div>
+                              </div>
+                            }
                           </div>
                         </div>
                       }

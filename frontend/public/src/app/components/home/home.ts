@@ -35,13 +35,20 @@ export class Home {
     distinctUntilChanged(),
     tap(() => this.themeOptionService.preloader.set(true)),
     switchMap((theme) =>
-      this.store.dispatch(new GetHomePage(theme)).pipe(
+      this.store
+        .dispatch(
+          new GetHomePage(
+            theme,
+            this.route.snapshot.routeConfig?.path === 'en' ? 'en-US' : 'id-ID',
+          ),
+        )
+        .pipe(
         map(() => ({
           theme,
           homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
         })),
         finalize(() => this.themeOptionService.preloader.set(false)),
-      ),
+        ),
     ),
   );
 

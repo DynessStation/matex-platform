@@ -58,6 +58,74 @@ type NormalizedAttachmentMedia = {
   isPublic?: 0 | 1;
 };
 
+type CmsPageAttachmentActionType =
+  | "none"
+  | "internal"
+  | "external"
+  | "product"
+  | "category";
+
+const CMS_PAGE_ATTACHMENT_ACTION_TYPES = new Set<CmsPageAttachmentActionType>([
+  "none",
+  "internal",
+  "external",
+  "product",
+  "category",
+]);
+
+const validateCmsPageAttachmentAction = (
+  actionType: CmsPageAttachmentActionType,
+  actionValue: string | null,
+): { code: string; message: string } | null => {
+  if (actionType === "none") return null;
+
+  if (!actionValue) {
+    return {
+      code: "CMS_PAGE_ATTACHMENT_ACTION_VALUE_REQUIRED",
+      message: "CMS page attachment action value is required",
+    };
+  }
+
+  if (actionValue.length > 1000) {
+    return {
+      code: "CMS_PAGE_ATTACHMENT_ACTION_VALUE_TOO_LONG",
+      message: "CMS page attachment action value is too long",
+    };
+  }
+
+  if (
+    actionType === "external" &&
+    !/^https:\/\/[^\s]+$/i.test(actionValue)
+  ) {
+    return {
+      code: "CMS_PAGE_ATTACHMENT_EXTERNAL_URL_INVALID",
+      message: "External banner action must use an HTTPS URL",
+    };
+  }
+
+  if (
+    actionType === "internal" &&
+    (!/^\/(?!\/)[^\s]*$/.test(actionValue) || actionValue.includes(".."))
+  ) {
+    return {
+      code: "CMS_PAGE_ATTACHMENT_INTERNAL_PATH_INVALID",
+      message: "Internal banner action must use a safe absolute website path",
+    };
+  }
+
+  if (
+    (actionType === "product" || actionType === "category") &&
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(actionValue)
+  ) {
+    return {
+      code: "CMS_PAGE_ATTACHMENT_SLUG_INVALID",
+      message: "Product and category banner actions must use a valid slug",
+    };
+  }
+
+  return null;
+};
+
 type AttachmentMediaRow = {
   id_attachment: number;
   mime_type: string;
@@ -2278,6 +2346,10 @@ app.post(
 
         isPublic: 0 | 1;
 
+        actionType: CmsPageAttachmentActionType;
+
+        actionValue: string | null;
+
         translations: {
           locale: string;
 
@@ -2294,6 +2366,7 @@ app.post(
         "meta",
         "og",
         "hero",
+        "about_content",
         ...CMS_GADGET_HOME_ATTACHMENT_ROLES,
       ]);
 
@@ -2365,6 +2438,35 @@ app.post(
           Number.isInteger(rawSortOrder) && rawSortOrder >= 0
             ? rawSortOrder
             : 0;
+
+        const actionType = String(item?.action_type ?? "none")
+          .trim()
+          .toLowerCase() as CmsPageAttachmentActionType;
+
+        if (!CMS_PAGE_ATTACHMENT_ACTION_TYPES.has(actionType)) {
+          return sendError(
+            res,
+            400,
+            "CMS_PAGE_ATTACHMENT_ACTION_TYPE_INVALID",
+            "Invalid CMS page attachment action type",
+          );
+        }
+
+        const actionValue = nullableString(item?.action_value);
+
+        const actionIssue = validateCmsPageAttachmentAction(
+          actionType,
+          actionValue,
+        );
+
+        if (actionIssue) {
+          return sendError(
+            res,
+            400,
+            actionIssue.code,
+            actionIssue.message,
+          );
+        }
 
         const mediaTranslations = item?.translations ?? [];
 
@@ -2455,6 +2557,10 @@ app.post(
           sortOrder,
 
           isPublic: normalizeFlag(item?.is_public, 1),
+
+          actionType,
+
+          actionValue: actionType === "none" ? null : actionValue,
 
           translations: normalizedMediaTranslations,
         });
@@ -2967,12 +3073,18 @@ app.post(
 
                 cms_page_attachment_is_public,
 
+                cms_page_attachment_action_type,
+
+                cms_page_attachment_action_value,
+
                 created,
 
                 updated
               )
               VALUES
               (
+                ?,
+                ?,
                 ?,
                 ?,
                 ?,
@@ -2994,6 +3106,10 @@ app.post(
             media.sortOrder,
 
             media.isPublic,
+
+            media.actionType,
+
+            media.actionValue,
           ],
         );
 
@@ -3119,6 +3235,10 @@ app.post(
             sort_order: item.sortOrder,
 
             is_public: item.isPublic,
+
+            action_type: item.actionType,
+
+            action_value: item.actionValue,
           })),
         },
 
@@ -4119,6 +4239,10 @@ app.put(
 
         isPublic: 0 | 1;
 
+        actionType: CmsPageAttachmentActionType;
+
+        actionValue: string | null;
+
         translationsProvided: boolean;
 
         translations: {
@@ -4160,6 +4284,7 @@ app.put(
           "meta",
           "og",
           "hero",
+          "about_content",
           ...CMS_GADGET_HOME_ATTACHMENT_ROLES,
         ]);
 
@@ -4247,6 +4372,39 @@ app.put(
             Number.isInteger(rawSortOrder) && rawSortOrder >= 0
               ? rawSortOrder
               : 0;
+
+          const actionType = String(item?.action_type ?? "none")
+            .trim()
+            .toLowerCase() as CmsPageAttachmentActionType;
+
+          if (!CMS_PAGE_ATTACHMENT_ACTION_TYPES.has(actionType)) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              "CMS_PAGE_ATTACHMENT_ACTION_TYPE_INVALID",
+              "Invalid CMS page attachment action type",
+            );
+          }
+
+          const actionValue = nullableString(item?.action_value);
+
+          const actionIssue = validateCmsPageAttachmentAction(
+            actionType,
+            actionValue,
+          );
+
+          if (actionIssue) {
+            await connection.rollback();
+
+            return sendError(
+              res,
+              400,
+              actionIssue.code,
+              actionIssue.message,
+            );
+          }
 
           const translationsProvided = item?.translations !== undefined;
 
@@ -4355,6 +4513,10 @@ app.put(
             sortOrder,
 
             isPublic: normalizeFlag(item?.is_public, 1),
+
+            actionType,
+
+            actionValue: actionType === "none" ? null : actionValue,
 
             translationsProvided,
 
@@ -4768,7 +4930,11 @@ app.put(
 
                 cms_page_attachment_sort_order,
 
-                cms_page_attachment_is_public
+                cms_page_attachment_is_public,
+
+                cms_page_attachment_action_type,
+
+                cms_page_attachment_action_value
 
               FROM cms_page_attachment
 
@@ -4899,6 +5065,13 @@ app.put(
                   sort_order: Number(item.cms_page_attachment_sort_order ?? 0),
 
                   is_public: Number(item.cms_page_attachment_is_public),
+
+                  action_type: String(
+                    item.cms_page_attachment_action_type ?? "none",
+                  ),
+
+                  action_value:
+                    item.cms_page_attachment_action_value ?? null,
 
                   translations: sortCmsPageAuditTranslations(
                     currentAttachmentTranslations
@@ -5263,13 +5436,24 @@ app.put(
 
             cms_page_attachment_is_public = ?,
 
+            cms_page_attachment_action_type = ?,
+
+            cms_page_attachment_action_value = ?,
+
             updated = NOW()
 
           WHERE id_cms_page_attachment = ?
 
             AND id_cms_page = ?
         `,
-              [media.sortOrder, media.isPublic, idRelation, idCmsPage],
+              [
+                media.sortOrder,
+                media.isPublic,
+                media.actionType,
+                media.actionValue,
+                idRelation,
+                idCmsPage,
+              ],
             );
           }
 
@@ -5291,12 +5475,18 @@ app.put(
 
               cms_page_attachment_is_public,
 
+              cms_page_attachment_action_type,
+
+              cms_page_attachment_action_value,
+
               created,
 
               updated
             )
             VALUES
             (
+              ?,
+              ?,
               ?,
               ?,
               ?,
@@ -5318,6 +5508,10 @@ app.put(
                 media.sortOrder,
 
                 media.isPublic,
+
+                media.actionType,
+
+                media.actionValue,
               ],
             );
 
@@ -5531,6 +5725,10 @@ app.put(
                   sort_order: item.sortOrder,
 
                   is_public: item.isPublic,
+
+                  action_type: item.actionType,
+
+                  action_value: item.actionValue,
 
                   translations: sortCmsPageAuditTranslations(
                     item.translations.map((translation) => ({
@@ -7182,6 +7380,10 @@ app.get(
 
               cpa.cms_page_attachment_is_public,
 
+              cpa.cms_page_attachment_action_type,
+
+              cpa.cms_page_attachment_action_value,
+
               cpa.created,
 
               cpa.updated,
@@ -7335,6 +7537,13 @@ app.get(
           cms_page_attachment_is_public: Number(
             item.cms_page_attachment_is_public,
           ),
+
+          cms_page_attachment_action_type: String(
+            item.cms_page_attachment_action_type ?? "none",
+          ),
+
+          cms_page_attachment_action_value:
+            item.cms_page_attachment_action_value ?? null,
 
           collection_name: item.collection_name,
 

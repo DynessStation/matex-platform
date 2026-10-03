@@ -7,24 +7,19 @@ import { PermissionGuard } from '../../core/guard/permission.guard';
 //==================================================
 
 export const cmsPageRoutes: Routes = [
-  //==================================================
-  //==== CREATE
-  //==================================================
-
   {
-    path: 'create',
+    path: 'fixed/:key',
 
     canActivate: [PermissionGuard],
 
     data: {
-      permission: 'cms_page.create',
-
-      titleKey: 'cms_page.create_title',
+      permission: 'cms_page.update',
+      titleKey: 'cms_page.edit_title',
     },
 
     loadComponent: () =>
-      import('./create-cms-page/create-cms-page').then(
-        (component) => component.CreateCmsPage,
+      import('./edit-cms-page/edit-cms-page').then(
+        (component) => component.EditCmsPage,
       ),
   },
 

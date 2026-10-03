@@ -78,7 +78,10 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
 
     const [attachments] = await pool.query<RowDataPacket[]>(
       `
-      SELECT c.cms_page_attachment_role AS role, a.storage_path, a.name,
+      SELECT c.cms_page_attachment_role AS role,
+        c.cms_page_attachment_action_type AS action_type,
+        c.cms_page_attachment_action_value AS action_value,
+        a.storage_path, a.name,
         i.cms_page_attachment_alt_text AS alt, i.cms_page_attachment_caption AS caption
       FROM cms_page_attachment c
       INNER JOIN attachment a ON a.id_attachment = c.id_attachment
@@ -90,7 +93,7 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         AND a.attachment_status = 1 AND a.deleted_at IS NULL
         AND a.mime_type IN ('image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif')
         AND c.cms_page_attachment_role IN (
-          'hero', 'gallery', 'og',
+          'hero', 'about_content', 'gallery', 'og',
           ${CMS_GADGET_HOME_ATTACHMENT_ROLES.map(() => "?").join(", ")}
         )
       ORDER BY c.cms_page_attachment_sort_order, c.id_cms_page_attachment
@@ -139,6 +142,8 @@ router.get("/api/public/cms-page/:locale/:slug", async (req, res) => {
         asset_url: buildAttachmentUrl(item.storage_path),
         alt: item.alt ?? item.name ?? "",
         caption: item.caption ?? "",
+        action_type: item.action_type ?? "none",
+        action_value: item.action_value ?? null,
       })),
     });
   } catch (error) {

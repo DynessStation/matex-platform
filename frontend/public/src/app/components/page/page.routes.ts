@@ -22,6 +22,7 @@ export const page: Routes = [
   {
     path: 'about-us',
     loadComponent: () => import('./about-us/about-us').then((m) => m.AboutUs),
+    data: { locale: 'en-US' },
   },
   {
     path: '400',
@@ -49,18 +50,31 @@ export const page: Routes = [
   },
   {
     path: 'tentang-matex',
-    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'id-ID', slug: 'tentang-kami' },
+    loadComponent: () => import('./about-us/about-us').then((m) => m.AboutUs),
+    data: { locale: 'id-ID' },
   },
   {
     path: 'en/about-matex',
-    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'en-US', slug: 'about-us' },
+    loadComponent: () => import('./about-us/about-us').then((m) => m.AboutUs),
+    data: { locale: 'en-US' },
   },
   {
-    path: 'en/:slug',
+    path: 'syarat-ketentuan',
     loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'en-US' },
+    data: { locale: 'id-ID', slug: 'syarat-ketentuan' },
+  },
+  {
+    path: 'en/terms-and-conditions',
+    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
+    data: { locale: 'en-US', slug: 'terms-and-conditions' },
+  },
+  {
+    path: 'karir',
+    loadComponent: () => import('./coming-soon/coming-soon').then((m) => m.ComingSoon),
+  },
+  {
+    path: 'en/careers',
+    loadComponent: () => import('./coming-soon/coming-soon').then((m) => m.ComingSoon),
   },
   {
     path: 'page/:slug',
@@ -68,10 +82,5 @@ export const page: Routes = [
     resolve: {
       data: PageResolver,
     },
-  },
-  {
-    path: ':slug',
-    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'id-ID' },
   },
 ];

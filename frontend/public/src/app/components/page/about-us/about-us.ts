@@ -1,8 +1,20 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, inject, PLATFORM_ID, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  DOCUMENT,
+  ElementRef,
+  Inject,
+  inject,
+  PLATFORM_ID,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { catchError, combineLatest, Observable, of } from 'rxjs';
 import SwiperCore, { Swiper } from 'swiper';
 import { EffectCards, Navigation } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
@@ -12,6 +24,10 @@ import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IAboutUs, Option } from '../../../shared/interface/theme-option.interface';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
+import { CmsPageService } from '../../../shared/services/cms-page.service';
+import { PublicPageContextService } from '../../../shared/services/public-page-context.service';
+import { IPublicCmsPage } from '../../../shared/interface/cms-page.interface';
+import { environment } from '../../../../environments/environment';
 
 SwiperCore.use([Navigation, EffectCards]);
 
@@ -22,6 +38,22 @@ SwiperCore.use([Navigation, EffectCards]);
   styleUrl: './about-us.scss',
 })
 export class AboutUs {
+  private readonly route = inject(ActivatedRoute);
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly cmsPageService = inject(CmsPageService);
+
+  private readonly publicPageContext = inject(PublicPageContextService);
+
+  private readonly title = inject(Title);
+
+  private readonly meta = inject(Meta);
+
+  private readonly document = inject(DOCUMENT);
+
+  private readonly originalLang = this.document.documentElement.lang;
+
   themeOptions$: Observable<Option> = inject(Store).select(
     ThemeOptionState.themeOptions,
   ) as Observable<Option>;
@@ -68,15 +100,150 @@ export class AboutUs {
 
   public aboutUs?: IAboutUs;
 
-  public breadcrumb: breadcrumb = {
-    title: 'About us',
-    items: [{ label: 'About us', active: true }],
-  };
+  public breadcrumb: breadcrumb = this.createBreadcrumb();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.themeOptions$.subscribe((option) => {
-      this.aboutUs = option?.about_us;
+    const locale = this.route.snapshot.data['locale'] === 'en-US' ? 'en-US' : 'id-ID';
+    const slug = locale === 'en-US' ? 'about-us' : 'tentang-kami';
+
+    combineLatest([
+      this.themeOptions$,
+      this.cmsPageService.getPage(locale, slug).pipe(catchError(() => of(null))),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([option, page]) => {
+        const template = option?.about_us;
+        if (!template) return;
+
+        const contentImage = page?.attachments.find(
+          (attachment) =>
+            attachment.role === 'about_content' || attachment.role === 'hero',
+        );
+
+        this.aboutUs = {
+          ...template,
+          about: {
+            ...template.about,
+            title: page?.title || this.breadcrumb.title,
+            description: page?.excerpt || '',
+            futures: this.readAboutFeatures(page?.content_json),
+            content_bg_image_url:
+              contentImage?.asset_url || template.about.content_bg_image_url,
+          },
+          team: {
+            ...template.team,
+            status: false,
+            members: [],
+          },
+        };
+
+        if (page) {
+          this.publicPageContext.setPage(page);
+          this.applySeo(page);
+        }
+      });
+
+    this.destroyRef.onDestroy(() => {
+      this.publicPageContext.clearPage();
+      this.document.head
+        .querySelectorAll('link[data-about-seo]')
+        .forEach((link) => link.remove());
+      this.document.documentElement.lang = this.originalLang;
     });
+  }
+
+  private applySeo(page: IPublicCmsPage): void {
+    this.document.documentElement.lang = page.locale;
+    this.title.setTitle(page.seo.title);
+
+    for (const name of ['description', 'keywords', 'robots'] as const) {
+      this.meta.updateTag({ name, content: page.seo[name] });
+    }
+
+    const site = environment.cmsSiteURL.replace(/\/$/, '');
+    const fallbackUrl = `${site}${this.publicPageContext.pathFor(
+      page.locale,
+      page.slug,
+      page.key,
+    )}`;
+    let canonical = fallbackUrl;
+
+    try {
+      const candidate = new URL(page.seo.canonical_url || fallbackUrl);
+      if (candidate.protocol === 'http:' || candidate.protocol === 'https:') {
+        canonical = candidate.href;
+      }
+    } catch {
+      /* Invalid custom canonical falls back to the fixed public route. */
+    }
+
+    this.addSeoLink('canonical', canonical);
+    for (const translation of page.translations) {
+      this.addSeoLink(
+        'alternate',
+        `${site}${this.publicPageContext.pathFor(
+          translation.locale,
+          translation.slug,
+          page.key,
+        )}`,
+        translation.locale,
+      );
+    }
+
+    const image =
+      page.attachments.find((item) => item.role === 'og') ||
+      page.attachments.find((item) => item.role === 'about_content') ||
+      page.attachments.find((item) => item.role === 'hero');
+
+    for (const [property, content] of Object.entries({
+      'og:type': 'website',
+      'og:url': canonical,
+      'og:title': page.seo.og_title,
+      'og:description': page.seo.og_description,
+      'og:locale': page.locale.replace('-', '_'),
+      'og:image': image?.asset_url || '',
+    })) {
+      this.meta.updateTag({ property, content });
+    }
+  }
+
+  private addSeoLink(rel: string, href: string, locale?: string): void {
+    const link = this.document.createElement('link');
+    link.setAttribute('data-about-seo', '');
+    link.rel = rel;
+    link.href = href;
+    if (locale) link.hreflang = locale;
+    this.document.head.appendChild(link);
+  }
+
+  private readAboutFeatures(content: unknown): IAboutUs['about']['futures'] {
+    if (!content || typeof content !== 'object' || Array.isArray(content)) return [];
+
+    const features = (content as Record<string, unknown>)['features'];
+    if (!Array.isArray(features)) return [];
+
+    return features
+      .filter(
+        (item): item is Record<string, unknown> =>
+          Boolean(item) && typeof item === 'object' && !Array.isArray(item),
+      )
+      .map((item) => ({
+        icon: typeof item['icon'] === 'string' ? item['icon'] : '',
+        title: typeof item['title'] === 'string' ? item['title'] : '',
+        description: typeof item['description'] === 'string' ? item['description'] : '',
+      }))
+      .filter((item) => item.title && item.description)
+      .slice(0, 6);
+  }
+
+  private createBreadcrumb(): breadcrumb {
+    const english = this.route.snapshot.data['locale'] === 'en-US';
+    const title = english ? 'About MATEX' : 'Tentang MATEX';
+
+    return {
+      title,
+      items: [{ label: title, active: true }],
+    };
   }
 
   ngAfterViewInit() {

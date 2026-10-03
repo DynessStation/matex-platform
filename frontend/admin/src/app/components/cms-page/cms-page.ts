@@ -52,8 +52,6 @@ import { AuthState } from '../../shared/store/state/auth.state';
 
 import { CmsPageState } from '../../shared/store/state/cms-page.state';
 
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
-
 //==================================================
 //==== COMPONENT
 //==================================================
@@ -69,7 +67,6 @@ import { HasPermissionDirective } from '../../shared/directive/has-permission.di
     Select2Module,
     PageWrapper,
     Table,
-    HasPermissionDirective,
   ],
 
   templateUrl: './cms-page.html',

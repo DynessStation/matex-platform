@@ -29,6 +29,8 @@ import {
 
 import { CmsPageState } from '../../../shared/store/state/cms-page.state';
 
+import { CmsPageService } from '../../../shared/services/cms-page.service';
+
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 
 import { FormCmsPage } from '../form-cms-page/form-cms-page';
@@ -64,11 +66,15 @@ export class EditCmsPage {
 
   private router = inject(Router);
 
+  private cmsPageService = inject(CmsPageService);
+
   //==================================================
   //==== STATE
   //==================================================
 
   public id = '';
+
+  public fixedKey = '';
 
   public detailErrorStatus: number | null = null;
 
@@ -78,6 +84,17 @@ export class EditCmsPage {
 
   public saving = false;
 
+  get pageTitle(): string {
+    const titles: Record<string, string> = {
+      home: 'website_home',
+      about: 'website_about',
+      terms: 'terms_conditions',
+      career: 'career',
+    };
+
+    return titles[this.fixedKey] ?? 'cms_page.edit_title';
+  }
+
   //==================================================
   //==== INIT
   //==================================================
@@ -86,6 +103,12 @@ export class EditCmsPage {
     this.route.paramMap
       .pipe(
         switchMap((params) => {
+          this.fixedKey = params.get('key')?.trim() ?? '';
+
+          if (this.fixedKey) {
+            return this.loadFixedPage(this.fixedKey);
+          }
+
           this.id = params.get('id')?.trim() ?? '';
 
           this.detailErrorStatus = null;
@@ -123,7 +146,11 @@ export class EditCmsPage {
           const savedId =
             this.store.selectSnapshot(CmsPageState.lastSavedId) || this.id;
 
-          void this.router.navigate(['/cms-page', savedId]);
+          void this.router.navigate(
+            this.fixedKey
+              ? ['/cms-page/fixed', this.fixedKey]
+              : ['/cms-page', savedId],
+          );
         },
       });
   }
@@ -152,11 +179,42 @@ export class EditCmsPage {
     );
   }
 
+  private loadFixedPage(key: string): Observable<unknown> {
+    this.detailErrorStatus = null;
+
+    return this.cmsPageService
+      .getCmsPages({ search: key, limit: 100, locale: 'id-ID' })
+      .pipe(
+        switchMap((result) => {
+          const page = result.data.find((item) => item.cms_page_key === key);
+
+          if (!page) {
+            this.detailErrorStatus = 404;
+            return EMPTY;
+          }
+
+          this.id = page.id_cms_page;
+          return this.loadDetail(this.id);
+        }),
+        catchError((error) => {
+          this.detailErrorStatus = resolveDetailErrorStatus(error);
+          return EMPTY;
+        }),
+      );
+  }
+
   //==================================================
   //==== RETRY
   //==================================================
 
   retryDetail(): void {
+    if (this.fixedKey) {
+      this.loadFixedPage(this.fixedKey)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe();
+      return;
+    }
+
     if (!this.id) {
       return;
     }

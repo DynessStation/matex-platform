@@ -153,19 +153,6 @@ export const menu: ISidebar[] = [
     children: [
       {
         parent_id: 4,
-
-        title: 'pages',
-
-        path: '/cms-page',
-
-        type: 'link',
-
-        level: 2,
-
-        permission: 'cms_page.view',
-      },
-      {
-        parent_id: 4,
         title: 'website_navigation',
         path: '/menu',
         type: 'link',
@@ -174,11 +161,19 @@ export const menu: ISidebar[] = [
       },
       {
         parent_id: 4,
-        title: 'contact_settings',
-        path: '/public-contact',
+        title: 'website_home',
+        path: '/cms-page/fixed/home',
         type: 'link',
         level: 2,
-        permission: 'public_contact.view',
+        permission: 'cms_page.update',
+      },
+      {
+        parent_id: 4,
+        title: 'website_about',
+        path: '/cms-page/fixed/about',
+        type: 'link',
+        level: 2,
+        permission: 'cms_page.update',
       },
       {
         parent_id: 4,
@@ -190,19 +185,11 @@ export const menu: ISidebar[] = [
       },
       {
         parent_id: 4,
-        title: 'product_categories',
-        path: '/category',
+        title: 'contact_settings',
+        path: '/public-contact',
         type: 'link',
         level: 2,
-        permission: 'product_category.view',
-      },
-      {
-        parent_id: 4,
-        title: 'products',
-        path: '/product',
-        type: 'link',
-        level: 2,
-        permission: 'product.view',
+        permission: 'public_contact.view',
       },
       {
         parent_id: 4,
@@ -211,6 +198,49 @@ export const menu: ISidebar[] = [
         type: 'link',
         level: 2,
         permission: 'faq.view',
+      },
+      {
+        parent_id: 4,
+        title: 'terms_conditions',
+        path: '/cms-page/fixed/terms',
+        type: 'link',
+        level: 2,
+        permission: 'cms_page.update',
+      },
+      {
+        parent_id: 4,
+        title: 'career_soon',
+        path: '/cms-page/fixed/career',
+        type: 'link',
+        level: 2,
+        permission: 'cms_page.update',
+      },
+    ],
+  },
+
+  {
+    id: 5,
+    title: 'catalog',
+    active: false,
+    icon: 'ri-store-2-line',
+    type: 'sub',
+    level: 1,
+    children: [
+      {
+        parent_id: 5,
+        title: 'product_categories',
+        path: '/category',
+        type: 'link',
+        level: 2,
+        permission: 'product_category.view',
+      },
+      {
+        parent_id: 5,
+        title: 'products',
+        path: '/product',
+        type: 'link',
+        level: 2,
+        permission: 'product.view',
       },
     ],
   },

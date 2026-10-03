@@ -8,23 +8,30 @@
         <p>{{ aboutUs?.about?.description }}</p>
       </div>
       <div>
-        <img [src]="aboutUs?.about?.content_bg_image_url" alt="contact us" class="img-fluid" />
+        <img
+          [src]="aboutUs?.about?.content_bg_image_url"
+          [alt]="breadcrumb.title"
+          class="img-fluid"
+        />
       </div>
     </div>
   </div>
-  <div class="business-agenda">
-    <div class="row g-sm-4 g-3">
-      @for (feature of aboutUs?.about?.futures; track feature) {
-        <div class="col-xl-4 col-md-6">
-          <h4>{{ feature.title }}</h4>
-          <p>{{ feature.description }}</p>
-        </div>
-      }
+  @if (aboutUs?.about?.futures?.length) {
+    <div class="business-agenda">
+      <div class="row g-sm-4 g-3">
+        @for (feature of aboutUs?.about?.futures; track feature) {
+          <div class="col-xl-4 col-md-6">
+            <h4>{{ feature.title }}</h4>
+            <p>{{ feature.description }}</p>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
 </div>
 
-<section class="team-section section-t-space section-b-space">
+@if (aboutUs?.team?.status && aboutUs?.team?.members?.length) {
+  <section class="team-section section-t-space section-b-space">
   <div class="custom-container">
     <div class="testimonial-title text-center">
       <h2>{{ aboutUs?.team?.title }}</h2>
@@ -74,9 +81,11 @@
       </div>
     </div>
   </div>
-</section>
+  </section>
+}
 
-<section class="testimonial-section overflow-hidden">
+@if (aboutUs?.testimonial?.status && aboutUs?.testimonial?.reviews?.length) {
+  <section class="testimonial-section overflow-hidden">
   <div class="custom-container">
     <div class="row g-sm-4 g-3">
       <div class="col-lg-4">
@@ -118,7 +127,8 @@
       </div>
     </div>
   </div>
-</section>
+  </section>
+}
 
 <section class="section-block-space newsletter-section">
   <div class="custom-container">

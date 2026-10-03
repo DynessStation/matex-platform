@@ -17,5 +17,12 @@ export interface IPublicCmsPage {
     og_description: string;
   };
   translations: { locale: string; slug: string }[];
-  attachments: { role: string; asset_url: string; alt: string; caption: string }[];
+  attachments: {
+    role: string;
+    asset_url: string;
+    alt: string;
+    caption: string;
+    action_type: 'none' | 'internal' | 'external' | 'product' | 'category';
+    action_value: string | null;
+  }[];
 }
