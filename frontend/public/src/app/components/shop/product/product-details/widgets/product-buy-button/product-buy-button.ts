@@ -97,7 +97,17 @@ export class ProductBuyButton {
       other: this.isEnglish ? 'Other marketplace' : 'Marketplace lainnya',
     };
 
-    return labels[marketplace.provider] ?? marketplace.provider;
+    return labels[this.marketplaceProviderKey(marketplace.provider)] ?? marketplace.provider;
+  }
+
+  marketplaceLogo(provider: string): string | null {
+    const logos: Record<string, string> = {
+      shopee: 'assets/images/ecommerces/shopee.svg',
+      tokopedia: 'assets/images/ecommerces/tokopedia.svg',
+      'tiktok-shop': 'assets/images/ecommerces/tiktok_shop.svg',
+    };
+
+    return logos[this.marketplaceProviderKey(provider)] ?? null;
   }
 
   marketplaceLabel(marketplace: ProductMarketplace): string | null {
@@ -106,7 +116,22 @@ export class ProductBuyButton {
   }
 
   marketplaceClass(provider: string): string {
-    return `marketplace-${provider.replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'other'}`;
+    return `marketplace-${this.marketplaceProviderKey(provider)}`;
+  }
+
+  private marketplaceProviderKey(provider: string): string {
+    const key = provider
+      .trim()
+      .toLowerCase()
+      .replace(/[\s_]+/g, '-');
+    const aliases: Record<string, string> = {
+      tokped: 'tokopedia',
+      tiktok: 'tiktok-shop',
+      tiktokshop: 'tiktok-shop',
+    };
+
+    const normalized = aliases[key] ?? key.replace(/[^a-z0-9-]/g, '');
+    return normalized || 'other';
   }
 
   wholesalePriceCal() {

@@ -139,7 +139,11 @@
           rel="noopener noreferrer"
         >
           <span class="marketplace-icon" aria-hidden="true">
-            <i class="ri-store-2-line"></i>
+            @if (marketplaceLogo(marketplace.provider); as logo) {
+              <img class="img-fluid" [src]="logo" alt="" width="28" height="28" decoding="async" />
+            } @else {
+              <i class="ri-store-2-line"></i>
+            }
           </span>
           <span class="marketplace-copy">
             <span class="marketplace-name">
