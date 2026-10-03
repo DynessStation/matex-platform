@@ -84,3 +84,12 @@
 @if (product()?.is_sale_enable) {
   <app-timer [title]="'Sales Ends In'" [type]="'timer-five'"> </app-timer>
 }
+
+@if (mobilePurchase()) {
+  <div class="d-lg-none">
+    <app-product-buy-button
+      [product]="product()"
+      [selectedVariation]="selectedVariation"
+    ></app-product-buy-button>
+  </div>
+}

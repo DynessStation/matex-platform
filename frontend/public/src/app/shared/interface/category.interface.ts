@@ -13,6 +13,7 @@ export interface Category {
   key?: string;
   name: string;
   slug: string;
+  localized_slugs?: Record<string, string>;
   description?: string;
   category_image?: Attachment | null;
   category_icon?: Attachment | null;

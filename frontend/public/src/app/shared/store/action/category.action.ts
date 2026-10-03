@@ -32,5 +32,8 @@ export class GetSearchByCategory {
 
 export class GetCategoryBySlug {
   static readonly type = '[Category] Get Category By Slug';
-  constructor(public slug: string) {}
+  constructor(
+    public slug: string,
+    public locale: 'id-ID' | 'en-US' = 'id-ID',
+  ) {}
 }

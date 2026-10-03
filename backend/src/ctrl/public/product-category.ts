@@ -41,6 +41,7 @@ const dto = (row: any) => ({
   key: row.product_category_key,
   name: row.product_category_name,
   slug: row.product_category_slug,
+  localized_slugs: row.localized_slugs ?? {},
   description: row.product_category_description ?? "",
   type: "product",
   status: true,
@@ -65,6 +66,25 @@ const tree = (items: any[]) => {
   }
   return roots;
 };
+const withLocalizedSlugs = async (rows: RowDataPacket[], company: number) => {
+  if (!rows.length) return [];
+  const ids = rows.map((row) => Number(row.id_product_category));
+  const marks = ids.map(() => "?").join(",");
+  const [translations] = await pool.query<RowDataPacket[]>(
+    `SELECT id_product_category,product_category_locale,product_category_slug FROM product_category_i18n WHERE id_product_category IN (${marks}) AND id_master_comp=? AND product_category_i18n_status=1`,
+    [...ids, company],
+  );
+  return rows.map((row) =>
+    dto({
+      ...row,
+      localized_slugs: Object.fromEntries(
+        translations
+          .filter((translation) => Number(translation.id_product_category) === Number(row.id_product_category))
+          .map((translation) => [translation.product_category_locale, translation.product_category_slug]),
+      ),
+    }),
+  );
+};
 
 router.get("/api/public/product-categories/:locale", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
@@ -75,7 +95,7 @@ router.get("/api/public/product-categories/:locale", async (req, res) => {
       `${select} WHERE ${where} ORDER BY c.product_category_sort_order,i.product_category_name`,
       [scope.company, scope.locale],
     );
-    const data = rows.map(dto);
+    const data = await withLocalizedSlugs(rows, scope.company);
     return sendSuccess(res, 200, "PRODUCT_CATEGORIES_FOUND", "Product categories loaded", { data: tree(data), total: data.length });
   } catch (error) {
     console.error("[Public product category] list failed", error);
@@ -93,7 +113,8 @@ router.get("/api/public/product-categories/:locale/:slug", async (req, res) => {
       [scope.company, scope.locale, req.params.slug],
     );
     if (!rows.length) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
-    return sendSuccess(res, 200, "PRODUCT_CATEGORY_FOUND", "Product category loaded", dto(rows[0]));
+    const [category] = await withLocalizedSlugs(rows, scope.company);
+    return sendSuccess(res, 200, "PRODUCT_CATEGORY_FOUND", "Product category loaded", category);
   } catch (error) {
     console.error("[Public product category] detail failed", error);
     return sendError(res, 500, "PRODUCT_CATEGORY_UNAVAILABLE", "Unable to load product category");

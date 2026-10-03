@@ -15,6 +15,7 @@ export interface Product {
   id: number;
   name: string;
   slug: string;
+  localized_slugs?: Record<string, string>;
   sku?: string;
   price: number;
   sale_price: number;

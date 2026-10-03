@@ -23,9 +23,15 @@ export class GlobalErrorHandlerInterceptor implements HttpInterceptor {
 
         // You can perform additional error handling tasks here,
         // such as logging the error, displaying a notification, etc.
-        const errorMessage = this.errorService.getClientErrorMessage(error.error);
-        this.logger.logError(errorMessage);
-        this.notifier.showError(errorMessage);
+        const expectedPublicNotFound =
+          error.status === 404 &&
+          /\/api\/public\/(products|product-categories|articles)\//.test(request.url);
+
+        if (!expectedPublicNotFound) {
+          const errorMessage = this.errorService.getClientErrorMessage(error);
+          this.logger.logError(errorMessage);
+          this.notifier.showError(errorMessage);
+        }
 
         // Rethrow the error to propagate it down the error handling chain
         return throwError(() => error);

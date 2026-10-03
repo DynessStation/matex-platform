@@ -24,6 +24,7 @@ import { CartState } from '../../../../../../shared/store/state/cart.state';
 import { SettingState } from '../../../../../../shared/store/state/setting.state';
 import { ThemeOptionState } from '../../../../../../shared/store/state/theme-option.state';
 import { ProductWholesales } from '../product-wholesales/product-wholesales';
+import { ProductBuyButton } from '../product-buy-button/product-buy-button';
 
 @Component({
   selector: 'app-product-content',
@@ -35,6 +36,7 @@ import { ProductWholesales } from '../product-wholesales/product-wholesales';
     Wishlist,
     Compare,
     TranslateModule,
+    ProductBuyButton,
   ],
   templateUrl: './product-content.html',
   styleUrl: './product-content.scss',
@@ -51,6 +53,7 @@ export class ProductContent {
   product = input<Product | null>(null);
   option = input<Option | null>();
   variant_hover = input<boolean>(true);
+  mobilePurchase = input<boolean>(true);
 
   selectedVariant = output<Variation>();
 

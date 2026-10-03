@@ -30,6 +30,13 @@
               </button>
             </div>
           </li>
+        } @empty {
+          <li class="empty-cart d-flex h-100 flex-column align-items-center justify-content-center">
+            <svg class="img-fluid">
+              <use xlink:href="assets/images/inner-page/empty-cart.svg#emptyCart"></use>
+            </svg>
+            <h4>{{ isEnglish ? 'Your wishlist is empty.' : 'Favorit Anda masih kosong.' }}</h4>
+          </li>
         }
       </ul>
       <div class="total-price-box">

@@ -16,7 +16,8 @@ export const CategoryResolver: ResolveFn<boolean> = async (route) => {
   }
 
   try {
-    await firstValueFrom(store.dispatch(new GetCategoryBySlug(slug)));
+    const locale = route.routeConfig?.path?.startsWith('en/') ? 'en-US' : 'id-ID';
+    await firstValueFrom(store.dispatch(new GetCategoryBySlug(slug, locale)));
     return true;
   } catch (e) {
     return false;

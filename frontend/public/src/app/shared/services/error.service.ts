@@ -7,12 +7,14 @@ import { Injectable } from '@angular/core';
 export class ErrorService {
   constructor() {}
 
-  getClientErrorMessage(error: Error): string {
-    return navigator.onLine
-      ? error.message
-        ? error.message
-        : 'Something Went Wrong'
-      : 'No Internet Connection';
+  getClientErrorMessage(error: HttpErrorResponse): string {
+    if (error.status === 0) {
+      return navigator.onLine ? 'Service is temporarily unavailable' : 'No Internet Connection';
+    }
+
+    return typeof error.error?.message === 'string'
+      ? error.error.message
+      : error.message || 'Something Went Wrong';
   }
 
   getServerErrorMessage(error: HttpErrorResponse): string {

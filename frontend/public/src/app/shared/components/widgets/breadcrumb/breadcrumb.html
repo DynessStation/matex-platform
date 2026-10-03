@@ -10,7 +10,7 @@
                 <i class="ri-home-3-fill"></i>
               </a>
             </li>
-            @for (item of breadcrumb()?.items; track item) {
+            @for (item of breadcrumb()?.items; track item.label) {
               <li class="breadcrumb-item" [class.active]="item?.active">
                 {{ item?.label! | titleCase }}
               </li>

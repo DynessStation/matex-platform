@@ -12,6 +12,7 @@ export interface IBlog {
   id: number;
   title: string;
   slug: string;
+  localized_slugs?: Record<string, string>;
   description: string;
   content: string;
   status: boolean;

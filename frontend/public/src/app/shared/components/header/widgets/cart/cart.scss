@@ -21,6 +21,14 @@
   }
 }
 
+.product-box-list {
+  overflow-x: hidden !important;
+
+  .empty-cart {
+    width: 100%;
+  }
+}
+
 .total-price-box {
   .free,
   .tax-text {

@@ -20,10 +20,10 @@ export class CategoryService {
       )
       .pipe(map((response) => response.data ?? { data: [], total: 0 }));
   }
-  getCategoryBySlug(slug: string): Observable<Category> {
+  getCategoryBySlug(slug: string, locale: 'id-ID' | 'en-US' = this.locale()): Observable<Category> {
     return this.http
       .get<PublicApiResponse<Category>>(
-        `${environment.cmsApiURL}/product-categories/${this.locale()}/${encodeURIComponent(slug)}`,
+        `${environment.cmsApiURL}/product-categories/${locale}/${encodeURIComponent(slug)}`,
       )
       .pipe(map((response) => response.data!));
   }

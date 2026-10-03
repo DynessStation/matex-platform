@@ -236,7 +236,7 @@ export class CategoryState {
 
   @Action(GetCategoryBySlug)
   getCategoryBySlug(ctx: StateContext<CategoryStateModel>, action: GetCategoryBySlug) {
-    return this.categoryService.getCategoryBySlug(action.slug).pipe(
+    return this.categoryService.getCategoryBySlug(action.slug, action.locale).pipe(
       tap({
         next: (result) => {
           const state = ctx.getState();
