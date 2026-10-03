@@ -50,6 +50,18 @@ const publicCmsPath = (
     return locale === "en-US" ? "/en" : "/";
   }
 
+  const fixedRoutes: Record<string, { id: string; en: string }> = {
+    about: { id: "/tentang-matex", en: "/en/about-matex" },
+    terms: { id: "/syarat-ketentuan", en: "/en/terms-and-conditions" },
+    career: { id: "/karir", en: "/en/careers" },
+  };
+
+  if (fixedRoutes[pageKey]) {
+    return locale === "en-US"
+      ? fixedRoutes[pageKey].en
+      : fixedRoutes[pageKey].id;
+  }
+
   const encodedSlug = encodeURIComponent(slug);
 
   return locale === "en-US" ? `/en/${encodedSlug}` : `/${encodedSlug}`;

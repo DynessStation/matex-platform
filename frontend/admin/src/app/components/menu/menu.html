@@ -1,21 +1,26 @@
 @if (loading) {
-  <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+  <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'website_navigation' | translate">
     <div class="d-flex justify-content-center py-5" aria-live="polite">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden"> Loading navigation </span>
+        <span class="visually-hidden">{{ 'loading' | translate }}</span>
       </div>
     </div>
   </app-page-wrapper>
 } @else {
   @if (primaryNavigation$ | async; as primary) {
-    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'website_navigation' | translate">
       <div class="d-flex flex-wrap align-items-center gap-2">
         <span
           class="badge"
           [class.bg-success]="primary.status === 1"
           [class.bg-warning]="primary.status === 0"
         >
-          {{ primary.status === 1 ? 'Active' : 'Inactive' }}
+          {{
+            (primary.status === 1
+              ? 'navigation_admin.status_active'
+              : 'navigation_admin.status_inactive'
+            ) | translate
+          }}
         </span>
 
         <ng-container *hasPermission="'web_navigation.publish'">
@@ -34,59 +39,23 @@
             "
             (click)="toggleNavigationStatus(primary)"
           >
-            {{ primary.status === 1 ? 'Deactivate' : 'Activate' }}
+            {{
+              (primary.status === 1
+                ? 'navigation_admin.deactivate'
+                : 'navigation_admin.activate'
+              ) | translate
+            }}
           </app-button>
         </ng-container>
       </div>
 
-      <div class="row g-3 mt-3">
-        <div class="col-md-3 col-sm-6">
-          <div class="border rounded p-3 h-100">
-            <small class="text-content d-block"> Key </small>
-
-            <strong>{{ primary.key }}</strong>
-          </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-          <div class="border rounded p-3 h-100">
-            <small class="text-content d-block"> Location </small>
-
-            <strong>
-              {{ primary.location }}
-            </strong>
-          </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-          <div class="border rounded p-3 h-100">
-            <small class="text-content d-block"> Default language </small>
-
-            <strong>
-              {{ primary.default_locale }}
-            </strong>
-          </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-          <div class="border rounded p-3 h-100">
-            <small class="text-content d-block"> Menu items </small>
-
-            <strong>
-              {{ primary.item_count }}
-            </strong>
-          </div>
-        </div>
-      </div>
-
       @if (primary.status === 0) {
         <div class="alert alert-warning mt-3 mb-0" role="status">
-          Navigation belum tampil di website publik. Pastikan tujuan setiap item
-          sudah benar sebelum diaktifkan.
+          {{ 'navigation_admin.navigation_hidden' | translate }}
         </div>
       } @else {
         <div class="alert alert-success mt-3 mb-0" role="status">
-          Navigation aktif dan dapat dibaca oleh website publik.
+          {{ 'navigation_admin.navigation_live' | translate }}
         </div>
       }
 
@@ -94,20 +63,12 @@
         <div class="d-flex gap-3 align-items-start">
           <i class="ri-information-line fs-4 text-primary"></i>
           <div>
-            <strong>Struktur header publik</strong>
+            <strong>{{ 'navigation_admin.summary_title' | translate }}</strong>
             <p class="text-content mb-2">
-              Header menampilkan urutan Beranda, Tentang MATEX, Kategori,
-              Produk, Artikel, dan Hubungi. Gunakan key
-              <code>home</code>, <code>about</code>, <code>categories</code>,
-              <code>products</code>, <code>articles</code>, dan
-              <code>contact</code> untuk mengatur tujuan tautan Indonesia dan
-              English. Label header mengikuti bahasa situs agar tetap
-              konsisten.
+              {{ 'navigation_admin.summary_help' | translate }}
             </p>
             <small class="text-content">
-              Isi dropdown Kategori dan Produk diambil otomatis dari data
-              katalog yang sudah dipublikasikan, sehingga tidak perlu dibuat
-              ulang sebagai anak menu manual.
+              {{ 'navigation_admin.catalog_help' | translate }}
             </small>
           </div>
         </div>
@@ -117,7 +78,12 @@
         <div class="row g-4 mt-3">
           <div class="col-xl-4">
             <div class="border rounded p-3 h-100">
-              <h5 class="mb-3">Menu Structure</h5>
+              <h5 class="mb-2">
+                {{ 'navigation_admin.structure_title' | translate }}
+              </h5>
+              <p class="text-content mb-3">
+                {{ 'navigation_admin.structure_help' | translate }}
+              </p>
 
               @if (navigationTree$ | async; as menuTree) {
                 @if (menuTree.length) {
@@ -127,13 +93,11 @@
                       editingItem?.id_web_navigation_item ?? null
                     "
                     (editItem)="editMenuItem($event)"
-                    (deleteItem)="deleteMenuItem($event)"
                     (reorderItems)="reorderMenuItems($event)"
                   />
                 } @else {
                   <p class="text-content mb-0">
-                    Belum ada menu item. Tambahkan item pertama melalui form di
-                    sebelah kanan.
+                    {{ 'navigation_admin.structure_empty' | translate }}
                   </p>
                 }
               }
@@ -143,10 +107,15 @@
           <div class="col-xl-8">
             <div class="border rounded p-3">
               <h5 class="mb-4">
-                {{ editingItem ? 'Edit Menu Item' : 'Add Menu Item' }}
+                {{
+                  (editingItem
+                    ? 'navigation_admin.form_edit_title'
+                    : 'navigation_admin.form_add_title'
+                  ) | translate
+                }}
               </h5>
 
-              <app-form-menu
+              <app-fixed-menu-form
                 [navigation]="navigation"
                 [item]="editingItem"
                 (completed)="finishEditing()"
@@ -158,7 +127,7 @@
       }
     </app-page-wrapper>
   } @else {
-    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'Website Navigation'">
+    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'website_navigation' | translate">
       <div class="text-center py-5">
         <div
           class="mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle bg-light"
@@ -167,12 +136,10 @@
           <i class="ri-menu-2-line fs-2 text-primary"></i>
         </div>
 
-        <h4>Primary Navigation belum dibuat</h4>
+        <h4>{{ 'navigation_admin.initialize_title' | translate }}</h4>
 
         <p class="text-content mx-auto mb-0" style="max-width: 620px">
-          Primary Navigation menjadi sumber menu header website publik. Data
-          akan tetap terpisah berdasarkan company dan dapat diterjemahkan ke
-          Indonesia serta English.
+          {{ 'navigation_admin.initialize_help' | translate }}
         </p>
 
         <ng-container *hasPermission="'web_navigation.create'">
@@ -183,7 +150,7 @@
             [disabled]="creating"
             (click)="initializePrimaryNavigation()"
           >
-            Initialize Primary Navigation
+            {{ 'navigation_admin.initialize_button' | translate }}
           </app-button>
         </ng-container>
       </div>

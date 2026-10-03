@@ -6,7 +6,7 @@ import { catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
 
 import { Category } from '../../../../interface/category.interface';
 import { Product } from '../../../../interface/product.interface';
-import { IPublicNavigationItem } from '../../../../interface/public-navigation.interface';
+import { IPublicNavigation } from '../../../../interface/public-navigation.interface';
 import { CurrencySymbolPipe } from '../../../../pipe/currency.pipe';
 import { CategoryService } from '../../../../services/category.service';
 import { MenuService } from '../../../../services/menu.service';
@@ -36,9 +36,11 @@ export class MainMenu {
   public menuService = inject(MenuService);
   public navigation = inject(PublicNavigationContextService);
 
-  readonly items$ = this.navigation.locale$.pipe(
-    switchMap((locale) =>
-      forkJoin({
+  readonly items$ = this.navigation.primaryNavigation$.pipe(
+    switchMap((navigation) => {
+      const locale = navigation?.locale ?? this.navigation.locale();
+
+      return forkJoin({
         categories: this.categoryService
           .getCategories({ status: 1 })
           .pipe(catchError(() => of({ data: [], total: 0 }))),
@@ -46,9 +48,11 @@ export class MainMenu {
           .getProducts({ status: 1 })
           .pipe(catchError(() => of({ data: [], total: 0 }))),
       }).pipe(
-        map(({ categories, products }) => this.buildItems(locale, categories.data, products.data)),
-      ),
-    ),
+        map(({ categories, products }) =>
+          this.buildItems(locale, navigation, categories.data, products.data),
+        ),
+      );
+    }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -84,11 +88,11 @@ export class MainMenu {
 
   private buildItems(
     locale: string,
+    navigation: IPublicNavigation | null,
     categories: Category[],
     products: Product[],
   ): HeaderMenuItem[] {
     const english = locale === 'en-US';
-    const managed = this.navigation.primaryItems();
     const featured = products.filter((product) => product.is_featured).slice(0, 2);
     const featuredIds = new Set(featured.map((product) => product.id));
     const random = products
@@ -96,61 +100,55 @@ export class MainMenu {
       .sort((a, b) => this.stableRank(locale, a) - this.stableRank(locale, b))
       .slice(0, 3);
 
-    return [
-      this.linkItem('home', english ? 'Home' : 'Beranda', english ? '/en' : '/', managed),
-      this.linkItem(
-        'about',
-        english ? 'About MATEX' : 'Tentang MATEX',
-        english ? '/en/about-matex' : '/tentang-matex',
-        managed,
-      ),
+    const defaults: Array<HeaderMenuItem & { aliases?: string[] }> = [
+      { key: 'home', label: english ? 'Home' : 'Beranda', path: english ? '/en' : '/' },
       {
-        ...this.linkItem(
-          'categories',
-          english ? 'Category' : 'Kategori',
-          english ? '/en/catalog' : '/katalog',
-          managed,
-        ),
+        key: 'about',
+        label: english ? 'About MATEX' : 'Tentang MATEX',
+        path: english ? '/en/about-matex' : '/tentang-matex',
+      },
+      {
+        key: 'categories',
+        label: english ? 'Category' : 'Kategori',
+        path: english ? '/en/catalog' : '/katalog',
         categories,
       },
       {
-        ...this.linkItem(
-          'products',
-          english ? 'Product' : 'Produk',
-          english ? '/en/catalog' : '/katalog',
-          managed,
-        ),
+        key: 'products',
+        label: english ? 'Product' : 'Produk',
+        path: english ? '/en/catalog' : '/katalog',
         products: [...featured, ...random],
       },
-      this.linkItem(
-        'articles',
-        english ? 'Blog' : 'Artikel',
-        english ? '/en/articles' : '/artikel',
-        managed,
-        ['blog'],
-      ),
-      this.linkItem(
-        'contact',
-        english ? 'Contact' : 'Hubungi',
-        english ? '/en/contact-us' : '/kontak',
-        managed,
-      ),
+      {
+        key: 'articles',
+        aliases: ['blog'],
+        label: english ? 'Blog' : 'Artikel',
+        path: english ? '/en/articles' : '/artikel',
+      },
+      {
+        key: 'contact',
+        label: english ? 'Contact' : 'Hubungi',
+        path: english ? '/en/contact-us' : '/kontak',
+      },
     ];
-  }
 
-  private linkItem(
-    key: string,
-    label: string,
-    path: string,
-    managed: IPublicNavigationItem[],
-    aliases: string[] = [],
-  ): HeaderMenuItem {
-    const configured = managed.find((item) => [key, ...aliases].includes(item.key));
-    return {
-      key,
-      label,
-      path: configured?.path || path,
-    };
+    if (!navigation) return defaults;
+
+    return navigation.items
+      .map((configured) => {
+        const definition = defaults.find((item) =>
+          [item.key, ...(item.aliases ?? [])].includes(configured.key),
+        );
+        if (!definition) return null;
+
+        return {
+          ...definition,
+          key: definition.key,
+          label: configured.label || definition.label,
+          path: configured.path || definition.path,
+        };
+      })
+      .filter((item): item is HeaderMenuItem => item !== null);
   }
 
   private stableRank(locale: string, product: Product): number {

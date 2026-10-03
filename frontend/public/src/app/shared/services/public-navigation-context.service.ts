@@ -1,10 +1,21 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 
-import { catchError, distinctUntilChanged, filter, map, of, startWith, switchMap } from 'rxjs';
+import {
+  catchError,
+  distinctUntilChanged,
+  filter,
+  map,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 
 import { PublicNavigationService } from './public-navigation.service';
+import { IPublicNavigation } from '../interface/public-navigation.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -24,19 +35,30 @@ export class PublicNavigationContextService {
     initialValue: 'id-ID',
   });
 
-  readonly primaryItems = toSignal(
-    this.locale$.pipe(
-      switchMap((locale) =>
-        this.navigationService.getNavigation('primary', locale).pipe(
-          map((response) => response.data.items),
-          catchError(() => of([])),
+  readonly primaryNavigation$ = this.locale$.pipe(
+    switchMap((locale) =>
+      this.navigationService.getNavigation('primary', locale).pipe(
+        map((response) => response.data),
+        catchError((error: unknown) =>
+          error instanceof HttpErrorResponse && error.status === 404
+            ? of<IPublicNavigation>({
+                key: 'primary',
+                location: 'header',
+                locale,
+                items: [],
+              })
+            : of(null),
         ),
       ),
     ),
-    {
-      initialValue: [],
-    },
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
+
+  readonly primaryNavigation = toSignal(this.primaryNavigation$, {
+    initialValue: undefined,
+  });
+
+  readonly primaryItems = computed(() => this.primaryNavigation()?.items ?? []);
 
   readonly homePath = computed(() => (this.locale() === 'en-US' ? '/en' : '/'));
 

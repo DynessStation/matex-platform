@@ -1,17 +1,15 @@
 import { CommonModule } from '@angular/common';
-
 import { Component, inject, input } from '@angular/core';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { Observable, finalize, map, of, switchMap } from 'rxjs';
 
+import { FixedMenuForm } from './fixed-menu-form/fixed-menu-form';
+import { MenuTree } from './menu-tree/menu-tree';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import { Button } from '../../shared/components/ui/button/button';
-
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
-
 import {
   IWebNavigationDetail,
   IWebNavigationItem,
@@ -19,20 +17,14 @@ import {
   IWebNavigationSummary,
   IWebNavigationTreeItem,
 } from '../../shared/interface/web-navigation.interface';
-
 import {
   CreateWebNavigationAction,
-  DeleteWebNavigationItemAction,
   GetWebNavigationDetailAction,
   GetWebNavigationsAction,
   ReorderWebNavigationItemsAction,
   UpdateWebNavigationStatusAction,
 } from '../../shared/store/action/web-navigation.action';
-
 import { WebNavigationState } from '../../shared/store/state/web-navigation.state';
-
-import { FormMenu } from './form-menu/form-menu';
-import { MenuTree } from './menu-tree/menu-tree';
 
 @Component({
   selector: 'app-menu',
@@ -42,7 +34,8 @@ import { MenuTree } from './menu-tree/menu-tree';
     PageWrapper,
     Button,
     HasPermissionDirective,
-    FormMenu,
+    TranslateModule,
+    FixedMenuForm,
     MenuTree,
   ],
 
@@ -98,7 +91,7 @@ export class Menu {
         new CreateWebNavigationAction({
           web_navigation_key: 'primary',
 
-          web_navigation_name: 'Primary Navigation',
+          web_navigation_name: 'Header Website',
 
           web_navigation_location: 'header',
 
@@ -127,29 +120,6 @@ export class Menu {
         }),
       )
       .subscribe();
-  }
-
-  deleteMenuItem(item: IWebNavigationTreeItem): void {
-    const navigation = this.store.selectSnapshot(
-      WebNavigationState.selectedNavigation,
-    );
-
-    if (
-      this.editingItem?.id_web_navigation_item === item.id_web_navigation_item
-    ) {
-      this.editingItem = null;
-    }
-
-    if (!navigation) {
-      return;
-    }
-
-    this.store.dispatch(
-      new DeleteWebNavigationItemAction(
-        navigation.id_web_navigation,
-        item.id_web_navigation_item,
-      ),
-    );
   }
 
   editMenuItem(item: IWebNavigationTreeItem): void {

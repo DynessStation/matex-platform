@@ -291,7 +291,7 @@ test("navigation response builds a safe localized tree", async () => {
 
   assert.equal(body.data.items[0].path, "/");
 
-  assert.equal(body.data.items[1].path, "/tentang-kami");
+  assert.equal(body.data.items[1].path, "/tentang-matex");
 
   assert.equal(body.data.items[2].path, "/produk");
 
@@ -320,7 +320,7 @@ test("navigation response builds a safe localized tree", async () => {
   assert.equal(body.data.items[1].cms_page_slug, undefined);
 });
 
-test("english CMS links use production-style localized paths", async () => {
+test("fixed website pages use stable localized paths", async () => {
   reset();
 
   rows = [
@@ -378,7 +378,7 @@ test("english CMS links use production-style localized paths", async () => {
 
   assert.equal(body.data.items[0].path, "/en");
 
-  assert.equal(body.data.items[1].path, "/en/about-us");
+  assert.equal(body.data.items[1].path, "/en/about-matex");
 
   assert.deepEqual(calls[1].params, ["en-US", "id-ID", "en-US", 14, 7]);
 });

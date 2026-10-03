@@ -3,23 +3,15 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-
 import { CommonModule } from '@angular/common';
-
-import { Component, input, output, viewChild } from '@angular/core';
-
+import { Component, input, output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
 import { Button } from '../../../shared/components/ui/button/button';
-
-import { DeleteModal } from '../../../shared/components/ui/modal/delete-modal/delete-modal';
-
 import { NoData } from '../../../shared/components/ui/no-data/no-data';
-
 import { HasPermissionDirective } from '../../../shared/directive/has-permission.directive';
-
 import {
   IWebNavigationReorderItem,
   IWebNavigationTreeItem,
@@ -33,7 +25,6 @@ import {
     ReactiveFormsModule,
     DragDropModule,
     TranslateModule,
-    DeleteModal,
     NoData,
     HasPermissionDirective,
     Button,
@@ -44,11 +35,7 @@ import {
   styleUrl: './menu-tree.scss',
 })
 export class MenuTree {
-  readonly DeleteModal = viewChild<DeleteModal>('deleteModal');
-
   readonly data = input<IWebNavigationTreeItem[]>([]);
-
-  readonly deleteItem = output<IWebNavigationTreeItem>();
 
   readonly editItem = output<IWebNavigationTreeItem>();
 
@@ -78,18 +65,6 @@ export class MenuTree {
 
   onShowChildrenNode(node: IWebNavigationTreeItem): void {
     node.show = !node.show;
-  }
-
-  confirmDelete(item: IWebNavigationTreeItem): void {
-    this.DeleteModal()?.openModal('delete', item);
-  }
-
-  delete(actionType: string, item: IWebNavigationTreeItem): void {
-    if (actionType !== 'delete') {
-      return;
-    }
-
-    this.deleteItem.emit(item);
   }
 
   edit(item: IWebNavigationTreeItem): void {

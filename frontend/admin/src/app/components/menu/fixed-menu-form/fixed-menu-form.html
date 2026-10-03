@@ -1,0 +1,143 @@
+@if (!isEdit && !availableDefinitions.length) {
+  <div class="alert alert-success mb-0" role="status">
+    <strong>{{ 'navigation_admin.complete_title' | translate }}</strong>
+    <p class="mb-0 mt-1">{{ 'navigation_admin.complete_help' | translate }}</p>
+  </div>
+} @else {
+  <form
+    class="theme-form theme-form-2 mega-form"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+  >
+    <div class="alert alert-light border" role="note">
+      <strong>{{ 'navigation_admin.form_scope_title' | translate }}</strong>
+      <p class="text-content mb-0 mt-1">
+        {{ 'navigation_admin.form_scope_help' | translate }}
+      </p>
+    </div>
+
+    <app-form-fields
+      [label]="'navigation_admin.menu_section' | translate"
+      [for]="'fixed_navigation_key'"
+    >
+      <select
+        id="fixed_navigation_key"
+        class="form-control"
+        formControlName="key"
+        [attr.disabled]="isEdit ? true : null"
+        (change)="selectSection()"
+      >
+        @for (definition of availableDefinitions; track definition.key) {
+          <option [value]="definition.key">
+            {{ definition.idLabel }} / {{ definition.enLabel }}
+          </option>
+        }
+      </select>
+      @if (invalid('key')) {
+        <div class="invalid-feedback">
+          {{ 'navigation_admin.menu_section_required' | translate }}
+        </div>
+      }
+    </app-form-fields>
+
+    @if (selectedDefinition; as definition) {
+      <div class="alert alert-info" role="note">
+        <strong>{{ 'navigation_admin.public_result' | translate }}</strong>
+        <p class="mb-1 mt-1">{{ definition.behaviorKey | translate }}</p>
+        <small class="d-block">Indonesia: {{ definition.idPath }}</small>
+        <small class="d-block">English: {{ definition.enPath }}</small>
+      </div>
+    }
+
+    <div class="border rounded p-3 mb-4">
+      <h5 class="mb-3">Bahasa Indonesia</h5>
+      <app-form-fields
+        [label]="'navigation_admin.menu_label' | translate"
+        [for]="'fixed_navigation_id_label'"
+      >
+        <input
+          id="fixed_navigation_id_label"
+          class="form-control"
+          type="text"
+          formControlName="id_label"
+          placeholder="Contoh: Tentang MATEX"
+        />
+        <p class="help-text">
+          {{ 'navigation_admin.label_help_id' | translate }}
+        </p>
+        @if (invalid('id_label')) {
+          <div class="invalid-feedback">
+            {{ 'navigation_admin.label_required_id' | translate }}
+          </div>
+        }
+      </app-form-fields>
+    </div>
+
+    <div class="border rounded p-3 mb-4">
+      <h5 class="mb-3">English</h5>
+      <app-form-fields
+        [label]="'navigation_admin.menu_label' | translate"
+        [for]="'fixed_navigation_en_label'"
+      >
+        <input
+          id="fixed_navigation_en_label"
+          class="form-control"
+          type="text"
+          formControlName="en_label"
+          placeholder="Example: About MATEX"
+        />
+        <p class="help-text">
+          {{ 'navigation_admin.label_help_en' | translate }}
+        </p>
+        @if (invalid('en_label')) {
+          <div class="invalid-feedback">
+            {{ 'navigation_admin.label_required_en' | translate }}
+          </div>
+        }
+      </app-form-fields>
+    </div>
+
+    <app-form-fields
+      [label]="'navigation_admin.visible_in_header' | translate"
+      [for]="'fixed_navigation_status'"
+    >
+      <div class="form-check form-switch ps-0">
+        <label class="switch">
+          <input
+            id="fixed_navigation_status"
+            type="checkbox"
+            formControlName="status"
+          />
+          <span class="switch-state"></span>
+        </label>
+      </div>
+      <p class="help-text">
+        {{ 'navigation_admin.visible_in_header_help' | translate }}
+      </p>
+    </app-form-fields>
+
+    <div class="d-flex flex-wrap gap-2">
+      @if (isEdit) {
+        <ng-container *hasPermission="'web_navigation.update'">
+          <app-button [id]="'update_navigation_item'" [disabled]="submitting">
+            {{ 'navigation_admin.update_item' | translate }}
+          </app-button>
+        </ng-container>
+        <button
+          class="btn btn-outline-theme"
+          type="button"
+          [disabled]="submitting"
+          (click)="cancel()"
+        >
+          {{ 'navigation_admin.cancel' | translate }}
+        </button>
+      } @else {
+        <ng-container *hasPermission="'web_navigation.create'">
+          <app-button [id]="'create_navigation_item'" [disabled]="submitting">
+            {{ 'navigation_admin.add_item' | translate }}
+          </app-button>
+        </ng-container>
+      }
+    </div>
+  </form>
+}
