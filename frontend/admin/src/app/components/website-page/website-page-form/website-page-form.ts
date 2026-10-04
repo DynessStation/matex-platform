@@ -1352,9 +1352,16 @@ export class WebsitePageForm {
   }
 
   get publicationRequiresPublishedTranslation(): boolean {
-    return (
+    if (
       this.publicationChoice === 'publish_now' ||
       this.publicationChoice === 'schedule'
+    ) {
+      return true;
+    }
+
+    return (
+      this.publicationChoice === 'current' &&
+      this.editData()?.website_page_status === 1
     );
   }
 
@@ -1833,6 +1840,18 @@ export class WebsitePageForm {
     this.publicationValidationAttempted = true;
     this.mediaValidationAttempted = true;
 
+    const invalidFormSection = this.firstInvalidFormSection();
+
+    if (invalidFormSection) {
+      this.activeTab = invalidFormSection.tab;
+
+      if (invalidFormSection.locale) {
+        this.activeLocale = invalidFormSection.locale;
+      }
+
+      return;
+    }
+
     if (this.gadgetHomeMediaBlocksSave) {
       this.activeTab = 'media';
 
@@ -1956,6 +1975,55 @@ export class WebsitePageForm {
 
       publicationActions: this.buildPublicationActions(),
     });
+  }
+
+  private firstInvalidFormSection(): {
+    tab: 'general' | 'content' | 'seo';
+    locale?: WebsitePageEditorLocale;
+  } | null {
+    this.form.markAllAsTouched();
+
+    const controls = this.form.controls;
+    const generalControls = [
+      controls.website_page_key,
+      controls.website_page_type,
+      controls.website_page_template,
+      controls.website_page_default_locale,
+      controls.website_page_visibility,
+      controls.website_page_sort_order,
+    ];
+
+    if (generalControls.some((control) => control.invalid)) {
+      return { tab: 'general' };
+    }
+
+    for (const language of this.supportedLanguages) {
+      const group = this.translationForm(language.locale);
+
+      if (group.disabled) {
+        continue;
+      }
+
+      if (group.controls.title.invalid || group.controls.slug.invalid) {
+        return { tab: 'content', locale: language.locale };
+      }
+
+      const seoControls = [
+        group.controls.meta_title,
+        group.controls.meta_description,
+        group.controls.meta_keywords,
+        group.controls.meta_robots,
+        group.controls.canonical_url,
+        group.controls.og_title,
+        group.controls.og_description,
+      ];
+
+      if (seoControls.some((control) => control.invalid)) {
+        return { tab: 'seo', locale: language.locale };
+      }
+    }
+
+    return null;
   }
 
   private buildPublicationActions(): IWebsitePageEditorPublicationPayload[] {

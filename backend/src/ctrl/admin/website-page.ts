@@ -19,6 +19,7 @@ const FIXED_PAGE_KEYS = new Set([
   "career",
 ]);
 const SUPPORTED_LOCALES = ["id-ID", "en-US"] as const;
+const DEFAULT_LOCALE = "id-ID" as const;
 const FIXED_PATHS: Record<
   string,
   Record<(typeof SUPPORTED_LOCALES)[number], string>
@@ -325,6 +326,19 @@ const parseSavePayload = (pageKey: string, body: any) => {
       isPublished: item.is_published ? 1 : 0,
     };
   });
+
+  if (
+    body.is_published &&
+    translations.find(
+      (item: { locale: string; isPublished: number }) =>
+        item.locale === DEFAULT_LOCALE,
+    )?.isPublished !== 1
+  ) {
+    throw new PayloadError(
+      "WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED",
+      "Published pages require published Indonesian content",
+    );
+  }
 
   if (!Array.isArray(body.media) || body.media.length > 10) {
     throw new PayloadError(

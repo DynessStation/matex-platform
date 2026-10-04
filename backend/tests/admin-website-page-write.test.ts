@@ -185,6 +185,27 @@ test("invalid payloads are rejected before a transaction begins", async () => {
   assert.equal(began, 0);
 });
 
+test("published pages require the Indonesian translation to be published", async () => {
+  reset();
+  const response = await request("about", {
+    is_published: true,
+    translations: translations.map((translation) => ({
+      ...translation,
+      is_published:
+        translation.locale === "id-ID" ? false : translation.is_published,
+    })),
+    media: [],
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal(
+    (await response.json()).code,
+    "WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED",
+  );
+  assert.equal(connectionRequested, 0);
+  assert.equal(began, 0);
+});
+
 test("fixed paths and all related page data are saved in one transaction", async () => {
   reset();
   const response = await request("about", {
