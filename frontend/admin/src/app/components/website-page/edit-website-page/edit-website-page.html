@@ -1,0 +1,16 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="pageTitle | translate">
+  @if (detailErrorStatus !== null) {
+    <app-detail-error-state
+      [status]="detailErrorStatus"
+      [backUrl]="'/dashboard'"
+      (retry)="retryDetail()"
+    />
+  } @else if (page$ | async; as page) {
+    <app-form-cms-page
+      [mode]="'edit'"
+      [editData]="page"
+      [saving]="saving"
+      (submitted)="submit($event)"
+    />
+  }
+</app-page-wrapper>

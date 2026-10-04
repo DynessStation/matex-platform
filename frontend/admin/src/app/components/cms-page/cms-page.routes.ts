@@ -9,18 +9,8 @@ import { PermissionGuard } from '../../core/guard/permission.guard';
 export const cmsPageRoutes: Routes = [
   {
     path: 'fixed/:key',
-
-    canActivate: [PermissionGuard],
-
-    data: {
-      permission: 'cms_page.update',
-      titleKey: 'cms_page.edit_title',
-    },
-
-    loadComponent: () =>
-      import('./edit-cms-page/edit-cms-page').then(
-        (component) => component.EditCmsPage,
-      ),
+    pathMatch: 'full',
+    redirectTo: ({ params }) => `/website-page/${params['key']}`,
   },
 
   //==================================================

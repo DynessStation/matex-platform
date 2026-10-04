@@ -11,8 +11,8 @@ export const websitePageRoutes: Routes = [
       titleKey: 'cms_page.edit_title',
     },
     loadComponent: () =>
-      import('../cms-page/edit-cms-page/edit-cms-page').then(
-        (component) => component.EditCmsPage,
+      import('./edit-website-page/edit-website-page').then(
+        (component) => component.EditWebsitePage,
       ),
   },
 ];
