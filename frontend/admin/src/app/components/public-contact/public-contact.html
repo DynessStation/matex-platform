@@ -2,6 +2,16 @@
   [gridClass]="'col-sm-12'"
   [title]="'public_contact.title' | translate"
 >
+  <div *hasPermission="'cms_page.update'" button>
+    <a
+      routerLink="/cms-page/fixed/contact"
+      class="align-items-center btn btn-outline-primary d-flex gap-1"
+    >
+      <i class="ri-settings-3-line"></i>
+      {{ 'page_settings_seo' | translate }}
+    </a>
+  </div>
+
   @if (loading) {
     <p>{{ 'loading' | translate }}...</p>
   } @else {

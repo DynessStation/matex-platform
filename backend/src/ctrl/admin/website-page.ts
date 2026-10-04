@@ -10,11 +10,23 @@ import { AuthRequest, verifyToken } from "../middleware/authJwt";
 import { requirePermission } from "../middleware/authPermission";
 
 const router = Router();
-const FIXED_PAGE_KEYS = new Set(["home", "about", "terms", "career"]);
+const FIXED_PAGE_KEYS = new Set([
+  "home",
+  "about",
+  "contact",
+  "faq",
+  "terms",
+  "career",
+]);
 const SUPPORTED_LOCALES = ["id-ID", "en-US"] as const;
-const FIXED_PATHS: Record<string, Record<(typeof SUPPORTED_LOCALES)[number], string>> = {
+const FIXED_PATHS: Record<
+  string,
+  Record<(typeof SUPPORTED_LOCALES)[number], string>
+> = {
   home: { "id-ID": "home", "en-US": "home" },
   about: { "id-ID": "tentang-matex", "en-US": "about-matex" },
+  contact: { "id-ID": "kontak", "en-US": "contact-us" },
+  faq: { "id-ID": "faq", "en-US": "faq" },
   terms: { "id-ID": "syarat-ketentuan", "en-US": "terms-and-conditions" },
   career: { "id-ID": "karir", "en-US": "careers" },
 };
@@ -30,6 +42,8 @@ const HOME_MEDIA_SLOTS = [
 const PAGE_MEDIA_SLOTS: Record<string, Set<string>> = {
   home: new Set([...HOME_MEDIA_SLOTS, "og"]),
   about: new Set(["about_content", "og"]),
+  contact: new Set(["og"]),
+  faq: new Set(["og"]),
   terms: new Set(["og"]),
   career: new Set(["og"]),
 };
@@ -159,11 +173,17 @@ const jsonValue = (value: unknown, field: string): unknown | null => {
 const dateValue = (value: unknown, field: string): Date | null => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value !== "string") {
-    throw new PayloadError("WEBSITE_PAGE_PAYLOAD_INVALID", `${field} is invalid`);
+    throw new PayloadError(
+      "WEBSITE_PAGE_PAYLOAD_INVALID",
+      `${field} is invalid`,
+    );
   }
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) {
-    throw new PayloadError("WEBSITE_PAGE_PAYLOAD_INVALID", `${field} is invalid`);
+    throw new PayloadError(
+      "WEBSITE_PAGE_PAYLOAD_INVALID",
+      `${field} is invalid`,
+    );
   }
   return date;
 };
@@ -249,7 +269,9 @@ const parseSavePayload = (pageKey: string, body: any) => {
   const translations = body.translations.map((item: any) => {
     const locale = String(item?.locale ?? "");
     if (
-      !SUPPORTED_LOCALES.includes(locale as (typeof SUPPORTED_LOCALES)[number]) ||
+      !SUPPORTED_LOCALES.includes(
+        locale as (typeof SUPPORTED_LOCALES)[number],
+      ) ||
       seenLocales.has(locale)
     ) {
       throw new PayloadError(
@@ -259,14 +281,22 @@ const parseSavePayload = (pageKey: string, body: any) => {
     }
     seenLocales.add(locale);
     const title = typeof item?.title === "string" ? item.title.trim() : "";
-    if (!title || title.length > 255 || typeof item?.is_published !== "boolean") {
+    if (
+      !title ||
+      title.length > 255 ||
+      typeof item?.is_published !== "boolean"
+    ) {
       throw new PayloadError(
         "WEBSITE_PAGE_TRANSLATIONS_INVALID",
         "Each language needs a valid title and publication status",
       );
     }
     const seo = item?.seo ?? {};
-    const canonicalUrl = optionalString(seo.canonical_url, "Canonical URL", 500);
+    const canonicalUrl = optionalString(
+      seo.canonical_url,
+      "Canonical URL",
+      500,
+    );
     if (canonicalUrl && !/^https?:\/\/[^\s]+$/i.test(canonicalUrl)) {
       throw new PayloadError(
         "WEBSITE_PAGE_TRANSLATIONS_INVALID",
@@ -305,7 +335,9 @@ const parseSavePayload = (pageKey: string, body: any) => {
   const seenSlots = new Set<string>();
   const seenAttachments = new Set<number>();
   const media = body.media.map((item: any, index: number) => {
-    const decoded = keyhsid.idAttachment.decode(String(item?.id_attachment ?? ""));
+    const decoded = keyhsid.idAttachment.decode(
+      String(item?.id_attachment ?? ""),
+    );
     const idAttachment = Number(decoded[0]);
     const slot = String(item?.slot ?? "");
     if (
@@ -324,7 +356,11 @@ const parseSavePayload = (pageKey: string, body: any) => {
     seenSlots.add(slot);
     seenAttachments.add(idAttachment);
     const clickAction = String(item.click_action ?? "none");
-    const clickTarget = optionalString(item.click_target, "Banner destination", 1000);
+    const clickTarget = optionalString(
+      item.click_target,
+      "Banner destination",
+      1000,
+    );
     validateClickAction(clickAction, clickTarget);
 
     const texts = item.translations ?? [];
@@ -338,7 +374,9 @@ const parseSavePayload = (pageKey: string, body: any) => {
     const translations = texts.map((text: any) => {
       const locale = String(text?.locale ?? "");
       if (
-        !SUPPORTED_LOCALES.includes(locale as (typeof SUPPORTED_LOCALES)[number]) ||
+        !SUPPORTED_LOCALES.includes(
+          locale as (typeof SUPPORTED_LOCALES)[number],
+        ) ||
         textLocales.has(locale)
       ) {
         throw new PayloadError(
@@ -366,9 +404,16 @@ const parseSavePayload = (pageKey: string, body: any) => {
 
   if (body.is_published) {
     const visibleSlots = new Set(
-      media.filter((item: any) => item.isVisible === 1).map((item: any) => item.slot),
+      media
+        .filter((item: any) => item.isVisible === 1)
+        .map((item: any) => item.slot),
     );
-    const requiredSlots = pageKey === "home" ? HOME_MEDIA_SLOTS : pageKey === "about" ? ["about_content"] : [];
+    const requiredSlots =
+      pageKey === "home"
+        ? HOME_MEDIA_SLOTS
+        : pageKey === "about"
+          ? ["about_content"]
+          : [];
     const missing = requiredSlots.filter((slot) => !visibleSlots.has(slot));
     if (missing.length) {
       throw new PayloadError(
@@ -578,21 +623,17 @@ router.get(
             content: parseJsonValue(translation.website_page_content_json),
             seo: {
               title: translation.website_page_seo_title ?? null,
-              description:
-                translation.website_page_seo_description ?? null,
+              description: translation.website_page_seo_description ?? null,
               keywords: translation.website_page_seo_keywords ?? null,
               robots: translation.website_page_seo_robots ?? null,
               canonical_url: translation.website_page_canonical_url ?? null,
-              social_title:
-                translation.website_page_social_title ?? null,
+              social_title: translation.website_page_social_title ?? null,
               social_description:
                 translation.website_page_social_description ?? null,
               schema: parseJsonValue(translation.website_page_schema_json),
             },
             is_published:
-              Number(
-                translation.website_page_translation_is_published,
-              ) === 1,
+              Number(translation.website_page_translation_is_published) === 1,
             created: translation.created,
             updated: translation.updated,
           })),
@@ -727,8 +768,7 @@ router.put(
         if (pageKey === "home" && item.slot !== "og") {
           const issue = validateCmsGadgetHomeMedia(item.slot, {
             mimeType: String(attachment.mime_type),
-            width:
-              attachment.width === null ? null : Number(attachment.width),
+            width: attachment.width === null ? null : Number(attachment.width),
             height:
               attachment.height === null ? null : Number(attachment.height),
           });

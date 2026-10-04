@@ -1,55 +1,81 @@
-<app-breadcrumb [breadcrumb]="breadcrumb" />
+@if (page(); as websitePage) {
+  <app-breadcrumb [breadcrumb]="breadcrumb" />
 
-<section class="faqs-section section-t-space">
-  <div class="custom-container">
-    <div class="row g-sm-4 g-3">
-      <div class="col-xxl-3 col-lg-4 col-md-5">
-        <div class="faq-wrapper">
-          <h3>{{ locale === 'en-US' ? 'Frequently Asked Questions' : 'Pertanyaan Umum' }}</h3>
-          <p class="faq-desc">
-            {{ locale === 'en-US' ? 'Find answers about our company, products, and services.' : 'Temukan jawaban seputar perusahaan, produk, dan layanan kami.' }}
-          </p>
-          <h2 class="faq-title">FAQ</h2>
+  <section class="faqs-section section-t-space">
+    <div class="custom-container">
+      <div class="row g-sm-4 g-3">
+        <div class="col-xxl-3 col-lg-4 col-md-5">
+          <div class="faq-wrapper">
+            <h3>{{ websitePage.title }}</h3>
+            <p class="faq-desc">
+              {{ websitePage.summary }}
+            </p>
+            <h2 class="faq-title">FAQ</h2>
+          </div>
+        </div>
+        <div class="col-xxl-9 col-lg-8 col-md-7">
+          @if (faq$ | async; as faqs) {
+            @if (faqs.length) {
+              <div class="accordion faq-accordion" ngbAccordion [closeOthers]="true">
+                @for (faq of faqs; track faq.key; let i = $index) {
+                  <div ngbAccordionItem [collapsed]="i !== 0">
+                    <div ngbAccordionHeader>
+                      <h5 class="accordion-header">
+                        <button class="accordion-button" type="button" ngbAccordionButton>
+                          {{ faq.question }} <i class="iconsax" icon-name="chevron-down"></i>
+                        </button>
+                      </h5>
+                    </div>
+                    <div class="collapse show" ngbAccordionCollapse>
+                      <div class="card-body" ngbAccordionBody>
+                        <ng-template>
+                          <p>{{ faq.answer }}</p>
+                        </ng-template>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <app-no-data
+                [class]="'no-data-added collection-no-data'"
+                [text]="'no_faq' | translate"
+                [description]="'no_faq_desc' | translate"
+              ></app-no-data>
+            }
+          }
         </div>
       </div>
-      <div class="col-xxl-9 col-lg-8 col-md-7">
-        @if ((faq$ | async); as faqs) {
-          @if (faqs.length) {
-          <div class="accordion faq-accordion" ngbAccordion [closeOthers]="true">
-            @for (faq of faqs; track faq.key; let i = $index) {
-              <div ngbAccordionItem [collapsed]="i !== 0">
-                <div ngbAccordionHeader>
-                  <h5 class="accordion-header">
-                    <button class="accordion-button" type="button" ngbAccordionButton>
-                      {{ faq.question }} <i class="iconsax" icon-name="chevron-down"></i>
-                    </button>
-                  </h5>
-                </div>
-                <div class="collapse show" ngbAccordionCollapse>
-                  <div class="card-body" ngbAccordionBody>
-                    <ng-template>
-                      <p>{{ faq.answer }}</p>
-                    </ng-template>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-          } @else {
-          <app-no-data
-            [class]="'no-data-added collection-no-data'"
-            [text]="'no_faq' | translate"
-            [description]="'no_faq_desc' | translate"
-          ></app-no-data>
-          }
-        }
-      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter />
-  </div>
-</section>
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+} @else {
+  <section
+    class="section-t-space section-b-space"
+    [attr.lang]="locale"
+    [attr.aria-busy]="pageState() === 'loading'"
+  >
+    <div class="custom-container text-center">
+      @if (pageState() === 'loading') {
+        <p>{{ pageMessage('Memuat halaman…', 'Loading page…') }}</p>
+      } @else if (pageState() === 'missing') {
+        <h2>{{ pageMessage('Halaman tidak tersedia', 'Page unavailable') }}</h2>
+        <p>
+          {{ pageMessage('Halaman ini belum diterbitkan.', 'This page has not been published.') }}
+        </p>
+      } @else {
+        <h2>{{ pageMessage('Halaman belum dapat dimuat', 'Unable to load this page') }}</h2>
+        <p>
+          {{
+            pageMessage('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.')
+          }}
+        </p>
+      }
+    </div>
+  </section>
+}

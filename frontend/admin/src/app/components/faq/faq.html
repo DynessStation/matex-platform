@@ -1,6 +1,21 @@
-<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'faq_admin.title' | translate">
-  <div *hasPermission="'faq.create'" button>
-    <a [routerLink]="['/faq/create']" class="align-items-center btn btn-theme d-flex gap-1">
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'faq_admin.title' | translate"
+>
+  <div button class="d-flex flex-wrap gap-2">
+    <a
+      *hasPermission="'cms_page.update'"
+      routerLink="/cms-page/fixed/faq"
+      class="align-items-center btn btn-outline-primary d-flex gap-1"
+    >
+      <i class="ri-settings-3-line"></i>
+      {{ 'page_settings_seo' | translate }}
+    </a>
+    <a
+      *hasPermission="'faq.create'"
+      [routerLink]="['/faq/create']"
+      class="align-items-center btn btn-theme d-flex gap-1"
+    >
       <i class="ri-add-line"></i> {{ 'add_faq' | translate }}
     </a>
   </div>

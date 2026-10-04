@@ -1,6 +1,7 @@
 import { IApiResponse } from './api-response.interface';
 
-export type WebsitePageKey = 'home' | 'about' | 'terms' | 'career';
+export type WebsitePageKey =
+  'home' | 'about' | 'contact' | 'faq' | 'terms' | 'career';
 
 export type WebsitePageLocale = 'id-ID' | 'en-US';
 

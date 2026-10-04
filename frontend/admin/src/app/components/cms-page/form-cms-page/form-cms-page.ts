@@ -649,8 +649,23 @@ export class FormCmsPage {
   get isMetadataOnlyFixedPage(): boolean {
     return (
       this.isSystemPage &&
-      ['terms', 'career'].includes(this.form.controls.cms_page_key.value)
+      ['contact', 'faq', 'terms', 'career'].includes(
+        this.form.controls.cms_page_key.value,
+      )
     );
+  }
+
+  get isOperationalDataPage(): boolean {
+    return (
+      this.isSystemPage &&
+      ['contact', 'faq'].includes(this.form.controls.cms_page_key.value)
+    );
+  }
+
+  get operationalDataHelpKey(): string {
+    return this.form.controls.cms_page_key.value === 'contact'
+      ? 'cms_page.operational_contact_help'
+      : 'cms_page.operational_faq_help';
   }
 
   get mediaRoleOptions(): { value: string; label: string }[] {

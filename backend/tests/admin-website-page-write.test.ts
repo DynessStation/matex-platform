@@ -165,7 +165,10 @@ test("invalid payloads are rejected before a transaction begins", async () => {
     media: [],
   });
   assert.equal(response.status, 400);
-  assert.equal((await response.json()).code, "WEBSITE_PAGE_TRANSLATIONS_REQUIRED");
+  assert.equal(
+    (await response.json()).code,
+    "WEBSITE_PAGE_TRANSLATIONS_REQUIRED",
+  );
   assert.equal(connectionRequested, 0);
   assert.equal(began, 0);
 });
@@ -219,6 +222,33 @@ test("fixed paths and all related page data are saved in one transaction", async
   assert.ok(
     connectionCalls.some((call) => call.sql.includes("INSERT INTO audit_log")),
   );
+});
+
+test("contact and FAQ metadata keep their fixed localized paths", async () => {
+  const cases = [
+    { key: "contact", paths: ["kontak", "contact-us"] },
+    { key: "faq", paths: ["faq", "faq"] },
+  ];
+
+  for (const item of cases) {
+    reset();
+    const response = await request(item.key, {
+      is_published: true,
+      publish_at: null,
+      unpublish_at: null,
+      translations,
+      media: [],
+    });
+
+    assert.equal(response.status, 200);
+    const writes = connectionCalls.filter((call) =>
+      call.sql.includes("INSERT INTO website_page_i18n"),
+    );
+    assert.deepEqual(
+      writes.map((call) => call.params[3]),
+      item.paths,
+    );
+  }
 });
 
 test("unavailable media rolls back before existing relations are replaced", async () => {

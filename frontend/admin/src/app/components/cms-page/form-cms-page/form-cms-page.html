@@ -677,7 +677,13 @@
 
                       <!-- CONTENT -->
 
-                      @if (!isAboutTemplate) {
+                      @if (isOperationalDataPage) {
+                        <div class="col-12">
+                          <div class="alert alert-info mb-0" role="note">
+                            {{ operationalDataHelpKey | translate }}
+                          </div>
+                        </div>
+                      } @else if (!isAboutTemplate) {
                         <div class="col-12">
                         <label class="form-label">
                           {{ 'cms_page.content' | translate }}

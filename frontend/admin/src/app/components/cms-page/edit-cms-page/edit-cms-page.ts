@@ -103,6 +103,8 @@ export class EditCmsPage {
     const titles: Record<string, string> = {
       home: 'website_home',
       about: 'website_about',
+      contact: 'contact_settings',
+      faq: 'faq_management',
       terms: 'terms_conditions',
       career: 'career',
     };
@@ -401,7 +403,9 @@ export class EditCmsPage {
   }
 
   private isWebsitePageKey(value: string): value is WebsitePageKey {
-    return ['home', 'about', 'terms', 'career'].includes(value);
+    return ['home', 'about', 'contact', 'faq', 'terms', 'career'].includes(
+      value,
+    );
   }
 
   //==================================================
