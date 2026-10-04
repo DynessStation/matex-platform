@@ -591,7 +591,8 @@ export class FormCmsPage {
           attachment: item,
 
           role:
-            this.isGadgetHomeTemplate && item.cms_page_attachment_role === 'hero'
+            this.isGadgetHomeTemplate &&
+            item.cms_page_attachment_role === 'hero'
               ? 'home_main'
               : this.isAboutTemplate && item.cms_page_attachment_role === 'hero'
                 ? 'about_content'
@@ -645,6 +646,13 @@ export class FormCmsPage {
     return this.form.controls.cms_page_key.value === 'about';
   }
 
+  get isMetadataOnlyFixedPage(): boolean {
+    return (
+      this.isSystemPage &&
+      ['terms', 'career'].includes(this.form.controls.cms_page_key.value)
+    );
+  }
+
   get mediaRoleOptions(): { value: string; label: string }[] {
     if (this.isGadgetHomeTemplate) return this.gadgetHomeMediaRoles;
 
@@ -653,6 +661,10 @@ export class FormCmsPage {
         { value: 'about_content', label: 'Gambar konten Tentang MATEX' },
         { value: 'og', label: 'Open Graph / share image' },
       ];
+    }
+
+    if (this.isMetadataOnlyFixedPage) {
+      return [{ value: 'og', label: 'Open Graph / share image' }];
     }
 
     return [
@@ -705,13 +717,15 @@ export class FormCmsPage {
 
   private readAboutFeatures(content: unknown): AboutFeatureDraft[] {
     const result = this.createAboutFeatures();
-    if (!this.isRecord(content) || !Array.isArray(content['features'])) return result;
+    if (!this.isRecord(content) || !Array.isArray(content['features']))
+      return result;
 
     content['features'].slice(0, 3).forEach((item, index) => {
       if (!this.isRecord(item)) return;
       result[index] = {
         title: typeof item['title'] === 'string' ? item['title'] : '',
-        description: typeof item['description'] === 'string' ? item['description'] : '',
+        description:
+          typeof item['description'] === 'string' ? item['description'] : '',
       };
     });
 
@@ -1051,9 +1065,11 @@ export class FormCmsPage {
           ? assignedRoles.has('about_content')
             ? 'og'
             : 'about_content'
-          : assignedRoles.has('hero')
-            ? 'gallery'
-            : 'hero';
+          : this.isMetadataOnlyFixedPage
+            ? 'og'
+            : assignedRoles.has('hero')
+              ? 'gallery'
+              : 'hero';
 
       assignedRoles.add(role);
 
@@ -1098,7 +1114,8 @@ export class FormCmsPage {
     this.pageMedia[index] = {
       ...this.pageMedia[index],
       action_type: actionType,
-      action_value: actionType === 'none' ? '' : this.pageMedia[index].action_value,
+      action_value:
+        actionType === 'none' ? '' : this.pageMedia[index].action_value,
     };
     this.pageMedia = [...this.pageMedia];
   }
@@ -1477,7 +1494,7 @@ export class FormCmsPage {
                   language.locale,
                   existing?.cms_page_content_json,
                 )
-            : (existing?.cms_page_content_json ?? null),
+              : (existing?.cms_page_content_json ?? null),
 
           cms_page_meta_title: value.meta_title.trim() || null,
 
@@ -1522,7 +1539,9 @@ export class FormCmsPage {
           cms_page_attachment_action_type: item.action_type,
 
           cms_page_attachment_action_value:
-            item.action_type === 'none' ? null : item.action_value.trim() || null,
+            item.action_type === 'none'
+              ? null
+              : item.action_value.trim() || null,
 
           translations: this.supportedLanguages
             .filter((language) => this.isLanguageEnabled(language.locale))

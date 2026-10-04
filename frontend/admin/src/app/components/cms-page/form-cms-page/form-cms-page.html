@@ -395,7 +395,9 @@
                       </div>
 
                       <div class="d-flex align-items-center gap-2">
-                        @if (!isDefaultLocale(activeLocale)) {
+                        @if (
+                          !isDefaultLocale(activeLocale) && !isSystemPage
+                        ) {
                           <button
                             type="button"
                             class="btn btn-light-danger"
@@ -501,6 +503,7 @@
                             class="form-control"
                             formControlName="slug"
                             placeholder="tentang-kami"
+                            [readonly]="isSystemPage"
                             [class.is-invalid]="
                               translationForm(activeLocale).controls.slug
                                 .touched &&
@@ -1693,7 +1696,7 @@
                     </div>
                   </label>
 
-                  @if (mode() === 'edit') {
+                  @if (mode() === 'edit' && !isSystemPage) {
                     <label
                       class="cms-publication-option cms-publication-option-danger"
                       [class.active]="publicationChoice === 'archive'"
