@@ -162,7 +162,7 @@ export const menu: ISidebar[] = [
       {
         parent_id: 4,
         title: 'website_home',
-        path: '/cms-page/fixed/home',
+        path: '/website-page/home',
         type: 'link',
         level: 2,
         permission: 'cms_page.update',
@@ -170,7 +170,7 @@ export const menu: ISidebar[] = [
       {
         parent_id: 4,
         title: 'website_about',
-        path: '/cms-page/fixed/about',
+        path: '/website-page/about',
         type: 'link',
         level: 2,
         permission: 'cms_page.update',
@@ -202,7 +202,7 @@ export const menu: ISidebar[] = [
       {
         parent_id: 4,
         title: 'terms_conditions',
-        path: '/cms-page/fixed/terms',
+        path: '/website-page/terms',
         type: 'link',
         level: 2,
         permission: 'cms_page.update',
@@ -210,7 +210,7 @@ export const menu: ISidebar[] = [
       {
         parent_id: 4,
         title: 'career_soon',
-        path: '/cms-page/fixed/career',
+        path: '/website-page/career',
         type: 'link',
         level: 2,
         permission: 'cms_page.update',

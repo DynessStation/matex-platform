@@ -75,6 +75,18 @@ export const content: Routes = [
   //==================================================
 
   {
+    path: 'website-page',
+
+    canActivate: [AuthGuard],
+
+    loadChildren: () =>
+      import('../../components/website-page/website-page.routes').then(
+        (routes) => routes.websitePageRoutes,
+      ),
+  },
+
+  // Legacy CMS routes remain available until the final migration cleanup.
+  {
     path: 'cms-page',
 
     canActivate: [AuthGuard],
@@ -90,7 +102,7 @@ export const content: Routes = [
     canActivate: [AuthGuard],
     loadChildren: () =>
       import('../../components/public-contact/public-contact.routes').then(
-        routes => routes.publicContactRoutes,
+        (routes) => routes.publicContactRoutes,
       ),
   },
 
