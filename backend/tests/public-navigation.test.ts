@@ -293,7 +293,9 @@ test("navigation response builds a safe localized tree", async () => {
 
   assert.equal(body.data.items[1].path, "/tentang-matex");
 
-  assert.equal(body.data.items[2].path, "/produk");
+  assert.equal(body.data.items[2].path, "/katalog");
+
+  assert.equal(body.data.items[2].link_type, "internal");
 
   assert.deepEqual(body.data.items[2].badge, {
     text: "Baru",
@@ -381,6 +383,86 @@ test("fixed website pages use stable localized paths", async () => {
   assert.equal(body.data.items[1].path, "/en/about-matex");
 
   assert.deepEqual(calls[1].params, ["en-US", "id-ID", "en-US", 14, 7]);
+});
+
+test("fixed header keys ignore stale or incomplete legacy targets", async () => {
+  reset();
+
+  rows = [
+    [
+      {
+        id_web_navigation: 14,
+        web_navigation_key: "primary",
+        web_navigation_location: "header",
+        web_navigation_default_locale: "id-ID",
+      },
+    ],
+    [
+      {
+        id_web_navigation_item: 1,
+        id_parent_web_navigation_item: null,
+        web_navigation_item_key: "products",
+        web_navigation_item_link_type: "internal",
+        web_navigation_item_target_blank: 1,
+        web_navigation_item_icon: null,
+        web_navigation_item_badge_text: null,
+        web_navigation_item_badge_color: null,
+        web_navigation_item_sort_order: 0,
+        label: "Product",
+        internal_path: "//legacy.invalid",
+        external_url: null,
+        cms_page_key: null,
+        cms_page_template: null,
+        cms_page_slug: null,
+      },
+      {
+        id_web_navigation_item: 2,
+        id_parent_web_navigation_item: null,
+        web_navigation_item_key: "contact",
+        web_navigation_item_link_type: "cms_page",
+        web_navigation_item_target_blank: 1,
+        web_navigation_item_icon: null,
+        web_navigation_item_badge_text: null,
+        web_navigation_item_badge_color: null,
+        web_navigation_item_sort_order: 1,
+        label: "Contact",
+        internal_path: null,
+        external_url: null,
+        cms_page_key: null,
+        cms_page_template: null,
+        cms_page_slug: null,
+      },
+    ],
+  ];
+
+  const response = await fetch(`${base}/primary/en-US`);
+
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as any;
+
+  assert.deepEqual(
+    body.data.items.map((item: any) => ({
+      key: item.key,
+      link_type: item.link_type,
+      path: item.path,
+      target_blank: item.target_blank,
+    })),
+    [
+      {
+        key: "products",
+        link_type: "internal",
+        path: "/en/catalog",
+        target_blank: false,
+      },
+      {
+        key: "contact",
+        link_type: "internal",
+        path: "/en/contact-us",
+        target_blank: false,
+      },
+    ],
+  );
 });
 
 test("unsafe, unpublished and orphaned items are omitted", async () => {

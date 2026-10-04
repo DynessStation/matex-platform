@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
@@ -15,7 +14,6 @@ import {
 } from 'rxjs';
 
 import { PublicNavigationService } from './public-navigation.service';
-import { IPublicNavigation } from '../interface/public-navigation.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -39,16 +37,7 @@ export class PublicNavigationContextService {
     switchMap((locale) =>
       this.navigationService.getNavigation('primary', locale).pipe(
         map((response) => response.data),
-        catchError((error: unknown) =>
-          error instanceof HttpErrorResponse && error.status === 404
-            ? of<IPublicNavigation>({
-                key: 'primary',
-                location: 'header',
-                locale,
-                items: [],
-              })
-            : of(null),
-        ),
+        catchError(() => of(null)),
       ),
     ),
     shareReplay({ bufferSize: 1, refCount: true }),

@@ -132,7 +132,7 @@ export class MainMenu {
       },
     ];
 
-    if (!navigation) return defaults;
+    if (!navigation?.items.length) return defaults;
 
     return navigation.items
       .map((configured) => {
@@ -145,7 +145,7 @@ export class MainMenu {
           ...definition,
           key: definition.key,
           label: configured.label || definition.label,
-          path: configured.path || definition.path,
+          path: definition.path,
         };
       })
       .filter((item): item is HeaderMenuItem => item !== null);

@@ -40,6 +40,26 @@ type PublicNavigationItem = {
   children: PublicNavigationItem[];
 };
 
+const fixedNavigationPath = (locale: string, key: string): string | null => {
+  const fixedRoutes: Record<string, { id: string; en: string }> = {
+    home: { id: "/", en: "/en" },
+    about: { id: "/tentang-matex", en: "/en/about-matex" },
+    categories: { id: "/katalog", en: "/en/catalog" },
+    products: { id: "/katalog", en: "/en/catalog" },
+    articles: { id: "/artikel", en: "/en/articles" },
+    blog: { id: "/artikel", en: "/en/articles" },
+    contact: { id: "/kontak", en: "/en/contact-us" },
+  };
+
+  const route = fixedRoutes[key];
+
+  if (!route) {
+    return null;
+  }
+
+  return locale === "en-US" ? route.en : route.id;
+};
+
 const publicCmsPath = (
   locale: string,
   pageKey: string,
@@ -315,18 +335,32 @@ router.get(
 
         const linkType = row.web_navigation_item_link_type;
 
+        const fixedPath = fixedNavigationPath(
+          locale,
+          row.web_navigation_item_key,
+        );
+
         if (
+          !fixedPath &&
           linkType === "cms_page" &&
           (!row.cms_page_key || !row.cms_page_slug)
         ) {
           continue;
         }
 
-        if (linkType === "internal" && !validInternalPath(row.internal_path)) {
+        if (
+          !fixedPath &&
+          linkType === "internal" &&
+          !validInternalPath(row.internal_path)
+        ) {
           continue;
         }
 
-        if (linkType === "external" && !validExternalUrl(row.external_url)) {
+        if (
+          !fixedPath &&
+          linkType === "external" &&
+          !validExternalUrl(row.external_url)
+        ) {
           continue;
         }
 
@@ -376,12 +410,22 @@ router.get(
 
         nextAncestors.add(id);
 
-        let path: string | null = null;
+        const fixedPath = fixedNavigationPath(
+          locale,
+          row.web_navigation_item_key,
+        );
+
+        const linkType = fixedPath
+          ? "internal"
+          : row.web_navigation_item_link_type;
+
+        let path: string | null = fixedPath;
 
         let url: string | null = null;
 
         if (
-          row.web_navigation_item_link_type === "cms_page" &&
+          !fixedPath &&
+          linkType === "cms_page" &&
           row.cms_page_key &&
           row.cms_page_slug
         ) {
@@ -393,11 +437,11 @@ router.get(
           );
         }
 
-        if (row.web_navigation_item_link_type === "internal") {
+        if (!fixedPath && linkType === "internal") {
           path = validInternalPath(row.internal_path);
         }
 
-        if (row.web_navigation_item_link_type === "external") {
+        if (linkType === "external") {
           url = validExternalUrl(row.external_url);
         }
 
@@ -414,14 +458,14 @@ router.get(
 
           label: String(row.label).trim(),
 
-          link_type: row.web_navigation_item_link_type,
+          link_type: linkType,
 
           path,
 
           url,
 
           target_blank:
-            row.web_navigation_item_link_type === "external" &&
+            linkType === "external" &&
             Number(row.web_navigation_item_target_blank) === 1,
 
           icon: row.web_navigation_item_icon || null,
