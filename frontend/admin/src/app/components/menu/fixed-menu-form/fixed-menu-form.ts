@@ -180,18 +180,10 @@ export class FixedMenuForm {
 
     const value = this.form.getRawValue();
     const payload: IWebNavigationItemPayload = {
-      id_parent_web_navigation_item: null,
-      id_cms_page: null,
       web_navigation_item_key: definition.key,
-      web_navigation_item_link_type: 'internal',
-      web_navigation_item_target_blank: false,
-      web_navigation_item_icon: null,
-      web_navigation_item_badge_text: null,
-      web_navigation_item_badge_color: null,
       web_navigation_item_sort_order:
         currentItem?.sort_order ?? this.nextSortOrder(),
       web_navigation_item_status: value.status === true ? 1 : 0,
-      web_navigation_item_settings_json: currentItem?.settings ?? null,
       translations: [
         {
           locale: 'id-ID',

@@ -16,7 +16,7 @@ export class PublicNavigationService {
 
   getNavigation(key: string, locale: string): Observable<IPublicNavigationResponse> {
     return this.http.get<IPublicNavigationResponse>(
-      `${environment.cmsApiURL}/navigation/${encodeURIComponent(key)}/${encodeURIComponent(locale)}`,
+      `${environment.publicApiURL}/navigation/${encodeURIComponent(key)}/${encodeURIComponent(locale)}`,
     );
   }
 }

@@ -10,7 +10,7 @@ export interface GadgetHomeMediaRule {
 }
 
 /**
- * Harus tetap selaras dengan CMS_GADGET_HOME_MEDIA_RULES di Backend.
+ * Harus tetap selaras dengan WEBSITE_HOME_MEDIA_RULES di Backend.
  * Angka rekomendasi berasal dari aset asli tema Kartify gadget-store.
  */
 export const GADGET_HOME_MEDIA_RULES: readonly GadgetHomeMediaRule[] = [

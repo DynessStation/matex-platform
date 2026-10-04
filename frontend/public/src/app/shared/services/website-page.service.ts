@@ -15,7 +15,7 @@ export class WebsitePageService {
   getPage(locale: string, path: string) {
     return this.http
       .get<{ data: IPublicWebsitePage }>(
-        `${environment.cmsApiURL}/website-page/${encodeURIComponent(locale)}/${encodeURIComponent(path)}`,
+        `${environment.publicApiURL}/website-page/${encodeURIComponent(locale)}/${encodeURIComponent(path)}`,
         { transferCache: false },
       )
       .pipe(map((response) => response.data));

@@ -17,9 +17,9 @@ import {
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
 import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import {
-  ICmsPageDetail,
-  ICmsPageSaveRequest,
-} from '../../../shared/interface/cms-page.interface';
+  IWebsitePageEditorDetail,
+  IWebsitePageEditorSaveRequest,
+} from '../../../shared/interface/website-page-editor.interface';
 import {
   IWebsitePageDetail,
   IWebsitePageSaveRequest,
@@ -30,7 +30,7 @@ import { ApiMessageService } from '../../../shared/services/api-message.service'
 import { NotificationService } from '../../../shared/services/notification.service';
 import { WebsitePageService } from '../../../shared/services/website-page.service';
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
-import { FormCmsPage } from '../../cms-page/form-cms-page/form-cms-page';
+import { WebsitePageForm } from '../website-page-form/website-page-form';
 
 @Component({
   selector: 'app-edit-website-page',
@@ -39,7 +39,7 @@ import { FormCmsPage } from '../../cms-page/form-cms-page/form-cms-page';
     TranslateModule,
     PageWrapper,
     DetailErrorState,
-    FormCmsPage,
+    WebsitePageForm,
   ],
   templateUrl: './edit-website-page.html',
 })
@@ -52,7 +52,7 @@ export class EditWebsitePage {
 
   public pageKey = '';
   public detailErrorStatus: number | null = null;
-  public page$ = new BehaviorSubject<ICmsPageDetail | null>(null);
+  public page$ = new BehaviorSubject<IWebsitePageEditorDetail | null>(null);
   public saving = false;
 
   private source: IWebsitePageDetail | null = null;
@@ -67,7 +67,7 @@ export class EditWebsitePage {
       career: 'career',
     };
 
-    return titles[this.pageKey] ?? 'cms_page.edit_title';
+    return titles[this.pageKey] ?? 'website_page.edit_title';
   }
 
   ngOnInit(): void {
@@ -82,7 +82,7 @@ export class EditWebsitePage {
       .subscribe();
   }
 
-  submit(request: ICmsPageSaveRequest): void {
+  submit(request: IWebsitePageEditorSaveRequest): void {
     if (this.saving || !this.isWebsitePageKey(this.pageKey) || !this.source) {
       return;
     }
@@ -129,7 +129,7 @@ export class EditWebsitePage {
     return this.websitePageService.getPage(key).pipe(
       tap((page) => {
         this.source = page;
-        this.page$.next(this.toCmsPageDetail(page));
+        this.page$.next(this.toWebsitePageEditorDetail(page));
       }),
       catchError((error) => {
         this.detailErrorStatus = resolveDetailErrorStatus(error);
@@ -138,7 +138,9 @@ export class EditWebsitePage {
     );
   }
 
-  private toCmsPageDetail(page: IWebsitePageDetail): ICmsPageDetail {
+  private toWebsitePageEditorDetail(
+    page: IWebsitePageDetail,
+  ): IWebsitePageEditorDetail {
     const template =
       page.key === 'home'
         ? 'home'
@@ -147,38 +149,38 @@ export class EditWebsitePage {
           : 'standard';
 
     return {
-      id_cms_page: `fixed:${page.key}`,
-      id_parent_cms_page: null,
-      cms_page_key: page.key,
-      cms_page_type: page.key,
-      cms_page_template: template,
-      cms_page_content_mode: 'html',
-      cms_page_default_locale: page.default_locale,
-      cms_page_status: page.is_published ? 1 : 0,
+      id_website_page: `fixed:${page.key}`,
+      id_parent_website_page: null,
+      website_page_key: page.key,
+      website_page_type: page.key,
+      website_page_template: template,
+      website_page_content_mode: 'html',
+      website_page_default_locale: page.default_locale,
+      website_page_status: page.is_published ? 1 : 0,
       effective_status: page.effective_status,
-      cms_page_visibility: 1,
-      cms_page_is_system: 1,
-      cms_page_is_featured: 0,
-      cms_page_sort_order: 0,
-      cms_page_publish_at: page.publish_at,
-      cms_page_unpublish_at: page.unpublish_at,
-      cms_page_settings_json: null,
+      website_page_visibility: 1,
+      website_page_is_system: 1,
+      website_page_is_featured: 0,
+      website_page_sort_order: 0,
+      website_page_publish_at: page.publish_at,
+      website_page_unpublish_at: page.unpublish_at,
+      website_page_settings_json: null,
       translations: page.translations.map((translation) => ({
-        cms_page_locale: translation.locale,
-        cms_page_slug: translation.path,
-        cms_page_title: translation.title,
-        cms_page_excerpt: translation.summary,
-        cms_page_content: translation.body_html,
-        cms_page_content_json: translation.content,
-        cms_page_meta_title: translation.seo.title,
-        cms_page_meta_description: translation.seo.description,
-        cms_page_meta_keywords: translation.seo.keywords,
-        cms_page_meta_robots: translation.seo.robots,
-        cms_page_canonical_url: translation.seo.canonical_url,
-        cms_page_og_title: translation.seo.social_title,
-        cms_page_og_description: translation.seo.social_description,
-        cms_page_schema_json: translation.seo.schema,
-        cms_page_i18n_status: translation.is_published ? 1 : 0,
+        website_page_locale: translation.locale,
+        website_page_slug: translation.path,
+        website_page_title: translation.title,
+        website_page_excerpt: translation.summary,
+        website_page_content: translation.body_html,
+        website_page_content_json: translation.content,
+        website_page_meta_title: translation.seo.title,
+        website_page_meta_description: translation.seo.description,
+        website_page_meta_keywords: translation.seo.keywords,
+        website_page_meta_robots: translation.seo.robots,
+        website_page_canonical_url: translation.seo.canonical_url,
+        website_page_og_title: translation.seo.social_title,
+        website_page_og_description: translation.seo.social_description,
+        website_page_schema_json: translation.seo.schema,
+        website_page_i18n_status: translation.is_published ? 1 : 0,
         created: translation.created,
         updated: translation.updated,
       })),
@@ -196,15 +198,15 @@ export class EditWebsitePage {
         width: media.width,
         height: media.height,
         asset_url: media.asset_url,
-        cms_page_attachment_role: media.slot,
-        cms_page_attachment_sort_order: media.sort_order,
-        cms_page_attachment_is_public: media.is_visible ? 1 : 0,
-        cms_page_attachment_action_type: media.click_action,
-        cms_page_attachment_action_value: media.click_target,
+        website_page_attachment_role: media.slot,
+        website_page_attachment_sort_order: media.sort_order,
+        website_page_attachment_is_public: media.is_visible ? 1 : 0,
+        website_page_attachment_action_type: media.click_action,
+        website_page_attachment_action_value: media.click_target,
         translations: media.translations.map((translation) => ({
-          cms_page_attachment_locale: translation.locale,
-          cms_page_attachment_caption: translation.caption,
-          cms_page_attachment_alt_text: translation.alt_text,
+          website_page_attachment_locale: translation.locale,
+          website_page_attachment_caption: translation.caption,
+          website_page_attachment_alt_text: translation.alt_text,
           created: media.created,
           updated: media.updated,
         })),
@@ -221,7 +223,7 @@ export class EditWebsitePage {
   }
 
   private toWebsitePageSaveRequest(
-    request: ICmsPageSaveRequest,
+    request: IWebsitePageEditorSaveRequest,
   ): IWebsitePageSaveRequest {
     const source = this.source!;
     let isPublished = source.is_published;
@@ -233,12 +235,12 @@ export class EditWebsitePage {
         case 'publish':
           isPublished = true;
           publishAt = null;
-          unpublishAt = action.cms_page_unpublish_at ?? null;
+          unpublishAt = action.website_page_unpublish_at ?? null;
           break;
         case 'schedule':
           isPublished = true;
-          publishAt = action.cms_page_publish_at ?? null;
-          unpublishAt = action.cms_page_unpublish_at ?? null;
+          publishAt = action.website_page_publish_at ?? null;
+          unpublishAt = action.website_page_unpublish_at ?? null;
           break;
         case 'cancel_schedule':
         case 'unpublish':

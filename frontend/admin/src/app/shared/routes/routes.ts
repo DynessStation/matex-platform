@@ -71,7 +71,7 @@ export const content: Routes = [
   },
 
   //==================================================
-  //==== CMS PAGE
+  //==== WEBSITE PAGE
   //==================================================
 
   {
@@ -82,18 +82,6 @@ export const content: Routes = [
     loadChildren: () =>
       import('../../components/website-page/website-page.routes').then(
         (routes) => routes.websitePageRoutes,
-      ),
-  },
-
-  // Legacy CMS routes remain available until the final migration cleanup.
-  {
-    path: 'cms-page',
-
-    canActivate: [AuthGuard],
-
-    loadChildren: () =>
-      import('../../components/cms-page/cms-page.routes').then(
-        (routes) => routes.cmsPageRoutes,
       ),
   },
 

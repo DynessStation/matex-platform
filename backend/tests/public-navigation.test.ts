@@ -7,7 +7,7 @@ import { pool } from "../src/db";
 
 const router = require("../src/ctrl/public/navigation").default;
 const originalQuery = pool.query;
-const originalCompany = process.env.PUBLIC_CMS_COMPANY_ID;
+const originalCompany = process.env.PUBLIC_COMPANY_ID;
 const app = express();
 app.use(router);
 const server = app.listen(0, "127.0.0.1");
@@ -33,9 +33,9 @@ after(async () => {
   pool.query = originalQuery;
 
   if (originalCompany === undefined) {
-    delete process.env.PUBLIC_CMS_COMPANY_ID;
+    delete process.env.PUBLIC_COMPANY_ID;
   } else {
-    process.env.PUBLIC_CMS_COMPANY_ID = originalCompany;
+    process.env.PUBLIC_COMPANY_ID = originalCompany;
   }
 
   await new Promise<void>((resolve, reject) =>
@@ -45,7 +45,7 @@ after(async () => {
 });
 
 function reset() {
-  process.env.PUBLIC_CMS_COMPANY_ID = "7";
+  process.env.PUBLIC_COMPANY_ID = "7";
   calls = [];
   rows = [];
 }
@@ -59,7 +59,7 @@ const navigation = {
 
 test("missing tenant fails closed before querying", async () => {
   reset();
-  delete process.env.PUBLIC_CMS_COMPANY_ID;
+  delete process.env.PUBLIC_COMPANY_ID;
   const response = await fetch(`${base}/primary/id-ID`);
 
   assert.equal(response.status, 503);
@@ -103,7 +103,7 @@ test("missing or inactive navigation is a generic 404", async () => {
   }
 });
 
-test("public lookup uses the server tenant and does not join legacy CMS tables", async () => {
+test("public lookup uses the server tenant and fixed navigation tables", async () => {
   reset();
   rows = [[navigation], []];
   const response = await fetch(`${base}/primary/id-ID?id_master_comp=999`);
@@ -111,8 +111,6 @@ test("public lookup uses the server tenant and does not join legacy CMS tables",
   assert.equal(response.status, 200);
   assert.deepEqual(calls[0].params, [7, "primary"]);
   assert.deepEqual(calls[1].params, ["id-ID", "id-ID", 14, 7]);
-  assert.equal(calls[1].sql.includes("cms_page"), false);
-  assert.equal(calls[1].sql.includes("id_cms_page"), false);
 });
 
 test("fixed items keep database order and localized labels", async () => {
@@ -177,13 +175,7 @@ test("fixed items keep database order and localized labels", async () => {
   assert.deepEqual(body.data.items[0], {
     key: "home",
     label: "Beranda",
-    link_type: "internal",
     path: "/",
-    url: null,
-    target_blank: false,
-    icon: null,
-    badge: null,
-    children: [],
   });
 });
 
@@ -264,13 +256,7 @@ test("unknown, duplicate and legacy alias items cannot extend the fixed header",
     {
       key: "articles",
       label: "Blog",
-      link_type: "internal",
       path: "/en/articles",
-      url: null,
-      target_blank: false,
-      icon: null,
-      badge: null,
-      children: [],
     },
   ]);
 });

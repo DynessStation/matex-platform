@@ -6,7 +6,7 @@
       (retry)="retryDetail()"
     />
   } @else if (page$ | async; as page) {
-    <app-form-cms-page
+    <app-website-page-form
       [mode]="'edit'"
       [editData]="page"
       [saving]="saving"

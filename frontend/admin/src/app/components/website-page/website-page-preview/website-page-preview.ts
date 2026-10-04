@@ -15,10 +15,10 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslateModule } from '@ngx-translate/core';
 
 import {
-  ICmsPageAttachment,
-  ICmsPageDetail,
-  ICmsPageTranslation,
-} from '../../../shared/interface/cms-page.interface';
+  IWebsitePageEditorAttachment,
+  IWebsitePageEditorDetail,
+  IWebsitePageEditorTranslation,
+} from '../../../shared/interface/website-page-editor.interface';
 
 //==================================================
 //==== TYPE
@@ -31,15 +31,15 @@ type PreviewViewport = 'fit' | 'desktop' | 'tablet' | 'mobile';
 //==================================================
 
 @Component({
-  selector: 'app-cms-page-preview',
+  selector: 'app-website-page-preview',
 
   imports: [TranslateModule],
 
-  templateUrl: './cms-page-preview.html',
+  templateUrl: './website-page-preview.html',
 
-  styleUrl: './cms-page-preview.scss',
+  styleUrl: './website-page-preview.scss',
 })
-export class CmsPagePreview implements OnChanges, OnDestroy {
+export class WebsitePagePreview implements OnChanges, OnDestroy {
   //==================================================
   //==== INJECT
   //==================================================
@@ -53,7 +53,7 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
   //==================================================
 
   @Input({ required: true })
-  page!: ICmsPageDetail;
+  page!: IWebsitePageEditorDetail;
 
   //==================================================
   //==== STATE
@@ -77,12 +77,14 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
     }
 
     const locales = this.page.translations.map(
-      (translation) => translation.cms_page_locale,
+      (translation) => translation.website_page_locale,
     );
 
     if (!locales.includes(this.selectedLocale)) {
-      this.selectedLocale = locales.includes(this.page.cms_page_default_locale)
-        ? this.page.cms_page_default_locale
+      this.selectedLocale = locales.includes(
+        this.page.website_page_default_locale,
+      )
+        ? this.page.website_page_default_locale
         : (locales[0] ?? '');
     }
 
@@ -162,10 +164,11 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
     );
   }
 
-  private getSelectedTranslation(): ICmsPageTranslation | null {
+  private getSelectedTranslation(): IWebsitePageEditorTranslation | null {
     return (
       this.page.translations.find(
-        (translation) => translation.cms_page_locale === this.selectedLocale,
+        (translation) =>
+          translation.website_page_locale === this.selectedLocale,
       ) ??
       this.page.translations[0] ??
       null
@@ -176,33 +179,36 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
   //==== DOCUMENT
   //==================================================
 
-  private buildPreviewDocument(translation: ICmsPageTranslation): string {
-    const title = this.escapeHtml(translation.cms_page_title || '');
+  private buildPreviewDocument(
+    translation: IWebsitePageEditorTranslation,
+  ): string {
+    const title = this.escapeHtml(translation.website_page_title || '');
 
-    const excerpt = this.escapeHtml(translation.cms_page_excerpt || '');
+    const excerpt = this.escapeHtml(translation.website_page_excerpt || '');
 
-    const content = translation.cms_page_content?.trim() || '<p><em>—</em></p>';
+    const content =
+      translation.website_page_content?.trim() || '<p><em>—</em></p>';
 
     const hero = this.getHeroAttachment();
 
     const heroHtml = hero
-      ? this.buildHero(hero, translation.cms_page_locale)
+      ? this.buildHero(hero, translation.website_page_locale)
       : '';
 
-    const galleryHtml = this.buildGallery(translation.cms_page_locale);
+    const galleryHtml = this.buildGallery(translation.website_page_locale);
 
     const isGadgetHome = ['home', 'gadget-home-v1'].includes(
-      this.page.cms_page_template ?? '',
+      this.page.website_page_template ?? '',
     );
 
     const gadgetHomeHtml = isGadgetHome
-      ? this.buildGadgetHome(translation.cms_page_locale)
+      ? this.buildGadgetHome(translation.website_page_locale)
       : '';
 
     return `
       <!doctype html>
 
-      <html lang="${this.escapeHtml(translation.cms_page_locale)}">
+      <html lang="${this.escapeHtml(translation.website_page_locale)}">
         <head>
           <meta charset="utf-8">
 
@@ -452,8 +458,8 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
     const slot = (role: string, className: string, label: string): string => {
       const attachment = this.page.attachments.find(
         (item) =>
-          item.cms_page_attachment_role === role &&
-          item.cms_page_attachment_is_public === 1,
+          item.website_page_attachment_role === role &&
+          item.website_page_attachment_is_public === 1,
       );
 
       if (!attachment) {
@@ -461,11 +467,11 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
       }
 
       const translation = attachment.translations.find(
-        (item) => item.cms_page_attachment_locale === locale,
+        (item) => item.website_page_attachment_locale === locale,
       );
 
       const alt = this.escapeHtml(
-        translation?.cms_page_attachment_alt_text || attachment.name || '',
+        translation?.website_page_attachment_alt_text || attachment.name || '',
       );
 
       return `<div class="${className}"><img src="${this.escapeHtml(attachment.asset_url)}" alt="${alt}"></div>`;
@@ -494,23 +500,26 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
   //==== HERO
   //==================================================
 
-  private getHeroAttachment(): ICmsPageAttachment | null {
+  private getHeroAttachment(): IWebsitePageEditorAttachment | null {
     return (
       this.page.attachments.find(
         (attachment) =>
-          attachment.cms_page_attachment_role === 'hero' &&
-          attachment.cms_page_attachment_is_public === 1,
+          attachment.website_page_attachment_role === 'hero' &&
+          attachment.website_page_attachment_is_public === 1,
       ) ?? null
     );
   }
 
-  private buildHero(attachment: ICmsPageAttachment, locale: string): string {
+  private buildHero(
+    attachment: IWebsitePageEditorAttachment,
+    locale: string,
+  ): string {
     const translation = attachment.translations.find(
-      (item) => item.cms_page_attachment_locale === locale,
+      (item) => item.website_page_attachment_locale === locale,
     );
 
     const alt = this.escapeHtml(
-      translation?.cms_page_attachment_alt_text || attachment.name || '',
+      translation?.website_page_attachment_alt_text || attachment.name || '',
     );
 
     return `
@@ -529,8 +538,8 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
   private buildGallery(locale: string): string {
     const attachments = this.page.attachments.filter(
       (attachment) =>
-        attachment.cms_page_attachment_role === 'gallery' &&
-        attachment.cms_page_attachment_is_public === 1,
+        attachment.website_page_attachment_role === 'gallery' &&
+        attachment.website_page_attachment_is_public === 1,
     );
 
     if (!attachments.length) {
@@ -540,15 +549,17 @@ export class CmsPagePreview implements OnChanges, OnDestroy {
     const items = attachments
       .map((attachment) => {
         const translation = attachment.translations.find(
-          (item) => item.cms_page_attachment_locale === locale,
+          (item) => item.website_page_attachment_locale === locale,
         );
 
         const alt = this.escapeHtml(
-          translation?.cms_page_attachment_alt_text || attachment.name || '',
+          translation?.website_page_attachment_alt_text ||
+            attachment.name ||
+            '',
         );
 
         const caption = this.escapeHtml(
-          translation?.cms_page_attachment_caption || '',
+          translation?.website_page_attachment_caption || '',
         );
 
         return `

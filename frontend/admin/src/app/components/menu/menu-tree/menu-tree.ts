@@ -160,19 +160,13 @@ export class MenuTree {
 
   private buildReorderPayload(
     items: IWebNavigationTreeItem[],
-    parentId: string | null = null,
     result: IWebNavigationReorderItem[] = [],
   ): IWebNavigationReorderItem[] {
     items.forEach((item, index) => {
       result.push({
         id_web_navigation_item: item.id_web_navigation_item,
-
-        id_parent_web_navigation_item: parentId,
-
         sort_order: index,
       });
-
-      this.buildReorderPayload(item.child, item.id_web_navigation_item, result);
     });
 
     return result;

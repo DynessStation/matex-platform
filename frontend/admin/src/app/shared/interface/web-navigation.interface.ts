@@ -2,9 +2,6 @@ export type WebNavigationStatus = 0 | 1;
 
 export type WebNavigationItemStatus = 0 | 1;
 
-export type WebNavigationItemLinkType =
-  'cms_page' | 'internal' | 'external' | 'label';
-
 export interface IWebNavigationSummary {
   id_web_navigation: string;
 
@@ -51,38 +48,14 @@ export interface IWebNavigationItemTranslation {
   status: WebNavigationItemStatus;
 }
 
-export interface IWebNavigationCmsPageReference {
-  key: string | null;
-
-  title: string | null;
-}
-
 export interface IWebNavigationItem {
   id_web_navigation_item: string;
 
-  id_parent_web_navigation_item: string | null;
-
-  id_cms_page: string | null;
-
-  cms_page: IWebNavigationCmsPageReference | null;
-
   key: string;
-
-  link_type: WebNavigationItemLinkType;
-
-  target_blank: boolean;
-
-  icon: string | null;
-
-  badge_text: string | null;
-
-  badge_color: string | null;
 
   sort_order: number;
 
   status: WebNavigationItemStatus;
-
-  settings: Record<string, unknown> | null;
 
   translations: IWebNavigationItemTranslation[];
 
@@ -165,35 +138,17 @@ export interface IWebNavigationItemTranslationPayload {
 }
 
 export interface IWebNavigationItemPayload {
-  id_parent_web_navigation_item: string | null;
-
-  id_cms_page: string | null;
-
   web_navigation_item_key: string;
-
-  web_navigation_item_link_type: WebNavigationItemLinkType;
-
-  web_navigation_item_target_blank: boolean;
-
-  web_navigation_item_icon: string | null;
-
-  web_navigation_item_badge_text: string | null;
-
-  web_navigation_item_badge_color: string | null;
 
   web_navigation_item_sort_order: number;
 
   web_navigation_item_status: WebNavigationItemStatus;
-
-  web_navigation_item_settings_json: Record<string, unknown> | null;
 
   translations: IWebNavigationItemTranslationPayload[];
 }
 
 export interface IWebNavigationReorderItem {
   id_web_navigation_item: string;
-
-  id_parent_web_navigation_item: string | null;
 
   sort_order: number;
 }

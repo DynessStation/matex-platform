@@ -41,7 +41,7 @@ export class Footer {
   }
 
   get companyLinks(): IPublicNavigationItem[] {
-    return this.navigation.primaryItems().filter((item) => item.path || item.url);
+    return this.navigation.primaryItems();
   }
 
   get quickLinks(): Array<{ label: string; path: string }> {
@@ -78,9 +78,11 @@ export class Footer {
 
   primaryChannel(data: PublicContactData | null, type: string): PublicContactChannel | null {
     const channels = data?.channels ?? [];
-    return channels.find((channel) => channel.type === type && channel.is_primary)
-      ?? channels.find((channel) => channel.type === type)
-      ?? null;
+    return (
+      channels.find((channel) => channel.type === type && channel.is_primary) ??
+      channels.find((channel) => channel.type === type) ??
+      null
+    );
   }
 
   channelIcon(type: string): string {

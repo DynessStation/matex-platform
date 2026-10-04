@@ -33,7 +33,7 @@ const channelUrl = (type: string, value: string, configured: unknown) => {
 
 router.get("/api/public/contact/:locale", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  const company = Number(process.env.PUBLIC_CMS_COMPANY_ID);
+  const company = Number(process.env.PUBLIC_COMPANY_ID);
   const locale = String(req.params.locale ?? "");
   if (!Number.isSafeInteger(company) || company <= 0)
     return sendError(res, 503, "CONTACT_UNAVAILABLE", "Contact is not configured");
@@ -105,7 +105,7 @@ router.get("/api/public/contact/:locale", async (req, res) => {
 
 router.post("/api/public/contact-inquiry", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  const company = Number(process.env.PUBLIC_CMS_COMPANY_ID);
+  const company = Number(process.env.PUBLIC_COMPANY_ID);
   if (!Number.isSafeInteger(company) || company <= 0)
     return sendError(res, 503, "CONTACT_UNAVAILABLE", "Contact is not configured");
 

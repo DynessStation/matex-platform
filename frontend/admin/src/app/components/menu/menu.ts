@@ -161,36 +161,15 @@ export class Menu {
       return [];
     }
 
-    const nodes = new Map<string, IWebNavigationTreeItem>();
+    const rootItems = navigation.items.map((item) => ({
+      ...item,
 
-    navigation.items.forEach((item) => {
-      nodes.set(item.id_web_navigation_item, {
-        ...item,
+      title: this.itemTitle(item, navigation.default_locale),
 
-        title: this.itemTitle(item, navigation.default_locale),
+      child: [],
 
-        child: [],
-
-        show: true,
-      });
-    });
-
-    const rootItems: IWebNavigationTreeItem[] = [];
-
-    nodes.forEach((item) => {
-      const parentId = item.id_parent_web_navigation_item;
-
-      const parent = parentId ? nodes.get(parentId) : null;
-
-      if (
-        parent &&
-        parent.id_web_navigation_item !== item.id_web_navigation_item
-      ) {
-        parent.child.push(item);
-      } else {
-        rootItems.push(item);
-      }
-    });
+      show: true,
+    })) satisfies IWebNavigationTreeItem[];
 
     this.sortTree(rootItems);
 
@@ -207,10 +186,6 @@ export class Menu {
 
   private sortTree(items: IWebNavigationTreeItem[]): void {
     items.sort((first, second) => first.sort_order - second.sort_order);
-
-    items.forEach((item) => {
-      this.sortTree(item.child);
-    });
   }
 
   private loadPrimaryNavigation(): void {

@@ -87,23 +87,12 @@ app.use(express.json());
 const adminFolder = path.join(__dirname, "ctrl", "admin");
 const publicFolder = path.join(__dirname, "ctrl", "public");
 
-// Legacy CMS handlers stay in source until the database cleanup migration,
-// but are no longer part of the running application. Fixed website pages use
-// the website-page handlers instead.
-const disabledAdminRoutes = new Set(["cms-page"]);
-const disabledPublicRoutes = new Set(["cms-page"]);
-
 if (fs.existsSync(adminFolder)) {
   const files = fs.readdirSync(adminFolder);
 
   files.forEach((file) => {
     if (file.endsWith(".ts") || file.endsWith(".js")) {
       const routeName = path.parse(file).name;
-
-      if (disabledAdminRoutes.has(routeName)) {
-        console.log(`[Auto-Load] Lewati rute legacy: admin/${file}`);
-        return;
-      }
 
       const routePath = `./ctrl/admin/${routeName}`;
 
@@ -136,11 +125,6 @@ if (fs.existsSync(publicFolder)) {
   files.forEach((file) => {
     if (file.endsWith(".ts") || file.endsWith(".js")) {
       const routeName = path.parse(file).name;
-
-      if (disabledPublicRoutes.has(routeName)) {
-        console.log(`[Auto-Load] Lewati rute legacy: public/${file}`);
-        return;
-      }
 
       const routePath = `./ctrl/public/${routeName}`;
 

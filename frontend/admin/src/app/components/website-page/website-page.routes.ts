@@ -8,7 +8,7 @@ export const websitePageRoutes: Routes = [
     canActivate: [PermissionGuard],
     data: {
       permission: 'website_page.update',
-      titleKey: 'cms_page.edit_title',
+      titleKey: 'website_page.edit_title',
     },
     loadComponent: () =>
       import('./edit-website-page/edit-website-page').then(

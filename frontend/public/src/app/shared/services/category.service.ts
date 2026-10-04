@@ -16,14 +16,14 @@ export class CategoryService {
   getCategories(_payload?: Params): Observable<CategoryModel> {
     return this.http
       .get<PublicApiResponse<CategoryModel>>(
-        `${environment.cmsApiURL}/product-categories/${this.locale()}`,
+        `${environment.publicApiURL}/product-categories/${this.locale()}`,
       )
       .pipe(map((response) => response.data ?? { data: [], total: 0 }));
   }
   getCategoryBySlug(slug: string, locale: 'id-ID' | 'en-US' = this.locale()): Observable<Category> {
     return this.http
       .get<PublicApiResponse<Category>>(
-        `${environment.cmsApiURL}/product-categories/${locale}/${encodeURIComponent(slug)}`,
+        `${environment.publicApiURL}/product-categories/${locale}/${encodeURIComponent(slug)}`,
       )
       .pipe(map((response) => response.data!));
   }

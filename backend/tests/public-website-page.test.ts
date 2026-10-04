@@ -9,7 +9,7 @@ process.env.FILE_BASE_URL ||= "http://localhost/files";
 
 const router = require("../src/ctrl/public/website-page").default;
 const originalQuery = pool.query;
-const originalCompany = process.env.PUBLIC_CMS_COMPANY_ID;
+const originalCompany = process.env.PUBLIC_COMPANY_ID;
 const app = express();
 app.use(router);
 const server = app.listen(0, "127.0.0.1");
@@ -30,8 +30,8 @@ before(async () => {
 
 after(async () => {
   pool.query = originalQuery;
-  if (originalCompany === undefined) delete process.env.PUBLIC_CMS_COMPANY_ID;
-  else process.env.PUBLIC_CMS_COMPANY_ID = originalCompany;
+  if (originalCompany === undefined) delete process.env.PUBLIC_COMPANY_ID;
+  else process.env.PUBLIC_COMPANY_ID = originalCompany;
   await new Promise<void>((resolve, reject) =>
     server.close((error) => (error ? reject(error) : resolve())),
   );
@@ -39,14 +39,14 @@ after(async () => {
 });
 
 function reset() {
-  process.env.PUBLIC_CMS_COMPANY_ID = "7";
+  process.env.PUBLIC_COMPANY_ID = "7";
   calls = [];
   rows = [];
 }
 
 test("missing deployment company fails closed before querying", async () => {
   reset();
-  delete process.env.PUBLIC_CMS_COMPANY_ID;
+  delete process.env.PUBLIC_COMPANY_ID;
   const response = await fetch(`${base}/id-ID/tentang-matex`);
   assert.equal(response.status, 503);
   assert.equal(calls.length, 0);

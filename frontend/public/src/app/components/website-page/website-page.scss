@@ -2,18 +2,7 @@
   display: block;
 }
 
-.cms-hero-wrapper {
-  overflow: hidden;
-
-  .cms-hero {
-    display: block;
-    width: 100%;
-    max-height: 520px;
-    object-fit: cover;
-  }
-}
-
-.cms-content {
+.website-page-content {
   max-width: 960px;
   margin-inline: auto;
   overflow-wrap: anywhere;
@@ -40,18 +29,5 @@
       max-width: 100%;
       overflow-x: auto;
     }
-  }
-}
-
-.cms-gallery-item {
-  margin: 0;
-
-  img {
-    width: 100%;
-    height: auto;
-  }
-
-  figcaption {
-    margin-top: 10px;
   }
 }

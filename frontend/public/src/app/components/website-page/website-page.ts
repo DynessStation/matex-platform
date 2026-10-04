@@ -24,7 +24,7 @@ import { WebsitePageService } from '../../shared/services/website-page.service';
   selector: 'app-website-page',
   imports: [Breadcrumb],
   templateUrl: './website-page.html',
-  styleUrl: '../cms-page/cms-page.scss',
+  styleUrl: './website-page.scss',
 })
 export class WebsitePage {
   private readonly route = inject(ActivatedRoute);
@@ -118,7 +118,7 @@ export class WebsitePage {
       this.meta.updateTag({ name, content: page.seo[name] });
     }
 
-    const site = environment.cmsSiteURL.replace(/\/$/, '');
+    const site = environment.publicSiteURL.replace(/\/$/, '');
     const fallbackUrl = `${site}${this.pageContext.pathFor(page.locale, page.path, page.key)}`;
     let canonical = fallbackUrl;
 

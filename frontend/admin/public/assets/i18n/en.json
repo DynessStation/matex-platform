@@ -1914,7 +1914,7 @@
   "common_ui": {
     "no_data_found": "No data found"
   },
-  "cms_page": {
+  "website_page": {
     "title": "Pages",
     "page_title": "Title",
     "key": "Internal identifier",

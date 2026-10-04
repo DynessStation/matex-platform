@@ -21,19 +21,13 @@ type NavigationRow = RowDataPacket & {
 type PublicNavigationItem = {
   key: string;
   label: string;
-  link_type: "internal";
   path: string;
-  url: null;
-  target_blank: false;
-  icon: null;
-  badge: null;
-  children: [];
 };
 
 router.get("/api/public/navigation/:key/:locale", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
 
-  const company = Number(process.env.PUBLIC_CMS_COMPANY_ID);
+  const company = Number(process.env.PUBLIC_COMPANY_ID);
 
   if (!Number.isSafeInteger(company) || company <= 0) {
     return sendError(
@@ -143,13 +137,7 @@ router.get("/api/public/navigation/:key/:locale", async (req, res) => {
       items.push({
         key: normalizedKey,
         label,
-        link_type: "internal",
         path: getFixedWebNavigationPath(normalizedKey, locale),
-        url: null,
-        target_blank: false,
-        icon: null,
-        badge: null,
-        children: [],
       });
     }
 

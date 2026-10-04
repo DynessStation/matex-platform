@@ -6,11 +6,11 @@
   <div class="cms-preview-toolbar">
     <div>
       <h5 class="mb-1">
-        {{ 'cms_page.preview' | translate }}
+        {{ 'website_page.preview' | translate }}
       </h5>
 
       <small class="text-muted">
-        {{ 'cms_page.preview_internal_notice' | translate }}
+        {{ 'website_page.preview_internal_notice' | translate }}
       </small>
     </div>
 
@@ -20,39 +20,41 @@
       <div class="d-flex flex-wrap gap-1">
         @for (
           translation of page.translations;
-          track translation.cms_page_locale
+          track translation.website_page_locale
         ) {
           <button
             type="button"
             class="btn btn-sm d-flex align-items-center gap-2"
-            [class.btn-theme]="selectedLocale === translation.cms_page_locale"
-            [class.btn-light-bg]="
-              selectedLocale !== translation.cms_page_locale
+            [class.btn-theme]="
+              selectedLocale === translation.website_page_locale
             "
-            (click)="selectLocale(translation.cms_page_locale)"
+            [class.btn-light-bg]="
+              selectedLocale !== translation.website_page_locale
+            "
+            (click)="selectLocale(translation.website_page_locale)"
           >
             <strong>
-              {{ translation.cms_page_locale === 'id-ID' ? 'ID' : 'EN' }}
+              {{ translation.website_page_locale === 'id-ID' ? 'ID' : 'EN' }}
             </strong>
 
             <span>
               {{
-                (translation.cms_page_locale === 'id-ID'
-                  ? 'cms_page.language_indonesian'
-                  : 'cms_page.language_english'
+                (translation.website_page_locale === 'id-ID'
+                  ? 'website_page.language_indonesian'
+                  : 'website_page.language_english'
                 ) | translate
               }}
             </span>
 
             <span
               class="badge"
-              [class.bg-success]="translation.cms_page_i18n_status === 1"
-              [class.bg-secondary]="translation.cms_page_i18n_status !== 1"
+              [class.bg-success]="translation.website_page_i18n_status === 1"
+              [class.bg-secondary]="translation.website_page_i18n_status !== 1"
             >
               {{
-                (translation.cms_page_i18n_status === 1
-                  ? 'cms_page.translation_published'
-                  : 'cms_page.translation_draft'
+                (translation.website_page_i18n_status === 1
+                  ? 'website_page.translation_published'
+                  : 'website_page.translation_draft'
                 ) | translate
               }}
             </span>
@@ -69,7 +71,7 @@
           [class.btn-theme]="viewport === 'fit'"
           [class.btn-light-bg]="viewport !== 'fit'"
           (click)="setViewport('fit')"
-          [title]="'cms_page.preview_fit' | translate"
+          [title]="'website_page.preview_fit' | translate"
         >
           <i class="ri-layout-line"></i>
         </button>
@@ -80,7 +82,7 @@
           [class.btn-theme]="viewport === 'desktop'"
           [class.btn-light-bg]="viewport !== 'desktop'"
           (click)="setViewport('desktop')"
-          [title]="'cms_page.preview_desktop' | translate"
+          [title]="'website_page.preview_desktop' | translate"
         >
           <i class="ri-computer-line"></i>
         </button>
@@ -91,7 +93,7 @@
           [class.btn-theme]="viewport === 'tablet'"
           [class.btn-light-bg]="viewport !== 'tablet'"
           (click)="setViewport('tablet')"
-          [title]="'cms_page.preview_tablet' | translate"
+          [title]="'website_page.preview_tablet' | translate"
         >
           <i class="ri-tablet-line"></i>
         </button>
@@ -102,7 +104,7 @@
           [class.btn-theme]="viewport === 'mobile'"
           [class.btn-light-bg]="viewport !== 'mobile'"
           (click)="setViewport('mobile')"
-          [title]="'cms_page.preview_mobile' | translate"
+          [title]="'website_page.preview_mobile' | translate"
         >
           <i class="ri-smartphone-line"></i>
         </button>
@@ -122,7 +124,7 @@
           [src]="previewUrl"
           sandbox
           referrerpolicy="no-referrer"
-          [attr.title]="'cms_page.preview_frame_title' | translate"
+          [attr.title]="'website_page.preview_frame_title' | translate"
         ></iframe>
       }
     </div>

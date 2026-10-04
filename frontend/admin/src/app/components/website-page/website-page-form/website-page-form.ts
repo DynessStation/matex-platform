@@ -37,24 +37,24 @@ import {
 } from '../../../shared/data/gadget-home-media';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
-  CmsPageEffectiveStatus,
-  CmsPageI18nStatus,
-  CmsPageStatus,
-  ICmsPageAttachment,
-  ICmsPageDetail,
-  ICmsPageTranslation,
-  ICmsPagePayload,
-  ICmsPagePublicationPayload,
-  ICmsPageSaveRequest,
-} from '../../../shared/interface/cms-page.interface';
+  WebsitePageEditorEffectiveStatus,
+  WebsitePageEditorI18nStatus,
+  WebsitePageEditorStatus,
+  IWebsitePageEditorAttachment,
+  IWebsitePageEditorDetail,
+  IWebsitePageEditorTranslation,
+  IWebsitePageEditorPayload,
+  IWebsitePageEditorPublicationPayload,
+  IWebsitePageEditorSaveRequest,
+} from '../../../shared/interface/website-page-editor.interface';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { AuthState } from '../../../shared/store/state/auth.state';
 import { hasPermissionAccess } from '../../../shared/utils/permission.util';
-import { CmsPagePreview } from '../cms-page-preview/cms-page-preview';
+import { WebsitePagePreview } from '../website-page-preview/website-page-preview';
 
-type CmsPageLocale = 'id-ID' | 'en-US';
+type WebsitePageEditorLocale = 'id-ID' | 'en-US';
 
-type CmsPagePublicationChoice =
+type WebsitePageEditorPublicationChoice =
   'current' | 'draft' | 'publish_now' | 'schedule' | 'archive';
 
 const HOME_SECTION_KEYS = [
@@ -82,13 +82,13 @@ interface AboutFeatureDraft {
 //==== MEDIA DRAFT
 //==================================================
 
-interface CmsPageMediaTranslationDraft {
+interface WebsitePageEditorMediaTranslationDraft {
   caption: string;
 
   alt_text: string;
 }
 
-interface CmsPageMediaDraft {
+interface WebsitePageEditorMediaDraft {
   attachment: IAttachment;
 
   role: string;
@@ -99,7 +99,10 @@ interface CmsPageMediaDraft {
 
   action_value: string;
 
-  translations: Record<CmsPageLocale, CmsPageMediaTranslationDraft>;
+  translations: Record<
+    WebsitePageEditorLocale,
+    WebsitePageEditorMediaTranslationDraft
+  >;
 }
 
 //==================================================
@@ -107,7 +110,7 @@ interface CmsPageMediaDraft {
 //==================================================
 
 @Component({
-  selector: 'app-form-cms-page',
+  selector: 'app-website-page-form',
 
   imports: [
     DatePipe,
@@ -117,14 +120,14 @@ interface CmsPageMediaDraft {
     TranslateModule,
     NgxEditorModule,
     MediaModal,
-    CmsPagePreview,
+    WebsitePagePreview,
   ],
 
-  templateUrl: './form-cms-page.html',
+  templateUrl: './website-page-form.html',
 
-  styleUrl: './form-cms-page.scss',
+  styleUrl: './website-page-form.scss',
 })
-export class FormCmsPage {
+export class WebsitePageForm {
   //==================================================
   //==== INJECT
   //==================================================
@@ -140,11 +143,11 @@ export class FormCmsPage {
 
   readonly mode = input<'create' | 'edit'>('create');
 
-  readonly editData = input<ICmsPageDetail | null>(null);
+  readonly editData = input<IWebsitePageEditorDetail | null>(null);
 
   readonly saving = input(false);
 
-  readonly submitted = output<ICmsPageSaveRequest>();
+  readonly submitted = output<IWebsitePageEditorSaveRequest>();
 
   //==================================================
   //==== VIEW STATE
@@ -152,13 +155,13 @@ export class FormCmsPage {
 
   public activeTab = 'general';
 
-  public activeLocale: CmsPageLocale = 'id-ID';
+  public activeLocale: WebsitePageEditorLocale = 'id-ID';
 
   //==================================================
   //==== PREVIEW
   //==================================================
 
-  public previewPage: ICmsPageDetail | null = null;
+  public previewPage: IWebsitePageEditorDetail | null = null;
 
   //==================================================
   //==== MEDIA
@@ -166,7 +169,7 @@ export class FormCmsPage {
 
   readonly mediaModal = viewChild<MediaModal>('mediaModal');
 
-  public pageMedia: CmsPageMediaDraft[] = [];
+  public pageMedia: WebsitePageEditorMediaDraft[] = [];
 
   public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -176,7 +179,7 @@ export class FormCmsPage {
   //==== PUBLICATION
   //==================================================
 
-  public publicationChoice: CmsPagePublicationChoice =
+  public publicationChoice: WebsitePageEditorPublicationChoice =
     this.mode() === 'edit' ? 'current' : 'draft';
 
   public publicationPublishAt = '';
@@ -216,18 +219,18 @@ export class FormCmsPage {
   ];
 
   public readonly supportedLanguages: {
-    locale: CmsPageLocale;
+    locale: WebsitePageEditorLocale;
     labelKey: string;
     shortLabel: string;
   }[] = [
     {
       locale: 'id-ID',
-      labelKey: 'cms_page.language_indonesian',
+      labelKey: 'website_page.language_indonesian',
       shortLabel: 'ID',
     },
     {
       locale: 'en-US',
-      labelKey: 'cms_page.language_english',
+      labelKey: 'website_page.language_english',
       shortLabel: 'EN',
     },
   ];
@@ -309,12 +312,15 @@ export class FormCmsPage {
     },
   ];
 
-  public homeSectionVisibility: Record<CmsPageLocale, HomeSectionVisibility> = {
+  public homeSectionVisibility: Record<
+    WebsitePageEditorLocale,
+    HomeSectionVisibility
+  > = {
     'id-ID': this.createHomeSectionVisibility(),
     'en-US': this.createHomeSectionVisibility(),
   };
 
-  public aboutFeatures: Record<CmsPageLocale, AboutFeatureDraft[]> = {
+  public aboutFeatures: Record<WebsitePageEditorLocale, AboutFeatureDraft[]> = {
     'id-ID': this.createAboutFeatures(),
     'en-US': this.createAboutFeatures(),
   };
@@ -332,7 +338,7 @@ export class FormCmsPage {
   //==== TRANSLATION FORM
   //==================================================
 
-  private createTranslationForm(locale: CmsPageLocale) {
+  private createTranslationForm(locale: WebsitePageEditorLocale) {
     return this.formBuilder.nonNullable.group({
       locale: [locale],
 
@@ -367,7 +373,7 @@ export class FormCmsPage {
 
       og_description: ['', [Validators.maxLength(500)]],
 
-      status: [0 as CmsPageI18nStatus],
+      status: [0 as WebsitePageEditorI18nStatus],
     });
   }
 
@@ -376,7 +382,7 @@ export class FormCmsPage {
   //==================================================
 
   public form = this.formBuilder.nonNullable.group({
-    cms_page_key: [
+    website_page_key: [
       '',
       [
         Validators.required,
@@ -385,7 +391,7 @@ export class FormCmsPage {
       ],
     ],
 
-    cms_page_type: [
+    website_page_type: [
       'standard',
       [
         Validators.required,
@@ -394,19 +400,19 @@ export class FormCmsPage {
       ],
     ],
 
-    cms_page_template: ['', [Validators.maxLength(100)]],
+    website_page_template: ['', [Validators.maxLength(100)]],
 
-    cms_page_content_mode: ['html'],
+    website_page_content_mode: ['html'],
 
-    cms_page_default_locale: ['id-ID', [Validators.required]],
+    website_page_default_locale: ['id-ID', [Validators.required]],
 
-    cms_page_visibility: [1, [Validators.required]],
+    website_page_visibility: [1, [Validators.required]],
 
-    cms_page_is_system: [false],
+    website_page_is_system: [false],
 
-    cms_page_is_featured: [false],
+    website_page_is_featured: [false],
 
-    cms_page_sort_order: [0, [Validators.required, Validators.min(0)]],
+    website_page_sort_order: [0, [Validators.required, Validators.min(0)]],
 
     translations: this.formBuilder.group({
       'id-ID': this.createTranslationForm('id-ID'),
@@ -433,10 +439,11 @@ export class FormCmsPage {
       emitEvent: false,
     });
 
-    this.form.controls.cms_page_default_locale.valueChanges
+    this.form.controls.website_page_default_locale.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
-        const locale: CmsPageLocale = value === 'en-US' ? 'en-US' : 'id-ID';
+        const locale: WebsitePageEditorLocale =
+          value === 'en-US' ? 'en-US' : 'id-ID';
 
         this.enableLanguage(locale);
 
@@ -452,23 +459,23 @@ export class FormCmsPage {
 
       this.form.patchValue(
         {
-          cms_page_key: data.cms_page_key,
+          website_page_key: data.website_page_key,
 
-          cms_page_type: data.cms_page_type,
+          website_page_type: data.website_page_type,
 
-          cms_page_template: data.cms_page_template ?? '',
+          website_page_template: data.website_page_template ?? '',
 
-          cms_page_content_mode: data.cms_page_content_mode,
+          website_page_content_mode: data.website_page_content_mode,
 
-          cms_page_default_locale: data.cms_page_default_locale,
+          website_page_default_locale: data.website_page_default_locale,
 
-          cms_page_visibility: data.cms_page_visibility,
+          website_page_visibility: data.website_page_visibility,
 
-          cms_page_is_system: data.cms_page_is_system === 1,
+          website_page_is_system: data.website_page_is_system === 1,
 
-          cms_page_is_featured: data.cms_page_is_featured === 1,
+          website_page_is_featured: data.website_page_is_featured === 1,
 
-          cms_page_sort_order: data.cms_page_sort_order,
+          website_page_sort_order: data.website_page_sort_order,
         },
         {
           emitEvent: false,
@@ -504,7 +511,7 @@ export class FormCmsPage {
       //==================================================
 
       data.translations.forEach((translation) => {
-        const locale = this.parseLocale(translation.cms_page_locale);
+        const locale = this.parseLocale(translation.website_page_locale);
 
         if (!locale) {
           return;
@@ -520,29 +527,29 @@ export class FormCmsPage {
           {
             locale,
 
-            title: translation.cms_page_title,
+            title: translation.website_page_title,
 
-            slug: translation.cms_page_slug,
+            slug: translation.website_page_slug,
 
-            excerpt: translation.cms_page_excerpt ?? '',
+            excerpt: translation.website_page_excerpt ?? '',
 
-            content: translation.cms_page_content ?? '',
+            content: translation.website_page_content ?? '',
 
-            meta_title: translation.cms_page_meta_title ?? '',
+            meta_title: translation.website_page_meta_title ?? '',
 
-            meta_description: translation.cms_page_meta_description ?? '',
+            meta_description: translation.website_page_meta_description ?? '',
 
-            meta_keywords: translation.cms_page_meta_keywords ?? '',
+            meta_keywords: translation.website_page_meta_keywords ?? '',
 
-            meta_robots: translation.cms_page_meta_robots ?? 'index,follow',
+            meta_robots: translation.website_page_meta_robots ?? 'index,follow',
 
-            canonical_url: translation.cms_page_canonical_url ?? '',
+            canonical_url: translation.website_page_canonical_url ?? '',
 
-            og_title: translation.cms_page_og_title ?? '',
+            og_title: translation.website_page_og_title ?? '',
 
-            og_description: translation.cms_page_og_description ?? '',
+            og_description: translation.website_page_og_description ?? '',
 
-            status: translation.cms_page_i18n_status,
+            status: translation.website_page_i18n_status,
           },
           {
             emitEvent: false,
@@ -550,16 +557,16 @@ export class FormCmsPage {
         );
 
         this.homeSectionVisibility[locale] = this.readHomeSectionVisibility(
-          translation.cms_page_content_json,
+          translation.website_page_content_json,
         );
 
         this.aboutFeatures[locale] = this.readAboutFeatures(
-          translation.cms_page_content_json,
+          translation.website_page_content_json,
         );
       });
 
       const defaultLocale =
-        this.parseLocale(data.cms_page_default_locale) ?? 'id-ID';
+        this.parseLocale(data.website_page_default_locale) ?? 'id-ID';
 
       this.enableLanguage(defaultLocale);
 
@@ -574,7 +581,7 @@ export class FormCmsPage {
 
         item.translations.forEach((translation) => {
           const locale = this.parseLocale(
-            translation.cms_page_attachment_locale,
+            translation.website_page_attachment_locale,
           );
 
           if (!locale) {
@@ -582,8 +589,8 @@ export class FormCmsPage {
           }
 
           translations[locale] = {
-            caption: translation.cms_page_attachment_caption ?? '',
-            alt_text: translation.cms_page_attachment_alt_text ?? '',
+            caption: translation.website_page_attachment_caption ?? '',
+            alt_text: translation.website_page_attachment_alt_text ?? '',
           };
         });
 
@@ -592,17 +599,18 @@ export class FormCmsPage {
 
           role:
             this.isGadgetHomeTemplate &&
-            item.cms_page_attachment_role === 'hero'
+            item.website_page_attachment_role === 'hero'
               ? 'home_main'
-              : this.isAboutTemplate && item.cms_page_attachment_role === 'hero'
+              : this.isAboutTemplate &&
+                  item.website_page_attachment_role === 'hero'
                 ? 'about_content'
-                : item.cms_page_attachment_role || 'gallery',
+                : item.website_page_attachment_role || 'gallery',
 
-          is_public: item.cms_page_attachment_is_public === 1,
+          is_public: item.website_page_attachment_is_public === 1,
 
-          action_type: item.cms_page_attachment_action_type ?? 'none',
+          action_type: item.website_page_attachment_action_type ?? 'none',
 
-          action_value: item.cms_page_attachment_action_value ?? '',
+          action_value: item.website_page_attachment_action_value ?? '',
 
           translations,
         };
@@ -613,9 +621,12 @@ export class FormCmsPage {
       //==================================================
 
       this.publicationChoice = 'current';
-      this.patchPublicationDateTime('publish', data.cms_page_publish_at);
+      this.patchPublicationDateTime('publish', data.website_page_publish_at);
 
-      this.patchPublicationDateTime('unpublish', data.cms_page_unpublish_at);
+      this.patchPublicationDateTime(
+        'unpublish',
+        data.website_page_unpublish_at,
+      );
 
       this.publicationValidationAttempted = false;
     });
@@ -626,7 +637,9 @@ export class FormCmsPage {
   //==================================================
 
   get isSystemPage(): boolean {
-    return this.mode() === 'edit' && this.editData()?.cms_page_is_system === 1;
+    return (
+      this.mode() === 'edit' && this.editData()?.website_page_is_system === 1
+    );
   }
 
   get canViewAttachments(): boolean {
@@ -638,19 +651,19 @@ export class FormCmsPage {
   }
 
   get isGadgetHomeTemplate(): boolean {
-    const template = this.form.controls.cms_page_template.value;
+    const template = this.form.controls.website_page_template.value;
     return template === 'home' || template === 'gadget-home-v1';
   }
 
   get isAboutTemplate(): boolean {
-    return this.form.controls.cms_page_key.value === 'about';
+    return this.form.controls.website_page_key.value === 'about';
   }
 
   get isMetadataOnlyFixedPage(): boolean {
     return (
       this.isSystemPage &&
       ['contact', 'faq', 'terms', 'career'].includes(
-        this.form.controls.cms_page_key.value,
+        this.form.controls.website_page_key.value,
       )
     );
   }
@@ -658,14 +671,14 @@ export class FormCmsPage {
   get isOperationalDataPage(): boolean {
     return (
       this.isSystemPage &&
-      ['contact', 'faq'].includes(this.form.controls.cms_page_key.value)
+      ['contact', 'faq'].includes(this.form.controls.website_page_key.value)
     );
   }
 
   get operationalDataHelpKey(): string {
-    return this.form.controls.cms_page_key.value === 'contact'
-      ? 'cms_page.operational_contact_help'
-      : 'cms_page.operational_faq_help';
+    return this.form.controls.website_page_key.value === 'contact'
+      ? 'website_page.operational_contact_help'
+      : 'website_page.operational_faq_help';
   }
 
   get mediaRoleOptions(): { value: string; label: string }[] {
@@ -710,7 +723,7 @@ export class FormCmsPage {
   }
 
   private buildHomeContentJson(
-    locale: CmsPageLocale,
+    locale: WebsitePageEditorLocale,
     existing: unknown,
   ): Record<string, unknown> {
     const content = this.isRecord(existing) ? { ...existing } : {};
@@ -748,7 +761,7 @@ export class FormCmsPage {
   }
 
   private buildAboutContentJson(
-    locale: CmsPageLocale,
+    locale: WebsitePageEditorLocale,
     existing: unknown,
   ): Record<string, unknown> {
     const content = this.isRecord(existing) ? { ...existing } : {};
@@ -762,7 +775,7 @@ export class FormCmsPage {
   }
 
   updateAboutFeature(
-    locale: CmsPageLocale,
+    locale: WebsitePageEditorLocale,
     index: number,
     field: keyof AboutFeatureDraft,
     value: string,
@@ -783,8 +796,8 @@ export class FormCmsPage {
   //==================================================
 
   private createEmptyMediaTranslations(): Record<
-    CmsPageLocale,
-    CmsPageMediaTranslationDraft
+    WebsitePageEditorLocale,
+    WebsitePageEditorMediaTranslationDraft
   > {
     return {
       'id-ID': {
@@ -803,35 +816,35 @@ export class FormCmsPage {
   //==== LANGUAGE
   //==================================================
 
-  translationForm(locale: CmsPageLocale) {
+  translationForm(locale: WebsitePageEditorLocale) {
     return this.form.controls.translations.controls[locale];
   }
 
-  isLanguageEnabled(locale: CmsPageLocale): boolean {
+  isLanguageEnabled(locale: WebsitePageEditorLocale): boolean {
     return this.translationForm(locale).enabled;
   }
 
-  isDefaultLocale(locale: CmsPageLocale): boolean {
-    return this.form.controls.cms_page_default_locale.value === locale;
+  isDefaultLocale(locale: WebsitePageEditorLocale): boolean {
+    return this.form.controls.website_page_default_locale.value === locale;
   }
 
-  selectLanguage(locale: CmsPageLocale): void {
+  selectLanguage(locale: WebsitePageEditorLocale): void {
     this.activeLocale = locale;
   }
 
-  enableLanguage(locale: CmsPageLocale): void {
+  enableLanguage(locale: WebsitePageEditorLocale): void {
     this.translationForm(locale).enable({
       emitEvent: false,
     });
   }
 
-  addLanguage(locale: CmsPageLocale): void {
+  addLanguage(locale: WebsitePageEditorLocale): void {
     this.enableLanguage(locale);
 
     this.activeLocale = locale;
   }
 
-  removeLanguage(locale: CmsPageLocale): void {
+  removeLanguage(locale: WebsitePageEditorLocale): void {
     if (this.isDefaultLocale(locale)) {
       return;
     }
@@ -844,14 +857,15 @@ export class FormCmsPage {
 
     if (this.activeLocale === locale) {
       const defaultLocale =
-        this.parseLocale(this.form.controls.cms_page_default_locale.value) ??
-        'id-ID';
+        this.parseLocale(
+          this.form.controls.website_page_default_locale.value,
+        ) ?? 'id-ID';
 
       this.activeLocale = defaultLocale;
     }
   }
 
-  private resetTranslationForm(locale: CmsPageLocale): void {
+  private resetTranslationForm(locale: WebsitePageEditorLocale): void {
     this.translationForm(locale).reset(
       {
         locale,
@@ -886,7 +900,7 @@ export class FormCmsPage {
     );
   }
 
-  private parseLocale(value: string): CmsPageLocale | null {
+  private parseLocale(value: string): WebsitePageEditorLocale | null {
     if (value === 'id-ID' || value === 'en-US') {
       return value;
     }
@@ -898,7 +912,7 @@ export class FormCmsPage {
   //==== TRANSLATION SLUG
   //==================================================
 
-  generateTranslationSlug(locale: CmsPageLocale): void {
+  generateTranslationSlug(locale: WebsitePageEditorLocale): void {
     const group = this.translationForm(locale);
 
     if (group.controls.slug.value.trim()) {
@@ -908,7 +922,7 @@ export class FormCmsPage {
     group.controls.slug.setValue(this.slugify(group.controls.title.value));
   }
 
-  normalizeTranslationSlug(locale: CmsPageLocale): void {
+  normalizeTranslationSlug(locale: WebsitePageEditorLocale): void {
     const control = this.translationForm(locale).controls.slug;
 
     control.setValue(this.slugify(control.value));
@@ -929,7 +943,7 @@ export class FormCmsPage {
   //==================================================
 
   goToSeo(): void {
-    let invalidLocale: CmsPageLocale | null = null;
+    let invalidLocale: WebsitePageEditorLocale | null = null;
 
     this.supportedLanguages.forEach((language) => {
       const group = this.translationForm(language.locale);
@@ -993,7 +1007,7 @@ export class FormCmsPage {
   //==================================================
 
   goToMedia(): void {
-    let invalidLocale: CmsPageLocale | null = null;
+    let invalidLocale: WebsitePageEditorLocale | null = null;
 
     this.supportedLanguages.forEach((language) => {
       const group = this.translationForm(language.locale);
@@ -1158,7 +1172,7 @@ export class FormCmsPage {
     return `Rekomendasi ${rule.recommendedWidth} × ${rule.recommendedHeight}px · minimal ${rule.minWidth} × ${rule.minHeight}px`;
   }
 
-  gadgetHomeMediaIssue(media: CmsPageMediaDraft): string | null {
+  gadgetHomeMediaIssue(media: WebsitePageEditorMediaDraft): string | null {
     const rule = getGadgetHomeMediaRule(media.role);
 
     if (!rule) return null;
@@ -1263,8 +1277,8 @@ export class FormCmsPage {
 
   updateMediaTranslation(
     index: number,
-    locale: CmsPageLocale,
-    field: keyof CmsPageMediaTranslationDraft,
+    locale: WebsitePageEditorLocale,
+    field: keyof WebsitePageEditorMediaTranslationDraft,
     value: string,
   ): void {
     const item = this.pageMedia[index];
@@ -1309,7 +1323,7 @@ export class FormCmsPage {
   //==== PUBLICATION
   //==================================================
 
-  selectPublicationChoice(choice: CmsPagePublicationChoice): void {
+  selectPublicationChoice(choice: WebsitePageEditorPublicationChoice): void {
     this.publicationChoice = choice;
 
     this.publicationValidationAttempted = false;
@@ -1331,7 +1345,7 @@ export class FormCmsPage {
 
   get defaultTranslationPublished(): boolean {
     const locale =
-      this.parseLocale(this.form.controls.cms_page_default_locale.value) ??
+      this.parseLocale(this.form.controls.website_page_default_locale.value) ??
       'id-ID';
 
     return this.translationForm(locale).controls.status.value === 1;
@@ -1466,76 +1480,79 @@ export class FormCmsPage {
     this.previewPage = this.buildPreviewPage();
   }
 
-  private buildPreviewPage(): ICmsPageDetail {
+  private buildPreviewPage(): IWebsitePageEditorDetail {
     const raw = this.form.getRawValue();
 
     const source = this.editData();
 
     const now = new Date().toISOString();
 
-    const translations: ICmsPageTranslation[] = this.supportedLanguages
-      .filter((language) => this.isLanguageEnabled(language.locale))
-      .map((language) => {
-        const group = this.translationForm(language.locale);
+    const translations: IWebsitePageEditorTranslation[] =
+      this.supportedLanguages
+        .filter((language) => this.isLanguageEnabled(language.locale))
+        .map((language) => {
+          const group = this.translationForm(language.locale);
 
-        const value = group.getRawValue();
+          const value = group.getRawValue();
 
-        const existing = source?.translations.find(
-          (item) => item.cms_page_locale === language.locale,
-        );
+          const existing = source?.translations.find(
+            (item) => item.website_page_locale === language.locale,
+          );
 
-        const title = value.title.trim();
+          const title = value.title.trim();
 
-        const slug = value.slug.trim() || this.slugify(title);
+          const slug = value.slug.trim() || this.slugify(title);
 
-        return {
-          cms_page_locale: language.locale,
+          return {
+            website_page_locale: language.locale,
 
-          cms_page_slug: slug,
+            website_page_slug: slug,
 
-          cms_page_title: title,
+            website_page_title: title,
 
-          cms_page_excerpt: value.excerpt.trim() || null,
+            website_page_excerpt: value.excerpt.trim() || null,
 
-          cms_page_content: value.content || null,
+            website_page_content: value.content || null,
 
-          cms_page_content_json: this.isGadgetHomeTemplate
-            ? this.buildHomeContentJson(
-                language.locale,
-                existing?.cms_page_content_json,
-              )
-            : this.isAboutTemplate
-              ? this.buildAboutContentJson(
+            website_page_content_json: this.isGadgetHomeTemplate
+              ? this.buildHomeContentJson(
                   language.locale,
-                  existing?.cms_page_content_json,
+                  existing?.website_page_content_json,
                 )
-              : (existing?.cms_page_content_json ?? null),
+              : this.isAboutTemplate
+                ? this.buildAboutContentJson(
+                    language.locale,
+                    existing?.website_page_content_json,
+                  )
+                : (existing?.website_page_content_json ?? null),
 
-          cms_page_meta_title: value.meta_title.trim() || null,
+            website_page_meta_title: value.meta_title.trim() || null,
 
-          cms_page_meta_description: value.meta_description.trim() || null,
+            website_page_meta_description:
+              value.meta_description.trim() || null,
 
-          cms_page_meta_keywords: value.meta_keywords.trim() || null,
+            website_page_meta_keywords: value.meta_keywords.trim() || null,
 
-          cms_page_meta_robots: value.meta_robots.trim() || null,
+            website_page_meta_robots: value.meta_robots.trim() || null,
 
-          cms_page_canonical_url: value.canonical_url.trim() || null,
+            website_page_canonical_url: value.canonical_url.trim() || null,
 
-          cms_page_og_title: value.og_title.trim() || null,
+            website_page_og_title: value.og_title.trim() || null,
 
-          cms_page_og_description: value.og_description.trim() || null,
+            website_page_og_description: value.og_description.trim() || null,
 
-          cms_page_schema_json: existing?.cms_page_schema_json ?? null,
+            website_page_schema_json:
+              existing?.website_page_schema_json ?? null,
 
-          cms_page_i18n_status: value.status,
+            website_page_i18n_status: value.status,
 
-          created: existing?.created ?? now,
+            created: existing?.created ?? now,
 
-          updated: now,
-        };
-      });
+            updated: now,
+          };
+        });
 
-    const attachments: ICmsPageAttachment[] = this.pageMedia.map(
+    const attachments: IWebsitePageEditorAttachment[] = this.pageMedia.map(
       (item, index) => {
         const existing = source?.attachments.find(
           (attachment) =>
@@ -1545,15 +1562,15 @@ export class FormCmsPage {
         return {
           ...item.attachment,
 
-          cms_page_attachment_role: item.role,
+          website_page_attachment_role: item.role,
 
-          cms_page_attachment_sort_order: index,
+          website_page_attachment_sort_order: index,
 
-          cms_page_attachment_is_public: item.is_public ? 1 : 0,
+          website_page_attachment_is_public: item.is_public ? 1 : 0,
 
-          cms_page_attachment_action_type: item.action_type,
+          website_page_attachment_action_type: item.action_type,
 
-          cms_page_attachment_action_value:
+          website_page_attachment_action_value:
             item.action_type === 'none'
               ? null
               : item.action_value.trim() || null,
@@ -1563,18 +1580,19 @@ export class FormCmsPage {
             .map((language) => {
               const existingTranslation = existing?.translations.find(
                 (translation) =>
-                  translation.cms_page_attachment_locale === language.locale,
+                  translation.website_page_attachment_locale ===
+                  language.locale,
               );
 
               const mediaTranslation = item.translations[language.locale];
 
               return {
-                cms_page_attachment_locale: language.locale,
+                website_page_attachment_locale: language.locale,
 
-                cms_page_attachment_caption:
+                website_page_attachment_caption:
                   mediaTranslation.caption.trim() || null,
 
-                cms_page_attachment_alt_text:
+                website_page_attachment_alt_text:
                   mediaTranslation.alt_text.trim() || null,
 
                 created: existingTranslation?.created ?? now,
@@ -1591,38 +1609,38 @@ export class FormCmsPage {
     );
 
     return {
-      id_cms_page: source?.id_cms_page ?? 'preview',
+      id_website_page: source?.id_website_page ?? 'preview',
 
-      id_parent_cms_page: source?.id_parent_cms_page ?? null,
+      id_parent_website_page: source?.id_parent_website_page ?? null,
 
-      cms_page_key: raw.cms_page_key.trim(),
+      website_page_key: raw.website_page_key.trim(),
 
-      cms_page_type: raw.cms_page_type.trim(),
+      website_page_type: raw.website_page_type.trim(),
 
-      cms_page_template: raw.cms_page_template.trim() || null,
+      website_page_template: raw.website_page_template.trim() || null,
 
-      cms_page_content_mode: raw.cms_page_content_mode.trim(),
+      website_page_content_mode: raw.website_page_content_mode.trim(),
 
-      cms_page_default_locale: raw.cms_page_default_locale,
+      website_page_default_locale: raw.website_page_default_locale,
 
-      cms_page_status: this.previewCmsPageStatus(),
+      website_page_status: this.previewWebsitePageEditorStatus(),
 
       effective_status: this.previewEffectiveStatus(),
 
-      cms_page_visibility: Number(raw.cms_page_visibility) as 0 | 1 | 2,
+      website_page_visibility: Number(raw.website_page_visibility) as 0 | 1 | 2,
 
-      cms_page_is_system:
-        source?.cms_page_is_system ?? (raw.cms_page_is_system ? 1 : 0),
+      website_page_is_system:
+        source?.website_page_is_system ?? (raw.website_page_is_system ? 1 : 0),
 
-      cms_page_is_featured: raw.cms_page_is_featured ? 1 : 0,
+      website_page_is_featured: raw.website_page_is_featured ? 1 : 0,
 
-      cms_page_sort_order: Number(raw.cms_page_sort_order),
+      website_page_sort_order: Number(raw.website_page_sort_order),
 
-      cms_page_publish_at: this.previewPublishAt(),
+      website_page_publish_at: this.previewPublishAt(),
 
-      cms_page_unpublish_at: this.previewUnpublishAt(),
+      website_page_unpublish_at: this.previewUnpublishAt(),
 
-      cms_page_settings_json: source?.cms_page_settings_json ?? null,
+      website_page_settings_json: source?.website_page_settings_json ?? null,
 
       translations,
 
@@ -1646,7 +1664,7 @@ export class FormCmsPage {
   //==== PREVIEW STATUS
   //==================================================
 
-  private previewCmsPageStatus(): CmsPageStatus {
+  private previewWebsitePageEditorStatus(): WebsitePageEditorStatus {
     switch (this.publicationChoice) {
       case 'publish_now':
       case 'schedule':
@@ -1659,11 +1677,11 @@ export class FormCmsPage {
         return 0;
 
       default:
-        return this.editData()?.cms_page_status ?? 0;
+        return this.editData()?.website_page_status ?? 0;
     }
   }
 
-  private previewEffectiveStatus(): CmsPageEffectiveStatus {
+  private previewEffectiveStatus(): WebsitePageEditorEffectiveStatus {
     switch (this.publicationChoice) {
       case 'publish_now':
         return 'published';
@@ -1692,7 +1710,7 @@ export class FormCmsPage {
     }
 
     if (this.publicationChoice === 'current') {
-      return this.editData()?.cms_page_publish_at ?? null;
+      return this.editData()?.website_page_publish_at ?? null;
     }
 
     return null;
@@ -1707,7 +1725,7 @@ export class FormCmsPage {
     }
 
     if (this.publicationChoice === 'current') {
-      return this.editData()?.cms_page_unpublish_at ?? null;
+      return this.editData()?.website_page_unpublish_at ?? null;
     }
 
     return null;
@@ -1727,7 +1745,7 @@ export class FormCmsPage {
   //==== PREVIEW SUMMARY
   //==================================================
 
-  get previewDefaultTranslation(): ICmsPageTranslation | null {
+  get previewDefaultTranslation(): IWebsitePageEditorTranslation | null {
     if (!this.previewPage) {
       return null;
     }
@@ -1735,22 +1753,24 @@ export class FormCmsPage {
     return (
       this.previewPage.translations.find(
         (item) =>
-          item.cms_page_locale === this.previewPage?.cms_page_default_locale,
+          item.website_page_locale ===
+          this.previewPage?.website_page_default_locale,
       ) ??
       this.previewPage.translations[0] ??
       null
     );
   }
 
-  get previewDraftTranslations(): ICmsPageTranslation[] {
+  get previewDraftTranslations(): IWebsitePageEditorTranslation[] {
     if (!this.previewPage || !this.publicationRequiresPublishedTranslation) {
       return [];
     }
 
     return this.previewPage.translations.filter(
       (item) =>
-        item.cms_page_locale !== this.previewPage?.cms_page_default_locale &&
-        item.cms_page_i18n_status === 0,
+        item.website_page_locale !==
+          this.previewPage?.website_page_default_locale &&
+        item.website_page_i18n_status === 0,
     );
   }
 
@@ -1758,7 +1778,7 @@ export class FormCmsPage {
     return (
       this.previewPage?.attachments.find(
         (item) =>
-          item.cms_page_attachment_role ===
+          item.website_page_attachment_role ===
           (this.isGadgetHomeTemplate ? 'home_main' : 'hero'),
       )?.original_name ?? '-'
     );
@@ -1766,8 +1786,8 @@ export class FormCmsPage {
 
   previewLanguageLabelKey(locale: string): string {
     return locale === 'en-US'
-      ? 'cms_page.language_english'
-      : 'cms_page.language_indonesian';
+      ? 'website_page.language_english'
+      : 'website_page.language_indonesian';
   }
 
   previewVisibilityKey(value: number): string {
@@ -1785,24 +1805,24 @@ export class FormCmsPage {
   previewPublicationChoiceKey(): string {
     switch (this.publicationChoice) {
       case 'publish_now':
-        return 'cms_page.publication_publish_now';
+        return 'website_page.publication_publish_now';
 
       case 'schedule':
-        return 'cms_page.publication_schedule';
+        return 'website_page.publication_schedule';
 
       case 'archive':
-        return 'cms_page.publication_archive';
+        return 'website_page.publication_archive';
 
       case 'draft':
-        return 'cms_page.publication_draft';
+        return 'website_page.publication_draft';
 
       default:
-        return 'cms_page.publication_keep_current';
+        return 'website_page.publication_keep_current';
     }
   }
 
   previewResultStatusKey(): string {
-    return `cms_page.status_${this.previewPage?.effective_status ?? 'draft'}`;
+    return `website_page.status_${this.previewPage?.effective_status ?? 'draft'}`;
   }
 
   //==================================================
@@ -1836,94 +1856,97 @@ export class FormCmsPage {
 
     const page = this.buildPreviewPage();
 
-    const payload: ICmsPagePayload = {
-      id_parent_cms_page: page.id_parent_cms_page,
+    const payload: IWebsitePageEditorPayload = {
+      id_parent_website_page: page.id_parent_website_page,
 
-      cms_page_key: page.cms_page_key,
+      website_page_key: page.website_page_key,
 
-      cms_page_type: page.cms_page_type,
+      website_page_type: page.website_page_type,
 
-      cms_page_template: page.cms_page_template,
+      website_page_template: page.website_page_template,
 
-      cms_page_content_mode: page.cms_page_content_mode,
+      website_page_content_mode: page.website_page_content_mode,
 
-      cms_page_default_locale: page.cms_page_default_locale,
+      website_page_default_locale: page.website_page_default_locale,
 
       // Base save tidak mengubah lifecycle.
-      cms_page_status:
-        this.mode() === 'edit' ? (this.editData()?.cms_page_status ?? 0) : 0,
-
-      cms_page_visibility: page.cms_page_visibility,
-
-      cms_page_is_system: page.cms_page_is_system,
-
-      cms_page_is_featured: page.cms_page_is_featured,
-
-      cms_page_sort_order: page.cms_page_sort_order,
-
-      cms_page_publish_at:
+      website_page_status:
         this.mode() === 'edit'
-          ? (this.editData()?.cms_page_publish_at ?? null)
+          ? (this.editData()?.website_page_status ?? 0)
+          : 0,
+
+      website_page_visibility: page.website_page_visibility,
+
+      website_page_is_system: page.website_page_is_system,
+
+      website_page_is_featured: page.website_page_is_featured,
+
+      website_page_sort_order: page.website_page_sort_order,
+
+      website_page_publish_at:
+        this.mode() === 'edit'
+          ? (this.editData()?.website_page_publish_at ?? null)
           : null,
 
-      cms_page_unpublish_at:
+      website_page_unpublish_at:
         this.mode() === 'edit'
-          ? (this.editData()?.cms_page_unpublish_at ?? null)
+          ? (this.editData()?.website_page_unpublish_at ?? null)
           : null,
 
-      cms_page_settings_json: this.editData()?.cms_page_settings_json ?? null,
+      website_page_settings_json:
+        this.editData()?.website_page_settings_json ?? null,
 
       translations: page.translations.map((translation) => ({
-        locale: translation.cms_page_locale,
+        locale: translation.website_page_locale,
 
-        slug: translation.cms_page_slug,
+        slug: translation.website_page_slug,
 
-        title: translation.cms_page_title,
+        title: translation.website_page_title,
 
-        excerpt: translation.cms_page_excerpt,
+        excerpt: translation.website_page_excerpt,
 
-        content: translation.cms_page_content,
+        content: translation.website_page_content,
 
-        content_json: translation.cms_page_content_json,
+        content_json: translation.website_page_content_json,
 
-        meta_title: translation.cms_page_meta_title,
+        meta_title: translation.website_page_meta_title,
 
-        meta_description: translation.cms_page_meta_description,
+        meta_description: translation.website_page_meta_description,
 
-        meta_keywords: translation.cms_page_meta_keywords,
+        meta_keywords: translation.website_page_meta_keywords,
 
-        meta_robots: translation.cms_page_meta_robots,
+        meta_robots: translation.website_page_meta_robots,
 
-        canonical_url: translation.cms_page_canonical_url,
+        canonical_url: translation.website_page_canonical_url,
 
-        og_title: translation.cms_page_og_title,
+        og_title: translation.website_page_og_title,
 
-        og_description: translation.cms_page_og_description,
+        og_description: translation.website_page_og_description,
 
-        schema_json: translation.cms_page_schema_json,
+        schema_json: translation.website_page_schema_json,
 
-        status: translation.cms_page_i18n_status,
+        status: translation.website_page_i18n_status,
       })),
 
       attachments: page.attachments.map((attachment) => ({
         id_attachment: attachment.id_attachment,
 
-        role: attachment.cms_page_attachment_role,
+        role: attachment.website_page_attachment_role,
 
-        sort_order: attachment.cms_page_attachment_sort_order,
+        sort_order: attachment.website_page_attachment_sort_order,
 
-        is_public: attachment.cms_page_attachment_is_public,
+        is_public: attachment.website_page_attachment_is_public,
 
-        action_type: attachment.cms_page_attachment_action_type,
+        action_type: attachment.website_page_attachment_action_type,
 
-        action_value: attachment.cms_page_attachment_action_value,
+        action_value: attachment.website_page_attachment_action_value,
 
         translations: attachment.translations.map((translation) => ({
-          locale: translation.cms_page_attachment_locale,
+          locale: translation.website_page_attachment_locale,
 
-          caption: translation.cms_page_attachment_caption,
+          caption: translation.website_page_attachment_caption,
 
-          alt_text: translation.cms_page_attachment_alt_text,
+          alt_text: translation.website_page_attachment_alt_text,
         })),
       })),
     };
@@ -1935,7 +1958,7 @@ export class FormCmsPage {
     });
   }
 
-  private buildPublicationActions(): ICmsPagePublicationPayload[] {
+  private buildPublicationActions(): IWebsitePageEditorPublicationPayload[] {
     const currentStatus = this.editData()?.effective_status ?? 'draft';
 
     const unpublishAt = this.toPreviewIso(this.publicationUnpublishAt);
@@ -1987,10 +2010,10 @@ export class FormCmsPage {
         ];
 
       case 'publish_now': {
-        const action: ICmsPagePublicationPayload = {
+        const action: IWebsitePageEditorPublicationPayload = {
           action: 'publish',
 
-          cms_page_unpublish_at: unpublishAt,
+          website_page_unpublish_at: unpublishAt,
         };
 
         return currentStatus === 'archived'
@@ -2004,12 +2027,12 @@ export class FormCmsPage {
       }
 
       case 'schedule': {
-        const action: ICmsPagePublicationPayload = {
+        const action: IWebsitePageEditorPublicationPayload = {
           action: 'schedule',
 
-          cms_page_publish_at: this.toPreviewIso(this.publicationPublishAt),
+          website_page_publish_at: this.toPreviewIso(this.publicationPublishAt),
 
-          cms_page_unpublish_at: unpublishAt,
+          website_page_unpublish_at: unpublishAt,
         };
 
         return currentStatus === 'archived'
@@ -2189,7 +2212,7 @@ export class FormCmsPage {
   //==================================================
 
   normalizePageKey(): void {
-    const control = this.form.controls.cms_page_key;
+    const control = this.form.controls.website_page_key;
 
     const normalized = control.value.trim().toLowerCase().replace(/\s+/g, '-');
 
@@ -2203,20 +2226,20 @@ export class FormCmsPage {
   goToContent(): void {
     const controls = this.form.controls;
 
-    controls.cms_page_key.markAsTouched();
-    controls.cms_page_type.markAsTouched();
-    controls.cms_page_template.markAsTouched();
-    controls.cms_page_default_locale.markAsTouched();
-    controls.cms_page_visibility.markAsTouched();
-    controls.cms_page_sort_order.markAsTouched();
+    controls.website_page_key.markAsTouched();
+    controls.website_page_type.markAsTouched();
+    controls.website_page_template.markAsTouched();
+    controls.website_page_default_locale.markAsTouched();
+    controls.website_page_visibility.markAsTouched();
+    controls.website_page_sort_order.markAsTouched();
 
     if (
-      controls.cms_page_key.invalid ||
-      controls.cms_page_type.invalid ||
-      controls.cms_page_template.invalid ||
-      controls.cms_page_default_locale.invalid ||
-      controls.cms_page_visibility.invalid ||
-      controls.cms_page_sort_order.invalid
+      controls.website_page_key.invalid ||
+      controls.website_page_type.invalid ||
+      controls.website_page_template.invalid ||
+      controls.website_page_default_locale.invalid ||
+      controls.website_page_visibility.invalid ||
+      controls.website_page_sort_order.invalid
     ) {
       this.activeTab = 'general';
 

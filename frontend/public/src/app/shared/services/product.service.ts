@@ -20,15 +20,18 @@ export class ProductService {
     for (const [key, value] of Object.entries(payload ?? {}))
       if (value !== '' && value != null) params = params.set(key, String(value));
     return this.http
-      .get<PublicApiResponse<ProductModel>>(`${environment.cmsApiURL}/products/${this.locale()}`, {
-        params,
-      })
+      .get<PublicApiResponse<ProductModel>>(
+        `${environment.publicApiURL}/products/${this.locale()}`,
+        {
+          params,
+        },
+      )
       .pipe(map((r) => r.data ?? { data: [], total: 0 }));
   }
   getProductBySlug(slug: string, locale: 'id-ID' | 'en-US' = this.locale()) {
     return this.http
       .get<PublicApiResponse<Product>>(
-        `${environment.cmsApiURL}/products/${locale}/${encodeURIComponent(slug)}`,
+        `${environment.publicApiURL}/products/${locale}/${encodeURIComponent(slug)}`,
       )
       .pipe(map((r) => r.data!));
   }

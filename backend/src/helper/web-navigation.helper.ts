@@ -8,8 +8,6 @@ import {
 } from "../config/web-navigation.config";
 import keyhsid from "../hsid";
 
-export type WebNavigationItemLinkType = "internal";
-
 export interface NormalizedNavigationItemTranslation {
   locale: string;
   label: string;
@@ -20,15 +18,8 @@ export interface NormalizedNavigationItemTranslation {
 
 export interface NormalizedNavigationItem {
   key: string;
-  linkType: WebNavigationItemLinkType;
-  targetBlank: 0 | 1;
-  icon: string | null;
-  badgeText: string | null;
-  badgeColor: string | null;
   sortOrder: number;
   status: 0 | 1;
-  settingsJson: string | null;
-  settings: Record<string, unknown> | null;
   translations: NormalizedNavigationItemTranslation[];
 }
 
@@ -89,56 +80,6 @@ export const normalizeNavigationItemInput = (
     };
   }
 
-  const linkType = String(
-    body?.web_navigation_item_link_type ?? "",
-  ) as WebNavigationItemLinkType;
-
-  if (linkType !== "internal") {
-    return {
-      success: false,
-      code: "WEB_NAVIGATION_ITEM_LINK_TYPE_INVALID",
-      message: "Fixed website navigation items must use internal routes",
-    };
-  }
-
-  for (const field of [
-    "id_parent_web_navigation_item",
-    "id_cms_page",
-    "web_navigation_item_icon",
-    "web_navigation_item_badge_text",
-    "web_navigation_item_badge_color",
-  ]) {
-    const value = body?.[field];
-
-    if (value !== null && value !== undefined && value !== "") {
-      return {
-        success: false,
-        code: "WEB_NAVIGATION_ITEM_FIELD_UNSUPPORTED",
-        message: `${field} is not used by the fixed website header`,
-      };
-    }
-  }
-
-  const targetBlankInput = normalizeFlag(
-    body?.web_navigation_item_target_blank ?? 0,
-  );
-
-  if (targetBlankInput === null) {
-    return {
-      success: false,
-      code: "WEB_NAVIGATION_ITEM_TARGET_INVALID",
-      message: "Invalid target blank value",
-    };
-  }
-
-  if (targetBlankInput === 1) {
-    return {
-      success: false,
-      code: "WEB_NAVIGATION_ITEM_TARGET_INVALID",
-      message: "Fixed website navigation items open in the same tab",
-    };
-  }
-
   const status = normalizeFlag(body?.web_navigation_item_status ?? 1);
 
   if (status === null) {
@@ -157,40 +98,6 @@ export const normalizeNavigationItemInput = (
       code: "WEB_NAVIGATION_ITEM_SORT_INVALID",
       message: "Invalid navigation item sort order",
     };
-  }
-
-  let settings: Record<string, unknown> | null = null;
-
-  const rawSettings = body?.web_navigation_item_settings_json;
-
-  if (rawSettings !== null && rawSettings !== undefined && rawSettings !== "") {
-    let parsedSettings: unknown = rawSettings;
-
-    if (typeof rawSettings === "string") {
-      try {
-        parsedSettings = JSON.parse(rawSettings);
-      } catch {
-        return {
-          success: false,
-          code: "WEB_NAVIGATION_ITEM_SETTINGS_INVALID",
-          message: "Navigation item settings must contain valid JSON",
-        };
-      }
-    }
-
-    if (
-      typeof parsedSettings !== "object" ||
-      parsedSettings === null ||
-      Array.isArray(parsedSettings)
-    ) {
-      return {
-        success: false,
-        code: "WEB_NAVIGATION_ITEM_SETTINGS_INVALID",
-        message: "Navigation item settings must be a JSON object",
-      };
-    }
-
-    settings = parsedSettings as Record<string, unknown>;
   }
 
   if (!Array.isArray(body?.translations)) {
@@ -286,15 +193,8 @@ export const normalizeNavigationItemInput = (
     success: true,
     data: {
       key,
-      linkType,
-      targetBlank: 0,
-      icon: null,
-      badgeText: null,
-      badgeColor: null,
       sortOrder,
       status,
-      settingsJson: settings === null ? null : JSON.stringify(settings),
-      settings,
       translations,
     },
   };

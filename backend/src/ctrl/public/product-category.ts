@@ -7,7 +7,7 @@ import { sendError, sendSuccess } from "../../helper/api-response.helper";
 
 const router = Router();
 const publicScope = (locale: unknown) => {
-  const company = Number(process.env.PUBLIC_CMS_COMPANY_ID);
+  const company = Number(process.env.PUBLIC_COMPANY_ID);
   return Number.isSafeInteger(company) && company > 0 && isPublicContentLocale(locale)
     ? { company, locale: String(locale) }
     : null;

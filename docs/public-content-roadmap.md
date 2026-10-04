@@ -1,84 +1,46 @@
-# MATEX public content roadmap
+# MATEX public content map
 
-Dokumen ini menetapkan batas antara desain Kartify, data MATEX, dan fitur commerce yang belum aktif. Nama `gadget-store` hanya penanda tema internal dan tidak boleh muncul sebagai label bisnis di UI publik atau Admin.
+This document records the boundary between the Kartify presentation, MATEX data, and commerce features that are not part of public v1. `gadget-store` is an internal theme name and must not appear as a MATEX business label.
 
-## Prinsip yang dipakai
+## Principles
 
-- Kartify tetap menjadi sumber struktur visual, responsivitas, grid, spacing, dan komponen halaman publik.
-- Backend dan database menjadi sumber data publik. File JSON Kartify hanya contoh bentuk tampilan selama integrasi belum selesai.
-- Admin memakai pola form, tabel, tab, media picker, dan permission yang sudah ada pada template Admin.
-- Konten Indonesia (`id-ID`) dan Inggris (`en-US`) disimpan terpisah. Data operasional yang tidak perlu diterjemahkan tetap berada di tabel induk.
-- Semua data publik dibatasi oleh `id_master_comp`. Public API mengambil company dari konfigurasi server, bukan dari input browser.
-- Commerce internal belum diaktifkan pada v1. Struktur katalog tetap menyediakan sambungan yang bersih untuk harga, stok, shipping, order, dan manufacturing pada tahap berikutnya.
+- Kartify remains the source of public layout, responsive behavior, spacing, and visual components.
+- The backend and database are the public data source. Kartify JSON files are presentation fixtures only.
+- Indonesian (`id-ID`) and English (`en-US`) content are stored separately.
+- Every public query is scoped to `PUBLIC_COMPANY_ID` on the server.
+- Public v1 covers company profile, catalog, articles, contact, FAQ, SEO, wishlist, cart, and outbound marketplace purchase links.
+- First-party checkout, payment, inventory, and manufacturing workflows belong to a later mapped phase.
 
-## Pemetaan halaman dan template
+## Page and data ownership
 
-| Halaman | Komponen Kartify yang dipertahankan | Sumber data MATEX |
+| Public area | Kartify presentation | MATEX source |
 | --- | --- | --- |
-| Home | `components/home/gadget` dan widget yang dipakai tema | `cms_page` template `home`, attachment roles sesuai slot template |
-| Tentang Kami | `components/page/about-us` | `cms_page` template `about`, attachment roles untuk hero, nilai/capability, team/testimonial bila dipakai |
-| Kontak | `components/page/contact-us` | `cms_page` untuk judul/pengantar/SEO, `office` untuk alamat/map/jam, contact channel untuk WA/email/telepon, inquiry untuk form |
-| FAQ | `components/page/faq` | `cms_page` untuk pengantar/SEO, tabel FAQ terstruktur untuk accordion |
-| Terms/Privacy/policy | `components/page/page` | `cms_page` standard; tidak membutuhkan tabel khusus |
-| Artikel | `components/blog` dan `components/blog/blog-details` | tabel article, category, tag, translation, media |
-| Kategori produk | `components/shop/category` dan collection grid | tabel product category dan translation |
-| Produk | `components/shop/product` dan product box | product, variant, specification, media, price, sales channel |
+| Home | `components/home/gadget` | fixed page `home` and its seven media slots |
+| About MATEX | `components/page/about-us` | fixed page `about`; testimonials remain local presentation data for now |
+| Contact | `components/page/contact-us` | fixed page `contact`, `office*`, public contact channels, inquiry topics, and inquiries |
+| FAQ | `components/page/faq` | fixed page `faq` plus structured FAQ tables |
+| Terms | existing standard page presentation | fixed page `terms` |
+| Career | existing career presentation | fixed page `career` |
+| Articles | `components/blog` | article, category, tag, translation, and media tables |
+| Product categories | category and collection components | product category, translation, hierarchy, and media tables |
+| Products | product detail and product card components | product, translation, media, price, stock presentation, and marketplace tables |
 
-## Kepemilikan data
+The four `website_page*` tables own page copy, publication, SEO, and page media. Operational content stays in its domain tables so changing page metadata does not duplicate contact offices, inquiries, FAQ records, articles, or products.
 
-### Tetap memakai tabel yang ada
+## Navigation
 
-- `cms_page*`: halaman editorial, SEO, OG, schema JSON, translation, dan attachment halaman.
-- `attachment`: pustaka media tunggal untuk halaman, artikel, dan produk.
-- `office*`: lokasi publik, alamat, koordinat, Google Maps URL, jam operasional, dan foto lokasi. Gudang fisik dapat direferensikan oleh modul inventory nanti; alamat yang sama tidak disalin ke tabel kontak.
-- `web_navigation*`: menu header/footer yang mengarah ke halaman, artikel, kategori, atau path internal.
+The header is fixed to Home, About MATEX, Category, Product, Article, and Contact. Admin can change Indonesian and English labels, visibility, and order. Category and Product dropdown contents are derived from published catalog data. Arbitrary link types, parent items, page selectors, icons, badges, and active flags are not part of the stored navigation model.
 
-### Fondasi tahap 1
+## Catalog and commerce boundary
 
-Migration `20260923_003_create_public_contact_and_faq.sql` menambahkan:
+- Marketplace links remain valid without marketplace API integration.
+- Wishlist and cart can use local storage until public authentication and first-party orders are designed.
+- Currency behavior remains present but its final multi-currency flow is deferred.
+- SKU and catalog records can later reference inventory and manufacturing modules; manufacturing is not embedded as free-form product fields.
+- Marketplace API integrations are decided per platform after partner access, cost, and synchronization value are verified.
 
-- contact channel per company untuk WhatsApp, email, phone, dan social link tanpa hardcode;
-- label channel per bahasa;
-- topik form kontak per bahasa;
-- contact inquiry beserta status penanganannya;
-- kategori FAQ dan FAQ per bahasa.
+## Tests and production packaging
 
-Nomor WhatsApp `62 858-1418-0370` nantinya disimpan sebagai nilai E.164 `+6285814180370` melalui Admin. Migration tidak menanam nomor tersebut agar konfigurasi lingkungan dan data bisnis tetap terpisah dari source code.
+`backend/tests` contains contract and regression tests. The folder is not imported by `src/app.ts` and is not part of runtime endpoints. Production packaging should install production dependencies and compile the application without copying source tests into the runtime image.
 
-### Tahap 2: artikel
-
-Tabel yang akan dibuat setelah fondasi kontak selesai:
-
-- `article`, `article_i18n`, `article_attachment`;
-- `article_category`, `article_category_i18n`, `article_category_map`;
-- `article_tag`, `article_tag_i18n`, `article_tag_map`.
-
-Translation artikel memuat slug, title, excerpt, body, meta title/description, canonical, OG, dan schema JSON. Tabel induk memuat author, status, featured/sticky, waktu publish/unpublish, dan timestamps. Struktur ini langsung melayani list, detail, recent posts, category, tag, sitemap, serta blok artikel di Home.
-
-### Tahap 3: katalog
-
-Katalog dipisah menjadi domain berikut agar form Admin tetap mudah dibaca:
-
-- identitas: `product`, `product_i18n`, `product_category*`, category map;
-- pilihan barang: `product_variant`, SKU/barcode, option/attribute;
-- presentasi: product media, localized specification, SEO/OG/schema;
-- harga: `price_list` dan `product_price` untuk harga publik, end-user, marketplace, wholesale, special, mata uang, minimum quantity, dan masa berlaku;
-- kanal: `sales_channel` dan `product_sales_channel` untuk URL listing Shopee, Tokopedia, TikTok Shop, serta external listing ID dan status sinkronisasi;
-- fulfillment: package weight/dimensions dan shipping class;
-- inventory: warehouse, stock balance, reservation, dan movement;
-- manufacturing: hubungan produk/variant ke struktur produksi dibuat sebagai modul terpisah saat proses produksi MATEX sudah dipetakan, bukan kolom bebas di tabel product.
-
-Integrasi API marketplace diputuskan per platform setelah biaya, akses partner, batas penggunaan, dan manfaat sinkronisasinya diverifikasi. Tautan marketplace tetap dapat dipakai tanpa menunggu API.
-
-## Urutan implementasi
-
-1. Review dan jalankan migration fondasi pada database development.
-2. Buat Admin Pengaturan Kontak dan FAQ memakai form/table template yang sudah ada.
-3. Sambungkan Contact dan FAQ publik ke API serta tambahkan map dan floating WhatsApp dari konfigurasi.
-4. Adaptasi About dan legal pages ke template Kartify memakai `cms_page`.
-5. Bangun artikel end-to-end, kemudian katalog end-to-end.
-6. Setelah data pengganti sudah aktif dan diuji responsive/SSR, bersihkan header/footer dari fitur commerce demo yang tidak dipakai.
-
-## Folder `backend/tests`
-
-Folder ini berisi contract/regression test dengan Node test runner. File tersebut tidak dimuat oleh `src/app.ts`, tidak menjadi endpoint, dan tidak menjadi sumber data aplikasi. Test menjaga batas tenant, published-only, sanitasi media, serta kontrak navigation/CMS. Karena fungsinya mendeteksi kerusakan sebelum deploy, folder tetap dipertahankan dan jumlah test ditambah hanya untuk kontrak yang berisiko.
+The fixed-page migration is complete when the database has no legacy generic page tables or permissions, active source code has no generic page routes or services, both frontends build, backend typecheck and contract tests pass, and local development listeners are stopped after verification.

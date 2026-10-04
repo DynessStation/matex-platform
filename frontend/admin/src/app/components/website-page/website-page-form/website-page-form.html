@@ -20,7 +20,7 @@
             <button ngbNavLink type="button">
               <i class="ri-settings-3-line"></i>
 
-              {{ 'cms_page.form_general' | translate }}
+              {{ 'website_page.form_general' | translate }}
             </button>
 
             <ng-template ngbNavContent>
@@ -31,11 +31,11 @@
               <div class="border rounded p-4">
                 <div class="mb-4">
                   <h5 class="mb-1">
-                    {{ 'cms_page.form_general_title' | translate }}
+                    {{ 'website_page.form_general_title' | translate }}
                   </h5>
 
                   <p class="text-muted mb-0">
-                    {{ 'cms_page.form_general_help' | translate }}
+                    {{ 'website_page.form_general_help' | translate }}
                   </p>
                 </div>
 
@@ -43,7 +43,7 @@
                   <div class="alert alert-warning">
                     <i class="ri-information-line me-1"></i>
 
-                    {{ 'cms_page.system_page_edit_notice' | translate }}
+                    {{ 'website_page.system_page_edit_notice' | translate }}
                   </div>
                 }
 
@@ -52,51 +52,53 @@
 
                   <div class="col-md-6">
                     <label class="form-label">
-                      {{ 'cms_page.key' | translate }}
+                      {{ 'website_page.key' | translate }}
                       *
                     </label>
 
                     <input
                       type="text"
                       class="form-control"
-                      formControlName="cms_page_key"
+                      formControlName="website_page_key"
                       placeholder="about"
                       [readonly]="isSystemPage"
                       [class.is-invalid]="
-                        form.controls.cms_page_key.touched &&
-                        form.controls.cms_page_key.invalid
+                        form.controls.website_page_key.touched &&
+                        form.controls.website_page_key.invalid
                       "
                       (blur)="normalizePageKey()"
                     />
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.key_help' | translate }}
+                      {{ 'website_page.key_help' | translate }}
                     </small>
 
                     @if (
-                      form.controls.cms_page_key.touched &&
-                      form.controls.cms_page_key.errors?.['required']
+                      form.controls.website_page_key.touched &&
+                      form.controls.website_page_key.errors?.['required']
                     ) {
                       <div class="text-danger form-error">
-                        {{ 'cms_page.validation.key_required' | translate }}
+                        {{ 'website_page.validation.key_required' | translate }}
                       </div>
                     }
 
                     @if (
-                      form.controls.cms_page_key.touched &&
-                      form.controls.cms_page_key.errors?.['pattern']
+                      form.controls.website_page_key.touched &&
+                      form.controls.website_page_key.errors?.['pattern']
                     ) {
                       <div class="text-danger form-error">
-                        {{ 'cms_page.validation.key_pattern' | translate }}
+                        {{ 'website_page.validation.key_pattern' | translate }}
                       </div>
                     }
 
                     @if (
-                      form.controls.cms_page_key.touched &&
-                      form.controls.cms_page_key.errors?.['maxlength']
+                      form.controls.website_page_key.touched &&
+                      form.controls.website_page_key.errors?.['maxlength']
                     ) {
                       <div class="text-danger form-error">
-                        {{ 'cms_page.validation.key_max_length' | translate }}
+                        {{
+                          'website_page.validation.key_max_length' | translate
+                        }}
                       </div>
                     }
                   </div>
@@ -105,13 +107,13 @@
 
                   <div class="col-md-6">
                     <label class="form-label">
-                      {{ 'cms_page.default_locale' | translate }}
+                      {{ 'website_page.default_locale' | translate }}
                       *
                     </label>
 
                     <select
                       class="form-select"
-                      formControlName="cms_page_default_locale"
+                      formControlName="website_page_default_locale"
                     >
                       <option value="id-ID">Bahasa Indonesia</option>
 
@@ -119,7 +121,7 @@
                     </select>
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.default_locale_help' | translate }}
+                      {{ 'website_page.default_locale_help' | translate }}
                     </small>
                   </div>
 
@@ -127,28 +129,28 @@
 
                   <div class="col-md-6">
                     <label class="form-label">
-                      {{ 'cms_page.visibility' | translate }}
+                      {{ 'website_page.visibility' | translate }}
                     </label>
 
                     <select
                       class="form-select"
-                      formControlName="cms_page_visibility"
+                      formControlName="website_page_visibility"
                     >
                       <option [ngValue]="1">
-                        {{ 'cms_page.visibility_public' | translate }}
+                        {{ 'website_page.visibility_public' | translate }}
                       </option>
 
                       <option [ngValue]="0">
-                        {{ 'cms_page.visibility_private' | translate }}
+                        {{ 'website_page.visibility_private' | translate }}
                       </option>
 
                       <option [ngValue]="2">
-                        {{ 'cms_page.visibility_unlisted' | translate }}
+                        {{ 'website_page.visibility_unlisted' | translate }}
                       </option>
                     </select>
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.visibility_help' | translate }}
+                      {{ 'website_page.visibility_help' | translate }}
                     </small>
                   </div>
 
@@ -156,22 +158,22 @@
 
                   <div class="col-md-6">
                     <label class="form-label">
-                      {{ 'cms_page.sort_order' | translate }}
+                      {{ 'website_page.sort_order' | translate }}
                     </label>
 
                     <input
                       type="number"
                       min="0"
                       class="form-control"
-                      formControlName="cms_page_sort_order"
+                      formControlName="website_page_sort_order"
                       [class.is-invalid]="
-                        form.controls.cms_page_sort_order.touched &&
-                        form.controls.cms_page_sort_order.invalid
+                        form.controls.website_page_sort_order.touched &&
+                        form.controls.website_page_sort_order.invalid
                       "
                     />
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.sort_order_help' | translate }}
+                      {{ 'website_page.sort_order_help' | translate }}
                     </small>
                   </div>
 
@@ -184,21 +186,21 @@
                       <div class="pe-3">
                         <label
                           class="form-label fw-semibold mb-1"
-                          for="cms_page_is_featured"
+                          for="website_page_is_featured"
                         >
-                          {{ 'cms_page.featured' | translate }}
+                          {{ 'website_page.featured' | translate }}
                         </label>
 
                         <div class="text-muted small">
-                          {{ 'cms_page.featured_help' | translate }}
+                          {{ 'website_page.featured_help' | translate }}
                         </div>
                       </div>
 
                       <label class="switch">
                         <input
-                          id="cms_page_is_featured"
+                          id="website_page_is_featured"
                           type="checkbox"
-                          formControlName="cms_page_is_featured"
+                          formControlName="website_page_is_featured"
                         />
 
                         <span class="switch-state"></span>
@@ -211,11 +213,11 @@
                   <div class="col-12">
                     <details class="border rounded p-3">
                       <summary class="fw-semibold cursor-pointer">
-                        {{ 'cms_page.advanced_settings' | translate }}
+                        {{ 'website_page.advanced_settings' | translate }}
                       </summary>
 
                       <p class="text-muted small mt-2">
-                        {{ 'cms_page.advanced_settings_help' | translate }}
+                        {{ 'website_page.advanced_settings_help' | translate }}
                       </p>
 
                       <div class="row g-4 mt-1">
@@ -223,17 +225,17 @@
 
                         <div class="col-md-6">
                           <label class="form-label">
-                            {{ 'cms_page.type' | translate }}
+                            {{ 'website_page.type' | translate }}
                           </label>
 
                           <input
                             type="text"
                             class="form-control"
-                            formControlName="cms_page_type"
+                            formControlName="website_page_type"
                             placeholder="standard"
                             [class.is-invalid]="
-                              form.controls.cms_page_type.touched &&
-                              form.controls.cms_page_type.invalid
+                              form.controls.website_page_type.touched &&
+                              form.controls.website_page_type.invalid
                             "
                           />
                         </div>
@@ -242,15 +244,15 @@
 
                         <div class="col-md-6">
                           <label class="form-label">
-                            {{ 'cms_page.template' | translate }}
+                            {{ 'website_page.template' | translate }}
                           </label>
 
                           <select
                             class="form-control"
-                            formControlName="cms_page_template"
+                            formControlName="website_page_template"
                             [class.is-invalid]="
-                              form.controls.cms_page_template.touched &&
-                              form.controls.cms_page_template.invalid
+                              form.controls.website_page_template.touched &&
+                              form.controls.website_page_template.invalid
                             "
                           >
                             <option value="">Default / generic</option>
@@ -265,7 +267,7 @@
                           </select>
 
                           <small class="text-muted d-block mt-1">
-                            {{ 'cms_page.template_help' | translate }}
+                            {{ 'website_page.template_help' | translate }}
                           </small>
                         </div>
                       </div>
@@ -279,7 +281,7 @@
                     class="btn btn-theme"
                     (click)="goToContent()"
                   >
-                    {{ 'cms_page.next_content' | translate }}
+                    {{ 'website_page.next_content' | translate }}
 
                     <i class="ri-arrow-right-line ms-1"></i>
                   </button>
@@ -294,18 +296,18 @@
             <button ngbNavLink type="button">
               <i class="ri-translate-2"></i>
 
-              {{ 'cms_page.content_languages' | translate }}
+              {{ 'website_page.content_languages' | translate }}
             </button>
 
             <ng-template ngbNavContent>
               <div class="border rounded p-4">
                 <div class="mb-4">
                   <h5 class="mb-1">
-                    {{ 'cms_page.content_languages' | translate }}
+                    {{ 'website_page.content_languages' | translate }}
                   </h5>
 
                   <p class="text-muted mb-0">
-                    {{ 'cms_page.content_languages_help' | translate }}
+                    {{ 'website_page.content_languages_help' | translate }}
                   </p>
                 </div>
 
@@ -332,13 +334,15 @@
 
                       @if (isDefaultLocale(language.locale)) {
                         <span class="badge bg-primary">
-                          {{ 'cms_page.default_language_badge' | translate }}
+                          {{
+                            'website_page.default_language_badge' | translate
+                          }}
                         </span>
                       }
 
                       @if (!isLanguageEnabled(language.locale)) {
                         <span class="badge bg-light text-dark">
-                          {{ 'cms_page.not_added' | translate }}
+                          {{ 'website_page.not_added' | translate }}
                         </span>
                       }
                     </button>
@@ -354,11 +358,15 @@
                     <i class="ri-translate-2 fs-1 text-muted"></i>
 
                     <h5 class="mt-3 mb-2">
-                      {{ 'cms_page.translation_not_added_title' | translate }}
+                      {{
+                        'website_page.translation_not_added_title' | translate
+                      }}
                     </h5>
 
                     <p class="text-muted mb-3">
-                      {{ 'cms_page.translation_not_added_help' | translate }}
+                      {{
+                        'website_page.translation_not_added_help' | translate
+                      }}
                     </p>
 
                     <button
@@ -368,7 +376,7 @@
                     >
                       <i class="ri-add-line me-1"></i>
 
-                      {{ 'cms_page.add_translation' | translate }}
+                      {{ 'website_page.add_translation' | translate }}
                     </button>
                   </div>
                 } @else {
@@ -384,8 +392,8 @@
                         <h6 class="mb-1">
                           {{
                             activeLocale === 'id-ID'
-                              ? ('cms_page.language_indonesian' | translate)
-                              : ('cms_page.language_english' | translate)
+                              ? ('website_page.language_indonesian' | translate)
+                              : ('website_page.language_english' | translate)
                           }}
                         </h6>
 
@@ -395,9 +403,7 @@
                       </div>
 
                       <div class="d-flex align-items-center gap-2">
-                        @if (
-                          !isDefaultLocale(activeLocale) && !isSystemPage
-                        ) {
+                        @if (!isDefaultLocale(activeLocale) && !isSystemPage) {
                           <button
                             type="button"
                             class="btn btn-light-danger"
@@ -405,7 +411,7 @@
                           >
                             <i class="ri-delete-bin-line me-1"></i>
 
-                            {{ 'cms_page.remove_translation' | translate }}
+                            {{ 'website_page.remove_translation' | translate }}
                           </button>
                         }
                       </div>
@@ -416,7 +422,7 @@
 
                       <div class="col-md-8">
                         <label class="form-label">
-                          {{ 'cms_page.translation_title' | translate }}
+                          {{ 'website_page.translation_title' | translate }}
                           *
                         </label>
 
@@ -425,7 +431,8 @@
                           class="form-control"
                           formControlName="title"
                           [placeholder]="
-                            'cms_page.translation_title_placeholder' | translate
+                            'website_page.translation_title_placeholder'
+                              | translate
                           "
                           [class.is-invalid]="
                             translationForm(activeLocale).controls.title
@@ -444,7 +451,7 @@
                         ) {
                           <div class="text-danger form-error">
                             {{
-                              'cms_page.validation.translation_title_required'
+                              'website_page.validation.translation_title_required'
                                 | translate
                             }}
                           </div>
@@ -459,7 +466,7 @@
                         ) {
                           <div class="text-danger form-error">
                             {{
-                              'cms_page.validation.translation_title_max_length'
+                              'website_page.validation.translation_title_max_length'
                                 | translate
                             }}
                           </div>
@@ -470,21 +477,23 @@
 
                       <div class="col-md-4">
                         <label class="form-label">
-                          {{ 'cms_page.translation_status' | translate }}
+                          {{ 'website_page.translation_status' | translate }}
                         </label>
 
                         <select class="form-select" formControlName="status">
                           <option [ngValue]="0">
-                            {{ 'cms_page.status_draft' | translate }}
+                            {{ 'website_page.status_draft' | translate }}
                           </option>
 
                           <option [ngValue]="1">
-                            {{ 'cms_page.status_published' | translate }}
+                            {{ 'website_page.status_published' | translate }}
                           </option>
                         </select>
 
                         <small class="text-muted d-block mt-1">
-                          {{ 'cms_page.translation_status_help' | translate }}
+                          {{
+                            'website_page.translation_status_help' | translate
+                          }}
                         </small>
                       </div>
 
@@ -492,7 +501,7 @@
 
                       <div class="col-12">
                         <label class="form-label">
-                          {{ 'cms_page.slug' | translate }}
+                          {{ 'website_page.slug' | translate }}
                         </label>
 
                         <div class="input-group">
@@ -515,7 +524,7 @@
                         </div>
 
                         <small class="text-muted d-block mt-1">
-                          {{ 'cms_page.slug_help' | translate }}
+                          {{ 'website_page.slug_help' | translate }}
                         </small>
 
                         @if (
@@ -525,7 +534,9 @@
                           ]
                         ) {
                           <div class="text-danger form-error">
-                            {{ 'cms_page.validation.slug_pattern' | translate }}
+                            {{
+                              'website_page.validation.slug_pattern' | translate
+                            }}
                           </div>
                         }
 
@@ -537,7 +548,8 @@
                         ) {
                           <div class="text-danger form-error">
                             {{
-                              'cms_page.validation.slug_max_length' | translate
+                              'website_page.validation.slug_max_length'
+                                | translate
                             }}
                           </div>
                         }
@@ -601,7 +613,7 @@
 
                       <div class="col-12">
                         <label class="form-label">
-                          {{ 'cms_page.excerpt' | translate }}
+                          {{ 'website_page.excerpt' | translate }}
                         </label>
 
                         <textarea
@@ -609,19 +621,21 @@
                           rows="3"
                           formControlName="excerpt"
                           [placeholder]="
-                            'cms_page.excerpt_placeholder' | translate
+                            'website_page.excerpt_placeholder' | translate
                           "
                         ></textarea>
 
                         <small class="text-muted d-block mt-1">
-                          {{ 'cms_page.excerpt_help' | translate }}
+                          {{ 'website_page.excerpt_help' | translate }}
                         </small>
                       </div>
 
                       @if (isAboutTemplate) {
                         <div class="col-12">
                           <div class="border rounded p-3">
-                            <h6 class="mb-1">{{ 'about_highlights' | translate }}</h6>
+                            <h6 class="mb-1">
+                              {{ 'about_highlights' | translate }}
+                            </h6>
                             <p class="text-muted small mb-3">
                               {{ 'about_highlights_help' | translate }}
                             </p>
@@ -635,7 +649,8 @@
                                 <div class="col-lg-4">
                                   <div class="border rounded p-3 h-100">
                                     <label class="form-label">
-                                      {{ 'about_highlight_title' | translate }} {{ featureIndex + 1 }}
+                                      {{ 'about_highlight_title' | translate }}
+                                      {{ featureIndex + 1 }}
                                     </label>
                                     <input
                                       type="text"
@@ -652,7 +667,10 @@
                                     />
 
                                     <label class="form-label">
-                                      {{ 'about_highlight_description' | translate }}
+                                      {{
+                                        'about_highlight_description'
+                                          | translate
+                                      }}
                                     </label>
                                     <textarea
                                       class="form-control"
@@ -685,41 +703,42 @@
                         </div>
                       } @else if (!isAboutTemplate) {
                         <div class="col-12">
-                        <label class="form-label">
-                          {{ 'cms_page.content' | translate }}
-                        </label>
+                          <label class="form-label">
+                            {{ 'website_page.content' | translate }}
+                          </label>
 
-                        @if (contentEditor(); as editor) {
-                          <div class="cms-rich-editor">
-                            <div class="NgxEditor__Wrapper">
-                              <ngx-editor-menu
-                                [editor]="editor"
-                                [toolbar]="contentEditorToolbar"
-                              ></ngx-editor-menu>
+                          @if (contentEditor(); as editor) {
+                            <div class="cms-rich-editor">
+                              <div class="NgxEditor__Wrapper">
+                                <ngx-editor-menu
+                                  [editor]="editor"
+                                  [toolbar]="contentEditorToolbar"
+                                ></ngx-editor-menu>
 
-                              <ngx-editor
-                                [editor]="editor"
-                                formControlName="content"
-                                [placeholder]="
-                                  'cms_page.content_placeholder' | translate
-                                "
-                              ></ngx-editor>
+                                <ngx-editor
+                                  [editor]="editor"
+                                  formControlName="content"
+                                  [placeholder]="
+                                    'website_page.content_placeholder'
+                                      | translate
+                                  "
+                                ></ngx-editor>
+                              </div>
                             </div>
-                          </div>
-                        } @else {
-                          <textarea
-                            class="form-control"
-                            rows="8"
-                            formControlName="content"
-                            [placeholder]="
-                              'cms_page.content_placeholder' | translate
-                            "
-                          ></textarea>
-                        }
+                          } @else {
+                            <textarea
+                              class="form-control"
+                              rows="8"
+                              formControlName="content"
+                              [placeholder]="
+                                'website_page.content_placeholder' | translate
+                              "
+                            ></textarea>
+                          }
 
-                        <small class="text-muted d-block mt-1">
-                          {{ 'cms_page.content_editor_help' | translate }}
-                        </small>
+                          <small class="text-muted d-block mt-1">
+                            {{ 'website_page.content_editor_help' | translate }}
+                          </small>
                         </div>
                       }
                     </div>
@@ -734,7 +753,7 @@
                       >
                         <i class="ri-arrow-left-line me-1"></i>
 
-                        {{ 'cms_page.back_general' | translate }}
+                        {{ 'website_page.back_general' | translate }}
                       </button>
 
                       <button
@@ -742,7 +761,7 @@
                         class="btn btn-theme"
                         (click)="goToSeo()"
                       >
-                        {{ 'cms_page.next_seo' | translate }}
+                        {{ 'website_page.next_seo' | translate }}
 
                         <i class="ri-arrow-right-line ms-1"></i>
                       </button>
@@ -766,11 +785,11 @@
               <div class="border rounded p-4">
                 <div class="mb-4">
                   <h5 class="mb-1">
-                    {{ 'cms_page.seo_title' | translate }}
+                    {{ 'website_page.seo_title' | translate }}
                   </h5>
 
                   <p class="text-muted mb-0">
-                    {{ 'cms_page.seo_help' | translate }}
+                    {{ 'website_page.seo_help' | translate }}
                   </p>
                 </div>
 
@@ -796,7 +815,9 @@
 
                         @if (isDefaultLocale(language.locale)) {
                           <span class="badge bg-primary">
-                            {{ 'cms_page.default_language_badge' | translate }}
+                            {{
+                              'website_page.default_language_badge' | translate
+                            }}
                           </span>
                         }
                       </button>
@@ -809,7 +830,7 @@
 
                   <div class="border rounded p-3 mb-4">
                     <small class="text-muted d-block mb-1">
-                      {{ 'cms_page.search_preview' | translate }}
+                      {{ 'website_page.search_preview' | translate }}
                     </small>
 
                     <div class="text-primary fw-semibold fs-5">
@@ -830,7 +851,7 @@
 
                     <div class="col-12">
                       <label class="form-label">
-                        {{ 'cms_page.meta_title' | translate }}
+                        {{ 'website_page.meta_title' | translate }}
                       </label>
 
                       <input
@@ -838,7 +859,7 @@
                         class="form-control"
                         formControlName="meta_title"
                         [placeholder]="
-                          'cms_page.meta_title_placeholder' | translate
+                          'website_page.meta_title_placeholder' | translate
                         "
                         [class.is-invalid]="
                           translationForm(activeLocale).controls.meta_title
@@ -850,7 +871,7 @@
 
                       <div class="d-flex justify-content-between mt-1">
                         <small class="text-muted">
-                          {{ 'cms_page.meta_title_help' | translate }}
+                          {{ 'website_page.meta_title_help' | translate }}
                         </small>
 
                         <small class="text-muted">
@@ -866,7 +887,7 @@
 
                     <div class="col-12">
                       <label class="form-label">
-                        {{ 'cms_page.meta_description' | translate }}
+                        {{ 'website_page.meta_description' | translate }}
                       </label>
 
                       <textarea
@@ -874,7 +895,8 @@
                         rows="3"
                         formControlName="meta_description"
                         [placeholder]="
-                          'cms_page.meta_description_placeholder' | translate
+                          'website_page.meta_description_placeholder'
+                            | translate
                         "
                         [class.is-invalid]="
                           translationForm(activeLocale).controls
@@ -886,7 +908,7 @@
 
                       <div class="d-flex justify-content-between mt-1">
                         <small class="text-muted">
-                          {{ 'cms_page.meta_description_help' | translate }}
+                          {{ 'website_page.meta_description_help' | translate }}
                         </small>
 
                         <small class="text-muted">
@@ -902,7 +924,7 @@
 
                     <div class="col-12">
                       <label class="form-label">
-                        {{ 'cms_page.canonical_url' | translate }}
+                        {{ 'website_page.canonical_url' | translate }}
                       </label>
 
                       <input
@@ -919,7 +941,7 @@
                       />
 
                       <small class="text-muted d-block mt-1">
-                        {{ 'cms_page.canonical_url_help' | translate }}
+                        {{ 'website_page.canonical_url_help' | translate }}
                       </small>
 
                       @if (
@@ -930,7 +952,7 @@
                       ) {
                         <div class="text-danger form-error">
                           {{
-                            'cms_page.validation.canonical_url_invalid'
+                            'website_page.validation.canonical_url_invalid'
                               | translate
                           }}
                         </div>
@@ -942,27 +964,27 @@
                     <div class="col-12">
                       <details class="border rounded p-3">
                         <summary class="fw-semibold cursor-pointer">
-                          {{ 'cms_page.seo_advanced' | translate }}
+                          {{ 'website_page.seo_advanced' | translate }}
                         </summary>
 
                         <p class="text-muted small mt-2">
-                          {{ 'cms_page.seo_advanced_help' | translate }}
+                          {{ 'website_page.seo_advanced_help' | translate }}
                         </p>
 
                         <div class="row g-4 mt-1">
                           <div class="col-md-6">
                             <label class="form-label">
-                              {{ 'cms_page.meta_robots' | translate }}
+                              {{ 'website_page.meta_robots' | translate }}
                             </label>
 
                             <input
                               type="text"
                               class="form-control"
                               formControlName="meta_robots"
-                              list="cmsPageRobots"
+                              list="websitePageRobots"
                             />
 
-                            <datalist id="cmsPageRobots">
+                            <datalist id="websitePageRobots">
                               <option value="index,follow"></option>
                               <option value="noindex,follow"></option>
                               <option value="index,nofollow"></option>
@@ -972,7 +994,7 @@
 
                           <div class="col-md-6">
                             <label class="form-label">
-                              {{ 'cms_page.meta_keywords' | translate }}
+                              {{ 'website_page.meta_keywords' | translate }}
                             </label>
 
                             <input
@@ -980,7 +1002,8 @@
                               class="form-control"
                               formControlName="meta_keywords"
                               [placeholder]="
-                                'cms_page.meta_keywords_placeholder' | translate
+                                'website_page.meta_keywords_placeholder'
+                                  | translate
                               "
                             />
                           </div>
@@ -989,17 +1012,17 @@
                             <hr />
 
                             <h6 class="mb-1">
-                              {{ 'cms_page.open_graph' | translate }}
+                              {{ 'website_page.open_graph' | translate }}
                             </h6>
 
                             <p class="text-muted small mb-0">
-                              {{ 'cms_page.open_graph_help' | translate }}
+                              {{ 'website_page.open_graph_help' | translate }}
                             </p>
                           </div>
 
                           <div class="col-12">
                             <label class="form-label">
-                              {{ 'cms_page.og_title' | translate }}
+                              {{ 'website_page.og_title' | translate }}
                             </label>
 
                             <input
@@ -1011,7 +1034,7 @@
 
                           <div class="col-12">
                             <label class="form-label">
-                              {{ 'cms_page.og_description' | translate }}
+                              {{ 'website_page.og_description' | translate }}
                             </label>
 
                             <textarea
@@ -1035,7 +1058,7 @@
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
-                      {{ 'cms_page.back_content' | translate }}
+                      {{ 'website_page.back_content' | translate }}
                     </button>
 
                     <button
@@ -1043,7 +1066,7 @@
                       class="btn btn-theme"
                       (click)="goToMedia()"
                     >
-                      {{ 'cms_page.next_media' | translate }}
+                      {{ 'website_page.next_media' | translate }}
 
                       <i class="ri-arrow-right-line ms-1"></i>
                     </button>
@@ -1060,7 +1083,7 @@
               <button ngbNavLink type="button">
                 <i class="ri-image-line"></i>
 
-                {{ 'cms_page.media' | translate }}
+                {{ 'website_page.media' | translate }}
               </button>
 
               <ng-template ngbNavContent>
@@ -1074,11 +1097,11 @@
                   >
                     <div>
                       <h5 class="mb-1">
-                        {{ 'cms_page.media_title' | translate }}
+                        {{ 'website_page.media_title' | translate }}
                       </h5>
 
                       <p class="text-muted mb-0">
-                        {{ 'cms_page.media_help' | translate }}
+                        {{ 'website_page.media_help' | translate }}
                       </p>
                     </div>
 
@@ -1089,7 +1112,7 @@
                     >
                       <i class="ri-image-add-line me-1"></i>
 
-                      {{ 'cms_page.select_media' | translate }}
+                      {{ 'website_page.select_media' | translate }}
                     </button>
                   </div>
 
@@ -1159,7 +1182,7 @@
 
                     <div class="mb-4">
                       <small class="text-muted d-block mb-2">
-                        {{ 'cms_page.media_language_help' | translate }}
+                        {{ 'website_page.media_language_help' | translate }}
                       </small>
 
                       <div class="d-flex flex-wrap gap-2">
@@ -1190,7 +1213,7 @@
                               @if (isDefaultLocale(language.locale)) {
                                 <span class="badge bg-primary">
                                   {{
-                                    'cms_page.default_language_badge'
+                                    'website_page.default_language_badge'
                                       | translate
                                   }}
                                 </span>
@@ -1205,14 +1228,14 @@
                     <!--==== MEDIA LIST ===================================-->
                     <!--==================================================-->
 
-                    <div class="cms-page-media-list">
+                    <div class="website-page-media-list">
                       @for (
                         media of pageMedia;
                         track media.attachment.id_attachment;
                         let index = $index
                       ) {
-                        <div class="cms-page-media-item">
-                          <div class="cms-page-media-preview">
+                        <div class="website-page-media-item">
+                          <div class="website-page-media-preview">
                             <img
                               [src]="media.attachment.asset_url"
                               [alt]="
@@ -1223,14 +1246,14 @@
 
                             @if (media.role !== 'gallery') {
                               <span
-                                class="badge bg-warning cms-page-media-badge"
+                                class="badge bg-warning website-page-media-badge"
                               >
                                 {{ mediaRoleLabel(media.role) }}
                               </span>
                             }
                           </div>
 
-                          <div class="cms-page-media-content">
+                          <div class="website-page-media-content">
                             <div
                               class="d-flex justify-content-between align-items-start gap-3"
                             >
@@ -1270,8 +1293,10 @@
 
                               <button
                                 type="button"
-                                class="btn btn-sm btn-light-bg cms-page-media-delete"
-                                [title]="'cms_page.remove_media' | translate"
+                                class="btn btn-sm btn-light-bg website-page-media-delete"
+                                [title]="
+                                  'website_page.remove_media' | translate
+                                "
                                 (click)="removeMedia(index)"
                               >
                                 <i class="ri-delete-bin-line"></i>
@@ -1281,7 +1306,7 @@
                             <div class="row g-3 mt-1">
                               <div class="col-md-6">
                                 <label class="form-label">
-                                  {{ 'cms_page.media_caption' | translate }}
+                                  {{ 'website_page.media_caption' | translate }}
                                 </label>
 
                                 <input
@@ -1291,7 +1316,7 @@
                                     media.translations[activeLocale].caption
                                   "
                                   [placeholder]="
-                                    'cms_page.media_caption_placeholder'
+                                    'website_page.media_caption_placeholder'
                                       | translate
                                   "
                                   (input)="
@@ -1307,7 +1332,9 @@
 
                               <div class="col-md-6">
                                 <label class="form-label">
-                                  {{ 'cms_page.media_alt_text' | translate }}
+                                  {{
+                                    'website_page.media_alt_text' | translate
+                                  }}
                                 </label>
 
                                 <input
@@ -1317,7 +1344,7 @@
                                     media.translations[activeLocale].alt_text
                                   "
                                   [placeholder]="
-                                    'cms_page.media_alt_text_placeholder'
+                                    'website_page.media_alt_text_placeholder'
                                       | translate
                                   "
                                   (input)="
@@ -1332,7 +1359,8 @@
 
                                 <small class="text-muted d-block mt-1">
                                   {{
-                                    'cms_page.media_alt_text_help' | translate
+                                    'website_page.media_alt_text_help'
+                                      | translate
                                   }}
                                 </small>
                               </div>
@@ -1375,7 +1403,7 @@
                                 >
                                   <i class="ri-image-line me-1"></i>
 
-                                  {{ 'cms_page.set_hero' | translate }}
+                                  {{ 'website_page.set_hero' | translate }}
                                 </button>
                               }
 
@@ -1396,7 +1424,7 @@
                                 </label>
 
                                 <span>
-                                  {{ 'cms_page.media_public' | translate }}
+                                  {{ 'website_page.media_public' | translate }}
                                 </span>
                               </div>
 
@@ -1437,11 +1465,23 @@
                                       )
                                     "
                                   >
-                                    <option value="none">{{ 'home_banner_no_action' | translate }}</option>
-                                    <option value="internal">{{ 'home_banner_website_page' | translate }}</option>
-                                    <option value="product">{{ 'home_banner_product' | translate }}</option>
-                                    <option value="category">{{ 'home_banner_category' | translate }}</option>
-                                    <option value="external">{{ 'home_banner_external' | translate }}</option>
+                                    <option value="none">
+                                      {{ 'home_banner_no_action' | translate }}
+                                    </option>
+                                    <option value="internal">
+                                      {{
+                                        'home_banner_website_page' | translate
+                                      }}
+                                    </option>
+                                    <option value="product">
+                                      {{ 'home_banner_product' | translate }}
+                                    </option>
+                                    <option value="category">
+                                      {{ 'home_banner_category' | translate }}
+                                    </option>
+                                    <option value="external">
+                                      {{ 'home_banner_external' | translate }}
+                                    </option>
                                   </select>
                                 </div>
 
@@ -1471,7 +1511,9 @@
                                     "
                                   />
                                   <small class="text-muted d-block mt-1">
-                                    {{ 'home_banner_destination_help' | translate }}
+                                    {{
+                                      'home_banner_destination_help' | translate
+                                    }}
                                   </small>
                                 </div>
                               </div>
@@ -1481,15 +1523,15 @@
                       }
                     </div>
                   } @else {
-                    <div class="cms-page-media-empty">
+                    <div class="website-page-media-empty">
                       <i class="ri-image-add-line fs-1 d-block mb-2"></i>
 
                       <strong class="d-block mb-1">
-                        {{ 'cms_page.no_media_selected' | translate }}
+                        {{ 'website_page.no_media_selected' | translate }}
                       </strong>
 
                       <span class="text-muted">
-                        {{ 'cms_page.media_empty_help' | translate }}
+                        {{ 'website_page.media_empty_help' | translate }}
                       </span>
                     </div>
                   }
@@ -1504,7 +1546,7 @@
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
-                      {{ 'cms_page.back_seo' | translate }}
+                      {{ 'website_page.back_seo' | translate }}
                     </button>
 
                     <button
@@ -1512,7 +1554,7 @@
                       class="btn btn-theme"
                       (click)="goToPublication()"
                     >
-                      {{ 'cms_page.next_publication' | translate }}
+                      {{ 'website_page.next_publication' | translate }}
 
                       <i class="ri-arrow-right-line ms-1"></i>
                     </button>
@@ -1528,18 +1570,18 @@
             <button ngbNavLink type="button">
               <i class="ri-send-plane-line"></i>
 
-              {{ 'cms_page.publication' | translate }}
+              {{ 'website_page.publication' | translate }}
             </button>
 
             <ng-template ngbNavContent>
               <div class="border rounded p-4">
                 <div class="mb-4">
                   <h5 class="mb-1">
-                    {{ 'cms_page.publication_title' | translate }}
+                    {{ 'website_page.publication_title' | translate }}
                   </h5>
 
                   <p class="text-muted mb-0">
-                    {{ 'cms_page.publication_help' | translate }}
+                    {{ 'website_page.publication_help' | translate }}
                   </p>
                 </div>
 
@@ -1551,25 +1593,26 @@
                   <div class="cms-publication-current mb-4">
                     <div>
                       <small class="text-muted d-block mb-1">
-                        {{ 'cms_page.current_status' | translate }}
+                        {{ 'website_page.current_status' | translate }}
                       </small>
 
                       <strong>
                         {{
-                          'cms_page.status_' + page.effective_status | translate
+                          'website_page.status_' + page.effective_status
+                            | translate
                         }}
                       </strong>
                     </div>
 
-                    @if (page.cms_page_publish_at) {
+                    @if (page.website_page_publish_at) {
                       <div>
                         <small class="text-muted d-block mb-1">
-                          {{ 'cms_page.publish_at' | translate }}
+                          {{ 'website_page.publish_at' | translate }}
                         </small>
 
                         <strong>
                           {{
-                            page.cms_page_publish_at
+                            page.website_page_publish_at
                               | date
                                 : localization.dateTimeFormat()
                                 : undefined
@@ -1579,15 +1622,15 @@
                       </div>
                     }
 
-                    @if (page.cms_page_unpublish_at) {
+                    @if (page.website_page_unpublish_at) {
                       <div>
                         <small class="text-muted d-block mb-1">
-                          {{ 'cms_page.unpublish_at' | translate }}
+                          {{ 'website_page.unpublish_at' | translate }}
                         </small>
 
                         <strong>
                           {{
-                            page.cms_page_unpublish_at
+                            page.website_page_unpublish_at
                               | date
                                 : localization.dateTimeFormat()
                                 : undefined
@@ -1619,12 +1662,15 @@
 
                       <div>
                         <strong>
-                          {{ 'cms_page.publication_keep_current' | translate }}
+                          {{
+                            'website_page.publication_keep_current' | translate
+                          }}
                         </strong>
 
                         <small>
                           {{
-                            'cms_page.publication_keep_current_help' | translate
+                            'website_page.publication_keep_current_help'
+                              | translate
                           }}
                         </small>
                       </div>
@@ -1645,11 +1691,11 @@
 
                     <div>
                       <strong>
-                        {{ 'cms_page.publication_draft' | translate }}
+                        {{ 'website_page.publication_draft' | translate }}
                       </strong>
 
                       <small>
-                        {{ 'cms_page.publication_draft_help' | translate }}
+                        {{ 'website_page.publication_draft_help' | translate }}
                       </small>
                     </div>
                   </label>
@@ -1668,12 +1714,13 @@
 
                     <div>
                       <strong>
-                        {{ 'cms_page.publication_publish_now' | translate }}
+                        {{ 'website_page.publication_publish_now' | translate }}
                       </strong>
 
                       <small>
                         {{
-                          'cms_page.publication_publish_now_help' | translate
+                          'website_page.publication_publish_now_help'
+                            | translate
                         }}
                       </small>
                     </div>
@@ -1693,11 +1740,13 @@
 
                     <div>
                       <strong>
-                        {{ 'cms_page.publication_schedule' | translate }}
+                        {{ 'website_page.publication_schedule' | translate }}
                       </strong>
 
                       <small>
-                        {{ 'cms_page.publication_schedule_help' | translate }}
+                        {{
+                          'website_page.publication_schedule_help' | translate
+                        }}
                       </small>
                     </div>
                   </label>
@@ -1717,11 +1766,13 @@
 
                       <div>
                         <strong>
-                          {{ 'cms_page.publication_archive' | translate }}
+                          {{ 'website_page.publication_archive' | translate }}
                         </strong>
 
                         <small>
-                          {{ 'cms_page.publication_archive_help' | translate }}
+                          {{
+                            'website_page.publication_archive_help' | translate
+                          }}
                         </small>
                       </div>
                     </label>
@@ -1735,7 +1786,7 @@
                 @if (publicationChoice === 'schedule') {
                   <div class="border rounded p-3 mt-4">
                     <label class="form-label">
-                      {{ 'cms_page.schedule_publish_at' | translate }}
+                      {{ 'website_page.schedule_publish_at' | translate }}
                       *
                     </label>
 
@@ -1744,7 +1795,7 @@
 
                       <div class="col-lg-7">
                         <label class="form-label small text-muted">
-                          {{ 'cms_page.date_label' | translate }}
+                          {{ 'website_page.date_label' | translate }}
                         </label>
 
                         <div
@@ -1772,7 +1823,7 @@
                                       : localization.locale()
                                 }}
                               } @else {
-                                {{ 'cms_page.select_date' | translate }}
+                                {{ 'website_page.select_date' | translate }}
                               }
                             </span>
 
@@ -1799,7 +1850,7 @@
 
                       <div class="col-lg-5">
                         <label class="form-label small text-muted">
-                          {{ 'cms_page.time_label' | translate }}
+                          {{ 'website_page.time_label' | translate }}
                         </label>
 
                         <div
@@ -1824,7 +1875,7 @@
                     </div>
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.schedule_publish_at_help' | translate }}
+                      {{ 'website_page.schedule_publish_at_help' | translate }}
                     </small>
 
                     @if (
@@ -1833,7 +1884,7 @@
                     ) {
                       <div class="text-danger form-error">
                         {{
-                          'cms_page.validation.schedule_future_required'
+                          'website_page.validation.schedule_future_required'
                             | translate
                         }}
                       </div>
@@ -1851,7 +1902,7 @@
                 ) {
                   <div class="border rounded p-3 mt-3">
                     <label class="form-label">
-                      {{ 'cms_page.auto_unpublish_at' | translate }}
+                      {{ 'website_page.auto_unpublish_at' | translate }}
                     </label>
 
                     <div class="row g-3">
@@ -1859,7 +1910,7 @@
 
                       <div class="col-lg-7">
                         <label class="form-label small text-muted">
-                          {{ 'cms_page.date_label' | translate }}
+                          {{ 'website_page.date_label' | translate }}
                         </label>
 
                         <div
@@ -1887,7 +1938,7 @@
                                       : localization.locale()
                                 }}
                               } @else {
-                                {{ 'cms_page.select_date' | translate }}
+                                {{ 'website_page.select_date' | translate }}
                               }
                             </span>
 
@@ -1916,7 +1967,7 @@
 
                       <div class="col-lg-5">
                         <label class="form-label small text-muted">
-                          {{ 'cms_page.time_label' | translate }}
+                          {{ 'website_page.time_label' | translate }}
                         </label>
 
                         <div
@@ -1948,12 +1999,12 @@
                       >
                         <i class="ri-close-line me-1"></i>
 
-                        {{ 'cms_page.clear_datetime' | translate }}
+                        {{ 'website_page.clear_datetime' | translate }}
                       </button>
                     }
 
                     <small class="text-muted d-block mt-1">
-                      {{ 'cms_page.auto_unpublish_at_help' | translate }}
+                      {{ 'website_page.auto_unpublish_at_help' | translate }}
                     </small>
 
                     @if (
@@ -1961,7 +2012,7 @@
                     ) {
                       <div class="text-danger form-error">
                         {{
-                          'cms_page.validation.unpublish_after_publish'
+                          'website_page.validation.unpublish_after_publish'
                             | translate
                         }}
                       </div>
@@ -1981,7 +2032,7 @@
                     <i class="ri-information-line me-1"></i>
 
                     {{
-                      'cms_page.default_translation_publish_required'
+                      'website_page.default_translation_publish_required'
                         | translate
                     }}
                   </div>
@@ -2003,8 +2054,8 @@
 
                     {{
                       (canViewAttachments
-                        ? 'cms_page.back_media'
-                        : 'cms_page.back_seo'
+                        ? 'website_page.back_media'
+                        : 'website_page.back_seo'
                       ) | translate
                     }}
                   </button>
@@ -2014,7 +2065,7 @@
                     class="btn btn-theme"
                     (click)="goToPreview()"
                   >
-                    {{ 'cms_page.next_preview' | translate }}
+                    {{ 'website_page.next_preview' | translate }}
 
                     <i class="ri-arrow-right-line ms-1"></i>
                   </button>
@@ -2029,7 +2080,7 @@
             <button ngbNavLink type="button">
               <i class="ri-eye-line"></i>
 
-              {{ 'cms_page.preview' | translate }}
+              {{ 'website_page.preview' | translate }}
             </button>
 
             <ng-template ngbNavContent>
@@ -2038,7 +2089,7 @@
                 <!--==== LIVE PREVIEW ================================-->
                 <!--==================================================-->
 
-                <app-cms-page-preview class="d-block mb-4" [page]="page" />
+                <app-website-page-preview class="d-block mb-4" [page]="page" />
 
                 <!--==================================================-->
                 <!--==== REVIEW ======================================-->
@@ -2047,11 +2098,11 @@
                 <div class="border rounded p-4">
                   <div class="mb-4">
                     <h5 class="mb-1">
-                      {{ 'cms_page.review_title' | translate }}
+                      {{ 'website_page.review_title' | translate }}
                     </h5>
 
                     <p class="text-muted mb-0">
-                      {{ 'cms_page.review_help' | translate }}
+                      {{ 'website_page.review_help' | translate }}
                     </p>
                   </div>
 
@@ -2059,18 +2110,18 @@
 
                   @for (
                     translation of previewDraftTranslations;
-                    track translation.cms_page_locale
+                    track translation.website_page_locale
                   ) {
                     <div class="alert alert-warning">
                       <i class="ri-information-line me-1"></i>
 
                       {{
-                        'cms_page.review_draft_language_warning'
+                        'website_page.review_draft_language_warning'
                           | translate
                             : {
                                 language:
                                   (previewLanguageLabelKey(
-                                    translation.cms_page_locale
+                                    translation.website_page_locale
                                   ) | translate),
                               }
                       }}
@@ -2083,52 +2134,54 @@
 
                   <div class="border rounded p-3 mb-3">
                     <h6 class="mb-3">
-                      {{ 'cms_page.review_identity' | translate }}
+                      {{ 'website_page.review_identity' | translate }}
                     </h6>
 
                     <div class="row g-3">
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.key' | translate }}
+                          {{ 'website_page.key' | translate }}
                         </small>
 
-                        <strong>{{ page.cms_page_key || '-' }}</strong>
+                        <strong>{{ page.website_page_key || '-' }}</strong>
                       </div>
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.review_main_title' | translate }}
+                          {{ 'website_page.review_main_title' | translate }}
                         </small>
 
                         <strong>
-                          {{ previewDefaultTranslation?.cms_page_title || '-' }}
+                          {{
+                            previewDefaultTranslation?.website_page_title || '-'
+                          }}
                         </strong>
                       </div>
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.default_locale' | translate }}
+                          {{ 'website_page.default_locale' | translate }}
                         </small>
 
                         <strong>
                           {{
                             previewLanguageLabelKey(
-                              page.cms_page_default_locale
+                              page.website_page_default_locale
                             ) | translate
                           }}
-                          · {{ page.cms_page_default_locale }}
+                          · {{ page.website_page_default_locale }}
                         </strong>
                       </div>
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.visibility' | translate }}
+                          {{ 'website_page.visibility' | translate }}
                         </small>
 
                         <strong>
                           {{
-                            'cms_page.visibility_' +
-                              previewVisibilityKey(page.cms_page_visibility)
+                            'website_page.visibility_' +
+                              previewVisibilityKey(page.website_page_visibility)
                               | translate
                           }}
                         </strong>
@@ -2136,14 +2189,14 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.featured' | translate }}
+                          {{ 'website_page.featured' | translate }}
                         </small>
 
                         <strong>
                           {{
-                            (page.cms_page_is_featured
-                              ? 'cms_page.review_yes'
-                              : 'cms_page.review_no'
+                            (page.website_page_is_featured
+                              ? 'website_page.review_yes'
+                              : 'website_page.review_no'
                             ) | translate
                           }}
                         </strong>
@@ -2151,7 +2204,7 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.review_media_count' | translate }}
+                          {{ 'website_page.review_media_count' | translate }}
                         </small>
 
                         <strong>{{ page.attachment_count }}</strong>
@@ -2159,7 +2212,7 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.media_hero' | translate }}
+                          {{ 'website_page.media_hero' | translate }}
                         </small>
 
                         <strong>{{ previewHeroMediaName }}</strong>
@@ -2167,10 +2220,10 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.sort_order' | translate }}
+                          {{ 'website_page.sort_order' | translate }}
                         </small>
 
-                        <strong>{{ page.cms_page_sort_order }}</strong>
+                        <strong>{{ page.website_page_sort_order }}</strong>
                       </div>
                     </div>
                   </div>
@@ -2181,14 +2234,14 @@
 
                   <div class="border rounded p-3 mb-3">
                     <h6 class="mb-3">
-                      {{ 'cms_page.review_languages' | translate }}
+                      {{ 'website_page.review_languages' | translate }}
                       ({{ page.translation_count }})
                     </h6>
 
                     <div class="row g-3">
                       @for (
                         translation of page.translations;
-                        track translation.cms_page_locale
+                        track translation.website_page_locale
                       ) {
                         <div class="col-xl-6">
                           <div class="border rounded h-100 p-3">
@@ -2199,21 +2252,21 @@
                                 <strong>
                                   {{
                                     previewLanguageLabelKey(
-                                      translation.cms_page_locale
+                                      translation.website_page_locale
                                     ) | translate
                                   }}
                                 </strong>
 
                                 <div class="text-muted small">
-                                  {{ translation.cms_page_locale }}
+                                  {{ translation.website_page_locale }}
 
                                   @if (
-                                    translation.cms_page_locale ===
-                                    page.cms_page_default_locale
+                                    translation.website_page_locale ===
+                                    page.website_page_default_locale
                                   ) {
                                     ·
                                     {{
-                                      'cms_page.default_language_badge'
+                                      'website_page.default_language_badge'
                                         | translate
                                     }}
                                   }
@@ -2223,19 +2276,19 @@
                               <span
                                 class="badge"
                                 [class.bg-success]="
-                                  translation.cms_page_i18n_status === 1
+                                  translation.website_page_i18n_status === 1
                                 "
                                 [class.bg-warning]="
-                                  translation.cms_page_i18n_status !== 1
+                                  translation.website_page_i18n_status !== 1
                                 "
                                 [class.text-dark]="
-                                  translation.cms_page_i18n_status !== 1
+                                  translation.website_page_i18n_status !== 1
                                 "
                               >
                                 {{
-                                  (translation.cms_page_i18n_status === 1
-                                    ? 'cms_page.translation_published'
-                                    : 'cms_page.translation_draft'
+                                  (translation.website_page_i18n_status === 1
+                                    ? 'website_page.translation_published'
+                                    : 'website_page.translation_draft'
                                   ) | translate
                                 }}
                               </span>
@@ -2243,21 +2296,23 @@
 
                             <div class="mb-2">
                               <small class="text-muted d-block">
-                                {{ 'cms_page.translation_title' | translate }}
+                                {{
+                                  'website_page.translation_title' | translate
+                                }}
                               </small>
 
                               <strong>
-                                {{ translation.cms_page_title || '-' }}
+                                {{ translation.website_page_title || '-' }}
                               </strong>
                             </div>
 
                             <div>
                               <small class="text-muted d-block">
-                                {{ 'cms_page.slug' | translate }}
+                                {{ 'website_page.slug' | translate }}
                               </small>
 
                               <span>
-                                /{{ translation.cms_page_slug || '' }}
+                                /{{ translation.website_page_slug || '' }}
                               </span>
                             </div>
                           </div>
@@ -2272,19 +2327,19 @@
 
                   <div class="border rounded p-3">
                     <h6 class="mb-3">
-                      {{ 'cms_page.review_publication' | translate }}
+                      {{ 'website_page.review_publication' | translate }}
                     </h6>
 
                     <div class="row g-3">
                       @if (mode() === 'edit') {
                         <div class="col-xl-3 col-md-6">
                           <small class="text-muted d-block">
-                            {{ 'cms_page.current_status' | translate }}
+                            {{ 'website_page.current_status' | translate }}
                           </small>
 
                           <strong>
                             {{
-                              'cms_page.status_' +
+                              'website_page.status_' +
                                 (editData()?.effective_status ?? 'draft')
                                 | translate
                             }}
@@ -2294,7 +2349,9 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.review_publication_action' | translate }}
+                          {{
+                            'website_page.review_publication_action' | translate
+                          }}
                         </small>
 
                         <strong>
@@ -2304,7 +2361,7 @@
 
                       <div class="col-xl-3 col-md-6">
                         <small class="text-muted d-block">
-                          {{ 'cms_page.review_after_save' | translate }}
+                          {{ 'website_page.review_after_save' | translate }}
                         </small>
 
                         <strong>
@@ -2312,15 +2369,15 @@
                         </strong>
                       </div>
 
-                      @if (page.cms_page_publish_at) {
+                      @if (page.website_page_publish_at) {
                         <div class="col-xl-3 col-md-6">
                           <small class="text-muted d-block">
-                            {{ 'cms_page.publish_at' | translate }}
+                            {{ 'website_page.publish_at' | translate }}
                           </small>
 
                           <strong>
                             {{
-                              page.cms_page_publish_at
+                              page.website_page_publish_at
                                 | date
                                   : localization.dateTimeFormat()
                                   : undefined
@@ -2330,15 +2387,15 @@
                         </div>
                       }
 
-                      @if (page.cms_page_unpublish_at) {
+                      @if (page.website_page_unpublish_at) {
                         <div class="col-xl-3 col-md-6">
                           <small class="text-muted d-block">
-                            {{ 'cms_page.unpublish_at' | translate }}
+                            {{ 'website_page.unpublish_at' | translate }}
                           </small>
 
                           <strong>
                             {{
-                              page.cms_page_unpublish_at
+                              page.website_page_unpublish_at
                                 | date
                                   : localization.dateTimeFormat()
                                   : undefined
@@ -2363,7 +2420,7 @@
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
-                      {{ 'cms_page.back_publication' | translate }}
+                      {{ 'website_page.back_publication' | translate }}
                     </button>
 
                     <button
@@ -2378,14 +2435,14 @@
                           aria-hidden="true"
                         ></span>
 
-                        {{ 'cms_page.saving' | translate }}
+                        {{ 'website_page.saving' | translate }}
                       } @else {
                         <i class="ri-save-line me-1"></i>
 
                         {{
                           (mode() === 'create'
-                            ? 'cms_page.create_page'
-                            : 'cms_page.save_changes'
+                            ? 'website_page.create_page'
+                            : 'website_page.save_changes'
                           ) | translate
                         }}
                       }

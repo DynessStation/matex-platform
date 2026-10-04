@@ -15,13 +15,15 @@ export class BlogService {
     if (payload?.['paginate']) params = params.set('limit', payload['paginate']);
     if (payload?.['search']) params = params.set('search', payload['search']);
     return this.http
-      .get<PublicApiResponse<IBlogModel>>(`${environment.cmsApiURL}/articles/${locale}`, { params })
+      .get<PublicApiResponse<IBlogModel>>(`${environment.publicApiURL}/articles/${locale}`, {
+        params,
+      })
       .pipe(map((r) => r.data ?? { data: [], total: 0 }));
   }
   getBlogBySlug(locale: string, slug: string): Observable<IBlog> {
     return this.http
       .get<PublicApiResponse<IBlog>>(
-        `${environment.cmsApiURL}/articles/${locale}/${encodeURIComponent(slug)}`,
+        `${environment.publicApiURL}/articles/${locale}/${encodeURIComponent(slug)}`,
       )
       .pipe(map((r) => r.data!));
   }

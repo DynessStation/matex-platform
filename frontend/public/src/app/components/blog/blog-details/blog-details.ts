@@ -85,7 +85,7 @@ export class BlogDetails {
 
     const title = blog.meta_title || blog.title;
     const description = blog.meta_description || blog.description || '';
-    const fallbackUrl = `${environment.cmsSiteURL.replace(/\/$/, '')}${
+    const fallbackUrl = `${environment.publicSiteURL.replace(/\/$/, '')}${
       this.locale === 'en-US' ? '/en/article/' : '/artikel/'
     }${encodeURIComponent(blog.slug)}`;
     const canonical = this.safePublicUrl(blog.canonical_url, fallbackUrl);

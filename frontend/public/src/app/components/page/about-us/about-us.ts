@@ -154,7 +154,7 @@ export class AboutUs {
       this.meta.updateTag({ name, content: page.seo[name] });
     }
 
-    const site = environment.cmsSiteURL.replace(/\/$/, '');
+    const site = environment.publicSiteURL.replace(/\/$/, '');
     const fallbackUrl = `${site}${this.publicPageContext.pathFor(
       page.locale,
       page.path,

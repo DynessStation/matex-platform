@@ -1,29 +1,9 @@
-export type PublicNavigationLinkType = 'cms_page' | 'internal' | 'external' | 'label';
-
-export interface IPublicNavigationBadge {
-  text: string;
-
-  color: string | null;
-}
-
 export interface IPublicNavigationItem {
   key: string;
 
   label: string;
 
-  link_type: PublicNavigationLinkType;
-
-  path: string | null;
-
-  url: string | null;
-
-  target_blank: boolean;
-
-  icon: string | null;
-
-  badge: IPublicNavigationBadge | null;
-
-  children: IPublicNavigationItem[];
+  path: string;
 
   active?: boolean;
 }

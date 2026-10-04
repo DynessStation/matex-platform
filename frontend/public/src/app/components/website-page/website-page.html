@@ -1,7 +1,7 @@
 @if (page(); as page) {
   <app-breadcrumb [breadcrumb]="breadcrumb()" />
 
-  <section class="cms-page-section section-t-space section-b-space" [attr.lang]="locale()">
+  <section class="website-page-section section-t-space section-b-space" [attr.lang]="locale()">
     <div class="custom-container">
       <div class="top-about-content">
         <h2>{{ page.title }}</h2>
@@ -12,7 +12,10 @@
       </div>
 
       @if (page.body_html) {
-        <article class="cms-content section-t-space" [innerHTML]="page.body_html"></article>
+        <article
+          class="website-page-content section-t-space"
+          [innerHTML]="page.body_html"
+        ></article>
       }
     </div>
   </section>
