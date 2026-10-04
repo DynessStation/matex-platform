@@ -224,10 +224,11 @@ test("fixed paths and all related page data are saved in one transaction", async
   );
 });
 
-test("contact and FAQ metadata keep their fixed localized paths", async () => {
+test("fixed metadata pages keep their localized paths", async () => {
   const cases = [
     { key: "contact", paths: ["kontak", "contact-us"] },
     { key: "faq", paths: ["faq", "faq"] },
+    { key: "career", paths: ["karir", "careers"] },
   ];
 
   for (const item of cases) {

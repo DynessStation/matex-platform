@@ -72,11 +72,15 @@ export const page: Routes = [
   },
   {
     path: 'karir',
-    loadComponent: () => import('./coming-soon/coming-soon').then((m) => m.ComingSoon),
+    loadComponent: () =>
+      import('../../components/website-page/website-page').then((m) => m.WebsitePage),
+    data: { locale: 'id-ID', path: 'karir' },
   },
   {
     path: 'en/careers',
-    loadComponent: () => import('./coming-soon/coming-soon').then((m) => m.ComingSoon),
+    loadComponent: () =>
+      import('../../components/website-page/website-page').then((m) => m.WebsitePage),
+    data: { locale: 'en-US', path: 'careers' },
   },
   {
     path: 'page/:slug',
