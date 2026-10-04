@@ -1,0 +1,46 @@
+@if (page(); as page) {
+  <app-breadcrumb [breadcrumb]="breadcrumb()" />
+
+  <section class="cms-page-section section-t-space section-b-space" [attr.lang]="locale()">
+    <div class="custom-container">
+      <div class="top-about-content">
+        <h2>{{ page.title }}</h2>
+
+        @if (page.summary) {
+          <p>{{ page.summary }}</p>
+        }
+      </div>
+
+      @if (page.body_html) {
+        <article class="cms-content section-t-space" [innerHTML]="page.body_html"></article>
+      }
+    </div>
+  </section>
+} @else {
+  <section
+    class="section-t-space section-b-space"
+    [attr.lang]="locale()"
+    [attr.aria-busy]="state() === 'loading'"
+  >
+    <div class="custom-container text-center">
+      @if (state() === 'loading') {
+        <p>{{ message('Memuat halaman…', 'Loading page…') }}</p>
+      } @else if (state() === 'missing') {
+        <h2>{{ message('Halaman tidak ditemukan', 'Page not found') }}</h2>
+        <p>
+          {{
+            message(
+              'Halaman ini belum tersedia atau belum diterbitkan.',
+              'This page is unavailable or has not been published.'
+            )
+          }}
+        </p>
+      } @else {
+        <h2>{{ message('Halaman belum dapat dimuat', 'Unable to load this page') }}</h2>
+        <p>
+          {{ message('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.') }}
+        </p>
+      }
+    </div>
+  </section>
+}

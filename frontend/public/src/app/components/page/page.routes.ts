@@ -60,13 +60,15 @@ export const page: Routes = [
   },
   {
     path: 'syarat-ketentuan',
-    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'id-ID', slug: 'syarat-ketentuan' },
+    loadComponent: () =>
+      import('../../components/website-page/website-page').then((m) => m.WebsitePage),
+    data: { locale: 'id-ID', path: 'syarat-ketentuan' },
   },
   {
     path: 'en/terms-and-conditions',
-    loadComponent: () => import('../../components/cms-page/cms-page').then((m) => m.CmsPage),
-    data: { locale: 'en-US', slug: 'terms-and-conditions' },
+    loadComponent: () =>
+      import('../../components/website-page/website-page').then((m) => m.WebsitePage),
+    data: { locale: 'en-US', path: 'terms-and-conditions' },
   },
   {
     path: 'karir',
