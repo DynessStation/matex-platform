@@ -21,8 +21,18 @@ export const page: Routes = [
   },
   {
     path: 'about-us',
-    loadComponent: () => import('./about-us/about-us').then((m) => m.AboutUs),
-    data: { locale: 'en-US' },
+    redirectTo: '/en/about-matex',
+    pathMatch: 'full',
+  },
+  {
+    path: 'en/about-us',
+    redirectTo: '/en/about-matex',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tentang-kami',
+    redirectTo: '/tentang-matex',
+    pathMatch: 'full',
   },
   {
     path: '400',
@@ -38,7 +48,8 @@ export const page: Routes = [
   },
   {
     path: 'contact-us',
-    loadComponent: () => import('./contact-us/contact-us').then((m) => m.ContactUs),
+    redirectTo: '/kontak',
+    pathMatch: 'full',
   },
   {
     path: 'kontak',
