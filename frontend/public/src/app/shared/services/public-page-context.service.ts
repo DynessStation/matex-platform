@@ -1,13 +1,26 @@
 import { Injectable, signal } from '@angular/core';
 
-import { IPublicCmsPage } from '../interface/cms-page.interface';
+export interface PublicPageTranslation {
+  locale: string;
+  path: string;
+}
 
-export type PublicPageTranslation = IPublicCmsPage['translations'][number];
+interface PublicPageSource {
+  key: string;
+  locale: string;
+  path?: string;
+  slug?: string;
+  translations: Array<{
+    locale: string;
+    path?: string;
+    slug?: string;
+  }>;
+}
 
 interface PublicPageContext {
   key: string;
   locale: string;
-  slug: string;
+  path: string;
   translations: PublicPageTranslation[];
 }
 
@@ -34,27 +47,31 @@ export class PublicPageContextService {
     this.pageState.set(null);
   }
 
-  setPage(page: IPublicCmsPage): void {
-    const translations = [...page.translations];
+  setPage(page: PublicPageSource): void {
+    const currentPath = page.path ?? page.slug ?? '';
+    const translations = page.translations.map((item) => ({
+      locale: item.locale,
+      path: item.path ?? item.slug ?? '',
+    }));
 
     // Jaga-jaga kalau API suatu saat tidak mengembalikan
     // translation untuk locale yang sedang aktif.
     if (!translations.some((item) => item.locale === page.locale)) {
       translations.unshift({
         locale: page.locale,
-        slug: page.slug,
+        path: currentPath,
       });
     }
 
     this.pageState.set({
       key: page.key,
       locale: page.locale,
-      slug: page.slug,
+      path: currentPath,
       translations,
     });
   }
 
-  pathFor(locale: string, slug: string, key?: string): string {
+  pathFor(locale: string, path: string, key?: string): string {
     if (key === 'home') {
       return locale === 'en-US' ? '/en' : '/';
     }
@@ -69,16 +86,16 @@ export class PublicPageContextService {
       return locale === 'en-US' ? fixedRoutes[key].en : fixedRoutes[key].id;
     }
 
-    const encodedSlug = encodeURIComponent(slug);
+    const encodedPath = encodeURIComponent(path);
 
     if (locale === 'en-US') {
-      return `/en/${encodedSlug}`;
+      return `/en/${encodedPath}`;
     }
 
-    return `/${encodedSlug}`;
+    return `/${encodedPath}`;
   }
 
   routeFor(translation: PublicPageTranslation): string {
-    return this.pathFor(translation.locale, translation.slug, this.pageState()?.key);
+    return this.pathFor(translation.locale, translation.path, this.pageState()?.key);
   }
 }

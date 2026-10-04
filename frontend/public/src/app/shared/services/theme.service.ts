@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 
-import { CmsPageService } from './cms-page.service';
+import { WebsitePageService } from './website-page.service';
 import { environment } from '../../../environments/environment';
-import { IPublicCmsPage } from '../interface/cms-page.interface';
+import { IPublicWebsitePage } from '../interface/website-page.interface';
 import { BannerLink, GadgetTheme, ThemesModel } from '../interface/theme.interface';
 
 @Injectable({
@@ -27,24 +27,21 @@ export class ThemeService {
 
   constructor(
     private http: HttpClient,
-    private cmsPageService: CmsPageService,
+    private websitePageService: WebsitePageService,
   ) {}
 
   getThemes(): Observable<ThemesModel> {
     return this.http.get<ThemesModel>(`${environment.URL}/theme.json`);
   }
 
-  getHomePage(
-    slug?: string,
-    locale: 'id-ID' | 'en-US' = 'id-ID',
-  ): Observable<any> {
+  getHomePage(slug?: string, locale: 'id-ID' | 'en-US' = 'id-ID'): Observable<any> {
     const template$ = this.http.get(`${environment.URL}/home/${slug}.json`);
 
     if (slug !== 'gadget-store') return template$;
 
     return template$.pipe(
       switchMap((template) =>
-        this.cmsPageService.getPage(locale, 'home').pipe(
+        this.websitePageService.getPage(locale, 'home').pipe(
           map((page) => this.mergeGadgetHome(template as GadgetTheme, page)),
           catchError(() => of(template)),
         ),
@@ -52,8 +49,8 @@ export class ThemeService {
     );
   }
 
-  private mergeGadgetHome(template: GadgetTheme, page: IPublicCmsPage): GadgetTheme {
-    const content = this.isRecord(page.content_json) ? page.content_json : {};
+  private mergeGadgetHome(template: GadgetTheme, page: IPublicWebsitePage): GadgetTheme {
+    const content = this.isRecord(page.content) ? page.content : {};
     const safeTemplate = this.mergeObjects(template, this.cmsHomeSectionDefaults);
     const merged = this.mergeObjects(safeTemplate, content) as unknown as GadgetTheme;
 
@@ -69,14 +66,14 @@ export class ThemeService {
       home_tile_4: merged.home_selection?.four_column_banner?.banner_4,
     };
 
-    for (const attachment of page.attachments) {
-      const banner = banners[attachment.role];
+    for (const media of page.media) {
+      const banner = banners[media.slot];
       if (!banner) continue;
 
-      if (attachment.asset_url) banner.image_url = attachment.asset_url;
+      if (media.asset_url) banner.image_url = media.asset_url;
 
-      banner.redirection_type = attachment.action_type;
-      banner.link = attachment.action_value ?? '';
+      banner.redirection_type = media.click_action;
+      banner.link = media.click_target ?? '';
     }
 
     return merged;

@@ -24,9 +24,9 @@ import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IAboutUs, Option } from '../../../shared/interface/theme-option.interface';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
-import { CmsPageService } from '../../../shared/services/cms-page.service';
+import { WebsitePageService } from '../../../shared/services/website-page.service';
 import { PublicPageContextService } from '../../../shared/services/public-page-context.service';
-import { IPublicCmsPage } from '../../../shared/interface/cms-page.interface';
+import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
 import { environment } from '../../../../environments/environment';
 
 SwiperCore.use([Navigation, EffectCards]);
@@ -42,7 +42,7 @@ export class AboutUs {
 
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly cmsPageService = inject(CmsPageService);
+  private readonly websitePageService = inject(WebsitePageService);
 
   private readonly publicPageContext = inject(PublicPageContextService);
 
@@ -104,31 +104,27 @@ export class AboutUs {
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     const locale = this.route.snapshot.data['locale'] === 'en-US' ? 'en-US' : 'id-ID';
-    const slug = locale === 'en-US' ? 'about-us' : 'tentang-kami';
+    const path = locale === 'en-US' ? 'about-matex' : 'tentang-matex';
 
     combineLatest([
       this.themeOptions$,
-      this.cmsPageService.getPage(locale, slug).pipe(catchError(() => of(null))),
+      this.websitePageService.getPage(locale, path).pipe(catchError(() => of(null))),
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([option, page]) => {
         const template = option?.about_us;
         if (!template) return;
 
-        const contentImage = page?.attachments.find(
-          (attachment) =>
-            attachment.role === 'about_content' || attachment.role === 'hero',
-        );
+        const contentImage = page?.media.find((media) => media.slot === 'about_content');
 
         this.aboutUs = {
           ...template,
           about: {
             ...template.about,
             title: page?.title || this.breadcrumb.title,
-            description: page?.excerpt || '',
-            futures: this.readAboutFeatures(page?.content_json),
-            content_bg_image_url:
-              contentImage?.asset_url || template.about.content_bg_image_url,
+            description: page?.summary || '',
+            futures: this.readAboutFeatures(page?.content),
+            content_bg_image_url: contentImage?.asset_url || template.about.content_bg_image_url,
           },
           team: {
             ...template.team,
@@ -145,14 +141,12 @@ export class AboutUs {
 
     this.destroyRef.onDestroy(() => {
       this.publicPageContext.clearPage();
-      this.document.head
-        .querySelectorAll('link[data-about-seo]')
-        .forEach((link) => link.remove());
+      this.document.head.querySelectorAll('link[data-about-seo]').forEach((link) => link.remove());
       this.document.documentElement.lang = this.originalLang;
     });
   }
 
-  private applySeo(page: IPublicCmsPage): void {
+  private applySeo(page: IPublicWebsitePage): void {
     this.document.documentElement.lang = page.locale;
     this.title.setTitle(page.seo.title);
 
@@ -163,7 +157,7 @@ export class AboutUs {
     const site = environment.cmsSiteURL.replace(/\/$/, '');
     const fallbackUrl = `${site}${this.publicPageContext.pathFor(
       page.locale,
-      page.slug,
+      page.path,
       page.key,
     )}`;
     let canonical = fallbackUrl;
@@ -181,25 +175,20 @@ export class AboutUs {
     for (const translation of page.translations) {
       this.addSeoLink(
         'alternate',
-        `${site}${this.publicPageContext.pathFor(
-          translation.locale,
-          translation.slug,
-          page.key,
-        )}`,
+        `${site}${this.publicPageContext.pathFor(translation.locale, translation.path, page.key)}`,
         translation.locale,
       );
     }
 
     const image =
-      page.attachments.find((item) => item.role === 'og') ||
-      page.attachments.find((item) => item.role === 'about_content') ||
-      page.attachments.find((item) => item.role === 'hero');
+      page.media.find((item) => item.slot === 'og') ||
+      page.media.find((item) => item.slot === 'about_content');
 
     for (const [property, content] of Object.entries({
       'og:type': 'website',
       'og:url': canonical,
-      'og:title': page.seo.og_title,
-      'og:description': page.seo.og_description,
+      'og:title': page.seo.social_title,
+      'og:description': page.seo.social_description,
       'og:locale': page.locale.replace('-', '_'),
       'og:image': image?.asset_url || '',
     })) {
