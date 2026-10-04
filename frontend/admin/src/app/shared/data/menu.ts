@@ -165,7 +165,7 @@ export const menu: ISidebar[] = [
         path: '/website-page/home',
         type: 'link',
         level: 2,
-        permission: 'cms_page.update',
+        permission: 'website_page.update',
       },
       {
         parent_id: 4,
@@ -173,7 +173,7 @@ export const menu: ISidebar[] = [
         path: '/website-page/about',
         type: 'link',
         level: 2,
-        permission: 'cms_page.update',
+        permission: 'website_page.update',
       },
       {
         parent_id: 4,
@@ -205,7 +205,7 @@ export const menu: ISidebar[] = [
         path: '/website-page/terms',
         type: 'link',
         level: 2,
-        permission: 'cms_page.update',
+        permission: 'website_page.update',
       },
       {
         parent_id: 4,
@@ -213,7 +213,7 @@ export const menu: ISidebar[] = [
         path: '/website-page/career',
         type: 'link',
         level: 2,
-        permission: 'cms_page.update',
+        permission: 'website_page.update',
       },
     ],
   },

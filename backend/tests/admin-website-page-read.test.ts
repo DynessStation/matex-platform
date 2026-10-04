@@ -75,6 +75,17 @@ test("unknown keys are rejected after normal authentication", async () => {
   assert.equal(calls.length, 1);
 });
 
+test("page lookup requires the dedicated website page permission", async () => {
+  reset();
+  rows[0][0].is_all_access = 0;
+  rows.push([{ id_admin_permission: 81 }]);
+
+  const response = await request("custom-page");
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(calls[1].params, [3, "website_page.view"]);
+});
+
 test("page lookup is restricted to the signed-in admin company", async () => {
   reset();
   rows.push(

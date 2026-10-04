@@ -435,7 +435,7 @@ const parseSavePayload = (pageKey: string, body: any) => {
 router.get(
   "/api/v1/website-page/:key",
   verifyToken,
-  requirePermission("cms_page.view"),
+  requirePermission("website_page.view"),
   async (req: AuthRequest, res: Response) => {
     const pageKey = String(req.params.key).trim().toLowerCase();
     if (!FIXED_PAGE_KEYS.has(pageKey)) {
@@ -659,7 +659,7 @@ router.get(
 router.put(
   "/api/v1/website-page/:key",
   verifyToken,
-  requirePermission("cms_page.update"),
+  requirePermission("website_page.update"),
   async (req: AuthRequest, res: Response) => {
     const pageKey = String(req.params.key).trim().toLowerCase();
     if (!FIXED_PAGE_KEYS.has(pageKey)) {

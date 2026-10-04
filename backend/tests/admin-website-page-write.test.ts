@@ -157,6 +157,18 @@ const translations = [
   },
 ];
 
+test("page updates require the dedicated website page permission", async () => {
+  reset();
+  poolRows[0][0].is_all_access = 0;
+  poolRows[1] = [{ id_admin_permission: 82 }];
+
+  const response = await request("custom-page", {});
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(poolCalls[1].params, [3, "website_page.update"]);
+  assert.equal(connectionRequested, 0);
+});
+
 test("invalid payloads are rejected before a transaction begins", async () => {
   reset();
   const response = await request("about", {
