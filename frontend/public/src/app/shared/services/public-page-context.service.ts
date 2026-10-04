@@ -78,6 +78,8 @@ export class PublicPageContextService {
 
     const fixedRoutes: Record<string, { id: string; en: string }> = {
       about: { id: '/tentang-matex', en: '/en/about-matex' },
+      contact: { id: '/kontak', en: '/en/contact-us' },
+      faq: { id: '/faq', en: '/en/faq' },
       terms: { id: '/syarat-ketentuan', en: '/en/terms-and-conditions' },
       career: { id: '/karir', en: '/en/careers' },
     };

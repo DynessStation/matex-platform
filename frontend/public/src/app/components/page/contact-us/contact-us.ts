@@ -92,9 +92,10 @@ export class ContactUs {
           this.breadcrumb.items = [{ label: page.title, active: true }];
           this.websiteSeo.apply(page);
         }),
-        catchError((error: HttpErrorResponse) => {
-          this.pageState.set(error.status === 404 ? 'missing' : 'error');
-          if (this.response) this.response.status = error.status === 404 ? 404 : 503;
+        catchError((error: unknown) => {
+          const missing = error instanceof HttpErrorResponse && error.status === 404;
+          this.pageState.set(missing ? 'missing' : 'error');
+          if (this.response) this.response.status = missing ? 404 : 503;
           return of(null);
         }),
         takeUntilDestroyed(this.destroyRef),

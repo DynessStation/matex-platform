@@ -31,7 +31,7 @@ const parseJsonValue = (value: unknown): unknown | null => {
   }
 };
 
-// Public company scope remains deployment-owned during the additive migration.
+// Public company scope is deployment-owned.
 // No request parameter, cookie, or header may override it.
 router.get("/api/public/website-page/:locale/:path", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");

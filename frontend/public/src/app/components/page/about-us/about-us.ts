@@ -1,4 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   DestroyRef,
@@ -7,14 +8,15 @@ import {
   Inject,
   inject,
   PLATFORM_ID,
+  RESPONSE_INIT,
+  signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { Meta, Title } from '@angular/platform-browser';
 
 import { Store } from '@ngxs/store';
-import { catchError, combineLatest, Observable, of } from 'rxjs';
+import { catchError, combineLatest, filter, Observable, of, take, timeout } from 'rxjs';
 import SwiperCore, { Swiper } from 'swiper';
 import { EffectCards, Navigation } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
@@ -22,12 +24,10 @@ import { SwiperOptions } from 'swiper/types';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IAboutUs, Option } from '../../../shared/interface/theme-option.interface';
+import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
+import { WebsitePageService } from '../../../shared/services/website-page.service';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
-import { WebsitePageService } from '../../../shared/services/website-page.service';
-import { PublicPageContextService } from '../../../shared/services/public-page-context.service';
-import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
-import { environment } from '../../../../environments/environment';
 
 SwiperCore.use([Navigation, EffectCards]);
 
@@ -44,19 +44,17 @@ export class AboutUs {
 
   private readonly websitePageService = inject(WebsitePageService);
 
-  private readonly publicPageContext = inject(PublicPageContextService);
-
-  private readonly title = inject(Title);
-
-  private readonly meta = inject(Meta);
+  private readonly websiteSeo = inject(WebsitePageSeoService);
 
   private readonly document = inject(DOCUMENT);
 
+  private readonly response = inject(RESPONSE_INIT, { optional: true });
+
   private readonly originalLang = this.document.documentElement.lang;
 
-  themeOptions$: Observable<Option> = inject(Store).select(
+  themeOptions$: Observable<Option | null> = inject(Store).select(
     ThemeOptionState.themeOptions,
-  ) as Observable<Option>;
+  ) as Observable<Option | null>;
 
   readonly teamSwiperContainer = viewChild<ElementRef>('teamSwiperContainer');
   readonly testimonialSwiperContainer = viewChild<ElementRef>('testimonialSwiperContainer');
@@ -100,30 +98,58 @@ export class AboutUs {
 
   public aboutUs?: IAboutUs;
 
+  readonly pageState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
+
   public breadcrumb: breadcrumb = this.createBreadcrumb();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     const locale = this.route.snapshot.data['locale'] === 'en-US' ? 'en-US' : 'id-ID';
     const path = locale === 'en-US' ? 'about-matex' : 'tentang-matex';
 
+    this.websiteSeo.prepare();
+
+    if (this.response) {
+      const headers = new Headers(this.response.headers);
+      headers.set('Cache-Control', 'no-store');
+      this.response.headers = headers;
+    }
+
     combineLatest([
-      this.themeOptions$,
-      this.websitePageService.getPage(locale, path).pipe(catchError(() => of(null))),
+      this.themeOptions$.pipe(
+        filter((option): option is Option => Boolean(option?.about_us)),
+        take(1),
+        timeout(15000),
+        catchError(() => {
+          this.pageState.set('error');
+          if (this.response) this.response.status = 503;
+          return of(null);
+        }),
+      ),
+      this.websitePageService.getPage(locale, path).pipe(
+        timeout(15000),
+        catchError((error: unknown) => {
+          const missing = error instanceof HttpErrorResponse && error.status === 404;
+          this.pageState.set(missing ? 'missing' : 'error');
+          if (this.response) this.response.status = missing ? 404 : 503;
+          return of(null);
+        }),
+      ),
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([option, page]) => {
-        const template = option?.about_us;
-        if (!template) return;
+        if (!option || !page) return;
 
-        const contentImage = page?.media.find((media) => media.slot === 'about_content');
+        const template = option.about_us;
+
+        const contentImage = page.media.find((media) => media.slot === 'about_content');
 
         this.aboutUs = {
           ...template,
           about: {
             ...template.about,
-            title: page?.title || this.breadcrumb.title,
-            description: page?.summary || '',
-            futures: this.readAboutFeatures(page?.content),
+            title: page.title,
+            description: page.summary || '',
+            futures: this.readAboutFeatures(page.content),
             content_bg_image_url: contentImage?.asset_url || template.about.content_bg_image_url,
           },
           team: {
@@ -132,77 +158,20 @@ export class AboutUs {
             members: [],
           },
         };
-
-        if (page) {
-          this.publicPageContext.setPage(page);
-          this.applySeo(page);
-        }
+        this.breadcrumb.title = page.title;
+        this.breadcrumb.items = [{ label: page.title, active: true }];
+        this.pageState.set('ready');
+        this.websiteSeo.apply(page);
       });
 
     this.destroyRef.onDestroy(() => {
-      this.publicPageContext.clearPage();
-      this.document.head.querySelectorAll('link[data-about-seo]').forEach((link) => link.remove());
+      this.websiteSeo.clear();
       this.document.documentElement.lang = this.originalLang;
     });
   }
 
-  private applySeo(page: IPublicWebsitePage): void {
-    this.document.documentElement.lang = page.locale;
-    this.title.setTitle(page.seo.title);
-
-    for (const name of ['description', 'keywords', 'robots'] as const) {
-      this.meta.updateTag({ name, content: page.seo[name] });
-    }
-
-    const site = environment.publicSiteURL.replace(/\/$/, '');
-    const fallbackUrl = `${site}${this.publicPageContext.pathFor(
-      page.locale,
-      page.path,
-      page.key,
-    )}`;
-    let canonical = fallbackUrl;
-
-    try {
-      const candidate = new URL(page.seo.canonical_url || fallbackUrl);
-      if (candidate.protocol === 'http:' || candidate.protocol === 'https:') {
-        canonical = candidate.href;
-      }
-    } catch {
-      /* Invalid custom canonical falls back to the fixed public route. */
-    }
-
-    this.addSeoLink('canonical', canonical);
-    for (const translation of page.translations) {
-      this.addSeoLink(
-        'alternate',
-        `${site}${this.publicPageContext.pathFor(translation.locale, translation.path, page.key)}`,
-        translation.locale,
-      );
-    }
-
-    const image =
-      page.media.find((item) => item.slot === 'og') ||
-      page.media.find((item) => item.slot === 'about_content');
-
-    for (const [property, content] of Object.entries({
-      'og:type': 'website',
-      'og:url': canonical,
-      'og:title': page.seo.social_title,
-      'og:description': page.seo.social_description,
-      'og:locale': page.locale.replace('-', '_'),
-      'og:image': image?.asset_url || '',
-    })) {
-      this.meta.updateTag({ property, content });
-    }
-  }
-
-  private addSeoLink(rel: string, href: string, locale?: string): void {
-    const link = this.document.createElement('link');
-    link.setAttribute('data-about-seo', '');
-    link.rel = rel;
-    link.href = href;
-    if (locale) link.hreflang = locale;
-    this.document.head.appendChild(link);
+  pageMessage(indonesian: string, english: string): string {
+    return this.route.snapshot.data['locale'] === 'en-US' ? english : indonesian;
   }
 
   private readAboutFeatures(content: unknown): IAboutUs['about']['futures'] {

@@ -1,123 +1,80 @@
-<app-breadcrumb [breadcrumb]="breadcrumb" />
+@if (aboutUs; as pageContent) {
+  <app-breadcrumb [breadcrumb]="breadcrumb" />
 
-<div class="about-us-section section-t-space">
-  <div class="custom-container ratio_66">
-    <div>
-      <div class="top-about-content">
-        <h2>{{ aboutUs?.about?.title }}</h2>
-        <p>{{ aboutUs?.about?.description }}</p>
-      </div>
+  <div class="about-us-section section-t-space">
+    <div class="custom-container ratio_66">
       <div>
-        <img
-          [src]="aboutUs?.about?.content_bg_image_url"
-          [alt]="breadcrumb.title"
-          class="img-fluid"
-        />
-      </div>
-    </div>
-  </div>
-  @if (aboutUs?.about?.futures?.length) {
-    <div class="business-agenda">
-      <div class="row g-sm-4 g-3">
-        @for (feature of aboutUs?.about?.futures; track feature) {
-          <div class="col-xl-4 col-md-6">
-            <h4>{{ feature.title }}</h4>
-            <p>{{ feature.description }}</p>
-          </div>
-        }
-      </div>
-    </div>
-  }
-</div>
-
-@if (aboutUs?.team?.status && aboutUs?.team?.members?.length) {
-  <section class="team-section section-t-space section-b-space">
-  <div class="custom-container">
-    <div class="testimonial-title text-center">
-      <h2>{{ aboutUs?.team?.title }}</h2>
-      <p>{{ aboutUs?.team?.description }}</p>
-    </div>
-    <div class="swiper user-slider" #teamSwiperContainer>
-      <div class="swiper-wrapper">
-        @for (team of aboutUs?.team?.members; track team) {
-          <div class="swiper-slide">
-            <div class="team-box">
-              <div class="team-image">
-                <img [src]="team.profile_image_url" class="img-fluid" alt="user" />
-                <ul class="team-media">
-                  <li>
-                    <a href="{{ team.facebook }}" class="fb-bg" target="_blank">
-                      <i class="ri-facebook-fill"></i>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="{{ team.instagram }}" class="insta-bg" target="_blank">
-                      <i class="ri-instagram-fill"></i>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="{{ team.linkedin }}" class="linkedin-bg" target="_blank">
-                      <i class="ri-linkedin-box-fill"></i>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="{{ team.youtube }}" class="youtube-bg" target="_blank">
-                      <i class="ri-youtube-fill"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="team-name">
-                <h4>{{ team.name }}</h4>
-                <p>{{ team.designation }}</p>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-  </section>
-}
-
-@if (aboutUs?.testimonial?.status && aboutUs?.testimonial?.reviews?.length) {
-  <section class="testimonial-section overflow-hidden">
-  <div class="custom-container">
-    <div class="row g-sm-4 g-3">
-      <div class="col-lg-4">
-        <div class="testimonial-title">
-          <h2>{{ aboutUs?.testimonial?.title }}</h2>
-          <p>{{ aboutUs?.testimonial?.description }}</p>
-          <div>
-            <button class="slider-btn slidePrev-btn">
-              <i class="ri-arrow-left-s-line"></i>
-            </button>
-            <button class="slider-btn slideNext-btn">
-              <i class="ri-arrow-right-s-line"></i>
-            </button>
-          </div>
+        <div class="top-about-content">
+          <h2>{{ pageContent.about.title }}</h2>
+          <p>{{ pageContent.about.description }}</p>
+        </div>
+        <div>
+          <img
+            [src]="pageContent.about.content_bg_image_url"
+            [alt]="breadcrumb.title"
+            class="img-fluid"
+          />
         </div>
       </div>
-      <div class="col-lg-8">
-        <div class="swiper testimonial-swiper" #testimonialSwiperContainer>
+    </div>
+    @if (pageContent.about.futures.length) {
+      <div class="business-agenda">
+        <div class="row g-sm-4 g-3">
+          @for (feature of pageContent.about.futures; track feature) {
+            <div class="col-xl-4 col-md-6">
+              <h4>{{ feature.title }}</h4>
+              <p>{{ feature.description }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (pageContent.team.status && pageContent.team.members.length) {
+    <section class="team-section section-t-space section-b-space">
+      <div class="custom-container">
+        <div class="testimonial-title text-center">
+          <h2>{{ pageContent.team.title }}</h2>
+          <p>{{ pageContent.team.description }}</p>
+        </div>
+        <div class="swiper user-slider" #teamSwiperContainer>
           <div class="swiper-wrapper">
-            @for (review of aboutUs?.testimonial?.reviews; track review) {
+            @for (team of pageContent.team.members; track team) {
               <div class="swiper-slide">
-                <div class="testimonial-card">
-                  <svg>
-                    <use [attr.xlink:href]="review.icon"></use>
-                  </svg>
-                  <p>{{ review.review }}</p>
-                  <div class="testimonial-user">
-                    <img [src]="review.profile_image_url" alt="user" class="img-fluid" />
-                    <div>
-                      <h4>{{ review.name }}</h4>
-                      <h6>{{ review.designation }}</h6>
-                    </div>
+                <div class="team-box">
+                  <div class="team-image">
+                    <img [src]="team.profile_image_url" class="img-fluid" alt="user" />
+                    <ul class="team-media">
+                      <li>
+                        <a href="{{ team.facebook }}" class="fb-bg" target="_blank">
+                          <i class="ri-facebook-fill"></i>
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="{{ team.instagram }}" class="insta-bg" target="_blank">
+                          <i class="ri-instagram-fill"></i>
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="{{ team.linkedin }}" class="linkedin-bg" target="_blank">
+                          <i class="ri-linkedin-box-fill"></i>
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="{{ team.youtube }}" class="youtube-bg" target="_blank">
+                          <i class="ri-youtube-fill"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="team-name">
+                    <h4>{{ team.name }}</h4>
+                    <p>{{ team.designation }}</p>
                   </div>
                 </div>
               </div>
@@ -125,13 +82,78 @@
           </div>
         </div>
       </div>
+    </section>
+  }
+
+  @if (pageContent.testimonial.status && pageContent.testimonial.reviews.length) {
+    <section class="testimonial-section overflow-hidden">
+      <div class="custom-container">
+        <div class="row g-sm-4 g-3">
+          <div class="col-lg-4">
+            <div class="testimonial-title">
+              <h2>{{ pageContent.testimonial.title }}</h2>
+              <p>{{ pageContent.testimonial.description }}</p>
+              <div>
+                <button class="slider-btn slidePrev-btn">
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <button class="slider-btn slideNext-btn">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="swiper testimonial-swiper" #testimonialSwiperContainer>
+              <div class="swiper-wrapper">
+                @for (review of pageContent.testimonial.reviews; track review) {
+                  <div class="swiper-slide">
+                    <div class="testimonial-card">
+                      <svg>
+                        <use [attr.xlink:href]="review.icon"></use>
+                      </svg>
+                      <p>{{ review.review }}</p>
+                      <div class="testimonial-user">
+                        <img [src]="review.profile_image_url" alt="user" class="img-fluid" />
+                        <div>
+                          <h4>{{ review.name }}</h4>
+                          <h6>{{ review.designation }}</h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
     </div>
-  </div>
+  </section>
+} @else {
+  <section class="section-t-space section-b-space" [attr.aria-busy]="pageState() === 'loading'">
+    <div class="custom-container text-center">
+      @if (pageState() === 'loading') {
+        <p>{{ pageMessage('Memuat halaman…', 'Loading page…') }}</p>
+      } @else if (pageState() === 'missing') {
+        <h2>{{ pageMessage('Halaman tidak tersedia', 'Page unavailable') }}</h2>
+        <p>
+          {{ pageMessage('Halaman ini belum diterbitkan.', 'This page has not been published.') }}
+        </p>
+      } @else {
+        <h2>{{ pageMessage('Halaman belum dapat dimuat', 'Unable to load this page') }}</h2>
+        <p>
+          {{
+            pageMessage('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.')
+          }}
+        </p>
+      }
+    </div>
   </section>
 }
-
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter />
-  </div>
-</section>
