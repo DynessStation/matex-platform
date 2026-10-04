@@ -15,7 +15,7 @@ import { IOfficeLocationValue } from '../../../interface/office.interface';
 
 import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
 
-import { environment } from '../../../../../environments/environment.development';
+import { environment } from '../../../../../environments/environment';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 

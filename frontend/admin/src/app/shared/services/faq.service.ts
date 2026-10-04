@@ -4,7 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { Params } from '../interface/core.interface';
 import { IFaqDetailResponse, IFaqModel, IFaqMutationResponse, IFaqPayload } from '../interface/faq.interface';
 import { IApiResponse } from '../interface/api-response.interface';

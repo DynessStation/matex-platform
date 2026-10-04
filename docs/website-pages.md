@@ -23,6 +23,18 @@ The page presentation records live in `website_page`, `website_page_i18n`, `webs
 - Backend deployment scope: `PUBLIC_COMPANY_ID`.
 - Public frontend settings: `publicApiURL` and `publicSiteURL`.
 
+The planned production website is `https://matexindo.com`. The production frontend currently
+expects the public API through the same origin at `https://matexindo.com/api/public`, which keeps
+browser requests and SSR canonical URLs on one domain. If the API is later moved to a subdomain,
+change `publicApiURL` and add that frontend origin to `CORS_ORIGINS`; `publicSiteURL` remains the
+canonical website origin.
+
+The planned production admin is `https://internal.matexindo.com`. Its production build expects
+the admin API through the same origin at `https://internal.matexindo.com/api/admin`; the reverse
+proxy should forward `/api` to the backend. Google Maps credentials are intentionally blank in the
+tracked production environment and must be supplied through the release configuration before a
+build that enables map features.
+
 The company scope comes from server configuration and cannot be overridden by a browser request. Public endpoints return only active, published content for the configured company.
 
 ## Navigation

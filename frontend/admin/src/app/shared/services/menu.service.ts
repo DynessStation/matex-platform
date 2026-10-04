@@ -4,7 +4,7 @@ import { Params } from '@angular/router';
 
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { IMenuModel } from '../interface/menu.interface';
 
 @Injectable({

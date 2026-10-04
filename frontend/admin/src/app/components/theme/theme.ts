@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 
 import { ITableClickedAction } from "src/app/shared/interface/table.interface";
 
-import { environment } from "../../../environments/environment.development";
+import { environment } from "../../../environments/environment";
 import { PageWrapper } from "../../shared/components/page-wrapper/page-wrapper";
 import { ConfirmationModal } from "../../shared/components/ui/modal/confirmation-modal/confirmation-modal";
 import { HasPermissionDirective } from "../../shared/directive/has-permission.directive";

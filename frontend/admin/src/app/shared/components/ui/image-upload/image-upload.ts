@@ -7,7 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 
-import { environment } from '../../../../../environments/environment.development';
+import { environment } from '../../../../../environments/environment';
 
 import { IAttachment } from '../../../interface/attachment.interface';
 
