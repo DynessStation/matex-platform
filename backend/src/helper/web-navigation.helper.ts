@@ -1,11 +1,15 @@
-import { isCmsPageLocale } from "../config/cms-page.config";
+import {
+  PUBLIC_CONTENT_LOCALES,
+  isPublicContentLocale,
+} from "../config/public-content.config";
+import {
+  getFixedWebNavigationPath,
+  isFixedWebNavigationKey,
+} from "../config/web-navigation.config";
 import keyhsid from "../hsid";
 
 export type WebNavigationItemLinkType =
-  | "cms_page"
-  | "internal"
-  | "external"
-  | "label";
+  "cms_page" | "internal" | "external" | "label";
 
 export interface NormalizedNavigationItemTranslation {
   locale: string;
@@ -76,23 +80,6 @@ export const decodeCmsPageId = (value: unknown): number | null => {
   return id;
 };
 
-const nullableString = (
-  value: unknown,
-  maximumLength: number,
-): string | null => {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const clean = value.trim();
-
-  if (!clean) {
-    return null;
-  }
-
-  return clean.slice(0, maximumLength);
-};
-
 const normalizeFlag = (value: unknown): 0 | 1 | null => {
   if (value === true || value === 1 || value === "1" || value === "true") {
     return 1;
@@ -105,49 +92,6 @@ const normalizeFlag = (value: unknown): 0 | 1 | null => {
   return null;
 };
 
-const normalizeInternalPath = (value: unknown): string | null => {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const path = value.trim();
-
-  if (
-    !path ||
-    path.length > 500 ||
-    !path.startsWith("/") ||
-    path.startsWith("//")
-  ) {
-    return null;
-  }
-
-  return path;
-};
-
-const normalizeExternalUrl = (value: unknown): string | null => {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const clean = value.trim();
-
-  if (!clean || clean.length > 1000) {
-    return null;
-  }
-
-  try {
-    const url = new URL(clean);
-
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
-      return null;
-    }
-
-    return url.toString();
-  } catch {
-    return null;
-  }
-};
-
 export const normalizeNavigationItemInput = (
   body: any,
   defaultLocale: string,
@@ -156,11 +100,11 @@ export const normalizeNavigationItemInput = (
     .trim()
     .toLowerCase();
 
-  if (!key || key.length > 100 || !/^[a-z0-9][a-z0-9_-]*$/.test(key)) {
+  if (!isFixedWebNavigationKey(key)) {
     return {
       success: false,
       code: "WEB_NAVIGATION_ITEM_KEY_INVALID",
-      message: "Invalid web navigation item key",
+      message: "Navigation item is not part of the fixed website header",
     };
   }
 
@@ -168,12 +112,30 @@ export const normalizeNavigationItemInput = (
     body?.web_navigation_item_link_type ?? "",
   ) as WebNavigationItemLinkType;
 
-  if (!["cms_page", "internal", "external", "label"].includes(linkType)) {
+  if (linkType !== "internal") {
     return {
       success: false,
       code: "WEB_NAVIGATION_ITEM_LINK_TYPE_INVALID",
-      message: "Invalid navigation item link type",
+      message: "Fixed website navigation items must use internal routes",
     };
+  }
+
+  for (const field of [
+    "id_parent_web_navigation_item",
+    "id_cms_page",
+    "web_navigation_item_icon",
+    "web_navigation_item_badge_text",
+    "web_navigation_item_badge_color",
+  ]) {
+    const value = body?.[field];
+
+    if (value !== null && value !== undefined && value !== "") {
+      return {
+        success: false,
+        code: "WEB_NAVIGATION_ITEM_FIELD_UNSUPPORTED",
+        message: `${field} is not used by the fixed website header`,
+      };
+    }
   }
 
   const targetBlankInput = normalizeFlag(
@@ -185,6 +147,14 @@ export const normalizeNavigationItemInput = (
       success: false,
       code: "WEB_NAVIGATION_ITEM_TARGET_INVALID",
       message: "Invalid target blank value",
+    };
+  }
+
+  if (targetBlankInput === 1) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_ITEM_TARGET_INVALID",
+      message: "Fixed website navigation items open in the same tab",
     };
   }
 
@@ -257,7 +227,7 @@ export const normalizeNavigationItemInput = (
   for (const rawTranslation of body.translations) {
     const locale = String(rawTranslation?.locale ?? "").trim();
 
-    if (!isCmsPageLocale(locale)) {
+    if (!isPublicContentLocale(locale)) {
       return {
         success: false,
         code: "WEB_NAVIGATION_ITEM_LOCALE_UNSUPPORTED",
@@ -295,40 +265,26 @@ export const normalizeNavigationItemInput = (
       };
     }
 
-    let path: string | null = null;
-    let url: string | null = null;
-
-    if (linkType === "internal") {
-      path = normalizeInternalPath(rawTranslation?.path);
-
-      if (translationStatus === 1 && !path) {
-        return {
-          success: false,
-          code: "WEB_NAVIGATION_ITEM_PATH_INVALID",
-          message: `A valid internal path is required for locale ${locale}`,
-        };
-      }
-    }
-
-    if (linkType === "external") {
-      url = normalizeExternalUrl(rawTranslation?.url);
-
-      if (translationStatus === 1 && !url) {
-        return {
-          success: false,
-          code: "WEB_NAVIGATION_ITEM_URL_INVALID",
-          message: `A valid external URL is required for locale ${locale}`,
-        };
-      }
-    }
-
     translations.push({
       locale,
       label,
-      path,
-      url,
+      path: getFixedWebNavigationPath(key, locale),
+      url: null,
       status: translationStatus,
     });
+  }
+
+  if (
+    PUBLIC_CONTENT_LOCALES.some(
+      (locale) =>
+        !translations.some((translation) => translation.locale === locale),
+    )
+  ) {
+    return {
+      success: false,
+      code: "WEB_NAVIGATION_ITEM_TRANSLATIONS_REQUIRED",
+      message: "Indonesian and English labels are required",
+    };
   }
 
   const defaultTranslation = translations.find(
@@ -350,10 +306,10 @@ export const normalizeNavigationItemInput = (
     data: {
       key,
       linkType,
-      targetBlank: linkType === "external" ? targetBlankInput : 0,
-      icon: nullableString(body?.web_navigation_item_icon, 100),
-      badgeText: nullableString(body?.web_navigation_item_badge_text, 100),
-      badgeColor: nullableString(body?.web_navigation_item_badge_color, 50),
+      targetBlank: 0,
+      icon: null,
+      badgeText: null,
+      badgeColor: null,
       sortOrder,
       status,
       settingsJson: settings === null ? null : JSON.stringify(settings),

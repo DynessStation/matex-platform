@@ -2,6 +2,10 @@ import { Router } from "express";
 import { RowDataPacket } from "mysql2";
 
 import { isPublicContentLocale } from "../../config/public-content.config";
+import {
+  getFixedWebNavigationPath,
+  isFixedWebNavigationKey,
+} from "../../config/web-navigation.config";
 import { pool } from "../../db";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 
@@ -24,19 +28,6 @@ type PublicNavigationItem = {
   icon: null;
   badge: null;
   children: [];
-};
-
-const FIXED_NAVIGATION_ROUTES: Record<
-  string,
-  { key: string; id: string; en: string }
-> = {
-  home: { key: "home", id: "/", en: "/en" },
-  about: { key: "about", id: "/tentang-matex", en: "/en/about-matex" },
-  categories: { key: "categories", id: "/katalog", en: "/en/catalog" },
-  products: { key: "products", id: "/katalog", en: "/en/catalog" },
-  articles: { key: "articles", id: "/artikel", en: "/en/articles" },
-  blog: { key: "articles", id: "/artikel", en: "/en/articles" },
-  contact: { key: "contact", id: "/kontak", en: "/en/contact-us" },
 };
 
 router.get("/api/public/navigation/:key/:locale", async (req, res) => {
@@ -137,19 +128,23 @@ router.get("/api/public/navigation/:key/:locale", async (req, res) => {
       const storedKey = String(row.web_navigation_item_key ?? "")
         .trim()
         .toLowerCase();
-      const route = FIXED_NAVIGATION_ROUTES[storedKey];
+      const normalizedKey = storedKey === "blog" ? "articles" : storedKey;
       const label = String(row.label ?? "").trim();
 
-      if (!route || !label || seenKeys.has(route.key)) {
+      if (
+        !isFixedWebNavigationKey(normalizedKey) ||
+        !label ||
+        seenKeys.has(normalizedKey)
+      ) {
         continue;
       }
 
-      seenKeys.add(route.key);
+      seenKeys.add(normalizedKey);
       items.push({
-        key: route.key,
+        key: normalizedKey,
         label,
         link_type: "internal",
-        path: locale === "en-US" ? route.en : route.id,
+        path: getFixedWebNavigationPath(normalizedKey, locale),
         url: null,
         target_blank: false,
         icon: null,
