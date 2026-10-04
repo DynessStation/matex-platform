@@ -1,99 +1,22 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 
-import { PermissionGuard } from '../../core/guard/permission.guard';
+const websitePageUrl = (key: string) =>
+  inject(Router).parseUrl(`/website-page/${key}`);
 
-//==================================================
-//==== ROUTES
-//==================================================
-
+/**
+ * Compatibility redirects for bookmarks created before fixed website pages
+ * were separated from the generic CMS module. The legacy components and API
+ * remain in the repository until the final cleanup migration.
+ */
 export const cmsPageRoutes: Routes = [
   {
     path: 'fixed/:key',
     pathMatch: 'full',
-    redirectTo: ({ params }) => `/website-page/${params['key']}`,
+    redirectTo: ({ params }) => websitePageUrl(params['key']),
   },
-
-  //==================================================
-  //==== EDIT
-  //==================================================
-
   {
-    path: 'edit/:id',
-
-    canActivate: [PermissionGuard],
-
-    data: {
-      permission: 'cms_page.update',
-
-      titleKey: 'cms_page.edit_title',
-    },
-
-    loadComponent: () =>
-      import('./edit-cms-page/edit-cms-page').then(
-        (component) => component.EditCmsPage,
-      ),
-  },
-
-  //==================================================
-  //==== TRASH
-  //==================================================
-
-  {
-    path: 'trash',
-
-    canActivate: [PermissionGuard],
-
-    data: {
-      permission: 'cms_page.view',
-
-      titleKey: 'cms_page.trash_title',
-    },
-
-    loadComponent: () =>
-      import('./cms-page-trash/cms-page-trash').then(
-        (component) => component.CmsPageTrash,
-      ),
-  },
-
-  //==================================================
-  //==== DETAIL
-  //==================================================
-
-  {
-    path: ':id',
-
-    canActivate: [PermissionGuard],
-
-    data: {
-      permission: 'cms_page.view',
-
-      titleKey: 'cms_page.detail_title',
-    },
-
-    loadComponent: () =>
-      import('./cms-page-detail/cms-page-detail').then(
-        (component) => component.CmsPageDetail,
-      ),
-  },
-
-  //==================================================
-  //==== LIST
-  //==================================================
-
-  {
-    path: '',
-
-    pathMatch: 'full',
-
-    canActivate: [PermissionGuard],
-
-    data: {
-      permission: 'cms_page.view',
-
-      titleKey: 'pages',
-    },
-
-    loadComponent: () =>
-      import('./cms-page').then((component) => component.CmsPage),
+    path: '**',
+    redirectTo: () => websitePageUrl('home'),
   },
 ];
