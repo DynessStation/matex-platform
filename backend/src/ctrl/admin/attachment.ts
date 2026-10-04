@@ -70,7 +70,7 @@ interface AttachmentReference {
   total: number;
 }
 
-const getAttachmentReferences = async (
+export const getAttachmentReferences = async (
   ids: number[],
 
   executor: any = pool,
@@ -181,13 +181,50 @@ const getAttachmentReferences = async (
     });
   }
 
+  //==================================================
+  //==== FIXED WEBSITE PAGE MEDIA
+  //==================================================
+
+  const [websitePageRows] = await executor.query(
+    `
+      SELECT
+        id_attachment,
+
+        COUNT(*) AS total
+
+      FROM website_page_media
+
+      WHERE id_attachment IN (
+        ${placeholders}
+      )
+
+      GROUP BY
+        id_attachment
+    `,
+    ids,
+  );
+
+  for (const row of websitePageRows as any[]) {
+    references.push({
+      idAttachment: Number(row.id_attachment),
+
+      source: "website_page.media",
+
+      total: Number(row.total),
+    });
+  }
+
   const [articleRows] = await executor.query(
     `SELECT id_attachment, COUNT(*) AS total FROM article_attachment
      WHERE id_attachment IN (${placeholders}) GROUP BY id_attachment`,
     ids,
   );
   for (const row of articleRows as any[]) {
-    references.push({ idAttachment: Number(row.id_attachment), source: "article.attachment", total: Number(row.total) });
+    references.push({
+      idAttachment: Number(row.id_attachment),
+      source: "article.attachment",
+      total: Number(row.total),
+    });
   }
 
   //==================================================
