@@ -16,6 +16,7 @@ import { PublicNavigationContextService } from '../../../shared/services/public-
 import { ThemeOptionService } from '../../../shared/services/theme-option.service';
 import { HomeBanner } from '../widgets/home-banner/home-banner';
 import { HomeNewsletter } from '../widgets/home-newsletter/home-newsletter';
+import { HomeTags } from '../widgets/home-tags/home-tags';
 
 interface HomeContent {
   categories: Category[];
@@ -25,7 +26,7 @@ interface HomeContent {
 
 @Component({
   selector: 'app-gadget',
-  imports: [AsyncPipe, DatePipe, HomeBanner, HomeNewsletter, RouterLink],
+  imports: [AsyncPipe, DatePipe, HomeBanner, HomeTags, HomeNewsletter, RouterLink],
   templateUrl: './gadget.html',
   styleUrl: './gadget.scss',
 })
@@ -116,5 +117,20 @@ export class Gadget {
       currency: product.currency || 'IDR',
       maximumFractionDigits: 0,
     }).format(product.sale_price);
+  }
+
+  // === yang gw pengen adain ==== ///
+  //  tambahan ini menyesuaikan dan disesuaikan nanti dengan BE dan Adminnya -->
+  /// ======= ///
+
+  switchLatexTab(index: any): void {
+    const tabs = document.querySelectorAll('.latex-tab-btn');
+    const panels = document.querySelectorAll('.latex-content-panel');
+
+    tabs.forEach((tab) => tab.classList.remove('active'));
+    panels.forEach((panel) => panel.classList.remove('active'));
+
+    tabs[index].classList.add('active');
+    panels[index].classList.add('active');
   }
 }

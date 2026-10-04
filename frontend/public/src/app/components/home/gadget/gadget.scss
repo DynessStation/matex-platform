@@ -26,7 +26,7 @@
 
     > a {
       align-items: center;
-      color: rgba(var(--title-color), 1);
+      // color: rgba(var(--title-color), 1);
       display: inline-flex;
       font-weight: 600;
       gap: 7px;
@@ -218,5 +218,223 @@
     h3 {
       font-size: 15px;
     }
+  }
+}
+
+// =======
+// === yang gw pengen adain ==== ///
+//  tambahan ini menyesuaikan dan disesuaikan nanti dengan BE dan Adminnya -->
+/// ======= ///
+/* --- Section Container --- */
+.latex-features-section {
+  padding: 60px 0;
+  font-family: inherit;
+}
+
+/* --- Header Section --- */
+.latex-features-header {
+  text-align: center;
+  margin-bottom: 45px;
+}
+
+.latex-subtitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #d99a26;
+  text-transform: uppercase;
+}
+
+.latex-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #202c3c;
+  margin: 8px 0 12px;
+}
+
+.latex-intro {
+  font-size: 1rem;
+  color: #555555;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* --- Layout Wrapper (Grid Kiri-Kanan) --- */
+.latex-interactive-wrapper {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  align-items: stretch;
+}
+
+/* --- Kolom Kiri: Daftar Tombol Tab --- */
+.latex-tabs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.latex-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.latex-tab-btn .num {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #64748b;
+  min-width: 24px;
+  transition: color 0.25s ease;
+}
+
+.latex-tab-btn .label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.25s ease;
+}
+
+/* State Hover & Active Tombol Tab */
+.latex-tab-btn:hover {
+  border-color: #d99a26;
+  background-color: #fffdf9;
+}
+
+.latex-tab-btn.active {
+  background-color: #202c3c;
+  border-color: #202c3c;
+  box-shadow: 0 6px 15px rgba(32, 44, 60, 0.15);
+}
+
+.latex-tab-btn.active .num {
+  color: #d99a26; /* Aksen Gold */
+}
+
+.latex-tab-btn.active .label {
+  color: #ffffff;
+}
+
+/* --- Kolom Kanan: Kotak Besar Translucent --- */
+/* --- Kotak Besar Translucent dengan Background & Logo MATEX --- */
+.latex-single-card-block {
+  position: relative;
+  /* Warna Background RGB(32, 44, 60) dengan Opacity 88% */
+  background-color: rgba(32, 44, 60, 0.88);
+
+  /* Efek Tekstur Pinhole Lateks Lembaran */
+  background-image: 
+    /* Watermark Logo MATEX di Pojok Kanan Atas */
+    url('../../../../../public/assets/images/logo/matex_logo_grey.svg'),
+    radial-gradient(rgba(255, 255, 255, 0.05) 15%, transparent 16%);
+
+  background-repeat: no-repeat, repeat;
+  background-position:
+    top 25px right 25px,
+    0 0;
+  background-size:
+    140px,
+    16px 16px;
+
+  border-radius: 20px;
+  padding: 45px;
+  color: #ffffff;
+
+  /* Glassmorphism Effect */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+// /* Watermark Gambar Lateks Lembaran Transparan di Latar Belakang Blok */
+// .latex-single-card-block::before {
+//   content: '';
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   width: 300px;
+//   height: 300px;
+//   background: url('https://png.pngtree.com/png-clipart/20220603/ourmid/pngtree-white-seamless-pattern-with-latex-texture-png-image_4860000.png')
+//     no-repeat center/cover;
+//   opacity: 0.04;
+//   pointer-events: none;
+// }
+
+/* --- Panel Konten (Hide/Show dengan Animasi Halus) --- */
+.latex-content-panel {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.latex-content-panel.active {
+  display: block;
+  opacity: 1;
+}
+
+.panel-header-mobile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.latex-content-panel .latex-item-number {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #d99a26;
+  line-height: 1;
+}
+
+.latex-content-panel h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.latex-content-panel p {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: #d0d7de;
+  margin: 0;
+}
+
+/* --- Responsif Mobile --- */
+@media (max-width: 900px) {
+  .latex-interactive-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .latex-tabs-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .latex-tab-btn {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .latex-single-card-block {
+    padding: 30px 24px;
   }
 }
