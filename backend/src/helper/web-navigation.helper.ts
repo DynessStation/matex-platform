@@ -8,8 +8,7 @@ import {
 } from "../config/web-navigation.config";
 import keyhsid from "../hsid";
 
-export type WebNavigationItemLinkType =
-  "cms_page" | "internal" | "external" | "label";
+export type WebNavigationItemLinkType = "internal";
 
 export interface NormalizedNavigationItemTranslation {
   locale: string;
@@ -52,24 +51,6 @@ export const decodeWebNavigationItemId = (value: unknown): number | null => {
   }
 
   const decoded = keyhsid.idWebNavigationItem.decode(encodedId)[0];
-
-  const id = Number(decoded);
-
-  if (!decoded || !Number.isInteger(id) || id <= 0) {
-    return null;
-  }
-
-  return id;
-};
-
-export const decodeCmsPageId = (value: unknown): number | null => {
-  const encodedId = String(value ?? "").trim();
-
-  if (!encodedId) {
-    return null;
-  }
-
-  const decoded = keyhsid.idCmsPage.decode(encodedId)[0];
 
   const id = Number(decoded);
 

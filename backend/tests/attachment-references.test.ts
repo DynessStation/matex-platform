@@ -19,7 +19,6 @@ test("website page media prevents a referenced attachment from being deleted", a
 
   const references = await getAttachmentReferences([17], executor);
 
-  assert.ok(queries.some((sql) => sql.includes("FROM cms_page_attachment")));
   assert.ok(queries.some((sql) => sql.includes("FROM website_page_media")));
   assert.deepEqual(references, [
     {

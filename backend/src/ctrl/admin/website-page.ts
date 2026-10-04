@@ -5,7 +5,7 @@ import keyhsid from "../../hsid";
 import { buildAttachmentUrl } from "../../helper/attachment.helper";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 import { writeAuditLog } from "../../helper/audit-log.helper";
-import { validateCmsGadgetHomeMedia } from "../../config/cms-page.config";
+import { validateWebsiteHomeMedia } from "../../config/website-home.config";
 import { AuthRequest, verifyToken } from "../middleware/authJwt";
 import { requirePermission } from "../middleware/authPermission";
 
@@ -766,7 +766,7 @@ router.put(
           );
         }
         if (pageKey === "home" && item.slot !== "og") {
-          const issue = validateCmsGadgetHomeMedia(item.slot, {
+          const issue = validateWebsiteHomeMedia(item.slot, {
             mimeType: String(attachment.mime_type),
             width: attachment.width === null ? null : Number(attachment.width),
             height:

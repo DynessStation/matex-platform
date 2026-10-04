@@ -12,12 +12,11 @@ import { AuthRequest, verifyToken } from "../middleware/authJwt";
 
 import { requirePermission } from "../middleware/authPermission";
 
-import { isCmsPageLocale } from "../../config/cms-page.config";
+import { isPublicContentLocale } from "../../config/public-content.config";
 
 import { writeAuditLog } from "../../helper/audit-log.helper";
 
 import {
-  decodeCmsPageId,
   decodeWebNavigationItemId,
   normalizeNavigationItemInput,
 } from "../../helper/web-navigation.helper";
@@ -191,7 +190,7 @@ const normalizeNavigationMetadata = (body: any): NavigationMetadataResult => {
     body?.web_navigation_default_locale ?? "",
   ).trim();
 
-  if (!isCmsPageLocale(defaultLocale)) {
+  if (!isPublicContentLocale(defaultLocale)) {
     return {
       success: false,
       code: "WEB_NAVIGATION_LOCALE_UNSUPPORTED",
@@ -468,55 +467,14 @@ app.get(
         `
           SELECT
             item.id_web_navigation_item,
-
-            item.id_parent_web_navigation_item,
-
-            item.id_cms_page,
-
             item.web_navigation_item_key,
-
-            item.web_navigation_item_link_type,
-
-            item.web_navigation_item_target_blank,
-
-            item.web_navigation_item_icon,
-
-            item.web_navigation_item_badge_text,
-
-            item.web_navigation_item_badge_color,
-
             item.web_navigation_item_sort_order,
-
             item.web_navigation_item_status,
-
-            item.web_navigation_item_settings_json,
-
             item.created,
 
-            item.updated,
-
-            cms_page.cms_page_key,
-
-            cms_page_i18n.cms_page_title
+            item.updated
 
           FROM web_navigation_item item
-
-          LEFT JOIN cms_page
-            ON cms_page.id_cms_page =
-              item.id_cms_page
-
-            AND cms_page.id_master_comp =
-              item.id_master_comp
-
-          LEFT JOIN cms_page_i18n
-            ON cms_page_i18n.id_cms_page =
-              cms_page.id_cms_page
-
-            AND cms_page_i18n.id_master_comp =
-              cms_page.id_master_comp
-
-            AND cms_page_i18n.cms_page_locale =
-              ?
 
           WHERE item.id_web_navigation = ?
 
@@ -530,11 +488,7 @@ app.get(
 
             item.id_web_navigation_item
         `,
-        [
-          navigation.web_navigation_default_locale,
-          idNavigation,
-          scope.idMasterComp,
-        ],
+        [idNavigation, scope.idMasterComp],
       );
 
       const [translationRows] = await pool.query(
@@ -604,45 +558,9 @@ app.get(
         return {
           id_web_navigation_item: keyhsid.idWebNavigationItem.encode(itemId),
 
-          id_parent_web_navigation_item:
-            item.id_parent_web_navigation_item === null
-              ? null
-              : keyhsid.idWebNavigationItem.encode(
-                  Number(item.id_parent_web_navigation_item),
-                ),
-
-          id_cms_page:
-            item.id_cms_page === null
-              ? null
-              : keyhsid.idCmsPage.encode(Number(item.id_cms_page)),
-
-          cms_page:
-            item.id_cms_page === null
-              ? null
-              : {
-                  key: item.cms_page_key ?? null,
-
-                  title: item.cms_page_title ?? null,
-                },
-
           key: item.web_navigation_item_key,
-
-          link_type: item.web_navigation_item_link_type,
-
-          target_blank: Number(item.web_navigation_item_target_blank) === 1,
-
-          icon: item.web_navigation_item_icon,
-
-          badge_text: item.web_navigation_item_badge_text,
-
-          badge_color: item.web_navigation_item_badge_color,
-
           sort_order: Number(item.web_navigation_item_sort_order),
-
           status: Number(item.web_navigation_item_status),
-
-          settings: parseJsonValue(item.web_navigation_item_settings_json),
-
           translations: translationsByItem.get(itemId) ?? [],
 
           created: item.created,
@@ -1546,122 +1464,6 @@ app.post(
         [idNavigation, scope.idMasterComp, item.key],
       );
 
-      let idParent: number | null = null;
-
-      const encodedParent = req.body?.id_parent_web_navigation_item;
-
-      if (
-        encodedParent !== null &&
-        encodedParent !== undefined &&
-        encodedParent !== ""
-      ) {
-        idParent = decodeWebNavigationItemId(encodedParent);
-
-        if (!idParent) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_PARENT_INVALID",
-            "Invalid parent navigation item identifier",
-          );
-        }
-
-        const [parentRows] = await connection.query(
-          `
-              SELECT id_web_navigation_item
-
-              FROM web_navigation_item
-
-              WHERE id_web_navigation_item = ?
-
-                AND id_web_navigation = ?
-
-                AND id_master_comp = ?
-
-                AND web_navigation_item_deleted_at
-                  IS NULL
-
-              LIMIT 1
-
-              FOR UPDATE
-            `,
-          [idParent, idNavigation, scope.idMasterComp],
-        );
-
-        if (!(parentRows as any[]).length) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_PARENT_NOT_FOUND",
-            "Parent navigation item was not found",
-          );
-        }
-      }
-
-      let idCmsPage: number | null = null;
-
-      const encodedCmsPage = req.body?.id_cms_page;
-
-      if (item.linkType === "cms_page") {
-        idCmsPage = decodeCmsPageId(encodedCmsPage);
-
-        if (!idCmsPage) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_CMS_PAGE_REQUIRED",
-            "A CMS page is required for this navigation item",
-          );
-        }
-
-        const [pageRows] = await connection.query(
-          `
-              SELECT id_cms_page
-
-              FROM cms_page
-
-              WHERE id_cms_page = ?
-
-                AND id_master_comp = ?
-
-                AND cms_page_deleted_at IS NULL
-
-              LIMIT 1
-            `,
-          [idCmsPage, scope.idMasterComp],
-        );
-
-        if (!(pageRows as any[]).length) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_CMS_PAGE_NOT_FOUND",
-            "CMS page was not found",
-          );
-        }
-      } else if (
-        encodedCmsPage !== null &&
-        encodedCmsPage !== undefined &&
-        encodedCmsPage !== ""
-      ) {
-        await connection.rollback();
-
-        return sendError(
-          res,
-          400,
-          "WEB_NAVIGATION_CMS_PAGE_NOT_ALLOWED",
-          "CMS page can only be used by a CMS page link",
-        );
-      }
-
       const [existingRows] = await connection.query(
         `
             SELECT id_web_navigation_item
@@ -1702,27 +1504,11 @@ app.post(
 
               id_master_comp,
 
-              id_parent_web_navigation_item,
-
-              id_cms_page,
-
               web_navigation_item_key,
-
-              web_navigation_item_link_type,
-
-              web_navigation_item_target_blank,
-
-              web_navigation_item_icon,
-
-              web_navigation_item_badge_text,
-
-              web_navigation_item_badge_color,
 
               web_navigation_item_sort_order,
 
               web_navigation_item_status,
-
-              web_navigation_item_settings_json,
 
               id_created_by,
 
@@ -1734,23 +1520,15 @@ app.post(
             )
             VALUES
             (
-              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
+              ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
             )
           `,
         [
           idNavigation,
           scope.idMasterComp,
-          idParent,
-          idCmsPage,
           item.key,
-          item.linkType,
-          item.targetBlank,
-          item.icon,
-          item.badgeText,
-          item.badgeColor,
           item.sortOrder,
           item.status,
-          item.settingsJson,
           scope.idAdminAcct,
           scope.idAdminAcct,
         ],
@@ -1816,17 +1594,9 @@ app.post(
           )?.label ?? item.key,
         after: {
           id_web_navigation: idNavigation,
-          id_parent_web_navigation_item: idParent,
-          id_cms_page: idCmsPage,
           key: item.key,
-          link_type: item.linkType,
-          target_blank: item.targetBlank,
-          icon: item.icon,
-          badge_text: item.badgeText,
-          badge_color: item.badgeColor,
           sort_order: item.sortOrder,
           status: item.status,
-          settings: item.settings,
           translations: item.translations,
         },
         metadata: {
@@ -1965,7 +1735,7 @@ app.put(
       const navigation = navigations[0];
 
       //==================================================
-      //==== LOCK ALL ITEMS FOR PARENT VALIDATION
+      //==== LOCK ALL ITEMS FOR UPDATE VALIDATION
       //==================================================
 
       const [itemRows] = await connection.query(
@@ -1973,27 +1743,11 @@ app.put(
             SELECT
               id_web_navigation_item,
 
-              id_parent_web_navigation_item,
-
-              id_cms_page,
-
               web_navigation_item_key,
-
-              web_navigation_item_link_type,
-
-              web_navigation_item_target_blank,
-
-              web_navigation_item_icon,
-
-              web_navigation_item_badge_text,
-
-              web_navigation_item_badge_color,
 
               web_navigation_item_sort_order,
 
-              web_navigation_item_status,
-
-              web_navigation_item_settings_json
+              web_navigation_item_status
 
             FROM web_navigation_item
 
@@ -2091,160 +1845,6 @@ app.put(
       }
 
       //==================================================
-      //==== PARENT
-      //==================================================
-
-      let idParent: number | null = null;
-
-      const encodedParent = req.body?.id_parent_web_navigation_item;
-
-      if (
-        encodedParent !== null &&
-        encodedParent !== undefined &&
-        encodedParent !== ""
-      ) {
-        idParent = decodeWebNavigationItemId(encodedParent);
-
-        if (!idParent) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_PARENT_INVALID",
-            "Invalid parent navigation item identifier",
-          );
-        }
-
-        if (idParent === idItem) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_PARENT_SELF",
-            "A navigation item cannot be its own parent",
-          );
-        }
-
-        const parentExists = navigationItems.some(
-          (candidate) => Number(candidate.id_web_navigation_item) === idParent,
-        );
-
-        if (!parentExists) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_PARENT_NOT_FOUND",
-            "Parent navigation item was not found",
-          );
-        }
-
-        //==================================================
-        //==== CYCLE PROTECTION
-        //==================================================
-
-        const parentByItem = new Map<number, number | null>();
-
-        for (const candidate of navigationItems) {
-          parentByItem.set(
-            Number(candidate.id_web_navigation_item),
-
-            candidate.id_parent_web_navigation_item === null
-              ? null
-              : Number(candidate.id_parent_web_navigation_item),
-          );
-        }
-
-        let cursor: number | null = idParent;
-
-        const visited = new Set<number>([idItem]);
-
-        while (cursor !== null) {
-          if (visited.has(cursor)) {
-            await connection.rollback();
-
-            return sendError(
-              res,
-              400,
-              "WEB_NAVIGATION_PARENT_CYCLE",
-              "Navigation item hierarchy would create a cycle",
-            );
-          }
-
-          visited.add(cursor);
-
-          cursor = parentByItem.get(cursor) ?? null;
-        }
-      }
-
-      //==================================================
-      //==== CMS PAGE
-      //==================================================
-
-      let idCmsPage: number | null = null;
-
-      const encodedCmsPage = req.body?.id_cms_page;
-
-      if (item.linkType === "cms_page") {
-        idCmsPage = decodeCmsPageId(encodedCmsPage);
-
-        if (!idCmsPage) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_CMS_PAGE_REQUIRED",
-            "A CMS page is required for this navigation item",
-          );
-        }
-
-        const [pageRows] = await connection.query(
-          `
-              SELECT id_cms_page
-
-              FROM cms_page
-
-              WHERE id_cms_page = ?
-
-                AND id_master_comp = ?
-
-                AND cms_page_deleted_at IS NULL
-
-              LIMIT 1
-            `,
-          [idCmsPage, scope.idMasterComp],
-        );
-
-        if (!(pageRows as any[]).length) {
-          await connection.rollback();
-
-          return sendError(
-            res,
-            400,
-            "WEB_NAVIGATION_CMS_PAGE_NOT_FOUND",
-            "CMS page was not found",
-          );
-        }
-      } else if (
-        encodedCmsPage !== null &&
-        encodedCmsPage !== undefined &&
-        encodedCmsPage !== ""
-      ) {
-        await connection.rollback();
-
-        return sendError(
-          res,
-          400,
-          "WEB_NAVIGATION_CMS_PAGE_NOT_ALLOWED",
-          "CMS page can only be used by a CMS page link",
-        );
-      }
-
-      //==================================================
       //==== BEFORE TRANSLATIONS
       //==================================================
 
@@ -2295,27 +1895,11 @@ app.put(
           UPDATE web_navigation_item
 
           SET
-            id_parent_web_navigation_item = ?,
-
-            id_cms_page = ?,
-
             web_navigation_item_key = ?,
-
-            web_navigation_item_link_type = ?,
-
-            web_navigation_item_target_blank = ?,
-
-            web_navigation_item_icon = ?,
-
-            web_navigation_item_badge_text = ?,
-
-            web_navigation_item_badge_color = ?,
 
             web_navigation_item_sort_order = ?,
 
             web_navigation_item_status = ?,
-
-            web_navigation_item_settings_json = ?,
 
             id_updated_by = ?,
 
@@ -2331,17 +1915,9 @@ app.put(
               IS NULL
         `,
         [
-          idParent,
-          idCmsPage,
           item.key,
-          item.linkType,
-          item.targetBlank,
-          item.icon,
-          item.badgeText,
-          item.badgeColor,
           item.sortOrder,
           item.status,
-          item.settingsJson,
           scope.idAdminAcct,
           idItem,
           idNavigation,
@@ -2427,63 +2003,18 @@ app.put(
         entityLabel: defaultTranslation?.label ?? item.key,
         before: {
           id_web_navigation: idNavigation,
-
-          id_parent_web_navigation_item:
-            currentItem.id_parent_web_navigation_item === null
-              ? null
-              : Number(currentItem.id_parent_web_navigation_item),
-
-          id_cms_page:
-            currentItem.id_cms_page === null
-              ? null
-              : Number(currentItem.id_cms_page),
-
           key: currentItem.web_navigation_item_key,
-
-          link_type: currentItem.web_navigation_item_link_type,
-
-          target_blank: Number(currentItem.web_navigation_item_target_blank),
-
-          icon: currentItem.web_navigation_item_icon,
-
-          badge_text: currentItem.web_navigation_item_badge_text,
-
-          badge_color: currentItem.web_navigation_item_badge_color,
-
           sort_order: Number(currentItem.web_navigation_item_sort_order),
 
           status: Number(currentItem.web_navigation_item_status),
-
-          settings: parseJsonValue(
-            currentItem.web_navigation_item_settings_json,
-          ),
-
           translations: beforeTranslations,
         },
         after: {
           id_web_navigation: idNavigation,
-
-          id_parent_web_navigation_item: idParent,
-
-          id_cms_page: idCmsPage,
-
           key: item.key,
-
-          link_type: item.linkType,
-
-          target_blank: item.targetBlank,
-
-          icon: item.icon,
-
-          badge_text: item.badgeText,
-
-          badge_color: item.badgeColor,
-
           sort_order: item.sortOrder,
 
           status: item.status,
-
-          settings: item.settings,
 
           translations: item.translations,
         },
@@ -2620,13 +2151,7 @@ app.delete(
         `
             SELECT
               id_web_navigation_item,
-
-              id_parent_web_navigation_item,
-
               web_navigation_item_key,
-
-              web_navigation_item_link_type,
-
               web_navigation_item_sort_order,
 
               web_navigation_item_status
@@ -2662,65 +2187,16 @@ app.delete(
         );
       }
 
-      const childrenByParent = new Map<number, number[]>();
+      const deletedIds = [idItem];
 
-      for (const item of navigationItems) {
-        if (item.id_parent_web_navigation_item === null) {
-          continue;
-        }
-
-        const parentId = Number(item.id_parent_web_navigation_item);
-
-        const children = childrenByParent.get(parentId) ?? [];
-
-        children.push(Number(item.id_web_navigation_item));
-
-        childrenByParent.set(parentId, children);
-      }
-
-      const deletedIds: number[] = [];
-
-      const stack: number[] = [idItem];
-
-      const visited = new Set<number>();
-
-      while (stack.length) {
-        const currentId = stack.pop();
-
-        if (currentId === undefined || visited.has(currentId)) {
-          continue;
-        }
-
-        visited.add(currentId);
-
-        deletedIds.push(currentId);
-
-        for (const childId of childrenByParent.get(currentId) ?? []) {
-          stack.push(childId);
-        }
-      }
-
-      const deletedSet = new Set(deletedIds);
-
-      const deletedItems = navigationItems
-        .filter((item) => deletedSet.has(Number(item.id_web_navigation_item)))
-        .map((item) => ({
-          id_web_navigation_item: Number(item.id_web_navigation_item),
-
-          id_parent_web_navigation_item:
-            item.id_parent_web_navigation_item === null
-              ? null
-              : Number(item.id_parent_web_navigation_item),
-
-          key: item.web_navigation_item_key,
-
-          link_type: item.web_navigation_item_link_type,
-
-          sort_order: Number(item.web_navigation_item_sort_order),
-
-          status: Number(item.web_navigation_item_status),
-        }))
-        .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
+      const deletedItems = [
+        {
+          id_web_navigation_item: Number(target.id_web_navigation_item),
+          key: target.web_navigation_item_key,
+          sort_order: Number(target.web_navigation_item_sort_order),
+          status: Number(target.web_navigation_item_status),
+        },
+      ];
 
       const placeholders = deletedIds.map(() => "?").join(", ");
 
@@ -2780,7 +2256,6 @@ app.delete(
 
           deleted_item_count: deletedIds.length,
 
-          includes_descendants: deletedIds.length > 1,
         },
         httpStatus: 200,
       });
@@ -2791,7 +2266,7 @@ app.delete(
         res,
         200,
         "WEB_NAVIGATION_ITEM_DELETED",
-        "Navigation item branch deleted successfully",
+        "Navigation item deleted successfully",
         {
           deleted_item_count: deletedIds.length,
         },
@@ -2901,9 +2376,6 @@ app.put(
         `
             SELECT
               id_web_navigation_item,
-
-              id_parent_web_navigation_item,
-
               web_navigation_item_key,
 
               web_navigation_item_sort_order
@@ -2941,7 +2413,6 @@ app.put(
 
       const normalizedItems: {
         idItem: number;
-        idParent: number | null;
         sortOrder: number;
       }[] = [];
 
@@ -2976,40 +2447,6 @@ app.put(
 
         suppliedIds.add(normalizedId);
 
-        let idParent: number | null = null;
-
-        const encodedParent = rawItem?.id_parent_web_navigation_item;
-
-        if (
-          encodedParent !== null &&
-          encodedParent !== undefined &&
-          encodedParent !== ""
-        ) {
-          idParent = decodeWebNavigationItemId(encodedParent);
-
-          if (!idParent || !currentIds.has(idParent)) {
-            await connection.rollback();
-
-            return sendError(
-              res,
-              400,
-              "WEB_NAVIGATION_REORDER_PARENT_INVALID",
-              "Reorder payload contains an invalid parent item",
-            );
-          }
-
-          if (idParent === normalizedId) {
-            await connection.rollback();
-
-            return sendError(
-              res,
-              400,
-              "WEB_NAVIGATION_REORDER_PARENT_SELF",
-              "A navigation item cannot be its own parent",
-            );
-          }
-        }
-
         const sortOrder = Number(rawItem?.sort_order);
 
         if (
@@ -3029,7 +2466,6 @@ app.put(
 
         normalizedItems.push({
           idItem: normalizedId,
-          idParent,
           sortOrder,
         });
       }
@@ -3047,60 +2483,21 @@ app.put(
         }
       }
 
-      //==================================================
-      //==== UNIQUE ORDER WITHIN EACH PARENT
-      //==================================================
-
-      const siblingOrders = new Set<string>();
+      const sortOrders = new Set<number>();
 
       for (const item of normalizedItems) {
-        const siblingKey = `${item.idParent ?? "root"}:${item.sortOrder}`;
-
-        if (siblingOrders.has(siblingKey)) {
+        if (sortOrders.has(item.sortOrder)) {
           await connection.rollback();
 
           return sendError(
             res,
             400,
             "WEB_NAVIGATION_REORDER_SORT_DUPLICATE",
-            "Sibling navigation items cannot share the same sort order",
+            "Navigation items cannot share the same sort order",
           );
         }
 
-        siblingOrders.add(siblingKey);
-      }
-
-      //==================================================
-      //==== CYCLE PROTECTION
-      //==================================================
-
-      const parentByItem = new Map<number, number | null>();
-
-      for (const item of normalizedItems) {
-        parentByItem.set(item.idItem, item.idParent);
-      }
-
-      for (const item of normalizedItems) {
-        const visited = new Set<number>();
-
-        let cursor: number | null = item.idItem;
-
-        while (cursor !== null) {
-          if (visited.has(cursor)) {
-            await connection.rollback();
-
-            return sendError(
-              res,
-              400,
-              "WEB_NAVIGATION_REORDER_CYCLE",
-              "Navigation item hierarchy contains a cycle",
-            );
-          }
-
-          visited.add(cursor);
-
-          cursor = parentByItem.get(cursor) ?? null;
-        }
+        sortOrders.add(item.sortOrder);
       }
 
       const before = currentItems
@@ -3108,12 +2505,6 @@ app.put(
           id_web_navigation_item: Number(item.id_web_navigation_item),
 
           key: item.web_navigation_item_key,
-
-          id_parent_web_navigation_item:
-            item.id_parent_web_navigation_item === null
-              ? null
-              : Number(item.id_parent_web_navigation_item),
-
           sort_order: Number(item.web_navigation_item_sort_order),
         }))
         .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
@@ -3124,8 +2515,6 @@ app.put(
             UPDATE web_navigation_item
 
             SET
-              id_parent_web_navigation_item = ?,
-
               web_navigation_item_sort_order = ?,
 
               id_updated_by = ?,
@@ -3142,7 +2531,6 @@ app.put(
                 IS NULL
           `,
           [
-            item.idParent,
             item.sortOrder,
             scope.idAdminAcct,
             item.idItem,
@@ -3165,9 +2553,6 @@ app.put(
           id_web_navigation_item: item.idItem,
 
           key: keyById.get(item.idItem) ?? null,
-
-          id_parent_web_navigation_item: item.idParent,
-
           sort_order: item.sortOrder,
         }))
         .sort((a, b) => a.id_web_navigation_item - b.id_web_navigation_item);
