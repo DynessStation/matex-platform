@@ -1,31 +1,19 @@
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
-
 import express from "express";
-
 import { AddressInfo } from "node:net";
 
 import { pool } from "../src/db";
 
 const router = require("../src/ctrl/public/navigation").default;
-
 const originalQuery = pool.query;
-
 const originalCompany = process.env.PUBLIC_CMS_COMPANY_ID;
-
 const app = express();
-
 app.use(router);
-
 const server = app.listen(0, "127.0.0.1");
 
 let base = "";
-
-let calls: {
-  sql: string;
-  params: unknown[];
-}[] = [];
-
+let calls: { sql: string; params: unknown[] }[] = [];
 let rows: any[][] = [];
 
 before(async () => {
@@ -33,17 +21,10 @@ before(async () => {
     await new Promise<void>((resolve) => server.once("listening", resolve));
   }
 
-  base =
-    `http://127.0.0.1:` +
-    `${(server.address() as AddressInfo).port}` +
-    `/api/public/navigation`;
+  base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/public/navigation`;
 
   pool.query = (async (sql: string, params: unknown[]) => {
-    calls.push({
-      sql,
-      params,
-    });
-
+    calls.push({ sql, params });
     return [rows.shift() || [], []];
   }) as any;
 });
@@ -60,66 +41,57 @@ after(async () => {
   await new Promise<void>((resolve, reject) =>
     server.close((error) => (error ? reject(error) : resolve())),
   );
-
   await pool.end();
 });
 
 function reset() {
   process.env.PUBLIC_CMS_COMPANY_ID = "7";
-
   calls = [];
-
   rows = [];
 }
 
+const navigation = {
+  id_web_navigation: 14,
+  web_navigation_key: "primary",
+  web_navigation_location: "header",
+  web_navigation_default_locale: "id-ID",
+};
+
 test("missing tenant fails closed before querying", async () => {
   reset();
-
   delete process.env.PUBLIC_CMS_COMPANY_ID;
-
   const response = await fetch(`${base}/primary/id-ID`);
 
   assert.equal(response.status, 503);
-
   assert.equal(calls.length, 0);
-
   assert.equal(response.headers.get("cache-control"), "no-store");
-
-  const body = (await response.json()) as any;
-
-  assert.equal(body.code, "NAVIGATION_UNAVAILABLE");
+  assert.equal(((await response.json()) as any).code, "NAVIGATION_UNAVAILABLE");
 });
 
-test("invalid key and unsupported locale do not query the database", async () => {
+test("only the fixed primary navigation and supported locales are accepted", async () => {
   reset();
 
-  const invalidKeyResponse = await fetch(`${base}/Invalid%20Key/id-ID`);
-
-  assert.equal(invalidKeyResponse.status, 404);
-
-  assert.equal(calls.length, 0);
-
-  const invalidLocaleResponse = await fetch(`${base}/primary/fr-FR`);
-
-  assert.equal(invalidLocaleResponse.status, 404);
+  for (const path of [
+    "secondary/id-ID",
+    "primary/fr-FR",
+    "Invalid%20Key/id-ID",
+  ]) {
+    const response = await fetch(`${base}/${path}`);
+    assert.equal(response.status, 404);
+  }
 
   assert.equal(calls.length, 0);
 });
 
 test("missing or inactive navigation is a generic 404", async () => {
   reset();
-
   rows = [[]];
-
   const response = await fetch(`${base}/primary/id-ID`);
 
   assert.equal(response.status, 404);
-
   assert.equal(calls.length, 1);
-
-  const body = (await response.json()) as any;
-
-  assert.equal(body.code, "NAVIGATION_NOT_FOUND");
+  assert.equal(((await response.json()) as any).code, "NAVIGATION_NOT_FOUND");
+  assert.deepEqual(calls[0].params, [7, "primary"]);
 
   for (const clause of [
     "id_master_comp = ?",
@@ -129,431 +101,176 @@ test("missing or inactive navigation is a generic 404", async () => {
   ]) {
     assert.ok(calls[0].sql.includes(clause), clause);
   }
-
-  assert.deepEqual(calls[0].params, [7, "primary"]);
 });
 
-test("public lookup binds the server tenant and ignores query tenant input", async () => {
+test("public lookup uses the server tenant and does not join legacy CMS tables", async () => {
   reset();
-
-  rows = [
-    [
-      {
-        id_web_navigation: 14,
-        web_navigation_key: "primary",
-        web_navigation_location: "header",
-        web_navigation_default_locale: "id-ID",
-      },
-    ],
-    [],
-  ];
-
+  rows = [[navigation], []];
   const response = await fetch(`${base}/primary/id-ID?id_master_comp=999`);
 
   assert.equal(response.status, 200);
-
   assert.deepEqual(calls[0].params, [7, "primary"]);
-
-  assert.deepEqual(calls[1].params, ["id-ID", "id-ID", "id-ID", 14, 7]);
-
-  for (const clause of [
-    "item.web_navigation_item_status = 1",
-    "item.web_navigation_item_deleted_at",
-    "cms_page.cms_page_status = 1",
-    "cms_page.cms_page_visibility IN (1, 2)",
-    "cms_page.cms_page_deleted_at IS NULL",
-    "cms_page.cms_page_publish_at <= NOW()",
-    "cms_page.cms_page_unpublish_at > NOW()",
-    "cms_page_i18n.cms_page_i18n_status = 1",
-  ]) {
-    assert.ok(calls[1].sql.includes(clause), clause);
-  }
+  assert.deepEqual(calls[1].params, ["id-ID", "id-ID", 14, 7]);
+  assert.equal(calls[1].sql.includes("cms_page"), false);
+  assert.equal(calls[1].sql.includes("id_cms_page"), false);
 });
 
-test("navigation response builds a safe localized tree", async () => {
+test("fixed items keep database order and localized labels", async () => {
   reset();
-
   rows = [
-    [
-      {
-        id_web_navigation: 14,
-        web_navigation_key: "primary",
-        web_navigation_location: "header",
-        web_navigation_default_locale: "id-ID",
-      },
-    ],
+    [navigation],
     [
       {
         id_web_navigation_item: 1,
-        id_parent_web_navigation_item: null,
         web_navigation_item_key: "home",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
         web_navigation_item_sort_order: 0,
         label: "Beranda",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: "home",
-        cms_page_template: "home",
-        cms_page_slug: "home",
       },
       {
         id_web_navigation_item: 2,
-        id_parent_web_navigation_item: null,
         web_navigation_item_key: "about",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
         web_navigation_item_sort_order: 1,
-        label: "Tentang Kami",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: "about",
-        cms_page_template: "company-profile",
-        cms_page_slug: "tentang-kami",
+        label: "Tentang MATEX",
       },
       {
         id_web_navigation_item: 3,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "products",
-        web_navigation_item_link_type: "internal",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: "Baru",
-        web_navigation_item_badge_color: "bg-danger",
+        web_navigation_item_key: "categories",
         web_navigation_item_sort_order: 2,
-        label: "Produk",
-        internal_path: "/produk",
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "Kategori",
       },
       {
         id_web_navigation_item: 4,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "marketplace",
-        web_navigation_item_link_type: "label",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
+        web_navigation_item_key: "products",
         web_navigation_item_sort_order: 3,
-        label: "Beli Online",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "Produk",
       },
       {
         id_web_navigation_item: 5,
-        id_parent_web_navigation_item: 4,
-        web_navigation_item_key: "shopee",
-        web_navigation_item_link_type: "external",
-        web_navigation_item_target_blank: 1,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
-        web_navigation_item_sort_order: 0,
-        label: "Shopee",
-        internal_path: null,
-        external_url: "https://shopee.co.id/matex",
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        web_navigation_item_key: "articles",
+        web_navigation_item_sort_order: 4,
+        label: "Artikel",
+      },
+      {
+        id_web_navigation_item: 6,
+        web_navigation_item_key: "contact",
+        web_navigation_item_sort_order: 5,
+        label: "Hubungi",
       },
     ],
   ];
 
   const response = await fetch(`${base}/primary/id-ID`);
-
-  assert.equal(response.status, 200);
-
   const body = (await response.json()) as any;
 
-  assert.equal(body.code, "NAVIGATION_FOUND");
-
-  assert.equal(body.data.key, "primary");
-
-  assert.equal(body.data.location, "header");
-
-  assert.equal(body.data.locale, "id-ID");
-
-  assert.equal(body.data.items.length, 4);
-
-  assert.equal(body.data.items[0].key, "home");
-
-  assert.equal(body.data.items[0].path, "/");
-
-  assert.equal(body.data.items[1].path, "/tentang-matex");
-
-  assert.equal(body.data.items[2].path, "/katalog");
-
-  assert.equal(body.data.items[2].link_type, "internal");
-
-  assert.deepEqual(body.data.items[2].badge, {
-    text: "Baru",
-    color: "bg-danger",
-  });
-
-  assert.equal(body.data.items[3].key, "marketplace");
-
-  assert.equal(body.data.items[3].path, null);
-
-  assert.equal(body.data.items[3].children.length, 1);
-
-  assert.equal(body.data.items[3].children[0].key, "shopee");
-
-  assert.equal(body.data.items[3].children[0].target_blank, true);
-
-  assert.equal(
-    body.data.items[3].children[0].url,
-    "https://shopee.co.id/matex",
+  assert.equal(response.status, 200);
+  assert.deepEqual(
+    body.data.items.map((item: any) => [item.key, item.label, item.path]),
+    [
+      ["home", "Beranda", "/"],
+      ["about", "Tentang MATEX", "/tentang-matex"],
+      ["categories", "Kategori", "/katalog"],
+      ["products", "Produk", "/katalog"],
+      ["articles", "Artikel", "/artikel"],
+      ["contact", "Hubungi", "/kontak"],
+    ],
   );
-
-  assert.equal(body.data.items[0].id_web_navigation_item, undefined);
-
-  assert.equal(body.data.items[1].cms_page_slug, undefined);
+  assert.deepEqual(body.data.items[0], {
+    key: "home",
+    label: "Beranda",
+    link_type: "internal",
+    path: "/",
+    url: null,
+    target_blank: false,
+    icon: null,
+    badge: null,
+    children: [],
+  });
 });
 
-test("fixed website pages use stable localized paths", async () => {
+test("English uses stable localized paths", async () => {
   reset();
-
   rows = [
-    [
-      {
-        id_web_navigation: 14,
-        web_navigation_key: "primary",
-        web_navigation_location: "header",
-        web_navigation_default_locale: "id-ID",
-      },
-    ],
+    [navigation],
     [
       {
         id_web_navigation_item: 1,
-        id_parent_web_navigation_item: null,
         web_navigation_item_key: "home",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
         web_navigation_item_sort_order: 0,
         label: "Home",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: "home",
-        cms_page_template: "home",
-        cms_page_slug: "home",
       },
       {
         id_web_navigation_item: 2,
-        id_parent_web_navigation_item: null,
         web_navigation_item_key: "about",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
         web_navigation_item_sort_order: 1,
-        label: "About Us",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: "about",
-        cms_page_template: "company-profile",
-        cms_page_slug: "about-us",
-      },
-    ],
-  ];
-
-  const response = await fetch(`${base}/primary/en-US`);
-
-  assert.equal(response.status, 200);
-
-  const body = (await response.json()) as any;
-
-  assert.equal(body.data.items[0].path, "/en");
-
-  assert.equal(body.data.items[1].path, "/en/about-matex");
-
-  assert.deepEqual(calls[1].params, ["en-US", "id-ID", "en-US", 14, 7]);
-});
-
-test("fixed header keys ignore stale or incomplete legacy targets", async () => {
-  reset();
-
-  rows = [
-    [
-      {
-        id_web_navigation: 14,
-        web_navigation_key: "primary",
-        web_navigation_location: "header",
-        web_navigation_default_locale: "id-ID",
-      },
-    ],
-    [
-      {
-        id_web_navigation_item: 1,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "products",
-        web_navigation_item_link_type: "internal",
-        web_navigation_item_target_blank: 1,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
-        web_navigation_item_sort_order: 0,
-        label: "Product",
-        internal_path: "//legacy.invalid",
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "About MATEX",
       },
       {
-        id_web_navigation_item: 2,
-        id_parent_web_navigation_item: null,
+        id_web_navigation_item: 3,
         web_navigation_item_key: "contact",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 1,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
-        web_navigation_item_sort_order: 1,
+        web_navigation_item_sort_order: 2,
         label: "Contact",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
       },
     ],
   ];
 
   const response = await fetch(`${base}/primary/en-US`);
-
-  assert.equal(response.status, 200);
-
   const body = (await response.json()) as any;
 
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls[1].params, ["en-US", "id-ID", 14, 7]);
   assert.deepEqual(
-    body.data.items.map((item: any) => ({
-      key: item.key,
-      link_type: item.link_type,
-      path: item.path,
-      target_blank: item.target_blank,
-    })),
-    [
-      {
-        key: "products",
-        link_type: "internal",
-        path: "/en/catalog",
-        target_blank: false,
-      },
-      {
-        key: "contact",
-        link_type: "internal",
-        path: "/en/contact-us",
-        target_blank: false,
-      },
-    ],
+    body.data.items.map((item: any) => item.path),
+    ["/en", "/en/about-matex", "/en/contact-us"],
   );
 });
 
-test("unsafe, unpublished and orphaned items are omitted", async () => {
+test("unknown, duplicate and legacy alias items cannot extend the fixed header", async () => {
   reset();
-
   rows = [
+    [navigation],
     [
       {
-        id_web_navigation: 14,
-        web_navigation_key: "primary",
-        web_navigation_location: "header",
-        web_navigation_default_locale: "id-ID",
-      },
-    ],
-    [
-      {
-        id_web_navigation_item: 10,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "unsafe-internal",
-        web_navigation_item_link_type: "internal",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
+        id_web_navigation_item: 1,
+        web_navigation_item_key: "blog",
         web_navigation_item_sort_order: 0,
-        label: "Unsafe",
-        internal_path: "//evil.example/path",
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "Blog",
       },
       {
-        id_web_navigation_item: 11,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "unsafe-external",
-        web_navigation_item_link_type: "external",
-        web_navigation_item_target_blank: 1,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
+        id_web_navigation_item: 2,
+        web_navigation_item_key: "articles",
         web_navigation_item_sort_order: 1,
-        label: "Unsafe external",
-        internal_path: null,
-        external_url: "javascript:alert(1)",
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "Articles duplicate",
       },
       {
-        id_web_navigation_item: 12,
-        id_parent_web_navigation_item: null,
-        web_navigation_item_key: "missing-page",
-        web_navigation_item_link_type: "cms_page",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
+        id_web_navigation_item: 3,
+        web_navigation_item_key: "marketplace",
         web_navigation_item_sort_order: 2,
-        label: "Draft page",
-        internal_path: null,
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        label: "Marketplace",
       },
       {
-        id_web_navigation_item: 13,
-        id_parent_web_navigation_item: 10,
-        web_navigation_item_key: "orphan-child",
-        web_navigation_item_link_type: "internal",
-        web_navigation_item_target_blank: 0,
-        web_navigation_item_icon: null,
-        web_navigation_item_badge_text: null,
-        web_navigation_item_badge_color: null,
-        web_navigation_item_sort_order: 0,
-        label: "Orphan",
-        internal_path: "/safe",
-        external_url: null,
-        cms_page_key: null,
-        cms_page_template: null,
-        cms_page_slug: null,
+        id_web_navigation_item: 4,
+        web_navigation_item_key: "contact",
+        web_navigation_item_sort_order: 3,
+        label: "",
       },
     ],
   ];
 
-  const response = await fetch(`${base}/primary/id-ID`);
-
-  assert.equal(response.status, 200);
-
+  const response = await fetch(`${base}/primary/en-US`);
   const body = (await response.json()) as any;
 
-  assert.deepEqual(body.data.items, []);
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.data.items, [
+    {
+      key: "articles",
+      label: "Blog",
+      link_type: "internal",
+      path: "/en/articles",
+      url: null,
+      target_blank: false,
+      icon: null,
+      badge: null,
+      children: [],
+    },
+  ]);
 });
