@@ -26,4 +26,5 @@ export interface BannerLink {
   image_url?: string;
   redirection_type?: string;
   link?: string;
+  alt_text?: string;
 }

@@ -1,4 +1,5 @@
 import { PaginateModel } from './core.interface';
+import { IPublicWebsitePage } from './website-page.interface';
 
 export interface ThemesModel extends PaginateModel {
   data: Themes[];
@@ -18,6 +19,7 @@ export interface BannerLink {
   image_url: string;
   redirection_type: string;
   link: string;
+  alt_text?: string;
 }
 
 export interface GadgetHomeSelection {
@@ -148,6 +150,7 @@ export interface GadgetTheme {
   newsletter?: { status: boolean };
   slug: string;
   products_ids?: number[];
+  website_page?: IPublicWebsitePage;
 }
 
 export interface MegaMartTheme {

@@ -55,6 +55,7 @@ export class ThemeService {
     const merged = this.mergeObjects(safeTemplate, content) as unknown as GadgetTheme;
 
     merged.slug = 'gadget-store';
+    merged.website_page = page;
 
     const banners: Record<string, BannerLink | undefined> = {
       home_main: merged.home_selection?.main_banner,
@@ -74,6 +75,7 @@ export class ThemeService {
 
       banner.redirection_type = media.click_action;
       banner.link = media.click_target ?? '';
+      banner.alt_text = media.alt_text;
     }
 
     return merged;

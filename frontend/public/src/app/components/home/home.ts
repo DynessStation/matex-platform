@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -13,6 +13,7 @@ import { OrganicStore } from './organic-store/organic-store';
 import { StyleTech } from './style-tech/style-tech';
 import { LayoutService } from '../../shared/services/layout.service';
 import { ThemeOptionService } from '../../shared/services/theme-option.service';
+import { WebsitePageSeoService } from '../../shared/services/website-page-seo.service';
 import { GetHomePage } from '../../shared/store/action/theme.action';
 import { ThemeState } from '../../shared/store/state/theme.state';
 
@@ -25,6 +26,10 @@ import { ThemeState } from '../../shared/store/state/theme.state';
 export class Home {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
+  private document = inject(DOCUMENT);
+  private websiteSeo = inject(WebsitePageSeoService);
+  private originalLang = this.document.documentElement.lang;
 
   readonly view$ = combineLatest([
     this.route.queryParamMap.pipe(map((params) => params.get('theme') || '')),
@@ -43,11 +48,16 @@ export class Home {
           ),
         )
         .pipe(
-        map(() => ({
-          theme,
-          homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
-        })),
-        finalize(() => this.themeOptionService.preloader.set(false)),
+          map(() => ({
+            theme,
+            homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
+          })),
+          tap(({ homePage }) => {
+            if (homePage?.website_page) {
+              this.websiteSeo.apply(homePage.website_page);
+            }
+          }),
+          finalize(() => this.themeOptionService.preloader.set(false)),
         ),
     ),
   );
@@ -55,5 +65,12 @@ export class Home {
   constructor(
     public layoutService: LayoutService,
     public themeOptionService: ThemeOptionService,
-  ) {}
+  ) {
+    this.websiteSeo.prepare();
+
+    this.destroyRef.onDestroy(() => {
+      this.websiteSeo.clear();
+      this.document.documentElement.lang = this.originalLang;
+    });
+  }
 }

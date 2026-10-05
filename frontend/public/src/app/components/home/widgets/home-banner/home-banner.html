@@ -1,13 +1,10 @@
 @if (image()?.redirection_type === 'external' && image()?.link) {
-  <a
-    [href]="image()?.link"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="{{ className() }}"
-  >
+  <a [href]="image()?.link" target="_blank" rel="noopener noreferrer" class="{{ className() }}">
     @if (bgImage()) {
       <div
         class="bg-size h-100"
+        role="img"
+        [attr.aria-label]="image()?.alt_text || null"
         [style.background-image]="
           'url(' +
           (image()?.image_url ? image()?.image_url : 'assets/images/placeholder/product.png') +
@@ -17,7 +14,7 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img src="{{ image()?.image_url }}" class="{{ imageClass() }}" alt="image" />
+      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
     }
   </a>
 } @else if (image()?.redirection_type !== 'none' && image()?.link) {
@@ -25,6 +22,8 @@
     @if (bgImage()) {
       <div
         class="bg-size h-100"
+        role="img"
+        [attr.aria-label]="image()?.alt_text || null"
         [style.background-image]="
           'url(' +
           (image()?.image_url ? image()?.image_url : 'assets/images/placeholder/product.png') +
@@ -34,7 +33,7 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img src="{{ image()?.image_url }}" class="{{ imageClass() }}" alt="image" />
+      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
     }
   </a>
 } @else {
@@ -42,6 +41,8 @@
     @if (bgImage()) {
       <div
         class="bg-size h-100"
+        role="img"
+        [attr.aria-label]="image()?.alt_text || null"
         [style.background-image]="
           'url(' +
           (image()?.image_url ? image()?.image_url : 'assets/images/placeholder/product.png') +
@@ -51,7 +52,7 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img src="{{ image()?.image_url }}" class="{{ imageClass() }}" alt="image" />
+      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
     }
   </a>
 }
