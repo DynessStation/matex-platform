@@ -47,7 +47,7 @@
                   </div>
                 }
 
-                <div class="row g-4">
+                <div class="row g-4" [class.d-none]="isSystemPage">
                   <!-- PAGE KEY -->
 
                   <div class="col-md-6">
@@ -559,12 +559,11 @@
                         <div class="col-12">
                           <div class="cms-home-section-contract">
                             <div class="mb-3">
-                              <h6 class="mb-1">Bagian halaman Home</h6>
+                              <h6 class="mb-1">
+                                {{ 'website_page.home_sections_title' | translate }}
+                              </h6>
                               <p class="text-muted mb-0">
-                                Tentukan bagian yang boleh tampil untuk bahasa
-                                ini. Bagian yang membutuhkan sumber data
-                                terverifikasi sebaiknya tetap nonaktif sampai
-                                data MATEX tersedia.
+                                {{ 'website_page.home_sections_help' | translate }}
                               </p>
                             </div>
 
@@ -578,8 +577,8 @@
                                     class="d-flex justify-content-between gap-3"
                                   >
                                     <div>
-                                      <strong>{{ section.label }}</strong>
-                                      <small>{{ section.description }}</small>
+                                      <strong>{{ section.labelKey | translate }}</strong>
+                                      <small>{{ section.descriptionKey | translate }}</small>
                                     </div>
 
                                     <div class="form-check form-switch mb-0">
@@ -599,7 +598,10 @@
 
                                   @if (section.requiresVerifiedData) {
                                     <span class="badge bg-light text-dark mt-2">
-                                      Memerlukan sumber data terverifikasi
+                                      {{
+                                        'website_page.home_section_verified_data'
+                                          | translate
+                                      }}
                                     </span>
                                   }
                                 </label>
@@ -626,7 +628,12 @@
                         ></textarea>
 
                         <small class="text-muted d-block mt-1">
-                          {{ 'website_page.excerpt_help' | translate }}
+                          {{
+                            (isGadgetHomeTemplate
+                              ? 'website_page.home_summary_help'
+                              : 'website_page.excerpt_help'
+                            ) | translate
+                          }}
                         </small>
                       </div>
 
@@ -701,7 +708,7 @@
                             {{ operationalDataHelpKey | translate }}
                           </div>
                         </div>
-                      } @else if (!isAboutTemplate) {
+                      } @else if (!isAboutTemplate && !isGadgetHomeTemplate) {
                         <div class="col-12">
                           <label class="form-label">
                             {{ 'website_page.content' | translate }}

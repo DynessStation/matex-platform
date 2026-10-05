@@ -58,20 +58,25 @@ type WebsitePageEditorPublicationChoice =
   'current' | 'draft' | 'publish_now' | 'schedule' | 'archive';
 
 const HOME_SECTION_KEYS = [
-  'sale_product',
-  'top_product_by_categories',
-  'two_column_banner',
+  'latex_features',
   'categories',
-  'banner_with_tabs_product',
-  'offers_product',
-  'trending_deals_section',
-  'offer_banner',
+  'products',
+  'articles',
   'tags',
   'newsletter',
 ] as const;
 
 type HomeSectionKey = (typeof HOME_SECTION_KEYS)[number];
 type HomeSectionVisibility = Record<HomeSectionKey, boolean>;
+
+const HOME_SECTION_DEFAULTS: HomeSectionVisibility = {
+  latex_features: true,
+  categories: true,
+  products: true,
+  articles: true,
+  tags: false,
+  newsletter: false,
+};
 
 interface AboutFeatureDraft {
   title: string;
@@ -246,68 +251,44 @@ export class WebsitePageForm {
 
   public readonly homeSectionOptions: readonly {
     key: HomeSectionKey;
-    label: string;
-    description: string;
+    labelKey: string;
+    descriptionKey: string;
     requiresVerifiedData: boolean;
   }[] = [
     {
-      key: 'sale_product',
-      label: 'Promo kilat',
-      description: 'Daftar produk dan penghitung waktu promo.',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'top_product_by_categories',
-      label: 'Produk pilihan per kategori',
-      description: 'Kelompok produk unggulan berdasarkan kategori.',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'two_column_banner',
-      label: 'Dua banner promosi',
-      description: 'Dua banner tambahan di bawah bagian produk awal.',
-      requiresVerifiedData: true,
+      key: 'latex_features',
+      labelKey: 'website_page.home_section_latex_features',
+      descriptionKey: 'website_page.home_section_latex_features_help',
+      requiresVerifiedData: false,
     },
     {
       key: 'categories',
-      label: 'Kategori pilihan',
-      description: 'Daftar kategori yang ditonjolkan pada Home.',
-      requiresVerifiedData: true,
+      labelKey: 'website_page.home_section_categories',
+      descriptionKey: 'website_page.home_section_categories_help',
+      requiresVerifiedData: false,
     },
     {
-      key: 'banner_with_tabs_product',
-      label: 'Rekomendasi produk',
-      description: 'Banner dan tab berisi kelompok produk rekomendasi.',
-      requiresVerifiedData: true,
+      key: 'products',
+      labelKey: 'website_page.home_section_products',
+      descriptionKey: 'website_page.home_section_products_help',
+      requiresVerifiedData: false,
     },
     {
-      key: 'offers_product',
-      label: 'Penawaran pilihan',
-      description: 'Kumpulan kartu penawaran pada bagian tengah halaman.',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'trending_deals_section',
-      label: 'Produk populer dan promo',
-      description: 'Gabungan produk populer, promo, dan kategori terkait.',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'offer_banner',
-      label: 'Banner lebar',
-      description: 'Banner promosi selebar area konten.',
-      requiresVerifiedData: true,
+      key: 'articles',
+      labelKey: 'website_page.home_section_articles',
+      descriptionKey: 'website_page.home_section_articles_help',
+      requiresVerifiedData: false,
     },
     {
       key: 'tags',
-      label: 'Tag populer',
-      description: 'Kumpulan tag untuk membantu penelusuran konten.',
+      labelKey: 'website_page.home_section_tags',
+      descriptionKey: 'website_page.home_section_tags_help',
       requiresVerifiedData: true,
     },
     {
       key: 'newsletter',
-      label: 'Langganan informasi',
-      description: 'Formulir pendaftaran pembaruan melalui email.',
+      labelKey: 'website_page.home_section_newsletter',
+      descriptionKey: 'website_page.home_section_newsletter_help',
       requiresVerifiedData: true,
     },
   ];
@@ -702,16 +683,19 @@ export class WebsitePageForm {
   }
 
   private createHomeSectionVisibility(): HomeSectionVisibility {
-    return Object.fromEntries(
-      HOME_SECTION_KEYS.map((key) => [key, false]),
-    ) as HomeSectionVisibility;
+    return { ...HOME_SECTION_DEFAULTS };
   }
 
   private readHomeSectionVisibility(content: unknown): HomeSectionVisibility {
     const visibility = this.createHomeSectionVisibility();
     if (!this.isRecord(content)) return visibility;
 
-    for (const key of HOME_SECTION_KEYS) {
+    const keys =
+      content['home_contract_version'] === 2
+        ? HOME_SECTION_KEYS
+        : (['tags', 'newsletter'] as const);
+
+    for (const key of keys) {
       const section = content[key];
       if (this.isRecord(section) && typeof section['status'] === 'boolean') {
         visibility[key] = section['status'];
@@ -725,10 +709,11 @@ export class WebsitePageForm {
     locale: WebsitePageEditorLocale,
     existing: unknown,
   ): Record<string, unknown> {
-    const content = this.isRecord(existing) ? { ...existing } : {};
+    const source = this.isRecord(existing) ? existing : {};
+    const content: Record<string, unknown> = { home_contract_version: 2 };
 
     for (const key of HOME_SECTION_KEYS) {
-      const current = this.isRecord(content[key]) ? content[key] : {};
+      const current = this.isRecord(source[key]) ? source[key] : {};
       content[key] = {
         ...current,
         status: this.homeSectionVisibility[locale][key],

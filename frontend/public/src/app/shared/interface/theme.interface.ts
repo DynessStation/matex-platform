@@ -137,7 +137,9 @@ export interface TrendingDealsSection {
 }
 
 export interface GadgetTheme {
+  home_contract_version?: number;
   home_selection: GadgetHomeSelection;
+  latex_features?: { status: boolean };
   sale_product: SaleProduct;
   top_product_by_categories: TopProductByCategories;
   two_column_banner: ColumnBanner;
@@ -148,6 +150,8 @@ export interface GadgetTheme {
   offers_product: OffersProduct;
   trending_deals_section: TrendingDealsSection;
   newsletter?: { status: boolean };
+  products?: { status: boolean };
+  articles?: { status: boolean };
   slug: string;
   products_ids?: number[];
   website_page?: IPublicWebsitePage;

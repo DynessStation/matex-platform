@@ -58,6 +58,7 @@
 <!--/// ======= ///-->
 
 <!-- SECTION: KENAPA HARUS LATEX (MULTI-LANGUAGE & INTERACTIVE) -->
+@if (data()?.latex_features?.status !== false) {
 <section class="latex-features-section">
   <div class="custom-container">
     <div class="latex-features-header">
@@ -257,11 +258,12 @@
     </div>
   </div>
 </section>
+}
 
 <!--/// ======= ///-->
 
 @if (content$ | async; as content) {
-  @if (content.categories.length) {
+  @if (data()?.categories?.status !== false && content.categories.length) {
     <section class="mt-20 public-home-section">
       <div class="custom-container">
         <div class="light-bg-color">
@@ -299,7 +301,7 @@
     </section>
   }
 
-  @if (content.products.length) {
+  @if (data()?.products?.status !== false && content.products.length) {
     <section class="section-t-space public-home-section">
       <div class="custom-container">
         <div class="section-heading">
@@ -352,7 +354,7 @@
     </section>
   }
 
-  @if (content.articles.length) {
+  @if (data()?.articles?.status !== false && content.articles.length) {
     <section class="section-t-space public-home-section">
       <div class="custom-container">
         <div class="section-heading">

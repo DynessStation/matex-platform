@@ -12,15 +12,12 @@ import { BannerLink, GadgetTheme, ThemesModel } from '../interface/theme.interfa
   providedIn: 'root',
 })
 export class ThemeService {
-  private readonly cmsHomeSectionDefaults = {
-    sale_product: { status: false },
-    top_product_by_categories: { status: false },
-    two_column_banner: { status: false },
-    categories: { status: false },
-    banner_with_tabs_product: { status: false },
-    offers_product: { status: false },
-    trending_deals_section: { status: false },
-    offer_banner: { status: false },
+  private readonly homeSectionDefaults = {
+    home_contract_version: 2,
+    latex_features: { status: true },
+    categories: { status: true },
+    products: { status: true },
+    articles: { status: true },
     tags: { status: false },
     newsletter: { status: false },
   };
@@ -49,8 +46,8 @@ export class ThemeService {
   }
 
   private mergeGadgetHome(template: GadgetTheme, page: IPublicWebsitePage): GadgetTheme {
-    const content = this.isRecord(page.content) ? page.content : {};
-    const safeTemplate = this.mergeObjects(template, this.cmsHomeSectionDefaults);
+    const content = this.normalizeHomeContent(page.content);
+    const safeTemplate = this.mergeObjects(template, this.homeSectionDefaults);
     const merged = this.mergeObjects(safeTemplate, content) as unknown as GadgetTheme;
 
     merged.slug = 'gadget-store';
@@ -78,6 +75,22 @@ export class ThemeService {
     }
 
     return merged;
+  }
+
+  private normalizeHomeContent(value: unknown): Record<string, unknown> {
+    if (!this.isRecord(value)) return { ...this.homeSectionDefaults };
+
+    const isCurrentContract = value['home_contract_version'] === 2;
+    const keys = isCurrentContract
+      ? ['latex_features', 'categories', 'products', 'articles', 'tags', 'newsletter']
+      : ['tags', 'newsletter'];
+    const content: Record<string, unknown> = { home_contract_version: 2 };
+
+    for (const key of keys) {
+      if (this.isRecord(value[key])) content[key] = value[key];
+    }
+
+    return this.mergeObjects(this.homeSectionDefaults, content) as Record<string, unknown>;
   }
 
   private mergeObjects(base: unknown, override: unknown): unknown {
