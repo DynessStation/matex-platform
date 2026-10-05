@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 
 import { WebsitePageService } from './website-page.service';
 import { environment } from '../../../environments/environment';
@@ -41,10 +41,9 @@ export class ThemeService {
 
     return template$.pipe(
       switchMap((template) =>
-        this.websitePageService.getPage(locale, 'home').pipe(
-          map((page) => this.mergeGadgetHome(template as GadgetTheme, page)),
-          catchError(() => of(template)),
-        ),
+        this.websitePageService
+          .getPage(locale, 'home')
+          .pipe(map((page) => this.mergeGadgetHome(template as GadgetTheme, page))),
       ),
     );
   }

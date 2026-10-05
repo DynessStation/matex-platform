@@ -1,9 +1,22 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, DOCUMENT, inject, RESPONSE_INIT, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { combineLatest, distinctUntilChanged, filter, finalize, map, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  of,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import { BabyShop } from './baby-shop/baby-shop';
 import { Electro } from './electro/electro';
@@ -29,7 +42,12 @@ export class Home {
   private destroyRef = inject(DestroyRef);
   private document = inject(DOCUMENT);
   private websiteSeo = inject(WebsitePageSeoService);
+  private title = inject(Title);
+  private response = inject(RESPONSE_INIT, { optional: true });
   private originalLang = this.document.documentElement.lang;
+  readonly state = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
+  readonly locale: 'id-ID' | 'en-US' =
+    this.route.snapshot.routeConfig?.path === 'en' ? 'en-US' : 'id-ID';
 
   readonly view$ = combineLatest([
     this.route.queryParamMap.pipe(map((params) => params.get('theme') || '')),
@@ -38,27 +56,39 @@ export class Home {
     map(([queryTheme, activeTheme]) => queryTheme || activeTheme),
     filter((theme): theme is string => Boolean(theme)),
     distinctUntilChanged(),
-    tap(() => this.themeOptionService.preloader.set(true)),
+    tap(() => {
+      this.state.set('loading');
+      this.websiteSeo.prepare();
+      this.themeOptionService.preloader.set(true);
+    }),
     switchMap((theme) =>
-      this.store
-        .dispatch(
-          new GetHomePage(
-            theme,
-            this.route.snapshot.routeConfig?.path === 'en' ? 'en-US' : 'id-ID',
-          ),
-        )
-        .pipe(
-          map(() => ({
-            theme,
-            homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
-          })),
-          tap(({ homePage }) => {
-            if (homePage?.website_page) {
-              this.websiteSeo.apply(homePage.website_page);
-            }
-          }),
-          finalize(() => this.themeOptionService.preloader.set(false)),
-        ),
+      this.store.dispatch(new GetHomePage(theme, this.locale)).pipe(
+        map(() => ({
+          theme,
+          homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
+        })),
+        tap(({ homePage }) => {
+          if (homePage?.website_page) {
+            this.websiteSeo.apply(homePage.website_page);
+          }
+          this.state.set('ready');
+        }),
+        catchError((error: unknown) => {
+          const missing = error instanceof HttpErrorResponse && error.status === 404;
+          this.state.set(missing ? 'missing' : 'error');
+          this.title.setTitle(
+            `${this.message('Halaman tidak tersedia', 'Page unavailable')} | MATEX`,
+          );
+
+          if (this.response) {
+            this.response.status = missing ? 404 : 503;
+          }
+
+          return of({ theme, homePage: null });
+        }),
+        startWith({ theme, homePage: null }),
+        finalize(() => this.themeOptionService.preloader.set(false)),
+      ),
     ),
   );
 
@@ -72,5 +102,9 @@ export class Home {
       this.websiteSeo.clear();
       this.document.documentElement.lang = this.originalLang;
     });
+  }
+
+  message(indonesian: string, english: string): string {
+    return this.locale === 'en-US' ? english : indonesian;
   }
 }

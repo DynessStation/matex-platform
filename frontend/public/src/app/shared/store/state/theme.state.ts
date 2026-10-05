@@ -88,6 +88,8 @@ export class ThemeState {
 
   @Action(GetHomePage)
   getHomePage(ctx: StateContext<ThemesStateModel>, action: GetHomePage) {
+    ctx.patchState({ homePage: null });
+
     return this.themeService.getHomePage(action?.slug, action.locale).pipe(
       tap({
         next: (result) => {
@@ -95,8 +97,8 @@ export class ThemeState {
             homePage: result,
           });
         },
-        error: (err) => {
-          throw new Error(err?.error?.message);
+        error: () => {
+          ctx.patchState({ homePage: null });
         },
         complete: () => {},
       }),

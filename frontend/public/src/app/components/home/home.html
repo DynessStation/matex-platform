@@ -17,4 +17,31 @@
   @if (view.homePage?.slug === 'electro') {
     <app-electro [data]="view.homePage" [slug]="view.theme"></app-electro>
   }
+
+  @if (!view.homePage && state() !== 'loading') {
+    <section
+      class="section-t-space section-b-space"
+      [attr.lang]="locale"
+      [attr.aria-live]="state() === 'error' ? 'polite' : null"
+    >
+      <div class="custom-container text-center">
+        @if (state() === 'missing') {
+          <h2>{{ message('Beranda belum diterbitkan', 'Home page is not published') }}</h2>
+          <p>
+            {{
+              message(
+                'Konten beranda ini belum tersedia untuk pengunjung.',
+                'This home page is not currently available to visitors.'
+              )
+            }}
+          </p>
+        } @else {
+          <h2>{{ message('Beranda belum dapat dimuat', 'Unable to load the home page') }}</h2>
+          <p>
+            {{ message('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.') }}
+          </p>
+        }
+      </div>
+    </section>
+  }
 }
