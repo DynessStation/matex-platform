@@ -355,6 +355,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="category?.category_image ?? null"
                         (selectedFiles)="selectMedia('image_id', $event)"
                       />
@@ -367,6 +368,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="category?.category_icon ?? null"
                         (selectedFiles)="selectMedia('icon_id', $event)"
                       />
@@ -379,6 +381,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="category?.category_meta_image ?? null"
                         (selectedFiles)="selectMedia('og_image_id', $event)"
                       />

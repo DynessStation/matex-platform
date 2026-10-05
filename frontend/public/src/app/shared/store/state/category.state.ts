@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { tap } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 
 import { Category } from '../../interface/category.interface';
 import { CategoryService } from '../../services/category.service';
@@ -237,17 +237,11 @@ export class CategoryState {
   @Action(GetCategoryBySlug)
   getCategoryBySlug(ctx: StateContext<CategoryStateModel>, action: GetCategoryBySlug) {
     return this.categoryService.getCategoryBySlug(action.slug, action.locale).pipe(
-      tap({
-        next: (result) => {
-          const state = ctx.getState();
-          ctx.patchState({
-            ...state,
-            selectedCategory: result,
-          });
-        },
-        error: (err) => {
-          throw new Error(err?.error?.message);
-        },
+      tap((result) => ctx.patchState({ selectedCategory: result })),
+      catchError((error) => {
+        // Never leave the previous category selected when a new slug fails.
+        ctx.patchState({ selectedCategory: null });
+        return throwError(() => error);
       }),
     );
   }

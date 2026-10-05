@@ -4,7 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable, Subscription, map } from 'rxjs';
+import { Observable, Subscription, combineLatest, map } from 'rxjs';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
@@ -40,8 +40,8 @@ export class Category {
   );
   public layout: string = 'collection_category_slider';
   public skeleton: boolean = true;
-  public category: ICategory;
-  public activeCategory: string | null;
+  public category: ICategory | null = null;
+  public activeCategory: string | null = null;
   public filter: Params = {
     page: 1,
     paginate: 40,
@@ -62,24 +62,24 @@ export class Category {
   constructor(
     private route: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
-  ) {
-    if (this.route.snapshot.paramMap.get('slug')) {
-      this.activeCategory = this.route.snapshot.paramMap.get('slug');
-      this.filter['category'] = this.activeCategory;
-    }
-  }
+  ) {}
 
   ngOnInit() {
     this.subscriptions.add(
-      this.category$.subscribe((category) => {
-        this.category = category!;
-        if (category) this.applySeo(category);
+      combineLatest([this.route.paramMap, this.category$]).subscribe(([params, category]) => {
+        const slug = params.get('slug');
+        this.activeCategory = slug;
+
+        // Angular reuses this component when only the slug changes. Ignore the
+        // previous store value until the resolver has loaded the requested category.
+        if (!slug || !category || category.slug !== slug) return;
+
+        this.category = category;
+        this.applySeo(category);
+        this.filter['page'] = 1;
         this.updateFilterAndFetchProducts();
       }),
     );
-
-    this.filter['category'] = this.route.snapshot.paramMap.get('slug');
-    this.store.dispatch(new GetProducts(this.filter));
   }
 
   private updateFilterAndFetchProducts() {
@@ -102,7 +102,7 @@ export class Category {
   private applySeo(category: ICategory) {
     const title = category.meta_title || category.name;
     const description = category.meta_description || category.description || '';
-    const canonical = category.canonical_url || this.document.location?.href || '';
+    const canonical = this.safeCanonicalUrl(category.canonical_url);
     const image =
       category.category_meta_image?.original_url || category.category_image?.original_url;
     this.title.setTitle(title);
@@ -114,17 +114,34 @@ export class Category {
       property: 'og:description',
       content: category.og_description || description,
     });
-    if (image) this.meta.updateTag({ property: 'og:image', content: image });
+    if (image) {
+      this.meta.updateTag({ property: 'og:image', content: image });
+    } else {
+      this.meta.removeTag('property="og:image"');
+    }
     let link = this.document.querySelector<HTMLLinkElement>(
       'link[data-product-category-canonical]',
     );
     if (!link) {
       link = this.document.createElement('link');
       link.rel = 'canonical';
-      link.dataset['productCategoryCanonical'] = 'true';
+      link.setAttribute('data-product-category-canonical', '');
       this.document.head.appendChild(link);
     }
     link.href = canonical;
+  }
+
+  private safeCanonicalUrl(value?: string): string {
+    const fallback = this.document.location?.href || '';
+
+    if (!value) return fallback;
+
+    try {
+      const url = new URL(value, fallback || undefined);
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : fallback;
+    } catch {
+      return fallback;
+    }
   }
 
   ngOnDestroy() {

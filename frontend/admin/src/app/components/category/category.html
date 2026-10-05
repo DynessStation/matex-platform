@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-xl-4 p-0">
+  <div class="col-xl-3 col-lg-4 p-0">
     <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'categories'">
       <div button *hasPermission="'product_category.create'">
         @if (type() === 'edit') {
@@ -22,7 +22,7 @@
       </div>
     </app-page-wrapper>
   </div>
-  <div class="col-xl-8 p-0">
+  <div class="col-xl-9 col-lg-8 p-0">
     <app-form-category
       [categories]="(category$ | async)?.data"
       [type]="type()"

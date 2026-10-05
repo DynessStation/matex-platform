@@ -627,6 +627,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="$any(media.thumbnail)"
                         (selectedFiles)="selectMedia('thumbnail', $event)"
                       />
@@ -639,6 +640,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="$any(media.og)"
                         (selectedFiles)="selectMedia('og', $event)"
                       />
@@ -653,6 +655,7 @@
                       ><app-image-upload
                         [multipleImage]="true"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [images]="$any(media.gallery)"
                         (selectedFiles)="selectMedia('gallery', $event)"
                       />
