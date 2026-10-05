@@ -2,12 +2,12 @@
   "id": 1,
   "options": {
     "seo": {
-      "og_title": "Kartify Angular: Uniting Vendors for Shopping Excellence",
+      "og_title": "Matex: 100% Natural Latex",
       "meta_tags": "Matex: 100% Natural Latex",
-      "meta_title": "Online Angular, Vendor Collaboration, E-commerce Platform",
+      "meta_title": "Matex: 100% Natural Latex",
       "og_image_id": 107,
-      "og_description": "Experience a unique shopping journey at Kartify Angular, where vendors collaborate to provide a vast array of products. Explore, shop, and connection in one convenient destination.",
-      "meta_description": "Discover Kartify Angular – a vibrant online platform where vendors unite to showcase their products, creating a diverse shopping experience. Explore a wide range of offerings and connect with sellers on a single platform.",
+      "og_description": "Discover 100% Natural Latex – a vibrant online platform where vendors unite to showcase their products, creating a diverse shopping experience. Explore a wide range of offerings and connect with sellers on a single platform.",
+      "meta_description": "Discover 100% Natural Latex – a vibrant online platform where vendors unite to showcase their products, creating a diverse shopping experience. Explore a wide range of offerings and connect with sellers on a single platform.",
       "og_image": {
         "id": 107,
         "name": "fashion_two_1",
@@ -446,7 +446,7 @@
       "taglines": ["🌿 100% Natural Latex", "🎉 Special Offers"],
       "cart_style": "cart_sidebar",
       "site_title": "Matex: 100% Natural Latex",
-      "site_tagline": "Shop Unique, Sell Exceptional – Kartify Multi-Vendor Universe.",
+      "site_tagline": "Shop Unique, Sell Exceptional",
       "primary_color": "#ec8951",
       "secondary_color": null,
       "back_to_top_enable": true,

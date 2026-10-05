@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter, RouterModule } from '@angular/router';
+import { provideRouter, RouterModule, withInMemoryScrolling } from '@angular/router';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -71,7 +71,12 @@ export const appConfig: ApplicationConfig = {
     SeoService,
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled', // Tells Angular to look at the URL fragment and scroll to the matching ID
+      }),
+    ),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: LoaderInterceptor,

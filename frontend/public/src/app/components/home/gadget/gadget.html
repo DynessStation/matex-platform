@@ -59,212 +59,214 @@
 
 <!-- SECTION: KENAPA HARUS LATEX (MULTI-LANGUAGE & INTERACTIVE) -->
 @if (data()?.latex_features?.status !== false) {
-<section class="latex-features-section">
-  <div class="custom-container">
-    <div class="latex-features-header">
-      <span class="latex-subtitle">{{ isEnglish ? 'MATEX EXCELLENCE' : 'KEUNGGULAN MATEX' }}</span>
-      <h2 class="latex-title">
-        {{ isEnglish ? 'Why Choose 100% Natural Latex?' : 'Kenapa Harus 100% Natural Latex?' }}
-      </h2>
-      <p class="latex-intro">
-        {{
-          isEnglish
-            ? 'The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.'
-            : 'Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.'
-        }}
-      </p>
-    </div>
-
-    <!-- WRAPPER UTAMA (LAYOUT 2 KOLOM: MENU KIRI & KOTAK KANAN) -->
-    <div class="latex-interactive-wrapper">
-      <!-- KOLOM KIRI: DAFTAR TOMBOL ANGKA (01 - 08) -->
-      <div class="latex-tabs-list">
-        <button class="latex-tab-btn active" (click)="switchLatexTab(0)">
-          <span class="num">01</span>
-          <span class="label">{{
-            isEnglish ? 'High Elasticity & Responsiveness' : 'Elastisitas & Respon Tinggi'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(1)">
-          <span class="num">02</span>
-          <span class="label">{{
-            isEnglish ? 'Damping & Load Support' : 'Peredam & Penopang Beban'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(2)">
-          <span class="num">03</span>
-          <span class="label">{{
-            isEnglish ? 'Hypoallergenic & Hygienic' : 'Hipoalergenik & Higienis'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(3)">
-          <span class="num">04</span>
-          <span class="label">{{
-            isEnglish ? 'Harmful Chemical Free' : 'Bebas Bahan Kimia Berbahaya'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(4)">
-          <span class="num">05</span>
-          <span class="label">{{
-            isEnglish ? 'Airflow & Pinhole Structure' : 'Sirkulasi Udara & Pinhole'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(5)">
-          <span class="num">06</span>
-          <span class="label">{{
-            isEnglish ? 'Versatile Applications' : 'Fleksibel Berbagai Aplikasi'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(6)">
-          <span class="num">07</span>
-          <span class="label">{{
-            isEnglish ? 'Long-Lasting Durability' : 'Daya Tahan Jangka Panjang'
-          }}</span>
-        </button>
-        <button class="latex-tab-btn" (click)="switchLatexTab(7)">
-          <span class="num">08</span>
-          <span class="label">{{
-            isEnglish ? 'Eco-Friendly & Sustainable' : 'Ramah Lingkungan (Eco-Friendly)'
-          }}</span>
-        </button>
+  <section class="latex-features-section" id="matex-excellence">
+    <div class="custom-container">
+      <div class="latex-features-header">
+        <span class="latex-subtitle">{{
+          isEnglish ? 'MATEX EXCELLENCE' : 'KEUNGGULAN MATEX'
+        }}</span>
+        <h2 class="latex-title">
+          {{ isEnglish ? 'Why Choose 100% Natural Latex?' : 'Kenapa Harus 100% Natural Latex?' }}
+        </h2>
+        <p class="latex-intro">
+          {{
+            isEnglish
+              ? 'The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.'
+              : 'Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.'
+          }}
+        </p>
       </div>
 
-      <!-- KOLOM KANAN: KOTAK KONTEN BESAR (TRANSLUCENT & EFEK LATEKS) -->
-      <div class="latex-single-card-block">
-        <!-- Konten 01 -->
-        <div class="latex-content-panel active" id="panel-0">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">01</span>
-            <h3>
-              {{ isEnglish ? 'High Elasticity & Responsiveness' : 'Elastisitas & Respon Tinggi' }}
-            </h3>
-          </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.'
-                : 'Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.'
-            }}
-          </p>
+      <!-- WRAPPER UTAMA (LAYOUT 2 KOLOM: MENU KIRI & KOTAK KANAN) -->
+      <div class="latex-interactive-wrapper">
+        <!-- KOLOM KIRI: DAFTAR TOMBOL ANGKA (01 - 08) -->
+        <div class="latex-tabs-list">
+          <button class="latex-tab-btn active" (click)="switchLatexTab(0)">
+            <span class="num">01</span>
+            <span class="label">{{
+              isEnglish ? 'High Elasticity & Responsiveness' : 'Elastisitas & Respon Tinggi'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(1)">
+            <span class="num">02</span>
+            <span class="label">{{
+              isEnglish ? 'Damping & Load Support' : 'Peredam & Penopang Beban'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(2)">
+            <span class="num">03</span>
+            <span class="label">{{
+              isEnglish ? 'Hypoallergenic & Hygienic' : 'Hipoalergenik & Higienis'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(3)">
+            <span class="num">04</span>
+            <span class="label">{{
+              isEnglish ? 'Harmful Chemical Free' : 'Bebas Bahan Kimia Berbahaya'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(4)">
+            <span class="num">05</span>
+            <span class="label">{{
+              isEnglish ? 'Airflow & Pinhole Structure' : 'Sirkulasi Udara & Pinhole'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(5)">
+            <span class="num">06</span>
+            <span class="label">{{
+              isEnglish ? 'Versatile Applications' : 'Fleksibel Berbagai Aplikasi'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(6)">
+            <span class="num">07</span>
+            <span class="label">{{
+              isEnglish ? 'Long-Lasting Durability' : 'Daya Tahan Jangka Panjang'
+            }}</span>
+          </button>
+          <button class="latex-tab-btn" (click)="switchLatexTab(7)">
+            <span class="num">08</span>
+            <span class="label">{{
+              isEnglish ? 'Eco-Friendly & Sustainable' : 'Ramah Lingkungan (Eco-Friendly)'
+            }}</span>
+          </button>
         </div>
 
-        <!-- Konten 02 -->
-        <div class="latex-content-panel" id="panel-1">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">02</span>
-            <h3>{{ isEnglish ? 'Damping & Load Support' : 'Peredam & Penopang Beban' }}</h3>
+        <!-- KOLOM KANAN: KOTAK KONTEN BESAR (TRANSLUCENT & EFEK LATEKS) -->
+        <div class="latex-single-card-block">
+          <!-- Konten 01 -->
+          <div class="latex-content-panel active" id="panel-0">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">01</span>
+              <h3>
+                {{ isEnglish ? 'High Elasticity & Responsiveness' : 'Elastisitas & Respon Tinggi' }}
+              </h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.'
+                  : 'Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.'
-                : 'Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 03 -->
-        <div class="latex-content-panel" id="panel-2">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">03</span>
-            <h3>{{ isEnglish ? 'Hypoallergenic & Hygienic' : 'Hipoalergenik & Higienis' }}</h3>
+          <!-- Konten 02 -->
+          <div class="latex-content-panel" id="panel-1">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">02</span>
+              <h3>{{ isEnglish ? 'Damping & Load Support' : 'Peredam & Penopang Beban' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.'
+                  : 'Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.'
-                : 'Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 04 -->
-        <div class="latex-content-panel" id="panel-3">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">04</span>
-            <h3>{{ isEnglish ? 'Harmful Chemical Free' : 'Bebas Bahan Kimia Berbahaya' }}</h3>
+          <!-- Konten 03 -->
+          <div class="latex-content-panel" id="panel-2">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">03</span>
+              <h3>{{ isEnglish ? 'Hypoallergenic & Hygienic' : 'Hipoalergenik & Higienis' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.'
+                  : 'Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.'
-                : 'Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 05 -->
-        <div class="latex-content-panel" id="panel-4">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">05</span>
-            <h3>{{ isEnglish ? 'Airflow & Pinhole Structure' : 'Sirkulasi Udara & Pinhole' }}</h3>
+          <!-- Konten 04 -->
+          <div class="latex-content-panel" id="panel-3">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">04</span>
+              <h3>{{ isEnglish ? 'Harmful Chemical Free' : 'Bebas Bahan Kimia Berbahaya' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.'
+                  : 'Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.'
-                : 'Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 06 -->
-        <div class="latex-content-panel" id="panel-5">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">06</span>
-            <h3>{{ isEnglish ? 'Versatile Applications' : 'Fleksibel Berbagai Aplikasi' }}</h3>
+          <!-- Konten 05 -->
+          <div class="latex-content-panel" id="panel-4">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">05</span>
+              <h3>{{ isEnglish ? 'Airflow & Pinhole Structure' : 'Sirkulasi Udara & Pinhole' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.'
+                  : 'Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.'
-                : 'Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 07 -->
-        <div class="latex-content-panel" id="panel-6">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">07</span>
-            <h3>{{ isEnglish ? 'Long-Lasting Durability' : 'Daya Tahan Jangka Panjang' }}</h3>
+          <!-- Konten 06 -->
+          <div class="latex-content-panel" id="panel-5">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">06</span>
+              <h3>{{ isEnglish ? 'Versatile Applications' : 'Fleksibel Berbagai Aplikasi' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.'
+                  : 'Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.'
-                : 'Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.'
-            }}
-          </p>
-        </div>
 
-        <!-- Konten 08 -->
-        <div class="latex-content-panel" id="panel-7">
-          <div class="panel-header-mobile">
-            <span class="latex-item-number">08</span>
-            <h3>
-              {{ isEnglish ? 'Eco-Friendly & Sustainable' : 'Ramah Lingkungan (Eco-Friendly)' }}
-            </h3>
+          <!-- Konten 07 -->
+          <div class="latex-content-panel" id="panel-6">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">07</span>
+              <h3>{{ isEnglish ? 'Long-Lasting Durability' : 'Daya Tahan Jangka Panjang' }}</h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.'
+                  : 'Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.'
+              }}
+            </p>
           </div>
-          <p>
-            {{
-              isEnglish
-                ? 'Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.'
-                : 'Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.'
-            }}
-          </p>
+
+          <!-- Konten 08 -->
+          <div class="latex-content-panel" id="panel-7">
+            <div class="panel-header-mobile">
+              <span class="latex-item-number">08</span>
+              <h3>
+                {{ isEnglish ? 'Eco-Friendly & Sustainable' : 'Ramah Lingkungan (Eco-Friendly)' }}
+              </h3>
+            </div>
+            <p>
+              {{
+                isEnglish
+                  ? 'Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.'
+                  : 'Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.'
+              }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 }
 
 <!--/// ======= ///-->
 
 @if (content$ | async; as content) {
   @if (data()?.categories?.status !== false && content.categories.length) {
-    <section class="mt-20 public-home-section">
+    <section class="mt-20 public-home-section" id="categories">
       <div class="custom-container">
         <div class="light-bg-color">
           <div class="section-heading">
@@ -302,7 +304,7 @@
   }
 
   @if (data()?.products?.status !== false && content.products.length) {
-    <section class="section-t-space public-home-section">
+    <section class="section-t-space public-home-section" id="products">
       <div class="custom-container">
         <div class="section-heading">
           <div>
@@ -355,7 +357,7 @@
   }
 
   @if (data()?.articles?.status !== false && content.articles.length) {
-    <section class="section-t-space public-home-section">
+    <section class="section-t-space public-home-section" id="articles">
       <div class="custom-container">
         <div class="section-heading">
           <div>
