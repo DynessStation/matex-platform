@@ -206,6 +206,62 @@ test("published pages require the Indonesian translation to be published", async
   assert.equal(began, 0);
 });
 
+test("home rejects incomplete section settings before a transaction begins", async () => {
+  reset();
+  const response = await request("home", {
+    is_published: false,
+    translations: translations.map((translation) => ({
+      ...translation,
+      content: { home_contract_version: 2, categories: { status: true } },
+    })),
+    media: [],
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).code, "WEBSITE_HOME_CONTENT_INVALID");
+  assert.equal(connectionRequested, 0);
+  assert.equal(began, 0);
+});
+
+test("home saves only its current section contract and clears unused HTML", async () => {
+  reset();
+  const content = {
+    home_contract_version: 2,
+    latex_features: { status: true },
+    categories: { status: true },
+    products: { status: true },
+    articles: { status: true },
+    tags: { status: false, title: "Popular tags" },
+    newsletter: { status: false },
+    sale_product: { status: true },
+  };
+  const response = await request("home", {
+    is_published: false,
+    translations: translations.map((translation) => ({
+      ...translation,
+      body_html: "<p>Unused legacy home copy</p>",
+      content,
+    })),
+    media: [],
+  });
+
+  assert.equal(response.status, 200);
+  const writes = connectionCalls.filter((call) =>
+    call.sql.includes("INSERT INTO website_page_i18n"),
+  );
+  assert.equal(writes.length, 2);
+  assert.equal(writes[0].params[6], null);
+  assert.deepEqual(JSON.parse(String(writes[0].params[7])), {
+    home_contract_version: 2,
+    latex_features: { status: true },
+    categories: { status: true },
+    products: { status: true },
+    articles: { status: true },
+    tags: { status: false, title: "Popular tags" },
+    newsletter: { status: false },
+  });
+});
+
 test("fixed paths and all related page data are saved in one transaction", async () => {
   reset();
   const response = await request("about", {

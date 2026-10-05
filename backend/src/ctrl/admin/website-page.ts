@@ -40,6 +40,14 @@ const HOME_MEDIA_SLOTS = [
   "home_tile_3",
   "home_tile_4",
 ] as const;
+const HOME_CONTENT_SECTION_KEYS = [
+  "latex_features",
+  "categories",
+  "products",
+  "articles",
+  "tags",
+  "newsletter",
+] as const;
 const PAGE_MEDIA_SLOTS: Record<string, Set<string>> = {
   home: new Set([...HOME_MEDIA_SLOTS, "og"]),
   about: new Set(["about_content", "og"]),
@@ -169,6 +177,41 @@ const jsonValue = (value: unknown, field: string): unknown | null => {
       `${field} must be valid JSON data`,
     );
   }
+};
+
+const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    Array.isArray(value) ||
+    (value as Record<string, unknown>)["home_contract_version"] !== 2
+  ) {
+    throw new PayloadError(
+      "WEBSITE_HOME_CONTENT_INVALID",
+      "Home content settings use an unsupported format",
+    );
+  }
+
+  const source = value as Record<string, unknown>;
+  const content: Record<string, unknown> = { home_contract_version: 2 };
+
+  for (const key of HOME_CONTENT_SECTION_KEYS) {
+    const section = source[key];
+    if (
+      typeof section !== "object" ||
+      section === null ||
+      Array.isArray(section) ||
+      typeof (section as Record<string, unknown>)["status"] !== "boolean"
+    ) {
+      throw new PayloadError(
+        "WEBSITE_HOME_CONTENT_INVALID",
+        `Home section ${key} requires a visibility setting`,
+      );
+    }
+    content[key] = { ...(section as Record<string, unknown>) };
+  }
+
+  return content;
 };
 
 const dateValue = (value: unknown, field: string): Date | null => {
@@ -304,13 +347,17 @@ const parseSavePayload = (pageKey: string, body: any) => {
         "Canonical URL must be an absolute HTTP or HTTPS URL",
       );
     }
+    const content = jsonValue(item.content, "Structured page content");
     return {
       locale: locale as (typeof SUPPORTED_LOCALES)[number],
       path: FIXED_PATHS[pageKey][locale as (typeof SUPPORTED_LOCALES)[number]],
       title,
       summary: optionalString(item.summary, "Summary", 65535),
-      bodyHtml: optionalString(item.body_html, "Page content", 2_000_000),
-      content: jsonValue(item.content, "Structured page content"),
+      bodyHtml:
+        pageKey === "home"
+          ? null
+          : optionalString(item.body_html, "Page content", 2_000_000),
+      content: pageKey === "home" ? normalizeHomeContent(content) : content,
       seoTitle: optionalString(seo.title, "SEO title", 255),
       seoDescription: optionalString(seo.description, "SEO description", 500),
       seoKeywords: optionalString(seo.keywords, "SEO keywords", 500),
