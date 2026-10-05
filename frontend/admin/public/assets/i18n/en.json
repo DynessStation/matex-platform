@@ -2057,6 +2057,10 @@
     "operational_faq_help": "Questions and answers are still managed in the FAQ menu. Here you only manage the page title, summary, SEO, social sharing image, and publication status.",
     "media_title": "Page Media",
     "media_help": "Choose images used by this page from the Media Library.",
+    "about_media_title": "Main About MATEX image",
+    "about_media_requirement": "Use one JPEG, PNG, or WebP content image. Alternative text is required for every published language.",
+    "about_media_missing": "Choose an image with the Main About MATEX image slot before publishing this page.",
+    "about_media_format_invalid": "The main image must use JPEG, PNG, or WebP format.",
     "select_media": "Select Media",
     "media_language_help": "Captions and alternative text follow the selected language.",
     "media_hero": "Hero",
@@ -2143,6 +2147,10 @@
       "slug_pattern": "The slug may only contain lowercase letters, numbers, and hyphens.",
       "slug_max_length": "The slug cannot exceed 191 characters.",
       "canonical_url_invalid": "The canonical URL must use http:// or https://.",
+      "about_highlight_pair_required": "Complete both the title and description, or leave both empty.",
+      "about_highlight_title_max_length": "A highlight title can contain up to 160 characters.",
+      "about_highlight_description_max_length": "A highlight description can contain up to 1,000 characters.",
+      "about_media_alt_required": "Alternative text is required for the main image in every published language.",
       "schedule_future_required": "The publication time is required and must be in the future.",
       "unpublish_after_publish": "The end time must be later than the publication start time."
     }

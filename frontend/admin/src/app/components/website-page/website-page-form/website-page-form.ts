@@ -83,6 +83,10 @@ interface AboutFeatureDraft {
   description: string;
 }
 
+const ABOUT_CONTRACT_VERSION = 1;
+const ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH = 160;
+const ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH = 1000;
+
 //==================================================
 //==== MEDIA DRAFT
 //==================================================
@@ -729,10 +733,17 @@ export class WebsitePageForm {
 
   private readAboutFeatures(content: unknown): AboutFeatureDraft[] {
     const result = this.createAboutFeatures();
-    if (!this.isRecord(content) || !Array.isArray(content['features']))
-      return result;
+    if (!this.isRecord(content)) return result;
 
-    content['features'].slice(0, 3).forEach((item, index) => {
+    const highlights =
+      content['about_contract_version'] === ABOUT_CONTRACT_VERSION &&
+      Array.isArray(content['highlights'])
+        ? content['highlights']
+        : Array.isArray(content['features'])
+          ? content['features']
+          : [];
+
+    highlights.slice(0, 3).forEach((item, index) => {
       if (!this.isRecord(item)) return;
       result[index] = {
         title: typeof item['title'] === 'string' ? item['title'] : '',
@@ -746,16 +757,57 @@ export class WebsitePageForm {
 
   private buildAboutContentJson(
     locale: WebsitePageEditorLocale,
-    existing: unknown,
+    _existing: unknown,
   ): Record<string, unknown> {
-    const content = this.isRecord(existing) ? { ...existing } : {};
-    content['features'] = this.aboutFeatures[locale]
-      .map((feature) => ({
-        title: feature.title.trim(),
-        description: feature.description.trim(),
-      }))
-      .filter((feature) => feature.title && feature.description);
-    return content;
+    return {
+      about_contract_version: ABOUT_CONTRACT_VERSION,
+      highlights: this.aboutFeatures[locale]
+        .map((feature) => ({
+          title: feature.title.trim(),
+          description: feature.description.trim(),
+        }))
+        .filter((feature) => feature.title && feature.description),
+    };
+  }
+
+  aboutHighlightIssue(
+    locale: WebsitePageEditorLocale,
+    index: number,
+  ): string | null {
+    if (!this.isAboutTemplate) return null;
+
+    const highlight = this.aboutFeatures[locale][index];
+    const title = highlight?.title.trim() ?? '';
+    const description = highlight?.description.trim() ?? '';
+
+    if (Boolean(title) !== Boolean(description)) {
+      return 'website_page.validation.about_highlight_pair_required';
+    }
+    if (title.length > ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH) {
+      return 'website_page.validation.about_highlight_title_max_length';
+    }
+    if (description.length > ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH) {
+      return 'website_page.validation.about_highlight_description_max_length';
+    }
+
+    return null;
+  }
+
+  private firstInvalidAboutLocale(): WebsitePageEditorLocale | null {
+    if (!this.isAboutTemplate) return null;
+
+    for (const language of this.supportedLanguages) {
+      if (
+        this.isLanguageEnabled(language.locale) &&
+        this.aboutFeatures[language.locale].some((_, index) =>
+          Boolean(this.aboutHighlightIssue(language.locale, index)),
+        )
+      ) {
+        return language.locale;
+      }
+    }
+
+    return null;
   }
 
   updateAboutFeature(
@@ -927,6 +979,13 @@ export class WebsitePageForm {
   //==================================================
 
   goToSeo(): void {
+    const invalidAboutLocale = this.firstInvalidAboutLocale();
+    if (invalidAboutLocale) {
+      this.activeLocale = invalidAboutLocale;
+      this.activeTab = 'content';
+      return;
+    }
+
     let invalidLocale: WebsitePageEditorLocale | null = null;
 
     this.supportedLanguages.forEach((language) => {
@@ -1296,6 +1355,51 @@ export class WebsitePageForm {
     );
   }
 
+  get aboutContentMedia(): WebsitePageEditorMediaDraft | null {
+    return (
+      this.pageMedia.find(
+        (media) => media.role === 'about_content' && media.is_public,
+      ) ?? null
+    );
+  }
+
+  get aboutRequiresCompleteMedia(): boolean {
+    return (
+      this.isAboutTemplate &&
+      ['published', 'scheduled'].includes(this.previewEffectiveStatus())
+    );
+  }
+
+  get aboutContentMediaFileInvalid(): boolean {
+    return Boolean(
+      this.aboutContentMedia &&
+      !this.pageMediaAccept.includes(
+        this.aboutContentMedia.attachment.mime_type,
+      ),
+    );
+  }
+
+  aboutContentMediaAltMissing(locale: WebsitePageEditorLocale): boolean {
+    return Boolean(
+      this.aboutContentMedia &&
+      this.isLanguageEnabled(locale) &&
+      this.translationForm(locale).controls.status.value === 1 &&
+      !this.aboutContentMedia.translations[locale].alt_text.trim(),
+    );
+  }
+
+  get aboutMediaBlocksSave(): boolean {
+    if (!this.aboutRequiresCompleteMedia) return false;
+
+    return (
+      !this.aboutContentMedia ||
+      this.aboutContentMediaFileInvalid ||
+      this.supportedLanguages.some((language) =>
+        this.aboutContentMediaAltMissing(language.locale),
+      )
+    );
+  }
+
   removeMedia(index: number): void {
     const wasHero = this.pageMedia[index]?.role === 'hero';
 
@@ -1478,6 +1582,19 @@ export class WebsitePageForm {
 
   goToPreview(): void {
     this.publicationValidationAttempted = true;
+    this.mediaValidationAttempted = true;
+
+    const invalidAboutLocale = this.firstInvalidAboutLocale();
+    if (invalidAboutLocale) {
+      this.activeLocale = invalidAboutLocale;
+      this.activeTab = 'content';
+      return;
+    }
+
+    if (this.aboutMediaBlocksSave || this.gadgetHomeMediaBlocksSave) {
+      this.activeTab = 'media';
+      return;
+    }
 
     if (
       this.publicationRequiresPublishedTranslation &&
@@ -1513,6 +1630,21 @@ export class WebsitePageForm {
     }
 
     this.publicationValidationAttempted = true;
+    this.mediaValidationAttempted = true;
+
+    const invalidAboutLocale = this.firstInvalidAboutLocale();
+    if (invalidAboutLocale) {
+      event.preventDefault();
+      this.activeLocale = invalidAboutLocale;
+      this.activeTab = 'content';
+      return;
+    }
+
+    if (this.aboutMediaBlocksSave || this.gadgetHomeMediaBlocksSave) {
+      event.preventDefault();
+      this.activeTab = 'media';
+      return;
+    }
 
     if (
       this.publicationRequiresPublishedTranslation &&
@@ -1909,7 +2041,7 @@ export class WebsitePageForm {
       return;
     }
 
-    if (this.gadgetHomeMediaBlocksSave) {
+    if (this.gadgetHomeMediaBlocksSave || this.aboutMediaBlocksSave) {
       this.activeTab = 'media';
 
       return;
@@ -2062,6 +2194,15 @@ export class WebsitePageForm {
       }
 
       if (group.controls.title.invalid || group.controls.slug.invalid) {
+        return { tab: 'content', locale: language.locale };
+      }
+
+      if (
+        this.isAboutTemplate &&
+        this.aboutFeatures[language.locale].some((_, index) =>
+          Boolean(this.aboutHighlightIssue(language.locale, index)),
+        )
+      ) {
         return { tab: 'content', locale: language.locale };
       }
 

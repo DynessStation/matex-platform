@@ -15,18 +15,16 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { catchError, combineLatest, filter, Observable, of, take, timeout } from 'rxjs';
+import { catchError, of, timeout } from 'rxjs';
 import SwiperCore, { Swiper } from 'swiper';
 import { EffectCards, Navigation } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
-import { IAboutUs, Option } from '../../../shared/interface/theme-option.interface';
+import { IAboutUs } from '../../../shared/interface/theme-option.interface';
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
 import { WebsitePageService } from '../../../shared/services/website-page.service';
-import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
 
 SwiperCore.use([Navigation, EffectCards]);
@@ -51,10 +49,6 @@ export class AboutUs {
   private readonly response = inject(RESPONSE_INIT, { optional: true });
 
   private readonly originalLang = this.document.documentElement.lang;
-
-  themeOptions$: Observable<Option | null> = inject(Store).select(
-    ThemeOptionState.themeOptions,
-  ) as Observable<Option | null>;
 
   readonly teamSwiperContainer = viewChild<ElementRef>('teamSwiperContainer');
   readonly testimonialSwiperContainer = viewChild<ElementRef>('testimonialSwiperContainer');
@@ -98,6 +92,8 @@ export class AboutUs {
 
   public aboutUs?: IAboutUs;
 
+  public aboutImageAlt = '';
+
   readonly pageState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
 
   public breadcrumb: breadcrumb = this.createBreadcrumb();
@@ -114,18 +110,9 @@ export class AboutUs {
       this.response.headers = headers;
     }
 
-    combineLatest([
-      this.themeOptions$.pipe(
-        filter((option): option is Option => Boolean(option?.about_us)),
-        take(1),
-        timeout(15000),
-        catchError(() => {
-          this.pageState.set('error');
-          if (this.response) this.response.status = 503;
-          return of(null);
-        }),
-      ),
-      this.websitePageService.getPage(locale, path).pipe(
+    this.websitePageService
+      .getPage(locale, path)
+      .pipe(
         timeout(15000),
         catchError((error: unknown) => {
           const missing = error instanceof HttpErrorResponse && error.status === 404;
@@ -133,29 +120,36 @@ export class AboutUs {
           if (this.response) this.response.status = missing ? 404 : 503;
           return of(null);
         }),
-      ),
-    ])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([option, page]) => {
-        if (!option || !page) return;
-
-        const template = option.about_us;
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((page) => {
+        if (!page) return;
 
         const contentImage = page.media.find((media) => media.slot === 'about_content');
+        this.aboutImageAlt = contentImage?.alt_text || page.title;
 
         this.aboutUs = {
-          ...template,
           about: {
-            ...template.about,
+            status: true,
             title: page.title,
             description: page.summary || '',
             futures: this.readAboutFeatures(page.content),
-            content_bg_image_url: contentImage?.asset_url || template.about.content_bg_image_url,
+            content_bg_image_url:
+              contentImage?.asset_url || 'assets/images/inner-page/about-us.jpg',
           },
           team: {
-            ...template.team,
             status: false,
+            sub_title: '',
+            title: '',
+            description: '',
             members: [],
+          },
+          testimonial: {
+            status: false,
+            sub_title: '',
+            title: locale === 'en-US' ? 'Testimonials' : 'Testimoni',
+            description: '',
+            reviews: [],
           },
         };
         this.breadcrumb.title = page.title;
@@ -177,7 +171,11 @@ export class AboutUs {
   private readAboutFeatures(content: unknown): IAboutUs['about']['futures'] {
     if (!content || typeof content !== 'object' || Array.isArray(content)) return [];
 
-    const features = (content as Record<string, unknown>)['features'];
+    const source = content as Record<string, unknown>;
+    const features =
+      source['about_contract_version'] === 1 && Array.isArray(source['highlights'])
+        ? source['highlights']
+        : source['features'];
     if (!Array.isArray(features)) return [];
 
     return features
@@ -191,7 +189,7 @@ export class AboutUs {
         description: typeof item['description'] === 'string' ? item['description'] : '',
       }))
       .filter((item) => item.title && item.description)
-      .slice(0, 6);
+      .slice(0, 3);
   }
 
   private createBreadcrumb(): breadcrumb {

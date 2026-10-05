@@ -141,7 +141,7 @@ const translations = [
     title: "Tentang MATEX",
     summary: "Ringkasan",
     body_html: "<p>Isi</p>",
-    content: { features: [] },
+    content: { about_contract_version: 1, highlights: [] },
     seo: { title: "Tentang MATEX", schema: { "@type": "AboutPage" } },
     is_published: true,
   },
@@ -151,7 +151,7 @@ const translations = [
     title: "About MATEX",
     summary: "Summary",
     body_html: "<p>Content</p>",
-    content: { features: [] },
+    content: { about_contract_version: 1, highlights: [] },
     seo: { title: "About MATEX" },
     is_published: true,
   },
@@ -262,6 +262,74 @@ test("home saves only its current section contract and clears unused HTML", asyn
   });
 });
 
+test("about rejects legacy or incomplete content before a transaction begins", async () => {
+  reset();
+  const response = await request("about", {
+    is_published: false,
+    translations: translations.map((translation) => ({
+      ...translation,
+      content: { features: [] },
+    })),
+    media: [],
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).code, "WEBSITE_ABOUT_CONTENT_INVALID");
+  assert.equal(connectionRequested, 0);
+});
+
+test("about saves only its current highlight contract and clears unused HTML", async () => {
+  reset();
+  const response = await request("about", {
+    is_published: false,
+    translations: translations.map((translation) => ({
+      ...translation,
+      body_html: "<p>Unused legacy About copy</p>",
+      content: {
+        about_contract_version: 1,
+        highlights: [{ title: "Natural latex", description: "Description" }],
+      },
+    })),
+    media: [],
+  });
+
+  assert.equal(response.status, 200);
+  const writes = connectionCalls.filter((call) =>
+    call.sql.includes("INSERT INTO website_page_i18n"),
+  );
+  assert.equal(writes.length, 2);
+  assert.equal(writes[0].params[6], null);
+  assert.deepEqual(JSON.parse(String(writes[0].params[7])), {
+    about_contract_version: 1,
+    highlights: [{ title: "Natural latex", description: "Description" }],
+  });
+});
+
+test("published about requires alternative text for every published language", async () => {
+  reset();
+  const response = await request("about", {
+    is_published: true,
+    translations,
+    media: [
+      {
+        id_attachment: keyhsid.idAttachment.encode(27),
+        slot: "about_content",
+        is_visible: true,
+        click_action: "none",
+        click_target: null,
+        translations: [{ locale: "id-ID", alt_text: "MATEX", caption: null }],
+      },
+    ],
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal(
+    (await response.json()).code,
+    "WEBSITE_ABOUT_MEDIA_ALT_REQUIRED",
+  );
+  assert.equal(connectionRequested, 0);
+});
+
 test("fixed paths and all related page data are saved in one transaction", async () => {
   reset();
   const response = await request("about", {
@@ -362,7 +430,10 @@ test("unavailable media rolls back before existing relations are replaced", asyn
         is_visible: true,
         click_action: "none",
         click_target: null,
-        translations: [],
+        translations: [
+          { locale: "id-ID", alt_text: "MATEX", caption: null },
+          { locale: "en-US", alt_text: "MATEX", caption: null },
+        ],
       },
     ],
   });

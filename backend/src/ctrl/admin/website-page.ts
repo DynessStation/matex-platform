@@ -48,6 +48,10 @@ const HOME_CONTENT_SECTION_KEYS = [
   "tags",
   "newsletter",
 ] as const;
+const ABOUT_CONTRACT_VERSION = 1;
+const ABOUT_HIGHLIGHT_LIMIT = 3;
+const ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH = 160;
+const ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH = 1000;
 const PAGE_MEDIA_SLOTS: Record<string, Set<string>> = {
   home: new Set([...HOME_MEDIA_SLOTS, "og"]),
   about: new Set(["about_content", "og"]),
@@ -214,6 +218,65 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
   return content;
 };
 
+const normalizeAboutContent = (value: unknown): Record<string, unknown> => {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    Array.isArray(value) ||
+    (value as Record<string, unknown>)["about_contract_version"] !==
+      ABOUT_CONTRACT_VERSION
+  ) {
+    throw new PayloadError(
+      "WEBSITE_ABOUT_CONTENT_INVALID",
+      "About MATEX content settings use an unsupported format",
+    );
+  }
+
+  const highlights = (value as Record<string, unknown>)["highlights"];
+  if (!Array.isArray(highlights) || highlights.length > ABOUT_HIGHLIGHT_LIMIT) {
+    throw new PayloadError(
+      "WEBSITE_ABOUT_CONTENT_INVALID",
+      `About MATEX supports up to ${ABOUT_HIGHLIGHT_LIMIT} highlights`,
+    );
+  }
+
+  const normalizedHighlights = highlights.map((item) => {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) {
+      throw new PayloadError(
+        "WEBSITE_ABOUT_CONTENT_INVALID",
+        "Each About MATEX highlight needs a title and description",
+      );
+    }
+
+    const source = item as Record<string, unknown>;
+    const title =
+      typeof source["title"] === "string" ? source["title"].trim() : "";
+    const description =
+      typeof source["description"] === "string"
+        ? source["description"].trim()
+        : "";
+
+    if (
+      !title ||
+      !description ||
+      title.length > ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH ||
+      description.length > ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH
+    ) {
+      throw new PayloadError(
+        "WEBSITE_ABOUT_CONTENT_INVALID",
+        "Each About MATEX highlight needs a valid title and description",
+      );
+    }
+
+    return { title, description };
+  });
+
+  return {
+    about_contract_version: ABOUT_CONTRACT_VERSION,
+    highlights: normalizedHighlights,
+  };
+};
+
 const dateValue = (value: unknown, field: string): Date | null => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value !== "string") {
@@ -354,10 +417,15 @@ const parseSavePayload = (pageKey: string, body: any) => {
       title,
       summary: optionalString(item.summary, "Summary", 65535),
       bodyHtml:
-        pageKey === "home"
+        pageKey === "home" || pageKey === "about"
           ? null
           : optionalString(item.body_html, "Page content", 2_000_000),
-      content: pageKey === "home" ? normalizeHomeContent(content) : content,
+      content:
+        pageKey === "home"
+          ? normalizeHomeContent(content)
+          : pageKey === "about"
+            ? normalizeAboutContent(content)
+            : content,
       seoTitle: optionalString(seo.title, "SEO title", 255),
       seoDescription: optionalString(seo.description, "SEO description", 500),
       seoKeywords: optionalString(seo.keywords, "SEO keywords", 500),
@@ -481,6 +549,28 @@ const parseSavePayload = (pageKey: string, body: any) => {
         "WEBSITE_PAGE_MEDIA_REQUIRED",
         `Complete required page images: ${missing.join(", ")}`,
       );
+    }
+
+    if (pageKey === "about") {
+      const contentImage = media.find(
+        (item: any) => item.slot === "about_content" && item.isVisible === 1,
+      );
+      const publishedLocales = translations
+        .filter((item: any) => item.isPublished === 1)
+        .map((item: any) => item.locale);
+      const missingAltLocales = publishedLocales.filter((locale: string) => {
+        const text = contentImage?.translations.find(
+          (item: any) => item.locale === locale,
+        );
+        return !text?.altText;
+      });
+
+      if (missingAltLocales.length) {
+        throw new PayloadError(
+          "WEBSITE_ABOUT_MEDIA_ALT_REQUIRED",
+          `About MATEX image alternative text is required for: ${missingAltLocales.join(", ")}`,
+        );
+      }
     }
   }
 

@@ -560,10 +560,14 @@
                           <div class="cms-home-section-contract">
                             <div class="mb-3">
                               <h6 class="mb-1">
-                                {{ 'website_page.home_sections_title' | translate }}
+                                {{
+                                  'website_page.home_sections_title' | translate
+                                }}
                               </h6>
                               <p class="text-muted mb-0">
-                                {{ 'website_page.home_sections_help' | translate }}
+                                {{
+                                  'website_page.home_sections_help' | translate
+                                }}
                               </p>
                             </div>
 
@@ -577,8 +581,12 @@
                                     class="d-flex justify-content-between gap-3"
                                   >
                                     <div>
-                                      <strong>{{ section.labelKey | translate }}</strong>
-                                      <small>{{ section.descriptionKey | translate }}</small>
+                                      <strong>{{
+                                        section.labelKey | translate
+                                      }}</strong>
+                                      <small>{{
+                                        section.descriptionKey | translate
+                                      }}</small>
                                     </div>
 
                                     <div class="form-check form-switch mb-0">
@@ -662,6 +670,13 @@
                                     <input
                                       type="text"
                                       class="form-control mb-3"
+                                      [class.is-invalid]="
+                                        aboutHighlightIssue(
+                                          activeLocale,
+                                          featureIndex
+                                        )
+                                      "
+                                      maxlength="160"
                                       [value]="feature.title"
                                       (input)="
                                         updateAboutFeature(
@@ -681,6 +696,13 @@
                                     </label>
                                     <textarea
                                       class="form-control"
+                                      [class.is-invalid]="
+                                        aboutHighlightIssue(
+                                          activeLocale,
+                                          featureIndex
+                                        )
+                                      "
+                                      maxlength="1000"
                                       rows="4"
                                       [value]="feature.description"
                                       (input)="
@@ -692,6 +714,18 @@
                                         )
                                       "
                                     ></textarea>
+
+                                    @if (
+                                      aboutHighlightIssue(
+                                        activeLocale,
+                                        featureIndex
+                                      );
+                                      as issue
+                                    ) {
+                                      <div class="invalid-feedback d-block">
+                                        {{ issue | translate }}
+                                      </div>
+                                    }
                                   </div>
                                 </div>
                               }
@@ -1182,6 +1216,38 @@
                     </div>
                   }
 
+                  @if (isAboutTemplate) {
+                    <div
+                      class="alert mb-4"
+                      [class.alert-danger]="
+                        mediaValidationAttempted && aboutMediaBlocksSave
+                      "
+                      [class.alert-info]="
+                        !mediaValidationAttempted || !aboutMediaBlocksSave
+                      "
+                      role="note"
+                    >
+                      <strong>
+                        {{ 'website_page.about_media_title' | translate }}
+                      </strong>
+                      <div>
+                        {{ 'website_page.about_media_requirement' | translate }}
+                      </div>
+                      @if (aboutRequiresCompleteMedia && !aboutContentMedia) {
+                        <div class="mt-1">
+                          {{ 'website_page.about_media_missing' | translate }}
+                        </div>
+                      } @else if (aboutContentMediaFileInvalid) {
+                        <div class="mt-1">
+                          {{
+                            'website_page.about_media_format_invalid'
+                              | translate
+                          }}
+                        </div>
+                      }
+                    </div>
+                  }
+
                   @if (pageMedia.length) {
                     <!--==================================================-->
                     <!--==== LANGUAGE =====================================-->
@@ -1347,6 +1413,12 @@
                                 <input
                                   type="text"
                                   class="form-control"
+                                  [class.is-invalid]="
+                                    media.role === 'about_content' &&
+                                    mediaValidationAttempted &&
+                                    aboutRequiresCompleteMedia &&
+                                    aboutContentMediaAltMissing(activeLocale)
+                                  "
                                   [value]="
                                     media.translations[activeLocale].alt_text
                                   "
@@ -1370,6 +1442,20 @@
                                       | translate
                                   }}
                                 </small>
+
+                                @if (
+                                  media.role === 'about_content' &&
+                                  mediaValidationAttempted &&
+                                  aboutRequiresCompleteMedia &&
+                                  aboutContentMediaAltMissing(activeLocale)
+                                ) {
+                                  <div class="invalid-feedback d-block">
+                                    {{
+                                      'website_page.validation.about_media_alt_required'
+                                        | translate
+                                    }}
+                                  </div>
+                                }
                               </div>
                             </div>
 

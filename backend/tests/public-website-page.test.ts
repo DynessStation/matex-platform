@@ -94,8 +94,11 @@ test("response exposes the clean website contract and safe media", async () => {
         website_page_path: "tentang-matex",
         website_page_title: "Tentang MATEX",
         website_page_summary: "Tentang perusahaan",
-        website_page_body_html: "<p>Isi</p>",
-        website_page_content_json: JSON.stringify({ features: [] }),
+        website_page_body_html: null,
+        website_page_content_json: JSON.stringify({
+          about_contract_version: 1,
+          highlights: [],
+        }),
         website_page_social_title: "Kenali MATEX",
       },
     ],
@@ -122,7 +125,10 @@ test("response exposes the clean website contract and safe media", async () => {
 
   assert.equal(data.key, "about");
   assert.equal(data.path, "tentang-matex");
-  assert.deepEqual(data.content, { features: [] });
+  assert.deepEqual(data.content, {
+    about_contract_version: 1,
+    highlights: [],
+  });
   assert.equal(data.template, undefined);
   assert.equal(data.id_website_page, undefined);
   assert.equal(data.seo.title, "Tentang MATEX");

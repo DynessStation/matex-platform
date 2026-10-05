@@ -2057,6 +2057,10 @@
     "operational_faq_help": "Daftar pertanyaan dan jawaban tetap dikelola melalui menu FAQ. Di sini Anda hanya mengatur judul, ringkasan, SEO, gambar saat dibagikan, dan status publikasi halaman.",
     "media_title": "Media Halaman",
     "media_help": "Pilih gambar yang digunakan oleh halaman ini dari Pustaka Media.",
+    "about_media_title": "Gambar utama Tentang MATEX",
+    "about_media_requirement": "Gunakan satu gambar konten berformat JPEG, PNG, atau WebP. Teks alternatif wajib diisi untuk setiap bahasa yang dipublikasikan.",
+    "about_media_missing": "Pilih gambar dengan slot Gambar konten Tentang MATEX sebelum halaman dipublikasikan.",
+    "about_media_format_invalid": "Format gambar utama harus JPEG, PNG, atau WebP.",
     "select_media": "Pilih Media",
     "media_language_help": "Keterangan dan teks alternatif mengikuti bahasa yang dipilih.",
     "media_hero": "Hero",
@@ -2143,6 +2147,10 @@
       "slug_pattern": "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung.",
       "slug_max_length": "Slug maksimal 191 karakter.",
       "canonical_url_invalid": "URL kanonis harus menggunakan http:// atau https://.",
+      "about_highlight_pair_required": "Isi judul dan deskripsi sekaligus, atau kosongkan keduanya.",
+      "about_highlight_title_max_length": "Judul sorotan maksimal 160 karakter.",
+      "about_highlight_description_max_length": "Deskripsi sorotan maksimal 1.000 karakter.",
+      "about_media_alt_required": "Teks alternatif wajib diisi untuk gambar utama pada bahasa yang dipublikasikan.",
       "schedule_future_required": "Waktu publikasi harus diisi dan berada di masa mendatang.",
       "unpublish_after_publish": "Waktu berakhir harus setelah waktu mulai publikasi."
     }

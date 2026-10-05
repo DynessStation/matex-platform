@@ -201,9 +201,13 @@ export class WebsitePagePreview implements OnChanges, OnDestroy {
       this.page.website_page_template ?? '',
     );
 
+    const isAbout = this.page.website_page_key === 'about';
+
     const gadgetHomeHtml = isGadgetHome
       ? this.buildGadgetHome(translation.website_page_locale)
       : '';
+
+    const aboutHtml = isAbout ? this.buildAbout(translation) : '';
 
     return `
       <!doctype html>
@@ -392,6 +396,46 @@ export class WebsitePagePreview implements OnChanges, OnDestroy {
 
             .gadget-tile { aspect-ratio: 11 / 9; }
 
+            .about-page {
+              width: min(calc(100% - 48px), 1280px);
+              margin: 0 auto;
+              padding: clamp(40px, 6vw, 80px) 0 80px;
+            }
+
+            .about-heading {
+              width: min(100%, 920px);
+              margin: 0 auto 32px;
+              text-align: center;
+            }
+
+            .about-heading h1 {
+              font-size: clamp(30px, 5vw, 52px);
+            }
+
+            .about-image {
+              width: 100%;
+              height: auto;
+              border-radius: 8px;
+            }
+
+            .about-highlights {
+              display: grid;
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+              gap: 28px;
+              margin-top: 40px;
+            }
+
+            .about-highlight h2 {
+              margin: 0 0 10px;
+              font-size: 22px;
+              line-height: 1.25;
+            }
+
+            .about-highlight p {
+              margin: 0;
+              color: #666666;
+            }
+
             .gadget-main img,
             .gadget-side img,
             .gadget-tile img {
@@ -427,30 +471,101 @@ export class WebsitePagePreview implements OnChanges, OnDestroy {
               .gadget-side-column { display: none; }
               .gadget-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
               .gadget-main { min-height: 360px; }
+              .about-page { width: min(calc(100% - 32px), 1280px); }
+              .about-highlights { grid-template-columns: 1fr; gap: 24px; }
             }
           </style>
         </head>
 
         <body>
           <main class="page">
-            ${isGadgetHome ? gadgetHomeHtml : heroHtml}
+            ${isAbout ? aboutHtml : isGadgetHome ? gadgetHomeHtml : heroHtml}
 
-            <header class="header">
+            ${
+              isAbout
+                ? ''
+                : `<header class="header">
               <div class="header-inner">
                 <h1>${title}</h1>
 
                 ${excerpt ? `<p class="excerpt">${excerpt}</p>` : ''}
               </div>
-            </header>
+            </header>`
+            }
 
-            <article class="content">
+            ${
+              isAbout
+                ? ''
+                : `<article class="content">
               ${content}
-            </article>
+            </article>`
+            }
 
-            ${isGadgetHome ? '' : galleryHtml}
+            ${isAbout || isGadgetHome ? '' : galleryHtml}
           </main>
         </body>
       </html>
+    `;
+  }
+
+  private buildAbout(translation: IWebsitePageEditorTranslation): string {
+    const image = this.page.attachments.find(
+      (attachment) =>
+        attachment.website_page_attachment_role === 'about_content' &&
+        attachment.website_page_attachment_is_public === 1,
+    );
+    const imageTranslation = image?.translations.find(
+      (item) =>
+        item.website_page_attachment_locale === translation.website_page_locale,
+    );
+    const imageHtml = image
+      ? `<img class="about-image" src="${this.escapeHtml(image.asset_url)}" alt="${this.escapeHtml(imageTranslation?.website_page_attachment_alt_text || image.name || '')}">`
+      : '';
+
+    const content = this.isRecord(translation.website_page_content_json)
+      ? translation.website_page_content_json
+      : {};
+    const items =
+      content['about_contract_version'] === 1 &&
+      Array.isArray(content['highlights'])
+        ? content['highlights']
+        : Array.isArray(content['features'])
+          ? content['features']
+          : [];
+    const highlights = items
+      .filter((item): item is Record<string, unknown> => this.isRecord(item))
+      .map((item) => ({
+        title: typeof item['title'] === 'string' ? item['title'].trim() : '',
+        description:
+          typeof item['description'] === 'string'
+            ? item['description'].trim()
+            : '',
+      }))
+      .filter((item) => item.title && item.description)
+      .slice(0, 3)
+      .map(
+        (item) => `
+          <article class="about-highlight">
+            <h2>${this.escapeHtml(item.title)}</h2>
+            <p>${this.escapeHtml(item.description)}</p>
+          </article>
+        `,
+      )
+      .join('');
+
+    return `
+      <section class="about-page">
+        <header class="about-heading">
+          <h1>${this.escapeHtml(translation.website_page_title || '')}</h1>
+          ${
+            translation.website_page_excerpt
+              ? `<p class="excerpt">${this.escapeHtml(translation.website_page_excerpt)}</p>`
+              : ''
+          }
+        </header>
+        ${imageHtml}
+        ${highlights ? `<div class="about-highlights">${highlights}</div>` : ''}
+      </section>
     `;
   }
 
@@ -599,6 +714,10 @@ export class WebsitePagePreview implements OnChanges, OnDestroy {
       .replaceAll('>', '&gt;')
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#039;');
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
   private revokeObjectUrl(): void {
