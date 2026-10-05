@@ -331,7 +331,6 @@ export class WebsitePageForm {
       label: `${rule.label} (${rule.recommendedWidth} × ${rule.recommendedHeight})`,
     })),
     { value: 'og', label: 'Open Graph / share image' },
-    { value: 'gallery', label: 'Galeri tambahan' },
   ];
 
   //==================================================
@@ -1064,7 +1063,12 @@ export class WebsitePageForm {
   }
 
   selectMedia(selection: MediaSelection): void {
-    const selected = this.toAttachmentArray(selection);
+    const selected = this.isGadgetHomeTemplate
+      ? this.toAttachmentArray(selection).slice(
+          0,
+          this.gadgetHomeMediaRoles.length,
+        )
+      : this.toAttachmentArray(selection);
 
     const oldMap = new Map(
       this.pageMedia.map((item) => [item.attachment.id_attachment, item]),
@@ -1085,11 +1089,8 @@ export class WebsitePageForm {
 
       const role = this.isGadgetHomeTemplate
         ? (this.gadgetHomeMediaRoles.find(
-            (option) =>
-              option.value !== 'og' &&
-              option.value !== 'gallery' &&
-              !assignedRoles.has(option.value),
-          )?.value ?? 'gallery')
+            (option) => !assignedRoles.has(option.value),
+          )?.value ?? this.gadgetHomeMediaRoles[0].value)
         : this.isAboutTemplate
           ? assignedRoles.has('about_content')
             ? 'og'
@@ -1127,6 +1128,24 @@ export class WebsitePageForm {
   }
 
   updateMediaRole(index: number, role: string): void {
+    if (this.isGadgetHomeTemplate) {
+      if (!this.gadgetHomeMediaRoles.some((option) => option.value === role)) {
+        return;
+      }
+
+      const previousRole = this.pageMedia[index]?.role;
+
+      this.pageMedia = this.pageMedia.map((item, currentIndex) => {
+        if (currentIndex === index) return { ...item, role };
+        if (item.role === role && previousRole) {
+          return { ...item, role: previousRole };
+        }
+        return item;
+      });
+
+      return;
+    }
+
     const uniqueRole = role !== 'gallery';
 
     this.pageMedia = this.pageMedia.map((item, currentIndex) => {
@@ -1175,7 +1194,11 @@ export class WebsitePageForm {
   gadgetHomeMediaIssue(media: WebsitePageEditorMediaDraft): string | null {
     const rule = getGadgetHomeMediaRule(media.role);
 
-    if (!rule) return null;
+    if (!rule) {
+      return media.role === 'og'
+        ? null
+        : 'Slot gambar tidak dikenali. Pilih slot desain yang tersedia.';
+    }
 
     if (!this.pageMediaAccept.includes(media.attachment.mime_type)) {
       return 'Format harus JPEG, PNG, atau WebP.';
@@ -1204,6 +1227,45 @@ export class WebsitePageForm {
     return null;
   }
 
+  gadgetHomeMediaActionIssue(
+    media: WebsitePageEditorMediaDraft,
+  ): string | null {
+    const target = media.action_value;
+
+    if (media.action_type === 'none') {
+      return target
+        ? 'Banner tanpa aksi tidak boleh memiliki tujuan tautan.'
+        : null;
+    }
+
+    if (!target) {
+      return 'Tujuan tautan wajib diisi untuk aksi banner ini.';
+    }
+
+    if (
+      media.action_type === 'external' &&
+      !/^https:\/\/[^\s]+$/i.test(target)
+    ) {
+      return 'Tautan eksternal harus berupa alamat HTTPS lengkap.';
+    }
+
+    if (
+      media.action_type === 'internal' &&
+      (!/^\/(?!\/)[^\s]*$/.test(target) || target.includes('..'))
+    ) {
+      return 'Halaman website harus diawali / dan tidak boleh memuat ..';
+    }
+
+    if (
+      (media.action_type === 'product' || media.action_type === 'category') &&
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(target)
+    ) {
+      return 'Gunakan slug huruf kecil, angka, dan tanda hubung.';
+    }
+
+    return null;
+  }
+
   get gadgetHomeMissingMediaRules(): readonly GadgetHomeMediaRule[] {
     if (!this.isGadgetHomeTemplate) return [];
 
@@ -1225,6 +1287,15 @@ export class WebsitePageForm {
     );
   }
 
+  get gadgetHomeMediaHasInvalidActions(): boolean {
+    return (
+      this.isGadgetHomeTemplate &&
+      this.pageMedia.some(
+        (media) => this.gadgetHomeMediaActionIssue(media) !== null,
+      )
+    );
+  }
+
   get gadgetHomeRequiresCompleteMedia(): boolean {
     if (!this.isGadgetHomeTemplate) return false;
 
@@ -1234,6 +1305,7 @@ export class WebsitePageForm {
   get gadgetHomeMediaBlocksSave(): boolean {
     return (
       this.gadgetHomeMediaHasInvalidFiles ||
+      this.gadgetHomeMediaHasInvalidActions ||
       (this.gadgetHomeRequiresCompleteMedia &&
         this.gadgetHomeMissingMediaRules.length > 0)
     );

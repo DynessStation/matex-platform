@@ -1492,6 +1492,9 @@
                                   <input
                                     type="text"
                                     class="form-control"
+                                    [class.is-invalid]="
+                                      gadgetHomeMediaActionIssue(media)
+                                    "
                                     [disabled]="media.action_type === 'none'"
                                     [value]="media.action_value"
                                     [placeholder]="
@@ -1515,6 +1518,15 @@
                                       'home_banner_destination_help' | translate
                                     }}
                                   </small>
+
+                                  @if (
+                                    gadgetHomeMediaActionIssue(media);
+                                    as actionIssue
+                                  ) {
+                                    <div class="text-danger form-error">
+                                      {{ actionIssue }}
+                                    </div>
+                                  }
                                 </div>
                               </div>
                             }
