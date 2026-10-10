@@ -42,21 +42,27 @@
                     />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">Bentuk produk</label
-                    ><select class="form-select" formControlName="product_type">
-                      <option value="physical">Produk fisik</option>
-                      <option value="service">Layanan</option>
-                      <option value="digital">Digital</option>
-                    </select>
+                    <label class="form-label">Bentuk produk</label>
+                    @if (isBrowser) {
+                      <select2
+                        class="custom-select d-block"
+                        [data]="productTypeOptions"
+                        formControlName="product_type"
+                        noResultMessage="Tidak ada pilihan"
+                      />
+                    }
                     <small class="text-muted">Barang fisik, layanan, atau produk digital.</small>
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">Status</label
-                    ><select class="form-select" formControlName="status">
-                      <option value="draft">Draft</option>
-                      <option value="published">Dipublikasikan</option>
-                      <option value="archived">Diarsipkan</option>
-                    </select>
+                    <label class="form-label">Status</label>
+                    @if (isBrowser) {
+                      <select2
+                        class="custom-select d-block"
+                        [data]="productStatusOptions"
+                        formControlName="status"
+                        noResultMessage="Tidak ada pilihan"
+                      />
+                    }
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Satuan</label
@@ -175,15 +181,15 @@
                     />
                   </div>
                   <div class="col-md-3">
-                    <label class="form-label">Status stok</label
-                    ><select class="form-select" formControlName="stock_status">
-                      <option value="in_stock">Tersedia</option>
-                      <option value="out_of_stock">Habis</option>
-                      <option value="preorder">Pre-order</option>
-                      <option value="made_to_order">
-                        Dibuat sesuai pesanan
-                      </option>
-                    </select>
+                    <label class="form-label">Status stok</label>
+                    @if (isBrowser) {
+                      <select2
+                        class="custom-select d-block"
+                        [data]="stockStatusOptions"
+                        formControlName="stock_status"
+                        noResultMessage="Tidak ada pilihan"
+                      />
+                    }
                   </div>
                   <div class="col-md-3">
                     <label class="form-label">Jumlah stok</label
@@ -372,15 +378,15 @@
                 </div>
                 <div class="row g-4 mb-4">
                   <div class="col-md-6">
-                    <label class="form-label">Tampilan harga publik</label
-                    ><select
-                      class="form-select"
-                      formControlName="price_visibility"
-                    >
-                      <option value="displayed">Tampilkan harga</option>
-                      <option value="contact">Hubungi kami</option>
-                      <option value="hidden">Sembunyikan</option>
-                    </select>
+                    <label class="form-label">Tampilan harga publik</label>
+                    @if (isBrowser) {
+                      <select2
+                        class="custom-select d-block"
+                        [data]="priceVisibilityOptions"
+                        formControlName="price_visibility"
+                        noResultMessage="Tidak ada pilihan"
+                      />
+                    }
                   </div>
                   <div class="col-md-6">
                     <label class="category-check mt-4"
@@ -509,21 +515,15 @@
                       </div>
                       <div class="row g-3">
                         <div class="col-xl-3 col-md-5">
-                          <label class="form-label">Platform *</label
-                          ><select
-                            class="form-select"
-                            formControlName="provider"
-                          >
-                            <option value="shopee">Shopee</option>
-                            <option value="tokopedia">Tokopedia</option>
-                            <option value="tiktok-shop">TikTok Shop</option>
-                            <option value="lazada">Lazada</option>
-                            <option value="blibli">Blibli</option>
-                            <option value="website">
-                              Toko resmi / website
-                            </option>
-                            <option value="other">Lainnya</option>
-                          </select>
+                          <label class="form-label">Platform *</label>
+                          @if (isBrowser) {
+                            <select2
+                              class="custom-select d-block"
+                              [data]="marketplaceProviderOptions"
+                              formControlName="provider"
+                              noResultMessage="Tidak ada pilihan"
+                            />
+                          }
                         </div>
                         <div class="col-xl-5 col-md-7">
                           <label class="form-label">Nama yang ditampilkan</label

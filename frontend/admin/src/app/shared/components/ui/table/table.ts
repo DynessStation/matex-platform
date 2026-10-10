@@ -35,6 +35,7 @@ import {
 } from '../../../interface/table.interface';
 import { CurrencySymbolPipe } from '../../../pipe/currency-symbol.pipe';
 import { AccountState } from '../../../store/state/account.state';
+import { AuthState } from '../../../store/state/auth.state';
 import { LoaderState } from '../../../store/state/loader.state';
 import { ConfirmationModal } from '../modal/confirmation-modal/confirmation-modal';
 import { DeleteModal } from '../modal/delete-modal/delete-modal';
@@ -75,6 +76,14 @@ export class Table {
 
   permissions$: Observable<IPermission[]> = inject(Store).select(
     AccountState.permissions,
+  );
+
+  authPermissions$: Observable<string[]> = inject(Store).select(
+    AuthState.permissions,
+  );
+
+  isAllAccess$: Observable<boolean> = inject(Store).select(
+    AuthState.isAllAccess,
   );
 
   user$: Observable<IAccountUser> = inject(Store).select(AccountState.user);
@@ -158,6 +167,10 @@ export class Table {
 
   public permissions: string[] = [];
 
+  public authPermissions: string[] = [];
+
+  public isAllAccess = false;
+
   public role: string;
 
   //==================================================
@@ -212,6 +225,14 @@ export class Table {
       this.permissions = permission?.map((value) => value?.name) ?? [];
     });
 
+    this.authPermissions$.subscribe((permissions) => {
+      this.authPermissions = permissions ?? [];
+    });
+
+    this.isAllAccess$.subscribe((isAllAccess) => {
+      this.isAllAccess = isAllAccess === true;
+    });
+
     //==================================================
     //==== LOADER
     //==================================================
@@ -237,7 +258,11 @@ export class Table {
 
   private getCurrentPermissions(): string[] {
     return Array.from(
-      new Set([...this.permissions, ...(this.externalPermissions() ?? [])]),
+      new Set([
+        ...this.permissions,
+        ...this.authPermissions,
+        ...(this.externalPermissions() ?? []),
+      ]),
     );
   }
 
@@ -246,7 +271,7 @@ export class Table {
   //==================================================
 
   private checkPermission(permission?: string | string[]): boolean {
-    if (this.externalAllAccess()) {
+    if (this.isAllAccess || this.externalAllAccess()) {
       return true;
     }
 

@@ -1,9 +1,10 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { AsyncPipe, isPlatformBrowser } from '@angular/common';
+import { Component, inject, input, PLATFORM_ID } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
+import { Select2Data, Select2Module } from 'ng-select2-component';
 import { filter, Observable, switchMap, take } from 'rxjs';
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { Button } from '../../../shared/components/ui/button/button';
@@ -17,12 +18,43 @@ import { CreateProductAction, EditProductAction, UpdateProductAction } from '../
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
 
-@Component({selector:'app-form-product',imports:[AsyncPipe,ReactiveFormsModule,NgbModule,AdvanceDropdown,ImageUpload,Button],templateUrl:'./form-product.html',styleUrl:'./form-product.scss'})
+@Component({selector:'app-form-product',imports:[AsyncPipe,ReactiveFormsModule,NgbModule,Select2Module,AdvanceDropdown,ImageUpload,Button],templateUrl:'./form-product.html',styleUrl:'./form-product.scss'})
 export class FormProduct {
   private fb=inject(FormBuilder);private store=inject(Store);private route=inject(ActivatedRoute);private router=inject(Router);
+  readonly isBrowser=isPlatformBrowser(inject(PLATFORM_ID));
   readonly type=input<string>('create');readonly mediaConfig=mediaConfig;
   readonly productImageAccept=['image/jpeg','image/png','image/webp'];
   readonly productGalleryAccept=[...this.productImageAccept,...mediaConfig.video];
+  readonly productTypeOptions:Select2Data=[
+    {value:'physical',label:'Produk fisik'},
+    {value:'service',label:'Layanan'},
+    {value:'digital',label:'Digital'},
+  ];
+  readonly productStatusOptions:Select2Data=[
+    {value:'draft',label:'Draft'},
+    {value:'published',label:'Dipublikasikan'},
+    {value:'archived',label:'Diarsipkan'},
+  ];
+  readonly stockStatusOptions:Select2Data=[
+    {value:'in_stock',label:'Tersedia'},
+    {value:'out_of_stock',label:'Habis'},
+    {value:'preorder',label:'Pre-order'},
+    {value:'made_to_order',label:'Dibuat sesuai pesanan'},
+  ];
+  readonly priceVisibilityOptions:Select2Data=[
+    {value:'displayed',label:'Tampilkan harga'},
+    {value:'contact',label:'Hubungi kami'},
+    {value:'hidden',label:'Sembunyikan'},
+  ];
+  readonly marketplaceProviderOptions:Select2Data=[
+    {value:'shopee',label:'Shopee'},
+    {value:'tokopedia',label:'Tokopedia'},
+    {value:'tiktok-shop',label:'TikTok Shop'},
+    {value:'lazada',label:'Lazada'},
+    {value:'blibli',label:'Blibli'},
+    {value:'website',label:'Toko resmi / website'},
+    {value:'other',label:'Lainnya'},
+  ];
   categories$:Observable<ICategoryModel>=this.store.select(CategoryState.category);
   product:IProduct|null=null;id:string|null=null;activeTab='general';activeLocale:'id'|'en'='id';categoryIds:string[]=[];categoryError=false;
   media:Partial<Record<ProductMediaRole,IAttachment|IAttachment[]|null>>={thumbnail:null,gallery:[],og:null};
