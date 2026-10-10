@@ -379,17 +379,51 @@ app.get(
       : "id-ID";
     const search = clean(req.query.search, 200),
       like = `%${search}%`;
+    const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
+    const paginate = Math.min(
+      100,
+      Math.max(1, Math.floor(Number(req.query.paginate) || 15)),
+    );
+    const offset = (page - 1) * paginate;
+    const sortFields: Record<string, string> = {
+      name: "i.product_name",
+      sku: "p.product_sku",
+    };
+    const sortField = sortFields[String(req.query.field ?? "")] ?? null;
+    const sortDirection = req.query.sort === "desc" ? "DESC" : "ASC";
+    const orderBy = sortField
+      ? `${sortField} ${sortDirection}, p.id_product ASC`
+      : "p.product_sort_order ASC, i.product_name ASC";
     try {
+      const [countRows] = await pool.query<RowDataPacket[]>(
+        `SELECT COUNT(DISTINCT p.id_product) AS total
+         FROM product_catalog p
+         LEFT JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.product_locale=?
+         WHERE p.id_master_comp=? AND p.product_deleted_at IS NULL
+         AND (?='' OR p.product_key LIKE ? OR p.product_sku LIKE ? OR i.product_name LIKE ?)`,
+        [locale, scope.idMasterComp, search, like, like, like],
+      );
       const [rows] = await pool.query<RowDataPacket[]>(
         `${baseSelect} WHERE p.id_master_comp=? AND p.product_deleted_at IS NULL
       AND (?='' OR p.product_key LIKE ? OR p.product_sku LIKE ? OR i.product_name LIKE ?)
-      ORDER BY p.product_sort_order,i.product_name`,
-        [locale, scope.idMasterComp, search, like, like, like],
+      ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
+        [
+          locale,
+          scope.idMasterComp,
+          search,
+          like,
+          like,
+          like,
+          paginate,
+          offset,
+        ],
       );
       const data = await hydrate(rows, scope.idMasterComp, locale);
       return sendSuccess(res, 200, "PRODUCTS_LISTED", "Products loaded", {
         data,
-        total: data.length,
+        total: Number(countRows[0]?.total ?? 0),
+        current_page: page,
+        per_page: paginate,
       });
     } catch (error) {
       console.error("[Product] list failed", error);
