@@ -15,6 +15,12 @@
       </li>
     }
 
+    @if (product()?.product_kind) {
+      <li>
+        <span>{{ isEnglish ? 'Product group' : 'Kelompok produk' }}: </span>{{ product()?.product_kind }}
+      </li>
+    }
+
     @if (product()?.weight) {
       <li>
         <span>{{ isEnglish ? 'Weight' : 'Berat' }}: </span>{{ product()?.weight }} gram
@@ -40,6 +46,9 @@
     }
     @if (product()?.categories?.length) {
       <li><span>{{ isEnglish ? 'Category' : 'Kategori' }}: </span>{{ product()?.categories?.[0]?.name }}</li>
+    }
+    @if (product()?.country_origin) {
+      <li><span>{{ isEnglish ? 'Origin' : 'Asal produk' }}: </span>{{ originLabel() }}</li>
     }
   </ul>
 </div>

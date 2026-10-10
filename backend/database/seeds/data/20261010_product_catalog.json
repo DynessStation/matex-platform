@@ -1,0 +1,5174 @@
+{
+  "schema_version": 1,
+  "source": "4. KATEGORI PRODUCT MATEX - 10 OKTOBER 2026 - 4 kategori.xlsx",
+  "source_date": "2026-10-10",
+  "company_id": 1,
+  "actor_admin_id": 1,
+  "import_mode": "replace",
+  "publication_status": "draft",
+  "categories": [
+    {
+      "key": "latex-mattress",
+      "source_name": "LATEX MATTRESS",
+      "sort_order": 1,
+      "translations": {
+        "id-ID": {
+          "slug": "latex-mattress",
+          "name": "Kasur Lateks"
+        },
+        "en-US": {
+          "slug": "latex-mattress",
+          "name": "Latex Mattress"
+        }
+      }
+    },
+    {
+      "key": "bedding-accessories",
+      "source_name": "BEDDING ACCESSORIES",
+      "sort_order": 2,
+      "translations": {
+        "id-ID": {
+          "slug": "bedding-accessories",
+          "name": "Aksesori Tempat Tidur"
+        },
+        "en-US": {
+          "slug": "bedding-accessories",
+          "name": "Bedding Accessories"
+        }
+      }
+    },
+    {
+      "key": "therapy-accessories",
+      "source_name": "THERAPY ACCESSORIES",
+      "sort_order": 3,
+      "translations": {
+        "id-ID": {
+          "slug": "therapy-accessories",
+          "name": "Aksesori Terapi"
+        },
+        "en-US": {
+          "slug": "therapy-accessories",
+          "name": "Therapy Accessories"
+        }
+      }
+    },
+    {
+      "key": "automotive",
+      "source_name": "OTOMOTIF",
+      "sort_order": 4,
+      "translations": {
+        "id-ID": {
+          "slug": "automotive",
+          "name": "Otomotif"
+        },
+        "en-US": {
+          "slug": "automotive",
+          "name": "Automotive"
+        }
+      }
+    }
+  ],
+  "products": [
+    {
+      "source_row": 7,
+      "source_number": 1,
+      "category_key": "latex-mattress",
+      "key": "kl0902005",
+      "sku": "KL0902005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL0902005",
+      "manufacturer_code": "KL0902005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 9000,
+      "length_mm": 2000,
+      "width_mm": 900,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 1,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-90-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "90x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "9 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 90x200x5 cm",
+          "og_title": "Kasur Latek 90x200x5 cm",
+          "og_description": "Kasur Latek 90x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-90-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "90x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "9 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 90x200x5 cm",
+          "og_title": "Latex Mattress 90x200x5 cm",
+          "og_description": "Latex Mattress 90x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1363080.4953560373,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 75.72669418644652,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1294926.4705882354,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 71.94035947712419,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 8,
+      "source_number": 2,
+      "category_key": "latex-mattress",
+      "key": "kl1002005",
+      "sku": "KL1002005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1002005",
+      "manufacturer_code": "KL1002005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 10000,
+      "length_mm": 2000,
+      "width_mm": 1000,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 2,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-100-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "100x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "10 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 100x200x5 cm",
+          "og_title": "Kasur Latek 100x200x5 cm",
+          "og_description": "Kasur Latek 100x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-100-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "100x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "10 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 100x200x5 cm",
+          "og_title": "Latex Mattress 100x200x5 cm",
+          "og_description": "Latex Mattress 100x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1484133.1269349845,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 82.45184038527691,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1409926.4705882352,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 78.32924836601306,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 9,
+      "source_number": 3,
+      "category_key": "latex-mattress",
+      "key": "kl1202005",
+      "sku": "KL1202005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1202005",
+      "manufacturer_code": "KL1202005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 12000,
+      "length_mm": 2000,
+      "width_mm": 1200,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 3,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-120-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "120x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "12 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 120x200x5 cm",
+          "og_title": "Kasur Latek 120x200x5 cm",
+          "og_description": "Kasur Latek 120x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-120-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "120x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "12 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 120x200x5 cm",
+          "og_title": "Latex Mattress 120x200x5 cm",
+          "og_description": "Latex Mattress 120x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1726238.3900928793,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 95.90213278293774,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1639926.4705882354,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 91.10702614379086,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 10,
+      "source_number": 4,
+      "category_key": "latex-mattress",
+      "key": "kl1602005",
+      "sku": "KL1602005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1602005",
+      "manufacturer_code": "KL1602005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 16000,
+      "length_mm": 2000,
+      "width_mm": 1600,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 4,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-160-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "160x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "16 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 160x200x5 cm",
+          "og_title": "Kasur Latek 160x200x5 cm",
+          "og_description": "Kasur Latek 160x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-160-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "160x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "16 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 160x200x5 cm",
+          "og_title": "Latex Mattress 160x200x5 cm",
+          "og_description": "Latex Mattress 160x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2210448.9164086687,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 122.80271757825938,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2099926.470588235,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 116.6625816993464,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 11,
+      "source_number": 5,
+      "category_key": "latex-mattress",
+      "key": "kl1802005",
+      "sku": "KL1802005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1802005",
+      "manufacturer_code": "KL1802005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 18000,
+      "length_mm": 2000,
+      "width_mm": 1800,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 5,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-180-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "180x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "18 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 180x200x5 cm",
+          "og_title": "Kasur Latek 180x200x5 cm",
+          "og_description": "Kasur Latek 180x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-180-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "180x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "18 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 180x200x5 cm",
+          "og_title": "Latex Mattress 180x200x5 cm",
+          "og_description": "Latex Mattress 180x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2452554.1795665636,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 136.2530099759202,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2329926.470588235,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 129.4403594771242,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 12,
+      "source_number": 6,
+      "category_key": "latex-mattress",
+      "key": "kl2002005",
+      "sku": "KL2002005",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL2002005",
+      "manufacturer_code": "KL2002005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 20000,
+      "length_mm": 2000,
+      "width_mm": 2000,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 6,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-200-200-5",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "200x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "20 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 200x200x5 cm",
+          "og_title": "Kasur Latek 200x200x5 cm",
+          "og_description": "Kasur Latek 200x200x5 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-200-200-5",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "200x200x5 cm",
+            "density": "100 kg/m3",
+            "berat": "20 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 200x200x5 cm",
+          "og_title": "Latex Mattress 200x200x5 cm",
+          "og_description": "Latex Mattress 200x200x5 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2694659.4427244584,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 149.703302373581,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2559926.4705882357,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 142.218137254902,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 13,
+      "source_number": 7,
+      "category_key": "latex-mattress",
+      "key": "kl0902008",
+      "sku": "KL0902008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL0902008",
+      "manufacturer_code": "KL0902008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 14000,
+      "length_mm": 2000,
+      "width_mm": 900,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 7,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-90-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "90x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "14 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 90x200x8 cm",
+          "og_title": "Kasur Latek 90x200x8 cm",
+          "og_description": "Kasur Latek 90x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-90-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "90x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "14 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 90x200x8 cm",
+          "og_title": "Latex Mattress 90x200x8 cm",
+          "og_description": "Latex Mattress 90x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1729721.3622291023,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 96.09563123495013,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1643235.2941176472,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 91.29084967320263,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 14,
+      "source_number": 8,
+      "category_key": "latex-mattress",
+      "key": "kl1002008",
+      "sku": "KL1002008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1002008",
+      "manufacturer_code": "KL1002008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 16000,
+      "length_mm": 2000,
+      "width_mm": 1000,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 8,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-100-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "100x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "16 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 100x200x8 cm",
+          "og_title": "Kasur Latek 100x200x8 cm",
+          "og_description": "Kasur Latek 100x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-100-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "100x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "16 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 100x200x8 cm",
+          "og_title": "Latex Mattress 100x200x8 cm",
+          "og_description": "Latex Mattress 100x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1889783.2817337462,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 104.98796009631923,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1795294.1176470588,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 99.73856209150327,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 15,
+      "source_number": 9,
+      "category_key": "latex-mattress",
+      "key": "kl1202008",
+      "sku": "KL1202008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1202008",
+      "manufacturer_code": "KL1202008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 19000,
+      "length_mm": 2000,
+      "width_mm": 1200,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 9,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-120-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "120x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "19 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 120x200x8 cm",
+          "og_title": "Kasur Latek 120x200x8 cm",
+          "og_description": "Kasur Latek 120x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-120-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "120x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "19 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 120x200x8 cm",
+          "og_title": "Latex Mattress 120x200x8 cm",
+          "og_description": "Latex Mattress 120x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2209907.1207430344,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 122.77261781905747,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2099411.764705883,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 116.6339869281046,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 16,
+      "source_number": 10,
+      "category_key": "latex-mattress",
+      "key": "kl1602008",
+      "sku": "KL1602008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1602008",
+      "manufacturer_code": "KL1602008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 26000,
+      "length_mm": 2000,
+      "width_mm": 1600,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 10,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-160-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "160x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "26 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 160x200x8 cm",
+          "og_title": "Kasur Latek 160x200x8 cm",
+          "og_description": "Kasur Latek 160x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-160-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "160x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "26 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 160x200x8 cm",
+          "og_title": "Latex Mattress 160x200x8 cm",
+          "og_description": "Latex Mattress 160x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2850154.79876161,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 158.34193326453388,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2707647.0588235296,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 150.4248366013072,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 17,
+      "source_number": 11,
+      "category_key": "latex-mattress",
+      "key": "kl1802008",
+      "sku": "KL1802008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL1802008",
+      "manufacturer_code": "KL1802008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 29000,
+      "length_mm": 2000,
+      "width_mm": 1800,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 11,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-180-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "180x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "29 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 180x200x8 cm",
+          "og_title": "Kasur Latek 180x200x8 cm",
+          "og_description": "Kasur Latek 180x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-180-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "180x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "29 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 180x200x8 cm",
+          "og_title": "Latex Mattress 180x200x8 cm",
+          "og_description": "Latex Mattress 180x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3170278.637770898,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 176.12659098727212,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3011764.7058823532,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 167.32026143790853,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 18,
+      "source_number": 12,
+      "category_key": "latex-mattress",
+      "key": "kl2002008",
+      "sku": "KL2002008",
+      "product_type": "physical",
+      "product_kind": "Kasur Tipis",
+      "unit": "Lembar",
+      "barcode": "KL2002008",
+      "manufacturer_code": "KL2002008",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 32000,
+      "length_mm": 2000,
+      "width_mm": 2000,
+      "height_mm": 80,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 12,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-200-200-8",
+          "name": "KASUR LATEX",
+          "short_description": "PELINDUNG KASUR",
+          "description": "Kasur latex tipis untuk menambah kenyamanan dan melindungi kasur",
+          "specifications": {
+            "dimention": "200x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "32 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 200x200x8 cm",
+          "og_title": "Kasur Latek 200x200x8 cm",
+          "og_description": "Kasur Latek 200x200x8 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-200-200-8",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS PROTECTOR",
+          "description": "Thin latex mattress topper to add comfort and protect the mattress",
+          "specifications": {
+            "dimention": "200x200x8 cm",
+            "density": "100 kg/m3",
+            "berat": "32 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 200x200x8 cm",
+          "og_title": "Latex Mattress 200x200x8 cm",
+          "og_description": "Latex Mattress 200x200x8 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3490402.4767801864,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 193.91124871001037,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3315882.352941177,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 184.21568627450984,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 19,
+      "source_number": 13,
+      "category_key": "latex-mattress",
+      "key": "kl09020010",
+      "sku": "KL09020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL09020010",
+      "manufacturer_code": "KL09020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 9000,
+      "length_mm": 2000,
+      "width_mm": 900,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 13,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-90-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "90x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "18 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 90x200x10 cm",
+          "og_title": "Kasur Latek 90x200x10 cm",
+          "og_description": "Kasur Latek 90x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-90-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "90x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "18 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 90x200x10 cm",
+          "og_title": "Latex Mattress 90x200x10 cm",
+          "og_description": "Latex Mattress 90x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 1974148.6068111456,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 109.6749226006192,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 1875441.1764705882,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 104.19117647058823,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 20,
+      "source_number": 14,
+      "category_key": "latex-mattress",
+      "key": "kl10020010",
+      "sku": "KL10020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL10020010",
+      "manufacturer_code": "KL10020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 10000,
+      "length_mm": 2000,
+      "width_mm": 1000,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 14,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-100-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "100x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "20 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 100x200x10 cm",
+          "og_title": "Kasur Latek 100x200x10 cm",
+          "og_description": "Kasur Latek 100x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-100-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "100x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "20 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 100x200x10 cm",
+          "og_title": "Latex Mattress 100x200x10 cm",
+          "og_description": "Latex Mattress 100x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2160216.7182662543,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 120.0120399036808,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2052205.8823529417,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 114.01143790849676,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 21,
+      "source_number": 15,
+      "category_key": "latex-mattress",
+      "key": "kl12020010",
+      "sku": "KL12020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL12020010",
+      "manufacturer_code": "KL12020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 12000,
+      "length_mm": 2000,
+      "width_mm": 1200,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 15,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-120-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "120x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "24 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 120x200x10 cm",
+          "og_title": "Kasur Latek 120x200x10 cm",
+          "og_description": "Kasur Latek 120x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-120-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "120x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "24 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 120x200x10 cm",
+          "og_title": "Latex Mattress 120x200x10 cm",
+          "og_description": "Latex Mattress 120x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2532352.941176471,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 140.68627450980392,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2405735.294117647,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 133.65196078431373,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 22,
+      "source_number": 16,
+      "category_key": "latex-mattress",
+      "key": "kl16020010",
+      "sku": "KL16020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL16020010",
+      "manufacturer_code": "KL16020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 16000,
+      "length_mm": 2000,
+      "width_mm": 1600,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 16,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-160-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "160x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "32 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 160x200x10 cm",
+          "og_title": "Kasur Latek 160x200x10 cm",
+          "og_description": "Kasur Latek 160x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-160-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "160x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "32 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 160x200x10 cm",
+          "og_title": "Latex Mattress 160x200x10 cm",
+          "og_description": "Latex Mattress 160x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3276625.3869969044,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 182.03474372205025,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3112794.1176470593,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 172.93300653594773,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 23,
+      "source_number": 17,
+      "category_key": "latex-mattress",
+      "key": "kl18020010",
+      "sku": "KL18020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL18020010",
+      "manufacturer_code": "KL18020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 18000,
+      "length_mm": 2000,
+      "width_mm": 1800,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 17,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-180-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "180x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 180x200x10 cm",
+          "og_title": "Kasur Latek 180x200x10 cm",
+          "og_description": "Kasur Latek 180x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-180-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "180x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 180x200x10 cm",
+          "og_title": "Latex Mattress 180x200x10 cm",
+          "og_description": "Latex Mattress 180x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3648761.609907121,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 202.70897832817337,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3466323.529411765,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 192.57352941176472,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 24,
+      "source_number": 18,
+      "category_key": "latex-mattress",
+      "key": "kl20020010",
+      "sku": "KL20020010",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL20020010",
+      "manufacturer_code": "KL20020010",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 20000,
+      "length_mm": 2000,
+      "width_mm": 2000,
+      "height_mm": 100,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 18,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-200-200-10",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "200x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "40 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 200x200x10 cm",
+          "og_title": "Kasur Latek 200x200x10 cm",
+          "og_description": "Kasur Latek 200x200x10 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-200-200-10",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "200x200x10 cm",
+            "density": "100 kg/m3",
+            "berat": "40 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 200x200x10 cm",
+          "og_title": "Latex Mattress 200x200x10 cm",
+          "og_description": "Latex Mattress 200x200x10 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 4020897.832817338,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 223.38321293429655,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3819852.941176471,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 212.21405228758172,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 25,
+      "source_number": 19,
+      "category_key": "latex-mattress",
+      "key": "kl09020015",
+      "sku": "KL09020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL09020015",
+      "manufacturer_code": "KL09020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 14000,
+      "length_mm": 2000,
+      "width_mm": 900,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 19,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-90-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "90x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "27 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 90x200x15 cm",
+          "og_title": "Kasur Latek 90x200x15 cm",
+          "og_description": "Kasur Latek 90x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-90-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "90x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "27 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 90x200x15 cm",
+          "og_title": "Latex Mattress 90x200x15 cm",
+          "og_description": "Latex Mattress 90x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2585216.7182662543,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 143.62315101479192,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2455955.8823529417,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 136.4419934640523,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 26,
+      "source_number": 20,
+      "category_key": "latex-mattress",
+      "key": "kl10020015",
+      "sku": "KL10020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL10020015",
+      "manufacturer_code": "KL10020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 16000,
+      "length_mm": 2000,
+      "width_mm": 1000,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 20,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-100-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "100x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "30 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 100x200x15 cm",
+          "og_title": "Kasur Latek 100x200x15 cm",
+          "og_description": "Kasur Latek 100x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-100-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "100x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "30 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 100x200x15 cm",
+          "og_title": "Latex Mattress 100x200x15 cm",
+          "og_description": "Latex Mattress 100x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 2836300.3095975234,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 157.57223942208464,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 2694485.294117647,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 149.69362745098042,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 27,
+      "source_number": 21,
+      "category_key": "latex-mattress",
+      "key": "kl12020015",
+      "sku": "KL12020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL12020015",
+      "manufacturer_code": "KL12020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 19000,
+      "length_mm": 2000,
+      "width_mm": 1200,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 21,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-120-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "120x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 120x200x15 cm",
+          "og_title": "Kasur Latek 120x200x15 cm",
+          "og_description": "Kasur Latek 120x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-120-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "120x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 120x200x15 cm",
+          "og_title": "Latex Mattress 120x200x15 cm",
+          "og_description": "Latex Mattress 120x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3338467.492260062,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 185.47041623667013,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3171544.1176470593,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 176.1968954248366,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 28,
+      "source_number": 22,
+      "category_key": "latex-mattress",
+      "key": "kl16020015",
+      "sku": "KL16020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL16020015",
+      "manufacturer_code": "KL16020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 26000,
+      "length_mm": 2000,
+      "width_mm": 1600,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 22,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-160-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "160x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "48 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 160x200x15 cm",
+          "og_title": "Kasur Latek 160x200x15 cm",
+          "og_description": "Kasur Latek 160x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-160-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "160x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "48 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 160x200x15 cm",
+          "og_title": "Latex Mattress 160x200x15 cm",
+          "og_description": "Latex Mattress 160x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 4342801.85758514,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 241.2667698658411,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 4125661.7647058824,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 229.20343137254903,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 29,
+      "source_number": 23,
+      "category_key": "latex-mattress",
+      "key": "kl18020015",
+      "sku": "KL18020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL18020015",
+      "manufacturer_code": "KL18020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 29000,
+      "length_mm": 2000,
+      "width_mm": 1800,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 23,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-180-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "180x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "54 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 180x200x15 cm",
+          "og_title": "Kasur Latek 180x200x15 cm",
+          "og_description": "Kasur Latek 180x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-180-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "180x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "54 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 180x200x15 cm",
+          "og_title": "Latex Mattress 180x200x15 cm",
+          "og_description": "Latex Mattress 180x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 4844969.040247678,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 269.16494668042657,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 4602720.5882352935,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 255.7066993464052,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 30,
+      "source_number": 24,
+      "category_key": "latex-mattress",
+      "key": "kl20020015",
+      "sku": "KL20020015",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL20020015",
+      "manufacturer_code": "KL20020015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 32000,
+      "length_mm": 2000,
+      "width_mm": 2000,
+      "height_mm": 150,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 24,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-200-200-15",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "200x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "60 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 200x200x15 cm",
+          "og_title": "Kasur Latek 200x200x15 cm",
+          "og_description": "Kasur Latek 200x200x15 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-200-200-15",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "200x200x15 cm",
+            "density": "100 kg/m3",
+            "berat": "60 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 200x200x15 cm",
+          "og_title": "Latex Mattress 200x200x15 cm",
+          "og_description": "Latex Mattress 200x200x15 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 5347136.222910217,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 297.06312349501206,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 5079779.4117647065,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 282.20996732026146,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 31,
+      "source_number": 25,
+      "category_key": "latex-mattress",
+      "key": "kl09020020",
+      "sku": "KL09020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL09020020",
+      "manufacturer_code": "KL09020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 14000,
+      "length_mm": 2000,
+      "width_mm": 900,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 25,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-90-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "90x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 90x200x20 cm",
+          "og_title": "Kasur Latek 90x200x20 cm",
+          "og_description": "Kasur Latek 90x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-90-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "90x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "36 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 90x200x20 cm",
+          "og_title": "Latex Mattress 90x200x20 cm",
+          "og_description": "Latex Mattress 90x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3196284.829721363,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 177.5713794289646,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3036470.5882352944,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 168.69281045751634,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 32,
+      "source_number": 26,
+      "category_key": "latex-mattress",
+      "key": "kl10020020",
+      "sku": "KL10020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL10020020",
+      "manufacturer_code": "KL10020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 16000,
+      "length_mm": 2000,
+      "width_mm": 1000,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 26,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-100-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "100x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "40 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 100x200x20 cm",
+          "og_title": "Kasur Latek 100x200x20 cm",
+          "og_description": "Kasur Latek 100x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-100-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "100x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "40 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 100x200x20 cm",
+          "og_title": "Latex Mattress 100x200x20 cm",
+          "og_description": "Latex Mattress 100x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 3512383.9009287925,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 195.13243894048847,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3336764.705882353,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 185.37581699346404,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 33,
+      "source_number": 27,
+      "category_key": "latex-mattress",
+      "key": "kl12020020",
+      "sku": "KL12020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL12020020",
+      "manufacturer_code": "KL12020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 19000,
+      "length_mm": 2000,
+      "width_mm": 1200,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 27,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-120-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "120x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "48 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 120x200x20 cm",
+          "og_title": "Kasur Latek 120x200x20 cm",
+          "og_description": "Kasur Latek 120x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-120-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "120x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "48 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 120x200x20 cm",
+          "og_title": "Latex Mattress 120x200x20 cm",
+          "og_description": "Latex Mattress 120x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 4144582.043343654,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 230.2545579635363,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 3937352.9411764713,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 218.74183006535952,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 34,
+      "source_number": 28,
+      "category_key": "latex-mattress",
+      "key": "kl16020020",
+      "sku": "KL16020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL16020020",
+      "manufacturer_code": "KL16020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 26000,
+      "length_mm": 2000,
+      "width_mm": 1600,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 28,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-160-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "160x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "64 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 160x200x20 cm",
+          "og_title": "Kasur Latek 160x200x20 cm",
+          "og_description": "Kasur Latek 160x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-160-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "160x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "64 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 160x200x20 cm",
+          "og_title": "Latex Mattress 160x200x20 cm",
+          "og_description": "Latex Mattress 160x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 5408978.328173376,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 300.498796009632,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 5138529.4117647065,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 285.47385620915037,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 35,
+      "source_number": 29,
+      "category_key": "latex-mattress",
+      "key": "kl18020020",
+      "sku": "KL18020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL18020020",
+      "manufacturer_code": "KL18020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 29000,
+      "length_mm": 2000,
+      "width_mm": 1800,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 29,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-180-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "180x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "72 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 180x200x20 cm",
+          "og_title": "Kasur Latek 180x200x20 cm",
+          "og_description": "Kasur Latek 180x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-180-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "180x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "72 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 180x200x20 cm",
+          "og_title": "Latex Mattress 180x200x20 cm",
+          "og_description": "Latex Mattress 180x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 6041176.470588235,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 335.6209150326797,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 5739117.647058823,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 318.8398692810457,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 36,
+      "source_number": 30,
+      "category_key": "latex-mattress",
+      "key": "kl20020020",
+      "sku": "KL20020020",
+      "product_type": "physical",
+      "product_kind": "Kasur Tidur",
+      "unit": "Lembar",
+      "barcode": "KL20020020",
+      "manufacturer_code": "KL20020020",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 32000,
+      "length_mm": 2000,
+      "width_mm": 2000,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "preorder",
+      "is_featured": false,
+      "sort_order": 30,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "kasur-recon-200-200-20",
+          "name": "KASUR LATEX",
+          "short_description": "KASUR",
+          "description": "Kasur latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "200x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "80 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Kasur Latek",
+          "meta_description": "Kasur Latek 200x200x20 cm",
+          "og_title": "Kasur Latek 200x200x20 cm",
+          "og_description": "Kasur Latek 200x200x20 cm"
+        },
+        "en-US": {
+          "slug": "recon-mattress-200-200-20",
+          "name": "LATEX MATTRESS",
+          "short_description": "MATTRESS",
+          "description": "Latex mattress for health and comfortable sleep",
+          "specifications": {
+            "dimention": "200x200x20 cm",
+            "density": "100 kg/m3",
+            "berat": "80 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Mattress",
+          "meta_description": "Latex Mattress 200x200x20 cm",
+          "og_title": "Latex Mattress 200x200x20 cm",
+          "og_description": "Latex Mattress 200x200x20 cm"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 6673374.613003097,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 370.7430340557276,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 6339705.882352942,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 352.2058823529412,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 37,
+      "source_number": 31,
+      "category_key": "bedding-accessories",
+      "key": "fp406012",
+      "sku": "FP406012",
+      "product_type": "physical",
+      "product_kind": "Bantal Latex",
+      "unit": "pcs",
+      "barcode": "FP406012",
+      "manufacturer_code": "FP406012",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 1400,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 2,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 31,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-flat-full-latex",
+          "name": "BANTAL FLAT FULL LATEK",
+          "short_description": "BANTAL STANDAR FULL LATEK",
+          "description": "Bantal latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Latek",
+          "meta_description": "Bantal Flat Latex Alami",
+          "og_title": "Bantal Flat Latex Alami",
+          "og_description": "Bantal Flat Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-flat-full-latex",
+          "name": "FLAT LATEX PILLOW",
+          "short_description": "STANDARD FULL LATEX PILLOW",
+          "description": "Latex pillow for health and sleep comfort",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Pillow",
+          "meta_description": "Natural Latex Flat Pillow",
+          "og_title": "Natural Latex Flat Pillow",
+          "og_description": "Natural Latex Flat Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 272059.2105263158,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 15.114400584795321,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 258456.25,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 14.358680555555555,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 38,
+      "source_number": 32,
+      "category_key": "bedding-accessories",
+      "key": "cp406012",
+      "sku": "CP406012",
+      "product_type": "physical",
+      "product_kind": "Bantal Latex",
+      "unit": "pcs",
+      "barcode": "CP406012",
+      "manufacturer_code": "CP406012",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 1300,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 32,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-contour-full-latex",
+          "name": "BANTAL CONTOUR FULL LATEK",
+          "short_description": "BANTAL ERGONOMIC FULL LATEK",
+          "description": "Bantal latex untuk kesehatan, mendukung posisi leher demi kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,3 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Latek",
+          "meta_description": "Bantal Contour Latex Alami",
+          "og_title": "Bantal Contour Latex Alami",
+          "og_description": "Bantal Contour Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-contour-full-latex",
+          "name": "CONTOUR LATEX PILLOW",
+          "short_description": "ERGONOMIC FULL LATEX PILLOW",
+          "description": "Latex pillow for health, neck supports for comfortable sleep",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,3 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Pillow",
+          "meta_description": "Natural Latex Contour Pillow",
+          "og_title": "Natural Latex Contour Pillow",
+          "og_description": "Natural Latex Contour Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 260177.63157894736,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 14.454312865497075,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 247168.75,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 13.731597222222222,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 39,
+      "source_number": 33,
+      "category_key": "bedding-accessories",
+      "key": "mp406012",
+      "sku": "MP406012",
+      "product_type": "physical",
+      "product_kind": "Bantal Latex",
+      "unit": "pcs",
+      "barcode": "MP406012",
+      "manufacturer_code": "MP406012",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 1400,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 33,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-massage-full-latex",
+          "name": "BANTAL MASSAGE FULL LATEK",
+          "short_description": "BANTAL ERGONOMIC FULL LATEK",
+          "description": "Bantal latex untuk kesehatan, mendukung posisi leher demi kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Latek",
+          "meta_description": "Bantal Massage Latex Alami",
+          "og_title": "Bantal Massage Latex Alami",
+          "og_description": "Bantal Massage Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-massage-full-latex",
+          "name": "MASSAGE LATEX PILLOW",
+          "short_description": "ERGONOMIC FULL LATEX PILLOW",
+          "description": "Latex pillow for health, neck supports for comfortable sleep",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Pillow",
+          "meta_description": "Natural Latex Massage Pillow",
+          "og_title": "Natural Latex Massage Pillow",
+          "og_description": "Natural Latex Massage Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 273703.94736842107,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 15.20577485380117,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 260018.75,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 14.44548611111111,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 40,
+      "source_number": 34,
+      "category_key": "bedding-accessories",
+      "key": "sp406015",
+      "sku": "SP406015",
+      "product_type": "physical",
+      "product_kind": "Bantal Latex",
+      "unit": "pcs",
+      "barcode": "SP406015",
+      "manufacturer_code": "SP406015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 1700,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 34,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-sidesleep-full-latex",
+          "name": "BANTAL SIDESLEEP FULL LATEK",
+          "short_description": "BANTAL SQUARE FULL LATEK",
+          "description": "Bantal latex untuk kesehatan, khusus tidur miring dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x15 cm",
+            "density": "50-70 kg/m3",
+            "berat": "1,7 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Latek",
+          "meta_description": "Bantal Sidesleep Latex Alami",
+          "og_title": "Bantal Sidesleep Latex Alami",
+          "og_description": "Bantal Sidesleep Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-sidesleep-full-latex",
+          "name": "SIDESLEEP LATEX PILLOW",
+          "short_description": "SQUARE FULL LATEX PILLOW",
+          "description": "Latex pillow for health, especially for side sleeping and sleep comfort",
+          "specifications": {
+            "dimention": "40x60x15 cm",
+            "density": "50-70 kg/m3",
+            "berat": "1,7 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Pillow",
+          "meta_description": "Natural Latex Sidesleep Pillow",
+          "og_title": "Natural Latex Sidesleep Pillow",
+          "og_description": "Natural Latex Sidesleep Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 336032.89473684214,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 18.668494152046787,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 319231.25,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 17.735069444444445,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 41,
+      "source_number": 35,
+      "category_key": "bedding-accessories",
+      "key": "b202090",
+      "sku": "B202090",
+      "product_type": "physical",
+      "product_kind": "Bantal Latex",
+      "unit": "pcs",
+      "barcode": "B202090",
+      "manufacturer_code": "B202090",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 2400,
+      "length_mm": 200,
+      "width_mm": 200,
+      "height_mm": 900,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 35,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "guling-full-latex",
+          "name": "GULING FULL LATEX",
+          "short_description": "BANTAL GULING FULL LATEK",
+          "description": "Guling latex untuk kesehatan, menemani tidur dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "Dia. 20x90 cm",
+            "density": "60 kg/m3",
+            "berat": "2,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Guling Latek",
+          "meta_description": "Bantal Guling Latex Alami",
+          "og_title": "Bantal Guling Latex Alami",
+          "og_description": "Bantal Guling Latex Alami"
+        },
+        "en-US": {
+          "slug": "bolster-full-latex",
+          "name": "FULL LATEX BOLSTER",
+          "short_description": "BODY PILLOW FULL LATEX",
+          "description": "Latex body pillow for health, accompanies your sleep and sleeping comfort",
+          "specifications": {
+            "dimention": "Dia. 20x90 cm",
+            "density": "60 kg/m3",
+            "berat": "2,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex Pillow",
+          "meta_description": "Natural Latex Bolster Pillow",
+          "og_title": "Natural Latex Bolster Pillow",
+          "og_description": "Natural Latex Bolster Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 385118.3114035087,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 21.395461744639373,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 365862.39583333326,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 20.325688657407404,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 42,
+      "source_number": 36,
+      "category_key": "bedding-accessories",
+      "key": "fpr406012",
+      "sku": "FPR406012",
+      "product_type": "physical",
+      "product_kind": "Bantal Recon Latex",
+      "unit": "pcs",
+      "barcode": "FPR406012",
+      "manufacturer_code": "FPR406012",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1000",
+      "weight_grams": 1500,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 2,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 36,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-flat-recon-latex",
+          "name": "BANTAL FLAT RECON LATEK",
+          "short_description": "BANTAL STANDAR RECON LATEK",
+          "description": "Bantal latex untuk kesehatan dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,5 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Recon Latek",
+          "meta_description": "Bantal Flat Recon Latex Alami",
+          "og_title": "Bantal Flat Recon Latex Alami",
+          "og_description": "Bantal Flat Recon Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-flat-recon-latex",
+          "name": "FLAT RECON LATEX PILLOW",
+          "short_description": "STANDARD RECON LATEX PILLOW",
+          "description": "Latex pillow for health and sleep comfort",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,5 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Recon Latex Pillow",
+          "meta_description": "Natural Recon Latex Flat Pillow",
+          "og_title": "Natural Recon Latex Flat Pillow",
+          "og_description": "Natural Recon Latex Flat Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 195175.43859649124,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 10.843079922027291,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 185416.6666666667,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 10.300925925925927,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 43,
+      "source_number": 37,
+      "category_key": "bedding-accessories",
+      "key": "cpr406012",
+      "sku": "CPR406012",
+      "product_type": "physical",
+      "product_kind": "Bantal Recon Latex",
+      "unit": "pcs",
+      "barcode": "CPR406012",
+      "manufacturer_code": "CPR406012",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 1400,
+      "length_mm": 600,
+      "width_mm": 400,
+      "height_mm": 120,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 37,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-contour-recon-latex",
+          "name": "BANTAL CONTOUR FULL LATEK",
+          "short_description": "BANTAL ERGONOMIC RECON LATEK",
+          "description": "Bantal latex untuk kesehatan, mendukung posisi leher demi kenyamanan tidur",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Recon Latek",
+          "meta_description": "Bantal Contour Recon Latex Alami",
+          "og_title": "Bantal Contour Recon Latex Alami",
+          "og_description": "Bantal Contour Recon Latex Alami"
+        },
+        "en-US": {
+          "slug": "pillow-contour-recon-latex",
+          "name": "CONTOUR RECON LATEX PILLOW",
+          "short_description": "ERGONOMIC RECON LATEX PILLOW",
+          "description": "Latex pillow for health, neck supports for comfortable sleep",
+          "specifications": {
+            "dimention": "40x60x12 cm",
+            "density": "50 kg/m3",
+            "berat": "1,4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Recon Latex Pillow",
+          "meta_description": "Natural Recon Latex Contour Pillow",
+          "og_title": "Natural Recon Latex Contour Pillow",
+          "og_description": "Natural Recon Latex Contour Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 180372.80701754388,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 10.02071150097466,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 171354.1666666667,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 9.519675925925927,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 44,
+      "source_number": 38,
+      "category_key": "bedding-accessories",
+      "key": "br202090",
+      "sku": "BR202090",
+      "product_type": "physical",
+      "product_kind": "Guling Recon Latex",
+      "unit": "pcs",
+      "barcode": "BR202090",
+      "manufacturer_code": "BR202090",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1001",
+      "weight_grams": 2500,
+      "length_mm": 200,
+      "width_mm": 200,
+      "height_mm": 900,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 38,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "guling-recon-latex",
+          "name": "GULING RECON LATEX",
+          "short_description": "BANTAL GULING RECON LATEK",
+          "description": "Guling latex untuk kesehatan, menemani tidur dan kenyamanan tidur",
+          "specifications": {
+            "dimention": "Dia. 20x90 cm",
+            "density": "60 kg/m3",
+            "berat": "2,5 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Guling Recon Latek",
+          "meta_description": "Guling Recon Latex Alami",
+          "og_title": "Guling Recon Latex Alami",
+          "og_description": "Guling Recon Latex Alami"
+        },
+        "en-US": {
+          "slug": "bolster-recon-latex",
+          "name": "RECON LATEX BOLSTER",
+          "short_description": "BODY PILLOW RECON LATEX",
+          "description": "Latex body pillow for health, accompanies your sleep and sleeping comfort",
+          "specifications": {
+            "dimention": "Dia. 20x90 cm",
+            "density": "60 kg/m3",
+            "berat": "2,5 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Recon Latex Pillow",
+          "meta_description": "Natural Recon Latex Bolster Pillow",
+          "og_title": "Natural Recon Latex Bolster Pillow",
+          "og_description": "Natural Recon Latex Bolster Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 214912.2807017544,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 11.939571150097468,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 204166.6666666667,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 11.342592592592593,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 45,
+      "source_number": 39,
+      "category_key": "therapy-accessories",
+      "key": "gp607520",
+      "sku": "GP607520",
+      "product_type": "physical",
+      "product_kind": "Therapy Latek",
+      "unit": "pcs",
+      "barcode": "GP607520",
+      "manufacturer_code": "GP607520",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1002",
+      "weight_grams": 4000,
+      "length_mm": 600,
+      "width_mm": 750,
+      "height_mm": 200,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 39,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-gerd-recon-latex",
+          "name": "BANTAL GERD RECON LATEX",
+          "short_description": "BANTAL GERD RECON LATEX",
+          "description": "Bantal untuk penderita asam lambung, jantung dan gangguan pernafasan",
+          "specifications": {
+            "dimention": "60x75x20 cm",
+            "density": "85 kg/m3",
+            "berat": "4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Gerd Latek",
+          "meta_description": "Bantal Gerd Latek",
+          "og_title": "Bantal Gerd Latek",
+          "og_description": "Bantal Gerd Latek"
+        },
+        "en-US": {
+          "slug": "pillow-gerd-recon-latex",
+          "name": "GERD RECON PILLOW",
+          "short_description": "GERD RECON PILLOW",
+          "description": "Pillow for people with acid reflux, heart problems, and breathing issues",
+          "specifications": {
+            "dimention": "60x75x20 cm",
+            "density": "85 kg/m3",
+            "berat": "4 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Gerd Latex Pillow",
+          "meta_description": "Gerd Latex Pillow",
+          "og_title": "Gerd Latex Pillow",
+          "og_description": "Gerd Latex Pillow"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 340254.9342105263,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 18.903051900584796,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 323242.1875,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 17.957899305555557,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 46,
+      "source_number": 40,
+      "category_key": "therapy-accessories",
+      "key": "bsp383806",
+      "sku": "BSP383806",
+      "product_type": "physical",
+      "product_kind": "Therapy Latek",
+      "unit": "pcs",
+      "barcode": "BSP383806",
+      "manufacturer_code": "BSP383806",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1003",
+      "weight_grams": 1100,
+      "length_mm": 380,
+      "width_mm": 380,
+      "height_mm": 60,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 40,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-back-support-full-latex",
+          "name": "BANTAL BACK SUPPORT FULL LATEX",
+          "short_description": "BANTAL BACK SUPPORT FULL LATEX",
+          "description": "Bantal untuk membantu punggung saat duduk dan terapi sakit punggung",
+          "specifications": {
+            "dimention": "38x38x6 cm",
+            "density": "85 kg/m3",
+            "berat": "1,1 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Back Support Latek",
+          "meta_description": "Bantal Back Support Latek",
+          "og_title": "Bantal Back Support Latek",
+          "og_description": "Bantal Back Support Latek"
+        },
+        "en-US": {
+          "slug": "pillow-back-support-full-latex",
+          "name": "BACK SUPPORT FULL LATEX",
+          "short_description": "BACK SUPPORT FULL LATEX",
+          "description": "Pillow to help the back while sitting and back pain therapy",
+          "specifications": {
+            "dimention": "38x38x6 cm",
+            "density": "85 kg/m3",
+            "berat": "1,1 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Back Support Latex",
+          "meta_description": "Back Support Latex",
+          "og_title": "Back Support Latex",
+          "og_description": "Back Support Latex"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 99371.25,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 5.520625,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 94402.6875,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 5.24459375,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 47,
+      "source_number": 41,
+      "category_key": "therapy-accessories",
+      "key": "cus404005",
+      "sku": "CUS404005",
+      "product_type": "physical",
+      "product_kind": "Therapy Latek",
+      "unit": "pcs",
+      "barcode": "CUS404005",
+      "manufacturer_code": "CUS404005",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1004",
+      "weight_grams": 1200,
+      "length_mm": 400,
+      "width_mm": 400,
+      "height_mm": 50,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 41,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "cushion-full-latex",
+          "name": "DUDUKAN FULL LATEX",
+          "short_description": "DUDUKAN FULL LATEX",
+          "description": "Dudukan untuk kenyamaan saat duduk di kursi dan lantai",
+          "specifications": {
+            "dimention": "40x40x5 cm",
+            "density": "85 kg/m3",
+            "berat": "1,2 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Cushion Latek",
+          "meta_description": "Cushion Latek",
+          "og_title": "Cushion Latek",
+          "og_description": "Cushion Latek"
+        },
+        "en-US": {
+          "slug": "cushion-full-latex",
+          "name": "CUSHION FULL LATEX",
+          "short_description": "CUSHION FULL LATEX",
+          "description": "Seat for comfort when sitting on chairs and the floor",
+          "specifications": {
+            "dimention": "40x40x5 cm",
+            "density": "85 kg/m3",
+            "berat": "1,2 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Cushion latex",
+          "meta_description": "Cushion latex",
+          "og_title": "Cushion latex",
+          "og_description": "Cushion latex"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 126789.47368421049,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 7.043859649122805,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 120449.99999999997,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 6.691666666666665,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 48,
+      "source_number": 42,
+      "category_key": "therapy-accessories",
+      "key": "lum654065",
+      "sku": "LUM654065",
+      "product_type": "physical",
+      "product_kind": "Therapy Latek",
+      "unit": "pcs",
+      "barcode": "LUM654065",
+      "manufacturer_code": "LUM654065",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1005",
+      "weight_grams": 1900,
+      "length_mm": 650,
+      "width_mm": 400,
+      "height_mm": 65,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 42,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-lumbar-full-latex",
+          "name": "BANTAL PUNGGUNG FULL LATEX",
+          "short_description": "BANTAL PUNGGUNG FULL LATEX",
+          "description": "Bantal dudukan punggung saat tidur untuk terapi nyeri punggung",
+          "specifications": {
+            "dimention": "65x40x6,5 cm",
+            "density": "85 kg/m3",
+            "berat": "1,9 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Lumbar Latek",
+          "meta_description": "Lumbar Latek",
+          "og_title": "Lumbar Latek",
+          "og_description": "Lumbar Latek"
+        },
+        "en-US": {
+          "slug": "pillow-lumbar-full-latex",
+          "name": "LUMBAR FULL LATEX",
+          "short_description": "LUMBAR FULL LATEX",
+          "description": "Backrest pillow for sleeping for back pain therapy",
+          "specifications": {
+            "dimention": "65x40x6,5 cm",
+            "density": "85 kg/m3",
+            "berat": "1,9 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Lumbar Latex",
+          "meta_description": "Lumbar Latex",
+          "og_title": "Lumbar Latex",
+          "og_description": "Lumbar Latex"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 223202.30263157887,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 12.400127923976605,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 212042.18749999994,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 11.780121527777775,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 49,
+      "source_number": 43,
+      "category_key": "therapy-accessories",
+      "key": "was344006",
+      "sku": "WAS344006",
+      "product_type": "physical",
+      "product_kind": "Therapy Latek",
+      "unit": "pcs",
+      "barcode": "WAS344006",
+      "manufacturer_code": "WAS344006",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1006",
+      "weight_grams": 1300,
+      "length_mm": 340,
+      "width_mm": 400,
+      "height_mm": 60,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 43,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "bantal-wasir-full-latex",
+          "name": "BANTAL WASIR FULL LATEX",
+          "short_description": "BANTAL WASIR FULL LATEX",
+          "description": "Bantal nyaman untuk dudukan penderita sakit wasir",
+          "specifications": {
+            "dimention": "34x40x6 cm",
+            "density": "85 kg/m3",
+            "berat": "1,3 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Bantal Wasir Latex",
+          "meta_description": "Bantal Wasir Latex",
+          "og_title": "Bantal Wasir Latex",
+          "og_description": "Bantal Wasir Latex"
+        },
+        "en-US": {
+          "slug": "pillow-hemorrhoid-full-latex",
+          "name": "HEMORRHOID PILLOW FULL LATEX",
+          "short_description": "HEMORRHOID PILLOW FULL LATEX",
+          "description": "Comfortable cushion for hemorrhoid sufferers",
+          "specifications": {
+            "dimention": "34x40x6 cm",
+            "density": "85 kg/m3",
+            "berat": "1,3 kg",
+            "inner cover": "Single Knit 100s White",
+            "outer cover": "Knitting White 225 gsm",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Hemmorhoid Latex",
+          "meta_description": "Hemmorhoid Latex",
+          "og_title": "Hemmorhoid Latex",
+          "og_description": "Hemmorhoid Latex"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 126789.47368421049,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 7.043859649122805,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 120449.99999999997,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 6.691666666666665,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 50,
+      "source_number": 44,
+      "category_key": "automotive",
+      "key": "jm408025",
+      "sku": "JM408025",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM408025",
+      "manufacturer_code": "JM408025",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1007",
+      "weight_grams": 700,
+      "length_mm": 400,
+      "width_mm": 800,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 4,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 44,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-40-80-2-5-jm408025",
+          "name": "JOK MOTOR 100% NATURAL LATEX",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "40x80x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,7 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-40-80-2-5-jm408025",
+          "name": "MOTORCYCLE SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "40x80x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,7 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 110855.26315789473,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 6.158625730994152,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 105312.5,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 5.850694444444445,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 51,
+      "source_number": 45,
+      "category_key": "automotive",
+      "key": "jm308025",
+      "sku": "JM308025",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM308025",
+      "manufacturer_code": "JM308025",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1008",
+      "weight_grams": 600,
+      "length_mm": 300,
+      "width_mm": 800,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 5,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 45,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-30-80-2-5-jm308025",
+          "name": "JOK MOTOR 100% NATURAL LATEX",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "30x80x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,6 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-30-80-2-5-jm308025",
+          "name": "MOTORCYCLE SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "30x80x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,6 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 83552.63157894736,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 4.641812865497076,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 79374.99999999999,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 4.409722222222221,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 52,
+      "source_number": 46,
+      "category_key": "automotive",
+      "key": "jm408015",
+      "sku": "JM408015",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM408015",
+      "manufacturer_code": "JM408015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1009",
+      "weight_grams": 500,
+      "length_mm": 400,
+      "width_mm": 800,
+      "height_mm": 15,
+      "min_order_qty": 1,
+      "lead_time_days": 6,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 46,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-40-80-1-5-jm408015",
+          "name": "JOK MOTOR 100% NATURAL LATEX",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "40x80x1,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-40-80-1-5-jm408015",
+          "name": "MOTORCYCLE SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "40x80x1,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 67171.05263157895,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 3.7317251461988303,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 63812.5,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 3.545138888888889,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 53,
+      "source_number": 47,
+      "category_key": "automotive",
+      "key": "jm308015",
+      "sku": "JM308015",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM308015",
+      "manufacturer_code": "JM308015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1010",
+      "weight_grams": 400,
+      "length_mm": 300,
+      "width_mm": 800,
+      "height_mm": 15,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 47,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-30-80-1-5-jm308015",
+          "name": "JOK MOTOR 100% NATURAL LATEX",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "30x80x1,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-30-80-1-5-jm308015",
+          "name": "MOTORCYCLE SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "30x80x1,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 50789.47368421052,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 2.8216374269005846,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 48249.99999999999,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 2.6805555555555554,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 54,
+      "source_number": 48,
+      "category_key": "automotive",
+      "key": "jm217025",
+      "sku": "JM217025",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM217025",
+      "manufacturer_code": "JM217025",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1011",
+      "weight_grams": 400,
+      "length_mm": 210,
+      "width_mm": 700,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 8,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 48,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-economy-21-70-2-5",
+          "name": "JOK MOTOR KECIL EKONOMIS",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "21x70x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-economy-21-70-2-5",
+          "name": "SMALL ECONOMY SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "21x70x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 56830.18092105263,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 3.157232273391813,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 53988.671875,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 2.999370659722222,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 55,
+      "source_number": 49,
+      "category_key": "automotive",
+      "key": "jm257425",
+      "sku": "JM257425",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM257425",
+      "manufacturer_code": "JM257425",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1012",
+      "weight_grams": 500,
+      "length_mm": 250,
+      "width_mm": 740,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 9,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 49,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-25-74-2-5",
+          "name": "JOK MOTOR BESAR EKONOMIS",
+          "short_description": "LEMBARAN JOK MOTOR FULL LATEX",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "25x74x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Full Latex",
+          "meta_description": "Jok Motor Full Latex",
+          "og_title": "Jok Motor Full Latex",
+          "og_description": "Jok Motor Full Latex"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-25-74-2-5",
+          "name": "BIG ECONOMY SEAT LATEXFOAM",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "25x74x2,5 cm",
+            "density": "85 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Full Latex Motorcycle Seat",
+          "meta_description": "Full Latex Motorcycle Seat",
+          "og_title": "Full Latex Motorcycle Seat",
+          "og_description": "Full Latex Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 71095.80592105261,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 3.9497669956140338,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 67541.01562499999,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 3.7522786458333326,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 56,
+      "source_number": 50,
+      "category_key": "automotive",
+      "key": "jm70408025",
+      "sku": "JM70408025",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM70408025",
+      "manufacturer_code": "JM70408025",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1007",
+      "weight_grams": 600,
+      "length_mm": 400,
+      "width_mm": 800,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 4,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 50,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-40-80-2-5-jm70408025",
+          "name": "JOK MOTOR 100% LATEX D70",
+          "short_description": "LEMBARAN JOK MOTOR LATEX D70",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "40x80x2,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,7 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Latex D70",
+          "meta_description": "Jok Motor Latex D70",
+          "og_title": "Jok Motor Latex D70",
+          "og_description": "Jok Motor Latex D70"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-40-80-2-5-jm70408025",
+          "name": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "40x80x2,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,7 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex D70 Motorcycle Seat",
+          "meta_description": "Latex D70 Motorcycle Seat",
+          "og_title": "Latex D70 Motorcycle Seat",
+          "og_description": "Latex D70 Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 45906.43274853801,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 2.5503573749187787,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 43611.11111111111,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 2.4228395061728394,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 57,
+      "source_number": 51,
+      "category_key": "automotive",
+      "key": "jm70308025",
+      "sku": "JM70308025",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM70308025",
+      "manufacturer_code": "JM70308025",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1008",
+      "weight_grams": 500,
+      "length_mm": 300,
+      "width_mm": 800,
+      "height_mm": 25,
+      "min_order_qty": 1,
+      "lead_time_days": 5,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 51,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-30-80-2-5-jm70308025",
+          "name": "JOK MOTOR 100% LATEX D70",
+          "short_description": "LEMBARAN JOK MOTOR LATEX D70",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "30x80x2,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,6 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Latex D70",
+          "meta_description": "Jok Motor Latex D70",
+          "og_title": "Jok Motor Latex D70",
+          "og_description": "Jok Motor Latex D70"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-30-80-2-5-jm70308025",
+          "name": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "30x80x2,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,6 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex D70 Motorcycle Seat",
+          "meta_description": "Latex D70 Motorcycle Seat",
+          "og_title": "Latex D70 Motorcycle Seat",
+          "og_description": "Latex D70 Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 34795.3216374269,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 1.9330734243014946,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 33055.555555555555,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 1.8364197530864197,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 58,
+      "source_number": 52,
+      "category_key": "automotive",
+      "key": "jm70408015",
+      "sku": "JM70408015",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM70408015",
+      "manufacturer_code": "JM70408015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1009",
+      "weight_grams": 400,
+      "length_mm": 400,
+      "width_mm": 800,
+      "height_mm": 15,
+      "min_order_qty": 1,
+      "lead_time_days": 6,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 52,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-40-80-1-5-jm70408015",
+          "name": "JOK MOTOR 100% LATEX D70",
+          "short_description": "LEMBARAN JOK MOTOR LATEX D70",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "40x80x1,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Latex D70",
+          "meta_description": "Jok Motor Latex D70",
+          "og_title": "Jok Motor Latex D70",
+          "og_description": "Jok Motor Latex D70"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-40-80-1-5-jm70408015",
+          "name": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "40x80x1,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,5 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex D70 Motorcycle Seat",
+          "meta_description": "Latex D70 Motorcycle Seat",
+          "og_title": "Latex D70 Motorcycle Seat",
+          "og_description": "Latex D70 Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 28128.654970760235,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 1.5627030539311242,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 26722.222222222223,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 1.4845679012345678,
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "source_row": 59,
+      "source_number": 53,
+      "category_key": "automotive",
+      "key": "jm70308015",
+      "sku": "JM70308015",
+      "product_type": "physical",
+      "product_kind": "Jok Motor Latek",
+      "unit": "pcs",
+      "barcode": "JM70308015",
+      "manufacturer_code": "JM70308015",
+      "country_origin": "Indonesia",
+      "origin_province": "Jawa Barat",
+      "origin_city": "Bogor",
+      "hs_code": "9404,21,1010",
+      "weight_grams": 300,
+      "length_mm": 300,
+      "width_mm": 800,
+      "height_mm": 15,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "stock_status": "in_stock",
+      "is_featured": true,
+      "sort_order": 53,
+      "status": "draft",
+      "source_image_url": null,
+      "source_visibility": null,
+      "source_inputted_by": null,
+      "translations": {
+        "id-ID": {
+          "slug": "jok-motor-latex-30-80-1-5-jm70308015",
+          "name": "JOK MOTOR 100% LATEX D70",
+          "short_description": "LEMBARAN JOK MOTOR LATEX D70",
+          "description": "Latex lembaran untuk jok motor yang memberikan kenyamanan extra",
+          "specifications": {
+            "dimention": "30x80x1,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Jok Motor Latex D70",
+          "meta_description": "Jok Motor Latex D70",
+          "og_title": "Jok Motor Latex D70",
+          "og_description": "Jok Motor Latex D70"
+        },
+        "en-US": {
+          "slug": "motorcycle-sheet-latex-30-80-1-5-jm70308015",
+          "name": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "short_description": "MOTORCYCLE SEAT LATEXFOAM D70",
+          "description": "Latex Sheet for motorcycle seats that provides extra comfort",
+          "specifications": {
+            "dimention": "30x80x1,5 cm",
+            "density": "70 kg/m3",
+            "berat": "0,4 kg",
+            "waranty": "Ten years"
+          },
+          "meta_title": "Latex D70 Motorcycle Seat",
+          "meta_description": "Latex D70 Motorcycle Seat",
+          "og_title": "Latex D70 Motorcycle Seat",
+          "og_description": "Latex D70 Motorcycle Seat"
+        }
+      },
+      "prices": [
+        {
+          "type": "end_user",
+          "label": "Harga konsumen",
+          "currency": "IDR",
+          "amount": 21461.988304093567,
+          "is_public": true
+        },
+        {
+          "type": "end_user",
+          "label": "Consumer price",
+          "currency": "USD",
+          "amount": 1.1923326835607537,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Harga grosir",
+          "currency": "IDR",
+          "amount": 20388.88888888889,
+          "is_public": false
+        },
+        {
+          "type": "wholesale",
+          "label": "Wholesale price",
+          "currency": "USD",
+          "amount": 1.1327160493827162,
+          "is_public": false
+        }
+      ]
+    }
+  ]
+}

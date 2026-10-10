@@ -7,7 +7,8 @@
     "start": "tsx src/app.ts",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:contracts",
-    "test:contracts": "node -e \"require('fs').rmSync('dist/tests-build',{recursive:true,force:true})\" && tsc --outDir dist/tests-build && node --test dist/tests-build/tests/*.test.js"
+    "test:contracts": "node -e \"require('fs').rmSync('dist/tests-build',{recursive:true,force:true})\" && tsc --outDir dist/tests-build && node --test dist/tests-build/tests/*.test.js",
+    "import:products": "tsx scripts/import-product-catalog.ts --replace"
   },
   "keywords": [],
   "author": "",

@@ -16,6 +16,11 @@ export class ProductInformation {
   private router = inject(Router);
 
   get isEnglish() { return this.router.url === '/en' || this.router.url.startsWith('/en/'); }
+  originLabel() {
+    return [this.product()?.origin_city, this.product()?.origin_province, this.product()?.country_origin]
+      .filter(Boolean)
+      .join(', ');
+  }
   stockLabel(status?: string) {
     const labels: Record<string, [string, string]> = {
       in_stock: ['Tersedia', 'Available'], out_of_stock: ['Habis', 'Out of stock'],

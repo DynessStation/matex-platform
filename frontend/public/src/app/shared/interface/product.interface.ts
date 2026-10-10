@@ -35,6 +35,7 @@ export interface Product {
   quantity: number;
   orders_count: number;
   product_type: string;
+  product_kind?: string | null;
   wholesale_price_type: string | null;
   wholesales: WholesalePrice[];
   is_sale_enable: boolean | number;
@@ -59,6 +60,8 @@ export interface Product {
   weight?: string;
   manufacturer_code?: string | null;
   country_origin?: string | null;
+  origin_province?: string | null;
+  origin_city?: string | null;
   hs_code?: string | null;
   min_order_qty?: number;
   lead_time_days?: number | null;

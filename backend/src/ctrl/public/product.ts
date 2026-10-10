@@ -34,11 +34,13 @@ const hydrate = async (rows: RowDataPacket[], company: number, locale: string) =
   const [markets]=await pool.query<RowDataPacket[]>(`SELECT * FROM product_catalog_marketplace WHERE id_product IN (${marks}) AND id_master_comp=? AND product_marketplace_is_active=1 ORDER BY product_marketplace_is_primary DESC,product_marketplace_sort_order`,[...ids,company]);
   const [localizedSlugs]=await pool.query<RowDataPacket[]>(`SELECT id_product,product_locale,product_slug FROM product_catalog_i18n WHERE id_product IN (${marks}) AND id_master_comp=? AND product_i18n_status=1`,[...ids,company]);
   return rows.map((row)=>{const id=Number(row.id_product), productMedia=media.filter(x=>Number(x.id_product)===id), publicPrice=prices.find(x=>Number(x.id_product)===id&&x.product_price_is_public), productMarkets=markets.filter(x=>Number(x.id_product)===id), primaryMarket=productMarkets.find(x=>Boolean(x.product_marketplace_is_primary))??productMarkets[0];let primaryAssigned=false;const normalizedMarkets:(RowDataPacket&{normalized_is_primary:boolean})[]=productMarkets.map(x=>{const isPrimary=!primaryAssigned&&Boolean(x.product_marketplace_is_primary);if(isPrimary)primaryAssigned=true;return Object.assign(x,{normalized_is_primary:isPrimary});});if(normalizedMarkets.length&&!primaryAssigned)normalizedMarkets[0].normalized_is_primary=true;return {
-    id,name:row.product_name,slug:row.product_slug,sku:row.product_sku,product_type:row.product_type,
+    id,name:row.product_name,slug:row.product_slug,sku:row.product_sku,
+    product_type:row.product_type,product_kind:row.product_kind??null,
     localized_slugs:Object.fromEntries(localizedSlugs.filter(x=>Number(x.id_product)===id).map(x=>[x.product_locale,x.product_slug])),
     short_description:row.product_short_description??"",description:row.product_description??"",
     specifications:row.product_specifications_json??null,unit:row.product_unit??"",weight:row.product_weight_grams==null?null:Number(row.product_weight_grams),
     manufacturer_code:row.product_manufacturer_code??null,country_origin:row.product_country_origin??null,
+    origin_province:row.product_origin_province??null,origin_city:row.product_origin_city??null,
     hs_code:row.product_hs_code??null,min_order_qty:Number(row.product_min_order_qty??1),
     lead_time_days:row.product_lead_time_days==null?null:Number(row.product_lead_time_days),
     dimensions:{length_mm:row.product_length_mm==null?null:Number(row.product_length_mm),width_mm:row.product_width_mm==null?null:Number(row.product_width_mm),height_mm:row.product_height_mm==null?null:Number(row.product_height_mm)},

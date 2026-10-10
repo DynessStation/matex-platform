@@ -16,6 +16,7 @@ export interface IProduct {
   id: any;
   key?: string;
   product_type: string;
+  product_kind?: string | null;
   name: string;
   slug: string;
   short_description: string;
@@ -120,6 +121,8 @@ export interface IProduct {
   manufacturer_code?: string;
   barcode?: string;
   country_origin?: string;
+  origin_province?: string;
+  origin_city?: string;
   hs_code?: string;
   length_mm?: number | null;
   width_mm?: number | null;
@@ -150,12 +153,15 @@ export interface IProductMarketplace {
 }
 export interface IProductPayload {
   key: string; sku: string; product_type: 'physical' | 'service' | 'digital';
+  product_kind: string | null;
   status: ProductCatalogStatus; unit: string | null; barcode: string | null;
-  manufacturer_code: string | null; country_origin: string | null; hs_code: string | null;
+  manufacturer_code: string | null; country_origin: string | null;
+  origin_province: string | null; origin_city: string | null; hs_code: string | null;
   weight_grams: number | null; length_mm: number | null; width_mm: number | null; height_mm: number | null;
   min_order_qty: number; lead_time_days: number | null; manage_stock: 0 | 1;
   stock_quantity: number | null; stock_status: string; price_visibility: ProductPriceVisibility;
-  internal_commerce_enabled: 0 | 1; is_featured: 0 | 1; sort_order: number;
+  internal_commerce_enabled: 0 | 1; is_featured: 0 | 1;
+  sort_order: number;
   category_ids: string[]; media: Array<{ id: string; role: ProductMediaRole; sort_order: number }>;
   prices: IProductPrice[]; marketplaces: IProductMarketplace[]; translations: IProductTranslation[];
 }

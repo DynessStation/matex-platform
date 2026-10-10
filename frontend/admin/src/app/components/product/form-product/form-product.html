@@ -42,12 +42,13 @@
                     />
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">Jenis</label
+                    <label class="form-label">Bentuk produk</label
                     ><select class="form-select" formControlName="product_type">
                       <option value="physical">Produk fisik</option>
                       <option value="service">Layanan</option>
                       <option value="digital">Digital</option>
                     </select>
+                    <small class="text-muted">Barang fisik, layanan, atau produk digital.</small>
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Status</label
@@ -64,6 +65,15 @@
                       formControlName="unit"
                       placeholder="pcs, lembar, kg"
                     />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Jenis / kelompok produk</label
+                    ><input
+                      class="form-control"
+                      formControlName="product_kind"
+                      placeholder="contoh: Kasur Tipis, Bantal, Jok Motor"
+                    />
+                    <small class="text-muted">Kelompok produk internal MATEX; berbeda dari kategori katalog.</small>
                   </div>
                   <div class="col-12">
                     <label class="form-label">Kategori</label
@@ -101,6 +111,14 @@
                       class="form-control"
                       formControlName="country_origin"
                     />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Provinsi asal</label
+                    ><input class="form-control" formControlName="origin_province" placeholder="contoh: Jawa Barat" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Kota / kabupaten asal</label
+                    ><input class="form-control" formControlName="origin_city" placeholder="contoh: Bogor" />
                   </div>
                   <div class="col-md-2">
                     <label class="form-label">Berat (gram)</label
@@ -142,7 +160,7 @@
                     <label class="form-label">Minimum pesanan</label
                     ><input
                       type="number"
-                      min="0"
+                      min="1"
                       class="form-control"
                       formControlName="min_order_qty"
                     />

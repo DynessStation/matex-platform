@@ -37,9 +37,11 @@ const parsePayload = (body: any) => {
   const productType = String(body?.product_type ?? "physical");
   const stockStatus = String(body?.stock_status ?? "in_stock");
   const priceVisibility = String(body?.price_visibility ?? "contact");
+  const isFeatured = body?.is_featured ? 1 : 0;
   if (!key || !sku || !statuses.has(status) || !types.has(productType) ||
       !stocks.has(stockStatus) || !priceVisibilities.has(priceVisibility) ||
-      !Array.isArray(body?.translations)) return null;
+      !Array.isArray(body?.translations) ||
+      !Array.isArray(body?.category_ids) || body.category_ids.length === 0) return null;
 
   const translations: any[] = [];
   const locales = new Set<string>();
@@ -118,13 +120,17 @@ const parsePayload = (body: any) => {
 
   return {
     key, sku, status, productType, stockStatus, priceVisibility, categoryIds, media, prices, marketplaces, translations,
+    kind: clean(body?.product_kind, 120) || null,
     unit: clean(body?.unit, 40) || null, barcode: clean(body?.barcode, 120) || null,
     manufacturerCode: clean(body?.manufacturer_code, 120) || null,
-    countryOrigin: clean(body?.country_origin, 100) || null, hsCode: clean(body?.hs_code, 50) || null,
+    countryOrigin: clean(body?.country_origin, 100) || null,
+    provinceOrigin: clean(body?.origin_province, 100) || null,
+    cityOrigin: clean(body?.origin_city, 100) || null,
+    hsCode: clean(body?.hs_code, 50) || null,
     weight, length, width, height, minOrderQty, leadTimeDays,
     manageStock: body?.manage_stock ? 1 : 0, stockQuantity,
     internalCommerce: body?.internal_commerce_enabled ? 1 : 0,
-    isFeatured: body?.is_featured ? 1 : 0, sortOrder: Math.max(0, Number(body?.sort_order) || 0),
+    isFeatured, sortOrder: Math.max(0, Number(body?.sort_order) || 0),
   };
 };
 
@@ -171,7 +177,9 @@ const hydrate = async (rows: RowDataPacket[], company: number, locale: string) =
       ...row, id: keyhsid.idProduct.encode(id), key: row.product_key, sku: row.product_sku,
       name: row.product_name ?? row.product_key, slug: row.product_slug ?? "",
       short_description: row.product_short_description ?? "", description: row.product_description ?? "",
-      product_type: row.product_type, status: row.product_status, stock_status: row.product_stock_status,
+      product_type: row.product_type, product_kind: row.product_kind,
+      origin_province: row.product_origin_province, origin_city: row.product_origin_city,
+      status: row.product_status, stock_status: row.product_stock_status,
       quantity: row.product_stock_quantity == null ? 0 : Number(row.product_stock_quantity),
       price_visibility: row.product_price_visibility, price: publicPrice?.amount ?? 0,
       sale_price: publicPrice?.amount ?? 0, is_featured: Boolean(row.product_is_featured),
@@ -241,9 +249,9 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     if (id) {
       const [exists] = await cx.query<RowDataPacket[]>(`SELECT id_product FROM product_catalog WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL FOR UPDATE`, [id, scope.idMasterComp]);
       if (!exists.length) { await cx.rollback(); return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found"); }
-      await cx.query(`UPDATE product_catalog SET product_key=?,product_sku=?,product_type=?,product_status=?,product_unit=?,product_barcode=?,product_manufacturer_code=?,product_country_origin=?,product_hs_code=?,product_weight_grams=?,product_length_mm=?,product_width_mm=?,product_height_mm=?,product_min_order_qty=?,product_lead_time_days=?,product_manage_stock=?,product_stock_quantity=?,product_stock_status=?,product_price_visibility=?,product_internal_commerce_enabled=?,product_is_featured=?,product_sort_order=?,id_updated_by=? WHERE id_product=? AND id_master_comp=?`, [payload.key,payload.sku,payload.productType,payload.status,payload.unit,payload.barcode,payload.manufacturerCode,payload.countryOrigin,payload.hsCode,payload.weight,payload.length,payload.width,payload.height,payload.minOrderQty,payload.leadTimeDays,payload.manageStock,payload.stockQuantity,payload.stockStatus,payload.priceVisibility,payload.internalCommerce,payload.isFeatured,payload.sortOrder,scope.idAdminAcct,id,scope.idMasterComp]);
+      await cx.query(`UPDATE product_catalog SET product_key=?,product_sku=?,product_type=?,product_kind=?,product_status=?,product_unit=?,product_barcode=?,product_manufacturer_code=?,product_country_origin=?,product_origin_province=?,product_origin_city=?,product_hs_code=?,product_weight_grams=?,product_length_mm=?,product_width_mm=?,product_height_mm=?,product_min_order_qty=?,product_lead_time_days=?,product_manage_stock=?,product_stock_quantity=?,product_stock_status=?,product_price_visibility=?,product_internal_commerce_enabled=?,product_is_featured=?,product_sort_order=?,id_updated_by=? WHERE id_product=? AND id_master_comp=?`, [payload.key,payload.sku,payload.productType,payload.kind,payload.status,payload.unit,payload.barcode,payload.manufacturerCode,payload.countryOrigin,payload.provinceOrigin,payload.cityOrigin,payload.hsCode,payload.weight,payload.length,payload.width,payload.height,payload.minOrderQty,payload.leadTimeDays,payload.manageStock,payload.stockQuantity,payload.stockStatus,payload.priceVisibility,payload.internalCommerce,payload.isFeatured,payload.sortOrder,scope.idAdminAcct,id,scope.idMasterComp]);
     } else {
-      const [result] = await cx.query<ResultSetHeader>(`INSERT INTO product_catalog(id_master_comp,product_key,product_sku,product_type,product_status,product_unit,product_barcode,product_manufacturer_code,product_country_origin,product_hs_code,product_weight_grams,product_length_mm,product_width_mm,product_height_mm,product_min_order_qty,product_lead_time_days,product_manage_stock,product_stock_quantity,product_stock_status,product_price_visibility,product_internal_commerce_enabled,product_is_featured,product_sort_order,id_created_by,id_updated_by) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, [scope.idMasterComp,payload.key,payload.sku,payload.productType,payload.status,payload.unit,payload.barcode,payload.manufacturerCode,payload.countryOrigin,payload.hsCode,payload.weight,payload.length,payload.width,payload.height,payload.minOrderQty,payload.leadTimeDays,payload.manageStock,payload.stockQuantity,payload.stockStatus,payload.priceVisibility,payload.internalCommerce,payload.isFeatured,payload.sortOrder,scope.idAdminAcct,scope.idAdminAcct]);
+      const [result] = await cx.query<ResultSetHeader>(`INSERT INTO product_catalog(id_master_comp,product_key,product_sku,product_type,product_kind,product_status,product_unit,product_barcode,product_manufacturer_code,product_country_origin,product_origin_province,product_origin_city,product_hs_code,product_weight_grams,product_length_mm,product_width_mm,product_height_mm,product_min_order_qty,product_lead_time_days,product_manage_stock,product_stock_quantity,product_stock_status,product_price_visibility,product_internal_commerce_enabled,product_is_featured,product_sort_order,id_created_by,id_updated_by) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, [scope.idMasterComp,payload.key,payload.sku,payload.productType,payload.kind,payload.status,payload.unit,payload.barcode,payload.manufacturerCode,payload.countryOrigin,payload.provinceOrigin,payload.cityOrigin,payload.hsCode,payload.weight,payload.length,payload.width,payload.height,payload.minOrderQty,payload.leadTimeDays,payload.manageStock,payload.stockQuantity,payload.stockStatus,payload.priceVisibility,payload.internalCommerce,payload.isFeatured,payload.sortOrder,scope.idAdminAcct,scope.idAdminAcct]);
       id = result.insertId;
     }
     await cx.query(`DELETE FROM product_catalog_i18n WHERE id_product=? AND id_master_comp=?`, [id, scope.idMasterComp]);
