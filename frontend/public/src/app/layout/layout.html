@@ -1,7 +1,7 @@
-@if (themeOptionService.preloader()) {
+@if (routeLoading() || requestLoading() || themeOptionService.preloader()) {
   <app-loader></app-loader>
 }
-<app-header [logo]="setLogo().header_logo"></app-header>
+<app-header [logo]="headerLogo"></app-header>
 <router-outlet></router-outlet>
-<app-footer [logo]="setLogo().footer_logo"></app-footer>
+<app-footer [logo]="footerLogo"></app-footer>
 <app-back-to-top />

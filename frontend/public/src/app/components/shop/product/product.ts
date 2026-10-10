@@ -18,9 +18,9 @@ import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadc
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { TProduct } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
+import { RecentProductService } from '../../../shared/services/recent-product.service';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
-import { RecentProductService } from '../../../shared/services/recent-product.service';
 
 @Component({
   selector: 'app-product',
@@ -35,7 +35,6 @@ import { RecentProductService } from '../../../shared/services/recent-product.se
     ProductLightBoxImage,
     Breadcrumb,
     ProductZoom,
-    AsyncPipe,
   ],
   templateUrl: './product.html',
   styleUrl: './product.scss',

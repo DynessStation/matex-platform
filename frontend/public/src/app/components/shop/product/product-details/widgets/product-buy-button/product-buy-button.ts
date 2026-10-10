@@ -1,5 +1,6 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, DestroyRef, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
@@ -34,12 +35,13 @@ export class ProductBuyButton {
   public cartItem: Cart | null;
 
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
   setting$: Observable<Values | null> = this.store.select(SettingState.setting);
 
   constructor(private router: Router) {
-    this.setting$.subscribe(
-      (setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!),
-    );
+    this.setting$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!));
   }
   get isEnglish() {
     return this.router.url === '/en' || this.router.url.startsWith('/en/');

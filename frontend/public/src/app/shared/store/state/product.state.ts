@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
-import { tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 
 import { Product, ProductModel } from '../../interface/product.interface';
 import { ProductService } from '../../services/product.service';
@@ -183,19 +183,16 @@ export class ProductState {
 
           ctx.patchState({ selectedProduct: result });
         },
-        complete: () => {
-          this.themeOptionService.preloader.set(false);
-        },
         error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
+      finalize(() => this.themeOptionService.preloader.set(false)),
     );
   }
 
   @Action(GetRelatedProducts)
   getRelatedProducts(ctx: StateContext<ProductStateModel>, action: GetProducts) {
-    this.themeOptionService.preloader.set(true);
     return this.productService.getProducts(action.payload).pipe(
       tap({
         next: (result: ProductModel) => {
@@ -204,9 +201,6 @@ export class ProductState {
             ...state,
             relatedProducts: result.data,
           });
-        },
-        complete: () => {
-          this.themeOptionService.preloader.set(false);
         },
         error: (err) => {
           throw new Error(err?.error?.message);
@@ -244,7 +238,6 @@ export class ProductState {
         },
         complete: () => {
           this.productService.skeletonCategoryProductLoader = false;
-          this.themeOptionService.preloader.set(false);
         },
         error: (err) => {
           throw new Error(err?.error?.message);

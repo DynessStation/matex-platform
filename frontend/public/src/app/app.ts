@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, DOCUMENT, inject, PLATFORM_ID } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, inject, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 
 import { NgbRatingConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -23,6 +24,8 @@ import { ThemeOptionState } from './shared/store/state/theme-option.state';
 })
 export class App {
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
+  private document = inject<Document>(DOCUMENT);
   seoService = inject(SeoService);
   private platformId = inject<Object>(PLATFORM_ID);
 
@@ -40,7 +43,6 @@ export class App {
     this.store.dispatch(new GetCurrencies({ status: 1 }));
     this.store.dispatch(new GetSettingOption());
 
-    const document = inject<Document>(DOCUMENT);
     const config = inject(NgbRatingConfig);
     const platformId = this.platformId;
 
@@ -48,7 +50,7 @@ export class App {
     config.max = 5;
     config.readonly = true;
 
-    this.setting$.subscribe((option) => {
+    this.setting$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((option) => {
       this.maintenance_mode = option && option.maintenance && option.maintenance.maintenance_mode;
       if (option?.analytics) {
         if (option?.analytics?.google_analytics && option?.analytics?.google_analytics.status) {
@@ -58,21 +60,21 @@ export class App {
     });
 
     if (this.isBrowser) {
-      this.themeOption$.subscribe((theme) => {
+      this.themeOption$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
         // Set Mode
         if (theme?.general?.mode === 'dark') {
-          document.body.classList.add(theme?.general && theme?.general?.mode);
+          this.document.body.classList.add(theme?.general && theme?.general?.mode);
         } else {
-          document.body.classList.remove('dark');
+          this.document.body.classList.remove('dark');
         }
 
         // Set Direction
         if (theme?.general?.language_direction === 'rtl') {
-          document.getElementsByTagName('html')[0].setAttribute('dir', 'rtl');
-          document.body.classList.add('rtl');
+          this.document.getElementsByTagName('html')[0].setAttribute('dir', 'rtl');
+          this.document.body.classList.add('rtl');
         } else {
-          document.getElementsByTagName('html')[0].removeAttribute('dir');
-          document.body.classList.remove('rtl');
+          this.document.getElementsByTagName('html')[0].removeAttribute('dir');
+          this.document.body.classList.remove('rtl');
         }
       });
     }
@@ -83,27 +85,35 @@ export class App {
     if (this.isBrowser) {
       // Load Google Analytics script if enabled
       if (val.google_analytics.status) {
-        const script = document.createElement('script');
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${val.google_analytics.measurement_id}`;
-        document.head.appendChild(script);
+        const scriptId = 'matex-google-analytics';
+        if (!this.document.getElementById(scriptId)) {
+          const script = this.document.createElement('script');
+          script.id = scriptId;
+          script.src = `https://www.googletagmanager.com/gtag/js?id=${val.google_analytics.measurement_id}`;
+          this.document.head.appendChild(script);
 
-        const configScript = document.createElement('script');
-        configScript.innerHTML = `
+          const configScript = this.document.createElement('script');
+          configScript.innerHTML = `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${val.google_analytics.measurement_id}');
           `;
-        document.head.appendChild(configScript);
+          this.document.head.appendChild(configScript);
+        }
       }
 
       // Load Facebook Pixel script if enabled
       if (val.facebook_pixel.status) {
-        const script = document.createElement('script');
-        script.src = `https://www.facebook.com/tr?id=${val.facebook_pixel.pixel_id}`;
-        document.head.appendChild(script);
+        const scriptId = 'matex-facebook-pixel';
+        if (this.document.getElementById(scriptId)) return;
 
-        const configScript = document.createElement('script');
+        const script = this.document.createElement('script');
+        script.id = scriptId;
+        script.src = `https://www.facebook.com/tr?id=${val.facebook_pixel.pixel_id}`;
+        this.document.head.appendChild(script);
+
+        const configScript = this.document.createElement('script');
         configScript.innerHTML = `
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -116,7 +126,7 @@ export class App {
           fbq('init', '${val.facebook_pixel.pixel_id}');
           fbq('track', 'PageView');
           `;
-        document.head.appendChild(configScript);
+        this.document.head.appendChild(configScript);
       }
     }
   }

@@ -45,16 +45,17 @@ export class LoaderState {
   @Action(ShowLoaderAction)
   public showLoaderAction(ctx: StateContext<LoaderStateModel>, action: ShowLoaderAction) {
     const state = ctx.getState();
-    const count = state?.loadingCount ? state?.loadingCount : 0;
-    ctx.patchState({ status: action?.loading, loadingCount: count + 1 });
+    const loadingCount = Math.max(0, state.loadingCount) + 1;
+    ctx.patchState({ status: action.loading && loadingCount > 0, loadingCount });
   }
 
   @Action(HideLoaderAction)
   public hideLoaderAction(ctx: StateContext<LoaderStateModel>) {
     const state = ctx.getState();
+    const loadingCount = Math.max(0, state.loadingCount - 1);
     ctx.patchState({
-      status: state?.loadingCount === 1 ? false : true,
-      loadingCount: state?.loadingCount - 1,
+      status: loadingCount > 0,
+      loadingCount,
     });
   }
 

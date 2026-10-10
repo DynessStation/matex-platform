@@ -1,24 +1,24 @@
 import { isPlatformBrowser, DatePipe, NgClass, AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, Inject, inject, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { map, Observable } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Sidebar } from './sidebar/sidebar';
+import { NoData } from '../../shared/components/no-data/no-data';
 import { Breadcrumb } from '../../shared/components/widgets/breadcrumb/breadcrumb';
 import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
 import { breadcrumb } from '../../shared/interface/breadcrumb.interface';
 import { Option } from '../../shared/interface/theme-option.interface';
 import { BlogService } from '../../shared/services/blog.service';
+import { PublicNavigationContextService } from '../../shared/services/public-navigation-context.service';
 import { GetBlogsAction } from '../../shared/store/action/blog.action';
 import { BlogState } from '../../shared/store/state/blog.state';
 import { ThemeOptionState } from '../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../home/widgets/home-newsletter/home-newsletter';
-import { PublicNavigationContextService } from '../../shared/services/public-navigation-context.service';
-import { NoData } from '../../shared/components/no-data/no-data';
 
 @Component({
   selector: 'app-blog',
@@ -90,6 +90,15 @@ export class Blog {
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
+    this.themeOption$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
+      if (!this.route.snapshot.queryParamMap.has('style')) {
+        this.style = theme?.blog?.blog_style || 'grid_view';
+      }
+      if (!this.route.snapshot.queryParamMap.has('sidebar')) {
+        this.sidebar = theme?.blog?.blog_sidebar_type || 'left_sidebar';
+      }
+    });
+
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.filter.category = params['category'] ? params['category'] : '';
       this.filter.tag = params['tag'] ? params['tag'] : '';
@@ -105,12 +114,6 @@ export class Blog {
         this.sidebar = params['sidebar'];
       }
 
-      if (!params['style'] && !params['sidebar']) {
-        this.themeOption$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
-          this.style = theme?.blog?.blog_style;
-          this.sidebar = theme?.blog?.blog_sidebar_type;
-        });
-      }
       this.setBreadcrumb();
     });
   }

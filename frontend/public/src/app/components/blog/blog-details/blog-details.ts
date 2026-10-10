@@ -65,11 +65,13 @@ export class BlogDetails {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       if (params['sidebar']) {
         this.sidebar = params['sidebar'];
-        return;
       }
-      this.themeOption$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
+    });
+
+    this.themeOption$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((theme) => {
+      if (!this.route.snapshot.queryParamMap.has('sidebar')) {
         this.sidebar = theme?.blog?.blog_sidebar_type || 'left_sidebar';
-      });
+      }
     });
 
     this.destroyRef.onDestroy(() => this.clearSeoElements());

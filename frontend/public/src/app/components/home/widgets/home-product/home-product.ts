@@ -12,7 +12,6 @@ import {
 import { RouterLink } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
 import Swiper from 'swiper';
 import { SwiperOptions } from 'swiper/types';
 
@@ -202,7 +201,8 @@ export class HomeProduct {
   };
 
   private store = inject(Store);
-  product$: Observable<Product[]> = this.store.select(ProductState.productByIds);
+  private readonly productByIds = this.store.selectSignal(ProductState.productByIds);
+  private readonly swipers: Swiper[] = [];
   products: Product[] = [];
 
   readonly columnSwiperContainer = viewChild<ElementRef>('columnSwiperContainer');
@@ -214,10 +214,9 @@ export class HomeProduct {
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     effect(() => {
       const ids = this.productIds();
+      const products = this.productByIds();
       if (Array.isArray(ids) && ids.length) {
-        this.product$.subscribe((products) => {
-          this.products = products.filter((p) => ids.includes(p.id));
-        });
+        this.products = products.filter((product) => ids.includes(product.id));
       } else {
         this.products = [];
       }
@@ -241,29 +240,33 @@ export class HomeProduct {
       setTimeout(() => {
         const container1 = this.columnSwiperContainer()?.nativeElement;
         if (container1) {
-          new Swiper(container1, this.option());
+          this.swipers.push(new Swiper(container1, this.option()));
         }
 
         const container2 = this.categorySwiperContainer()?.nativeElement;
         if (container2) {
-          new Swiper(container2, this.swiperOption2);
+          this.swipers.push(new Swiper(container2, this.swiperOption2));
         }
 
         const container3 = this.productSliderSwiperOption()?.nativeElement;
         if (container3) {
-          new Swiper(container3, this.optionProductSlider);
+          this.swipers.push(new Swiper(container3, this.optionProductSlider));
         }
 
         const container4 = this.productSliderTwoSwiperOption()?.nativeElement;
         if (container4) {
-          new Swiper(container4, this.optionProductSliderTwo);
+          this.swipers.push(new Swiper(container4, this.optionProductSliderTwo));
         }
 
         const container5 = this.trendingProductSwiperContainer()?.nativeElement;
         if (container5) {
-          new Swiper(container5, this.optionSwiperTrendingProduct);
+          this.swipers.push(new Swiper(container5, this.optionSwiperTrendingProduct));
         }
       }, 100);
     }
+  }
+
+  ngOnDestroy() {
+    this.swipers.forEach((swiper) => swiper.destroy(true, true));
   }
 }

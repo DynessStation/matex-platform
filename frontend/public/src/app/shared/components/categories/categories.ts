@@ -1,22 +1,24 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   ElementRef,
+  effect,
   Inject,
   inject,
   input,
   PLATFORM_ID,
   viewChild,
 } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
 import SwiperCore, { Swiper } from 'swiper';
 import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
 
-import { Category, CategoryModel } from '../../interface/category.interface';
+import { Category } from '../../interface/category.interface';
 import { CategoryState } from '../../store/state/category.state';
 
 SwiperCore.use([Navigation, Pagination, Autoplay, EffectFade]);
@@ -52,37 +54,41 @@ export class HomeCategory {
   swiperOptions = input<SwiperOptions>(this.options);
 
   private store = inject(Store);
-  category$: Observable<CategoryModel> = this.store.select(CategoryState.category);
+  private destroyRef = inject(DestroyRef);
+  private readonly categoryState = this.store.selectSignal(CategoryState.category);
+  private swiper?: Swiper;
 
-  public categories: Category[];
+  public categories: Category[] = [];
   public selectedCategorySlug: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.selectedCategorySlug = params['category'] ? params['category'].split(',') : [];
     });
 
-    this.category$.subscribe((res) => (this.categories = res.data.map((category) => category)));
-  }
-
-  ngOnChanges() {
-    if (this.categoryIds() && this.categoryIds()?.length) {
-      this.category$.subscribe(
-        (res) => (this.categories = this.getCategoriesByIds(res.data, this.categoryIds()!)),
-      );
-    }
+    effect(() => {
+      const result = this.categoryState();
+      const ids = this.categoryIds();
+      this.categories = ids?.length
+        ? this.getCategoriesByIds(result.data, ids)
+        : result.data.map((category) => category);
+    });
   }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
-        new Swiper(this.categorySwiperContainer()?.nativeElement, this.swiperOptions());
+        const container = this.categorySwiperContainer()?.nativeElement;
+        if (container) this.swiper = new Swiper(container, this.swiperOptions());
       }, 100);
     }
+  }
+
+  ngOnDestroy() {
+    this.swiper?.destroy(true, true);
   }
 
   getCategoriesByIds(categories: Category[], ids: number[]): Category[] {

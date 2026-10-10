@@ -2,8 +2,7 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { finalize, Observable } from 'rxjs';
 
 import {
   HideButtonSpinnerAction,
@@ -17,21 +16,25 @@ export class LoaderInterceptor implements HttpInterceptor {
   constructor(private store: Store) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const isReadRequest = req.method === 'GET';
+
     void Promise.resolve(null).then(() => {
-      this.store.dispatch(new ShowLoaderAction(req.method == 'GET' ? true : false));
-      this.store.dispatch(new ShowButtonSpinnerAction(req.method != 'GET' ? true : false));
+      if (isReadRequest) {
+        this.store.dispatch(new ShowLoaderAction());
+      } else {
+        this.store.dispatch(new ShowButtonSpinnerAction());
+      }
     });
 
     return next.handle(req).pipe(
-      tap({
-        error: (_err) => {
-          this.store.dispatch(new HideLoaderAction());
-          this.store.dispatch(new HideButtonSpinnerAction());
-        },
-        complete: () => {
-          this.store.dispatch(new HideLoaderAction());
-          this.store.dispatch(new HideButtonSpinnerAction());
-        },
+      finalize(() => {
+        void Promise.resolve(null).then(() => {
+          if (isReadRequest) {
+            this.store.dispatch(new HideLoaderAction());
+          } else {
+            this.store.dispatch(new HideButtonSpinnerAction());
+          }
+        });
       }),
     );
   }

@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { combineLatest, Observable } from 'rxjs';
+import { distinctUntilChanged, map, Observable } from 'rxjs';
 
 import { CollectionBanner } from './collection-banner/collection-banner';
 import { CollectionCategorySlider } from './collection-category-slider/collection-category-slider';
@@ -38,7 +38,6 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
     CollectionNoSidebar,
     CollectionRightSidebar,
     CollectionRelatedProduct,
-    AsyncPipe,
     CollectionProductInfiniteScroll,
     Breadcrumb,
     AsyncPipe,
@@ -82,47 +81,46 @@ export class Collection {
   };
 
   public totalItems: number = 0;
+  private recentProductIds = '';
 
   constructor(private route: ActivatedRoute) {
-    combineLatest([this.route.queryParams, this.themeOptions$])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([params, option]) => {
-        this.filter = {
-          page: params['page'] ? params['page'] : 1,
-          paginate: params['paginate'] ? params['paginate'] : 12,
-          status: 1,
-          field: params['field'] ? params['field'] : this.filter['field'],
-          price: params['price'] ? params['price'] : '',
-          category: params['category'] ? params['category'] : '',
-          tag: params['tag'] ? params['tag'] : '',
-          sortBy: params['sortBy'] ? params['sortBy'] : this.filter['sortBy'],
-          rating: params['rating'] ? params['rating'] : '',
-          attribute: params['attribute'] ? params['attribute'] : '',
-          brand: params['brand'] ? params['brand'] : '',
-        };
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const option = this.store.selectSnapshot(ThemeOptionState.themeOptions);
+      this.layout =
+        params['layout'] || option?.collection?.collection_layout || 'collection_category_slider';
 
-        this.scrollFilter = {
-          ...this.filter,
-          page: this.scrollFilter['page'],
-          paginate: this.scrollFilter['paginate'],
-        };
+      this.filter = {
+        page: params['page'] ? Number(params['page']) : 1,
+        paginate: params['paginate'] ? Number(params['paginate']) : 12,
+        status: 1,
+        field: params['field'] ? params['field'] : this.filter['field'],
+        price: params['price'] ? params['price'] : '',
+        category: params['category'] ? params['category'] : '',
+        tag: params['tag'] ? params['tag'] : '',
+        sortBy: params['sortBy'] ? params['sortBy'] : this.filter['sortBy'],
+        rating: params['rating'] ? params['rating'] : '',
+        attribute: params['attribute'] ? params['attribute'] : '',
+        brand: params['brand'] ? params['brand'] : '',
+      };
 
-        this.store.dispatch(new GetProducts(this.filter));
-        if (params['layout']) {
-          this.layout = params['layout'];
-        } else {
-          this.layout = option?.collection?.collection_layout || 'collection_category_slider';
-        }
-        if (
-          this.layout == 'collection_product_infinite_scroll' ||
-          this.layout == 'collection_shop_list_infinite'
-        ) {
-          this.store.dispatch(new GetMoreProduct(this.scrollFilter));
-        }
+      this.scrollFilter = {
+        ...this.filter,
+        page: 1,
+        paginate: this.scrollFilter['paginate'],
+      };
 
-        this.filter['layout'] = this.layout;
-        this.setBreadcrumb();
-      });
+      this.store.dispatch(new GetProducts(this.filter));
+      if (
+        this.layout == 'collection_product_infinite_scroll' ||
+        this.layout == 'collection_shop_list_infinite'
+      ) {
+        this.store.dispatch(new GetMoreProduct(this.scrollFilter));
+      }
+
+      this.filter['layout'] = this.layout;
+      this.loadRecentProducts(option);
+      this.setBreadcrumb();
+    });
 
     this.product$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -131,18 +129,36 @@ export class Collection {
   }
 
   ngOnInit() {
-    this.themeOptions$?.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((option) => {
-      if (option?.collection?.product_ids?.length && this.layout === 'collection_recent_product') {
-        this.store.dispatch(
-          new GetProductByIds({
-            status: 1,
-            approve: 1,
-            ids: option?.collection?.product_ids?.join(','),
-            paginate: option?.collection?.product_ids?.length,
-          }),
-        );
-      }
-    });
+    this.themeOptions$
+      .pipe(
+        map((option) => option || null),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((option) => {
+        if (!this.route.snapshot.queryParamMap.has('layout')) {
+          this.layout = option?.collection?.collection_layout || 'collection_category_slider';
+          this.filter['layout'] = this.layout;
+        }
+        if (option) this.loadRecentProducts(option);
+      });
+  }
+
+  private loadRecentProducts(option: Option) {
+    const ids = option?.collection?.product_ids || [];
+    const key = ids.join(',');
+    if (this.layout !== 'collection_recent_product' || !key || key === this.recentProductIds)
+      return;
+
+    this.recentProductIds = key;
+    this.store.dispatch(
+      new GetProductByIds({
+        status: 1,
+        approve: 1,
+        ids: key,
+        paginate: ids.length,
+      }),
+    );
   }
 
   setBreadcrumb() {

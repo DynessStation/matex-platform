@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -23,8 +24,8 @@ import { AddToCart } from '../../../../../../shared/store/action/cart.action';
 import { CartState } from '../../../../../../shared/store/state/cart.state';
 import { SettingState } from '../../../../../../shared/store/state/setting.state';
 import { ThemeOptionState } from '../../../../../../shared/store/state/theme-option.state';
-import { ProductWholesales } from '../product-wholesales/product-wholesales';
 import { ProductBuyButton } from '../product-buy-button/product-buy-button';
+import { ProductWholesales } from '../product-wholesales/product-wholesales';
 
 @Component({
   selector: 'app-product-content',
@@ -43,6 +44,7 @@ import { ProductBuyButton } from '../product-buy-button/product-buy-button';
 })
 export class ProductContent {
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
 
   setting$: Observable<Values | null> = this.store.select(SettingState.setting);
   cartItem$: Observable<Cart[]> = this.store.select(CartState.cartItems);
@@ -68,13 +70,13 @@ export class ProductContent {
     private router: Router,
     private modal: NgbModal,
   ) {
-    this.setting$.subscribe(
-      (setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!),
-    );
+    this.setting$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((setting) => (this.shippingFreeAmt = setting?.general?.min_order_free_shipping!));
 
-    this.themeOptions$.subscribe((option) => {
-      this.policy = option?.product?.shipping_and_return;
-    });
+    this.themeOptions$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((option) => (this.policy = option?.product?.shipping_and_return));
 
     effect(() => {
       const product = this.product();
@@ -85,7 +87,7 @@ export class ProductContent {
       }
     });
 
-    this.cartItem$.subscribe((items) => {
+    this.cartItem$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       const currentProduct = this.product();
       if (!currentProduct) return;
 

@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter, RouterModule, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -38,11 +38,13 @@ import { CompareState } from './shared/store/state/compare.state';
 import { CountryState } from './shared/store/state/country.state';
 import { CouponState } from './shared/store/state/coupon.state';
 import { CurrencyState } from './shared/store/state/currency.state';
+import { LoaderState } from './shared/store/state/loader.state';
 import { MenuState } from './shared/store/state/menu.state';
 import { NotificationState } from './shared/store/state/notification.state';
 import { OrderStatusState } from './shared/store/state/order-status.state';
 import { OrderState } from './shared/store/state/order.state';
 import { PageState } from './shared/store/state/page.state';
+import { PaymentDetailsState } from './shared/store/state/payment-details.state';
 import { PointState } from './shared/store/state/point.state';
 import { ProductState } from './shared/store/state/product.state';
 import { QuestionAnswersState } from './shared/store/state/questions-answers.state';
@@ -56,8 +58,6 @@ import { ThemeOptionState } from './shared/store/state/theme-option.state';
 import { ThemeState } from './shared/store/state/theme.state';
 import { WalletState } from './shared/store/state/wallet.state';
 import { WishlistState } from './shared/store/state/wishlist.state';
-
-import { PaymentDetailsState } from './shared/store/state/payment-details.state';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -75,6 +75,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({
         anchorScrolling: 'enabled', // Tells Angular to look at the URL fragment and scroll to the matching ID
+        scrollPositionRestoration: 'enabled',
       }),
     ),
     {
@@ -111,6 +112,7 @@ export const appConfig: ApplicationConfig = {
       }),
       NgxsModule.forRoot([
         MenuState,
+        LoaderState,
         ThemeState,
         ProductState,
         CategoryState,
@@ -152,10 +154,6 @@ export const appConfig: ApplicationConfig = {
           'wishlist',
           'compare',
         ],
-      }),
-      RouterModule.forRoot(routes, {
-        anchorScrolling: 'enabled',
-        scrollPositionRestoration: 'enabled',
       }),
     ),
   ],
