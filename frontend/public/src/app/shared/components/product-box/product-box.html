@@ -2,7 +2,7 @@
   <div class="latest-product-box">
     <a [routerLink]="['/product', product()?.slug]">
       <img
-        [src]="product()?.product_thumbnail?.asset_url!"
+        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
         class="img-fluid"
         [alt]="product()?.name"
       />
@@ -12,7 +12,7 @@
 } @else if (productBoxStyle() === 'product-slider') {
   <a [routerLink]="['/product/' + product()?.slug]" class="recent-product-box">
     <img
-      [src]="product()?.product_thumbnail?.asset_url!"
+      [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
       class="img-fluid"
       [alt]="product()?.name"
     />
@@ -21,7 +21,7 @@
   <div class="vertical-product-box">
     <a [routerLink]="['/product', product()?.slug]" class="product-image">
       <img
-        [src]="product()?.product_thumbnail?.asset_url!"
+        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
         class="img-fluid"
         [alt]="product()?.name"
       />
@@ -55,7 +55,7 @@
   <div class="product-box productMain">
     <a [routerLink]="['/product', product()?.slug]" class="product-image">
       <img
-        [src]="product()?.product_thumbnail?.asset_url!"
+        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
         class="img-fluid productImage"
         [alt]="product()?.name"
       />

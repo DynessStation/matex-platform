@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { tap } from 'rxjs';
 
-import { Category } from '../../interface/category.interface';
 import { Product, ProductModel } from '../../interface/product.interface';
 import { ProductService } from '../../services/product.service';
 import { ThemeOptionService } from '../../services/theme-option.service';
@@ -63,7 +62,7 @@ export class ProductState {
     private router: Router,
     private productService: ProductService,
     private themeOptionService: ThemeOptionService,
-  ) { }
+  ) {}
 
   @Selector()
   static product(state: ProductStateModel) {
@@ -121,105 +120,10 @@ export class ProductState {
     return this.productService.getProducts(action.payload).pipe(
       tap({
         next: (result: ProductModel) => {
-          let products = result.data || [];
-          if (action?.payload) {
-            if (action?.payload?.['store_slug'] || action?.payload?.['category']) {
-              products = result.data.filter(
-                (product) =>
-                  (action?.payload?.['store_slug'] &&
-                    product?.store?.slug == action?.payload?.['store_slug']) ||
-                  (action?.payload?.['category'] &&
-                    product?.categories?.length &&
-                    product?.categories?.some((category) =>
-                      action?.payload?.['category']?.split(',')?.includes(category.slug),
-                    )),
-              );
-            }
-
-            if (action?.payload?.['sortBy']) {
-              if (action?.payload?.['sortBy'] === 'asc') {
-                products = products.sort((a, b) => {
-                  if (a.id < b.id) {
-                    return -1;
-                  } else if (a.id > b.id) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              } else if (action?.payload?.['sortBy'] === 'desc') {
-                products = products.sort((a, b) => {
-                  if (a.id > b.id) {
-                    return -1;
-                  } else if (a.id < b.id) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              } else if (action?.payload?.['sortBy'] === 'a-z') {
-                products = products.sort((a, b) => {
-                  if (a.name < b.name) {
-                    return -1;
-                  } else if (a.name > b.name) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              } else if (action?.payload?.['sortBy'] === 'z-a') {
-                products = products.sort((a, b) => {
-                  if (a.name > b.name) {
-                    return -1;
-                  } else if (a.name < b.name) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              } else if (action?.payload?.['sortBy'] === 'low-high') {
-                products = products.sort((a, b) => {
-                  if (a.sale_price < b.sale_price) {
-                    return -1;
-                  } else if (a.price > b.price) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              } else if (action?.payload?.['sortBy'] === 'high-low') {
-                products = products.sort((a, b) => {
-                  if (a.sale_price > b.sale_price) {
-                    return -1;
-                  } else if (a.price < b.price) {
-                    return 1;
-                  }
-                  return 0;
-                });
-              }
-            } else if (!action?.payload?.['ids']) {
-              products = products.sort((a, b) => {
-                if (a.id < b.id) {
-                  return -1;
-                } else if (a.id > b.id) {
-                  return 1;
-                }
-                return 0;
-              });
-            }
-
-            if (action?.payload?.['search']) {
-              products = products.filter((product) =>
-                product.name.toLowerCase().includes(action?.payload?.['search'].toLowerCase()),
-              );
-            }
-
-            if (action?.payload?.['brand']) {
-              products = products.filter(
-                (product) => product?.brand?.slug === action?.payload?.['brand'],
-              );
-            }
-          }
-
           ctx.patchState({
             product: {
-              data: products,
-              total: result.data?.length ? result.data?.length : 0,
+              data: result.data ?? [],
+              total: result.total ?? 0,
             },
           });
         },
@@ -266,13 +170,14 @@ export class ProductState {
               ? result.cross_sell_products
               : [];
 
-          const ids = [...result.related_products, ...result.cross_sell_products];
-          const categoryIds = [...result?.categories?.map((category: Category) => category.id)];
+          const category = result.categories?.[0]?.slug;
           this.store.dispatch(
             new GetRelatedProducts({
-              ids: ids?.join(','),
-              category_ids: categoryIds?.join(','),
-              status: 1,
+              category: category ?? '',
+              exclude_id: result.id,
+              page: 1,
+              paginate: 8,
+              sortBy: 'asc',
             }),
           );
 

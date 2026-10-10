@@ -1,12 +1,10 @@
 import { Component, input } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
-import { CurrencySymbolPipe } from '../../../../../../shared/pipe/currency.pipe';
-
 @Component({
   selector: 'app-collection-price-filter',
   standalone: true,
-  imports: [CurrencySymbolPipe],
+  imports: [],
   templateUrl: './collection-price-filter.html',
   styleUrl: './collection-price-filter.scss',
 })
@@ -16,45 +14,33 @@ export class CollectionPriceFilter {
   public prices = [
     {
       id: 1,
-      price: 100,
-      text: 'Below',
-      value: '100',
+      minPrice: 0,
+      maxPrice: 250000,
+      value: '0-250000',
     },
     {
       id: 2,
-      minPrice: 100,
-      maxPrice: 200,
-      value: '0-200',
+      minPrice: 250001,
+      maxPrice: 500000,
+      value: '250001-500000',
     },
     {
       id: 3,
-      minPrice: 200,
-      maxPrice: 400,
-      value: '200-400',
+      minPrice: 500001,
+      maxPrice: 1000000,
+      value: '500001-1000000',
     },
     {
       id: 4,
-      minPrice: 400,
-      maxPrice: 600,
-      value: '400-600',
+      minPrice: 1000001,
+      maxPrice: 2000000,
+      value: '1000001-2000000',
     },
     {
       id: 5,
-      minPrice: 600,
-      maxPrice: 800,
-      value: '600-800',
-    },
-    {
-      id: 6,
-      minPrice: 800,
-      maxPrice: 1000,
-      value: '800-1000',
-    },
-    {
-      id: 7,
-      price: 1000,
-      text: 'Above',
-      value: '1000',
+      minPrice: 2000001,
+      maxPrice: 2000000000,
+      value: '2000001-2000000000',
     },
   ];
 
@@ -64,6 +50,22 @@ export class CollectionPriceFilter {
     private route: ActivatedRoute,
     private router: Router,
   ) {}
+
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
+
+  priceLabel(price: { minPrice?: number; maxPrice?: number }) {
+    const currency = (value: number) =>
+      new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0,
+      }).format(value);
+    if (price.maxPrice === 2000000000)
+      return `${this.isEnglish ? 'Above' : 'Di atas'} ${currency(price.minPrice ?? 0)}`;
+    return `${currency(price.minPrice ?? 0)} – ${currency(price.maxPrice ?? 0)}`;
+  }
 
   ngOnChanges() {
     this.selectedPrices = this.filter()!['price'] ? this.filter()!['price'].split(',') : [];

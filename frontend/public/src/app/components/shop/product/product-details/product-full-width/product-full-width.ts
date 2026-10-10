@@ -37,7 +37,7 @@ export class ProductFullWidth {
 
   public videType = ['video/mp4', 'video/webm', 'video/ogg'];
   public audioType = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
-  public selectedVariation: Variation;
+  public selectedVariation: Variation | null = null;
 
   selectedVariant(variant: Variation) {
     this.selectedVariation = variant;

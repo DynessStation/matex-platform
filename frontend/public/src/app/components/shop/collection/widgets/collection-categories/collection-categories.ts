@@ -1,39 +1,26 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { afterNextRender, Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-import { SwiperOptions } from 'swiper/types';
-
-import { HomeCategory } from '../../../../../shared/components/categories/categories';
-import { Option } from '../../../../../shared/interface/theme-option.interface';
-import { ThemeOptionState } from '../../../../../shared/store/state/theme-option.state';
+import { ProductBox } from '../../../../../shared/components/product-box/product-box';
+import { Product } from '../../../../../shared/interface/product.interface';
+import { RecentProductService } from '../../../../../shared/services/recent-product.service';
 
 @Component({
   selector: 'app-collection-categories',
-  imports: [HomeCategory, AsyncPipe],
+  imports: [ProductBox],
   templateUrl: './collection-categories.html',
   styleUrl: './collection-categories.scss',
 })
 export class CollectionCategories {
-  private store = inject(Store);
-  themeOption$: Observable<Option> = this.store.select(ThemeOptionState.themeOptions);
+  private recentProductService = inject(RecentProductService);
+  private router = inject(Router);
+  products: Product[] = [];
 
-  shopCategorySwiperOptions: SwiperOptions = {
-    slidesPerView: 10,
-    spaceBetween: 24,
-    breakpoints: {
-      0: { slidesPerView: 2, spaceBetween: 8 },
-      380: { slidesPerView: 3, spaceBetween: 8 },
-      500: { slidesPerView: 4, spaceBetween: 8 },
-      660: { slidesPerView: 5, spaceBetween: 8 },
-      850: { slidesPerView: 6 },
-      991: { slidesPerView: 7 },
-      1242: { slidesPerView: 8 },
-      1288: { slidesPerView: 9 },
-      1388: { slidesPerView: 10 },
-    },
-  };
+  constructor() {
+    afterNextRender(() => (this.products = this.recentProductService.get()));
+  }
 
-  swiperOptions = input<SwiperOptions>(this.shopCategorySwiperOptions);
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
 }

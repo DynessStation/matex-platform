@@ -10,7 +10,7 @@
   <div class="product-image">
     <a [routerLink]="['/product/' + product()?.slug]">
       <img
-        [src]="product()?.product_thumbnail?.asset_url!"
+        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
         class="img-fluid productImage"
         [alt]="product()?.name"
       />

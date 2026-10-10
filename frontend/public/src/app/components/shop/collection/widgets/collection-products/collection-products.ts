@@ -1,11 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Component, DestroyRef, inject, input, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ProductBox } from '../../../../../shared/components/product-box/product-box';
 import { Params } from '../../../../../shared/interface/core.interface';
@@ -17,11 +18,11 @@ import { CollectionSort } from '../collection-sort/collection-sort';
 
 @Component({
   selector: 'app-collection-products',
-  imports: [CollectionSort, AsyncPipe, ProductBox, NgbPagination, AsyncPipe, TranslateModule],
+  imports: [CollectionSort, AsyncPipe, ProductBox, NgbPagination, TranslateModule],
   templateUrl: './collection-products.html',
   styleUrl: './collection-products.scss',
 })
-export class CollectionProducts implements OnInit, OnDestroy {
+export class CollectionProducts implements OnInit {
   filter = input<Params>();
   gridCol = input<string>();
   productClass = input<string>();
@@ -34,7 +35,6 @@ export class CollectionProducts implements OnInit, OnDestroy {
   public total = 0;
   public finished = false;
   public button_loader = false;
-  public productsArray: Product[] = [];
   public paginateProduct: Product[] = [];
   public scrollFilter: Params = { page: 1, paginate: 9 };
   public isEnglish = false;
@@ -42,82 +42,23 @@ export class CollectionProducts implements OnInit, OnDestroy {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
   public productService = inject(ProductService);
-
-  private productSubscription?: Subscription;
-  private moreProductSubscription?: Subscription;
 
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
   moreProduct$: Observable<Product[]> = this.store.select(ProductState.moreProduct);
 
   ngOnInit() {
     this.isEnglish = this.router.url === '/en' || this.router.url.startsWith('/en/');
-    this.productSubscription = this.product$.subscribe((res) => {
-      if (res) {
-        this.productsArray = res.data;
-        this.total = this.productsArray.length;
-        this.updatePaginatedProducts();
-      }
+    this.product$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
+      this.paginateProduct = result?.data ?? [];
+      this.total = result?.total ?? 0;
+      this.total_product = this.total;
     });
-
-    this.route.queryParams.subscribe(() => {
-      this.total_product = 0;
-      const currentFilter = this.filter();
-      if (
-        currentFilter!['layout'] === 'collection_product_infinite_scroll' ||
-        currentFilter!['layout'] === 'collection_shop_list_infinite'
-      ) {
-        this.scrollFilter = {
-          ...currentFilter,
-          page: this.scrollFilter['page'],
-          paginate: this.scrollFilter['paginate'],
-        };
-      }
+    this.moreProduct$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((products) => {
+      this.products = products?.length ?? 0;
+      this.finished = this.total_product > 0 && this.products >= this.total_product;
     });
-
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd && this.productSubscription) {
-        this.productSubscription.unsubscribe();
-      }
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['filter']) {
-      const currentFilter = this.filter();
-      this.route.queryParams.subscribe(() => {
-        this.total_product = 0;
-
-        this.productSubscription = this.product$.subscribe((product) => {
-          if (product && product.total) {
-            this.total_product = product.total;
-          }
-        });
-
-        if (
-          currentFilter!['layout'] === 'collection_product_infinite_scroll' ||
-          currentFilter!['layout'] === 'collection_shop_list_infinite'
-        ) {
-          this.moreProductSubscription = this.moreProduct$.subscribe((product) => {
-            if (product?.length) this.products = product.length;
-            this.finished = this.total_product === this.products;
-          });
-
-          this.scrollFilter = {
-            ...currentFilter,
-            page: this.scrollFilter['page'],
-            paginate: this.scrollFilter['paginate'],
-          };
-        }
-
-        this.router.events.subscribe((event) => {
-          if (event instanceof NavigationEnd) {
-            this.productSubscription?.unsubscribe();
-            this.moreProductSubscription?.unsubscribe();
-          }
-        });
-      });
-    }
   }
 
   setGridClass(value: { class: string; list_view: boolean }) {
@@ -125,35 +66,18 @@ export class CollectionProducts implements OnInit, OnDestroy {
     this.listView = value.list_view;
   }
 
-  private updatePaginatedProducts() {
-    const filter = this.filter();
-    if (!filter) return;
-
-    const products = this.productsArray.map((product) => ({ ...product }));
-    const sortBy = filter['sortBy'];
-    products.sort((a, b) => {
-      if (sortBy === 'a-z') return a.name.localeCompare(b.name);
-      if (sortBy === 'z-a') return b.name.localeCompare(a.name);
-      if (sortBy === 'low-high') return Number(a.sale_price ?? 0) - Number(b.sale_price ?? 0);
-      if (sortBy === 'high-low') return Number(b.sale_price ?? 0) - Number(a.sale_price ?? 0);
-      return 0;
-    });
-    this.total = products.length;
-    this.paginateProduct = products
-      .slice(
-        (filter['page'] - 1) * filter['paginate'],
-        (filter['page'] - 1) * filter['paginate'] + filter['paginate'],
-      );
-  }
-
   applyFilter() {
-    this.updatePaginatedProducts();
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: 1 },
+      queryParamsHandling: 'merge',
+    });
   }
 
   onScroll(value: number) {
-    if (this.products !== this.total_product) {
+    if (this.products < this.total_product) {
       this.button_loader = true;
-      this.scrollFilter['page'] += value;
+      this.scrollFilter = { ...this.filter(), page: Number(this.scrollFilter['page']) + value };
       this.store.dispatch(new GetMoreProduct(this.scrollFilter, true)).subscribe({
         complete: () => (this.button_loader = false),
       });
@@ -163,17 +87,10 @@ export class CollectionProducts implements OnInit, OnDestroy {
   }
 
   setPage() {
-    this.updatePaginatedProducts();
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { page: this.filter()!['page'] },
       queryParamsHandling: 'merge',
-      skipLocationChange: false,
     });
-  }
-
-  ngOnDestroy() {
-    this.productSubscription?.unsubscribe();
-    this.moreProductSubscription?.unsubscribe();
   }
 }

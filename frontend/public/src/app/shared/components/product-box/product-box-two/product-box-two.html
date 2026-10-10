@@ -4,7 +4,7 @@
       <img
         [src]="
           product()?.product_thumbnail
-            ? product()?.product_thumbnail?.asset_url!
+            ? product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'
             : 'assets/images/placeholder/product.png'
         "
         class="img-fluid productImage loaded"

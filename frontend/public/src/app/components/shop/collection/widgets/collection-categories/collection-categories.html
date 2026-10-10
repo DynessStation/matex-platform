@@ -1,9 +1,17 @@
-<div class="light-bg-color light-sm-box">
-  <div class="title-2 title-2-sm slider-button-sm mb-3">
-    <h3>Recent Viewed Products</h3>
+@if (products.length) {
+  <div class="light-bg-color light-sm-box">
+    <div class="title-2 title-2-sm mb-3">
+      <h3>{{ isEnglish ? 'Recently viewed products' : 'Produk yang baru dilihat' }}</h3>
+    </div>
+    <div class="row g-sm-3 g-2 row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6">
+      @for (product of products; track product.id) {
+        <div class="col pro-bg-white">
+          <app-product-box
+            [product]="product"
+            [productBoxStyle]="'product_box_one'"
+          ></app-product-box>
+        </div>
+      }
+    </div>
   </div>
-  <app-categories
-    [categoryIds]="(themeOption$ | async)?.collection?.collection_categories_ids!"
-    [swiperOptions]="swiperOptions()!"
-  ></app-categories>
-</div>
+}

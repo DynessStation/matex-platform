@@ -21,7 +21,10 @@ type CategorySeed = {
   key: string;
   source_name: string;
   sort_order: number;
-  translations: Record<"id-ID" | "en-US", Pick<TranslationSeed, "slug" | "name">>;
+  translations: Record<
+    "id-ID" | "en-US",
+    Pick<TranslationSeed, "slug" | "name">
+  >;
 };
 
 type ProductSeed = {
@@ -93,15 +96,24 @@ const verifySeed = (seed: CatalogSeed) => {
   }
   const keys = new Set(seed.products.map((item) => item.key));
   const skus = new Set(seed.products.map((item) => item.sku.toLowerCase()));
-  if (keys.size !== seed.products.length || skus.size !== seed.products.length) {
+  if (
+    keys.size !== seed.products.length ||
+    skus.size !== seed.products.length
+  ) {
     throw new Error("Product keys and SKUs must be unique");
   }
   for (const product of seed.products) {
-    if (product.status !== "draft") throw new Error(`${product.sku} is not draft`);
-    if (!seed.categories.some((category) => category.key === product.category_key)) {
+    if (product.status !== "draft")
+      throw new Error(`${product.sku} is not draft`);
+    if (
+      !seed.categories.some((category) => category.key === product.category_key)
+    ) {
       throw new Error(`${product.sku} references an unknown category`);
     }
-    if (product.prices.length !== 4 || product.prices.some((price) => price.amount == null)) {
+    if (
+      product.prices.length !== 4 ||
+      product.prices.some((price) => price.amount == null)
+    ) {
       throw new Error(`${product.sku} does not have the four required prices`);
     }
   }
@@ -244,7 +256,7 @@ const main = async () => {
              product_specifications_json, product_meta_title,
              product_meta_description, product_og_title,
              product_og_description, product_i18n_status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, JSON_EXTRACT(?, '$'), ?, ?, ?, ?, 1)`,
           [
             productId,
             seed.company_id,
@@ -306,7 +318,9 @@ const main = async () => {
     };
     for (const [key, value] of Object.entries(expected)) {
       if (Number(counts[key]) !== value) {
-        throw new Error(`Import count mismatch for ${key}: ${counts[key]} != ${value}`);
+        throw new Error(
+          `Import count mismatch for ${key}: ${counts[key]} != ${value}`,
+        );
       }
     }
 

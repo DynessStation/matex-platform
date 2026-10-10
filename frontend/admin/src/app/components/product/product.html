@@ -1,10 +1,18 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'products'">
   <div button *hasPermission="'product.create'">
-    <a [routerLink]="['/product/create']" class="align-items-center btn btn-theme d-flex">
+    <a
+      [routerLink]="['/product/create']"
+      class="align-items-center btn btn-theme d-flex"
+    >
       <i class="ri-add-line"></i> {{ 'add_product' | translate }}
     </a>
   </div>
-  <app-table [tableConfig]="tableConfig" [hasCheckbox]="false"
-    (tableChanged)="onTableChange($event)" (rowClicked)="onActionClicked({ actionToPerform: 'edit', data: $event })"
-    (action)="onActionClicked($event)" />
+  <app-table
+    [tableConfig]="tableConfig"
+    [hasCheckbox]="false"
+    [emitInitialChange]="false"
+    (tableChanged)="onTableChange($event)"
+    (rowClicked)="onActionClicked({ actionToPerform: 'edit', data: $event })"
+    (action)="onActionClicked($event)"
+  />
 </app-page-wrapper>

@@ -6,7 +6,7 @@
           <img
             [src]="
               product()?.product_thumbnail
-                ? product()?.product_thumbnail?.asset_url!
+                ? product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'
                 : 'assets/images/placeholder/product.png'
             "
             class="img-fluid productImage"
@@ -23,13 +23,15 @@
         </p>
         @if (product()?.price_visibility === 'displayed') {
           <h5 class="price">
-            {{ product()?.sale_price | currencySymbol:'before_price':priceCurrency }}
+            {{ product()?.sale_price | currencySymbol: 'before_price' : priceCurrency }}
             @if (product()?.price && product()?.price !== product()?.sale_price) {
-              <del>{{ product()?.price | currencySymbol:'before_price':priceCurrency }}</del>
+              <del>{{ product()?.price | currencySymbol: 'before_price' : priceCurrency }}</del>
             }
           </h5>
         } @else if (product()?.price_visibility === 'contact') {
-          <h5 class="price">{{ isEnglish ? 'Contact us for pricing' : 'Hubungi kami untuk harga' }}</h5>
+          <h5 class="price">
+            {{ isEnglish ? 'Contact us for pricing' : 'Hubungi kami untuk harga' }}
+          </h5>
         }
         <a [routerLink]="productLink" class="btn btn-solid rounded-3 mt-3">
           {{ isEnglish ? 'View product' : 'Lihat produk' }}

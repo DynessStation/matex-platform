@@ -32,6 +32,11 @@
                       formControlName="key"
                       placeholder="contoh: topper-latex-natural"
                     />
+                    <small class="field-help"
+                      >Kode tetap untuk sistem. Gunakan huruf kecil dan tanda
+                      hubung; sebaiknya tidak diubah setelah produk
+                      dipublikasikan.</small
+                    >
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">SKU *</label
@@ -40,6 +45,10 @@
                       formControlName="sku"
                       placeholder="MTX-TOP-001"
                     />
+                    <small class="field-help"
+                      >Kode unik produk untuk administrasi, harga, dan kanal
+                      marketplace.</small
+                    >
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Bentuk produk</label>
@@ -51,7 +60,9 @@
                         noResultMessage="Tidak ada pilihan"
                       />
                     }
-                    <small class="text-muted">Barang fisik, layanan, atau produk digital.</small>
+                    <small class="text-muted"
+                      >Barang fisik, layanan, atau produk digital.</small
+                    >
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Status</label>
@@ -79,7 +90,10 @@
                       formControlName="product_kind"
                       placeholder="contoh: Kasur Tipis, Bantal, Jok Motor"
                     />
-                    <small class="text-muted">Kelompok produk internal MATEX; berbeda dari kategori katalog.</small>
+                    <small class="text-muted"
+                      >Kelompok produk internal MATEX; berbeda dari kategori
+                      katalog.</small
+                    >
                   </div>
                   <div class="col-12">
                     <label class="form-label">Kategori</label
@@ -120,11 +134,19 @@
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Provinsi asal</label
-                    ><input class="form-control" formControlName="origin_province" placeholder="contoh: Jawa Barat" />
+                    ><input
+                      class="form-control"
+                      formControlName="origin_province"
+                      placeholder="contoh: Jawa Barat"
+                    />
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Kota / kabupaten asal</label
-                    ><input class="form-control" formControlName="origin_city" placeholder="contoh: Bogor" />
+                    ><input
+                      class="form-control"
+                      formControlName="origin_city"
+                      placeholder="contoh: Bogor"
+                    />
                   </div>
                   <div class="col-md-2">
                     <label class="form-label">Berat (gram)</label
@@ -295,13 +317,70 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Spesifikasi</label
-                      ><textarea
-                        rows="5"
-                        class="form-control code-field"
-                        formControlName="id_specifications"
-                        placeholder='JSON opsional, contoh: {"Material":"Lateks alami"}'
-                      ></textarea>
+                      <div class="repeater-heading">
+                        <div>
+                          <h6>Spesifikasi</h6>
+                          <p class="section-help">
+                            Tambahkan nama dan isi spesifikasi satu per satu.
+                            Data akan disimpan otomatis dengan format yang
+                            dibutuhkan sistem.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-outline"
+                          (click)="addSpecification('id')"
+                        >
+                          <i class="ri-add-line"></i> Tambah spesifikasi
+                        </button>
+                      </div>
+                      <div formArrayName="id_specifications">
+                        @for (
+                          spec of specifications('id').controls;
+                          track $index
+                        ) {
+                          <div class="repeater-card" [formGroupName]="$index">
+                            <button
+                              type="button"
+                              class="remove-row"
+                              title="Hapus spesifikasi"
+                              (click)="removeSpecification('id', $index)"
+                            >
+                              <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="row g-3">
+                              <div class="col-md-5">
+                                <label class="form-label"
+                                  >Nama spesifikasi</label
+                                ><input
+                                  class="form-control"
+                                  formControlName="label"
+                                  placeholder="Contoh: Material"
+                                />
+                              </div>
+                              <div class="col-md-7">
+                                <label class="form-label">Nilai</label
+                                ><input
+                                  class="form-control"
+                                  formControlName="value"
+                                  placeholder="Contoh: 100% lateks alami"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        } @empty {
+                          <div class="repeater-empty">
+                            <i class="ri-list-check-3"></i>
+                            <div>
+                              <strong>Belum ada spesifikasi</strong
+                              ><span
+                                >Bagian spesifikasi tidak akan ditampilkan di
+                                publik sampai data ditambahkan.</span
+                              >
+                            </div>
+                          </div>
+                        }
+                      </div>
                     </div>
                   </div>
                 } @else {
@@ -337,19 +416,76 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Specifications</label
-                      ><textarea
-                        rows="5"
-                        class="form-control code-field"
-                        formControlName="en_specifications"
-                      ></textarea>
+                      <div class="repeater-heading">
+                        <div>
+                          <h6>Specifications</h6>
+                          <p class="section-help">
+                            Add each specification name and value. The system
+                            handles the stored format automatically.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-outline"
+                          (click)="addSpecification('en')"
+                        >
+                          <i class="ri-add-line"></i> Add specification
+                        </button>
+                      </div>
+                      <div formArrayName="en_specifications">
+                        @for (
+                          spec of specifications('en').controls;
+                          track $index
+                        ) {
+                          <div class="repeater-card" [formGroupName]="$index">
+                            <button
+                              type="button"
+                              class="remove-row"
+                              title="Remove specification"
+                              (click)="removeSpecification('en', $index)"
+                            >
+                              <i class="ri-delete-bin-line"></i>
+                            </button>
+                            <div class="row g-3">
+                              <div class="col-md-5">
+                                <label class="form-label"
+                                  >Specification name</label
+                                ><input
+                                  class="form-control"
+                                  formControlName="label"
+                                  placeholder="Example: Material"
+                                />
+                              </div>
+                              <div class="col-md-7">
+                                <label class="form-label">Value</label
+                                ><input
+                                  class="form-control"
+                                  formControlName="value"
+                                  placeholder="Example: 100% natural latex"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        } @empty {
+                          <div class="repeater-empty">
+                            <i class="ri-list-check-3"></i>
+                            <div>
+                              <strong>No specifications yet</strong
+                              ><span
+                                >The public specification section stays hidden
+                                until data is added.</span
+                              >
+                            </div>
+                          </div>
+                        }
+                      </div>
                     </div>
                   </div>
                 }
                 <div class="category-actions">
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="setTab('general')"
                   >
                     <i class="ri-arrow-left-line"></i> Kembali</button
@@ -403,7 +539,7 @@
                   <h6>Daftar harga</h6>
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="addPrice()"
                   >
                     <i class="ri-add-line"></i> Tambah harga
@@ -477,7 +613,7 @@
                   </div>
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="addMarketplace()"
                   >
                     <i class="ri-add-line"></i> Tambah kanal
@@ -616,7 +752,7 @@
                 <div class="category-actions">
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="setTab('content')"
                   >
                     <i class="ri-arrow-left-line"></i> Kembali</button
@@ -689,7 +825,7 @@
                 <div class="category-actions">
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="setTab('channels')"
                   >
                     <i class="ri-arrow-left-line"></i> Kembali</button
@@ -814,7 +950,7 @@
                 <div class="category-actions">
                   <button
                     type="button"
-                    class="btn btn-light"
+                    class="btn btn-outline"
                     (click)="setTab('media')"
                   >
                     <i class="ri-arrow-left-line"></i> Kembali</button

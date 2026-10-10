@@ -1,5 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NgbAccordionModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
@@ -38,6 +39,7 @@ export class Sidebar {
   hideFilter = input<string[]>([]);
 
   private store = inject(Store);
+  private router = inject(Router);
   attribute$: Observable<AttributeModel> = this.store.select(AttributeState.attribute);
 
   constructor(public layoutService: LayoutService) {
@@ -46,5 +48,9 @@ export class Sidebar {
 
   openOffCanvasFilter(value: boolean) {
     this.layoutService.offCanvasFilterMenu = value;
+  }
+
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
   }
 }

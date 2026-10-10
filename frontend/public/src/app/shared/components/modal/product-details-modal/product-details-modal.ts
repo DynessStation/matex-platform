@@ -44,7 +44,7 @@ export class ProductDetailsModal {
   public audio = ['mpeg', 'wav', 'ogg', 'mp3'];
   public cartItem: Cart | null;
   public productQty: number = 1;
-  public selectedVariation: Variation;
+  public selectedVariation: Variation | null = null;
   public totalPrice: number = 0;
   public activeSlide: string = '0';
 
@@ -95,9 +95,9 @@ export class ProductDetailsModal {
       const params: CartAddOrUpdate = {
         id:
           this.cartItem &&
-            this.selectedVariation &&
-            this.cartItem?.variation &&
-            this.selectedVariation?.id == this.cartItem?.variation?.id
+          this.selectedVariation &&
+          this.cartItem?.variation &&
+          this.selectedVariation?.id == this.cartItem?.variation?.id
             ? this.cartItem.id
             : null,
         product_id: product?.id!,

@@ -6,26 +6,26 @@
           <a ngbNavLink>{{ isEnglish ? 'Description' : 'Deskripsi' }}</a>
           <ng-template ngbNavContent>
             @if (product()?.description) {
-              <div
-                class="part ckeditor-content"
-                [innerHTML]="getTrustedHtml(product()?.description)"
-              ></div>
+              <div class="part ckeditor-content" [innerHTML]="product()?.description"></div>
             }
           </ng-template>
         </li>
         @if ((specifications | keyvalue).length) {
-        <li ngbNavItem>
-          <a ngbNavLink>{{ isEnglish ? 'Specifications' : 'Spesifikasi' }}</a>
-          <ng-template ngbNavContent>
-            <div class="information-box">
-              <ul class="about-item-list">
-                @for (item of specifications | keyvalue; track item.key) {
-                  <li><strong>{{ item.key }}</strong><span>{{ item.value }}</span></li>
-                }
-              </ul>
-            </div>
-          </ng-template>
-        </li>
+          <li ngbNavItem>
+            <a ngbNavLink>{{ isEnglish ? 'Specifications' : 'Spesifikasi' }}</a>
+            <ng-template ngbNavContent>
+              <div class="information-box">
+                <ul class="about-item-list">
+                  @for (item of specifications | keyvalue; track item.key) {
+                    <li>
+                      <strong>{{ item.key }}</strong
+                      ><span>{{ item.value }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </ng-template>
+          </li>
         }
       </ul>
 

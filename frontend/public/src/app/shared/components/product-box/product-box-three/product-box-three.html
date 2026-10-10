@@ -1,7 +1,11 @@
 <div class="product-category productMain p-0">
   <div class="product-image">
     <a [routerLink]="['/product/' + product()?.slug]">
-      <img [src]="product()?.product_thumbnail?.asset_url!" class="productImage" alt="image" />
+      <img
+        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
+        class="productImage"
+        alt="image"
+      />
     </a>
     <ul class="hover-box">
       <li>

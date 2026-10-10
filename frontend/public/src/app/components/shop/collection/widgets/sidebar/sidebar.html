@@ -1,6 +1,6 @@
 <div class="shop-left-sidebar">
   <button class="back-button btn" (click)="openOffCanvasFilter(false)">
-    Back <i class="ri-arrow-left-line"></i>
+    {{ isEnglish ? 'Back' : 'Kembali' }} <i class="ri-arrow-left-line"></i>
   </button>
   <app-collection-filter [filter]="filter()"></app-collection-filter>
 
@@ -9,7 +9,7 @@
       <div class="accordion-item" ngbAccordionItem [collapsed]="false">
         <h2 class="accordion-header">
           <button class="accordion-button" type="button" ngbAccordionButton>
-            <span>Categories</span>
+            <span>{{ isEnglish ? 'Categories' : 'Kategori' }}</span>
           </button>
         </h2>
         <div class="accordion-collapse collapse show" ngbAccordionCollapse>
@@ -22,7 +22,7 @@
     <div class="accordion-item" ngbAccordionItem [collapsed]="false">
       <h2 class="accordion-header">
         <button class="accordion-button" type="button" ngbAccordionButton>
-          <span>Price</span>
+          <span>{{ isEnglish ? 'Price' : 'Harga' }}</span>
         </button>
       </h2>
       <div class="accordion-collapse collapse show" ngbAccordionCollapse>

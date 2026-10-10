@@ -11,7 +11,7 @@
       (click)="layoutService.offCanvasFilterMenu = !layoutService.offCanvasFilterMenu"
       class="filter-main-btn btn"
     >
-      <i class="ri-equalizer-2-line"></i> Filter Menu
+      <i class="ri-equalizer-2-line"></i> {{ isEnglish ? 'Filter menu' : 'Menu filter' }}
     </button>
   </div>
 }
@@ -27,7 +27,7 @@
 
       <div class="filter-button d-inline-block d-lg-none">
         <button (click)="openOffCanvasFilter(true)" class="filter-main-btn btn">
-          <i class="ri-equalizer-2-line"></i> Filter Menu
+          <i class="ri-equalizer-2-line"></i> {{ isEnglish ? 'Filter menu' : 'Menu filter' }}
         </button>
       </div>
 

@@ -1,9 +1,10 @@
 import { AsyncPipe, isPlatformBrowser } from '@angular/common';
-import { Component, HostListener, inject, PLATFORM_ID } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { ProductFullWidth } from './product-details/product-full-width/product-full-width';
 import { ProductImage } from './product-details/product-image/product-image';
@@ -19,6 +20,7 @@ import { TProduct } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
+import { RecentProductService } from '../../../shared/services/recent-product.service';
 
 @Component({
   selector: 'app-product',
@@ -52,10 +54,15 @@ export class Product {
   public isScrollActive = false;
   public isBrowser: boolean;
   private platformId = inject<Object>(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
+  private recentProducts = inject(RecentProductService);
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    this.product$.subscribe((product) => {
+    this.product$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((product) => {
       if (!product) return;
       this.breadcrumb.items = [];
       this.breadcrumb.title = product.name;
@@ -64,23 +71,20 @@ export class Product {
         { label: product.name, active: false },
       );
       this.product = product;
+      this.recentProducts.add(product);
     });
 
     // For Demo Purpose only
-    this.route.queryParams.subscribe((params) => {
-      if (params['layout']) {
-        this.layout = params['layout'];
-      } else {
-        // Get Product Layout
-        this.themeOptions$.subscribe((option) => {
-          this.layout =
-            option?.product && option?.product?.product_layout
-              ? option?.product?.product_layout
-              : 'product_thumbnail';
-        });
-      }
-      this.setBreadcrumb();
-    });
+    combineLatest([this.route.queryParams, this.themeOptions$])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([params, option]) => {
+        if (params['layout']) {
+          this.layout = params['layout'];
+        } else {
+          this.layout = option?.product?.product_layout || 'product_thumbnail';
+        }
+        this.setBreadcrumb();
+      });
     this.setBreadcrumb();
   }
 

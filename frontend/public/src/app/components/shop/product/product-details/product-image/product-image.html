@@ -9,11 +9,11 @@
                 <div class="row g-sm-3 g-2 product-original-box product-original-box-sm">
                   @if (
                     product()?.product_galleries?.length ||
-                    (selectedVariation && selectedVariation.variation_galleries.length)
+                    (selectedVariation?.variation_galleries?.length ?? 0)
                   ) {
                     @for (
-                      image of selectedVariation && selectedVariation.variation_galleries.length
-                        ? selectedVariation && selectedVariation.variation_galleries
+                      image of (selectedVariation?.variation_galleries?.length ?? 0)
+                        ? (selectedVariation?.variation_galleries ?? [])
                         : product()?.product_galleries;
                       track image
                     ) {

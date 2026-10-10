@@ -1,9 +1,10 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { CollectionBanner } from './collection-banner/collection-banner';
 import { CollectionCategorySlider } from './collection-category-slider/collection-category-slider';
@@ -49,6 +50,7 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
 })
 export class Collection {
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
   themeOptions$: Observable<Option> = this.store.select(ThemeOptionState.themeOptions);
 
@@ -82,59 +84,54 @@ export class Collection {
   public totalItems: number = 0;
 
   constructor(private route: ActivatedRoute) {
-    // Get Query params..
-    this.route.queryParams.subscribe((params) => {
-      this.filter = {
-        page: params['page'] ? params['page'] : 1,
-        paginate: params['paginate'] ? params['paginate'] : 12,
-        status: 1,
-        field: params['field'] ? params['field'] : this.filter['field'],
-        price: params['price'] ? params['price'] : '',
-        category: params['category'] ? params['category'] : '',
-        tag: params['tag'] ? params['tag'] : '',
-        sortBy: params['sortBy'] ? params['sortBy'] : this.filter['sortBy'],
-        rating: params['rating'] ? params['rating'] : '',
-        attribute: params['attribute'] ? params['attribute'] : '',
-        brand: params['brand'] ? params['brand'] : '',
-      };
+    combineLatest([this.route.queryParams, this.themeOptions$])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([params, option]) => {
+        this.filter = {
+          page: params['page'] ? params['page'] : 1,
+          paginate: params['paginate'] ? params['paginate'] : 12,
+          status: 1,
+          field: params['field'] ? params['field'] : this.filter['field'],
+          price: params['price'] ? params['price'] : '',
+          category: params['category'] ? params['category'] : '',
+          tag: params['tag'] ? params['tag'] : '',
+          sortBy: params['sortBy'] ? params['sortBy'] : this.filter['sortBy'],
+          rating: params['rating'] ? params['rating'] : '',
+          attribute: params['attribute'] ? params['attribute'] : '',
+          brand: params['brand'] ? params['brand'] : '',
+        };
 
-      this.scrollFilter = {
-        ...this.filter,
-        page: this.scrollFilter['page'],
-        paginate: this.scrollFilter['paginate'],
-      };
+        this.scrollFilter = {
+          ...this.filter,
+          page: this.scrollFilter['page'],
+          paginate: this.scrollFilter['paginate'],
+        };
 
-      this.store.dispatch(new GetProducts(this.filter));
-      // Params For Demo Purpose only
-      if (params['layout']) {
-        this.layout = params['layout'];
-
+        this.store.dispatch(new GetProducts(this.filter));
+        if (params['layout']) {
+          this.layout = params['layout'];
+        } else {
+          this.layout = option?.collection?.collection_layout || 'collection_category_slider';
+        }
         if (
           this.layout == 'collection_product_infinite_scroll' ||
           this.layout == 'collection_shop_list_infinite'
         ) {
           this.store.dispatch(new GetMoreProduct(this.scrollFilter));
         }
-      } else {
-        // Get Collection Layout
-        this.themeOptions$.subscribe((option) => {
-          this.layout =
-            option?.collection && option?.collection?.collection_layout
-              ? option?.collection?.collection_layout
-              : 'collection_category_slider';
-        });
-      }
 
-      this.filter['layout'] = this.layout;
-      this.setBreadcrumb();
-    });
+        this.filter['layout'] = this.layout;
+        this.setBreadcrumb();
+      });
 
-    this.product$.subscribe((product) => (this.totalItems = product?.total));
+    this.product$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((product) => (this.totalItems = product?.total));
     this.setBreadcrumb();
   }
 
   ngOnInit() {
-    this.themeOptions$?.subscribe((option) => {
+    this.themeOptions$?.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((option) => {
       if (option?.collection?.product_ids?.length && this.layout === 'collection_recent_product') {
         this.store.dispatch(
           new GetProductByIds({
