@@ -1,6 +1,6 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
 
@@ -24,7 +24,7 @@ interface HeaderMenuItem {
 
 @Component({
   selector: 'app-main-menu',
-  imports: [AsyncPipe, CurrencySymbolPipe, NgTemplateOutlet, RouterLink],
+  imports: [AsyncPipe, CurrencySymbolPipe, NgTemplateOutlet, RouterLink, RouterLinkActive],
   templateUrl: './main-menu.html',
   styleUrl: './main-menu.scss',
 })

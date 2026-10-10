@@ -31,6 +31,17 @@
       background: rgba(var(--theme-color), 0.08);
       color: rgba(var(--theme-color), 1);
     }
+
+    &:active {
+      background: rgba(var(--primary-color), 0.12);
+    }
+
+    &.active {
+      background: rgba(
+        var(--primary-color),
+        0.15
+      ); // Atur intensitas background aktif sesuai selera
+    }
   }
 }
 
@@ -47,7 +58,21 @@
     padding: 8px;
 
     &:hover {
-      background: rgba(var(--theme-color), 0.08);
+      background: rgba(var(--primary-color), 0.08);
+    }
+    &:active {
+      background: rgba(var(--primary-color), 0.12);
+    }
+
+    &.active {
+      background: rgba(
+        var(--primary-color),
+        0.15
+      ); // Atur intensitas background aktif sesuai selera
+
+      strong {
+        color: rgba(var(--primary-color), 1); // Opsional: sesuaikan warna harga saat aktif
+      }
     }
 
     img {
@@ -107,4 +132,19 @@
       width: auto;
     }
   }
+  .active > .nav-link {
+    color: rgba(var(--primary-color), 1);
+  }
+}
+
+@media (max-width: 1199.98px) {
+  header .offcanvas-collapse .offcanvas-body .navbar-nav .active > .nav-link {
+    color: rgba(var(--primary-color), 1);
+  }
+}
+
+.nav-item.active > .nav-link,
+.nav-link.active {
+  color: rgba(var(--primary-color), 1); /* Sesuaikan dengan warna brand MATEX Anda */
+  font-weight: 600;
 }

@@ -14,7 +14,12 @@
       @if (items$ | async; as items) {
         <ul class="navbar-nav {{ navClass() }}">
           @for (item of items; track item.key) {
-            <li class="nav-item" [class.dropdown]="item.categories || item.products">
+            <li
+              class="nav-item"
+              [class.dropdown]="item.categories || item.products"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               @if (item.categories || item.products) {
                 <a class="nav-link dropdown-toggle" role="button" (click)="toggle(item, items)">{{
                   item.label
@@ -30,7 +35,12 @@
                         <ul class="category-tree">
                           @for (category of categories; track category.id) {
                             <li>
-                              <a [routerLink]="categoryPath(category)" (click)="close()">
+                              <a
+                                [routerLink]="categoryPath(category)"
+                                (click)="close()"
+                                routerLinkActive="active"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                              >
                                 <span>{{ category.name }}</span>
                                 @if (category.subcategories?.length) {
                                   <i class="ri-arrow-right-s-line"></i>
@@ -66,7 +76,12 @@
                     @if (item.products.length) {
                       <div class="header-product-list">
                         @for (product of item.products; track product.id) {
-                          <a [routerLink]="productPath(product)" (click)="close()">
+                          <a
+                            [routerLink]="productPath(product)"
+                            (click)="close()"
+                            routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                          >
                             <img [src]="imageUrl(product)" [alt]="product.name" />
                             <span class="header-product-copy">
                               <strong [title]="product.name">{{ product.name }}</strong>
