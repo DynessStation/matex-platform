@@ -16,7 +16,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { Params } from '@angular/router';
 
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { Store } from '@ngxs/store';
 
@@ -43,6 +43,8 @@ import { NoData } from '../no-data/no-data';
 import { Pagination } from '../pagination/pagination';
 
 import { HasPermissionDirective } from '../../../directive/has-permission.directive';
+
+import { NotificationService } from '../../../services/notification.service';
 
 //==================================================
 //==== MEDIA SELECTION TYPE
@@ -82,6 +84,10 @@ export class MediaBox {
 
   private destroyRef = inject(DestroyRef);
 
+  private notificationService = inject(NotificationService);
+
+  private translate = inject(TranslateService);
+
   //==================================================
   //==== STATE
   //==================================================
@@ -101,6 +107,8 @@ export class MediaBox {
   //==================================================
 
   readonly multiple = input<boolean>(false);
+
+  readonly maxSelection = input<number>(5);
 
   readonly url = input<boolean>(false);
 
@@ -397,6 +405,21 @@ export class MediaBox {
       const index = this.selectedAttachments.findIndex(
         (item) => item.id_attachment === attachment.id_attachment,
       );
+
+      if (
+        checked &&
+        index === -1 &&
+        this.selectedAttachments.length >=
+          Math.max(1, Math.floor(this.maxSelection()))
+      ) {
+        (event.target as HTMLInputElement).checked = false;
+        this.notificationService.showError(
+          this.translate.instant('media_ui.file_limit_reached', {
+            max: Math.max(1, Math.floor(this.maxSelection())),
+          }),
+        );
+        return;
+      }
 
       if (checked && index === -1) {
         this.selectedAttachments.push(attachment);

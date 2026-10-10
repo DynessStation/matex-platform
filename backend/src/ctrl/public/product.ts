@@ -18,8 +18,10 @@ const base = `SELECT p.*,i.product_slug,i.product_name,i.product_short_descripti
 const where = `p.id_master_comp=? AND i.product_locale=? AND p.product_status='published'
  AND i.product_i18n_status=1 AND p.product_deleted_at IS NULL`;
 const image = (row: any) => ({
+  id: Number(row.id_attachment),
   asset_url: buildAttachmentUrl(row.storage_path), original_url: buildAttachmentUrl(row.storage_path),
-  name: row.name ?? "", width: row.width == null ? null : Number(row.width),
+  name: row.name ?? "", file_name: row.file_name ?? row.name ?? "",
+  width: row.width == null ? null : Number(row.width),
   height: row.height == null ? null : Number(row.height), mime_type: row.mime_type ?? "",
 });
 
@@ -50,7 +52,7 @@ const hydrate = async (rows: RowDataPacket[], company: number, locale: string) =
     external_url:primaryMarket?.product_marketplace_url??"",
     external_button_text:locale==="id-ID"?"Lihat di marketplace":"View on marketplace",
     product_thumbnail:(()=>{const x=productMedia.find(m=>m.product_attachment_role==="thumbnail");return x?image(x):null;})(),
-    product_galleries:productMedia.filter(m=>m.product_attachment_role==="gallery").map(image),
+    product_galleries:(()=>{const gallery=productMedia.filter(m=>m.product_attachment_role==="gallery");const thumbnail=productMedia.find(m=>m.product_attachment_role==="thumbnail");return (gallery.length?gallery:thumbnail?[thumbnail]:[]).map(image);})(),
     product_meta_image:(()=>{const x=productMedia.find(m=>m.product_attachment_role==="og")??productMedia.find(m=>m.product_attachment_role==="thumbnail");return x?image(x):null;})(),
     categories:categories.filter(x=>Number(x.id_product)===id).map(x=>({id:Number(x.id_product_category),name:x.product_category_name,slug:x.product_category_slug})),
     marketplaces:normalizedMarkets.map(x=>({provider:x.product_marketplace_provider,label:x.product_marketplace_label,url:x.product_marketplace_url,sku:x.product_marketplace_sku,price:x.product_marketplace_price==null?null:Number(x.product_marketplace_price),currency:x.product_marketplace_currency,is_primary:x.normalized_is_primary})),

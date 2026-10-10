@@ -66,11 +66,17 @@ const parsePayload = (body: any) => {
 
   const categoryIds = [...new Set((Array.isArray(body?.category_ids) ? body.category_ids : [])
     .map((id: unknown) => decode(id, keyhsid.idProductCategory)).filter(Boolean))] as number[];
+  if (!categoryIds.length) return null;
   const media = (Array.isArray(body?.media) ? body.media : []).map((item: any, index: number) => ({
     id: decode(item?.id, keyhsid.idAttachment), role: String(item?.role ?? "gallery"),
     sortOrder: Math.max(0, Number(item?.sort_order) || index),
   }));
   if (media.some((item: any) => !item.id || !roles.has(item.role))) return null;
+  const gallery = media.filter((item: any) => item.role === "gallery");
+  if (gallery.length > 10 ||
+      media.filter((item: any) => item.role === "thumbnail").length > 1 ||
+      media.filter((item: any) => item.role === "og").length > 1 ||
+      new Set(media.map((item: any) => `${item.role}:${item.sortOrder}`)).size !== media.length) return null;
   const prices = (Array.isArray(body?.prices) ? body.prices : []).map((item: any, index: number) => ({
     type: clean(item?.type, 40), label: clean(item?.label, 120) || null,
     currency: clean(item?.currency || "IDR", 3).toUpperCase(), amount: numberOrNull(item?.amount),
@@ -100,15 +106,23 @@ const parsePayload = (body: any) => {
     activeMarketplaces[0].isPrimary = 1;
   }
 
+  const weight = numberOrNull(body?.weight_grams);
+  const length = numberOrNull(body?.length_mm);
+  const width = numberOrNull(body?.width_mm);
+  const height = numberOrNull(body?.height_mm);
+  const minOrderQty = numberOrNull(body?.min_order_qty) ?? 1;
+  const leadTimeDays = numberOrNull(body?.lead_time_days);
+  const stockQuantity = numberOrNull(body?.stock_quantity);
+  if ([weight, length, width, height, leadTimeDays, stockQuantity]
+      .some((value) => value != null && value < 0) || minOrderQty < 1) return null;
+
   return {
     key, sku, status, productType, stockStatus, priceVisibility, categoryIds, media, prices, marketplaces, translations,
     unit: clean(body?.unit, 40) || null, barcode: clean(body?.barcode, 120) || null,
     manufacturerCode: clean(body?.manufacturer_code, 120) || null,
     countryOrigin: clean(body?.country_origin, 100) || null, hsCode: clean(body?.hs_code, 50) || null,
-    weight: numberOrNull(body?.weight_grams), length: numberOrNull(body?.length_mm),
-    width: numberOrNull(body?.width_mm), height: numberOrNull(body?.height_mm),
-    minOrderQty: numberOrNull(body?.min_order_qty) ?? 1, leadTimeDays: numberOrNull(body?.lead_time_days),
-    manageStock: body?.manage_stock ? 1 : 0, stockQuantity: numberOrNull(body?.stock_quantity),
+    weight, length, width, height, minOrderQty, leadTimeDays,
+    manageStock: body?.manage_stock ? 1 : 0, stockQuantity,
     internalCommerce: body?.internal_commerce_enabled ? 1 : 0,
     isFeatured: body?.is_featured ? 1 : 0, sortOrder: Math.max(0, Number(body?.sort_order) || 0),
   };
@@ -242,7 +256,18 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       await cx.query(`INSERT INTO product_catalog_category(id_product,id_product_category,id_master_comp,is_primary,sort_order) VALUES(?,?,?,?,?)`,[id,categoryId,scope.idMasterComp,index===0?1:0,index]);
     }
     await cx.query(`DELETE FROM product_catalog_attachment WHERE id_product=? AND id_master_comp=?`, [id, scope.idMasterComp]);
-    for(const item of payload.media){const [valid]=await cx.query<RowDataPacket[]>(`SELECT id_attachment FROM attachment WHERE id_attachment=? AND id_master_comp=? AND attachment_status=1 AND deleted_at IS NULL`,[item.id,scope.idMasterComp]);if(!valid.length){await cx.rollback();return sendError(res,400,"PRODUCT_MEDIA_INVALID","Selected media is unavailable");}await cx.query(`INSERT INTO product_catalog_attachment(id_product,id_master_comp,id_attachment,product_attachment_role,product_attachment_sort_order) VALUES(?,?,?,?,?)`,[id,scope.idMasterComp,item.id,item.role,item.sortOrder]);}
+    for(const item of payload.media){
+      const [valid]=await cx.query<RowDataPacket[]>(`SELECT id_attachment,mime_type FROM attachment WHERE id_attachment=? AND id_master_comp=? AND attachment_status=1 AND deleted_at IS NULL`,[item.id,scope.idMasterComp]);
+      if(!valid.length){await cx.rollback();return sendError(res,400,"PRODUCT_MEDIA_INVALID","Selected media is unavailable");}
+      const mime=String(valid[0].mime_type??"");
+      const isImage=mime.startsWith("image/");
+      const isVideo=["video/mp4","video/webm","video/ogg"].includes(mime);
+      if(((item.role==="thumbnail"||item.role==="og")&&!isImage)||(item.role==="gallery"&&!isImage&&!isVideo)){
+        await cx.rollback();
+        return sendError(res,400,"PRODUCT_MEDIA_TYPE_INVALID","Thumbnail and social media must be images; gallery media may be images or supported videos");
+      }
+      await cx.query(`INSERT INTO product_catalog_attachment(id_product,id_master_comp,id_attachment,product_attachment_role,product_attachment_sort_order) VALUES(?,?,?,?,?)`,[id,scope.idMasterComp,item.id,item.role,item.sortOrder]);
+    }
     await cx.query(`DELETE FROM product_catalog_price WHERE id_product=? AND id_master_comp=?`, [id, scope.idMasterComp]);
     for(const item of payload.prices)await cx.query(`INSERT INTO product_catalog_price(id_product,id_master_comp,product_price_type,product_price_label,product_price_currency,product_price_amount,product_price_compare_at,product_price_min_qty,product_price_max_qty,product_price_starts_at,product_price_ends_at,product_price_is_public,product_price_is_active,product_price_sort_order) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,[id,scope.idMasterComp,item.type,item.label,item.currency,item.amount,item.compareAt,item.minQty,item.maxQty,item.startsAt,item.endsAt,item.isPublic,item.isActive,item.sortOrder]);
     await cx.query(`DELETE FROM product_catalog_marketplace WHERE id_product=? AND id_master_comp=?`, [id, scope.idMasterComp]);

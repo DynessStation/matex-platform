@@ -17,9 +17,15 @@
                       <div class="swiper-wrapper">
                         @for (img of product()?.product_galleries; track img.id; let i = $index) {
                           <div class="swiper-slide">
-                            <a class="slider-image item" (click)="openLightbox(i)">
-                              <img [src]="img.asset_url" class="img-fluid" alt="image" />
-                            </a>
+                            @if (isVideo(img.mime_type)) {
+                              <video class="slider-image item w-100" controls preload="metadata">
+                                <source [src]="img.asset_url" [type]="img.mime_type" />
+                              </video>
+                            } @else {
+                              <a class="slider-image item" (click)="openLightbox(i)">
+                                <img [src]="img.asset_url" class="img-fluid" alt="image" />
+                              </a>
+                            }
                           </div>
                         }
                       </div>
@@ -33,7 +39,16 @@
                         @for (img of product()?.product_galleries; track img.id; let i = $index) {
                           <div class="swiper-slide">
                             <div class="sidebar-image">
-                              <img [src]="img.asset_url" class="img-fluid" alt="image" />
+                              @if (isVideo(img.mime_type)) {
+                                <div
+                                  class="bg-light d-flex align-items-center justify-content-center p-4"
+                                  aria-label="Video"
+                                >
+                                  <i class="ri-play-circle-line fs-3"></i>
+                                </div>
+                              } @else {
+                                <img [src]="img.asset_url" class="img-fluid" alt="image" />
+                              }
                             </div>
                           </div>
                         }

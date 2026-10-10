@@ -74,6 +74,11 @@
                       [subArrayKey]="'subcategories'"
                       (selectedItem)="selectCategories($event)"
                     />
+                    @if (categoryError) {
+                      <small class="text-danger d-block mt-1"
+                        >Pilih minimal satu kategori produk.</small
+                      >
+                    }
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Barcode / GTIN</label
@@ -615,8 +620,8 @@
                 <div class="category-heading">
                   <h5>Media produk</h5>
                   <p>
-                    Pilih gambar dari Pustaka Media. Gambar utama disarankan
-                    persegi; galeri dapat berisi beberapa sudut produk.
+                    Gambar utama dan gambar sosial tetap berupa gambar. Galeri
+                    dapat berisi gabungan gambar dan video.
                   </p>
                 </div>
                 <div class="row g-4">
@@ -626,8 +631,8 @@
                       <small>Rekomendasi minimal 1000 × 1000px.</small
                       ><app-image-upload
                         [multipleImage]="false"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
+                        [accept]="productImageAccept"
+                        [collection]="'product_media'"
                         [image]="$any(media.thumbnail)"
                         (selectedFiles)="selectMedia('thumbnail', $event)"
                       />
@@ -639,8 +644,8 @@
                       <small>Rekomendasi 1200 × 630px.</small
                       ><app-image-upload
                         [multipleImage]="false"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
+                        [accept]="productImageAccept"
+                        [collection]="'product_media'"
                         [image]="$any(media.og)"
                         (selectedFiles)="selectMedia('og', $event)"
                       />
@@ -650,12 +655,13 @@
                     <div class="category-media">
                       <h6>Galeri produk</h6>
                       <small
-                        >Pilih beberapa gambar dan atur urutannya dari Pustaka
-                        Media.</small
+                        >Pilih maksimal 10 gambar atau video (MP4, WebM, OGG).
+                        Urutan pilihan menjadi urutan tampil di publik.</small
                       ><app-image-upload
                         [multipleImage]="true"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
+                        [accept]="productGalleryAccept"
+                        [collection]="'product_media'"
+                        [maxFiles]="10"
                         [images]="$any(media.gallery)"
                         (selectedFiles)="selectMedia('gallery', $event)"
                       />

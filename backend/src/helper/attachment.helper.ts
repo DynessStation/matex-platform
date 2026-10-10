@@ -95,10 +95,10 @@ export const deleteStoredAttachment = async (
 };
 
 //==================================================
-//==== STORE IMAGE ATTACHMENT
+//==== STORE ATTACHMENT
 //==================================================
 
-export const storeImageAttachment = async (
+export const storeAttachment = async (
   file: Express.Multer.File,
 
   collection: AttachmentCollection,
@@ -122,16 +122,12 @@ export const storeImageAttachment = async (
     throw new Error("Invalid attachment collection");
   }
 
-  if (!config.image) {
-    throw new Error("Attachment collection does not support image processing");
-  }
-
   //==================================================
   //==== VALIDATE MIME
   //==================================================
 
   if (!config.allowedMimeTypes.includes(file.mimetype)) {
-    throw new Error("Unsupported image type");
+    throw new Error("Unsupported attachment type");
   }
 
   //==================================================
@@ -150,7 +146,7 @@ export const storeImageAttachment = async (
 
   const originalParsed = path.parse(originalName);
 
-  const name = (originalParsed.name || "image").slice(0, 255);
+  const name = (originalParsed.name || "file").slice(0, 255);
 
   //==================================================
   //==== DIRECTORY DATE
@@ -168,7 +164,19 @@ export const storeImageAttachment = async (
 
   const generatedName = randomUUID().replace(/-/g, "");
 
-  const extension = config.image.format;
+  const isImage = file.mimetype.startsWith("image/");
+  const videoExtensions: Record<string, string> = {
+    "video/mp4": "mp4",
+    "video/webm": "webm",
+    "video/ogg": "ogv",
+  };
+  const extension = isImage
+    ? config.image?.format
+    : videoExtensions[file.mimetype];
+
+  if (!extension || (isImage && !config.image)) {
+    throw new Error("Attachment collection does not support this file type");
+  }
 
   const fileName = `${generatedName}.${extension}`;
 
@@ -194,6 +202,25 @@ export const storeImageAttachment = async (
   //==== PROCESS IMAGE
   //==================================================
 
+  if (!isImage) {
+    await fs.writeFile(absolutePath, file.buffer);
+
+    return {
+      collection_name: collection,
+      name,
+      original_name: originalName,
+      file_name: fileName,
+      mime_type: file.mimetype,
+      extension,
+      disk: storageConfig.disk,
+      storage_path: storagePath,
+      file_size: file.size,
+      width: null,
+      height: null,
+      asset_url: buildAttachmentUrl(storagePath),
+    };
+  }
+
   let info: sharp.OutputInfo;
 
   try {
@@ -211,15 +238,15 @@ export const storeImageAttachment = async (
       //==================================================
 
       .resize({
-        width: config.image.width,
+        width: config.image!.width,
 
-        height: config.image.height,
+        height: config.image!.height,
 
-        fit: config.image.fit,
+        fit: config.image!.fit,
 
-        position: config.image.position,
+        position: config.image!.position,
 
-        withoutEnlargement: config.image.withoutEnlargement ?? false,
+        withoutEnlargement: config.image!.withoutEnlargement ?? false,
       })
 
       //==================================================
@@ -227,7 +254,7 @@ export const storeImageAttachment = async (
       //==================================================
 
       .webp({
-        quality: config.image.quality,
+        quality: config.image!.quality,
       })
 
       //==================================================
@@ -275,3 +302,6 @@ export const storeImageAttachment = async (
     asset_url: buildAttachmentUrl(storagePath),
   };
 };
+
+// Kept as an alias while older callers move to the generic name.
+export const storeImageAttachment = storeAttachment;

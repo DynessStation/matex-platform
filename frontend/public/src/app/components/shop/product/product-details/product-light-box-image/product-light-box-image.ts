@@ -97,9 +97,10 @@ export class ProductLightBoxImage {
 
   ngOnInit() {
     this.items =
-      this.product()?.product_galleries?.map(
-        (gallery) => new ImageItem({ src: gallery.asset_url, thumb: gallery.asset_url }),
-      ) ?? [];
+      this.product()
+        ?.product_galleries?.filter((gallery) => !this.isVideo(gallery.mime_type))
+        .map((gallery) => new ImageItem({ src: gallery.asset_url, thumb: gallery.asset_url })) ??
+      [];
 
     const lightboxRef = this.gallery.ref('lightbox');
     lightboxRef.setConfig({
@@ -134,6 +135,14 @@ export class ProductLightBoxImage {
   }
 
   openLightbox(index: number) {
-    this.lightbox.open(index, 'lightbox');
+    const imageIndex =
+      this.product()
+        ?.product_galleries?.slice(0, index)
+        .filter((item) => !this.isVideo(item.mime_type)).length ?? 0;
+    this.lightbox.open(imageIndex, 'lightbox');
+  }
+
+  isVideo(mimeType?: string): boolean {
+    return String(mimeType ?? '').startsWith('video/');
   }
 }

@@ -3,20 +3,14 @@
 //==================================================
 
 export type AttachmentCollection =
-  | "admin_profile"
-  | "media_library"
-  | "office_media";
+  "admin_profile" | "media_library" | "office_media" | "product_media";
 
 //==================================================
 //==== IMAGE FIT
 //==================================================
 
 export type AttachmentImageFit =
-  | "cover"
-  | "contain"
-  | "fill"
-  | "inside"
-  | "outside";
+  "cover" | "contain" | "fill" | "inside" | "outside";
 
 //==================================================
 //==== COLLECTION CONFIG
@@ -131,6 +125,44 @@ export const attachmentConfig: Record<
     maxFileSize: 12 * 1024 * 1024,
 
     allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
+
+    image: {
+      width: 1920,
+
+      height: 1920,
+
+      fit: "inside",
+
+      position: "centre",
+
+      format: "webp",
+
+      quality: 85,
+
+      withoutEnlargement: true,
+    },
+  },
+
+  //==================================================
+  //==== PRODUCT MEDIA
+  //==================================================
+
+  product_media: {
+    directory: "product-media",
+
+    // Product gallery may contain up to ten images/videos per upload.
+    maxFiles: 10,
+
+    maxFileSize: 50 * 1024 * 1024,
+
+    allowedMimeTypes: [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "video/mp4",
+      "video/webm",
+      "video/ogg",
+    ],
 
     image: {
       width: 1920,

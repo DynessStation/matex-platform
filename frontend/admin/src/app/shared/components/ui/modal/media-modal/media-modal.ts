@@ -97,6 +97,8 @@ export class MediaModal {
 
   readonly multipleImage = input<boolean>(false);
 
+  readonly maxFiles = input<number>(5);
+
   readonly url = input<boolean>(false);
 
   readonly collection = input<string>('');
@@ -254,7 +256,9 @@ export class MediaModal {
   //==================================================
 
   onSelect(event: NgxDropzoneChangeEvent): void {
-    const maxFiles = this.multipleImage() ? 5 : 1;
+    const maxFiles = this.multipleImage()
+      ? Math.max(1, Math.floor(this.maxFiles()))
+      : 1;
 
     const available = maxFiles - this.files.length;
 

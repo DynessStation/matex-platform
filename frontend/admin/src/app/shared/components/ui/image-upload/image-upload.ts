@@ -47,6 +47,8 @@ export class ImageUpload {
 
   readonly multipleImage = input<boolean>(false);
 
+  readonly maxFiles = input<number>(5);
+
   readonly helpText = input<string>('');
 
   //==================================================

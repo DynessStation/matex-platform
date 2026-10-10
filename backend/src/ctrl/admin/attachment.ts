@@ -21,7 +21,7 @@ import {
   StoredAttachment,
   buildAttachmentUrl,
   deleteStoredAttachment,
-  storeImageAttachment,
+  storeAttachment,
 } from "../../helper/attachment.helper";
 
 import { AuthRequest, verifyToken } from "../middleware/authJwt";
@@ -222,7 +222,9 @@ const upload = multer({
     //==== HARD GLOBAL LIMIT
     //==================================================
 
-    fileSize: 20 * 1024 * 1024,
+    // Collection-specific validation still applies after Multer. This ceiling
+    // only prevents Multer from rejecting the 50 MB product-video allowance.
+    fileSize: 50 * 1024 * 1024,
 
     files: 10,
   },
@@ -753,7 +755,7 @@ app.post(
         //==== STORE PHYSICAL FILE
         //==================================================
 
-        const stored = await storeImageAttachment(
+        const stored = await storeAttachment(
           file,
 
           collection as AttachmentCollection,
