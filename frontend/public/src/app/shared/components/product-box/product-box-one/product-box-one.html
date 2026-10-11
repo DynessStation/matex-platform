@@ -23,9 +23,9 @@
         </p>
         @if (product()?.price_visibility === 'displayed') {
           <h5 class="price">
-            {{ product()?.sale_price | currencySymbol: 'before_price' : priceCurrency }}
+            {{ product() | productPrice }}
             @if (product()?.price && product()?.price !== product()?.sale_price) {
-              <del>{{ product()?.price | currencySymbol: 'before_price' : priceCurrency }}</del>
+              <del>{{ product() | productPrice: 'compare' }}</del>
             }
           </h5>
         } @else if (product()?.price_visibility === 'contact') {

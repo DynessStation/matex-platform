@@ -36,8 +36,8 @@
         </ng-template>
       </ngb-rating>
       <h6 class="price">
-        {{ product()?.sale_price | currencySymbol }}
-        <del>{{ product()?.price | currencySymbol }}</del>
+        {{ product() | productPrice }}
+        <del>{{ product() | productPrice: 'compare' }}</del>
       </h6>
     </div>
   </div>
@@ -70,8 +70,8 @@
         </ng-template>
       </ngb-rating>
       <h5 class="price">
-        {{ product()?.sale_price | currencySymbol }}
-        <del>{{ product()?.price | currencySymbol }}</del>
+        {{ product() | productPrice }}
+        <del>{{ product() | productPrice: 'compare' }}</del>
       </h5>
       <div class="progress">
         <div class="progress-bar progress-bar-striped progress-bar-animated"></div>

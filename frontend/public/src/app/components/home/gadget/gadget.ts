@@ -1,6 +1,7 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Store } from '@ngxs/store';
 
 import { catchError, forkJoin, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
@@ -14,6 +15,7 @@ import { CategoryService } from '../../../shared/services/category.service';
 import { ProductService } from '../../../shared/services/product.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { ThemeOptionService } from '../../../shared/services/theme-option.service';
+import { SettingState } from '../../../shared/store/state/setting.state';
 import { HomeBanner } from '../widgets/home-banner/home-banner';
 import { HomeNewsletter } from '../widgets/home-newsletter/home-newsletter';
 import { HomeTags } from '../widgets/home-tags/home-tags';
@@ -36,6 +38,8 @@ export class Gadget {
   private blogService = inject(BlogService);
   private navigation = inject(PublicNavigationContextService);
   private themeOptionService = inject(ThemeOptionService);
+  private selectedCurrency = inject(Store).selectSignal(SettingState.selectedCurrency);
+  private router = inject(Router);
 
   data = input<GadgetTheme>();
   slug = input<string>();
@@ -111,12 +115,26 @@ export class Gadget {
 
   displayPrice(product: Product): string | null {
     if (product.price_visibility !== 'displayed' || !product.sale_price) return null;
+    const requestedCode = String(
+      this.router.parseUrl(this.router.url).queryParams['currency'] ?? '',
+    ).toUpperCase();
+    const selectedCode =
+      (requestedCode === 'IDR' || requestedCode === 'USD' ? requestedCode : null) ??
+      this.selectedCurrency()?.code?.toUpperCase() ??
+      product.currency ??
+      'IDR';
+    const prices = (product.prices ?? []).filter((price) => price.type === 'end_user');
+    const selectedPrice =
+      prices.find((price) => price.currency.toUpperCase() === selectedCode) ??
+      prices.find((price) => price.currency.toUpperCase() === 'IDR') ??
+      prices[0];
+    const code = selectedPrice?.currency || product.currency || selectedCode;
 
     return new Intl.NumberFormat(this.isEnglish ? 'en-US' : 'id-ID', {
       style: 'currency',
-      currency: product.currency || 'IDR',
-      maximumFractionDigits: 0,
-    }).format(product.sale_price);
+      currency: code,
+      maximumFractionDigits: code === 'IDR' ? 0 : 2,
+    }).format(selectedPrice?.amount ?? product.sale_price);
   }
 
   // === yang gw pengen adain ==== ///

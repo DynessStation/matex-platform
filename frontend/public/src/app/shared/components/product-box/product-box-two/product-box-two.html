@@ -36,8 +36,8 @@
       </ngb-rating>
     </ul>
     <h5 class="price">
-      {{ product()?.sale_price | currencySymbol }}
-      <del>{{ product()?.price | currencySymbol }}</del>
+      {{ product() | productPrice }}
+      <del>{{ product() | productPrice: 'compare' }}</del>
     </h5>
     <div class="btn-box">
       <app-cart-button

@@ -25,6 +25,7 @@ import {
   GetProducts,
 } from '../../../shared/store/action/product.action';
 import { ProductState } from '../../../shared/store/state/product.state';
+import { SettingState } from '../../../shared/store/state/setting.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
 
@@ -101,6 +102,10 @@ export class Collection {
         rating: params['rating'] ? params['rating'] : '',
         attribute: params['attribute'] ? params['attribute'] : '',
         brand: params['brand'] ? params['brand'] : '',
+        currency:
+          params['currency'] ||
+          this.store.selectSnapshot(SettingState.selectedCurrency)?.code ||
+          'IDR',
       };
 
       this.scrollFilter = {

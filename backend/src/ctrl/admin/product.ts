@@ -26,6 +26,8 @@ const stocks = new Set([
   "made_to_order",
 ]);
 const priceVisibilities = new Set(["displayed", "contact", "hidden"]);
+const priceTypes = new Set(["end_user", "wholesale"]);
+const priceCurrencies = new Set(["IDR", "USD"]);
 const roles = new Set(["thumbnail", "gallery", "og", "size_chart", "document"]);
 const decode = (value: unknown, codec: any) => {
   const id = Number(codec.decode(String(value ?? ""))[0]);
@@ -135,13 +137,32 @@ const parsePayload = (body: any) => {
   if (
     prices.some(
       (item: any) =>
-        !item.type ||
+        !priceTypes.has(item.type) ||
         item.amount == null ||
         item.amount < 0 ||
-        item.currency.length !== 3,
+        !priceCurrencies.has(item.currency),
     )
   )
     return null;
+  const publicConsumerCurrencies = prices
+    .filter((item: any) => item.isPublic && item.type === "end_user")
+    .map((item: any) => item.currency);
+  const activePublicConsumerPrices = prices.filter(
+    (item: any) => item.isPublic && item.isActive && item.type === "end_user",
+  );
+  const activePublicCurrencies = new Set(
+    activePublicConsumerPrices.map((item: any) => item.currency),
+  );
+  if (
+    new Set(publicConsumerCurrencies).size !==
+      publicConsumerCurrencies.length ||
+    (priceVisibility === "displayed" &&
+      !["IDR", "USD"].every((currency) => activePublicCurrencies.has(currency)))
+  )
+    return null;
+  for (const item of prices) {
+    if (item.type !== "end_user") item.isPublic = 0;
+  }
   const marketplaces = (
     Array.isArray(body?.marketplaces) ? body.marketplaces : []
   ).map((item: any, index: number) => ({

@@ -45,11 +45,18 @@ const positiveInt = (value: unknown, fallback: number, maximum = 100) => {
     ? Math.min(parsed, maximum)
     : fallback;
 };
+const currencyCode = (value: unknown) => {
+  const code = String(value ?? "IDR")
+    .trim()
+    .toUpperCase();
+  return code === "USD" ? code : "IDR";
+};
 
 const hydrate = async (
   rows: RowDataPacket[],
   company: number,
   locale: string,
+  preferredCurrency = "IDR",
 ) => {
   if (!rows.length) return [];
   const ids = rows.map((row) => Number(row.id_product)),
@@ -63,7 +70,7 @@ const hydrate = async (
     [locale, ...ids, company],
   );
   const [prices] = await pool.query<RowDataPacket[]>(
-    `SELECT * FROM product_catalog_price WHERE id_product IN (${marks}) AND id_master_comp=? AND product_price_is_active=1 AND (product_price_starts_at IS NULL OR product_price_starts_at<=NOW()) AND (product_price_ends_at IS NULL OR product_price_ends_at>=NOW()) ORDER BY product_price_sort_order`,
+    `SELECT * FROM product_catalog_price WHERE id_product IN (${marks}) AND id_master_comp=? AND product_price_is_active=1 AND product_price_is_public=1 AND (product_price_starts_at IS NULL OR product_price_starts_at<=NOW()) AND (product_price_ends_at IS NULL OR product_price_ends_at>=NOW()) ORDER BY product_price_sort_order`,
     [...ids, company],
   );
   const [markets] = await pool.query<RowDataPacket[]>(
@@ -77,9 +84,17 @@ const hydrate = async (
   return rows.map((row) => {
     const id = Number(row.id_product),
       productMedia = media.filter((x) => Number(x.id_product) === id),
-      publicPrice = prices.find(
-        (x) => Number(x.id_product) === id && x.product_price_is_public,
+      productPrices = prices.filter((x) => Number(x.id_product) === id),
+      consumerPrices = productPrices.filter(
+        (x) => x.product_price_type === "end_user",
       ),
+      publicPrice =
+        consumerPrices.find(
+          (x) => x.product_price_currency === preferredCurrency,
+        ) ??
+        consumerPrices.find((x) => x.product_price_currency === "IDR") ??
+        consumerPrices[0] ??
+        productPrices[0],
       productMarkets = markets.filter((x) => Number(x.id_product) === id),
       primaryMarket =
         productMarkets.find((x) => Boolean(x.product_marketplace_is_primary)) ??
@@ -204,26 +219,27 @@ const hydrate = async (
         currency: x.product_marketplace_currency,
         is_primary: x.normalized_is_primary,
       })),
-      prices: prices
-        .filter((x) => Number(x.id_product) === id && x.product_price_is_public)
-        .map((x) => ({
-          type: x.product_price_type,
-          label: x.product_price_label,
-          currency: x.product_price_currency,
-          amount: Number(x.product_price_amount),
-          compare_at:
-            x.product_price_compare_at == null
-              ? null
-              : Number(x.product_price_compare_at),
-          min_qty:
-            x.product_price_min_qty == null
-              ? null
-              : Number(x.product_price_min_qty),
-          max_qty:
-            x.product_price_max_qty == null
-              ? null
-              : Number(x.product_price_max_qty),
-        })),
+      prices:
+        row.product_price_visibility === "displayed"
+          ? productPrices.map((x) => ({
+              type: x.product_price_type,
+              label: x.product_price_label,
+              currency: x.product_price_currency,
+              amount: Number(x.product_price_amount),
+              compare_at:
+                x.product_price_compare_at == null
+                  ? null
+                  : Number(x.product_price_compare_at),
+              min_qty:
+                x.product_price_min_qty == null
+                  ? null
+                  : Number(x.product_price_min_qty),
+              max_qty:
+                x.product_price_max_qty == null
+                  ? null
+                  : Number(x.product_price_max_qty),
+            }))
+          : [],
       meta_title: row.product_meta_title ?? row.product_name,
       meta_description:
         row.product_meta_description ?? row.product_short_description ?? "",
@@ -275,7 +291,8 @@ router.get("/api/public/products/:locale", async (req, res) => {
     .slice(0, 100);
   const excludedId = Number(req.query.exclude_id);
   const page = positiveInt(req.query.page, 1, 100000),
-    paginate = positiveInt(req.query.paginate, 100, 100);
+    paginate = positiveInt(req.query.paginate, 100, 100),
+    preferredCurrency = currencyCode(req.query.currency);
   const sortBy = String(req.query.sortBy ?? "asc");
   try {
     const needsCategoryJoin = categories.length > 0 || categoryIds.length > 0;
@@ -320,17 +337,24 @@ router.get("/api/public/products/:locale", async (req, res) => {
       `${distinctBase}${categoryJoin} WHERE ${clauses.join(" AND ")} ORDER BY ${order}`,
       params,
     );
-    let data = await hydrate(rows, scope.company, scope.locale);
+    let data = await hydrate(
+      rows,
+      scope.company,
+      scope.locale,
+      preferredCurrency,
+    );
     const ranges = String(req.query.price ?? "")
       .split(",")
       .map((value) => value.split("-").map(Number))
       .filter((range) => range.length === 2 && range.every(Number.isFinite));
     if (ranges.length)
-      data = data.filter((product) =>
-        ranges.some(
-          ([min, max]) =>
-            product.sale_price >= min && product.sale_price <= max,
-        ),
+      data = data.filter(
+        (product) =>
+          product.price_visibility === "displayed" &&
+          ranges.some(
+            ([min, max]) =>
+              product.sale_price >= min && product.sale_price <= max,
+          ),
       );
     if (sortBy === "low-high") data.sort((a, b) => a.sale_price - b.sale_price);
     if (sortBy === "high-low") data.sort((a, b) => b.sale_price - a.sale_price);
@@ -364,7 +388,12 @@ router.get("/api/public/products/:locale/:slug", async (req, res) => {
     );
     if (!rows.length)
       return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
-    const [product] = await hydrate(rows, scope.company, scope.locale);
+    const [product] = await hydrate(
+      rows,
+      scope.company,
+      scope.locale,
+      currencyCode(req.query.currency),
+    );
     return sendSuccess(res, 200, "PRODUCT_FOUND", "Product loaded", product);
   } catch (error) {
     console.error("[Public product] detail failed", error);

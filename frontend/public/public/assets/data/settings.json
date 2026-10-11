@@ -63,9 +63,9 @@
       },
       "default_currency": {
         "id": 1,
-        "code": "USD",
-        "symbol": "$",
-        "no_of_decimal": 2,
+        "code": "IDR",
+        "symbol": "Rp",
+        "no_of_decimal": 0,
         "exchange_rate": 1,
         "symbol_position": "before_price",
         "thousands_separator": "comma",

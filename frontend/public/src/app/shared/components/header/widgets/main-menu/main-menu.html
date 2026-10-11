@@ -89,10 +89,7 @@
                                 product.price_visibility === 'displayed' && product.sale_price > 0
                               ) {
                                 <small class="header-product-price">
-                                  {{
-                                    product.sale_price
-                                      | currencySymbol: 'before_price' : product.currency
-                                  }}
+                                  {{ product | productPrice }}
                                 </small>
                               } @else {
                                 <small class="header-product-price">

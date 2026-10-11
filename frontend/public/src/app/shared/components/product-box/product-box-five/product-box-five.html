@@ -29,8 +29,8 @@
   </div>
   <div class="product-content">
     <h5 class="price">
-      {{ product()?.sale_price | currencySymbol }}
-      <del>{{ product()?.price | currencySymbol }}</del>
+      {{ product() | productPrice }}
+      <del>{{ product() | productPrice: 'compare' }}</del>
     </h5>
   </div>
 </div>

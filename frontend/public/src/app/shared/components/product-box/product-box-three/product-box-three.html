@@ -21,9 +21,9 @@
   </div>
   <a [routerLink]="['/product/' + product()?.slug]" class="category-content">
     <h5 class="name productName">{{ product()?.name }}</h5>
-    <h5 class="offer">Min. {{ product()?.sale_price | currencySymbol }}</h5>
+    <h5 class="offer">Min. {{ product() | productPrice }}</h5>
     <h5 class="rate">
-      <del>{{ product()?.price | currencySymbol }}</del>
+      <del>{{ product() | productPrice: 'compare' }}</del>
     </h5>
   </a>
 </div>

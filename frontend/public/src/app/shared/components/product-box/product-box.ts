@@ -10,7 +10,7 @@ import { ProductBoxThree } from './product-box-three/product-box-three';
 import { ProductBoxTwo } from './product-box-two/product-box-two';
 import { Product } from '../../interface/product.interface';
 import { Wishlist } from './widgets/wishlist/wishlist';
-import { CurrencySymbolPipe } from '../../pipe/currency.pipe';
+import { ProductPricePipe } from '../../pipe/product-price.pipe';
 import { ProductCartButton } from './widgets/product-cart-button/product-cart-button';
 
 @Component({
@@ -24,7 +24,7 @@ import { ProductCartButton } from './widgets/product-cart-button/product-cart-bu
     ProductBoxFour,
     ProductBoxThree,
     ProductBoxFive,
-    CurrencySymbolPipe,
+    ProductPricePipe,
     ProductCartButton,
     RouterModule,
   ],

@@ -7,7 +7,7 @@ import { catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
 import { Category } from '../../../../interface/category.interface';
 import { Product } from '../../../../interface/product.interface';
 import { IPublicNavigation } from '../../../../interface/public-navigation.interface';
-import { CurrencySymbolPipe } from '../../../../pipe/currency.pipe';
+import { ProductPricePipe } from '../../../../pipe/product-price.pipe';
 import { CategoryService } from '../../../../services/category.service';
 import { MenuService } from '../../../../services/menu.service';
 import { ProductService } from '../../../../services/product.service';
@@ -24,7 +24,7 @@ interface HeaderMenuItem {
 
 @Component({
   selector: 'app-main-menu',
-  imports: [AsyncPipe, CurrencySymbolPipe, NgTemplateOutlet, RouterLink, RouterLinkActive],
+  imports: [AsyncPipe, ProductPricePipe, NgTemplateOutlet, RouterLink, RouterLinkActive],
   templateUrl: './main-menu.html',
   styleUrl: './main-menu.scss',
 })

@@ -1216,16 +1216,6 @@
       line-height: 1.4;
       margin-bottom: calc(12px + (20 - 12) * ((100vw - 320px) / (1920 - 320)));
 
-      &:first-child {
-        &::first-letter {
-          color: rgba(var(--title-color), 1);
-          margin-right: calc(3px + (6 - 3) * ((100vw - 320px) / (1920 - 320)));
-          font-size: calc(46px + (52 - 46) * ((100vw - 320px) / (1920 - 320)));
-          line-height: 1;
-          font-weight: 600;
-        }
-      }
-
       &:last-child {
         margin-bottom: 0;
       }
@@ -1242,6 +1232,14 @@
         );
         @include flex_common;
       }
+    }
+
+    > p:first-of-type::first-letter {
+      color: rgba(var(--title-color), 1);
+      margin-right: calc(3px + (6 - 3) * ((100vw - 320px) / (1920 - 320)));
+      font-size: calc(46px + (52 - 46) * ((100vw - 320px) / (1920 - 320)));
+      line-height: 1;
+      font-weight: 600;
     }
 
     .blog-quote {

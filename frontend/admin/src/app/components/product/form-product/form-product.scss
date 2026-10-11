@@ -17,6 +17,59 @@
 .repeater-heading > div {
   min-width: 0;
 }
+.price-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.price-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef0f3;
+}
+.price-card-heading span {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fff4e6;
+  color: #a76000;
+  font-size: 12px;
+  font-weight: 700;
+}
+.price-check {
+  align-items: flex-start;
+  height: 100%;
+  padding-block: 10px;
+}
+.price-check input {
+  margin-top: 4px;
+}
+.price-check span,
+.price-check strong,
+.price-check small {
+  display: block;
+}
+.price-check small {
+  margin-top: 2px;
+  color: #777;
+}
+.price-preview {
+  color: #287a43;
+  font-weight: 600;
+}
+.price-internal-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px dashed #d9dde5;
+  border-radius: 4px;
+  color: #666;
+}
 .section-help {
   margin: 4px 0 0;
   color: #777;
@@ -248,6 +301,12 @@
     .btn {
       width: 100%;
     }
+  }
+  .price-add-actions {
+    justify-content: stretch;
+  }
+  .price-add-actions .btn {
+    flex: 1 1 100%;
   }
   .repeater-card {
     padding: 18px 46px 18px 16px;

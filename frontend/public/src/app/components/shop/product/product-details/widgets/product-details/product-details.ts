@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 
 import { Product, Variation } from '../../../../../../shared/interface/product.interface';
 import { Option } from '../../../../../../shared/interface/theme-option.interface';
-import { CurrencySymbolPipe } from '../../../../../../shared/pipe/currency.pipe';
+import { ProductPricePipe } from '../../../../../../shared/pipe/product-price.pipe';
 
 @Component({
   selector: 'app-product-details',
   templateUrl: './product-details.html',
-  imports: [CurrencySymbolPipe],
+  imports: [ProductPricePipe],
   styleUrl: './product-details.scss',
 })
 export class ProductDetails {
@@ -25,6 +25,7 @@ export class ProductDetails {
       this.activeVariation.set(this.selectedVariation() ?? this.product());
     });
   }
-  get isEnglish() { return this.router.url === '/en' || this.router.url.startsWith('/en/'); }
-  get priceCurrency() { return this.product()?.currency || this.product()?.prices?.[0]?.currency || 'IDR'; }
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
 }

@@ -536,60 +536,197 @@
                   </div>
                 </div>
                 <div class="repeater-heading">
-                  <h6>Daftar harga</h6>
-                  <button
-                    type="button"
-                    class="btn btn-outline"
-                    (click)="addPrice()"
-                  >
-                    <i class="ri-add-line"></i> Tambah harga
-                  </button>
+                  <div>
+                    <h6>Harga produk per mata uang</h6>
+                    <p class="section-help">
+                      Nominal Rupiah dan Dollar disimpan terpisah. Website akan
+                      memakai harga konsumen sesuai mata uang yang dipilih
+                      pengunjung, tanpa menghitung kurs ulang. Jika harga
+                      ditampilkan, harga konsumen IDR dan USD wajib aktif dan
+                      ditandai tampil di website.
+                    </p>
+                    @if (pricePublicationError) {
+                      <div class="text-danger mt-2">
+                        Lengkapi dan aktifkan satu harga konsumen Rupiah serta
+                        satu harga konsumen Dollar untuk website.
+                      </div>
+                    }
+                  </div>
+                  <div class="price-add-actions">
+                    <button
+                      type="button"
+                      class="btn btn-outline"
+                      (click)="addCurrencyPrice('IDR')"
+                    >
+                      <i class="ri-add-line"></i> Harga Rupiah
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline"
+                      (click)="addCurrencyPrice('USD')"
+                    >
+                      <i class="ri-add-line"></i> Harga Dollar
+                    </button>
+                  </div>
                 </div>
                 <div formArrayName="prices">
                   @for (row of prices.controls; track $index) {
                     <div class="repeater-card" [formGroupName]="$index">
+                      <div class="price-card-heading">
+                        <strong>{{ priceCardTitle($index) }}</strong>
+                        <span>{{ row.get('currency')?.value }}</span>
+                      </div>
                       <div class="row g-3">
-                        <div class="col-md-3">
-                          <label>Jenis harga</label
-                          ><input
-                            class="form-control"
-                            formControlName="type"
-                            placeholder="end_user / wholesale"
-                          />
+                        <div class="col-lg-3 col-md-6">
+                          <label class="form-label">Untuk siapa?</label>
+                          @if (isBrowser) {
+                            <select2
+                              class="custom-select d-block"
+                              [data]="priceTypeOptions"
+                              formControlName="type"
+                              [displaySearchStatus]="'hidden'"
+                            />
+                          }
+                          <small class="field-help"
+                            >Konsumen untuk harga katalog; grosir untuk data
+                            internal dan transaksi berikutnya.</small
+                          >
                         </div>
-                        <div class="col-md-3">
-                          <label>Label</label
-                          ><input
+                        <div class="col-lg-3 col-md-6">
+                          <label class="form-label">Mata uang</label>
+                          @if (isBrowser) {
+                            <select2
+                              class="custom-select d-block"
+                              [data]="currencyOptions"
+                              formControlName="currency"
+                              [displaySearchStatus]="'hidden'"
+                            />
+                          }
+                          <small class="field-help"
+                            >Pilih IDR untuk Rupiah atau USD untuk Dollar
+                            AS.</small
+                          >
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                          <label class="form-label">Nominal harga</label>
+                          <div class="input-group">
+                            <span class="input-group-text">{{
+                              priceSymbol($index)
+                            }}</span>
+                            <input
+                              type="number"
+                              min="0"
+                              [step]="
+                                row.get('currency')?.value === 'USD'
+                                  ? '0.01'
+                                  : '1'
+                              "
+                              class="form-control"
+                              formControlName="amount"
+                              placeholder="0"
+                            />
+                          </div>
+                          @if (pricePreview($index)) {
+                            <small class="field-help price-preview"
+                              >Tampil sebagai {{ pricePreview($index) }}</small
+                            >
+                          }
+                          @if (
+                            row.get('amount')?.touched &&
+                            row.get('amount')?.invalid
+                          ) {
+                            <div class="text-danger mt-1">
+                              Nominal wajib diisi dengan angka nol atau lebih.
+                            </div>
+                          }
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                          <label class="form-label">Nama harga</label>
+                          <input
                             class="form-control"
                             formControlName="label"
+                            placeholder="Contoh: Harga konsumen"
                           />
+                          <small class="field-help"
+                            >Nama internal agar baris harga mudah
+                            dikenali.</small
+                          >
                         </div>
-                        <div class="col-md-2">
-                          <label>Nominal</label
-                          ><input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            formControlName="amount"
-                          />
-                        </div>
-                        <div class="col-md-2">
-                          <label>Minimum qty</label
-                          ><input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            formControlName="min_qty"
-                          />
-                        </div>
-                        <div class="col-md-2">
-                          <label class="category-check mt-4"
+                        @if (row.get('type')?.value === 'wholesale') {
+                          <div class="col-lg-3 col-md-6">
+                            <label class="form-label">Minimum pembelian</label>
+                            <input
+                              type="number"
+                              min="1"
+                              class="form-control"
+                              formControlName="min_qty"
+                              placeholder="Contoh: 10"
+                            />
+                          </div>
+                          <div class="col-lg-3 col-md-6">
+                            <label class="form-label">Maksimum pembelian</label>
+                            <input
+                              type="number"
+                              min="1"
+                              class="form-control"
+                              formControlName="max_qty"
+                              placeholder="Opsional"
+                            />
+                          </div>
+                        } @else {
+                          <div class="col-lg-3 col-md-6">
+                            <label class="form-label">Harga pembanding</label>
+                            <div class="input-group">
+                              <span class="input-group-text">{{
+                                priceSymbol($index)
+                              }}</span>
+                              <input
+                                type="number"
+                                min="0"
+                                class="form-control"
+                                formControlName="compare_at"
+                                placeholder="Opsional"
+                              />
+                            </div>
+                            <small class="field-help"
+                              >Isi hanya jika ingin menampilkan harga lama yang
+                              dicoret.</small
+                            >
+                          </div>
+                        }
+                        <div class="col-lg-3 col-md-6">
+                          <label class="category-check price-check"
                             ><input
                               type="checkbox"
-                              formControlName="is_public"
+                              formControlName="is_active"
                             />
-                            Publik</label
+                            <span
+                              ><strong>Harga aktif</strong
+                              ><small>Dapat dipakai oleh sistem.</small></span
+                            ></label
                           >
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                          @if (row.get('type')?.value === 'end_user') {
+                            <label class="category-check price-check"
+                              ><input
+                                type="checkbox"
+                                formControlName="is_public"
+                              />
+                              <span
+                                ><strong>Tampilkan di website</strong
+                                ><small
+                                  >Menjadi harga publik untuk mata uang
+                                  ini.</small
+                                ></span
+                              ></label
+                            >
+                          } @else {
+                            <div class="price-internal-note">
+                              <i class="ri-lock-line"></i>
+                              Harga grosir disimpan sebagai data internal.
+                            </div>
+                          }
                         </div>
                       </div>
                       <button

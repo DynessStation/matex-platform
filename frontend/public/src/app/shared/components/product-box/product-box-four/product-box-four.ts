@@ -4,14 +4,14 @@ import { RouterLink } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { Product, Variation } from '../../../interface/product.interface';
-import { CurrencySymbolPipe } from '../../../pipe/currency.pipe';
+import { ProductPricePipe } from '../../../pipe/product-price.pipe';
 import { Compare } from '../widgets/compare/compare';
 import { QuickView } from '../widgets/quick-view/quick-view';
 import { Wishlist } from '../widgets/wishlist/wishlist';
 
 @Component({
   selector: 'app-product-box-four',
-  imports: [RouterLink, CurrencySymbolPipe, NgbModule, Wishlist, Compare, QuickView],
+  imports: [RouterLink, ProductPricePipe, NgbModule, Wishlist, Compare, QuickView],
   templateUrl: './product-box-four.html',
   styleUrl: './product-box-four.scss',
 })

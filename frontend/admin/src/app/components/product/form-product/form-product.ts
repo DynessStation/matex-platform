@@ -79,6 +79,14 @@ export class FormProduct {
     { value: 'contact', label: 'Hubungi kami' },
     { value: 'hidden', label: 'Sembunyikan' },
   ];
+  readonly priceTypeOptions: Select2Data = [
+    { value: 'end_user', label: 'Harga konsumen' },
+    { value: 'wholesale', label: 'Harga grosir' },
+  ];
+  readonly currencyOptions: Select2Data = [
+    { value: 'IDR', label: 'Rupiah Indonesia (IDR)' },
+    { value: 'USD', label: 'Dollar Amerika Serikat (USD)' },
+  ];
   readonly marketplaceProviderOptions: Select2Data = [
     { value: 'shopee', label: 'Shopee' },
     { value: 'tokopedia', label: 'Tokopedia' },
@@ -97,6 +105,7 @@ export class FormProduct {
   activeLocale: 'id' | 'en' = 'id';
   categoryIds: string[] = [];
   categoryError = false;
+  pricePublicationError = false;
   media: Partial<Record<ProductMediaRole, IAttachment | IAttachment[] | null>> =
     { thumbnail: null, gallery: [], og: null };
   readonly form = this.fb.group({
@@ -183,7 +192,10 @@ export class FormProduct {
           take(1),
         )
         .subscribe((v) => this.patch(v));
-    else this.addPrice();
+    else {
+      this.addCurrencyPrice('IDR');
+      this.addCurrencyPrice('USD');
+    }
   }
   setTab(tab: string) {
     this.activeTab = tab;
@@ -213,6 +225,52 @@ export class FormProduct {
         is_active: [value.is_active ?? true],
       }),
     );
+  }
+  addCurrencyPrice(currency: 'IDR' | 'USD') {
+    const existing = this.prices.controls.find(
+      (row) =>
+        row.get('type')?.value === 'end_user' &&
+        row.get('currency')?.value === currency,
+    );
+    if (existing) {
+      existing.get('is_active')?.setValue(true);
+      existing.get('is_public')?.setValue(true);
+      return;
+    }
+    this.addPrice({
+      currency,
+      type: 'end_user',
+      label: currency === 'IDR' ? 'Harga konsumen' : 'Consumer price',
+      is_public: true,
+      is_active: true,
+    });
+  }
+  priceSymbol(index: number) {
+    return this.prices.at(index).get('currency')?.value === 'USD'
+      ? 'US$'
+      : 'Rp';
+  }
+  priceCardTitle(index: number) {
+    const row = this.prices.at(index);
+    const type =
+      row.get('type')?.value === 'wholesale'
+        ? 'Harga grosir'
+        : 'Harga konsumen';
+    const currency =
+      row.get('currency')?.value === 'USD' ? 'Dollar AS' : 'Rupiah';
+    return `${type} · ${currency}`;
+  }
+  pricePreview(index: number) {
+    const row = this.prices.at(index);
+    const currency = row.get('currency')?.value === 'USD' ? 'USD' : 'IDR';
+    const amount = Number(row.get('amount')?.value);
+    if (!Number.isFinite(amount)) return '';
+    return new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'id-ID', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: currency === 'IDR' ? 0 : 2,
+      maximumFractionDigits: currency === 'IDR' ? 0 : 2,
+    }).format(amount);
   }
   addMarketplace(value: any = {}) {
     const isFirst = this.marketplaces.length === 0;
@@ -273,8 +331,24 @@ export class FormProduct {
   submit() {
     this.form.markAllAsTouched();
     this.categoryError = this.categoryIds.length === 0;
-    if (this.form.invalid || this.categoryError) {
-      this.activeTab = this.categoryError ? 'general' : this.invalidTab();
+    const publicCurrencies = new Set(
+      this.prices
+        .getRawValue()
+        .filter(
+          (price: any) =>
+            price.type === 'end_user' && price.is_active && price.is_public,
+        )
+        .map((price: any) => String(price.currency).toUpperCase()),
+    );
+    this.pricePublicationError =
+      this.form.controls.price_visibility.value === 'displayed' &&
+      !['IDR', 'USD'].every((currency) => publicCurrencies.has(currency));
+    if (this.form.invalid || this.categoryError || this.pricePublicationError) {
+      this.activeTab = this.categoryError
+        ? 'general'
+        : this.pricePublicationError
+          ? 'channels'
+          : this.invalidTab();
       return;
     }
     const payload = this.payload();
@@ -357,6 +431,8 @@ export class FormProduct {
       media,
       prices: v.prices.map((x: any, i: number) => ({
         ...x,
+        currency: String(x.currency || 'IDR').toUpperCase(),
+        is_public: x.type === 'end_user' ? Boolean(x.is_public) : false,
         label: x.label || null,
         sort_order: i,
       })),
