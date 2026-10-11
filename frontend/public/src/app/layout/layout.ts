@@ -19,6 +19,7 @@ import { Loader } from '../shared/components/loader/loader';
 import { BackToTop } from '../shared/components/widgets/back-to-top/back-to-top';
 import { Option } from '../shared/interface/theme-option.interface';
 import { BodyService } from '../shared/services/body.service';
+import { NavigationScrollService } from '../shared/services/navigation-scroll.service';
 import { ThemeOptionService } from '../shared/services/theme-option.service';
 import { ThemeOptions } from '../shared/store/action/theme-option.action';
 import { LoaderState } from '../shared/store/state/loader.state';
@@ -47,6 +48,7 @@ export class Layout {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private appliedTheme: string | null = null;
+  private readonly navigationScroll = inject(NavigationScrollService);
 
   get loadingLabel(): string {
     return this.router.url === '/en' || this.router.url.startsWith('/en/')
@@ -70,6 +72,7 @@ export class Layout {
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
   ) {
+    void this.navigationScroll;
     this.route.queryParamMap
       .pipe(
         map((params) => params.get('theme') || ''),

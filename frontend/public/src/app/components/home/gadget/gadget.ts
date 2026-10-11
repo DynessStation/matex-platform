@@ -1,8 +1,8 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Store } from '@ngxs/store';
 
+import { Store } from '@ngxs/store';
 import { catchError, forkJoin, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
 import { Attachment } from '../../../shared/interface/attachment.interface';
@@ -26,6 +26,18 @@ interface HomeContent {
   articles: IBlog[];
 }
 
+interface LatexFeatureItem {
+  title: string;
+  description: string;
+}
+
+interface LatexFeatureContent {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: LatexFeatureItem[];
+}
+
 @Component({
   selector: 'app-gadget',
   imports: [AsyncPipe, DatePipe, HomeBanner, HomeTags, HomeNewsletter, RouterLink],
@@ -43,6 +55,8 @@ export class Gadget {
 
   data = input<GadgetTheme>();
   slug = input<string>();
+  readonly activeLatexFeature = signal(0);
+  readonly latexContent = computed(() => this.resolveLatexContent());
 
   readonly content$ = this.navigation.locale$.pipe(
     switchMap((locale) =>
@@ -137,18 +151,111 @@ export class Gadget {
     }).format(selectedPrice?.amount ?? product.sale_price);
   }
 
-  // === yang gw pengen adain ==== ///
-  //  tambahan ini menyesuaikan dan disesuaikan nanti dengan BE dan Adminnya -->
-  /// ======= ///
+  selectLatexFeature(index: number): void {
+    this.activeLatexFeature.set(index);
+  }
 
-  switchLatexTab(index: any): void {
-    const tabs = document.querySelectorAll('.latex-tab-btn');
-    const panels = document.querySelectorAll('.latex-content-panel');
+  private resolveLatexContent(): LatexFeatureContent {
+    const source = this.data()?.latex_features;
+    const defaults = this.defaultLatexContent();
+    const items = Array.isArray(source?.items)
+      ? source.items
+          .filter(
+            (item): item is LatexFeatureItem =>
+              Boolean(item?.title?.trim()) && Boolean(item?.description?.trim()),
+          )
+          .slice(0, 8)
+      : [];
 
-    tabs.forEach((tab) => tab.classList.remove('active'));
-    panels.forEach((panel) => panel.classList.remove('active'));
+    return {
+      eyebrow: source?.eyebrow?.trim() || defaults.eyebrow,
+      title: source?.title?.trim() || defaults.title,
+      description: source?.description?.trim() || defaults.description,
+      items: items.length ? items : defaults.items,
+    };
+  }
 
-    tabs[index].classList.add('active');
-    panels[index].classList.add('active');
+  private defaultLatexContent(): LatexFeatureContent {
+    return this.isEnglish
+      ? {
+          eyebrow: 'MATEX EXCELLENCE',
+          title: 'Why Choose 100% Natural Latex?',
+          description:
+            'The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.',
+          items: [
+            [
+              'High Elasticity & Responsiveness',
+              'Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.',
+            ],
+            [
+              'Damping & Load Support',
+              'Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.',
+            ],
+            [
+              'Hypoallergenic & Hygienic',
+              'Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.',
+            ],
+            [
+              'Harmful Chemical Free',
+              'Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.',
+            ],
+            [
+              'Airflow & Pinhole Structure',
+              'Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.',
+            ],
+            [
+              'Versatile Applications',
+              'From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.',
+            ],
+            [
+              'Long-Lasting Durability',
+              'Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.',
+            ],
+            [
+              'Eco-Friendly & Sustainable',
+              'Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.',
+            ],
+          ].map(([title, description]) => ({ title, description })),
+        }
+      : {
+          eyebrow: 'KEUNGGULAN MATEX',
+          title: 'Kenapa Harus 100% Natural Latex?',
+          description:
+            'Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.',
+          items: [
+            [
+              'Elastisitas & Respon Tinggi',
+              'Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.',
+            ],
+            [
+              'Peredam & Penopang Beban',
+              'Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.',
+            ],
+            [
+              'Hipoalergenik & Higienis',
+              'Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.',
+            ],
+            [
+              'Bebas Bahan Kimia Berbahaya',
+              'Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.',
+            ],
+            [
+              'Sirkulasi Udara & Pinhole',
+              'Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.',
+            ],
+            [
+              'Fleksibel Berbagai Aplikasi',
+              'Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.',
+            ],
+            [
+              'Daya Tahan Jangka Panjang',
+              'Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.',
+            ],
+            [
+              'Ramah Lingkungan (Eco-Friendly)',
+              'Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.',
+            ],
+          ].map(([title, description]) => ({ title, description })),
+        };
   }
 }

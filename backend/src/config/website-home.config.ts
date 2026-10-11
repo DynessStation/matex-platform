@@ -77,6 +77,15 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     ratioTolerance: 0.05,
     required: true,
   },
+  home_advertisement: {
+    label: "Home promotion banner",
+    recommendedWidth: 1600,
+    recommendedHeight: 500,
+    minWidth: 960,
+    minHeight: 300,
+    ratioTolerance: 0.2,
+    required: false,
+  },
 } as const satisfies Record<string, WebsiteHomeMediaRule>;
 
 export type WebsiteHomeMediaSlot = keyof typeof WEBSITE_HOME_MEDIA_RULES;

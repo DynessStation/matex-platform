@@ -15,6 +15,7 @@ const PUBLIC_MEDIA_SLOTS = [
   "home_tile_2",
   "home_tile_3",
   "home_tile_4",
+  "home_advertisement",
   "about_content",
   "gallery",
   "og",
@@ -155,57 +156,44 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
       [locale, page.id_website_page, company, ...PUBLIC_MEDIA_SLOTS],
     );
 
-    return sendSuccess(
-      res,
-      200,
-      "WEBSITE_PAGE_FOUND",
-      "Page loaded",
-      {
-        key: page.website_page_key,
-        locale: page.website_page_locale,
-        path: page.website_page_path,
-        title: page.website_page_title,
-        summary: page.website_page_summary,
-        body_html: page.website_page_body_html,
-        content: parseJsonValue(page.website_page_content_json),
-        seo: {
-          title: page.website_page_seo_title || page.website_page_title,
-          description:
-            page.website_page_seo_description ||
-            page.website_page_summary ||
-            "",
-          keywords: page.website_page_seo_keywords || "",
-          robots: page.website_page_seo_robots || "index, follow",
-          canonical_url: page.website_page_canonical_url,
-          social_title:
-            page.website_page_social_title ||
-            page.website_page_seo_title ||
-            page.website_page_title,
-          social_description:
-            page.website_page_social_description ||
-            page.website_page_seo_description ||
-            page.website_page_summary ||
-            "",
-        },
-        translations,
-        media: media.map((item) => ({
-          slot: item.slot,
-          asset_url: buildAttachmentUrl(item.storage_path),
-          alt_text: item.alt_text ?? item.name ?? "",
-          caption: item.caption ?? "",
-          click_action: item.click_action ?? "none",
-          click_target: item.click_target ?? null,
-        })),
+    return sendSuccess(res, 200, "WEBSITE_PAGE_FOUND", "Page loaded", {
+      key: page.website_page_key,
+      locale: page.website_page_locale,
+      path: page.website_page_path,
+      title: page.website_page_title,
+      summary: page.website_page_summary,
+      body_html: page.website_page_body_html,
+      content: parseJsonValue(page.website_page_content_json),
+      seo: {
+        title: page.website_page_seo_title || page.website_page_title,
+        description:
+          page.website_page_seo_description || page.website_page_summary || "",
+        keywords: page.website_page_seo_keywords || "",
+        robots: page.website_page_seo_robots || "index, follow",
+        canonical_url: page.website_page_canonical_url,
+        social_title:
+          page.website_page_social_title ||
+          page.website_page_seo_title ||
+          page.website_page_title,
+        social_description:
+          page.website_page_social_description ||
+          page.website_page_seo_description ||
+          page.website_page_summary ||
+          "",
       },
-    );
+      translations,
+      media: media.map((item) => ({
+        slot: item.slot,
+        asset_url: buildAttachmentUrl(item.storage_path),
+        alt_text: item.alt_text ?? item.name ?? "",
+        caption: item.caption ?? "",
+        click_action: item.click_action ?? "none",
+        click_target: item.click_target ?? null,
+      })),
+    });
   } catch (error) {
     console.error("[Public Website] Failed to load page", error);
-    return sendError(
-      res,
-      500,
-      "WEBSITE_UNAVAILABLE",
-      "Unable to load page",
-    );
+    return sendError(res, 500, "WEBSITE_UNAVAILABLE", "Unable to load page");
   }
 });
 

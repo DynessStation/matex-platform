@@ -75,7 +75,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({
         anchorScrolling: 'enabled', // Tells Angular to look at the URL fragment and scroll to the matching ID
-        scrollPositionRestoration: 'enabled',
+        scrollPositionRestoration: 'disabled',
       }),
     ),
     {

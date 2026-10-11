@@ -576,9 +576,9 @@
                                 section of homeSectionOptions;
                                 track section.key
                               ) {
-                                <label class="cms-home-section-option">
+                                <div class="cms-home-section-option">
                                   <div
-                                    class="d-flex justify-content-between gap-3"
+                                    class="d-flex justify-content-between align-items-start gap-3"
                                   >
                                     <div>
                                       <strong>{{
@@ -591,6 +591,7 @@
 
                                     <div class="form-check form-switch mb-0">
                                       <input
+                                        [id]="'home-section-' + section.key"
                                         type="checkbox"
                                         class="form-check-input"
                                         role="switch"
@@ -612,7 +613,235 @@
                                       }}
                                     </span>
                                   }
-                                </label>
+
+                                  @if (section.key === 'latex_features') {
+                                    <div class="cms-home-section-editor">
+                                      <div class="row g-3">
+                                        <div class="col-md-4">
+                                          <label class="form-label">{{
+                                            'website_page.home_section_eyebrow'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="80"
+                                            [(ngModel)]="
+                                              homeLatexContent[activeLocale]
+                                                .eyebrow
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          />
+                                        </div>
+                                        <div class="col-md-8">
+                                          <label class="form-label">{{
+                                            'website_page.home_section_heading'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="180"
+                                            [(ngModel)]="
+                                              homeLatexContent[activeLocale]
+                                                .title
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          />
+                                        </div>
+                                        <div class="col-12">
+                                          <label class="form-label">{{
+                                            'website_page.home_section_description'
+                                              | translate
+                                          }}</label>
+                                          <textarea
+                                            class="form-control"
+                                            rows="3"
+                                            maxlength="700"
+                                            [(ngModel)]="
+                                              homeLatexContent[activeLocale]
+                                                .description
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          ></textarea>
+                                        </div>
+                                      </div>
+
+                                      <div class="cms-home-feature-grid mt-3">
+                                        @for (
+                                          feature of homeLatexContent[
+                                            activeLocale
+                                          ].items;
+                                          track $index;
+                                          let featureIndex = $index
+                                        ) {
+                                          <div class="cms-home-feature-item">
+                                            <strong>{{
+                                              (featureIndex + 1)
+                                                .toString()
+                                                .padStart(2, '0')
+                                            }}</strong>
+                                            <input
+                                              type="text"
+                                              class="form-control"
+                                              maxlength="160"
+                                              [value]="feature.title"
+                                              [attr.aria-label]="
+                                                ('website_page.home_feature_title'
+                                                  | translate) +
+                                                ' ' +
+                                                (featureIndex + 1)
+                                              "
+                                              (input)="
+                                                updateHomeLatexItem(
+                                                  activeLocale,
+                                                  featureIndex,
+                                                  'title',
+                                                  $any($event.target).value
+                                                )
+                                              "
+                                            />
+                                            <textarea
+                                              class="form-control"
+                                              rows="3"
+                                              maxlength="1000"
+                                              [value]="feature.description"
+                                              [attr.aria-label]="
+                                                ('website_page.home_feature_description'
+                                                  | translate) +
+                                                ' ' +
+                                                (featureIndex + 1)
+                                              "
+                                              (input)="
+                                                updateHomeLatexItem(
+                                                  activeLocale,
+                                                  featureIndex,
+                                                  'description',
+                                                  $any($event.target).value
+                                                )
+                                              "
+                                            ></textarea>
+                                          </div>
+                                        }
+                                      </div>
+                                    </div>
+                                  }
+
+                                  @if (section.key === 'advertisement') {
+                                    <div class="cms-home-section-editor">
+                                      <div class="row g-3">
+                                        <div class="col-md-4">
+                                          <label class="form-label">{{
+                                            'website_page.home_ad_label'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="80"
+                                            [(ngModel)]="
+                                              homeAdvertisementContent[
+                                                activeLocale
+                                              ].label
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          />
+                                        </div>
+                                        <div class="col-md-8">
+                                          <label class="form-label">{{
+                                            'website_page.home_ad_title'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="180"
+                                            [(ngModel)]="
+                                              homeAdvertisementContent[
+                                                activeLocale
+                                              ].title
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          />
+                                        </div>
+                                        <div class="col-12">
+                                          <label class="form-label">{{
+                                            'website_page.home_section_description'
+                                              | translate
+                                          }}</label>
+                                          <textarea
+                                            class="form-control"
+                                            rows="3"
+                                            maxlength="700"
+                                            [(ngModel)]="
+                                              homeAdvertisementContent[
+                                                activeLocale
+                                              ].description
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          ></textarea>
+                                        </div>
+                                        <div class="col-md-4">
+                                          <label class="form-label">{{
+                                            'website_page.home_ad_cta_label'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="80"
+                                            [(ngModel)]="
+                                              homeAdvertisementContent[
+                                                activeLocale
+                                              ].cta_label
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                          />
+                                        </div>
+                                        <div class="col-md-8">
+                                          <label class="form-label">{{
+                                            'website_page.home_ad_cta_url'
+                                              | translate
+                                          }}</label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            maxlength="500"
+                                            [(ngModel)]="
+                                              homeAdvertisementContent[
+                                                activeLocale
+                                              ].cta_url
+                                            "
+                                            [ngModelOptions]="{
+                                              standalone: true,
+                                            }"
+                                            placeholder="/kontak atau https://..."
+                                          />
+                                        </div>
+                                        <div class="col-12">
+                                          <small class="text-muted">{{
+                                            'website_page.home_ad_media_help'
+                                              | translate
+                                          }}</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  }
+                                </div>
                               }
                             </div>
                           </div>
@@ -1176,7 +1405,7 @@
                           <div
                             class="cms-home-media-rule"
                             [class.is-assigned]="
-                              !gadgetHomeMissingMediaRules.includes(rule)
+                              gadgetHomeMediaAssigned(rule.value)
                             "
                           >
                             <strong>{{ rule.label }}</strong>

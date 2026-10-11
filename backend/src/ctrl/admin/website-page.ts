@@ -39,6 +39,7 @@ const HOME_MEDIA_SLOTS = [
   "home_tile_2",
   "home_tile_3",
   "home_tile_4",
+  "home_advertisement",
 ] as const;
 const HOME_CONTENT_SECTION_KEYS = [
   "latex_features",
@@ -47,6 +48,7 @@ const HOME_CONTENT_SECTION_KEYS = [
   "articles",
   "tags",
   "newsletter",
+  "advertisement",
 ] as const;
 const ABOUT_CONTRACT_VERSION = 1;
 const ABOUT_HIGHLIGHT_LIMIT = 3;
@@ -188,7 +190,9 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
     typeof value !== "object" ||
     value === null ||
     Array.isArray(value) ||
-    (value as Record<string, unknown>)["home_contract_version"] !== 2
+    ![2, 3].includes(
+      Number((value as Record<string, unknown>)["home_contract_version"]),
+    )
   ) {
     throw new PayloadError(
       "WEBSITE_HOME_CONTENT_INVALID",
@@ -197,7 +201,7 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
   }
 
   const source = value as Record<string, unknown>;
-  const content: Record<string, unknown> = { home_contract_version: 2 };
+  const content: Record<string, unknown> = { home_contract_version: 3 };
 
   for (const key of HOME_CONTENT_SECTION_KEYS) {
     const section = source[key];

@@ -64,6 +64,7 @@ const HOME_SECTION_KEYS = [
   'articles',
   'tags',
   'newsletter',
+  'advertisement',
 ] as const;
 
 type HomeSectionKey = (typeof HOME_SECTION_KEYS)[number];
@@ -76,7 +77,28 @@ const HOME_SECTION_DEFAULTS: HomeSectionVisibility = {
   articles: true,
   tags: false,
   newsletter: false,
+  advertisement: false,
 };
+
+interface HomeLatexFeatureDraft {
+  title: string;
+  description: string;
+}
+
+interface HomeLatexContentDraft {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: HomeLatexFeatureDraft[];
+}
+
+interface HomeAdvertisementDraft {
+  label: string;
+  title: string;
+  description: string;
+  cta_label: string;
+  cta_url: string;
+}
 
 interface AboutFeatureDraft {
   title: string;
@@ -295,6 +317,12 @@ export class WebsitePageForm {
       descriptionKey: 'website_page.home_section_newsletter_help',
       requiresVerifiedData: true,
     },
+    {
+      key: 'advertisement',
+      labelKey: 'website_page.home_section_advertisement',
+      descriptionKey: 'website_page.home_section_advertisement_help',
+      requiresVerifiedData: false,
+    },
   ];
 
   public homeSectionVisibility: Record<
@@ -303,6 +331,22 @@ export class WebsitePageForm {
   > = {
     'id-ID': this.createHomeSectionVisibility(),
     'en-US': this.createHomeSectionVisibility(),
+  };
+
+  public homeLatexContent: Record<
+    WebsitePageEditorLocale,
+    HomeLatexContentDraft
+  > = {
+    'id-ID': this.createHomeLatexContent('id-ID'),
+    'en-US': this.createHomeLatexContent('en-US'),
+  };
+
+  public homeAdvertisementContent: Record<
+    WebsitePageEditorLocale,
+    HomeAdvertisementDraft
+  > = {
+    'id-ID': this.createHomeAdvertisementContent('id-ID'),
+    'en-US': this.createHomeAdvertisementContent('en-US'),
   };
 
   public aboutFeatures: Record<WebsitePageEditorLocale, AboutFeatureDraft[]> = {
@@ -477,6 +521,15 @@ export class WebsitePageForm {
         'en-US': this.createHomeSectionVisibility(),
       };
 
+      this.homeLatexContent = {
+        'id-ID': this.createHomeLatexContent('id-ID'),
+        'en-US': this.createHomeLatexContent('en-US'),
+      };
+      this.homeAdvertisementContent = {
+        'id-ID': this.createHomeAdvertisementContent('id-ID'),
+        'en-US': this.createHomeAdvertisementContent('en-US'),
+      };
+
       this.aboutFeatures = {
         'id-ID': this.createAboutFeatures(),
         'en-US': this.createAboutFeatures(),
@@ -543,6 +596,16 @@ export class WebsitePageForm {
         this.homeSectionVisibility[locale] = this.readHomeSectionVisibility(
           translation.website_page_content_json,
         );
+
+        this.homeLatexContent[locale] = this.readHomeLatexContent(
+          locale,
+          translation.website_page_content_json,
+        );
+        this.homeAdvertisementContent[locale] =
+          this.readHomeAdvertisementContent(
+            locale,
+            translation.website_page_content_json,
+          );
 
         this.aboutFeatures[locale] = this.readAboutFeatures(
           translation.website_page_content_json,
@@ -694,10 +757,9 @@ export class WebsitePageForm {
     const visibility = this.createHomeSectionVisibility();
     if (!this.isRecord(content)) return visibility;
 
-    const keys =
-      content['home_contract_version'] === 2
-        ? HOME_SECTION_KEYS
-        : (['tags', 'newsletter'] as const);
+    const keys = [2, 3].includes(Number(content['home_contract_version']))
+      ? HOME_SECTION_KEYS
+      : (['tags', 'newsletter'] as const);
 
     for (const key of keys) {
       const section = content[key];
@@ -714,7 +776,7 @@ export class WebsitePageForm {
     existing: unknown,
   ): Record<string, unknown> {
     const source = this.isRecord(existing) ? existing : {};
-    const content: Record<string, unknown> = { home_contract_version: 2 };
+    const content: Record<string, unknown> = { home_contract_version: 3 };
 
     for (const key of HOME_SECTION_KEYS) {
       const current = this.isRecord(source[key]) ? source[key] : {};
@@ -724,7 +786,210 @@ export class WebsitePageForm {
       };
     }
 
+    content['latex_features'] = {
+      ...(this.isRecord(content['latex_features'])
+        ? content['latex_features']
+        : {}),
+      ...this.homeLatexContent[locale],
+      items: this.homeLatexContent[locale].items
+        .map((item) => ({
+          title: item.title.trim(),
+          description: item.description.trim(),
+        }))
+        .filter((item) => item.title && item.description),
+      status: this.homeSectionVisibility[locale].latex_features,
+    };
+    content['advertisement'] = {
+      ...(this.isRecord(content['advertisement'])
+        ? content['advertisement']
+        : {}),
+      ...this.homeAdvertisementContent[locale],
+      status: this.homeSectionVisibility[locale].advertisement,
+    };
+
     return content;
+  }
+
+  private createHomeLatexContent(
+    locale: WebsitePageEditorLocale,
+  ): HomeLatexContentDraft {
+    const english = locale === 'en-US';
+    const items = english
+      ? [
+          [
+            'High Elasticity & Responsiveness',
+            'Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.',
+          ],
+          [
+            'Damping & Load Support',
+            'Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.',
+          ],
+          [
+            'Hypoallergenic & Hygienic',
+            'Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.',
+          ],
+          [
+            'Harmful Chemical Free',
+            'Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.',
+          ],
+          [
+            'Airflow & Pinhole Structure',
+            'Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.',
+          ],
+          [
+            'Versatile Applications',
+            'From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.',
+          ],
+          [
+            'Long-Lasting Durability',
+            'Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.',
+          ],
+          [
+            'Eco-Friendly & Sustainable',
+            'Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.',
+          ],
+        ]
+      : [
+          [
+            'Elastisitas & Respon Tinggi',
+            'Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.',
+          ],
+          [
+            'Peredam & Penopang Beban',
+            'Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.',
+          ],
+          [
+            'Hipoalergenik & Higienis',
+            'Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.',
+          ],
+          [
+            'Bebas Bahan Kimia Berbahaya',
+            'Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.',
+          ],
+          [
+            'Sirkulasi Udara & Pinhole',
+            'Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.',
+          ],
+          [
+            'Fleksibel Berbagai Aplikasi',
+            'Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.',
+          ],
+          [
+            'Daya Tahan Jangka Panjang',
+            'Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.',
+          ],
+          [
+            'Ramah Lingkungan (Eco-Friendly)',
+            'Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.',
+          ],
+        ];
+
+    return {
+      eyebrow: english ? 'MATEX EXCELLENCE' : 'KEUNGGULAN MATEX',
+      title: english
+        ? 'Why Choose 100% Natural Latex?'
+        : 'Kenapa Harus 100% Natural Latex?',
+      description: english
+        ? 'The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.'
+        : 'Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.',
+      items: items.map(([title, description]) => ({ title, description })),
+    };
+  }
+
+  private readHomeLatexContent(
+    locale: WebsitePageEditorLocale,
+    content: unknown,
+  ): HomeLatexContentDraft {
+    const defaults = this.createHomeLatexContent(locale);
+    if (!this.isRecord(content) || !this.isRecord(content['latex_features']))
+      return defaults;
+    const section = content['latex_features'];
+    const items = Array.isArray(section['items'])
+      ? section['items']
+          .filter((item): item is Record<string, unknown> =>
+            this.isRecord(item),
+          )
+          .map((item) => ({
+            title: typeof item['title'] === 'string' ? item['title'] : '',
+            description:
+              typeof item['description'] === 'string'
+                ? item['description']
+                : '',
+          }))
+          .filter((item) => item.title || item.description)
+          .slice(0, 8)
+      : [];
+
+    return {
+      eyebrow:
+        typeof section['eyebrow'] === 'string'
+          ? section['eyebrow']
+          : defaults.eyebrow,
+      title:
+        typeof section['title'] === 'string'
+          ? section['title']
+          : defaults.title,
+      description:
+        typeof section['description'] === 'string'
+          ? section['description']
+          : defaults.description,
+      items: items.length ? items : defaults.items,
+    };
+  }
+
+  private createHomeAdvertisementContent(
+    locale: WebsitePageEditorLocale,
+  ): HomeAdvertisementDraft {
+    return locale === 'en-US'
+      ? {
+          label: 'MATEX PROMOTION',
+          title: 'Need a natural latex solution for your business?',
+          description:
+            'Talk with our team about product specifications, availability, and partnership opportunities.',
+          cta_label: 'Contact MATEX',
+          cta_url: '/en/contact-us',
+        }
+      : {
+          label: 'PROMOSI MATEX',
+          title: 'Butuh solusi lateks alami untuk bisnis Anda?',
+          description:
+            'Diskusikan spesifikasi produk, ketersediaan, dan peluang kerja sama bersama tim kami.',
+          cta_label: 'Hubungi MATEX',
+          cta_url: '/kontak',
+        };
+  }
+
+  private readHomeAdvertisementContent(
+    locale: WebsitePageEditorLocale,
+    content: unknown,
+  ): HomeAdvertisementDraft {
+    const defaults = this.createHomeAdvertisementContent(locale);
+    if (!this.isRecord(content) || !this.isRecord(content['advertisement']))
+      return defaults;
+    const section = content['advertisement'];
+    const field = (key: keyof HomeAdvertisementDraft): string =>
+      typeof section[key] === 'string' ? section[key] : defaults[key];
+    return {
+      label: field('label'),
+      title: field('title'),
+      description: field('description'),
+      cta_label: field('cta_label'),
+      cta_url: field('cta_url'),
+    };
+  }
+
+  updateHomeLatexItem(
+    locale: WebsitePageEditorLocale,
+    index: number,
+    field: keyof HomeLatexFeatureDraft,
+    value: string,
+  ): void {
+    const items = [...this.homeLatexContent[locale].items];
+    items[index] = { ...items[index], [field]: value };
+    this.homeLatexContent = {
+      ...this.homeLatexContent,
+      [locale]: { ...this.homeLatexContent[locale], items },
+    };
   }
 
   private createAboutFeatures(): AboutFeatureDraft[] {
@@ -1321,6 +1586,12 @@ export class WebsitePageForm {
 
     return GADGET_HOME_MEDIA_RULES.filter(
       (rule) => rule.required && !assignedRoles.has(rule.value),
+    );
+  }
+
+  gadgetHomeMediaAssigned(role: string): boolean {
+    return this.pageMedia.some(
+      (media) => media.is_public && media.role === role,
     );
   }
 

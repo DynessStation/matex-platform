@@ -212,7 +212,7 @@ test("home rejects incomplete section settings before a transaction begins", asy
     is_published: false,
     translations: translations.map((translation) => ({
       ...translation,
-      content: { home_contract_version: 2, categories: { status: true } },
+      content: { home_contract_version: 3, categories: { status: true } },
     })),
     media: [],
   });
@@ -226,13 +226,27 @@ test("home rejects incomplete section settings before a transaction begins", asy
 test("home saves only its current section contract and clears unused HTML", async () => {
   reset();
   const content = {
-    home_contract_version: 2,
-    latex_features: { status: true },
+    home_contract_version: 3,
+    latex_features: {
+      status: true,
+      eyebrow: "MATEX EXCELLENCE",
+      title: "Why natural latex",
+      description: "Natural material benefits",
+      items: [{ title: "Elastic", description: "Responsive support" }],
+    },
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
     tags: { status: false, title: "Popular tags" },
     newsletter: { status: false },
+    advertisement: {
+      status: true,
+      label: "Promotion",
+      title: "Talk to MATEX",
+      description: "Product information",
+      cta_label: "Contact us",
+      cta_url: "/contact",
+    },
     sale_product: { status: true },
   };
   const response = await request("home", {
@@ -252,13 +266,27 @@ test("home saves only its current section contract and clears unused HTML", asyn
   assert.equal(writes.length, 2);
   assert.equal(writes[0].params[6], null);
   assert.deepEqual(JSON.parse(String(writes[0].params[7])), {
-    home_contract_version: 2,
-    latex_features: { status: true },
+    home_contract_version: 3,
+    latex_features: {
+      status: true,
+      eyebrow: "MATEX EXCELLENCE",
+      title: "Why natural latex",
+      description: "Natural material benefits",
+      items: [{ title: "Elastic", description: "Responsive support" }],
+    },
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
     tags: { status: false, title: "Popular tags" },
     newsletter: { status: false },
+    advertisement: {
+      status: true,
+      label: "Promotion",
+      title: "Talk to MATEX",
+      description: "Product information",
+      cta_label: "Contact us",
+      cta_url: "/contact",
+    },
   });
 });
 

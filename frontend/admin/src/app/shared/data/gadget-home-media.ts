@@ -84,6 +84,16 @@ export const GADGET_HOME_MEDIA_RULES: readonly GadgetHomeMediaRule[] = [
     ratioTolerance: 0.05,
     required: true,
   },
+  {
+    value: 'home_advertisement',
+    label: 'Banner promosi sebelum footer',
+    recommendedWidth: 1600,
+    recommendedHeight: 500,
+    minWidth: 960,
+    minHeight: 300,
+    ratioTolerance: 0.2,
+    required: false,
+  },
 ] as const;
 
 export const getGadgetHomeMediaRule = (

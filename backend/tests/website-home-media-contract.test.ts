@@ -8,7 +8,7 @@ import {
 } from "../src/config/website-home.config";
 
 test("every Home media slot accepts its original template canvas", () => {
-  assert.equal(WEBSITE_HOME_MEDIA_SLOTS.length, 7);
+  assert.equal(WEBSITE_HOME_MEDIA_SLOTS.length, 8);
 
   for (const slot of WEBSITE_HOME_MEDIA_SLOTS) {
     const rule = WEBSITE_HOME_MEDIA_RULES[slot];

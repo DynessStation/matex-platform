@@ -3,6 +3,15 @@
   overflow-y: auto;
 }
 
+// Chrome/Safari render their own cancel glyph for type="search". The header
+// already provides one explicit close control, so keep a single, predictable X.
+:host input[type='search']::-webkit-search-cancel-button,
+:host input[type='search']::-webkit-search-decoration {
+  display: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 .empty-search-result {
   color: rgba(var(--content-color), 1);
   padding: 20px;

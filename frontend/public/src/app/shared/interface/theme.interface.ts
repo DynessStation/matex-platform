@@ -139,7 +139,23 @@ export interface TrendingDealsSection {
 export interface GadgetTheme {
   home_contract_version?: number;
   home_selection: GadgetHomeSelection;
-  latex_features?: { status: boolean };
+  latex_features?: {
+    status: boolean;
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    items?: { title: string; description: string }[];
+  };
+  advertisement?: {
+    status: boolean;
+    label?: string;
+    title?: string;
+    description?: string;
+    cta_label?: string;
+    cta_url?: string;
+    image_url?: string;
+    image_alt?: string;
+  };
   sale_product: SaleProduct;
   top_product_by_categories: TopProductByCategories;
   two_column_banner: ColumnBanner;

@@ -5,21 +5,22 @@ import { map, Observable, switchMap } from 'rxjs';
 
 import { WebsitePageService } from './website-page.service';
 import { environment } from '../../../environments/environment';
-import { IPublicWebsitePage } from '../interface/website-page.interface';
 import { BannerLink, GadgetTheme, ThemesModel } from '../interface/theme.interface';
+import { IPublicWebsitePage } from '../interface/website-page.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
   private readonly homeSectionDefaults = {
-    home_contract_version: 2,
+    home_contract_version: 3,
     latex_features: { status: true },
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
     tags: { status: false },
     newsletter: { status: false },
+    advertisement: { status: false },
   };
 
   constructor(
@@ -74,17 +75,36 @@ export class ThemeService {
       banner.alt_text = media.alt_text;
     }
 
+    const advertisement = merged.advertisement;
+    const advertisementMedia = page.media.find((media) => media.slot === 'home_advertisement');
+    if (advertisement && advertisementMedia) {
+      advertisement.image_url = advertisementMedia.asset_url;
+      advertisement.image_alt = advertisementMedia.alt_text;
+      if (!advertisement.cta_url && advertisementMedia.click_target) {
+        advertisement.cta_url = advertisementMedia.click_target;
+      }
+    }
+
     return merged;
   }
 
   private normalizeHomeContent(value: unknown): Record<string, unknown> {
     if (!this.isRecord(value)) return { ...this.homeSectionDefaults };
 
-    const isCurrentContract = value['home_contract_version'] === 2;
+    const contractVersion = Number(value['home_contract_version']);
+    const isCurrentContract = contractVersion === 2 || contractVersion === 3;
     const keys = isCurrentContract
-      ? ['latex_features', 'categories', 'products', 'articles', 'tags', 'newsletter']
+      ? [
+          'latex_features',
+          'categories',
+          'products',
+          'articles',
+          'tags',
+          'newsletter',
+          'advertisement',
+        ]
       : ['tags', 'newsletter'];
-    const content: Record<string, unknown> = { home_contract_version: 2 };
+    const content: Record<string, unknown> = { home_contract_version: 3 };
 
     for (const key of keys) {
       if (this.isRecord(value[key])) content[key] = value[key];
