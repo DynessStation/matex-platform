@@ -15,7 +15,7 @@ INSERT INTO `contact_inquiry_topic` (
   `contact_inquiry_topic_sort_order`,
   `contact_inquiry_topic_status`
 )
-SELECT `id_master_comp`, 'product-information', 'hardyness.ms9@gmail.com', 0, 1
+SELECT `id_master_comp`, 'product-information', 'info@matexindo.com', 0, 1
 FROM `master_comp`
 WHERE `comp_status` = 1
 ON DUPLICATE KEY UPDATE
@@ -28,7 +28,7 @@ INSERT INTO `contact_inquiry_topic` (
   `contact_inquiry_topic_recipient_email`, `contact_inquiry_topic_sort_order`,
   `contact_inquiry_topic_status`
 )
-SELECT `id_master_comp`, 'quotation-and-sales', 'hardyness.ms9@gmail.com', 1, 1
+SELECT `id_master_comp`, 'quotation-and-sales', 'info@matexindo.com', 1, 1
 FROM `master_comp`
 WHERE `comp_status` = 1
 ON DUPLICATE KEY UPDATE
@@ -41,7 +41,7 @@ INSERT INTO `contact_inquiry_topic` (
   `contact_inquiry_topic_recipient_email`, `contact_inquiry_topic_sort_order`,
   `contact_inquiry_topic_status`
 )
-SELECT `id_master_comp`, 'partnership', 'hardyness.ms9@gmail.com', 2, 1
+SELECT `id_master_comp`, 'partnership', 'info@matexindo.com', 2, 1
 FROM `master_comp`
 WHERE `comp_status` = 1
 ON DUPLICATE KEY UPDATE
@@ -54,7 +54,7 @@ INSERT INTO `contact_inquiry_topic` (
   `contact_inquiry_topic_recipient_email`, `contact_inquiry_topic_sort_order`,
   `contact_inquiry_topic_status`
 )
-SELECT `id_master_comp`, 'other', 'hardyness.ms9@gmail.com', 3, 1
+SELECT `id_master_comp`, 'other', 'info@matexindo.com', 3, 1
 FROM `master_comp`
 WHERE `comp_status` = 1
 ON DUPLICATE KEY UPDATE
