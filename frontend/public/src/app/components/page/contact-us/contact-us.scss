@@ -56,6 +56,21 @@
   line-height: 1.35;
 }
 
+.contact-submit-result {
+  margin: 14px 0 18px;
+  line-height: 1.55;
+
+  strong,
+  .contact-reference {
+    display: block;
+  }
+
+  .contact-reference {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+}
+
 .office-section-heading {
   max-width: 720px;
   margin-bottom: 22px;

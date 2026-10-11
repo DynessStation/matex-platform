@@ -201,12 +201,16 @@
                   />
                 </div>
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.recipient' | translate }}</label
+                  <label>{{ 'public_contact.recipient' | translate }} *</label
                   ><input
                     class="form-control"
                     type="email"
                     formControlName="recipient_email"
                   />
+                  <small class="form-text text-muted"
+                    >Notifikasi pesan untuk topik ini dikirim ke alamat
+                    tersebut.</small
+                  >
                 </div>
                 <div class="col-lg-2">
                   <label>{{ 'public_contact.order' | translate }}</label

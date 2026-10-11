@@ -5,6 +5,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { isPublicContentLocale } from "../../config/public-content.config";
 import { pool } from "../../db";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { sendContactInquiryMail } from "../../service/contact-inquiry-mail.service";
 
 const router = Router();
 const attempts = new Map<string, number[]>();
@@ -210,10 +211,18 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
 
   try {
     const [topicRows] = await pool.query<RowDataPacket[]>(
-      `SELECT id_contact_inquiry_topic FROM contact_inquiry_topic
-       WHERE id_master_comp = ? AND contact_inquiry_topic_key = ?
-        AND contact_inquiry_topic_status = 1 LIMIT 1`,
-      [company, topicKey],
+      `SELECT q.id_contact_inquiry_topic,
+        q.contact_inquiry_topic_recipient_email AS recipient_email,
+        COALESCE(t.contact_inquiry_topic_label, q.contact_inquiry_topic_key) AS topic_label
+       FROM contact_inquiry_topic q
+       LEFT JOIN contact_inquiry_topic_i18n t
+        ON t.id_contact_inquiry_topic = q.id_contact_inquiry_topic
+        AND t.id_master_comp = q.id_master_comp
+        AND t.contact_inquiry_topic_locale = ?
+        AND t.contact_inquiry_topic_i18n_status = 1
+       WHERE q.id_master_comp = ? AND q.contact_inquiry_topic_key = ?
+        AND q.contact_inquiry_topic_status = 1 LIMIT 1`,
+      [locale, company, topicKey],
     );
     if (!topicRows.length)
       return sendError(
@@ -235,13 +244,16 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
       String(req.get("user-agent") ?? "")
         .trim()
         .slice(0, 1000) || null;
+    const recipient = String(topicRows[0].recipient_email ?? "").trim() || null;
+    const createdAt = new Date();
     const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO contact_inquiry (id_master_comp, id_contact_inquiry_topic,
         contact_inquiry_name, contact_inquiry_email, contact_inquiry_phone,
         contact_inquiry_message, contact_inquiry_locale, contact_inquiry_source_path,
         contact_inquiry_referrer, contact_inquiry_user_agent,
-        contact_inquiry_ip_hash, contact_inquiry_consent_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        contact_inquiry_ip_hash, contact_inquiry_consent_at,
+        contact_inquiry_recipient_email, contact_inquiry_notification_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [
         company,
         topicRows[0].id_contact_inquiry_topic,
@@ -254,15 +266,44 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
         referrer,
         userAgent,
         ipHash,
+        createdAt,
+        recipient,
+      ],
+    );
+    const reference = `MSG-${result.insertId}`;
+    const delivery = await sendContactInquiryMail({
+      reference,
+      recipient,
+      topic: String(topicRows[0].topic_label),
+      name,
+      email,
+      phone,
+      message,
+      locale,
+      sourcePath,
+      createdAt,
+    });
+    await pool.query(
+      `UPDATE contact_inquiry
+       SET contact_inquiry_notification_status = ?,
+        contact_inquiry_notification_sent_at = CASE WHEN ? = 'sent' THEN NOW() ELSE NULL END,
+        contact_inquiry_notification_error = ?
+       WHERE id_contact_inquiry = ? AND id_master_comp = ?`,
+      [
+        delivery.status,
+        delivery.status,
+        delivery.error ?? null,
+        result.insertId,
+        company,
       ],
     );
     return sendSuccess(
       res,
       201,
       "CONTACT_INQUIRY_CREATED",
-      "Message sent successfully",
+      "Message received successfully",
       {
-        reference: `MSG-${result.insertId}`,
+        reference,
       },
     );
   } catch (error) {

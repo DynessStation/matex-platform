@@ -84,15 +84,16 @@ const normalizeTopics = (value: unknown) => {
     const item = value[index];
     const key = normalizePublicContentKey(item?.key);
     const email = String(item?.recipient_email ?? "").trim() || null;
+    const status = Number(item?.status) === 0 ? 0 : 1;
     const translations = normalizeTranslations(item?.translations);
-    if (!key || key.length > 100 || seen.has(key) ||
+    if (!key || key.length > 100 || seen.has(key) || (status === 1 && email === null) ||
       (email !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || !translations)
       return null;
     seen.add(key);
     result.push({
       key, email,
       sortOrder: Number.isSafeInteger(Number(item?.sort_order)) ? Math.max(0, Number(item.sort_order)) : index,
-      status: Number(item?.status) === 0 ? 0 : 1,
+      status,
       translations,
     });
   }

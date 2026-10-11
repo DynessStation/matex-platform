@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-import { catchError, map, of, shareReplay, tap, timeout } from 'rxjs';
+import { catchError, finalize, map, of, shareReplay, tap, timeout } from 'rxjs';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
@@ -60,6 +60,11 @@ export class ContactUs {
   readonly page = signal<IPublicWebsitePage | null>(null);
   readonly pageState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
   readonly contactState = signal<'loading' | 'ready' | 'error'>('loading');
+  readonly submission = signal<
+    | { state: 'idle' }
+    | { state: 'success'; reference: string }
+    | { state: 'error'; message: string }
+  >({ state: 'idle' });
   readonly contact$ = this.content.getContact(this.locale).pipe(
     map((response): ContactView | null => {
       if (!response.data) {
@@ -87,11 +92,11 @@ export class ContactUs {
 
   readonly form = this.fb.group(
     {
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(255)]],
       email: ['', Validators.email],
-      phone: [''],
+      phone: ['', Validators.maxLength(50)],
       topic_key: ['', Validators.required],
-      message: ['', Validators.required],
+      message: ['', [Validators.required, Validators.maxLength(5000)]],
       consent: [false, Validators.requiredTrue],
       website: [''],
     },
@@ -221,6 +226,7 @@ export class ContactUs {
   submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting) return;
+    this.submission.set({ state: 'idle' });
     this.submitting = true;
     const value = this.form.getRawValue();
     this.content
@@ -235,14 +241,35 @@ export class ContactUs {
         website: value.website ?? '',
         source_path: location.pathname,
       })
+      .pipe(
+        finalize(() => {
+          this.submitting = false;
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (response) => {
-          this.notifications.showSuccess(response.message);
+          const reference = response.data?.reference ?? '';
+          this.submission.set({ state: 'success', reference });
+          this.notifications.showSuccess(
+            this.locale === 'en-US'
+              ? 'Your message has been received.'
+              : 'Pesan Anda sudah diterima.',
+          );
           this.form.reset({ consent: false, website: '' });
-          this.submitting = false;
         },
-        error: () => {
-          this.submitting = false;
+        error: (error: unknown) => {
+          const rateLimited = error instanceof HttpErrorResponse && error.status === 429;
+          this.submission.set({
+            state: 'error',
+            message: rateLimited
+              ? this.locale === 'en-US'
+                ? 'Too many messages were sent. Please wait a moment and try again.'
+                : 'Terlalu banyak pesan dikirim. Tunggu sebentar lalu coba kembali.'
+              : this.locale === 'en-US'
+                ? 'The message could not be sent. Please try again or use another contact channel.'
+                : 'Pesan belum dapat dikirim. Coba kembali atau gunakan kanal kontak lainnya.',
+          });
         },
       });
   }

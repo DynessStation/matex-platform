@@ -122,7 +122,10 @@ export class PublicContact {
             Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
           ],
         ],
-        recipient_email: [value?.recipient_email ?? '', Validators.email],
+        recipient_email: [
+          value?.recipient_email ?? '',
+          [Validators.required, Validators.email],
+        ],
         sort_order: [value?.sort_order ?? this.topics.length],
         status: [value?.status !== 0],
         translations: this.translations(value?.translations),

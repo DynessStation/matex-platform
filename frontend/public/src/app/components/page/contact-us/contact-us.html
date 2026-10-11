@@ -44,6 +44,30 @@
             <div class="col-xxl-9 col-lg-8 col-md-7">
               <form class="contact-right-box" [formGroup]="form" (ngSubmit)="submit()">
                 <h3>{{ locale === 'en-US' ? 'Send a message' : 'Kirim pesan' }}</h3>
+                @if (submission(); as result) {
+                  @if (result.state === 'success') {
+                    <div class="alert alert-success contact-submit-result" role="status">
+                      <strong>{{
+                        locale === 'en-US' ? 'Message received.' : 'Pesan sudah diterima.'
+                      }}</strong>
+                      {{
+                        locale === 'en-US'
+                          ? 'Our team will follow up using the contact details you provided.'
+                          : 'Tim kami akan menindaklanjuti melalui kontak yang Anda berikan.'
+                      }}
+                      @if (result.reference) {
+                        <span class="contact-reference"
+                          >{{ locale === 'en-US' ? 'Reference' : 'Referensi' }}:
+                          {{ result.reference }}</span
+                        >
+                      }
+                    </div>
+                  } @else if (result.state === 'error') {
+                    <div class="alert alert-danger contact-submit-result" role="alert">
+                      {{ result.message }}
+                    </div>
+                  }
+                }
                 @if (!contact.topics.length) {
                   <div class="alert alert-warning">
                     {{
@@ -61,6 +85,7 @@
                       id="contactName"
                       class="form-control"
                       autocomplete="name"
+                      maxlength="255"
                       formControlName="name"
                     />
                     @if (form.controls.name.touched && form.controls.name.invalid) {
@@ -95,6 +120,7 @@
                       type="tel"
                       class="form-control"
                       autocomplete="tel"
+                      maxlength="50"
                       formControlName="phone"
                     />
                   </div>
@@ -134,6 +160,7 @@
                       id="contactMessage"
                       class="form-control"
                       rows="8"
+                      maxlength="5000"
                       formControlName="message"
                     ></textarea>
                     @if (form.controls.message.touched && form.controls.message.invalid) {
