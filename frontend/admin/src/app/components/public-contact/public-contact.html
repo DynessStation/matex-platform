@@ -57,14 +57,21 @@
                     formControlName="key"
                     placeholder="whatsapp-sales"
                   />
+                  <small class="field-help"
+                    >Tidak tampil ke pengunjung. Gunakan huruf kecil dan tanda
+                    hubung, misalnya whatsapp-sales.</small
+                  >
                 </div>
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.type' | translate }}</label
-                  ><select class="form-select" formControlName="type">
-                    @for (type of channelTypes; track type) {
-                      <option [value]="type">{{ type }}</option>
-                    }
-                  </select>
+                  <label>{{ 'public_contact.type' | translate }}</label>
+                  @if (isBrowser) {
+                    <select2
+                      class="custom-select d-block"
+                      [data]="channelTypeOptions"
+                      formControlName="type"
+                      noResultMessage="Tidak ada pilihan"
+                    />
+                  }
                 </div>
                 <div class="col-lg-4">
                   <label>{{ 'public_contact.value' | translate }}</label
@@ -74,7 +81,7 @@
                     placeholder="+6285814180370"
                   />
                 </div>
-                <div class="col-lg-8">
+                <div class="col-lg-7">
                   <label>{{ 'public_contact.url' | translate }}</label
                   ><input
                     class="form-control"
@@ -96,13 +103,23 @@
                     formControlName="sort_order"
                   />
                 </div>
-                <div class="col-lg-2 checks">
-                  <label
+                <div class="col-lg-3 checks">
+                  <label class="app-check app-check-card"
                     ><input type="checkbox" formControlName="is_primary" />
-                    {{ 'public_contact.primary' | translate }}</label
-                  ><label
+                    <span
+                      ><strong>{{
+                        'public_contact.primary' | translate
+                      }}</strong
+                      ><small>Kanal utama untuk jenis kontak ini.</small></span
+                    ></label
+                  ><label class="app-check app-check-card"
                     ><input type="checkbox" formControlName="is_public" />
-                    {{ 'public_contact.public' | translate }}</label
+                    <span
+                      ><strong>{{ 'public_contact.public' | translate }}</strong
+                      ><small
+                        >Tampilkan kanal ini kepada pengunjung.</small
+                      ></span
+                    ></label
                   >
                 </div>
               </div>
@@ -183,7 +200,7 @@
                     placeholder="general-inquiry"
                   />
                 </div>
-                <div class="col-lg-5">
+                <div class="col-lg-4">
                   <label>{{ 'public_contact.recipient' | translate }}</label
                   ><input
                     class="form-control"
@@ -200,10 +217,15 @@
                     formControlName="sort_order"
                   />
                 </div>
-                <div class="col-lg-1 checks">
-                  <label
+                <div class="col-lg-2 checks">
+                  <label class="app-check app-check-card"
                     ><input type="checkbox" formControlName="status" />
-                    {{ 'public_contact.active' | translate }}</label
+                    <span
+                      ><strong>{{ 'public_contact.active' | translate }}</strong
+                      ><small
+                        >Tampilkan sebagai pilihan di formulir publik.</small
+                      ></span
+                    ></label
                   >
                 </div>
               </div>
@@ -223,16 +245,19 @@
       </div>
 
       <div class="office-note">
-        <i class="ri-map-pin-line"></i>
-        <div>
+        <div class="office-note__icon"><i class="ri-map-pin-line"></i></div>
+        <div class="office-note__content">
           <strong>{{ 'public_contact.locations' | translate }}</strong>
           <p>{{ 'public_contact.locations_help' | translate }}</p>
-          <a routerLink="/office"
-            >{{ 'public_contact.manage_offices' | translate }} →</a
-          >
         </div>
+        <a
+          class="btn btn-outline-theme office-note__action"
+          routerLink="/office"
+          >{{ 'public_contact.manage_offices' | translate }}
+          <i class="ri-arrow-right-line"></i
+        ></a>
       </div>
-      <div *hasPermission="'public_contact.update'">
+      <div class="contact-save" *hasPermission="'public_contact.update'">
         <app-button [id]="'public_contact_save'">{{
           'public_contact.save' | translate
         }}</app-button>

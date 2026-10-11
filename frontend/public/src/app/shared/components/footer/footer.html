@@ -14,10 +14,7 @@
                     <svg class="content-color">
                       <use xlink:href="assets/svg/footer-icon.svg#location"></use>
                     </svg>
-                    <h5>
-                      {{ office.address }}, {{ office.city }}, {{ office.province }}
-                      {{ office.postal_code }}
-                    </h5>
+                    <h5>{{ officeAddress(office) }}</h5>
                   </a>
                 </li>
                 @if (office.phone) {

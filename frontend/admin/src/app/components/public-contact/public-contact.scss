@@ -1,1 +1,154 @@
-.settings-intro,.card-heading,.office-note{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.settings-intro p,.office-note p{margin:4px 0 0;color:#777}.settings-list{display:grid;gap:16px}.settings-card{border:1px solid #e6e9ed}.card-heading{margin-bottom:18px}.language-row{margin-top:6px;padding-top:16px;border-top:1px dashed #ddd}.checks{display:flex;flex-direction:column;gap:10px;justify-content:end;padding-bottom:8px}.checks label{display:flex;align-items:center;gap:7px}.section-gap{margin-top:32px}.office-note{justify-content:flex-start;margin:28px 0;padding:18px;background:#f8f9fa;border-left:3px solid var(--theme-color)}.office-note i{font-size:24px;color:var(--theme-color)}label{display:block;margin-bottom:7px;font-weight:600}@media(max-width:767px){.settings-intro{flex-direction:column}.checks{padding-bottom:0}}
+.settings-intro,
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.settings-intro p {
+  margin: 4px 0 0;
+  color: #777;
+}
+
+.settings-list {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-card {
+  border: 1px solid #e6e9ed;
+}
+
+.card-heading {
+  margin-bottom: 18px;
+}
+
+.language-row {
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px dashed #ddd;
+}
+
+.checks {
+  display: grid;
+  gap: 10px;
+  align-content: end;
+}
+
+.checks .app-check {
+  margin-bottom: 0;
+}
+
+.checks strong,
+.checks small {
+  display: block;
+}
+
+.checks small,
+.field-help {
+  margin-top: 3px;
+  color: #777;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.field-help {
+  display: block;
+}
+
+.section-gap {
+  margin-top: 32px;
+}
+
+.office-note {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid #e5e8ed;
+  border-left: 3px solid var(--theme-color);
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.office-note__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 153, 0, 0.1);
+}
+
+.office-note__icon i {
+  color: var(--theme-color);
+  font-size: 24px;
+}
+
+.office-note__content {
+  min-width: 0;
+}
+
+.office-note__content strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.office-note__content p {
+  max-width: 780px;
+  margin: 0;
+  color: #777;
+  line-height: 1.5;
+}
+
+.office-note__action {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.contact-save {
+  display: flex;
+  justify-content: flex-end;
+}
+
+label:not(.app-check) {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+@media (max-width: 991px) {
+  .office-note {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .office-note__action {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 767px) {
+  .settings-intro {
+    flex-direction: column;
+  }
+
+  .settings-intro .btn,
+  .office-note__action {
+    width: 100%;
+  }
+
+  .office-note {
+    grid-template-columns: 1fr;
+  }
+
+  .office-note__action {
+    grid-column: 1;
+  }
+}

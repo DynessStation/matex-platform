@@ -76,6 +76,19 @@ export class Footer {
     return data?.offices?.[0] ?? null;
   }
 
+  officeAddress(office: PublicOffice): string {
+    return [office.address, office.city, office.province, office.postal_code]
+      .map((part) => String(part ?? '').trim())
+      .filter(Boolean)
+      .filter((part, index, parts) => {
+        const normalized = part.toLocaleLowerCase();
+        return !parts
+          .slice(0, index)
+          .some((previous) => previous.toLocaleLowerCase().includes(normalized));
+      })
+      .join(', ');
+  }
+
   primaryChannel(data: PublicContactData | null, type: string): PublicContactChannel | null {
     const channels = data?.channels ?? [];
     return (

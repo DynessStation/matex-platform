@@ -12,27 +12,33 @@
                 <p class="contact-desc">
                   {{ websitePage.summary }}
                 </p>
-                @for (channel of contact.channels; track channel.key) {
-                  <div class="mb-3">
-                    <strong>{{ channel.label }}</strong
-                    ><br />
-                    @if (channel.url) {
-                      <a
-                        [href]="channel.url"
-                        [target]="
-                          channel.type === 'email' || channel.type === 'phone' ? '_self' : '_blank'
-                        "
-                        rel="noopener"
-                        >{{ channel.value }}</a
-                      >
-                    } @else {
-                      <span>{{ channel.value }}</span>
-                    }
-                    @if (channel.description) {
-                      <small class="d-block">{{ channel.description }}</small>
-                    }
-                  </div>
-                }
+                <div class="contact-channel-list">
+                  @for (channel of contact.channels; track channel.key) {
+                    <div class="contact-channel">
+                      <i [class]="channelIcon(channel.type)" aria-hidden="true"></i>
+                      <div>
+                        <strong>{{ channel.label }}</strong>
+                        @if (channel.url) {
+                          <a
+                            [href]="channel.url"
+                            [target]="
+                              channel.type === 'email' || channel.type === 'phone'
+                                ? '_self'
+                                : '_blank'
+                            "
+                            rel="noopener"
+                            >{{ channel.value }}</a
+                          >
+                        } @else {
+                          <span>{{ channel.value }}</span>
+                        }
+                        @if (channel.description) {
+                          <small>{{ channel.description }}</small>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
             <div class="col-xxl-9 col-lg-8 col-md-7">
@@ -51,7 +57,17 @@
                   <div class="col-12 theme-form">
                     <label for="contactName" class="form-label"
                       >{{ locale === 'en-US' ? 'Name' : 'Nama' }} *</label
-                    ><input id="contactName" class="form-control" formControlName="name" />
+                    ><input
+                      id="contactName"
+                      class="form-control"
+                      autocomplete="name"
+                      formControlName="name"
+                    />
+                    @if (form.controls.name.touched && form.controls.name.invalid) {
+                      <small class="contact-field-error">{{
+                        locale === 'en-US' ? 'Enter your name.' : 'Isi nama Anda.'
+                      }}</small>
+                    }
                   </div>
                   <div class="col-sm-6 theme-form">
                     <label for="contactEmail" class="form-label">Email</label
@@ -59,8 +75,16 @@
                       id="contactEmail"
                       type="email"
                       class="form-control"
+                      autocomplete="email"
                       formControlName="email"
                     />
+                    @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+                      <small class="contact-field-error">{{
+                        locale === 'en-US'
+                          ? 'Use a valid email address.'
+                          : 'Gunakan alamat email yang valid.'
+                      }}</small>
+                    }
                   </div>
                   <div class="col-sm-6 theme-form">
                     <label for="contactPhone" class="form-label">{{
@@ -70,6 +94,7 @@
                       id="contactPhone"
                       type="tel"
                       class="form-control"
+                      autocomplete="tel"
                       formControlName="phone"
                     />
                   </div>
@@ -93,6 +118,11 @@
                         <option [value]="topic.key">{{ topic.label }}</option>
                       }
                     </select>
+                    @if (form.controls.topic_key.touched && form.controls.topic_key.invalid) {
+                      <small class="contact-field-error">{{
+                        locale === 'en-US' ? 'Choose a message topic.' : 'Pilih topik pesan.'
+                      }}</small>
+                    }
                   </div>
                   <div class="col-12 theme-form">
                     <label for="contactMessage" class="form-label"
@@ -106,6 +136,11 @@
                       rows="8"
                       formControlName="message"
                     ></textarea>
+                    @if (form.controls.message.touched && form.controls.message.invalid) {
+                      <small class="contact-field-error">{{
+                        locale === 'en-US' ? 'Write your message.' : 'Tuliskan pesan Anda.'
+                      }}</small>
+                    }
                   </div>
                   <div class="d-none">
                     <label for="contactWebsite">Website</label
@@ -117,13 +152,20 @@
                     />
                   </div>
                   <div class="col-12">
-                    <label class="d-flex gap-2 align-items-start"
+                    <label class="app-check contact-consent"
                       ><input type="checkbox" formControlName="consent" /><span>{{
                         locale === 'en-US'
                           ? 'I agree that my information may be used to respond to this message.'
                           : 'Saya setuju data saya digunakan untuk merespons pesan ini.'
                       }}</span></label
                     >
+                    @if (form.controls.consent.touched && form.controls.consent.invalid) {
+                      <small class="contact-field-error">{{
+                        locale === 'en-US'
+                          ? 'Consent is required before sending.'
+                          : 'Persetujuan diperlukan sebelum mengirim pesan.'
+                      }}</small>
+                    }
                   </div>
                   <div class="col-auto">
                     <button
@@ -149,47 +191,111 @@
         </div>
 
         @if (contact.offices.length) {
-          <div class="row g-4 section-t-space">
-            @for (office of contact.offices; track office.code) {
-              <div class="col-lg-6">
-                <div class="contact-main-box h-100">
-                  <h4>{{ office.name }}</h4>
-                  <p>
-                    {{ office.address }}, {{ office.city }}, {{ office.province }}
-                    {{ office.postal_code }}
-                  </p>
-                  @if (office.phone) {
-                    <p>{{ office.phone }}</p>
-                  }
-                  @if (mapUrl(office); as map) {
-                    <div class="ratio ratio-16x9 mb-3">
+          <section class="office-section section-t-space">
+            <header class="office-section-heading">
+              <span>{{ locale === 'en-US' ? 'Our locations' : 'Lokasi kami' }}</span>
+              <h3>
+                {{
+                  locale === 'en-US'
+                    ? 'Visit or contact our office'
+                    : 'Kunjungi atau hubungi kantor kami'
+                }}
+              </h3>
+            </header>
+            <div class="office-list">
+              @for (office of contact.offices; track office.code) {
+                <article class="office-card">
+                  <div class="office-details">
+                    <span class="office-label">{{
+                      locale === 'en-US' ? 'MATEX office' : 'Kantor MATEX'
+                    }}</span>
+                    <h4>{{ office.name }}</h4>
+                    @if (office.description) {
+                      <p class="office-description">{{ office.description }}</p>
+                    }
+                    <div class="office-contact-list">
+                      <div>
+                        <i class="ri-map-pin-2-line" aria-hidden="true"></i>
+                        <span>{{ office.display_address }}</span>
+                      </div>
+                      @if (office.phone) {
+                        <div>
+                          <i class="ri-phone-line" aria-hidden="true"></i>
+                          <a [href]="'tel:' + office.phone">{{ office.phone }}</a>
+                        </div>
+                      }
+                      @if (office.email) {
+                        <div>
+                          <i class="ri-mail-line" aria-hidden="true"></i>
+                          <a [href]="'mailto:' + office.email">{{ office.email }}</a>
+                        </div>
+                      }
+                    </div>
+                    @if (office.schedule.length) {
+                      <div class="office-hours">
+                        <h5>
+                          <i class="ri-time-line" aria-hidden="true"></i>
+                          {{ locale === 'en-US' ? 'Operating hours' : 'Jam operasional' }}
+                        </h5>
+                        <dl>
+                          @for (row of office.schedule; track row.day) {
+                            <div>
+                              <dt>{{ row.day }}</dt>
+                              <dd>{{ row.hours }}</dd>
+                            </div>
+                          }
+                        </dl>
+                      </div>
+                    }
+                    <div class="office-actions">
+                      @if (office.google_maps_url) {
+                        <a
+                          class="btn theme-bg-color text-white"
+                          [href]="office.google_maps_url"
+                          target="_blank"
+                          rel="noopener"
+                          ><i class="ri-map-2-line"></i>
+                          {{ locale === 'en-US' ? 'Open in Maps' : 'Buka di Maps' }}</a
+                        >
+                      }
+                      @if (office.website_url) {
+                        <a
+                          class="btn btn-outline-dark"
+                          [href]="office.website_url"
+                          target="_blank"
+                          rel="noopener"
+                          ><i class="ri-global-line"></i>
+                          {{ locale === 'en-US' ? 'Visit website' : 'Kunjungi website' }}</a
+                        >
+                      }
+                    </div>
+                  </div>
+                  <div class="office-map">
+                    @if (office.map; as map) {
                       <iframe
                         [src]="map"
                         [title]="office.name"
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
                       ></iframe>
-                    </div>
-                  }
-                  @if (office.google_maps_url) {
-                    <a
-                      class="btn btn-sm btn-outline-dark"
-                      [href]="office.google_maps_url"
-                      target="_blank"
-                      rel="noopener"
-                      >{{ locale === 'en-US' ? 'Open map' : 'Buka peta' }}</a
-                    >
-                  }
-                </div>
-              </div>
-            }
-          </div>
+                    } @else {
+                      <div class="office-map-empty">
+                        <i class="ri-map-pin-2-line"></i>
+                        <span>{{
+                          locale === 'en-US'
+                            ? 'Map coordinates have not been added.'
+                            : 'Koordinat peta belum ditambahkan.'
+                        }}</span>
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          </section>
         }
       </div>
     </div>
-  }
-
-  @if (contact$ | async; as contact) {
     @if (whatsapp(contact.channels); as channel) {
       <a
         class="floating-whatsapp"
@@ -200,6 +306,31 @@
         ><i class="ri-whatsapp-line"></i
       ></a>
     }
+  } @else {
+    <section
+      class="section-t-space section-b-space"
+      [attr.aria-busy]="contactState() === 'loading'"
+    >
+      <div class="custom-container text-center">
+        @if (contactState() === 'loading') {
+          <p>{{ pageMessage('Memuat informasi kontak…', 'Loading contact information…') }}</p>
+        } @else {
+          <h2>
+            {{
+              pageMessage(
+                'Informasi kontak belum dapat dimuat',
+                'Unable to load contact information'
+              )
+            }}
+          </h2>
+          <p>
+            {{
+              pageMessage('Silakan coba lagi beberapa saat kemudian.', 'Please try again shortly.')
+            }}
+          </p>
+        }
+      </div>
+    </section>
   }
 
   <section class="section-block-space newsletter-section">

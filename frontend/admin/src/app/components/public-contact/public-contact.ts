@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -7,14 +8,12 @@ import {
 } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { Select2Data, Select2Module } from 'ng-select2-component';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
-import {
-  IPublicContactSettings,
-  PublicContactType,
-} from '../../shared/interface/public-contact.interface';
+import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PublicContactService } from '../../shared/services/public-contact.service';
@@ -25,6 +24,7 @@ import { PublicContactService } from '../../shared/services/public-contact.servi
     ReactiveFormsModule,
     RouterModule,
     TranslateModule,
+    Select2Module,
     PageWrapper,
     Button,
     HasPermissionDirective,
@@ -37,13 +37,14 @@ export class PublicContact {
   private service = inject(PublicContactService);
   private notifications = inject(NotificationService);
   private messages = inject(ApiMessageService);
-  readonly channelTypes: PublicContactType[] = [
-    'whatsapp',
-    'email',
-    'phone',
-    'social',
-    'website',
-    'other',
+  readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly channelTypeOptions: Select2Data = [
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Telepon' },
+    { value: 'social', label: 'Media sosial' },
+    { value: 'website', label: 'Website' },
+    { value: 'other', label: 'Lainnya' },
   ];
   loading = true;
 

@@ -36,7 +36,12 @@ router.get("/api/public/contact/:locale", async (req, res) => {
   const company = Number(process.env.PUBLIC_COMPANY_ID);
   const locale = String(req.params.locale ?? "");
   if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, "CONTACT_UNAVAILABLE", "Contact is not configured");
+    return sendError(
+      res,
+      503,
+      "CONTACT_UNAVAILABLE",
+      "Contact is not configured",
+    );
   if (!isPublicContentLocale(locale))
     return sendError(res, 404, "CONTACT_NOT_FOUND", "Contact not found");
 
@@ -73,7 +78,7 @@ router.get("/api/public/contact/:locale", async (req, res) => {
       [locale, company],
     );
     const [offices] = await pool.query<RowDataPacket[]>(
-      `SELECT office_code AS code, office_name AS name, office_description AS description,
+      `SELECT id_office, office_code AS code, office_name AS name, office_description AS description,
         address, city, province, postal_code, country_code, email, phone, lat, lng,
         website_url, public_slug AS slug, google_place_id, google_maps_url,
         google_business_url
@@ -81,21 +86,56 @@ router.get("/api/public/contact/:locale", async (req, res) => {
        ORDER BY public_sort_order, id_office`,
       [company],
     );
+    const officeIds = offices.map((office) => Number(office.id_office));
+    let operatingHours: RowDataPacket[] = [];
+    if (officeIds.length) {
+      [operatingHours] = await pool.query<RowDataPacket[]>(
+        `SELECT id_office, day_of_week, sequence, open_time, close_time, is_closed
+         FROM office_operating_hour
+         WHERE id_office IN (?)
+         ORDER BY id_office, day_of_week, sequence`,
+        [officeIds],
+      );
+    }
+    const hoursByOffice = new Map<number, RowDataPacket[]>();
+    for (const item of operatingHours) {
+      const idOffice = Number(item.id_office);
+      const current = hoursByOffice.get(idOffice) ?? [];
+      current.push(item);
+      hoursByOffice.set(idOffice, current);
+    }
 
     return sendSuccess(res, 200, "CONTACT_FOUND", "Contact loaded", {
       locale,
       channels: channels.map((item) => ({
-        key: item.channel_key, type: item.type, value: item.value,
+        key: item.channel_key,
+        type: item.type,
+        value: item.value,
         url: channelUrl(item.type, item.value, item.configured_url),
         is_primary: Number(item.is_primary) === 1,
-        label: item.label, description: item.description,
+        label: item.label,
+        description: item.description,
       })),
-      topics: topics.map((topic) => ({ key: topic.topic_key, label: topic.label })),
-      offices: offices.map((office) => ({
-        ...office,
-        lat: office.lat === null ? null : Number(office.lat),
-        lng: office.lng === null ? null : Number(office.lng),
+      topics: topics.map((topic) => ({
+        key: topic.topic_key,
+        label: topic.label,
       })),
+      offices: offices.map((office) => {
+        const idOffice = Number(office.id_office);
+        const { id_office: _idOffice, ...publicOffice } = office;
+        return {
+          ...publicOffice,
+          lat: office.lat === null ? null : Number(office.lat),
+          lng: office.lng === null ? null : Number(office.lng),
+          operating_hours: (hoursByOffice.get(idOffice) ?? []).map((item) => ({
+            day_of_week: Number(item.day_of_week),
+            sequence: Number(item.sequence),
+            open_time: item.open_time,
+            close_time: item.close_time,
+            is_closed: Number(item.is_closed) === 1,
+          })),
+        };
+      }),
     });
   } catch (error) {
     console.error("[Public Contact] Failed to load", error);
@@ -107,10 +147,21 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   const company = Number(process.env.PUBLIC_COMPANY_ID);
   if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, "CONTACT_UNAVAILABLE", "Contact is not configured");
+    return sendError(
+      res,
+      503,
+      "CONTACT_UNAVAILABLE",
+      "Contact is not configured",
+    );
 
   if (String(req.body?.website ?? "").trim())
-    return sendSuccess(res, 202, "CONTACT_INQUIRY_ACCEPTED", "Message received", null);
+    return sendSuccess(
+      res,
+      202,
+      "CONTACT_INQUIRY_ACCEPTED",
+      "Message received",
+      null,
+    );
 
   const locale = String(req.body?.locale ?? "");
   const topicKey = String(req.body?.topic_key ?? "").trim();
@@ -120,17 +171,40 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
   const message = String(req.body?.message ?? "").trim();
   const consent = req.body?.consent === true;
 
-  if (!isPublicContentLocale(locale) || !topicKey || !name || name.length > 255 ||
-    (!email && !phone) || (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
-    (phone && phone.length > 50) || !message || message.length > 5000 || !consent)
-    return sendError(res, 400, "CONTACT_INQUIRY_INVALID", "Complete the required contact fields");
+  if (
+    !isPublicContentLocale(locale) ||
+    !topicKey ||
+    !name ||
+    name.length > 255 ||
+    (!email && !phone) ||
+    (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
+    (phone && phone.length > 50) ||
+    !message ||
+    message.length > 5000 ||
+    !consent
+  )
+    return sendError(
+      res,
+      400,
+      "CONTACT_INQUIRY_INVALID",
+      "Complete the required contact fields",
+    );
 
-  const ipHash = createHash("sha256").update(String(req.ip ?? "unknown")).digest();
+  const ipHash = createHash("sha256")
+    .update(String(req.ip ?? "unknown"))
+    .digest();
   const rateKey = ipHash.toString("hex");
   const now = Date.now();
-  const recent = (attempts.get(rateKey) ?? []).filter((time) => now - time < WINDOW_MS);
+  const recent = (attempts.get(rateKey) ?? []).filter(
+    (time) => now - time < WINDOW_MS,
+  );
   if (recent.length >= MAX_ATTEMPTS)
-    return sendError(res, 429, "CONTACT_INQUIRY_RATE_LIMITED", "Please wait before sending another message");
+    return sendError(
+      res,
+      429,
+      "CONTACT_INQUIRY_RATE_LIMITED",
+      "Please wait before sending another message",
+    );
   recent.push(now);
   attempts.set(rateKey, recent);
 
@@ -142,11 +216,25 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
       [company, topicKey],
     );
     if (!topicRows.length)
-      return sendError(res, 400, "CONTACT_TOPIC_INVALID", "Select a valid contact topic");
+      return sendError(
+        res,
+        400,
+        "CONTACT_TOPIC_INVALID",
+        "Select a valid contact topic",
+      );
 
-    const sourcePath = String(req.body?.source_path ?? "").trim().slice(0, 500) || null;
-    const referrer = String(req.get("referer") ?? "").trim().slice(0, 1000) || null;
-    const userAgent = String(req.get("user-agent") ?? "").trim().slice(0, 1000) || null;
+    const sourcePath =
+      String(req.body?.source_path ?? "")
+        .trim()
+        .slice(0, 500) || null;
+    const referrer =
+      String(req.get("referer") ?? "")
+        .trim()
+        .slice(0, 1000) || null;
+    const userAgent =
+      String(req.get("user-agent") ?? "")
+        .trim()
+        .slice(0, 1000) || null;
     const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO contact_inquiry (id_master_comp, id_contact_inquiry_topic,
         contact_inquiry_name, contact_inquiry_email, contact_inquiry_phone,
@@ -154,15 +242,37 @@ router.post("/api/public/contact-inquiry", async (req, res) => {
         contact_inquiry_referrer, contact_inquiry_user_agent,
         contact_inquiry_ip_hash, contact_inquiry_consent_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [company, topicRows[0].id_contact_inquiry_topic, name, email, phone,
-        message, locale, sourcePath, referrer, userAgent, ipHash],
+      [
+        company,
+        topicRows[0].id_contact_inquiry_topic,
+        name,
+        email,
+        phone,
+        message,
+        locale,
+        sourcePath,
+        referrer,
+        userAgent,
+        ipHash,
+      ],
     );
-    return sendSuccess(res, 201, "CONTACT_INQUIRY_CREATED", "Message sent successfully", {
-      reference: `MSG-${result.insertId}`,
-    });
+    return sendSuccess(
+      res,
+      201,
+      "CONTACT_INQUIRY_CREATED",
+      "Message sent successfully",
+      {
+        reference: `MSG-${result.insertId}`,
+      },
+    );
   } catch (error) {
     console.error("[Public Contact] Failed to save inquiry", error);
-    return sendError(res, 500, "CONTACT_INQUIRY_FAILED", "Unable to send message");
+    return sendError(
+      res,
+      500,
+      "CONTACT_INQUIRY_FAILED",
+      "Unable to send message",
+    );
   }
 });
 

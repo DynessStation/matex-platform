@@ -4,13 +4,51 @@
 //==== KARTIFY THEME
 //==================================================
 
-@use "../public/assets/scss/app.scss";
+@use '../public/assets/scss/app.scss';
 
 //==================================================
 //==== NGX TOASTR
 //==================================================
 
-@import "ngx-toastr/toastr";
+@import 'ngx-toastr/toastr';
+
+// Shared checkbox alignment for application forms.
+.app-check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.45;
+  cursor: pointer;
+
+  > input[type='checkbox'] {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--theme-color);
+    cursor: inherit;
+  }
+
+  > span {
+    min-width: 0;
+  }
+
+  &:has(> input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+.app-check-card {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  background: #fff;
+}
 
 //==================================================
 //==== TOAST OVERRIDE

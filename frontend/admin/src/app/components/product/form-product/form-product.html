@@ -223,13 +223,13 @@
                     />
                   </div>
                   <div class="col-md-4">
-                    <label class="category-check"
+                    <label class="app-check app-check-card category-check"
                       ><input type="checkbox" formControlName="manage_stock" />
                       Kelola stok</label
                     >
                   </div>
                   <div class="col-md-4">
-                    <label class="category-check"
+                    <label class="app-check app-check-card category-check"
                       ><input type="checkbox" formControlName="is_featured" />
                       Produk unggulan</label
                     >
@@ -525,7 +525,7 @@
                     }
                   </div>
                   <div class="col-md-6">
-                    <label class="category-check mt-4"
+                    <label class="app-check app-check-card category-check mt-4"
                       ><input
                         type="checkbox"
                         formControlName="internal_commerce_enabled"
@@ -695,7 +695,8 @@
                           </div>
                         }
                         <div class="col-lg-3 col-md-6">
-                          <label class="category-check price-check"
+                          <label
+                            class="app-check app-check-card category-check price-check"
                             ><input
                               type="checkbox"
                               formControlName="is_active"
@@ -708,7 +709,8 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                           @if (row.get('type')?.value === 'end_user') {
-                            <label class="category-check price-check"
+                            <label
+                              class="app-check app-check-card category-check price-check"
                               ><input
                                 type="checkbox"
                                 formControlName="is_public"
@@ -810,14 +812,16 @@
                         </div>
                         <div class="col-xl-4">
                           <div class="marketplace-flags">
-                            <label class="category-check"
+                            <label
+                              class="app-check app-check-card category-check"
                               ><input
                                 type="checkbox"
                                 formControlName="is_primary"
                                 (change)="selectPrimaryMarketplace(index)"
                               />
                               Rekomendasi utama</label
-                            ><label class="category-check"
+                            ><label
+                              class="app-check app-check-card category-check"
                               ><input
                                 type="checkbox"
                                 formControlName="is_active"

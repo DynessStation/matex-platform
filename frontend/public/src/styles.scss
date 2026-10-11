@@ -5,3 +5,32 @@
 @use '../public/assets/fonts/br-hendrix/stylesheet.css';
 
 @use '../public/assets/scss/app.scss';
+
+// Shared checkbox alignment for application forms.
+.app-check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.45;
+  cursor: pointer;
+
+  > input[type='checkbox'] {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--theme-color);
+    cursor: inherit;
+  }
+
+  > span {
+    min-width: 0;
+  }
+
+  &:has(> input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}

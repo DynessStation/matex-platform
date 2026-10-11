@@ -11,6 +11,7 @@ import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadc
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import {
   PublicContactChannel,
+  PublicContactData,
   PublicOffice,
 } from '../../../shared/interface/public-content.interface';
 import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
@@ -20,6 +21,21 @@ import { PublicNavigationContextService } from '../../../shared/services/public-
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
 import { WebsitePageService } from '../../../shared/services/website-page.service';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
+
+interface OfficeScheduleRow {
+  day: string;
+  hours: string;
+}
+
+interface ContactOfficeView extends PublicOffice {
+  display_address: string;
+  map: SafeResourceUrl | null;
+  schedule: OfficeScheduleRow[];
+}
+
+interface ContactView extends Omit<PublicContactData, 'offices'> {
+  offices: ContactOfficeView[];
+}
 
 @Component({
   selector: 'app-contact-us',
@@ -43,9 +59,23 @@ export class ContactUs {
   readonly locale = this.navigation.locale();
   readonly page = signal<IPublicWebsitePage | null>(null);
   readonly pageState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
+  readonly contactState = signal<'loading' | 'ready' | 'error'>('loading');
   readonly contact$ = this.content.getContact(this.locale).pipe(
-    map((response) => response.data ?? null),
-    catchError(() => of(null)),
+    map((response): ContactView | null => {
+      if (!response.data) {
+        this.contactState.set('error');
+        return null;
+      }
+      this.contactState.set('ready');
+      return {
+        ...response.data,
+        offices: response.data.offices.map((office) => this.officeView(office)),
+      };
+    }),
+    catchError(() => {
+      this.contactState.set('error');
+      return of(null);
+    }),
     shareReplay(1),
   );
   submitting = false;
@@ -119,6 +149,17 @@ export class ContactUs {
     );
   }
 
+  channelIcon(type: string): string {
+    const icons: Record<string, string> = {
+      whatsapp: 'ri-whatsapp-line',
+      email: 'ri-mail-line',
+      phone: 'ri-phone-line',
+      social: 'ri-share-line',
+      website: 'ri-global-line',
+    };
+    return icons[type] ?? 'ri-links-line';
+  }
+
   mapUrl(office: PublicOffice): SafeResourceUrl | null {
     if (office.lat === null || office.lng === null) return null;
     const cached = this.mapUrls.get(office.code);
@@ -128,6 +169,53 @@ export class ContactUs {
     );
     this.mapUrls.set(office.code, url);
     return url;
+  }
+
+  private officeView(office: PublicOffice): ContactOfficeView {
+    const addressParts = [office.address, office.city, office.province, office.postal_code]
+      .map((part) => String(part ?? '').trim())
+      .filter(Boolean)
+      .filter((part, index, parts) => {
+        const normalized = part.toLocaleLowerCase();
+        return !parts
+          .slice(0, index)
+          .some((previous) => previous.toLocaleLowerCase().includes(normalized));
+      });
+
+    return {
+      ...office,
+      display_address: addressParts.join(', '),
+      map: this.mapUrl(office),
+      schedule: this.officeSchedule(office),
+    };
+  }
+
+  private officeSchedule(office: PublicOffice): OfficeScheduleRow[] {
+    if (!office.operating_hours?.length) return [];
+    const weekdays =
+      this.locale === 'en-US'
+        ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        : ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+    return weekdays.flatMap((day, index) => {
+      const ranges = office.operating_hours.filter((item) => item.day_of_week === index + 1);
+      if (!ranges.length) return [];
+      const openRanges = ranges.filter(
+        (item) => !item.is_closed && item.open_time && item.close_time,
+      );
+      return [
+        {
+          day,
+          hours: openRanges.length
+            ? openRanges
+                .map((item) => `${item.open_time!.slice(0, 5)}–${item.close_time!.slice(0, 5)}`)
+                .join(', ')
+            : this.locale === 'en-US'
+              ? 'Closed'
+              : 'Tutup',
+        },
+      ];
+    });
   }
 
   submit(): void {
