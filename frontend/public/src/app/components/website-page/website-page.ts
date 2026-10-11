@@ -15,13 +15,14 @@ import { ActivatedRoute } from '@angular/router';
 import { catchError, of, startWith, tap, timeout } from 'rxjs';
 
 import { Breadcrumb } from '../../shared/components/widgets/breadcrumb/breadcrumb';
+import { Loader } from '../../shared/components/loader/loader';
 import { IPublicWebsitePage } from '../../shared/interface/website-page.interface';
 import { WebsitePageSeoService } from '../../shared/services/website-page-seo.service';
 import { WebsitePageService } from '../../shared/services/website-page.service';
 
 @Component({
   selector: 'app-website-page',
-  imports: [Breadcrumb],
+  imports: [Breadcrumb, Loader],
   templateUrl: './website-page.html',
   styleUrl: './website-page.scss',
 })

@@ -13,42 +13,74 @@
       [formControl]="search"
       autocomplete="off"
     />
-    <button class="search-button btn" type="submit" [attr.aria-label]="locale === 'en-US' ? 'Search' : 'Cari'">
+    <button
+      class="search-button btn"
+      type="submit"
+      [attr.aria-label]="locale === 'en-US' ? 'Search' : 'Cari'"
+    >
       <i class="ri-search-line"></i>
     </button>
   </div>
 
-  @if (results$ | async; as results) {
-    @if (menuService.isOpenSearch && results.term.length >= 2) {
+  @if (view$ | async; as view) {
+    @if (menuService.isOpenSearch && search.value.trim().length >= 2) {
       <div class="result-box show public-search-results">
-        @if (results.products.length) {
-          <div class="search-result-box search-border-box">
-            <div class="result-title"><h4>{{ locale === 'en-US' ? 'Products' : 'Produk' }}</h4></div>
-            <ul class="result-list-box">
-              @for (product of results.products; track product.id) {
-                <li><a [routerLink]="productPath(product.slug)" (click)="closeSearch()">{{ product.name }}</a></li>
-              }
-            </ul>
-          </div>
+        @if (view.state === 'loading') {
+          <app-loader
+            loaderClass="loader-compact"
+            [label]="locale === 'en-US' ? 'Searching…' : 'Mencari…'"
+          />
+        } @else if (view.results; as results) {
+          @if (results.products.length) {
+            <div class="search-result-box search-border-box">
+              <div class="result-title">
+                <h4>{{ locale === 'en-US' ? 'Products' : 'Produk' }}</h4>
+              </div>
+              <ul class="result-list-box">
+                @for (product of results.products; track product.id) {
+                  <li>
+                    <a [routerLink]="productPath(product.slug)" (click)="closeSearch()">{{
+                      product.name
+                    }}</a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          @if (results.articles.length) {
+            <div class="search-result-box search-border-box">
+              <div class="result-title">
+                <h4>{{ locale === 'en-US' ? 'Articles' : 'Artikel' }}</h4>
+              </div>
+              <ul class="result-list-box">
+                @for (article of results.articles; track article.id) {
+                  <li>
+                    <a [routerLink]="articlePath(article.slug)" (click)="closeSearch()">{{
+                      article.title
+                    }}</a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          @if (!results.total) {
+            <div class="search-border-box empty-search-result">
+              {{
+                locale === 'en-US'
+                  ? 'No matching content found.'
+                  : 'Konten yang cocok belum ditemukan.'
+              }}
+            </div>
+          }
+          <a
+            class="view-all-search"
+            [routerLink]="searchPath"
+            [queryParams]="{ q: results.term }"
+            (click)="closeSearch()"
+          >
+            {{ locale === 'en-US' ? 'View all results' : 'Lihat semua hasil' }}
+          </a>
         }
-        @if (results.articles.length) {
-          <div class="search-result-box search-border-box">
-            <div class="result-title"><h4>{{ locale === 'en-US' ? 'Articles' : 'Artikel' }}</h4></div>
-            <ul class="result-list-box">
-              @for (article of results.articles; track article.id) {
-                <li><a [routerLink]="articlePath(article.slug)" (click)="closeSearch()">{{ article.title }}</a></li>
-              }
-            </ul>
-          </div>
-        }
-        @if (!results.total) {
-          <div class="search-border-box empty-search-result">
-            {{ locale === 'en-US' ? 'No matching content found.' : 'Konten yang cocok belum ditemukan.' }}
-          </div>
-        }
-        <a class="view-all-search" [routerLink]="searchPath" [queryParams]="{ q: results.term }" (click)="closeSearch()">
-          {{ locale === 'en-US' ? 'View all results' : 'Lihat semua hasil' }}
-        </a>
       </div>
     }
   }

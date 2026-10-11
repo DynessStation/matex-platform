@@ -199,16 +199,14 @@
                       type="submit"
                       class="btn theme-bg-color text-white"
                       [disabled]="submitting || !contact.topics.length"
+                      [attr.aria-busy]="submitting"
                     >
-                      {{
-                        submitting
-                          ? locale === 'en-US'
-                            ? 'Sending...'
-                            : 'Mengirim...'
-                          : locale === 'en-US'
-                            ? 'Send message'
-                            : 'Kirim pesan'
-                      }}
+                      @if (submitting) {
+                        <span class="contact-button-spinner" aria-hidden="true"></span>
+                        {{ locale === 'en-US' ? 'Sending…' : 'Mengirim…' }}
+                      } @else {
+                        {{ locale === 'en-US' ? 'Send message' : 'Kirim pesan' }}
+                      }
                     </button>
                   </div>
                 </div>
@@ -340,7 +338,10 @@
     >
       <div class="custom-container text-center">
         @if (contactState() === 'loading') {
-          <p>{{ pageMessage('Memuat informasi kontak…', 'Loading contact information…') }}</p>
+          <app-loader
+            loaderClass="loader-inline"
+            [label]="pageMessage('Memuat informasi kontak…', 'Loading contact information…')"
+          />
         } @else {
           <h2>
             {{
@@ -371,7 +372,10 @@
   >
     <div class="custom-container text-center">
       @if (pageState() === 'loading') {
-        <p>{{ pageMessage('Memuat halaman…', 'Loading page…') }}</p>
+        <app-loader
+          loaderClass="loader-inline"
+          [label]="pageMessage('Memuat halaman…', 'Loading page…')"
+        />
       } @else if (pageState() === 'missing') {
         <h2>{{ pageMessage('Halaman tidak tersedia', 'Page unavailable') }}</h2>
         <p>

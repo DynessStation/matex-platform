@@ -8,6 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { catchError, map, of, tap, timeout } from 'rxjs';
 
 import { NoData } from '../../../shared/components/no-data/no-data';
+import { Loader } from '../../../shared/components/loader/loader';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
@@ -19,7 +20,15 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
 
 @Component({
   selector: 'app-faq',
-  imports: [AsyncPipe, NgbAccordionModule, NoData, Breadcrumb, HomeNewsletter, TranslateModule],
+  imports: [
+    AsyncPipe,
+    NgbAccordionModule,
+    NoData,
+    Breadcrumb,
+    HomeNewsletter,
+    TranslateModule,
+    Loader,
+  ],
   templateUrl: './faq.html',
   styleUrl: './faq.scss',
 })

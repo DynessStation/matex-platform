@@ -1,6 +1,17 @@
 <app-breadcrumb [breadcrumb]="breadcrumb" />
 
-@if ((totalItems$ | async) === 0) {
+@if (loading()) {
+  <section class="section-t-space">
+    <div class="custom-container">
+      <app-loader
+        loaderClass="loader-inline"
+        [label]="locale === 'en-US' ? 'Loading articles…' : 'Memuat artikel…'"
+      />
+    </div>
+  </section>
+}
+
+@if (!loading() && (totalItems$ | async) === 0) {
   <section class="section-t-space">
     <div class="custom-container">
       <app-no-data
@@ -16,7 +27,7 @@
   </section>
 }
 
-@if (style === 'blog_no_sidebar') {
+@if (!loading() && style === 'blog_no_sidebar') {
   <section class="blog-section section-t-space">
     <div class="custom-container">
       <div class="row g-sm-4 g-3">
@@ -71,7 +82,7 @@
       </div>
     </div>
   </section>
-} @else {
+} @else if (!loading()) {
   <section class="blog-section section-t-space">
     <div class="custom-container">
       <div

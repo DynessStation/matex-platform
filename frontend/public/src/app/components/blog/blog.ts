@@ -1,13 +1,14 @@
 import { isPlatformBrowser, DatePipe, NgClass, AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, Inject, inject, PLATFORM_ID } from '@angular/core';
+import { Component, DestroyRef, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
-import { map, Observable } from 'rxjs';
+import { finalize, map, Observable } from 'rxjs';
 
 import { Sidebar } from './sidebar/sidebar';
+import { Loader } from '../../shared/components/loader/loader';
 import { NoData } from '../../shared/components/no-data/no-data';
 import { Breadcrumb } from '../../shared/components/widgets/breadcrumb/breadcrumb';
 import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
@@ -32,6 +33,7 @@ import { HomeNewsletter } from '../home/widgets/home-newsletter/home-newsletter'
     NgClass,
     AsyncPipe,
     NoData,
+    Loader,
   ],
   templateUrl: './blog.html',
   styleUrl: './blog.scss',
@@ -68,6 +70,7 @@ export class Blog {
   public style: string = 'grid_view';
   public sidebar: string = 'left_sidebar';
   public open: boolean = false;
+  readonly loading = signal(true);
   get detailBase(): string {
     return this.navigation.locale() === 'en-US' ? '/en/article' : '/artikel';
   }
@@ -104,7 +107,11 @@ export class Blog {
       this.filter.tag = params['tag'] ? params['tag'] : '';
       this.filter.page = params['page'] ? Number(params['page']) : 1;
 
-      this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
+      this.loading.set(true);
+      this.store
+        .dispatch(new GetBlogsAction(this.filter, this.navigation.locale()))
+        .pipe(finalize(() => this.loading.set(false)))
+        .subscribe({ error: () => undefined });
 
       if (params['style']) {
         this.style = params['style'];
@@ -124,8 +131,6 @@ export class Blog {
 
   setPaginate(data: number) {
     this.filter.page = data;
-    this.store.dispatch(new GetBlogsAction(this.filter, this.navigation.locale()));
-
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {

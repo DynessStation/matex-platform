@@ -6,7 +6,14 @@
   [products]="(product$ | async)?.total"
 ></app-collection-sort>
 
-<div class="row g-sm-4 g-3" [class]="gridClass">
+@if (productService.skeletonLoader) {
+  <app-loader
+    loaderClass="loader-inline"
+    [label]="isEnglish ? 'Loading products…' : 'Memuat produk…'"
+  />
+}
+
+<div class="row g-sm-4 g-3" [class]="gridClass" [attr.aria-busy]="productService.skeletonLoader">
   @for (
     product of filter()!['layout'] === 'collection_product_infinite_scroll' ||
     filter()!['layout'] === 'collection_shop_list_infinite'
@@ -23,7 +30,13 @@
 @if (!productService.skeletonLoader && !paginateProduct.length) {
   <div class="text-center py-5">
     <h4>{{ isEnglish ? 'No products found' : 'Belum ada produk' }}</h4>
-    <p class="text-content mt-2">{{ isEnglish ? 'Products in this category will appear here.' : 'Produk pada kategori ini akan ditampilkan di sini.' }}</p>
+    <p class="text-content mt-2">
+      {{
+        isEnglish
+          ? 'Products in this category will appear here.'
+          : 'Produk pada kategori ini akan ditampilkan di sini.'
+      }}
+    </p>
   </div>
 }
 
@@ -36,7 +49,8 @@
       (click)="onScroll(1)"
     >
       @if (button_loader) {
-        <img src="assets/images/loading.gif" alt="loading" />
+        <span class="collection-button-spinner" aria-hidden="true"></span>
+        {{ isEnglish ? 'Loading…' : 'Memuat…' }}
       } @else {
         {{ finished ? ('no_more_product' | translate) : ('load_more' | translate) }}
       }

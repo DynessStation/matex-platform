@@ -3,15 +3,16 @@ import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs';
 
+import { Loader } from '../../../loader/loader';
 import { MenuService } from '../../../../services/menu.service';
 import { PublicNavigationContextService } from '../../../../services/public-navigation-context.service';
 import { PublicSearchService } from '../../../../services/public-search.service';
 
 @Component({
   selector: 'app-search',
-  imports: [AsyncPipe, ReactiveFormsModule, RouterLink],
+  imports: [AsyncPipe, ReactiveFormsModule, RouterLink, Loader],
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })
@@ -23,11 +24,16 @@ export class Search {
   public menuService = inject(MenuService);
   public search = new FormControl('', { nonNullable: true });
 
-  readonly results$ = this.search.valueChanges.pipe(
+  readonly view$ = this.search.valueChanges.pipe(
     startWith(''),
     debounceTime(250),
     distinctUntilChanged(),
-    switchMap((term) => this.publicSearch.search(term, this.navigation.locale(), 4)),
+    switchMap((term) =>
+      this.publicSearch.search(term, this.navigation.locale(), 4).pipe(
+        map((results) => ({ state: 'ready' as const, results })),
+        startWith({ state: 'loading' as const, results: null }),
+      ),
+    ),
   );
 
   get locale(): string {
@@ -35,7 +41,9 @@ export class Search {
   }
 
   get placeholder(): string {
-    return this.locale === 'en-US' ? 'Search products and articles...' : 'Cari produk dan artikel...';
+    return this.locale === 'en-US'
+      ? 'Search products and articles...'
+      : 'Cari produk dan artikel...';
   }
 
   get searchPath(): string {

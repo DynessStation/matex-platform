@@ -1,0 +1,17 @@
+.collection-button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 7px;
+  vertical-align: -3px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: collection-button-spin 0.7s linear infinite;
+}
+
+@keyframes collection-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

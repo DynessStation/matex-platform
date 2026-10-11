@@ -48,6 +48,18 @@ export class Layout {
   private route = inject(ActivatedRoute);
   private appliedTheme: string | null = null;
 
+  get loadingLabel(): string {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/')
+      ? 'Loading page…'
+      : 'Memuat halaman…';
+  }
+
+  get requestLoadingLabel(): string {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/')
+      ? 'Processing data…'
+      : 'Memproses data…';
+  }
+
   themeOption$: Observable<Option> = inject(Store).select(
     ThemeOptionState.themeOptions,
   ) as Observable<Option>;

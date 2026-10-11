@@ -62,7 +62,10 @@
   >
     <div class="custom-container text-center">
       @if (pageState() === 'loading') {
-        <p>{{ pageMessage('Memuat halaman…', 'Loading page…') }}</p>
+        <app-loader
+          loaderClass="loader-inline"
+          [label]="pageMessage('Memuat halaman…', 'Loading page…')"
+        />
       } @else if (pageState() === 'missing') {
         <h2>{{ pageMessage('Halaman tidak tersedia', 'Page unavailable') }}</h2>
         <p>

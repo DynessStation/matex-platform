@@ -8,6 +8,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { catchError, finalize, map, of, shareReplay, tap, timeout } from 'rxjs';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
+import { Loader } from '../../../shared/components/loader/loader';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import {
   PublicContactChannel,
@@ -39,7 +40,7 @@ interface ContactView extends Omit<PublicContactData, 'offices'> {
 
 @Component({
   selector: 'app-contact-us',
-  imports: [AsyncPipe, HomeNewsletter, ReactiveFormsModule, Breadcrumb],
+  imports: [AsyncPipe, HomeNewsletter, ReactiveFormsModule, Breadcrumb, Loader],
   templateUrl: './contact-us.html',
   styleUrl: './contact-us.scss',
 })

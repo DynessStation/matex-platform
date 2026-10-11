@@ -21,6 +21,7 @@ import { EffectCards, Navigation } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
+import { Loader } from '../../../shared/components/loader/loader';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IAboutUs } from '../../../shared/interface/theme-option.interface';
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
@@ -31,7 +32,7 @@ SwiperCore.use([Navigation, EffectCards]);
 
 @Component({
   selector: 'app-about-us',
-  imports: [HomeNewsletter, Breadcrumb],
+  imports: [HomeNewsletter, Breadcrumb, Loader],
   templateUrl: './about-us.html',
   styleUrl: './about-us.scss',
 })

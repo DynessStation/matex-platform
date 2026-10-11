@@ -9,6 +9,7 @@ import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { ProductBox } from '../../../../../shared/components/product-box/product-box';
+import { Loader } from '../../../../../shared/components/loader/loader';
 import { Params } from '../../../../../shared/interface/core.interface';
 import { Product, ProductModel } from '../../../../../shared/interface/product.interface';
 import { ProductService } from '../../../../../shared/services/product.service';
@@ -18,7 +19,7 @@ import { CollectionSort } from '../collection-sort/collection-sort';
 
 @Component({
   selector: 'app-collection-products',
-  imports: [CollectionSort, AsyncPipe, ProductBox, NgbPagination, TranslateModule],
+  imports: [CollectionSort, AsyncPipe, ProductBox, NgbPagination, TranslateModule, Loader],
   templateUrl: './collection-products.html',
   styleUrl: './collection-products.scss',
 })

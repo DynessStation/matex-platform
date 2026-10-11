@@ -27,7 +27,10 @@
   >
     <div class="custom-container text-center">
       @if (state() === 'loading') {
-        <p>{{ message('Memuat halaman…', 'Loading page…') }}</p>
+        <app-loader
+          loaderClass="loader-inline"
+          [label]="message('Memuat halaman…', 'Loading page…')"
+        />
       } @else if (state() === 'missing') {
         <h2>{{ message('Halaman tidak ditemukan', 'Page not found') }}</h2>
         <p>

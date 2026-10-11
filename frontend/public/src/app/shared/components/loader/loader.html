@@ -1,11 +1,13 @@
-<div class="loader-wrapper">
-  <div class="honeycomb">
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+<div
+  [class]="loaderClass()"
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+  [attr.aria-label]="label()"
+>
+  <div class="loader-indicator">
+    <span class="loader-spinner" aria-hidden="true"></span>
+    <span class="loader-label">{{ label() }}</span>
   </div>
+  <span class="loader-progress" aria-hidden="true"></span>
 </div>

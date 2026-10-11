@@ -19,9 +19,8 @@ export class LoaderInterceptor implements HttpInterceptor {
     const isReadRequest = req.method === 'GET';
 
     void Promise.resolve(null).then(() => {
-      if (isReadRequest) {
-        this.store.dispatch(new ShowLoaderAction());
-      } else {
+      this.store.dispatch(new ShowLoaderAction());
+      if (!isReadRequest) {
         this.store.dispatch(new ShowButtonSpinnerAction());
       }
     });
@@ -29,9 +28,8 @@ export class LoaderInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       finalize(() => {
         void Promise.resolve(null).then(() => {
-          if (isReadRequest) {
-            this.store.dispatch(new HideLoaderAction());
-          } else {
+          this.store.dispatch(new HideLoaderAction());
+          if (!isReadRequest) {
             this.store.dispatch(new HideButtonSpinnerAction());
           }
         });

@@ -4,8 +4,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, switchMap } from 'rxjs';
 
+import { Loader } from '../../../shared/components/loader/loader';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
@@ -13,7 +14,7 @@ import { PublicSearchService } from '../../../shared/services/public-search.serv
 
 @Component({
   selector: 'app-search-page',
-  imports: [AsyncPipe, Breadcrumb, ReactiveFormsModule, RouterLink],
+  imports: [AsyncPipe, Breadcrumb, ReactiveFormsModule, RouterLink, Loader],
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })
@@ -27,10 +28,15 @@ export class Search {
   public search = new FormControl('', { nonNullable: true });
   public breadcrumb: breadcrumb = { title: '', items: [] };
 
-  readonly results$ = this.route.queryParamMap.pipe(
+  readonly view$ = this.route.queryParamMap.pipe(
     map((params) => (params.get('q') ?? params.get('search') ?? '').trim()),
     distinctUntilChanged(),
-    switchMap((term) => this.publicSearch.search(term, this.navigation.locale(), 24)),
+    switchMap((term) =>
+      this.publicSearch.search(term, this.navigation.locale(), 24).pipe(
+        map((results) => ({ state: 'ready' as const, results })),
+        startWith({ state: 'loading' as const, results: null }),
+      ),
+    ),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
