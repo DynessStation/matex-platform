@@ -128,6 +128,49 @@
                     <strong>EN</strong> English
                   </button>
                 </div>
+                <div class="article-assistant-bar">
+                  <div>
+                    <strong>Bantuan konten</strong>
+                    <small
+                      >Konten hanya dimasukkan ke form dan belum disimpan
+                      otomatis.</small
+                    >
+                  </div>
+                  <div class="article-assistant-actions">
+                    <button
+                      type="button"
+                      class="btn btn-light"
+                      [disabled]="
+                        assistingLocale !== null || translatingToEnglish
+                      "
+                      (click)="generateArticle(activeLocale)"
+                    >
+                      <i class="ri-magic-line"></i>
+                      {{
+                        assistingLocale === activeLocale
+                          ? 'Sedang membuat…'
+                          : 'Bantu isi artikel'
+                      }}
+                    </button>
+                    @if (activeLocale === 'en') {
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        [disabled]="
+                          assistingLocale !== null || translatingToEnglish
+                        "
+                        (click)="copyAndTranslateToEnglish()"
+                      >
+                        <i class="ri-translate-2"></i>
+                        {{
+                          translatingToEnglish
+                            ? 'Menerjemahkan…'
+                            : 'Salin & terjemahkan dari Indonesia'
+                        }}
+                      </button>
+                    }
+                  </div>
+                </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-5">

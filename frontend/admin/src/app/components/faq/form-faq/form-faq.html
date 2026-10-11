@@ -1,42 +1,149 @@
-<form class="theme-form theme-form-2 mega-form" [formGroup]="form" (ngSubmit)="submit()">
+<form
+  class="theme-form theme-form-2 mega-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
   <div class="row g-4">
     <div class="col-lg-8">
-      <app-form-fields [label]="'faq_admin.key'" [for]="'key'" [required]="true">
-        <input class="form-control" id="key" formControlName="key" placeholder="contoh: pengiriman-produk" />
+      <app-form-fields
+        [label]="'faq_admin.key'"
+        [for]="'key'"
+        [required]="true"
+      >
+        <input
+          class="form-control"
+          id="key"
+          formControlName="key"
+          placeholder="contoh: pengiriman-produk"
+        />
         @if (form.controls.key.touched && form.controls.key.invalid) {
-          <div class="invalid-feedback">{{ 'faq_admin.key_help' | translate }}</div>
+          <div class="invalid-feedback">
+            {{ 'faq_admin.key_help' | translate }}
+          </div>
         }
       </app-form-fields>
     </div>
     <div class="col-lg-4">
-      <app-form-fields [label]="'faq_admin.order'" [for]="'sort_order'" [required]="true">
-        <input class="form-control" id="sort_order" type="number" min="0" formControlName="sort_order" />
+      <app-form-fields
+        [label]="'faq_admin.order'"
+        [for]="'sort_order'"
+        [required]="true"
+      >
+        <input
+          class="form-control"
+          id="sort_order"
+          type="number"
+          min="0"
+          formControlName="sort_order"
+        />
       </app-form-fields>
     </div>
   </div>
 
-  <div class="card mt-4"><div class="card-body">
-    <h4 class="mb-3">Bahasa Indonesia</h4>
-    <app-form-fields [label]="'faq_admin.question'" [for]="'id_question'" [required]="true">
-      <input class="form-control" id="id_question" formControlName="id_question" />
-    </app-form-fields>
-    <app-form-fields [label]="'faq_admin.answer'" [for]="'id_answer'" [required]="true">
-      <textarea class="form-control" id="id_answer" rows="6" formControlName="id_answer"></textarea>
-    </app-form-fields>
-  </div></div>
+  <div class="card mt-4">
+    <div class="card-body">
+      <div
+        class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"
+      >
+        <h4 class="mb-0">Bahasa Indonesia</h4>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-theme"
+          [disabled]="assisting"
+          (click)="generateAnswer('id')"
+        >
+          <i class="ri-sparkling-line"></i> Isi jawaban otomatis
+        </button>
+      </div>
+      <app-form-fields
+        [label]="'faq_admin.question'"
+        [for]="'id_question'"
+        [required]="true"
+      >
+        <input
+          class="form-control"
+          id="id_question"
+          formControlName="id_question"
+        />
+      </app-form-fields>
+      <app-form-fields
+        [label]="'faq_admin.answer'"
+        [for]="'id_answer'"
+        [required]="true"
+      >
+        <textarea
+          class="form-control"
+          id="id_answer"
+          rows="6"
+          formControlName="id_answer"
+        ></textarea>
+      </app-form-fields>
+    </div>
+  </div>
 
-  <div class="card mt-4"><div class="card-body">
-    <h4 class="mb-3">English</h4>
-    <app-form-fields [label]="'faq_admin.question'" [for]="'en_question'" [required]="true">
-      <input class="form-control" id="en_question" formControlName="en_question" />
-    </app-form-fields>
-    <app-form-fields [label]="'faq_admin.answer'" [for]="'en_answer'" [required]="true">
-      <textarea class="form-control" id="en_answer" rows="6" formControlName="en_answer"></textarea>
-    </app-form-fields>
-  </div></div>
+  <div class="card mt-4">
+    <div class="card-body">
+      <div
+        class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"
+      >
+        <h4 class="mb-0">English</h4>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-theme"
+            [disabled]="assisting"
+            (click)="copyAndTranslateToEnglish()"
+          >
+            <i class="ri-translate-2"></i> Salin dari Indonesia
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-theme"
+            [disabled]="assisting"
+            (click)="generateAnswer('en')"
+          >
+            <i class="ri-sparkling-line"></i> Generate answer
+          </button>
+        </div>
+      </div>
+      <app-form-fields
+        [label]="'faq_admin.question'"
+        [for]="'en_question'"
+        [required]="true"
+      >
+        <input
+          class="form-control"
+          id="en_question"
+          formControlName="en_question"
+        />
+      </app-form-fields>
+      <app-form-fields
+        [label]="'faq_admin.answer'"
+        [for]="'en_answer'"
+        [required]="true"
+      >
+        <textarea
+          class="form-control"
+          id="en_answer"
+          rows="6"
+          formControlName="en_answer"
+        ></textarea>
+      </app-form-fields>
+    </div>
+  </div>
 
-  <app-form-fields class="d-block mt-4" [label]="'faq_admin.active'" [for]="'status'">
-    <label class="switch"><input type="checkbox" id="status" formControlName="status" /><span class="switch-state"></span></label>
+  <app-form-fields
+    class="d-block mt-4"
+    [label]="'faq_admin.active'"
+    [for]="'status'"
+  >
+    <label class="switch"
+      ><input type="checkbox" id="status" formControlName="status" /><span
+        class="switch-state"
+      ></span
+    ></label>
   </app-form-fields>
-  <app-button [id]="'faq_btn'">{{ (type() === 'create' ? 'faq_admin.save' : 'faq_admin.update') | translate }}</app-button>
+  <app-button [id]="'faq_btn'">{{
+    (type() === 'create' ? 'faq_admin.save' : 'faq_admin.update') | translate
+  }}</app-button>
 </form>

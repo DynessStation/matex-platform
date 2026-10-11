@@ -1,0 +1,28 @@
+.media-modal-heading {
+  min-width: 0;
+
+  h2 {
+    margin-bottom: 3px;
+  }
+
+  p {
+    max-width: 760px;
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+}
+
+.media-selection-summary {
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+:host-context(body.dark-only) {
+  .media-modal-heading p,
+  .media-selection-summary {
+    color: #aaa;
+  }
+}

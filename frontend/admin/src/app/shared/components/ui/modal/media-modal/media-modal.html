@@ -1,8 +1,14 @@
 <ng-template #mediaModal let-modal>
   <div class="modal-header">
-    <h2>
-      {{ 'media_ui.insert_media' | translate }}
-    </h2>
+    <div class="media-modal-heading">
+      <h2>
+        {{ dialogTitle || ('media_ui.insert_media' | translate) }}
+      </h2>
+
+      @if (dialogDescription) {
+        <p>{{ dialogDescription }}</p>
+      }
+    </div>
 
     <app-button
       [class]="'btn btn-close'"
@@ -24,12 +30,14 @@
 
           <ng-template ngbNavContent>
             <app-media-box
-              [multiple]="multipleImage()"
-              [maxSelection]="maxFiles()"
+              [multiple]="dialogMultiple"
+              [maxSelection]="dialogMaxSelection"
               [url]="url()"
               [accept]="accept()"
               [collection]="collection()"
               [selectedImages]="selectedImages"
+              [disabledSelectionIds]="dialogDisabledSelectionIds"
+              [selectionValidator]="dialogSelectionValidator"
               [deleteAction]="false"
               (setImage)="setImage($event)"
             />
@@ -47,7 +55,7 @@
             class="content-section drop-files-sec"
             ngx-dropzone
             [accept]="accept().join(',')"
-            [multiple]="multipleImage()"
+            [multiple]="dialogMultiple"
             (change)="onSelect($event)"
           >
             <ngx-dropzone-label>
@@ -94,7 +102,13 @@
   </div>
 
   <div class="modal-footer">
-    <div class="left-part"></div>
+    <div class="left-part">
+      @if (active === 'select') {
+        <span class="media-selection-summary">
+          {{ selectionCount }} {{ 'media_ui.selected_count' | translate }}
+        </span>
+      }
+    </div>
 
     <div class="right-part">
       @if (active === 'upload') {
@@ -110,6 +124,7 @@
         <app-button
           [class]="'align-items-center btn btn-theme d-flex'"
           [id]="'media_insert_btn'"
+          [disabled]="selectionCount === 0"
           (click)="selectedMedia(modal)"
         >
           {{ 'media_ui.insert_media' | translate }}

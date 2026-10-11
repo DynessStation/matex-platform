@@ -1,0 +1,74 @@
+<div class="product-media-gallery" aria-label="Galeri media produk">
+  @if (media().length) {
+    <div
+      class="product-media-stage"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+    >
+      @for (item of media(); track item.id ?? item.asset_url; let index = $index) {
+        @if (index === activeIndex()) {
+          @if (isVideo(item)) {
+            <video class="product-media-item is-video" controls playsinline preload="metadata">
+              <source [src]="mediaUrl(item)" [type]="item.mime_type" />
+            </video>
+          } @else {
+            <img
+              class="product-media-item"
+              [src]="mediaUrl(item)"
+              [alt]="product()?.name || item.name"
+              decoding="async"
+            />
+          }
+        }
+      }
+
+      @if (media().length > 1) {
+        <button
+          class="gallery-arrow is-previous"
+          type="button"
+          (click)="previous()"
+          aria-label="Media sebelumnya"
+        >
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+        <button
+          class="gallery-arrow is-next"
+          type="button"
+          (click)="next()"
+          aria-label="Media berikutnya"
+        >
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+        <span class="gallery-counter">{{ activeIndex() + 1 }} / {{ media().length }}</span>
+      }
+    </div>
+
+    @if (media().length > 1) {
+      <div class="product-media-thumbnails" role="list" aria-label="Pilih media produk">
+        @for (item of media(); track item.id ?? item.asset_url; let index = $index) {
+          <button
+            type="button"
+            role="listitem"
+            class="product-media-thumbnail"
+            [class.is-active]="index === activeIndex()"
+            (click)="select(index)"
+            [attr.aria-label]="'Tampilkan media ' + (index + 1)"
+          >
+            @if (isVideo(item)) {
+              <span class="video-thumbnail" aria-hidden="true">
+                <i class="ri-video-line"></i>
+              </span>
+              <span class="video-badge"><i class="ri-play-fill"></i></span>
+            } @else {
+              <img [src]="mediaUrl(item)" [alt]="product()?.name || item.name" loading="lazy" />
+            }
+          </button>
+        }
+      </div>
+    }
+  } @else {
+    <div class="product-media-stage is-empty">
+      <img src="assets/images/placeholder/product.png" [alt]="product()?.name || 'Produk'" />
+    </div>
+  }
+</div>

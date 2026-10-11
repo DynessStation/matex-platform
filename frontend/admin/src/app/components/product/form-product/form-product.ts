@@ -7,10 +7,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { Select2Data, Select2Module } from 'ng-select2-component';
-import { filter, Observable, switchMap, take } from 'rxjs';
+import { Editor, NgxEditorModule } from 'ngx-editor';
+import { filter, finalize, Observable, switchMap, take } from 'rxjs';
+
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { Button } from '../../../shared/components/ui/button/button';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
@@ -22,6 +25,8 @@ import {
   IProductPayload,
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
+import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { GetCategoriesAction } from '../../../shared/store/action/category.action';
 import {
   CreateProductAction,
@@ -41,6 +46,7 @@ import { ProductState } from '../../../shared/store/state/product.state';
     AdvanceDropdown,
     ImageUpload,
     Button,
+    NgxEditorModule,
   ],
   templateUrl: './form-product.html',
   styleUrl: './form-product.scss',
@@ -50,6 +56,8 @@ export class FormProduct {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private contentAssistant = inject(ContentAssistantService);
+  private notification = inject(NotificationService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly type = input<string>('create');
   readonly mediaConfig = mediaConfig;
@@ -103,6 +111,10 @@ export class FormProduct {
   id: string | null = null;
   activeTab = 'general';
   activeLocale: 'id' | 'en' = 'id';
+  idDescriptionEditor?: Editor;
+  enDescriptionEditor?: Editor;
+  assistingLocale: 'id' | 'en' | null = null;
+  translatingToEnglish = false;
   categoryIds: string[] = [];
   categoryError = false;
   pricePublicationError = false;
@@ -181,6 +193,10 @@ export class FormProduct {
     this.specifications(locale).removeAt(index);
   }
   ngOnInit() {
+    if (this.isBrowser) {
+      this.idDescriptionEditor = new Editor();
+      this.enDescriptionEditor = new Editor();
+    }
     this.store.dispatch(new GetCategoriesAction({ locale: 'id-ID' }));
     this.id = this.route.snapshot.paramMap.get('id');
     if (this.id)
@@ -205,8 +221,149 @@ export class FormProduct {
     this.categoryError = this.categoryIds.length === 0;
   }
   selectMedia(role: ProductMediaRole, value: any) {
-    this.media[role] =
-      role === 'gallery' && Array.isArray(value) ? value.slice(0, 10) : value;
+    if (role !== 'gallery' || !Array.isArray(value)) {
+      this.media[role] = value;
+      return;
+    }
+    const seen = new Set<string>();
+    this.media.gallery = value
+      .filter((item: IAttachment) => {
+        const id = String(item?.id_attachment ?? '');
+        if (!id || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      })
+      .slice(0, 10);
+  }
+
+  generateDescriptions(locale: 'id' | 'en') {
+    const prefix = locale;
+    const value = this.form.getRawValue() as any;
+    this.assistingLocale = locale;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: 'product',
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          name: value[`${prefix}_name`],
+          sku: value.sku,
+          product_kind: value.product_kind,
+          categories: this.categoryIds,
+          unit: value.unit,
+          dimensions_mm: {
+            length: value.length_mm,
+            width: value.width_mm,
+            height: value.height_mm,
+          },
+          weight_grams: value.weight_grams,
+          specifications: this.specificationPayload(prefix),
+        }),
+        fields: {
+          short_description: value[`${prefix}_short_description`] || '',
+          description: value[`${prefix}_description`] || '',
+          meta_description: value[`${prefix}_meta_description`] || '',
+          og_description: value[`${prefix}_og_description`] || '',
+        },
+      })
+      .pipe(finalize(() => (this.assistingLocale = null)))
+      .subscribe({
+        next: (fields) => {
+          this.form.patchValue({
+            [`${prefix}_short_description`]: fields['short_description'],
+            [`${prefix}_description`]: fields['description'],
+            [`${prefix}_meta_description`]: fields['meta_description'],
+            [`${prefix}_og_description`]: fields['og_description'],
+          });
+          this.notification.showSuccess(
+            locale === 'id'
+              ? 'Draf deskripsi berhasil dibuat. Periksa kembali sebelum menyimpan.'
+              : 'Description draft generated. Review it before saving.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  copyAndTranslateToEnglish() {
+    const value = this.form.getRawValue() as any;
+    const fields: Record<string, string> = {
+      name: value.id_name || '',
+      short_description: value.id_short_description || '',
+      description: value.id_description || '',
+      meta_title: value.id_meta_title || '',
+      meta_description: value.id_meta_description || '',
+      og_title: value.id_og_title || '',
+      og_description: value.id_og_description || '',
+    };
+    const sourceSpecifications = this.specifications(
+      'id',
+    ).getRawValue() as Array<{
+      label: string;
+      value: string;
+    }>;
+    sourceSpecifications.forEach((item, index) => {
+      fields[`spec_${index}_label`] = item.label;
+      fields[`spec_${index}_value`] = item.value;
+    });
+
+    this.translatingToEnglish = true;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: 'product',
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields,
+      })
+      .pipe(finalize(() => (this.translatingToEnglish = false)))
+      .subscribe({
+        next: (translated) => {
+          const englishName = translated['name'] || value.id_name || '';
+          this.form.patchValue({
+            en_name: englishName,
+            en_slug: this.slugify(englishName || value.id_slug),
+            en_short_description: translated['short_description'] || '',
+            en_description: translated['description'] || '',
+            en_meta_title: translated['meta_title'] || '',
+            en_meta_description: translated['meta_description'] || '',
+            en_og_title: translated['og_title'] || '',
+            en_og_description: translated['og_description'] || '',
+          });
+          this.specifications('en').clear();
+          sourceSpecifications.forEach((_item, index) =>
+            this.addSpecification('en', {
+              label: translated[`spec_${index}_label`] || '',
+              value: translated[`spec_${index}_value`] || '',
+            }),
+          );
+          this.activeLocale = 'en';
+          this.notification.showSuccess(
+            'Konten English sudah diisi dari Bahasa Indonesia. Periksa hasil terjemahan sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  private slugify(value: string) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 255);
+  }
+
+  private showAssistantError(error: any) {
+    const notConfigured =
+      error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED';
+    this.notification.showError(
+      notConfigured
+        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
+    );
   }
   addPrice(value: any = {}) {
     this.prices.push(
@@ -554,5 +711,10 @@ export class FormProduct {
       return 'content';
     if (this.prices.invalid || this.marketplaces.invalid) return 'channels';
     return 'general';
+  }
+
+  ngOnDestroy() {
+    this.idDescriptionEditor?.destroy();
+    this.enDescriptionEditor?.destroy();
   }
 }

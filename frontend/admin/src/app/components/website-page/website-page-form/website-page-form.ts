@@ -24,9 +24,10 @@ import {
   NgbNavChangeEvent,
   NgbTimeStruct,
 } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
+import { finalize } from 'rxjs';
 
 import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
 import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
@@ -47,7 +48,9 @@ import {
   IWebsitePageEditorPublicationPayload,
   IWebsitePageEditorSaveRequest,
 } from '../../../shared/interface/website-page-editor.interface';
+import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { AuthState } from '../../../shared/store/state/auth.state';
 import { hasPermissionAccess } from '../../../shared/utils/permission.util';
 import { WebsitePagePreview } from '../website-page-preview/website-page-preview';
@@ -167,6 +170,9 @@ export class WebsitePageForm {
   private destroyRef = inject(DestroyRef);
   private store = inject(Store);
   public readonly localization = inject(LocalizationService);
+  private readonly translate = inject(TranslateService);
+  private readonly contentAssistant = inject(ContentAssistantService);
+  private readonly notification = inject(NotificationService);
 
   //==================================================
   //==== INPUT
@@ -187,6 +193,8 @@ export class WebsitePageForm {
   public activeTab = 'general';
 
   public activeLocale: WebsitePageEditorLocale = 'id-ID';
+  public translatingPage = false;
+  public generatingPage = false;
 
   //==================================================
   //==== PREVIEW
@@ -205,6 +213,8 @@ export class WebsitePageForm {
   public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
 
   public mediaValidationAttempted = false;
+
+  public activeHomeMediaRole: string | null = null;
 
   //==================================================
   //==== PUBLICATION
@@ -1133,6 +1143,177 @@ export class WebsitePageForm {
     this.activeLocale = locale;
   }
 
+  copyAndTranslatePageToEnglish(): void {
+    const source = this.translationForm('id-ID').getRawValue();
+    const fields: Record<string, string> = {
+      title: source.title,
+      excerpt: source.excerpt,
+      content: source.content,
+      meta_title: source.meta_title,
+      meta_description: source.meta_description,
+      meta_keywords: source.meta_keywords,
+      og_title: source.og_title,
+      og_description: source.og_description,
+    };
+
+    if (this.isGadgetHomeTemplate) {
+      const latex = this.homeLatexContent['id-ID'];
+      fields['home_latex_eyebrow'] = latex.eyebrow;
+      fields['home_latex_title'] = latex.title;
+      fields['home_latex_description'] = latex.description;
+      latex.items.forEach((item, index) => {
+        fields[`home_latex_${index}_title`] = item.title;
+        fields[`home_latex_${index}_description`] = item.description;
+      });
+      const ad = this.homeAdvertisementContent['id-ID'];
+      fields['home_ad_label'] = ad.label;
+      fields['home_ad_title'] = ad.title;
+      fields['home_ad_description'] = ad.description;
+      fields['home_ad_cta_label'] = ad.cta_label;
+    }
+
+    if (this.isAboutTemplate) {
+      this.aboutFeatures['id-ID'].forEach((feature, index) => {
+        fields[`about_${index}_title`] = feature.title;
+        fields[`about_${index}_description`] = feature.description;
+      });
+    }
+
+    this.translatingPage = true;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: this.isGadgetHomeTemplate
+          ? 'home page and section organizer'
+          : 'website page',
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields,
+      })
+      .pipe(finalize(() => (this.translatingPage = false)))
+      .subscribe({
+        next: (translated) => {
+          this.enableLanguage('en-US');
+          this.translationForm('en-US').patchValue({
+            title: translated['title'],
+            slug: this.slugifyAssistant(translated['title'] || source.title),
+            excerpt: translated['excerpt'],
+            content: translated['content'],
+            meta_title: translated['meta_title'],
+            meta_description: translated['meta_description'],
+            meta_keywords: translated['meta_keywords'],
+            og_title: translated['og_title'],
+            og_description: translated['og_description'],
+            status: source.status,
+          });
+
+          if (this.isGadgetHomeTemplate) {
+            const idLatex = this.homeLatexContent['id-ID'];
+            this.homeLatexContent = {
+              ...this.homeLatexContent,
+              'en-US': {
+                eyebrow: translated['home_latex_eyebrow'] || '',
+                title: translated['home_latex_title'] || '',
+                description: translated['home_latex_description'] || '',
+                items: idLatex.items.map((_item, index) => ({
+                  title: translated[`home_latex_${index}_title`] || '',
+                  description:
+                    translated[`home_latex_${index}_description`] || '',
+                })),
+              },
+            };
+            const idAd = this.homeAdvertisementContent['id-ID'];
+            this.homeAdvertisementContent = {
+              ...this.homeAdvertisementContent,
+              'en-US': {
+                label: translated['home_ad_label'] || '',
+                title: translated['home_ad_title'] || '',
+                description: translated['home_ad_description'] || '',
+                cta_label: translated['home_ad_cta_label'] || '',
+                cta_url: idAd.cta_url,
+              },
+            };
+            this.homeSectionVisibility = {
+              ...this.homeSectionVisibility,
+              'en-US': { ...this.homeSectionVisibility['id-ID'] },
+            };
+          }
+
+          if (this.isAboutTemplate) {
+            this.aboutFeatures = {
+              ...this.aboutFeatures,
+              'en-US': this.aboutFeatures['id-ID'].map((_feature, index) => ({
+                title: translated[`about_${index}_title`] || '',
+                description: translated[`about_${index}_description`] || '',
+              })),
+            };
+          }
+
+          this.activeLocale = 'en-US';
+          this.notification.showSuccess(
+            'Versi English dan organizer bagiannya sudah diisi. Periksa hasil terjemahan sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showContentAssistantError(error),
+      });
+  }
+
+  generatePageDescriptions(): void {
+    const locale = this.activeLocale;
+    const group = this.translationForm(locale);
+    const value = group.getRawValue();
+    this.generatingPage = true;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: this.isGadgetHomeTemplate ? 'home page' : 'website page',
+        target_locale: locale,
+        context: JSON.stringify({
+          title: value.title,
+          page_key: this.form.controls.website_page_key.value,
+        }),
+        fields: {
+          excerpt: value.excerpt,
+          content: value.content,
+          meta_description: value.meta_description,
+          og_description: value.og_description,
+        },
+      })
+      .pipe(finalize(() => (this.generatingPage = false)))
+      .subscribe({
+        next: (generated) => {
+          group.patchValue({
+            excerpt: generated['excerpt'],
+            content: generated['content'],
+            meta_description: generated['meta_description'],
+            og_description: generated['og_description'],
+          });
+          this.notification.showSuccess(
+            'Draf deskripsi halaman sudah diisi. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showContentAssistantError(error),
+      });
+  }
+
+  private slugifyAssistant(value: string): string {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 255);
+  }
+
+  private showContentAssistantError(error: any): void {
+    this.notification.showError(
+      error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
+        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        : 'Bantuan konten belum berhasil. Coba lagi sebentar.',
+    );
+  }
+
   enableLanguage(locale: WebsitePageEditorLocale): void {
     this.translationForm(locale).enable({
       emitEvent: false,
@@ -1364,14 +1545,86 @@ export class WebsitePageForm {
   //==================================================
 
   openMedia(): void {
+    this.activeHomeMediaRole = null;
     void this.mediaModal()?.openModal();
   }
 
+  openHomeMedia(rule: GadgetHomeMediaRule): void {
+    this.activeHomeMediaRole = rule.value;
+    const current = this.gadgetHomeMediaForRole(rule.value);
+    const disabledSelectionIds = this.pageMedia
+      .filter((media) => media.role !== rule.value)
+      .map((media) => media.attachment.id_attachment);
+
+    void this.mediaModal()?.openModal({
+      selection: current?.attachment ?? null,
+      title: `Pilih gambar · ${rule.label}`,
+      description: this.gadgetHomeMediaRequirement(rule),
+      multiple: false,
+      maxSelection: 1,
+      disabledSelectionIds,
+      validateSelection: (attachment) =>
+        this.gadgetHomeAttachmentIssue(attachment, rule),
+    });
+  }
+
+  openHomeOgMedia(): void {
+    const role = 'og';
+    this.activeHomeMediaRole = role;
+    const current = this.gadgetHomeMediaForRole(role);
+    const disabledSelectionIds = this.pageMedia
+      .filter((media) => media.role !== role)
+      .map((media) => media.attachment.id_attachment);
+
+    void this.mediaModal()?.openModal({
+      selection: current?.attachment ?? null,
+      title: this.translate.instant('website_page.home_media_og_title'),
+      description: this.translate.instant(
+        'website_page.home_media_og_requirement',
+      ),
+      multiple: false,
+      maxSelection: 1,
+      disabledSelectionIds,
+      validateSelection: (attachment) =>
+        this.pageMediaAccept.includes(attachment.mime_type)
+          ? null
+          : this.translate.instant('website_page.home_media_format_error'),
+    });
+  }
+
   get selectedMedia(): IAttachment[] {
+    if (this.isGadgetHomeTemplate && this.activeHomeMediaRole) {
+      const current = this.gadgetHomeMediaForRole(this.activeHomeMediaRole);
+      return current ? [current.attachment] : [];
+    }
+
     return this.pageMedia.map((item) => item.attachment);
   }
 
   selectMedia(selection: MediaSelection): void {
+    if (this.isGadgetHomeTemplate && this.activeHomeMediaRole) {
+      const [attachment] = this.toAttachmentArray(selection);
+      if (!attachment) return;
+
+      const role = this.activeHomeMediaRole;
+      const currentIndex = this.pageMedia.findIndex(
+        (media) => media.role === role,
+      );
+
+      if (currentIndex >= 0) {
+        this.pageMedia[currentIndex] = {
+          ...this.pageMedia[currentIndex],
+          attachment,
+        };
+      } else {
+        this.pageMedia.push(this.createMediaDraft(attachment, role));
+      }
+
+      this.pageMedia = this.sortGadgetHomeMedia(this.pageMedia);
+      this.activeHomeMediaRole = null;
+      return;
+    }
+
     const selected = this.isGadgetHomeTemplate
       ? this.toAttachmentArray(selection).slice(
           0,
@@ -1412,20 +1665,36 @@ export class WebsitePageForm {
 
       assignedRoles.add(role);
 
-      return {
-        attachment,
-
-        role,
-
-        is_public: true,
-
-        action_type: 'none',
-
-        action_value: '',
-
-        translations: this.createEmptyMediaTranslations(),
-      };
+      return this.createMediaDraft(attachment, role);
     });
+  }
+
+  private createMediaDraft(
+    attachment: IAttachment,
+    role: string,
+  ): WebsitePageEditorMediaDraft {
+    return {
+      attachment,
+      role,
+      is_public: true,
+      action_type: 'none',
+      action_value: '',
+      translations: this.createEmptyMediaTranslations(),
+    };
+  }
+
+  private sortGadgetHomeMedia(
+    media: WebsitePageEditorMediaDraft[],
+  ): WebsitePageEditorMediaDraft[] {
+    const order = new Map(
+      this.gadgetHomeMediaRoles.map((option, index) => [option.value, index]),
+    );
+
+    return [...media].sort(
+      (left, right) =>
+        (order.get(left.role) ?? Number.MAX_SAFE_INTEGER) -
+        (order.get(right.role) ?? Number.MAX_SAFE_INTEGER),
+    );
   }
 
   setHero(index: number): void {
@@ -1509,12 +1778,19 @@ export class WebsitePageForm {
         : 'Slot gambar tidak dikenali. Pilih slot desain yang tersedia.';
     }
 
-    if (!this.pageMediaAccept.includes(media.attachment.mime_type)) {
+    return this.gadgetHomeAttachmentIssue(media.attachment, rule);
+  }
+
+  gadgetHomeAttachmentIssue(
+    attachment: IAttachment,
+    rule: GadgetHomeMediaRule,
+  ): string | null {
+    if (!this.pageMediaAccept.includes(attachment.mime_type)) {
       return 'Format harus JPEG, PNG, atau WebP.';
     }
 
-    const width = media.attachment.width;
-    const height = media.attachment.height;
+    const width = attachment.width;
+    const height = attachment.height;
 
     if (!width || !height) {
       return 'Dimensi gambar tidak terbaca. Unggah ulang gambar yang valid.';
@@ -1593,6 +1869,10 @@ export class WebsitePageForm {
     return this.pageMedia.some(
       (media) => media.is_public && media.role === role,
     );
+  }
+
+  gadgetHomeMediaForRole(role: string): WebsitePageEditorMediaDraft | null {
+    return this.pageMedia.find((media) => media.role === role) ?? null;
   }
 
   get gadgetHomeMediaHasInvalidFiles(): boolean {

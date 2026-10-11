@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 
 import { Product, Variation } from '../../../../../shared/interface/product.interface';
 import { Option } from '../../../../../shared/interface/theme-option.interface';
+import { ProductMediaGallery } from '../product-media-gallery/product-media-gallery';
 import { ProductBundle } from '../widgets/product-bundle/product-bundle';
 import { ProductContent } from '../widgets/product-content/product-content';
 import { ProductDetails } from '../widgets/product-details/product-details';
@@ -18,6 +19,7 @@ import { ProductSelectedVariant } from '../widgets/product-selected-variant/prod
     ProductDetailsTab,
     ProductSelectedVariant,
     ProductBundle,
+    ProductMediaGallery,
   ],
   templateUrl: './product-thumbnail.html',
   styleUrl: './product-thumbnail.scss',
@@ -27,8 +29,6 @@ export class ProductThumbnail {
   option = input<Option | null>();
   layout = input<string>();
 
-  public videType = ['video/mp4', 'video/webm', 'video/ogg'];
-  public audioType = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
   public selectedVariation: Variation | null = null;
 
   selectedVariant(variant: Variation) {

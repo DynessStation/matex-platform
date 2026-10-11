@@ -12,6 +12,7 @@ import { getAdminScope } from "../../helper/admin-scope.helper";
 import { buildAttachmentUrl } from "../../helper/attachment.helper";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 import { writeAuditLog } from "../../helper/audit-log.helper";
+import { normalizeProductMediaSortOrder } from "../../helper/product-media.helper";
 import { AuthRequest, verifyToken } from "../middleware/authJwt";
 import { requirePermission } from "../middleware/authPermission";
 
@@ -105,7 +106,11 @@ const parsePayload = (body: any) => {
     (item: any, index: number) => ({
       id: decode(item?.id, keyhsid.idAttachment),
       role: String(item?.role ?? "gallery"),
-      sortOrder: Math.max(0, Number(item?.sort_order) || index),
+      // Zero is a valid first position. Using `|| index` here made the first
+      // gallery item inherit its position in the whole media array. When a
+      // thumbnail and OG image preceded it, the third gallery item then got
+      // the same order and the payload was rejected as invalid.
+      sortOrder: normalizeProductMediaSortOrder(item?.sort_order, index),
     }),
   );
   if (media.some((item: any) => !item.id || !roles.has(item.role))) return null;

@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import {
   NgbDateStruct,
   NgbModule,
@@ -15,6 +16,8 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Editor, NgxEditorModule } from 'ngx-editor';
+import { finalize } from 'rxjs';
+
 import { Button } from '../../../shared/components/ui/button/button';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import { mediaConfig } from '../../../shared/data/media-config';
@@ -25,6 +28,8 @@ import {
   IArticlePayload,
   IArticleTranslation,
 } from '../../../shared/interface/blog.interface';
+import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateBlogAction,
   EditBlogAction,
@@ -52,6 +57,8 @@ export class FormBlog {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private contentAssistant = inject(ContentAssistantService);
+  private notification = inject(NotificationService);
   readonly type = input<'create' | 'edit'>('create');
   readonly mediaConfig = mediaConfig;
   readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -61,6 +68,8 @@ export class FormBlog {
   enEditor?: Editor;
   activeTab = 'general';
   activeLocale: 'id' | 'en' = 'id';
+  assistingLocale: 'id' | 'en' | null = null;
+  translatingToEnglish = false;
   publishDate: NgbDateStruct | null = null;
   publishTime: NgbTimeStruct | null = null;
   unpublishDate: NgbDateStruct | null = null;
@@ -178,6 +187,94 @@ export class FormBlog {
     this.unpublishDate = null;
     this.unpublishTime = null;
     this.syncSchedule();
+  }
+  generateArticle(locale: 'id' | 'en') {
+    const value = this.form.getRawValue() as any;
+    this.assistingLocale = locale;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: 'article',
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({ title: value[`${locale}_title`] }),
+        fields: {
+          excerpt: value[`${locale}_excerpt`] || '',
+          body: value[`${locale}_body`] || '',
+          meta_description: value[`${locale}_meta_description`] || '',
+          og_description: value[`${locale}_og_description`] || '',
+        },
+      })
+      .pipe(finalize(() => (this.assistingLocale = null)))
+      .subscribe({
+        next: (fields) => {
+          this.form.patchValue({
+            [`${locale}_excerpt`]: fields['excerpt'],
+            [`${locale}_body`]: fields['body'],
+            [`${locale}_meta_description`]: fields['meta_description'],
+            [`${locale}_og_description`]: fields['og_description'],
+          } as any);
+          this.notification.showSuccess(
+            'Draf artikel berhasil dibuat. Periksa fakta dan gaya bahasa sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+  copyAndTranslateToEnglish() {
+    const value = this.form.getRawValue() as any;
+    this.translatingToEnglish = true;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: 'article',
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields: {
+          title: value.id_title || '',
+          excerpt: value.id_excerpt || '',
+          body: value.id_body || '',
+          meta_title: value.id_meta_title || '',
+          meta_description: value.id_meta_description || '',
+          og_title: value.id_og_title || '',
+          og_description: value.id_og_description || '',
+        },
+      })
+      .pipe(finalize(() => (this.translatingToEnglish = false)))
+      .subscribe({
+        next: (fields) => {
+          this.form.patchValue({
+            en_title: fields['title'],
+            en_slug: this.slugify(fields['title'] || value.id_title),
+            en_excerpt: fields['excerpt'],
+            en_body: fields['body'],
+            en_meta_title: fields['meta_title'],
+            en_meta_description: fields['meta_description'],
+            en_og_title: fields['og_title'],
+            en_og_description: fields['og_description'],
+          });
+          this.activeLocale = 'en';
+          this.notification.showSuccess(
+            'Versi English sudah diisi. Periksa hasil terjemahan sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+  private slugify(value: string) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 255);
+  }
+  private showAssistantError(error: any) {
+    this.notification.showError(
+      error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
+        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        : 'Bantuan konten belum berhasil. Coba lagi sebentar.',
+    );
   }
   dateLabel(value: NgbDateStruct | null) {
     if (!value) return 'Pilih tanggal';

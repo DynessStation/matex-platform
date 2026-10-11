@@ -15,24 +15,27 @@ import {
   NgbModule,
   NgbNav,
 } from '@ng-bootstrap/ng-bootstrap';
-
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { NgxDropzoneChangeEvent, NgxDropzoneModule } from 'ngx-dropzone';
 
 import * as media from '../../../../../shared/data/media-config';
-
 import { HasPermissionDirective } from '../../../../directive/has-permission.directive';
-
+import { IAttachment } from '../../../../interface/attachment.interface';
 import { NotificationService } from '../../../../services/notification.service';
-
 import { CreateAttachmentAction } from '../../../../store/action/attachment.action';
-
 import { Button } from '../../button/button';
-
 import { MediaBox, MediaSelection } from '../../media-box/media-box';
+
+export interface MediaModalOpenOptions {
+  selection?: MediaSelection;
+  title?: string;
+  description?: string;
+  multiple?: boolean;
+  maxSelection?: number;
+  disabledSelectionIds?: string[];
+  validateSelection?: ((attachment: IAttachment) => string | null) | null;
+}
 
 //==================================================
 //==== COMPONENT
@@ -88,6 +91,19 @@ export class MediaModal {
   public files: File[] = [];
 
   public selectedImages: MediaSelection = null;
+
+  public dialogTitle = '';
+
+  public dialogDescription = '';
+
+  public dialogMultiple = false;
+
+  public dialogMaxSelection = 1;
+
+  public dialogDisabledSelectionIds: string[] = [];
+
+  public dialogSelectionValidator:
+    ((attachment: IAttachment) => string | null) | null = null;
 
   //==================================================
   //==== INPUT
@@ -174,9 +190,24 @@ export class MediaModal {
   //==== OPEN MODAL
   //==================================================
 
-  async openModal(): Promise<void> {
+  async openModal(options?: MediaModalOpenOptions): Promise<void> {
     this.files = [];
-    this.media = this.selectedImages;
+    const hasSelectionOverride = Boolean(
+      options && Object.prototype.hasOwnProperty.call(options, 'selection'),
+    );
+    this.media = hasSelectionOverride
+      ? (options?.selection ?? null)
+      : this.selectedImages;
+    this.selectedImages = this.media;
+    this.dialogTitle = options?.title?.trim() ?? '';
+    this.dialogDescription = options?.description?.trim() ?? '';
+    this.dialogMultiple = options?.multiple ?? this.multipleImage();
+    this.dialogMaxSelection = Math.max(
+      1,
+      Math.floor(options?.maxSelection ?? this.maxFiles()),
+    );
+    this.dialogDisabledSelectionIds = options?.disabledSelectionIds ?? [];
+    this.dialogSelectionValidator = options?.validateSelection ?? null;
 
     this.modalOpen = true;
 
@@ -256,9 +287,7 @@ export class MediaModal {
   //==================================================
 
   onSelect(event: NgxDropzoneChangeEvent): void {
-    const maxFiles = this.multipleImage()
-      ? Math.max(1, Math.floor(this.maxFiles()))
-      : 1;
+    const maxFiles = this.dialogMultiple ? this.dialogMaxSelection : 1;
 
     const available = maxFiles - this.files.length;
 
@@ -387,6 +416,11 @@ export class MediaModal {
 
   setImage(data: MediaSelection): void {
     this.media = data;
+  }
+
+  get selectionCount(): number {
+    if (!this.media) return 0;
+    return Array.isArray(this.media) ? this.media.length : 1;
   }
 
   //==================================================

@@ -5,6 +5,38 @@
   max-width: 760px;
 }
 
+:host ::ng-deep .ckeditor-content {
+  color: rgba(var(--title-color), 0.82);
+  font-size: 16px;
+  line-height: 1.75;
+
+  p {
+    margin: 0 0 1em;
+  }
+  h2,
+  h3,
+  h4 {
+    margin: 1.4em 0 0.55em;
+    color: rgba(var(--title-color), 1);
+  }
+  ul,
+  ol {
+    margin: 0 0 1em;
+    padding-inline-start: 1.4em;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 20px auto;
+    border-radius: 10px;
+  }
+  a {
+    color: var(--theme-color);
+    text-decoration: underline;
+  }
+}
+
 .information-box .about-item-list li {
   display: grid;
   grid-template-columns: minmax(150px, 220px) 1fr;

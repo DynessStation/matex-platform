@@ -6,9 +6,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
-import { filter, switchMap, take } from 'rxjs';
+import { filter, finalize, switchMap, take } from 'rxjs';
+
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { Button } from '../../../shared/components/ui/button/button';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
@@ -20,6 +22,8 @@ import {
   ICategoryPayload,
   ProductCategoryStatus,
 } from '../../../shared/interface/category.interface';
+import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateCategoryAction,
   EditCategoryAction,
@@ -46,6 +50,8 @@ export class FormCategory {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private contentAssistant = inject(ContentAssistantService);
+  private notification = inject(NotificationService);
 
   readonly type = input<string>('create');
   readonly categories = input<ICategory[]>([]);
@@ -56,6 +62,7 @@ export class FormCategory {
   id: string | null = null;
   activeTab = 'general';
   activeLocale: 'id' | 'en' = 'id';
+  assisting = false;
 
   readonly form = this.fb.group({
     key: [
@@ -111,6 +118,98 @@ export class FormCategory {
     media: IAttachment | null,
   ) {
     this.form.controls[control].setValue(media?.id_attachment ?? '');
+  }
+
+  generateDescription(locale: 'id' | 'en') {
+    const value = this.form.getRawValue() as any;
+    this.assisting = true;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: 'product-category',
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          name: value[`${locale}_name`] || '',
+          key: value.key || '',
+        }),
+        fields: {
+          description: value[`${locale}_description`] || '',
+          meta_description: value[`${locale}_meta_description`] || '',
+          og_description: value[`${locale}_og_description`] || '',
+        },
+      })
+      .pipe(finalize(() => (this.assisting = false)))
+      .subscribe({
+        next: (fields) => {
+          this.form.patchValue({
+            [`${locale}_description`]: fields['description'] || '',
+            [`${locale}_meta_description`]: fields['meta_description'] || '',
+            [`${locale}_og_description`]: fields['og_description'] || '',
+          });
+          this.notification.showSuccess(
+            'Draf deskripsi kategori dibuat. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  copyAndTranslateToEnglish() {
+    const value = this.form.getRawValue() as any;
+    this.assisting = true;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: 'product-category',
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields: {
+          name: value.id_name || '',
+          description: value.id_description || '',
+          meta_title: value.id_meta_title || '',
+          meta_description: value.id_meta_description || '',
+          og_title: value.id_og_title || '',
+          og_description: value.id_og_description || '',
+        },
+      })
+      .pipe(finalize(() => (this.assisting = false)))
+      .subscribe({
+        next: (fields) => {
+          const name = fields['name'] || value.id_name || '';
+          this.form.patchValue({
+            en_name: name,
+            en_slug: this.slugify(name || value.id_slug),
+            en_description: fields['description'] || '',
+            en_meta_title: fields['meta_title'] || '',
+            en_meta_description: fields['meta_description'] || '',
+            en_og_title: fields['og_title'] || '',
+            en_og_description: fields['og_description'] || '',
+          });
+          this.activeLocale = 'en';
+          this.notification.showSuccess(
+            'Konten English kategori sudah diisi dari Bahasa Indonesia.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  private slugify(value: string) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 255);
+  }
+
+  private showAssistantError(error: any) {
+    this.notification.showError(
+      error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
+        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
+        : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
+    );
   }
 
   submit() {

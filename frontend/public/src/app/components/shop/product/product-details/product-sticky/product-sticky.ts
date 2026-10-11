@@ -2,6 +2,7 @@ import { Component, ElementRef, input, viewChild } from '@angular/core';
 
 import { Product, Variation } from '../../../../../shared/interface/product.interface';
 import { Option } from '../../../../../shared/interface/theme-option.interface';
+import { ProductMediaGallery } from '../product-media-gallery/product-media-gallery';
 import { PaymentOption } from '../widgets/payment-option/payment-option';
 import { ProductBundle } from '../widgets/product-bundle/product-bundle';
 import { ProductContent } from '../widgets/product-content/product-content';
@@ -24,6 +25,7 @@ import { ProductSocialShare } from '../widgets/product-social-share/product-soci
     ProductSelectedVariant,
     ProductDetailsTab,
     ProductBundle,
+    ProductMediaGallery,
   ],
   templateUrl: './product-sticky.html',
   styleUrl: './product-sticky.scss',
@@ -35,8 +37,6 @@ export class ProductSticky {
 
   readonly productSwiperContainer = viewChild<ElementRef>('productSwiperContainer');
 
-  public videType = ['video/mp4', 'video/webm', 'video/ogg'];
-  public audioType = ['audio/mpeg', 'audio/wav', 'audio/ogg'];
   public selectedVariation: Variation | null = null;
 
   selectedVariant(variant: Variation) {

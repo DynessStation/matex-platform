@@ -284,6 +284,49 @@
                     <strong>EN</strong> English
                   </button>
                 </div>
+                <div class="content-assistant-bar">
+                  <div>
+                    <strong>Bantuan konten</strong>
+                    <small
+                      >Hasil hanya mengisi form dan tetap bisa Anda sunting
+                      sebelum disimpan.</small
+                    >
+                  </div>
+                  <div class="content-assistant-actions">
+                    <button
+                      type="button"
+                      class="btn btn-outline"
+                      [disabled]="
+                        assistingLocale !== null || translatingToEnglish
+                      "
+                      (click)="generateDescriptions(activeLocale)"
+                    >
+                      <i class="ri-magic-line"></i>
+                      {{
+                        assistingLocale === activeLocale
+                          ? 'Sedang membuat…'
+                          : 'Bantu isi deskripsi'
+                      }}
+                    </button>
+                    @if (activeLocale === 'en') {
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        [disabled]="
+                          assistingLocale !== null || translatingToEnglish
+                        "
+                        (click)="copyAndTranslateToEnglish()"
+                      >
+                        <i class="ri-translate-2"></i>
+                        {{
+                          translatingToEnglish
+                            ? 'Menerjemahkan…'
+                            : 'Salin & terjemahkan dari Indonesia'
+                        }}
+                      </button>
+                    }
+                  </div>
+                </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-5">
@@ -309,12 +352,20 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi lengkap</label
-                      ><textarea
-                        rows="8"
-                        class="form-control"
-                        formControlName="id_description"
-                      ></textarea>
+                      <label class="form-label">Deskripsi lengkap</label>
+                      @if (isBrowser && idDescriptionEditor) {
+                        <div class="product-rich-editor">
+                          <ngx-editor-menu [editor]="idDescriptionEditor" />
+                          <ngx-editor
+                            [editor]="idDescriptionEditor"
+                            formControlName="id_description"
+                          />
+                        </div>
+                        <small class="editor-help"
+                          >Gunakan paragraf, heading, daftar, tautan, dan gambar
+                          agar konten mudah dibaca.</small
+                        >
+                      }
                     </div>
                     <div class="col-12">
                       <div class="repeater-heading">
@@ -408,12 +459,20 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Full description</label
-                      ><textarea
-                        rows="8"
-                        class="form-control"
-                        formControlName="en_description"
-                      ></textarea>
+                      <label class="form-label">Full description</label>
+                      @if (isBrowser && enDescriptionEditor) {
+                        <div class="product-rich-editor">
+                          <ngx-editor-menu [editor]="enDescriptionEditor" />
+                          <ngx-editor
+                            [editor]="enDescriptionEditor"
+                            formControlName="en_description"
+                          />
+                        </div>
+                        <small class="editor-help"
+                          >Use paragraphs, headings, lists, links, and images
+                          for readable content.</small
+                        >
+                      }
                     </div>
                     <div class="col-12">
                       <div class="repeater-heading">
@@ -951,7 +1010,9 @@
                       <h6>Galeri produk</h6>
                       <small
                         >Pilih maksimal 10 gambar atau video (MP4, WebM, OGG).
-                        Urutan pilihan menjadi urutan tampil di publik.</small
+                        Urutan pilihan menjadi urutan tampil di publik. Video
+                        potret ditampilkan maksimal dalam bingkai 9:16 dan video
+                        1:1 tetap didukung tanpa memenuhi tinggi halaman.</small
                       ><app-image-upload
                         [multipleImage]="true"
                         [accept]="productGalleryAccept"

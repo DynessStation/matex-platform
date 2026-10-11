@@ -129,6 +129,15 @@
                   >
                     <strong>EN</strong> English
                   </button>
+                  <button
+                    type="button"
+                    class="ms-auto"
+                    [disabled]="assisting"
+                    (click)="copyAndTranslateToEnglish()"
+                  >
+                    <i class="ri-translate-2"></i>
+                    {{ assisting ? 'Memproses...' : 'Salin ID ke English' }}
+                  </button>
                 </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
@@ -148,8 +157,20 @@
                       ><input class="form-control" formControlName="id_name" />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi</label
-                      ><textarea
+                      <div
+                        class="d-flex align-items-center justify-content-between gap-2 mb-2"
+                      >
+                        <label class="form-label mb-0">Deskripsi</label>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-theme"
+                          [disabled]="assisting"
+                          (click)="generateDescription('id')"
+                        >
+                          <i class="ri-sparkling-line"></i> Isi otomatis
+                        </button>
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="5"
                         formControlName="id_description"
@@ -174,8 +195,20 @@
                       ><input class="form-control" formControlName="en_name" />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Description</label
-                      ><textarea
+                      <div
+                        class="d-flex align-items-center justify-content-between gap-2 mb-2"
+                      >
+                        <label class="form-label mb-0">Description</label>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-theme"
+                          [disabled]="assisting"
+                          (click)="generateDescription('en')"
+                        >
+                          <i class="ri-sparkling-line"></i> Generate
+                        </button>
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="5"
                         formControlName="en_description"

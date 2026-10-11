@@ -6,88 +6,10 @@
           <div class="row g-xxl-5 g-md-4 g-3">
             <div class="col-xxl-6">
               <div class="product-left-box">
-                <div class="product-original-box full-width-img">
-                  <div class="row g-sm-4 g-2">
-                    @if (
-                      product()?.product_galleries?.length ||
-                      (selectedVariation?.variation_galleries?.length ?? 0)
-                    ) {
-                      @for (
-                        image of (selectedVariation?.variation_galleries?.length ?? 0)
-                          ? (selectedVariation?.variation_galleries ?? [])
-                          : product()?.product_galleries;
-                        track image
-                      ) {
-                        <div class="col-12">
-                          <div class="slider-image slider-image-2">
-                            @if (videType.includes(image?.mime_type!)) {
-                              <video class="w-100" controls>
-                                <source
-                                  [src]="image ? image.asset_url : ''"
-                                  [type]="image?.mime_type"
-                                />
-                              </video>
-                            } @else if (audioType.includes(image?.mime_type!)) {
-                              <audio controls>
-                                <source
-                                  [src]="image ? image.asset_url : ''"
-                                  [type]="image?.mime_type"
-                                />
-                              </audio>
-                            } @else {
-                              <img
-                                [src]="
-                                  image ? image.asset_url : 'assets/images/placeholder/product.png'
-                                "
-                                class="img-fluid"
-                                [alt]="product()?.name"
-                              />
-                            }
-                          </div>
-                        </div>
-                      }
-                    } @else {
-                      <div>
-                        @if (
-                          product()?.product_thumbnail &&
-                          videType.includes(product()?.product_thumbnail?.mime_type!)
-                        ) {
-                          <video class="w-100" controls>
-                            <source
-                              [src]="
-                                product()?.product_thumbnail
-                                  ? product()?.product_thumbnail?.asset_url
-                                  : ''
-                              "
-                              [type]="product()?.product_thumbnail?.mime_type"
-                            />
-                          </video>
-                        } @else if (audioType.includes(product()?.product_thumbnail?.mime_type!)) {
-                          <audio controls>
-                            <source
-                              [src]="
-                                product()?.product_thumbnail
-                                  ? product()?.product_thumbnail?.asset_url
-                                  : ''
-                              "
-                              [type]="product()?.product_thumbnail?.mime_type"
-                            />
-                          </audio>
-                        } @else {
-                          <img
-                            [src]="
-                              product()?.product_thumbnail
-                                ? product()?.product_thumbnail?.asset_url
-                                : 'assets/images/placeholder/product.png'
-                            "
-                            class="img-fluid"
-                            [alt]="product()?.name"
-                          />
-                        }
-                      </div>
-                    }
-                  </div>
-                </div>
+                <app-product-media-gallery
+                  [product]="product()"
+                  [mediaOverride]="selectedVariation?.variation_galleries ?? null"
+                />
               </div>
             </div>
 

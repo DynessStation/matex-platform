@@ -319,3 +319,68 @@
     align-items: flex-start;
   }
 }
+.content-assistant-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px dashed rgba(var(--theme-color-rgb), 0.45);
+  border-radius: 6px;
+  background: rgba(var(--theme-color-rgb), 0.04);
+
+  strong,
+  small {
+    display: block;
+  }
+  small {
+    margin-top: 3px;
+    color: #777;
+  }
+}
+
+.content-assistant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-rich-editor {
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+:host ::ng-deep .product-rich-editor {
+  .NgxEditor__MenuBar {
+    border: 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .NgxEditor {
+    min-height: 320px;
+    border: 0;
+  }
+  .NgxEditor__Content {
+    min-height: 320px;
+    padding: 18px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+
+.editor-help {
+  display: block;
+  margin-top: 7px;
+  color: #777;
+}
+
+@media (max-width: 767px) {
+  .content-assistant-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .content-assistant-actions .btn {
+    width: 100%;
+  }
+}

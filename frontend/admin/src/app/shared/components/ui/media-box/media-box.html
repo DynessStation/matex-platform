@@ -59,10 +59,15 @@
                 [value]="attachment.id_attachment"
                 class="media-checkbox"
                 [id]="'attachment-' + attachment.id_attachment"
+                [disabled]="isSelectionDisabled(attachment)"
                 (change)="selectImage($event, attachment, url())"
               />
 
-              <label [for]="'attachment-' + attachment.id_attachment">
+              <label
+                [for]="'attachment-' + attachment.id_attachment"
+                [class.is-disabled]="isSelectionDisabled(attachment)"
+                [title]="selectionDisabledReason(attachment)"
+              >
                 <div class="ratio ratio-1x1">
                   @if (
                     attachment.mime_type &&
@@ -82,6 +87,28 @@
                     />
                   }
                 </div>
+
+                <div class="media-card-meta">
+                  <strong>{{
+                    attachment.original_name || attachment.name
+                  }}</strong>
+                  <span>{{ attachmentDimensions(attachment) }}</span>
+                </div>
+
+                @if (isSelectionDisabled(attachment)) {
+                  <div class="media-card-status is-disabled">
+                    <i class="ri-error-warning-line"></i>
+                    <span>{{ selectionDisabledReason(attachment) }}</span>
+                  </div>
+                } @else if (
+                  selected.includes(attachment.id_attachment) ||
+                  selected.includes(attachment.asset_url)
+                ) {
+                  <div class="media-card-status is-selected">
+                    <i class="ri-check-line"></i>
+                    <span>{{ 'media_ui.selected' | translate }}</span>
+                  </div>
+                }
               </label>
 
               @if (deleteAction()) {

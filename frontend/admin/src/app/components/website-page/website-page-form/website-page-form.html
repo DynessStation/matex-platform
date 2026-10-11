@@ -378,6 +378,22 @@
 
                       {{ 'website_page.add_translation' | translate }}
                     </button>
+
+                    @if (activeLocale === 'en-US') {
+                      <button
+                        type="button"
+                        class="btn btn-light-bg ms-2"
+                        [disabled]="translatingPage"
+                        (click)="copyAndTranslatePageToEnglish()"
+                      >
+                        <i class="ri-translate-2 me-1"></i>
+                        {{
+                          translatingPage
+                            ? 'Menerjemahkan…'
+                            : 'Tambah dari versi Indonesia'
+                        }}
+                      </button>
+                    }
                   </div>
                 } @else {
                   <!--==================================================-->
@@ -403,6 +419,34 @@
                       </div>
 
                       <div class="d-flex align-items-center gap-2">
+                        <button
+                          type="button"
+                          class="btn btn-light-bg"
+                          [disabled]="generatingPage || translatingPage"
+                          (click)="generatePageDescriptions()"
+                        >
+                          <i class="ri-magic-line me-1"></i>
+                          {{
+                            generatingPage
+                              ? 'Sedang membuat…'
+                              : 'Bantu isi deskripsi'
+                          }}
+                        </button>
+                        @if (activeLocale === 'en-US') {
+                          <button
+                            type="button"
+                            class="btn btn-theme"
+                            [disabled]="generatingPage || translatingPage"
+                            (click)="copyAndTranslatePageToEnglish()"
+                          >
+                            <i class="ri-translate-2 me-1"></i>
+                            {{
+                              translatingPage
+                                ? 'Menerjemahkan…'
+                                : 'Salin & terjemahkan dari Indonesia'
+                            }}
+                          </button>
+                        }
                         @if (!isDefaultLocale(activeLocale) && !isSystemPage) {
                           <button
                             type="button"
@@ -1375,15 +1419,17 @@
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      class="btn btn-theme"
-                      (click)="openMedia()"
-                    >
-                      <i class="ri-image-add-line me-1"></i>
+                    @if (!isGadgetHomeTemplate) {
+                      <button
+                        type="button"
+                        class="btn btn-theme"
+                        (click)="openMedia()"
+                      >
+                        <i class="ri-image-add-line me-1"></i>
 
-                      {{ 'website_page.select_media' | translate }}
-                    </button>
+                        {{ 'website_page.select_media' | translate }}
+                      </button>
+                    }
                   </div>
 
                   @if (isGadgetHomeTemplate) {
@@ -1408,10 +1454,159 @@
                               gadgetHomeMediaAssigned(rule.value)
                             "
                           >
-                            <strong>{{ rule.label }}</strong>
-                            <span>{{ gadgetHomeMediaRequirement(rule) }}</span>
+                            <div class="cms-home-media-rule-header">
+                              <div>
+                                <strong>{{ rule.label }}</strong>
+                                <span>
+                                  {{ gadgetHomeMediaRequirement(rule) }}
+                                </span>
+                              </div>
+
+                              <span
+                                class="badge"
+                                [class.bg-success]="
+                                  gadgetHomeMediaAssigned(rule.value)
+                                "
+                                [class.bg-light]="
+                                  !gadgetHomeMediaAssigned(rule.value)
+                                "
+                                [class.text-dark]="
+                                  !gadgetHomeMediaAssigned(rule.value)
+                                "
+                              >
+                                {{
+                                  gadgetHomeMediaAssigned(rule.value)
+                                    ? ('website_page.home_media_assigned'
+                                      | translate)
+                                    : ('website_page.home_media_empty'
+                                      | translate)
+                                }}
+                              </span>
+                            </div>
+
+                            @if (
+                              gadgetHomeMediaForRole(rule.value);
+                              as assignedMedia
+                            ) {
+                              <div class="cms-home-media-rule-preview">
+                                <img
+                                  [src]="assignedMedia.attachment.asset_url"
+                                  [alt]="assignedMedia.attachment.original_name"
+                                />
+                                <div>
+                                  <strong>
+                                    {{ assignedMedia.attachment.original_name }}
+                                  </strong>
+                                  <span>
+                                    {{ assignedMedia.attachment.width }} ×
+                                    {{ assignedMedia.attachment.height }}px
+                                  </span>
+                                </div>
+                              </div>
+                            } @else {
+                              <div class="cms-home-media-rule-placeholder">
+                                <i class="ri-image-add-line"></i>
+                                <span>
+                                  {{
+                                    'website_page.home_media_choose_for_slot'
+                                      | translate
+                                  }}
+                                </span>
+                              </div>
+                            }
+
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-theme align-self-start"
+                              (click)="openHomeMedia(rule)"
+                            >
+                              <i class="ri-image-line me-1"></i>
+                              {{
+                                (gadgetHomeMediaAssigned(rule.value)
+                                  ? 'website_page.home_media_replace'
+                                  : 'website_page.home_media_choose'
+                                ) | translate
+                              }}
+                            </button>
                           </div>
                         }
+
+                        <div
+                          class="cms-home-media-rule"
+                          [class.is-assigned]="gadgetHomeMediaAssigned('og')"
+                        >
+                          <div class="cms-home-media-rule-header">
+                            <div>
+                              <strong>
+                                {{
+                                  'website_page.home_media_og_title' | translate
+                                }}
+                              </strong>
+                              <span>
+                                {{
+                                  'website_page.home_media_og_requirement'
+                                    | translate
+                                }}
+                              </span>
+                            </div>
+
+                            <span
+                              class="badge"
+                              [class.bg-success]="gadgetHomeMediaAssigned('og')"
+                              [class.bg-light]="!gadgetHomeMediaAssigned('og')"
+                              [class.text-dark]="!gadgetHomeMediaAssigned('og')"
+                            >
+                              {{
+                                gadgetHomeMediaAssigned('og')
+                                  ? ('website_page.home_media_assigned'
+                                    | translate)
+                                  : ('website_page.home_media_empty'
+                                    | translate)
+                              }}
+                            </span>
+                          </div>
+
+                          @if (gadgetHomeMediaForRole('og'); as assignedMedia) {
+                            <div class="cms-home-media-rule-preview">
+                              <img
+                                [src]="assignedMedia.attachment.asset_url"
+                                [alt]="assignedMedia.attachment.original_name"
+                              />
+                              <div>
+                                <strong>
+                                  {{ assignedMedia.attachment.original_name }}
+                                </strong>
+                                <span>
+                                  {{ assignedMedia.attachment.width }} ×
+                                  {{ assignedMedia.attachment.height }}px
+                                </span>
+                              </div>
+                            </div>
+                          } @else {
+                            <div class="cms-home-media-rule-placeholder">
+                              <i class="ri-share-line"></i>
+                              <span>
+                                {{
+                                  'website_page.home_media_og_help' | translate
+                                }}
+                              </span>
+                            </div>
+                          }
+
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-theme align-self-start"
+                            (click)="openHomeOgMedia()"
+                          >
+                            <i class="ri-image-line me-1"></i>
+                            {{
+                              (gadgetHomeMediaAssigned('og')
+                                ? 'website_page.home_media_replace'
+                                : 'website_page.home_media_choose'
+                              ) | translate
+                            }}
+                          </button>
+                        </div>
                       </div>
 
                       @if (gadgetHomeMissingMediaRules.length) {
@@ -1691,7 +1886,18 @@
                             <div
                               class="d-flex flex-wrap align-items-center gap-3 mt-3"
                             >
-                              @if (isGadgetHomeTemplate || isAboutTemplate) {
+                              @if (isGadgetHomeTemplate) {
+                                <div class="cms-home-fixed-slot">
+                                  <span class="text-muted small">
+                                    {{
+                                      'website_page.home_media_slot' | translate
+                                    }}
+                                  </span>
+                                  <strong>{{
+                                    mediaRoleLabel(media.role)
+                                  }}</strong>
+                                </div>
+                              } @else if (isAboutTemplate) {
                                 <div class="d-flex align-items-center gap-2">
                                   <label class="small text-muted mb-0"
                                     >Slot desain</label
@@ -1750,25 +1956,27 @@
                                 </span>
                               </div>
 
-                              <div class="ms-auto d-flex gap-2">
-                                <button
-                                  type="button"
-                                  class="btn btn-sm btn-light-bg"
-                                  [disabled]="index === 0"
-                                  (click)="moveMedia(index, -1)"
-                                >
-                                  <i class="ri-arrow-up-line"></i>
-                                </button>
+                              @if (!isGadgetHomeTemplate) {
+                                <div class="ms-auto d-flex gap-2">
+                                  <button
+                                    type="button"
+                                    class="btn btn-sm btn-light-bg"
+                                    [disabled]="index === 0"
+                                    (click)="moveMedia(index, -1)"
+                                  >
+                                    <i class="ri-arrow-up-line"></i>
+                                  </button>
 
-                                <button
-                                  type="button"
-                                  class="btn btn-sm btn-light-bg"
-                                  [disabled]="index === pageMedia.length - 1"
-                                  (click)="moveMedia(index, 1)"
-                                >
-                                  <i class="ri-arrow-down-line"></i>
-                                </button>
-                              </div>
+                                  <button
+                                    type="button"
+                                    class="btn btn-sm btn-light-bg"
+                                    [disabled]="index === pageMedia.length - 1"
+                                    (click)="moveMedia(index, 1)"
+                                  >
+                                    <i class="ri-arrow-down-line"></i>
+                                  </button>
+                                </div>
+                              }
                             </div>
 
                             @if (isGadgetHomeTemplate) {

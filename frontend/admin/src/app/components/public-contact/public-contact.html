@@ -125,8 +125,20 @@
               </div>
               <div formGroupName="translations" class="row g-3 language-row">
                 <div class="col-lg-6">
-                  <label>Label — Bahasa Indonesia</label
-                  ><input
+                  <div
+                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
+                  >
+                    <label class="mb-0">Label — Bahasa Indonesia</label>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-theme"
+                      [disabled]="assistingKey !== null"
+                      (click)="generateChannelDescription(index, 'id')"
+                    >
+                      <i class="ri-sparkling-line"></i> Isi keterangan
+                    </button>
+                  </div>
+                  <input
                     class="form-control"
                     formControlName="id_label"
                   /><textarea
@@ -137,8 +149,30 @@
                   ></textarea>
                 </div>
                 <div class="col-lg-6">
-                  <label>Label — English</label
-                  ><input
+                  <div
+                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
+                  >
+                    <label class="mb-0">Label — English</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-theme"
+                        [disabled]="assistingKey !== null"
+                        (click)="copyTranslationToEnglish('channel', index)"
+                      >
+                        <i class="ri-translate-2"></i> Salin dari Indonesia
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-theme"
+                        [disabled]="assistingKey !== null"
+                        (click)="generateChannelDescription(index, 'en')"
+                      >
+                        <i class="ri-sparkling-line"></i> Generate
+                      </button>
+                    </div>
+                  </div>
+                  <input
                     class="form-control"
                     formControlName="en_label"
                   /><textarea
@@ -239,8 +273,20 @@
                   ><input class="form-control" formControlName="id_label" />
                 </div>
                 <div class="col-lg-6">
-                  <label>Topic — English</label
-                  ><input class="form-control" formControlName="en_label" />
+                  <div
+                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
+                  >
+                    <label class="mb-0">Topic — English</label>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-theme"
+                      [disabled]="assistingKey !== null"
+                      (click)="copyTranslationToEnglish('topic', index)"
+                    >
+                      <i class="ri-translate-2"></i> Salin dari Indonesia
+                    </button>
+                  </div>
+                  <input class="form-control" formControlName="en_label" />
                 </div>
               </div>
             </div>

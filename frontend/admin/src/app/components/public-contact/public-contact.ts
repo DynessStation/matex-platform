@@ -3,18 +3,22 @@ import { Component, inject, PLATFORM_ID } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { Select2Data, Select2Module } from 'ng-select2-component';
+import { finalize } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
+import { ContentAssistantService } from '../../shared/services/content-assistant.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PublicContactService } from '../../shared/services/public-contact.service';
 
@@ -37,6 +41,7 @@ export class PublicContact {
   private service = inject(PublicContactService);
   private notifications = inject(NotificationService);
   private messages = inject(ApiMessageService);
+  private contentAssistant = inject(ContentAssistantService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly channelTypeOptions: Select2Data = [
     { value: 'whatsapp', label: 'WhatsApp' },
@@ -47,6 +52,7 @@ export class PublicContact {
     { value: 'other', label: 'Lainnya' },
   ];
   loading = true;
+  assistingKey: string | null = null;
 
   readonly form = this.fb.group({
     channels: this.fb.array([]),
@@ -60,6 +66,85 @@ export class PublicContact {
   }
   isDerivedChannel(type: unknown): boolean {
     return ['whatsapp', 'email', 'phone'].includes(String(type));
+  }
+
+  copyTranslationToEnglish(kind: 'channel' | 'topic', index: number): void {
+    const group = (kind === 'channel' ? this.channels : this.topics).at(
+      index,
+    ) as FormGroup;
+    const translations = group.controls['translations'] as FormGroup;
+    const key = `${kind}-${index}-translate`;
+    if (this.assistingKey) return;
+    this.assistingKey = key;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: `public-contact-${kind}`,
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields: {
+          label: String(translations.controls['id_label'].value || ''),
+          description: String(
+            translations.controls['id_description'].value || '',
+          ),
+        },
+      })
+      .pipe(finalize(() => (this.assistingKey = null)))
+      .subscribe({
+        next: (fields) => {
+          translations.patchValue({
+            en_label: fields['label'] || '',
+            en_description: fields['description'] || '',
+          });
+          this.notifications.showSuccess(
+            'Konten English sudah diisi dari Bahasa Indonesia.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  generateChannelDescription(index: number, locale: 'id' | 'en'): void {
+    const group = this.channels.at(index) as FormGroup;
+    const translations = group.controls['translations'] as FormGroup;
+    const key = `channel-${index}-${locale}`;
+    if (this.assistingKey) return;
+    this.assistingKey = key;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: 'public-contact-channel',
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          type: group.controls['type'].value,
+          label: translations.controls[`${locale}_label`].value,
+        }),
+        fields: {
+          description: String(
+            translations.controls[`${locale}_description`].value || '',
+          ),
+        },
+      })
+      .pipe(finalize(() => (this.assistingKey = null)))
+      .subscribe({
+        next: (fields) => {
+          translations.controls[`${locale}_description`].setValue(
+            fields['description'] || '',
+          );
+          this.notifications.showSuccess(
+            'Draf keterangan dibuat. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  private showAssistantError(error: any): void {
+    this.notifications.showError(
+      error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
+        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
+        : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
+    );
   }
 
   ngOnInit(): void {

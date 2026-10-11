@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-
 import {
   Component,
   DestroyRef,
@@ -9,42 +8,29 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-
 import { Params } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { Observable, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
+import { HasPermissionDirective } from '../../../directive/has-permission.directive';
 import {
   IAttachment,
   IAttachmentModel,
 } from '../../../interface/attachment.interface';
-
+import { NotificationService } from '../../../services/notification.service';
 import {
   DeleteAttachmentAction,
   GetAttachmentsAction,
 } from '../../../store/action/attachment.action';
-
 import { AttachmentState } from '../../../store/state/attachment.state';
-
 import { Loader } from '../../loader/loader';
-
 import { DeleteModal } from '../modal/delete-modal/delete-modal';
-
 import { NoData } from '../no-data/no-data';
-
 import { Pagination } from '../pagination/pagination';
-
-import { HasPermissionDirective } from '../../../directive/has-permission.directive';
-
-import { NotificationService } from '../../../services/notification.service';
 
 //==================================================
 //==== MEDIA SELECTION TYPE
@@ -119,6 +105,12 @@ export class MediaBox {
   readonly collection = input<string>('');
 
   readonly selectedImages = input<MediaSelection>(null);
+
+  readonly disabledSelectionIds = input<string[]>([]);
+
+  readonly selectionValidator = input<
+    ((attachment: IAttachment) => string | null) | null
+  >(null);
 
   //==================================================
   //==== OUTPUT
@@ -395,6 +387,11 @@ export class MediaBox {
 
     returnUrl: boolean,
   ) {
+    if (this.isSelectionDisabled(attachment)) {
+      (event.target as HTMLInputElement).checked = false;
+      return;
+    }
+
     const checked = (event.target as HTMLInputElement).checked;
 
     //==================================================
@@ -459,6 +456,33 @@ export class MediaBox {
     }
   }
 
+  selectionIssue(attachment: IAttachment): string | null {
+    return this.selectionValidator()?.(attachment) ?? null;
+  }
+
+  isSelectionDisabled(attachment: IAttachment): boolean {
+    return (
+      this.disabledSelectionIds().includes(attachment.id_attachment) ||
+      this.selectionIssue(attachment) !== null
+    );
+  }
+
+  selectionDisabledReason(attachment: IAttachment): string {
+    if (this.disabledSelectionIds().includes(attachment.id_attachment)) {
+      return this.translate.instant('media_ui.already_used');
+    }
+
+    return this.selectionIssue(attachment) ?? '';
+  }
+
+  attachmentDimensions(attachment: IAttachment): string {
+    if (!attachment.width || !attachment.height) {
+      return this.translate.instant('media_ui.dimension_unknown');
+    }
+
+    return `${attachment.width} × ${attachment.height}px`;
+  }
+
   //==================================================
   //==== SYNC SELECTED
   //==================================================
@@ -477,14 +501,19 @@ export class MediaBox {
     //==================================================
 
     if (Array.isArray(value)) {
+      const seen = new Set<string>();
       value.forEach((item) => {
         if (typeof item === 'string') {
-          this.selected.push(item);
+          if (!seen.has(item)) {
+            seen.add(item);
+            this.selected.push(item);
+          }
 
           return;
         }
 
-        if (item?.id_attachment) {
+        if (item?.id_attachment && !seen.has(item.id_attachment)) {
+          seen.add(item.id_attachment);
           this.selected.push(item.id_attachment);
 
           this.selectedAttachments.push(item);
