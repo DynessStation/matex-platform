@@ -55,7 +55,11 @@ export class BlogDetails {
       this.breadcrumb = {
         title: blog.title,
         items: [
-          { label: this.articleLabel, active: false },
+          {
+            label: this.articleLabel,
+            url: this.locale === 'en-US' ? '/en/articles' : '/artikel',
+            active: false,
+          },
           { label: blog.title, active: true },
         ],
       };

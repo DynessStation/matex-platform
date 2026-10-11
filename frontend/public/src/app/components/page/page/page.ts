@@ -34,10 +34,7 @@ export class Page {
     this.selectedPage$.subscribe((page) => {
       this.breadcrumb.items = [];
       this.breadcrumb.title = page.title;
-      this.breadcrumb.items.push(
-        { label: 'Page', active: true },
-        { label: page.title, active: false },
-      );
+      this.breadcrumb.items.push({ label: page.title, active: true });
       page?.meta_title && this.meta.updateTag({ property: 'og:title', content: page?.meta_title });
       page?.meta_description &&
         this.meta.updateTag({ property: 'og:description', content: page?.meta_description });

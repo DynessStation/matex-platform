@@ -10,14 +10,14 @@
     @if ((currency$ | async)?.data?.length) {
       @for (currency of (currency$ | async)?.data; track currency.id) {
         <li>
-          <a
+          <button
+            type="button"
             class="dropdown-item"
-            href="javascript:void()"
             (click)="selectCurrency(currency)"
             [class.active]="currency.code === (selectedCurrency$ | async)?.code"
           >
             <span>{{ currency.code }}</span>
-          </a>
+          </button>
         </li>
       }
     }

@@ -19,6 +19,7 @@ import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadc
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import {
   GetMoreProduct,
   GetProductByIds,
@@ -51,6 +52,7 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
 export class Collection {
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
+  private navigation = inject(PublicNavigationContextService);
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
   themeOptions$: Observable<Option> = this.store.select(ThemeOptionState.themeOptions);
 
@@ -167,10 +169,8 @@ export class Collection {
   }
 
   setBreadcrumb() {
-    const layoutParam = this.route.snapshot.queryParamMap.get('layout');
-    if (layoutParam) {
-      this.breadcrumb.title = layoutParam;
-      this.breadcrumb.items = [{ label: layoutParam }];
-    }
+    const title = this.navigation.locale() === 'en-US' ? 'Product Catalog' : 'Katalog Produk';
+    this.breadcrumb.title = title;
+    this.breadcrumb.items = [{ label: title, active: true }];
   }
 }

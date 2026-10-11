@@ -12,6 +12,7 @@ import { ICategory } from '../../../shared/interface/category.interface';
 import { Params } from '../../../shared/interface/core.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
 import { LayoutService } from '../../../shared/services/layout.service';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { GetProducts } from '../../../shared/store/action/product.action';
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
@@ -29,13 +30,21 @@ export class Category {
   private meta = inject(Meta);
   private title = inject(Title);
   public layoutService = inject(LayoutService);
+  private navigation = inject(PublicNavigationContextService);
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
   category$: Observable<ICategory | null> = this.store.select(CategoryState.selectedCategory);
 
   breadcrumb$: Observable<breadcrumb> = this.category$.pipe(
     map((category) => ({
       title: category?.name || '',
-      items: [{ label: category?.name || '', active: false }],
+      items: [
+        {
+          label: this.navigation.locale() === 'en-US' ? 'Product Catalog' : 'Katalog Produk',
+          url: this.navigation.locale() === 'en-US' ? '/en/catalog' : '/katalog',
+          active: false,
+        },
+        { label: category?.name || '', active: true },
+      ],
     })),
   );
   public layout: string = 'collection_category_slider';

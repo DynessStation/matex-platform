@@ -1,5 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, HostListener, inject, input } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
@@ -17,6 +17,7 @@ interface HeaderMenuItem {
   key: string;
   label: string;
   path: string;
+  icon: string;
   active?: boolean;
   categories?: Category[];
   products?: Product[];
@@ -66,6 +67,11 @@ export class MainMenu {
     this.menuService.mainMenuToggle = false;
   }
 
+  @HostListener('document:keydown.escape')
+  closeOnEscape(): void {
+    if (this.menuService.mainMenuToggle) this.close();
+  }
+
   categoryPath(category: Category): string {
     return this.navigation.locale() === 'en-US'
       ? `/en/category/${category.slug}`
@@ -101,22 +107,30 @@ export class MainMenu {
       .slice(0, 3);
 
     const defaults: Array<HeaderMenuItem & { aliases?: string[] }> = [
-      { key: 'home', label: english ? 'Home' : 'Beranda', path: english ? '/en' : '/' },
+      {
+        key: 'home',
+        label: english ? 'Home' : 'Beranda',
+        path: english ? '/en' : '/',
+        icon: 'ri-home-4-line',
+      },
       {
         key: 'about',
         label: english ? 'About MATEX' : 'Tentang MATEX',
         path: english ? '/en/about-matex' : '/tentang-matex',
+        icon: 'ri-information-line',
       },
       {
         key: 'categories',
         label: english ? 'Category' : 'Kategori',
         path: english ? '/en/catalog' : '/katalog',
+        icon: 'ri-layout-grid-line',
         categories,
       },
       {
         key: 'products',
         label: english ? 'Product' : 'Produk',
         path: english ? '/en/catalog' : '/katalog',
+        icon: 'ri-box-3-line',
         products: [...featured, ...random],
       },
       {
@@ -124,11 +138,13 @@ export class MainMenu {
         aliases: ['blog'],
         label: english ? 'Blog' : 'Artikel',
         path: english ? '/en/articles' : '/artikel',
+        icon: 'ri-article-line',
       },
       {
         key: 'contact',
         label: english ? 'Contact' : 'Hubungi',
         path: english ? '/en/contact-us' : '/kontak',
+        icon: 'ri-customer-service-2-line',
       },
     ];
 

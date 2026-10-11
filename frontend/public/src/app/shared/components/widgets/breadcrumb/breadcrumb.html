@@ -12,7 +12,13 @@
             </li>
             @for (item of breadcrumb()?.items; track item.label) {
               <li class="breadcrumb-item" [class.active]="item?.active">
-                {{ item?.label! | titleCase }}
+                @if (item.url && !item.active) {
+                  <a [routerLink]="item.url">{{ item.label | titleCase }}</a>
+                } @else {
+                  <span [attr.aria-current]="item.active ? 'page' : null">
+                    {{ item.label | titleCase }}
+                  </span>
+                }
               </li>
             }
           </ol>

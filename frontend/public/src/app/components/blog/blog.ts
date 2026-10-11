@@ -146,13 +146,8 @@ export class Blog {
   }
 
   setBreadcrumb() {
-    const layoutParam = this.route.snapshot.queryParamMap.get('style');
     const title = this.navigation.locale() === 'en-US' ? 'Articles' : 'Artikel';
     this.breadcrumb.title = title;
     this.breadcrumb.items = [{ label: title, active: true }];
-    if (layoutParam) {
-      this.breadcrumb.title = layoutParam;
-      this.breadcrumb.items = [{ label: layoutParam }];
-    }
   }
 }

@@ -1,3 +1,11 @@
+@if (menuService.mainMenuToggle) {
+  <button
+    class="menu-backdrop"
+    type="button"
+    (click)="close()"
+    [attr.aria-label]="navigation.locale() === 'en-US' ? 'Close menu' : 'Tutup menu'"
+  ></button>
+}
 <div class="main-nav navbar navbar-expand-xl navbar-light navbar-sticky">
   <div
     class="offcanvas offcanvas-collapse order-xl-2"
@@ -5,8 +13,23 @@
     [class.show]="menuService.mainMenuToggle"
   >
     <div class="offcanvas-header navbar-shadow">
-      <h5>Menu</h5>
-      <button class="btn-close lead" type="button" (click)="close()">
+      <div class="menu-heading">
+        <span>MATEX</span>
+        <h5>{{ navigation.locale() === 'en-US' ? 'Explore menu' : 'Jelajahi menu' }}</h5>
+        <p>
+          {{
+            navigation.locale() === 'en-US'
+              ? 'Products, articles, and company information'
+              : 'Produk, artikel, dan informasi perusahaan'
+          }}
+        </p>
+      </div>
+      <button
+        class="btn-close lead"
+        type="button"
+        (click)="close()"
+        [attr.aria-label]="navigation.locale() === 'en-US' ? 'Close menu' : 'Tutup menu'"
+      >
         <i class="ri-close-fill"></i>
       </button>
     </div>
@@ -21,9 +44,16 @@
               [routerLinkActiveOptions]="{ exact: true }"
             >
               @if (item.categories || item.products) {
-                <a class="nav-link dropdown-toggle" role="button" (click)="toggle(item, items)">{{
-                  item.label
-                }}</a>
+                <button
+                  class="nav-link dropdown-toggle"
+                  type="button"
+                  (click)="toggle(item, items)"
+                  [attr.aria-expanded]="item.active"
+                >
+                  <i class="menu-item-icon {{ item.icon }}"></i>
+                  <span>{{ item.label }}</span>
+                  <i class="menu-chevron ri-arrow-down-s-line"></i>
+                </button>
                 <div
                   class="dropdown-menu public-data-menu"
                   [class.product-data-menu]="item.products"
@@ -118,7 +148,10 @@
                   </a>
                 </div>
               } @else {
-                <a class="nav-link" [routerLink]="item.path" (click)="close()">{{ item.label }}</a>
+                <a class="nav-link" [routerLink]="item.path" (click)="close()">
+                  <i class="menu-item-icon {{ item.icon }}"></i>
+                  <span>{{ item.label }}</span>
+                </a>
               }
             </li>
           }

@@ -60,7 +60,7 @@ export class OrderDetails {
 
   public breadcrumb: IBreadcrumb = {
     title: 'Order Details',
-    items: [{ label: 'Order Details', active: false }],
+    items: [{ label: 'Order Details', active: true }],
   };
 
   constructor() {

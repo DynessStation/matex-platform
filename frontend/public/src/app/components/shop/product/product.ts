@@ -66,8 +66,12 @@ export class Product {
       this.breadcrumb.items = [];
       this.breadcrumb.title = product.name;
       this.breadcrumb.items.push(
-        { label: this.isEnglish ? 'Product' : 'Produk', active: true },
-        { label: product.name, active: false },
+        {
+          label: this.isEnglish ? 'Products' : 'Produk',
+          url: this.isEnglish ? '/en/catalog' : '/katalog',
+          active: false,
+        },
+        { label: product.name, active: true },
       );
       this.product = product;
       this.recentProducts.add(product);
@@ -82,9 +86,7 @@ export class Product {
         } else {
           this.layout = option?.product?.product_layout || 'product_thumbnail';
         }
-        this.setBreadcrumb();
       });
-    this.setBreadcrumb();
   }
 
   get isEnglish() {
@@ -101,14 +103,6 @@ export class Product {
         this.isScrollActive = false;
         document.body.classList.remove('stickyCart');
       }
-    }
-  }
-
-  setBreadcrumb() {
-    const layoutParam = this.route.snapshot.queryParamMap.get('layout');
-    if (layoutParam) {
-      this.breadcrumb.title = layoutParam;
-      this.breadcrumb.items = [{ label: layoutParam }];
     }
   }
 

@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.breadcrumb-item {
+  max-width: min(34vw, 360px);
+
+  a,
+  span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  a {
+    color: rgba(var(--content-color), 1);
+    transition: color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: rgba(var(--theme-color), 1);
+    }
+  }
+
+  &.active span {
+    color: rgba(var(--title-color), 1);
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .breadcrumb-contain {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .breadcrumb-item {
+    max-width: 42vw;
+  }
+}

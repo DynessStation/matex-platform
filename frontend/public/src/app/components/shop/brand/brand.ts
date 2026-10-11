@@ -11,6 +11,7 @@ import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { Params } from '../../../shared/interface/core.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
 import { LayoutService } from '../../../shared/services/layout.service';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { GetProducts } from '../../../shared/store/action/product.action';
 import { BrandState } from '../../../shared/store/state/brand.state';
 import { ProductState } from '../../../shared/store/state/product.state';
@@ -28,6 +29,7 @@ export class Brand {
   private route = inject(ActivatedRoute);
   private store = inject(Store);
   public layoutService = inject(LayoutService);
+  private navigation = inject(PublicNavigationContextService);
 
   product$: Observable<ProductModel> = inject(Store).select(ProductState.product);
   brand$: Observable<IBrand> = inject(Store).select(BrandState.selectedBrand) as Observable<IBrand>;
@@ -35,8 +37,15 @@ export class Brand {
   breadcrumb$: Observable<breadcrumb> = this.brand$.pipe(
     map((brand) => ({
       title: `Brand: ${brand?.name}`,
-      items: [{ label: brand?.name, active: false }],
-    }))
+      items: [
+        {
+          label: this.navigation.locale() === 'en-US' ? 'Product Catalog' : 'Katalog Produk',
+          url: this.navigation.locale() === 'en-US' ? '/en/catalog' : '/katalog',
+          active: false,
+        },
+        { label: brand?.name, active: true },
+      ],
+    })),
   );
   public layout: string = 'collection_category_slider';
   public skeleton: boolean = true;
@@ -61,7 +70,6 @@ export class Brand {
     this.filter['brand'] = this.route.snapshot.paramMap.get('slug');
     this.store.dispatch(new GetProducts(this.filter));
   }
-
 
   private updateFilterAndFetchProducts() {
     if (this.brand) {

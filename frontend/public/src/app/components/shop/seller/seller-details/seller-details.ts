@@ -152,7 +152,7 @@ export class SellerDetails {
         this.breadcrumb.title = this.filter['store_slug'] ? this.filter['store_slug'] : 'Seller';
         this.breadcrumb.items.push(
           { label: 'Seller Store', active: true },
-          { label: this.breadcrumb.title, active: false },
+          { label: this.breadcrumb.title, active: true },
         );
 
         // Dispatch action to fetch products
