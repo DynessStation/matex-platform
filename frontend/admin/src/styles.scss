@@ -51,6 +51,88 @@
 }
 
 //==================================================
+//==== ADMIN BUTTON CONTRAST
+//==================================================
+
+// Kartify's default light button pairs a near-white background with white
+// text. Keep secondary actions neutral, bordered, and readable everywhere.
+.btn.btn-light,
+.btn.btn-light-bg,
+.btn.btn-light-bg-secondary {
+  border: 1px solid #cbd2dc !important;
+  background-color: #fff !important;
+  color: #273142 !important;
+
+  &:hover:not(:disabled):not(.disabled),
+  &:focus-visible:not(:disabled):not(.disabled) {
+    border-color: #9da8b7 !important;
+    background-color: #eef1f5 !important;
+    color: #172033 !important;
+  }
+}
+
+// Orange remains the brand accent while the darker text keeps outline actions
+// legible on white cards and form backgrounds.
+.btn.btn-outline,
+.btn.btn-outline-theme,
+.btn.btn-outline-primary {
+  border: 1px solid #c46f00 !important;
+  background-color: #fff !important;
+  color: #814900 !important;
+
+  &:hover:not(:disabled):not(.disabled),
+  &:focus-visible:not(:disabled):not(.disabled) {
+    border-color: #a75f00 !important;
+    background-color: #fff3df !important;
+    color: #633800 !important;
+  }
+}
+
+.btn:focus-visible {
+  outline: 3px solid rgba(196, 111, 0, 0.28);
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+
+// Disabled and loading buttons must still disclose their label and state.
+.btn:disabled,
+.btn.disabled {
+  border-color: #c7cdd5 !important;
+  background-color: #e7eaee !important;
+  color: #5b6472 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+body.dark-only {
+  .btn.btn-light,
+  .btn.btn-light-bg,
+  .btn.btn-light-bg-secondary,
+  .btn.btn-outline,
+  .btn.btn-outline-theme,
+  .btn.btn-outline-primary {
+    border-color: #596273 !important;
+    background-color: #282d38 !important;
+    color: #f2f4f7 !important;
+
+    &:hover:not(:disabled):not(.disabled),
+    &:focus-visible:not(:disabled):not(.disabled) {
+      border-color: #8993a3 !important;
+      background-color: #343b48 !important;
+      color: #fff !important;
+    }
+  }
+
+  .btn:disabled,
+  .btn.disabled {
+    border-color: #454c59 !important;
+    background-color: #303641 !important;
+    color: #aeb6c2 !important;
+  }
+}
+
+//==================================================
 //==== TOAST OVERRIDE
 //==================================================
 
