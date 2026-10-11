@@ -65,9 +65,16 @@ const mailTransport = (): Transporter | null => {
 export const sendContactInquiryMail = async (
   input: ContactInquiryMailInput,
 ): Promise<ContactInquiryMailResult> => {
-  if (!input.recipient) return { status: "skipped" };
+  if (!input.recipient) {
+    return { status: "skipped", error: "Recipient email is not configured" };
+  }
   const transport = mailTransport();
-  if (!transport) return { status: "skipped" };
+  if (!transport) {
+    return {
+      status: "skipped",
+      error: "SMTP_HOST, SMTP_USER, or SMTP_PASS is not configured",
+    };
+  }
 
   const fromEmail = cleanEnv("SMTP_FROM_EMAIL") || cleanEnv("SMTP_USER");
   const fromName = cleanEnv("SMTP_FROM_NAME") || "MATEX Website";
