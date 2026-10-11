@@ -6,6 +6,14 @@
 
 @use '../public/assets/scss/app.scss';
 
+// Keep responsive pages inside the visual viewport while drawers and sliders
+// prepare off-screen content. `clip` avoids creating a second scroll container.
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 // Shared checkbox alignment for application forms.
 .app-check {
   display: inline-flex;

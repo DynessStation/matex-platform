@@ -1259,10 +1259,32 @@
         display: flex;
         align-items: center;
         gap: 10px;
+
+        @include max(575.98px) {
+          gap: 8px;
+          min-width: 0;
+          width: 100%;
+
+          .product-page-per-view,
+          .product-page-filter {
+            flex: 1 1 0;
+            min-width: 0;
+
+            .custom-select,
+            .select2-container {
+              min-width: 0;
+              width: 100% !important;
+            }
+          }
+        }
       }
 
       .product-page-per-view {
         min-width: 145px;
+
+        @include max(575.98px) {
+          min-width: 0;
+        }
       }
 
       .product-page-per-view,
