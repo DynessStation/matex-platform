@@ -309,7 +309,7 @@
                   } @else if (
                     columnHead?.type && columnHead?.type === 'switch'
                   ) {
-                    <div class="form-check form-switch ps-0">
+                    <div class="form-check form-switch ps-0 status-switch-cell">
                       <label class="switch switch-sm">
                         <input
                           type="checkbox"
@@ -319,23 +319,22 @@
                             !hasPermission(['edit'])
                           "
                           [value]="
-                            columnData[columnHead?.dataField.toString()] === '1'
-                              ? 0
-                              : 1
+                            nextSwitchValue(
+                              columnData[columnHead?.dataField.toString()]
+                            )
                           "
                           [checked]="
-                            columnData[columnHead?.dataField.toString()] === '1'
-                              ? true
-                              : false
+                            isSwitchActive(
+                              columnData[columnHead?.dataField.toString()]
+                            )
                           "
                           (click)="
                             ConfirmationModal().openModal(
                               columnHead?.dataField.toString(),
                               columnData,
-                              columnData[columnHead?.dataField.toString()] ===
-                                '1'
-                                ? 0
-                                : 1
+                              nextSwitchValue(
+                                columnData[columnHead?.dataField.toString()]
+                              )
                             );
                             $event.preventDefault();
                             $event.stopPropagation()
@@ -349,6 +348,17 @@
                           "
                         ></span>
                       </label>
+                      @if (columnHead.activeLabel || columnHead.inactiveLabel) {
+                        <span class="status-switch-label">
+                          {{
+                            isSwitchActive(
+                              columnData[columnHead?.dataField.toString()]
+                            )
+                              ? columnHead.activeLabel
+                              : columnHead.inactiveLabel
+                          }}
+                        </span>
+                      }
                     </div>
                   } @else if (
                     columnHead?.type && columnHead?.type === 'price'

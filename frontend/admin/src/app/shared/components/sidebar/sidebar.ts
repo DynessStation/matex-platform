@@ -86,6 +86,8 @@ export class Sidebar {
 
   public showEmptyMessage = false;
 
+  private readonly expandedMenuIds = new Set<number>();
+
   //==================================================
   //==== CONSTRUCTOR
   //==================================================
@@ -123,6 +125,10 @@ export class Sidebar {
   private cloneMenu(menus: ISidebar[]): ISidebar[] {
     return menus.map((menu) => ({
       ...menu,
+
+      active:
+        (menu.id != null && this.expandedMenuIds.has(menu.id)) ||
+        menu.active === true,
 
       children: menu.children ? this.cloneMenu(menu.children) : undefined,
     }));
@@ -199,12 +205,18 @@ export class Sidebar {
   //==================================================
 
   onItemSelected(item: ISidebar, onRoute: boolean = false) {
-    this.menuItems.forEach((menu) => {
-      this.deActiveAllMenu(menu, item);
-    });
-
-    if (!onRoute) {
+    if (onRoute) {
+      item.active = true;
+    } else {
       item.active = !item.active;
+    }
+
+    if (item.id != null) {
+      if (item.active) {
+        this.expandedMenuIds.add(item.id);
+      } else {
+        this.expandedMenuIds.delete(item.id);
+      }
     }
   }
 
@@ -228,22 +240,6 @@ export class Sidebar {
     if (menu?.children?.length) {
       menu.children.forEach((child) => {
         this.activeMenuRecursive(child, normalizedUrl, menu);
-      });
-    }
-  }
-
-  //==================================================
-  //==== DEACTIVATE MENU
-  //==================================================
-
-  deActiveAllMenu(menu: ISidebar, item: ISidebar) {
-    if (menu && menu.active && menu.id !== item.id) {
-      menu.active = false;
-    }
-
-    if (menu?.children?.length) {
-      menu.children.forEach((child) => {
-        this.deActiveAllMenu(child, item);
       });
     }
   }

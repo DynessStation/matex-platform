@@ -70,6 +70,15 @@ app.get("/api/v1/articles", verifyToken, requirePermission("article.view"), asyn
   const scope = await getAdminScope(req, pool); if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
   const page = Math.max(1, Number(req.query.page) || 1), limit = Math.min(100, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 15));
   const locale = isPublicContentLocale(req.query.locale) ? req.query.locale : "id-ID"; const search = text(req.query.search, 200); const like = `%${search}%`;
+  const sortFields: Record<string, string> = {
+    title: "i.article_title",
+    created_at: "a.created",
+  };
+  const sortField = sortFields[String(req.query.field ?? "")];
+  const sortDirection = String(req.query.sort ?? "").toLowerCase() === "asc" ? "ASC" : "DESC";
+  const orderBy = sortField
+    ? `${sortField} ${sortDirection}, a.id_article DESC`
+    : "a.article_is_sticky DESC, COALESCE(a.article_published_at,a.created) DESC";
   try {
     const [counts] = await pool.query<RowDataPacket[]>(`SELECT COUNT(DISTINCT a.id_article) total FROM article a LEFT JOIN article_i18n i ON i.id_article=a.id_article WHERE a.id_master_comp=? AND a.article_deleted_at IS NULL AND (?='' OR a.article_key LIKE ? OR i.article_title LIKE ?)`, [scope.idMasterComp, search, like, like]);
     const [rows] = await pool.query<RowDataPacket[]>(`SELECT a.*,i.article_slug,i.article_title,i.article_excerpt,i.article_i18n_status,
@@ -78,7 +87,7 @@ app.get("/api/v1/articles", verifyToken, requirePermission("article.view"), asyn
       LEFT JOIN article_attachment aa ON aa.id_article=a.id_article AND aa.article_attachment_role='thumbnail' AND aa.article_attachment_sort_order=0
       LEFT JOIN attachment th ON th.id_attachment=aa.id_attachment
       WHERE a.id_master_comp=? AND a.article_deleted_at IS NULL AND (?='' OR a.article_key LIKE ? OR i.article_title LIKE ?)
-      ORDER BY a.article_is_sticky DESC,COALESCE(a.article_published_at,a.created) DESC LIMIT ? OFFSET ?`, [locale, scope.idMasterComp, search, like, like, limit, (page-1)*limit]);
+      ORDER BY ${orderBy} LIMIT ? OFFSET ?`, [locale, scope.idMasterComp, search, like, like, limit, (page-1)*limit]);
     return sendSuccess(res, 200, "ARTICLES_LISTED", "Articles loaded", { data: rows.map(row => ({ id:keyhsid.idArticle.encode(Number(row.id_article)), key:row.article_key, title:row.article_title??"", slug:row.article_slug??"", description:row.article_excerpt??"", status:row.article_status, locale_status:Number(row.article_i18n_status??0), is_featured:Boolean(row.article_is_featured), is_sticky:Boolean(row.article_is_sticky), published_at:row.article_published_at, created_at:row.created, updated_at:row.updated, blog_thumbnail:attachmentDto(row,"thumbnail") })), total:Number(counts[0]?.total??0), current_page:page, per_page:limit });
   } catch (error) { console.error("[Article] list failed", error); return sendError(res,500,"ARTICLE_LIST_FAILED","Unable to load articles"); }
 });

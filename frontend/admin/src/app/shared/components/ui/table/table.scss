@@ -16,6 +16,20 @@
   background: #fff;
 }
 
+.status-switch-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.status-switch-label {
+  color: #5e6672;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 thead {
   .sticky-action-column {
     z-index: 7;

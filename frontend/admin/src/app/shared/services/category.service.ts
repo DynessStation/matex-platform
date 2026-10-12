@@ -6,6 +6,7 @@ import { IApiResponse } from '../interface/api-response.interface';
 import {
   ICategoryDetail,
   ICategoryModel,
+  ICategoryOrderItem,
   ICategoryPayload,
 } from '../interface/category.interface';
 import { Params } from '../interface/core.interface';
@@ -34,6 +35,11 @@ export class CategoryService {
       `${this.api}/${id}`,
       payload,
     );
+  }
+  reorder(items: ICategoryOrderItem[]) {
+    return this.http.patch<IApiResponse<null>>(`${this.api}/reorder`, {
+      items,
+    });
   }
   delete(id: string) {
     return this.http.delete<IApiResponse<null>>(`${this.api}/${id}`);

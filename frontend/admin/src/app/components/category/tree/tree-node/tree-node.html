@@ -1,8 +1,23 @@
 <li
   class="cursor-pointer"
+  [class.category-drag-over]="dragOver"
   [class.inside-ul]="node()[recursionKey()] && node()[recursionKey()].length"
+  (dragover)="allowDrop($event)"
+  (dragleave)="leaveDrop()"
+  (drop)="dropBefore($event)"
 >
   <div>
+    <button
+      type="button"
+      class="category-drag-handle"
+      draggable="true"
+      [disabled]="savingOrder || reorderDisabled()"
+      aria-label="Geser untuk mengubah urutan kategori"
+      title="Geser untuk mengubah urutan"
+      (dragstart)="startDrag($event)"
+    >
+      <i class="ri-draggable"></i>
+    </button>
     @if (node()[recursionKey()] && node()[recursionKey()].length) {
       <i
         class="ri-arrow-down-s-line"
@@ -40,9 +55,11 @@
     node()[recursionKey()] && node()[recursionKey()].length && showChildrenNode
   ) {
     <ul>
-      @for (node of node()[recursionKey()]; track node.id) {
+      @for (child of node()[recursionKey()]; track child.id) {
         <app-tree-node
-          [node]="node"
+          [node]="child"
+          [siblings]="node()[recursionKey()]"
+          [reorderDisabled]="reorderDisabled()"
           [displayKey]="displayKey()"
           [recursionKey]="recursionKey()"
           [categoryType]="categoryType()"

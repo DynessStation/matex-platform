@@ -9,6 +9,7 @@ import { ICategory } from '../../../../shared/interface/category.interface';
 import {
   DeleteCategoryAction,
   GetCategoriesAction,
+  ReorderCategoriesAction,
 } from '../../../../shared/store/action/category.action';
 
 @Component({
@@ -23,6 +24,8 @@ export class TreeNode {
   private route = inject(ActivatedRoute);
 
   readonly node = input<any>(undefined);
+  readonly siblings = input<ICategory[]>([]);
+  readonly reorderDisabled = input(false);
   readonly recursionKey = input<string>(undefined);
   readonly displayKey = input<string>(undefined);
   readonly categoryType = input<string | null>('product');
@@ -31,6 +34,8 @@ export class TreeNode {
 
   public showChildrenNode: boolean = true;
   public id: string;
+  public dragOver = false;
+  public savingOrder = false;
 
   ngOnInit() {
     this.route.params.subscribe((params) => (this.id = params['id']));
@@ -43,6 +48,74 @@ export class TreeNode {
         complete: () => {
           this.store.dispatch(new GetCategoriesAction({ type: 'product' }));
           if (this.id) void this.router.navigateByUrl('/category');
+        },
+      });
+  }
+
+  startDrag(event: DragEvent) {
+    if (!event.dataTransfer || this.savingOrder || this.reorderDisabled()) return;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/category-id', String(this.node().id));
+  }
+
+  allowDrop(event: DragEvent) {
+    if (
+      this.reorderDisabled() ||
+      !event.dataTransfer?.types.includes('text/category-id')
+    )
+      return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'move';
+    this.dragOver = true;
+  }
+
+  leaveDrop() {
+    this.dragOver = false;
+  }
+
+  dropBefore(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragOver = false;
+    const sourceId = event.dataTransfer?.getData('text/category-id');
+    const siblings = this.siblings();
+    const from = siblings.findIndex((item) => String(item.id) === sourceId);
+    const to = siblings.findIndex((item) => item.id === this.node().id);
+    if (
+      from < 0 ||
+      to < 0 ||
+      from === to ||
+      this.savingOrder ||
+      this.reorderDisabled()
+    )
+      return;
+
+    const [moved] = siblings.splice(from, 1);
+    siblings.splice(to, 0, moved);
+    siblings.forEach((item, index) => (item.sort_order = index));
+    this.savingOrder = true;
+    this.store
+      .dispatch(
+        new ReorderCategoriesAction(
+          siblings.map((item) => ({
+            id: String(item.id),
+            sort_order: item.sort_order,
+          })),
+        ),
+      )
+      .subscribe({
+        complete: () => {
+          this.savingOrder = false;
+          this.store.dispatch(
+            new GetCategoriesAction({ type: this.categoryType() }),
+          );
+        },
+        error: () => {
+          this.savingOrder = false;
+          this.store.dispatch(
+            new GetCategoriesAction({ type: this.categoryType() }),
+          );
         },
       });
   }

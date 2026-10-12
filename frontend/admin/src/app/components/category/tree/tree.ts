@@ -27,17 +27,17 @@ export class Tree {
     this.treeSearch.valueChanges.subscribe(data => {
       if (data) {
         this.dataToShow = [];
-        this.data().forEach(item => {
+        (this.data() ?? []).forEach(item => {
           this.hasValue(item) && this.dataToShow.push(item);
         });
       } else {
-        this.dataToShow = this.data();
+        this.dataToShow = this.data() ?? [];
       }
     });
   }
 
   ngOnChanges() {
-    this.dataToShow = this.data();
+    this.dataToShow = this.data() ?? [];
   }
 
   hasValue(item: ICategory) {

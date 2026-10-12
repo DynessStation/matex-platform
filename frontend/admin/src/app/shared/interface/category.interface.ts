@@ -49,3 +49,8 @@ export interface ICategoryPayload {
   og_image_id: string | null;
   translations: ICategoryTranslation[];
 }
+
+export interface ICategoryOrderItem {
+  id: string;
+  sort_order: number;
+}

@@ -165,6 +165,113 @@ app.get(
   },
 );
 
+app.patch(
+  "/api/v1/product-categories/reorder",
+  verifyToken,
+  requirePermission("product_category.update"),
+  async (req: AuthRequest, res: Response) => {
+    const scope = await getAdminScope(req, pool);
+    if (!scope.success)
+      return sendError(res, scope.status, scope.code, scope.message);
+
+    const rawItems = Array.isArray(req.body?.items) ? req.body.items : [];
+    if (!rawItems.length || rawItems.length > 500)
+      return sendError(
+        res,
+        400,
+        "PRODUCT_CATEGORY_ORDER_INVALID",
+        "Category order is invalid",
+      );
+
+    const items = rawItems.map((item: any) => ({
+      id: decode(item?.id, keyhsid.idProductCategory),
+      sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
+    }));
+    if (items.some((item: any) => !item.id))
+      return sendError(
+        res,
+        400,
+        "PRODUCT_CATEGORY_ORDER_INVALID",
+        "Category order is invalid",
+      );
+
+    const uniqueIds = new Set(items.map((item: any) => item.id));
+    if (uniqueIds.size !== items.length)
+      return sendError(
+        res,
+        400,
+        "PRODUCT_CATEGORY_ORDER_DUPLICATE",
+        "Category order contains duplicate items",
+      );
+
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const marks = items.map(() => "?").join(",");
+      const [existing] = await connection.query<RowDataPacket[]>(
+        `SELECT id_product_category FROM product_category
+         WHERE id_master_comp=? AND product_category_deleted_at IS NULL
+         AND id_product_category IN (${marks}) FOR UPDATE`,
+        [scope.idMasterComp, ...items.map((item: any) => item.id)],
+      );
+      if (existing.length !== items.length) {
+        await connection.rollback();
+        return sendError(
+          res,
+          404,
+          "PRODUCT_CATEGORY_NOT_FOUND",
+          "One or more categories were not found",
+        );
+      }
+
+      for (const item of items) {
+        await connection.query(
+          `UPDATE product_category
+           SET product_category_sort_order=?, id_updated_by=?, updated=NOW()
+           WHERE id_product_category=? AND id_master_comp=?`,
+          [item.sortOrder, scope.idAdminAcct, item.id, scope.idMasterComp],
+        );
+      }
+
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: "strict",
+        idMasterComp: scope.idMasterComp,
+        eventCode: "product_category.reordered",
+        category: "data_change",
+        module: "product_category",
+        action: "reorder",
+        actorType: "admin",
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: "product_category",
+        after: items,
+        httpStatus: 200,
+      });
+      await connection.commit();
+      return sendSuccess(
+        res,
+        200,
+        "PRODUCT_CATEGORY_REORDERED",
+        "Urutan kategori disimpan",
+        null,
+      );
+    } catch (error) {
+      await connection.rollback();
+      console.error("[Product category] reorder failed", error);
+      return sendError(
+        res,
+        500,
+        "PRODUCT_CATEGORY_REORDER_FAILED",
+        "Unable to reorder product categories",
+      );
+    } finally {
+      connection.release();
+    }
+  },
+);
+
 app.get(
   "/api/v1/product-categories/:id",
   verifyToken,

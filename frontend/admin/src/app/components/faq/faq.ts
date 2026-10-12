@@ -30,12 +30,20 @@ export class Faq {
   router = inject(Router);
 
   faq$: Observable<IFaqModel | null> = this.store.select(FaqState.faq);
+  private currentTableParams: Params = {
+    search: '',
+    page: 1,
+    paginate: 15,
+    field: '',
+    sort: '',
+  };
 
   public tableConfig: ITableConfig = {
     columns: [
       { title: 'faq_admin.question', dataField: 'question', sortable: true, sort_direction: 'asc' },
       { title: 'faq_admin.key', dataField: 'key', sortable: true, sort_direction: 'asc' },
       { title: 'faq_admin.translations', dataField: 'translation_label' },
+      { title: 'Urutan', dataField: 'sort_order', sortable: true, sort_direction: 'asc' },
       {
         title: 'created_at',
         dataField: 'created',
@@ -43,7 +51,13 @@ export class Faq {
         sortable: true,
         sort_direction: 'desc',
       },
-      { title: 'status', dataField: 'status', type: 'switch' },
+      {
+        title: 'Tampil di website',
+        dataField: 'status',
+        type: 'switch',
+        activeLabel: 'Tampil',
+        inactiveLabel: 'Disembunyikan',
+      },
     ],
     rowActions: [
       { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'faq.update' },
@@ -69,7 +83,8 @@ export class Faq {
   }
 
   onTableChange(data?: Params) {
-    this.store.dispatch(new GetFaqsAction(data));
+    this.currentTableParams = { ...this.currentTableParams, ...(data ?? {}) };
+    this.store.dispatch(new GetFaqsAction(this.currentTableParams));
   }
 
   onActionClicked(action: ITableClickedAction) {
@@ -84,14 +99,27 @@ export class Faq {
   }
 
   status(data: IFaq) {
-    this.store.dispatch(new UpdateFaqStatusAction(data.id, data.status));
+    this.store
+      .dispatch(new UpdateFaqStatusAction(data.id, data.status))
+      .subscribe({
+        complete: () =>
+          this.store.dispatch(new GetFaqsAction(this.currentTableParams)),
+        error: () =>
+          this.store.dispatch(new GetFaqsAction(this.currentTableParams)),
+      });
   }
 
   delete(data: IFaq) {
-    this.store.dispatch(new DeleteFaqAction(data.id));
+    this.store.dispatch(new DeleteFaqAction(data.id)).subscribe({
+      complete: () =>
+        this.store.dispatch(new GetFaqsAction(this.currentTableParams)),
+    });
   }
 
   deleteAll(ids: string[]) {
-    this.store.dispatch(new DeleteAllFaqAction(ids));
+    this.store.dispatch(new DeleteAllFaqAction(ids)).subscribe({
+      complete: () =>
+        this.store.dispatch(new GetFaqsAction(this.currentTableParams)),
+    });
   }
 }

@@ -101,6 +101,20 @@ app.get(
       ? req.query.locale
       : "id-ID";
     const like = `%${search}%`;
+    const sortFields: Record<string, string> = {
+      question: 'requested.faq_question',
+      key: 'f.faq_key',
+      sort_order: 'f.faq_sort_order',
+      created: 'f.created',
+      status: 'f.faq_status',
+    };
+    const sortField = sortFields[String(req.query.field ?? '')];
+    const sortDirection = String(req.query.sort ?? '').toLowerCase() === 'desc'
+      ? 'DESC'
+      : 'ASC';
+    const orderBy = sortField
+      ? `${sortField} ${sortDirection}, f.id_faq ASC`
+      : 'f.faq_sort_order ASC, f.id_faq ASC';
 
     try {
       const [countRows] = await pool.query<RowDataPacket[]>(
@@ -131,7 +145,7 @@ app.get(
             AND requested.faq_locale = ?
           WHERE f.id_master_comp = ? AND f.faq_deleted_at IS NULL
             AND (? = '' OR f.faq_key LIKE ? OR requested.faq_question LIKE ?)
-          ORDER BY f.faq_sort_order, f.id_faq
+          ORDER BY ${orderBy}
           LIMIT ? OFFSET ?
         `,
         [locale, scope.idMasterComp, search, like, like, limit, offset],

@@ -4,6 +4,10 @@
     placeholder="{{ 'search_category' | translate }}"
     [formControl]="treeSearch"
   />
+  <p class="category-order-hint">
+    <i class="ri-draggable"></i>
+    Geser pegangan di samping nama untuk mengatur urutan pada tingkat yang sama.
+  </p>
   @if(dataToShow?.length){
   <ul class="tree-main-ul">
     <li class="cursor-pointer">
@@ -15,6 +19,8 @@
         @for(node of dataToShow; track node.id){
         <app-tree-node
           [node]="node"
+          [siblings]="dataToShow"
+          [reorderDisabled]="!!treeSearch.value"
           [displayKey]="displayKey()"
           [recursionKey]="recursionKey()"
           [categoryType]="categoryType()"

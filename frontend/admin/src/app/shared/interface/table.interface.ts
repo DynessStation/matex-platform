@@ -23,6 +23,8 @@ export interface ITableColumn {
   date_format?: string;
   class?: string;
   placeholder?: string;
+  activeLabel?: string;
+  inactiveLabel?: string;
 }
 
 export interface ITableAction {

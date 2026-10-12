@@ -355,6 +355,14 @@ export class Table {
     this.onActionClicked(action.actionToPerform, rowData);
   }
 
+  public isSwitchActive(value: unknown): boolean {
+    return value === true || value === 1 || value === '1';
+  }
+
+  public nextSwitchValue(value: unknown): 0 | 1 {
+    return this.isSwitchActive(value) ? 0 : 1;
+  }
+
   //==================================================
   //==== SYNC EXTERNAL STATE
   //==================================================
@@ -540,6 +548,8 @@ export class Table {
 
       data: rowData,
     });
+
+    this.ConfirmationModal()?.closeModal();
   }
 
   //==================================================

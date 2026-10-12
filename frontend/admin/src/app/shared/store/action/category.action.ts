@@ -1,4 +1,7 @@
-import { ICategoryPayload } from '../../interface/category.interface';
+import {
+  ICategoryOrderItem,
+  ICategoryPayload,
+} from '../../interface/category.interface';
 import { Params } from '../../interface/core.interface';
 
 export class GetCategoriesAction {
@@ -22,6 +25,11 @@ export class UpdateCategoryAction {
     public payload: ICategoryPayload,
     public id: string,
   ) {}
+}
+
+export class ReorderCategoriesAction {
+  static readonly type = '[Category] Reorder';
+  constructor(public items: ICategoryOrderItem[]) {}
 }
 
 export class DeleteCategoryAction {

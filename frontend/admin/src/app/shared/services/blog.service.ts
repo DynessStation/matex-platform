@@ -20,6 +20,8 @@ export class BlogService {
     if (payload?.['paginate'])
       params = params.set('limit', payload['paginate']);
     if (payload?.['search']) params = params.set('search', payload['search']);
+    if (payload?.['field']) params = params.set('field', payload['field']);
+    if (payload?.['sort']) params = params.set('sort', payload['sort']);
     return this.http
       .get<IApiResponse<IBlogModel>>(this.api, { params })
       .pipe(map((r) => r.data ?? { data: [], total: 0 }));

@@ -22,6 +22,8 @@ export class FaqService {
     if (payload?.['paginate'] !== undefined) params = params.set('limit', String(payload['paginate']));
     if (payload?.['limit'] !== undefined) params = params.set('limit', String(payload['limit']));
     if (payload?.['search']) params = params.set('search', String(payload['search']));
+    if (payload?.['field']) params = params.set('field', String(payload['field']));
+    if (payload?.['sort']) params = params.set('sort', String(payload['sort']));
     return this.http.get<IApiResponse<IFaqModel>>(this.apiUrl, { params }).pipe(
       map(response => response.data ?? { data: [], pagination: { current_page: 1, per_page: 15, total: 0 } }),
     );
