@@ -40,6 +40,15 @@
   margin-bottom: 0;
 }
 
+.checks--inline {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checks--compact .app-check-card {
+  min-height: 46px;
+  padding-block: 9px;
+}
+
 .checks strong,
 .checks small {
   display: block;
@@ -147,6 +156,10 @@ label:not(.app-check) {
 }
 
 @media (max-width: 767px) {
+  .checks--inline {
+    grid-template-columns: 1fr;
+  }
+
   .contact-description-heading {
     align-items: stretch;
     flex-direction: column;

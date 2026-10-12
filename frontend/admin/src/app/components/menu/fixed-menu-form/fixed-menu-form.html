@@ -119,7 +119,11 @@
     <div class="d-flex flex-wrap gap-2">
       @if (isEdit) {
         <ng-container *hasPermission="'web_navigation.update'">
-          <app-button [id]="'update_navigation_item'" [disabled]="submitting">
+          <app-button
+            [id]="'update_navigation_item'"
+            [class]="'btn btn-theme'"
+            [disabled]="submitting"
+          >
             {{ 'navigation_admin.update_item' | translate }}
           </app-button>
         </ng-container>
@@ -133,7 +137,11 @@
         </button>
       } @else {
         <ng-container *hasPermission="'web_navigation.create'">
-          <app-button [id]="'create_navigation_item'" [disabled]="submitting">
+          <app-button
+            [id]="'create_navigation_item'"
+            [class]="'btn btn-theme'"
+            [disabled]="submitting"
+          >
             {{ 'navigation_admin.add_item' | translate }}
           </app-button>
         </ng-container>

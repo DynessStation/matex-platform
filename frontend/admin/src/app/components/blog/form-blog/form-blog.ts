@@ -30,6 +30,7 @@ import {
   IArticleTranslation,
 } from '../../../shared/interface/blog.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateBlogAction,
@@ -61,6 +62,7 @@ export class FormBlog {
   private fb = inject(FormBuilder);
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
+  private formIssues = inject(FormIssueNavigatorService);
   readonly type = input<'create' | 'edit'>('create');
   readonly mediaConfig = mediaConfig;
   readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -206,6 +208,12 @@ export class FormBlog {
           meta_description: value[`${locale}_meta_description`] || '',
           og_description: value[`${locale}_og_description`] || '',
         },
+        field_types: {
+          excerpt: 'multiline_text',
+          body: 'rich_text_html',
+          meta_description: 'seo_description',
+          og_description: 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assistingLocale = null)))
       .subscribe({
@@ -240,6 +248,14 @@ export class FormBlog {
           user_written_title: value[`${locale}_title`],
         }),
         fields: { [field]: value[controlName] || '' },
+        field_types: {
+          [field]:
+            field === 'body'
+              ? 'rich_text_html'
+              : field === 'excerpt'
+                ? 'multiline_text'
+                : 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
@@ -267,6 +283,14 @@ export class FormBlog {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: { [field]: value[`id_${field}`] || '' },
+        field_types: {
+          [field]:
+            field === 'body'
+              ? 'rich_text_html'
+              : field === 'excerpt'
+                ? 'multiline_text'
+                : 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
@@ -293,6 +317,12 @@ export class FormBlog {
           body: value.id_body || '',
           meta_description: value.id_meta_description || '',
           og_description: value.id_og_description || '',
+        },
+        field_types: {
+          excerpt: 'multiline_text',
+          body: 'rich_text_html',
+          meta_description: 'seo_description',
+          og_description: 'seo_description',
         },
       })
       .pipe(finalize(() => (this.translatingToEnglish = false)))
@@ -363,6 +393,12 @@ export class FormBlog {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.scheduledDateInvalid) {
       this.activeTab = this.firstInvalidTab();
+      this.notification.showError(
+        this.scheduledDateInvalid
+          ? 'Lengkapi tanggal dan waktu publikasi artikel.'
+          : 'Form artikel belum lengkap. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
       return;
     }
     const v = this.form.getRawValue() as any;
@@ -383,9 +419,18 @@ export class FormBlog {
     const action = this.id
       ? new UpdateBlogAction(payload, this.id)
       : new CreateBlogAction(payload);
-    this.store
-      .dispatch(action)
-      .subscribe({ complete: () => void this.router.navigateByUrl('/blog') });
+    this.store.dispatch(action).subscribe({
+      complete: () => void this.router.navigateByUrl('/blog'),
+      error: (error) => {
+        if (error?.error?.code !== 'ARTICLE_CONFLICT') return;
+        this.activeTab = 'general';
+        this.form.controls.key.setErrors({
+          ...(this.form.controls.key.errors ?? {}),
+          duplicate: true,
+        });
+        this.formIssues.focusFirstInvalid('key');
+      },
+    });
   }
   private firstInvalidTab() {
     if (this.form.controls.key.invalid) return 'general';

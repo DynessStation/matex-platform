@@ -12,7 +12,16 @@ export interface ContentAssistantRequest {
   target_locale: string;
   context?: string;
   fields: Record<string, string>;
+  field_types: Record<string, ContentAssistantFieldType>;
 }
+
+export type ContentAssistantFieldType =
+  | 'plain_text'
+  | 'multiline_text'
+  | 'rich_text_html'
+  | 'seo_description'
+  | 'keyword_list'
+  | 'short_value';
 
 @Injectable({ providedIn: 'root' })
 export class ContentAssistantService {

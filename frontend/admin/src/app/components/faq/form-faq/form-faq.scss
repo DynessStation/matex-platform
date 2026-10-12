@@ -24,6 +24,11 @@ textarea.form-control {
   resize: vertical;
 }
 
+.faq-status-card {
+  width: min(100%, 440px);
+  margin-bottom: 20px;
+}
+
 @media (max-width: 575px) {
   .faq-field-tools app-ai-field-action {
     width: 100%;

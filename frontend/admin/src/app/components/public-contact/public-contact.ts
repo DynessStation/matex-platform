@@ -21,6 +21,7 @@ import { HasPermissionDirective } from '../../shared/directive/has-permission.di
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { ContentAssistantService } from '../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PublicContactService } from '../../shared/services/public-contact.service';
 
@@ -46,6 +47,7 @@ export class PublicContact {
   private notifications = inject(NotificationService);
   private messages = inject(ApiMessageService);
   private contentAssistant = inject(ContentAssistantService);
+  private formIssues = inject(FormIssueNavigatorService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly channelTypeOptions: Select2Data = [
     { value: 'whatsapp', label: 'WhatsApp' },
@@ -91,6 +93,7 @@ export class PublicContact {
             translations.controls['id_description'].value || '',
           ),
         },
+        field_types: { description: 'multiline_text' },
       })
       .pipe(finalize(() => (this.assistingKey = null)))
       .subscribe({
@@ -126,6 +129,7 @@ export class PublicContact {
             translations.controls[`${locale}_description`].value || '',
           ),
         },
+        field_types: { description: 'multiline_text' },
       })
       .pipe(finalize(() => (this.assistingKey = null)))
       .subscribe({
@@ -228,8 +232,22 @@ export class PublicContact {
   }
 
   submit(): void {
+    if (!this.topics.length) {
+      this.notifications.showError(
+        'Tambahkan minimal satu topik agar formulir kontak publik dapat digunakan.',
+      );
+      return;
+    }
+    this.applyDuplicateKeyErrors(this.channels);
+    this.applyDuplicateKeyErrors(this.topics);
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.notifications.showError(
+        'Pengaturan kontak belum lengkap atau memiliki kunci yang sama. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
+      return;
+    }
     const raw = this.form.getRawValue();
     const mapTranslations = (value: any) => [
       {
@@ -264,9 +282,32 @@ export class PublicContact {
         translations: mapTranslations(item.translations),
       })),
     };
-    this.service.updateSettings(payload).subscribe((response) => {
-      this.notifications.showSuccess(this.messages.resolveResponse(response));
-      if (response.data) this.load(response.data);
+    this.service.updateSettings(payload).subscribe({
+      next: (response) => {
+        this.notifications.showSuccess(this.messages.resolveResponse(response));
+        if (response.data) this.load(response.data);
+      },
+      error: () => this.formIssues.focusFirstInvalid(),
     });
+  }
+
+  private applyDuplicateKeyErrors(array: FormArray): void {
+    const counts = new Map<string, number>();
+    for (const group of array.controls) {
+      const key = String(group.get('key')?.value || '')
+        .trim()
+        .toLowerCase();
+      if (key) counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    for (const group of array.controls) {
+      const control = group.get('key');
+      const key = String(control?.value || '')
+        .trim()
+        .toLowerCase();
+      const errors = { ...(control?.errors ?? {}) };
+      delete errors['duplicate'];
+      if (key && (counts.get(key) ?? 0) > 1) errors['duplicate'] = true;
+      control?.setErrors(Object.keys(errors).length ? errors : null);
+    }
   }
 }

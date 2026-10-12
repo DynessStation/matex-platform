@@ -1,0 +1,24 @@
+:host ::ng-deep app-table {
+  .theme-table > :not(caption) > * > * {
+    padding: 12px 14px;
+    vertical-align: middle;
+  }
+
+  .theme-table .tbl-image img {
+    width: 46px;
+    height: 46px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .show-box {
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  :host ::ng-deep app-table .theme-table > :not(caption) > * > * {
+    padding: 10px;
+  }
+}

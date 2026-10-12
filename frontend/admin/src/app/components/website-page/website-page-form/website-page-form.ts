@@ -50,7 +50,11 @@ import {
   IWebsitePageEditorPublicationPayload,
   IWebsitePageEditorSaveRequest,
 } from '../../../shared/interface/website-page-editor.interface';
-import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import {
+  ContentAssistantFieldType,
+  ContentAssistantService,
+} from '../../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { AuthState } from '../../../shared/store/state/auth.state';
@@ -177,6 +181,7 @@ export class WebsitePageForm {
   private readonly translate = inject(TranslateService);
   private readonly contentAssistant = inject(ContentAssistantService);
   private readonly notification = inject(NotificationService);
+  private readonly formIssues = inject(FormIssueNavigatorService);
 
   //==================================================
   //==== INPUT
@@ -1185,6 +1190,18 @@ export class WebsitePageForm {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields,
+        field_types: Object.fromEntries(
+          Object.keys(fields).map((key) => [
+            key,
+            key === 'content'
+              ? 'rich_text_html'
+              : key === 'meta_description' || key === 'og_description'
+                ? 'seo_description'
+                : key === 'meta_keywords'
+                  ? 'keyword_list'
+                  : 'multiline_text',
+          ]),
+        ) as Record<string, ContentAssistantFieldType>,
       })
       .pipe(finalize(() => (this.translatingPage = false)))
       .subscribe({
@@ -1268,6 +1285,12 @@ export class WebsitePageForm {
           meta_description: value.meta_description,
           og_description: value.og_description,
         },
+        field_types: {
+          excerpt: 'multiline_text',
+          content: 'rich_text_html',
+          meta_description: 'seo_description',
+          og_description: 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.generatingPage = false)))
       .subscribe({
@@ -1309,6 +1332,14 @@ export class WebsitePageForm {
           [field]: translateFromIndonesia
             ? this.translationForm('id-ID').getRawValue()[field]
             : value[field],
+        },
+        field_types: {
+          [field]:
+            field === 'content'
+              ? 'rich_text_html'
+              : field === 'excerpt'
+                ? 'multiline_text'
+                : 'seo_description',
         },
       })
       .pipe(finalize(() => (this.assistingPageField = null)))
@@ -1367,6 +1398,7 @@ export class WebsitePageForm {
         target_locale: locale,
         context: JSON.stringify({ user_written_title: userWrittenTitle }),
         fields: { description: translateFromIndonesia ? source : current },
+        field_types: { description: 'multiline_text' },
       })
       .pipe(finalize(() => (this.assistingOrganizerField = null)))
       .subscribe({
@@ -2684,11 +2716,21 @@ export class WebsitePageForm {
         this.activeLocale = invalidFormSection.locale;
       }
 
+      this.notification.showError(
+        'Pengaturan halaman belum lengkap. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
+
       return;
     }
 
     if (this.gadgetHomeMediaBlocksSave || this.aboutMediaBlocksSave) {
       this.activeTab = 'media';
+
+      this.notification.showError(
+        'Media wajib belum lengkap atau ukurannya belum sesuai slot.',
+      );
+      this.formIssues.focusFirstInvalid();
 
       return;
     }
@@ -2699,11 +2741,21 @@ export class WebsitePageForm {
     ) {
       this.activeTab = 'publication';
 
+      this.notification.showError(
+        'Publikasikan bahasa utama terlebih dahulu sebelum menerapkan status halaman.',
+      );
+      this.formIssues.focusFirstInvalid();
+
       return;
     }
 
     if (this.publicationScheduleInvalid || this.publicationEndInvalid) {
       this.activeTab = 'publication';
+
+      this.notification.showError(
+        'Tanggal atau waktu publikasi belum lengkap atau tidak valid.',
+      );
+      this.formIssues.focusFirstInvalid();
 
       return;
     }
@@ -2810,6 +2862,24 @@ export class WebsitePageForm {
 
       publicationActions: this.buildPublicationActions(),
     });
+  }
+
+  showServerIssue(code: string): void {
+    if (code === 'WEBSITE_PAGE_CONFLICT') {
+      this.activeTab = 'content';
+      this.activeLocale = 'id-ID';
+      const control = this.translationForm('id-ID').controls.slug;
+      control.setErrors({ ...(control.errors ?? {}), duplicate: true });
+      this.formIssues.focusFirstInvalid('slug');
+      return;
+    }
+    this.form.markAllAsTouched();
+    const invalid = this.firstInvalidFormSection();
+    if (invalid) {
+      this.activeTab = invalid.tab;
+      if (invalid.locale) this.activeLocale = invalid.locale;
+    }
+    this.formIssues.focusFirstInvalid();
   }
 
   private firstInvalidFormSection(): {

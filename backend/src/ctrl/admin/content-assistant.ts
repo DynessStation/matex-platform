@@ -10,6 +10,22 @@ const app = express();
 const { pool } = db;
 
 type AssistMode = "translate" | "generate";
+type FieldType =
+  | "plain_text"
+  | "multiline_text"
+  | "rich_text_html"
+  | "seo_description"
+  | "keyword_list"
+  | "short_value";
+
+const fieldTypes = new Set<FieldType>([
+  "plain_text",
+  "multiline_text",
+  "rich_text_html",
+  "seo_description",
+  "keyword_list",
+  "short_value",
+]);
 
 const protectedFieldPattern =
   /(^|_)(title|name|question|label|heading|headline|slug|key)(_|$)/i;
@@ -29,6 +45,85 @@ const cleanRecord = (value: unknown) => {
     result[key] = text;
   }
   return result;
+};
+
+const cleanFieldTypes = (
+  value: unknown,
+  keys: string[],
+): Record<string, FieldType> | null => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const input = value as Record<string, unknown>;
+  const result: Record<string, FieldType> = {};
+  for (const key of keys) {
+    const type = input[key];
+    if (typeof type !== "string" || !fieldTypes.has(type as FieldType))
+      return null;
+    result[key] = type as FieldType;
+  }
+  return result;
+};
+
+const decodeEntities = (value: string) =>
+  value
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#(\d+);/g, (_match, code) =>
+      String.fromCodePoint(Number(code) || 32),
+    );
+
+const stripMarkup = (value: string, preserveLines: boolean) => {
+  let text = String(value ?? "")
+    .replace(/^```(?:html|markdown|text)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
+  if (preserveLines) {
+    text = text
+      .replace(/<br\s*\/?\s*>/gi, "\n")
+      .replace(/<\/p\s*>/gi, "\n\n")
+      .replace(/<\/li\s*>/gi, "\n")
+      .replace(/<li\b[^>]*>/gi, "- ")
+      .replace(/<\/(?:h[1-6]|div|blockquote)\s*>/gi, "\n\n");
+  }
+  text = decodeEntities(text.replace(/<[^>]+>/g, ""));
+  return preserveLines
+    ? text
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim()
+    : text.replace(/\s+/g, " ").trim();
+};
+
+const normalizeFieldValue = (value: string, type: FieldType) => {
+  if (type === "rich_text_html") {
+    const html = String(value ?? "")
+      .replace(/^```(?:html)?\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+      .replace(/\son\w+\s*=\s*(["'])[^"']*\1/gi, "")
+      .replace(/javascript\s*:/gi, "")
+      .trim();
+    if (!html) return "";
+    return /<\/?[a-z][\s\S]*>/i.test(html)
+      ? html
+      : html
+          .split(/\n{2,}/)
+          .map((paragraph) => `<p>${paragraph.trim()}</p>`)
+          .join("");
+  }
+  if (type === "multiline_text") return stripMarkup(value, true);
+  if (type === "keyword_list")
+    return stripMarkup(value, false)
+      .split(/[,;\n]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(", ");
+  return stripMarkup(value, false);
 };
 
 const extractOutputText = (response: any) => {
@@ -52,6 +147,9 @@ app.post(
 
     const mode = String(req.body?.mode ?? "") as AssistMode;
     const fields = cleanRecord(req.body?.fields);
+    const requestedFieldTypes = fields
+      ? cleanFieldTypes(req.body?.field_types, Object.keys(fields))
+      : null;
     const sourceLocale = String(req.body?.source_locale ?? "id-ID").slice(
       0,
       12,
@@ -66,7 +164,11 @@ app.post(
     );
     const context = String(req.body?.context ?? "").slice(0, 12000);
 
-    if (!fields || !["translate", "generate"].includes(mode))
+    if (
+      !fields ||
+      !requestedFieldTypes ||
+      !["translate", "generate"].includes(mode)
+    )
       return sendError(
         res,
         400,
@@ -95,10 +197,13 @@ app.post(
       );
 
     const fieldNames = Object.keys(fields);
+    const formatRules = Object.entries(requestedFieldTypes).map(
+      ([key, type]) => `${key}: ${type}`,
+    );
     const task =
       mode === "translate"
-        ? `Translate every field from ${sourceLocale} to ${targetLocale}. Preserve HTML structure, URLs, product codes, measurements, and brand names. Do not add claims or facts.`
-        : `Write or improve every requested ${targetLocale} field for a ${contentType}. Use only the supplied context and current field values. Keep factual claims conservative. HTML fields must use clean semantic HTML with paragraphs and headings when useful.`;
+        ? `Translate every field from ${sourceLocale} to ${targetLocale}. Preserve URLs, product codes, measurements, and brand names. Follow each field format exactly. Do not add claims or facts.`
+        : `Write or improve every requested ${targetLocale} field for a ${contentType}. Use only the supplied context and current field values. Keep factual claims conservative. Follow each field format exactly.`;
 
     try {
       const providerResponse = await fetch(
@@ -121,7 +226,7 @@ app.post(
               {
                 role: "developer",
                 content:
-                  "You help edit MATEX natural-latex business content. Return only the requested fields. Preserve meaning and formatting. Never invent certifications, prices, stock, medical benefits, warranties, or technical specifications.",
+                  "You help edit MATEX natural-latex business content. Return only the requested fields. Field formats: plain_text and short_value are one line without HTML or Markdown; multiline_text is plain text with optional line breaks and never HTML or Markdown; rich_text_html is semantic HTML and never Markdown; seo_description is one concise plain-text paragraph without HTML; keyword_list is comma-separated plain text. Never invent certifications, prices, stock, medical benefits, warranties, or technical specifications.",
               },
               {
                 role: "user",
@@ -130,6 +235,7 @@ app.post(
                   content_type: contentType,
                   context,
                   fields,
+                  field_formats: formatRules,
                 }),
               },
             ],
@@ -183,7 +289,10 @@ app.post(
       const result: Record<string, string> = {};
       for (const item of Array.isArray(parsed?.fields) ? parsed.fields : []) {
         if (fieldNames.includes(item?.key) && typeof item?.value === "string")
-          result[item.key] = item.value;
+          result[item.key] = normalizeFieldValue(
+            item.value,
+            requestedFieldTypes[item.key],
+          );
       }
       if (!fieldNames.every((key) => typeof result[key] === "string"))
         throw new Error("Provider returned incomplete fields");

@@ -18,7 +18,11 @@
         />
         @if (form.controls.key.touched && form.controls.key.invalid) {
           <div class="invalid-feedback">
-            {{ 'faq_admin.key_help' | translate }}
+            @if (form.controls.key.errors?.['duplicate']) {
+              Kunci FAQ ini sudah digunakan.
+            } @else {
+              {{ 'faq_admin.key_help' | translate }}
+            }
           </div>
         }
       </app-form-fields>
@@ -55,6 +59,11 @@
           maxlength="500"
           formControlName="id_question"
         />
+        @if (
+          form.controls.id_question.touched && form.controls.id_question.invalid
+        ) {
+          <div class="invalid-feedback">Pertanyaan Indonesia wajib diisi.</div>
+        }
       </app-form-fields>
       <app-form-fields
         [label]="'faq_admin.answer'"
@@ -81,6 +90,11 @@
           maxlength="50000"
           formControlName="id_answer"
         ></textarea>
+        @if (
+          form.controls.id_answer.touched && form.controls.id_answer.invalid
+        ) {
+          <div class="invalid-feedback">Jawaban Indonesia wajib diisi.</div>
+        }
       </app-form-fields>
     </div>
   </div>
@@ -99,6 +113,11 @@
           maxlength="500"
           formControlName="en_question"
         />
+        @if (
+          form.controls.en_question.touched && form.controls.en_question.invalid
+        ) {
+          <div class="invalid-feedback">English question is required.</div>
+        }
       </app-form-fields>
       <app-form-fields
         [label]="'faq_admin.answer'"
@@ -137,21 +156,22 @@
           maxlength="50000"
           formControlName="en_answer"
         ></textarea>
+        @if (
+          form.controls.en_answer.touched && form.controls.en_answer.invalid
+        ) {
+          <div class="invalid-feedback">English answer is required.</div>
+        }
       </app-form-fields>
     </div>
   </div>
 
-  <app-form-fields
-    class="d-block mt-4"
-    [label]="'faq_admin.active'"
-    [for]="'status'"
-  >
-    <label class="switch"
-      ><input type="checkbox" id="status" formControlName="status" /><span
-        class="switch-state"
-      ></span
-    ></label>
-  </app-form-fields>
+  <label class="app-check app-check-card faq-status-card mt-4" for="status">
+    <input type="checkbox" id="status" formControlName="status" />
+    <span>
+      <strong>{{ 'faq_admin.active' | translate }}</strong>
+      <small>Tampilkan pertanyaan ini pada halaman FAQ publik.</small>
+    </span>
+  </label>
   <app-button [id]="'faq_btn'">{{
     (type() === 'create' ? 'faq_admin.save' : 'faq_admin.update') | translate
   }}</app-button>

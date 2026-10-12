@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
@@ -49,6 +49,7 @@ export class EditWebsitePage {
   private websitePageService = inject(WebsitePageService);
   private apiMessageService = inject(ApiMessageService);
   private notificationService = inject(NotificationService);
+  readonly formEditor = viewChild(WebsitePageForm);
 
   public pageKey = '';
   public detailErrorStatus: number | null = null;
@@ -103,7 +104,10 @@ export class EditWebsitePage {
         }),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe();
+      .subscribe({
+        error: (error) =>
+          this.formEditor()?.showServerIssue(String(error?.error?.code || '')),
+      });
   }
 
   retryDetail(): void {

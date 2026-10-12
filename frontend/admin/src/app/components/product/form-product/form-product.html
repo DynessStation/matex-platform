@@ -37,6 +37,11 @@
                       hubung; sebaiknya tidak diubah setelah produk
                       dipublikasikan.</small
                     >
+                    @if (form.controls.key.errors?.['duplicate']) {
+                      <div class="field-error">
+                        Kunci internal ini sudah digunakan produk lain.
+                      </div>
+                    }
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">SKU *</label
@@ -49,6 +54,11 @@
                       >Kode unik produk untuk administrasi, harga, dan kanal
                       marketplace.</small
                     >
+                    @if (form.controls.sku.errors?.['duplicate']) {
+                      <div class="field-error">
+                        SKU ini sudah digunakan produk lain.
+                      </div>
+                    }
                   </div>
                   <div class="col-md-4">
                     <label class="form-label">Bentuk produk</label>

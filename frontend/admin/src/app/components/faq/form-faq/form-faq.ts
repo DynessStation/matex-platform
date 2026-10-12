@@ -16,6 +16,7 @@ import {
   IFaqTranslation,
 } from '../../../shared/interface/faq.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateFaqAction,
@@ -44,6 +45,7 @@ export class FormFaq {
   private fb = inject(FormBuilder);
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
+  private formIssues = inject(FormIssueNavigatorService);
   assistingField: 'id_answer' | 'en_answer' | null = null;
   assistingMode: 'generate' | 'translate' | null = null;
 
@@ -99,6 +101,7 @@ export class FormFaq {
         target_locale: locale === 'id' ? 'id-ID' : 'en-US',
         context: String(value[`${locale}_question`] || ''),
         fields: { answer: String(value[`${locale}_answer`] || '') },
+        field_types: { answer: 'multiline_text' },
       })
       .pipe(
         finalize(() => {
@@ -133,6 +136,7 @@ export class FormFaq {
         fields: {
           answer: value.id_answer || '',
         },
+        field_types: { answer: 'multiline_text' },
       })
       .pipe(
         finalize(() => {
@@ -163,7 +167,13 @@ export class FormFaq {
 
   submit(): void {
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.notification.showError(
+        'Form FAQ belum lengkap. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
+      return;
+    }
     const value = this.form.getRawValue();
     const translations: IFaqTranslation[] = [
       {
@@ -189,8 +199,16 @@ export class FormFaq {
       this.type() === 'edit' && this.faq
         ? new UpdateFaqAction(payload, this.faq.id)
         : new CreateFaqAction(payload);
-    this.store
-      .dispatch(action)
-      .subscribe({ complete: () => void this.router.navigateByUrl('/faq') });
+    this.store.dispatch(action).subscribe({
+      complete: () => void this.router.navigateByUrl('/faq'),
+      error: (error) => {
+        if (error?.error?.code !== 'FAQ_KEY_EXISTS') return;
+        this.form.controls.key.setErrors({
+          ...(this.form.controls.key.errors ?? {}),
+          duplicate: true,
+        });
+        this.formIssues.focusFirstInvalid('key');
+      },
+    });
   }
 }

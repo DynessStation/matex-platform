@@ -522,6 +522,59 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   const cx = await pool.getConnection();
   try {
     await cx.beginTransaction();
+    const [duplicateProducts] = await cx.query<RowDataPacket[]>(
+      `SELECT id_product,product_key,product_sku
+       FROM product_catalog
+       WHERE id_master_comp=? AND product_deleted_at IS NULL
+         AND (? IS NULL OR id_product<>?)
+         AND (product_key=? OR product_sku=?)
+       LIMIT 1`,
+      [scope.idMasterComp, id, id, payload.key, payload.sku],
+    );
+    if (duplicateProducts.length) {
+      await cx.rollback();
+      const duplicate = duplicateProducts[0];
+      if (String(duplicate.product_key) === payload.key)
+        return sendError(
+          res,
+          409,
+          "PRODUCT_KEY_EXISTS",
+          "Kunci internal produk sudah digunakan",
+          { field: "key" },
+        );
+      return sendError(
+        res,
+        409,
+        "PRODUCT_SKU_EXISTS",
+        "SKU produk sudah digunakan",
+        { field: "sku" },
+      );
+    }
+    for (const translation of payload.translations) {
+      const [duplicateSlugs] = await cx.query<RowDataPacket[]>(
+        `SELECT id_product FROM product_catalog_i18n
+         WHERE id_master_comp=? AND product_locale=? AND product_slug=?
+           AND (? IS NULL OR id_product<>?)
+         LIMIT 1`,
+        [
+          scope.idMasterComp,
+          translation.locale,
+          translation.slug,
+          id,
+          id,
+        ],
+      );
+      if (duplicateSlugs.length) {
+        await cx.rollback();
+        return sendError(
+          res,
+          409,
+          "PRODUCT_SLUG_EXISTS",
+          `Alamat produk ${translation.locale} sudah digunakan`,
+          { field: "slug", locale: translation.locale },
+        );
+      }
+    }
     if (id) {
       const [exists] = await cx.query<RowDataPacket[]>(
         `SELECT id_product FROM product_catalog WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL FOR UPDATE`,

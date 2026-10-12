@@ -10,6 +10,7 @@
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
+    [actionMode]="'dropdown'"
     [emitInitialChange]="false"
     (tableChanged)="onTableChange($event)"
     (rowClicked)="onActionClicked({ actionToPerform: 'edit', data: $event })"

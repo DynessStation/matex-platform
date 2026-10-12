@@ -29,6 +29,7 @@ import {
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { GetCategoriesAction } from '../../../shared/store/action/category.action';
@@ -65,6 +66,7 @@ export class FormProduct {
   private contentAssistant = inject(ContentAssistantService);
   private localization = inject(LocalizationService);
   private notification = inject(NotificationService);
+  private formIssues = inject(FormIssueNavigatorService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly type = input<string>('create');
   readonly mediaConfig = mediaConfig;
@@ -227,6 +229,7 @@ export class FormProduct {
           sku: this.form.controls.sku.value,
         }),
         fields: { value: sourceValue },
+        field_types: { value: 'short_value' },
       })
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
@@ -317,6 +320,14 @@ export class FormProduct {
           specifications: this.specificationPayload(locale),
         }),
         fields: { [field]: value[controlName] || '' },
+        field_types: {
+          [field]:
+            field === 'description'
+              ? 'rich_text_html'
+              : field === 'short_description'
+                ? 'multiline_text'
+                : 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
@@ -350,6 +361,14 @@ export class FormProduct {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: { [field]: value[`id_${field}`] || '' },
+        field_types: {
+          [field]:
+            field === 'description'
+              ? 'rich_text_html'
+              : field === 'short_description'
+                ? 'multiline_text'
+                : 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
@@ -524,6 +543,14 @@ export class FormProduct {
         : this.pricePublicationError
           ? 'channels'
           : this.invalidTab();
+      this.notification.showError(
+        this.categoryError
+          ? 'Pilih minimal satu kategori produk sebelum menyimpan.'
+          : this.pricePublicationError
+            ? 'Harga publik Rupiah dan Dollar wajib diisi serta diaktifkan.'
+            : 'Form produk belum lengkap. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
       return;
     }
     const payload = this.payload();
@@ -533,6 +560,7 @@ export class FormProduct {
         : new CreateProductAction(payload);
     this.store.dispatch(action).subscribe({
       complete: () => void this.router.navigateByUrl('/product'),
+      error: (error) => this.handleSaveError(error),
     });
   }
   private specificationPayload(prefix: 'id' | 'en') {
@@ -729,6 +757,53 @@ export class FormProduct {
       return 'content';
     if (this.prices.invalid || this.marketplaces.invalid) return 'channels';
     return 'general';
+  }
+
+  private handleSaveError(error: any): void {
+    const code = String(error?.error?.code || '');
+    if (code === 'PRODUCT_CATEGORY_INVALID') {
+      this.activeTab = 'general';
+      this.categoryError = true;
+      this.formIssues.focusFirstInvalid();
+      return;
+    }
+    if (
+      code === 'PRODUCT_MEDIA_INVALID' ||
+      code === 'PRODUCT_MEDIA_TYPE_INVALID'
+    ) {
+      this.activeTab = 'media';
+      this.formIssues.focusFirstInvalid();
+      return;
+    }
+    if (code === 'PRODUCT_DUPLICATE' || code === 'PRODUCT_KEY_EXISTS') {
+      this.activeTab = 'general';
+      this.form.controls.key.setErrors({
+        ...(this.form.controls.key.errors ?? {}),
+        duplicate: true,
+      });
+      this.formIssues.focusFirstInvalid('key');
+      return;
+    }
+    if (code === 'PRODUCT_SKU_EXISTS') {
+      this.activeTab = 'general';
+      this.form.controls.sku.setErrors({
+        ...(this.form.controls.sku.errors ?? {}),
+        duplicate: true,
+      });
+      this.formIssues.focusFirstInvalid('sku');
+      return;
+    }
+    if (code === 'PRODUCT_SLUG_EXISTS') {
+      const locale = String(error?.error?.data?.locale || 'id-ID');
+      this.activeTab = 'content';
+      this.activeLocale = locale === 'en-US' ? 'en' : 'id';
+      const control =
+        this.form.controls[this.activeLocale === 'en' ? 'en_slug' : 'id_slug'];
+      control.setErrors({ ...(control.errors ?? {}), duplicate: true });
+      this.formIssues.focusFirstInvalid(
+        this.activeLocale === 'en' ? 'en_slug' : 'id_slug',
+      );
+    }
   }
 
   ngOnDestroy() {

@@ -42,6 +42,11 @@
                     <small class="text-muted"
                       >Gunakan huruf kecil, angka, dan tanda hubung.</small
                     >
+                    @if (form.controls.key.errors?.['duplicate']) {
+                      <div class="invalid-feedback d-block">
+                        Kunci atau alamat kategori ini sudah digunakan.
+                      </div>
+                    }
                   </div>
                   <div class="col-md-5">
                     <label class="form-label" for="status">Status</label>

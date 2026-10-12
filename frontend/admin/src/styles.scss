@@ -59,6 +59,55 @@
   box-sizing: border-box;
 }
 
+// Active fields stay visually available. Muted fills are reserved for values
+// that cannot currently be edited.
+.page-body-wrapper .form-control:not(:disabled):not([readonly]),
+.page-body-wrapper .form-select:not(:disabled),
+.page-body-wrapper .custom-select:not(.ng-select-disabled) .select2-selection {
+  border: 1px solid #dfe3e8 !important;
+  background-color: #fff !important;
+  color: #30343b !important;
+}
+
+.page-body-wrapper .form-control:disabled,
+.page-body-wrapper .form-control[readonly],
+.page-body-wrapper .form-select:disabled,
+.page-body-wrapper .custom-select.ng-select-disabled .select2-selection {
+  border: 1px solid #e3e6ea !important;
+  background-color: #f1f3f5 !important;
+  color: #6f7782 !important;
+  cursor: not-allowed;
+}
+
+.page-body-wrapper .form-control:focus,
+.page-body-wrapper .form-select:focus,
+.page-body-wrapper .custom-select .select2-container--focus .select2-selection {
+  border-color: var(--theme-color) !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(var(--theme-color-rgb), 0.12) !important;
+}
+
+form .form-control.ng-invalid.ng-touched,
+form .form-select.ng-invalid.ng-touched,
+form select2.ng-invalid.ng-touched .select2-selection,
+form .custom-select.ng-invalid.ng-touched .select2-selection {
+  border: 1px solid var(--bs-danger) !important;
+  background-image: none !important;
+}
+
+.input-group > .input-group-text {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  border: 1px solid #dfe3e8;
+  background: #f6f3ec;
+  color: #343a40;
+}
+
+.btn:not(.btn-sm):not(.btn-lg):not(.action-dropdown-toggle) {
+  min-height: 42px;
+}
+
 .theme-form label.form-label {
   display: block;
   min-height: 20px;
@@ -136,6 +185,25 @@
 }
 
 body.dark-only {
+  .page-body-wrapper .form-control:not(:disabled):not([readonly]),
+  .page-body-wrapper .form-select:not(:disabled),
+  .page-body-wrapper
+    .custom-select:not(.ng-select-disabled)
+    .select2-selection {
+    border-color: #505765 !important;
+    background-color: #242832 !important;
+    color: #f2f4f7 !important;
+  }
+
+  .page-body-wrapper .form-control:disabled,
+  .page-body-wrapper .form-control[readonly],
+  .page-body-wrapper .form-select:disabled,
+  .page-body-wrapper .custom-select.ng-select-disabled .select2-selection {
+    border-color: #414752 !important;
+    background-color: #30353f !important;
+    color: #aeb6c2 !important;
+  }
+
   .btn.btn-light,
   .btn.btn-light-bg,
   .btn.btn-light-bg-secondary,

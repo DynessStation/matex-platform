@@ -25,6 +25,7 @@ import {
   ProductCategoryStatus,
 } from '../../../shared/interface/category.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateCategoryAction,
@@ -56,6 +57,7 @@ export class FormCategory {
   private fb = inject(FormBuilder);
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
+  private formIssues = inject(FormIssueNavigatorService);
 
   readonly type = input<string>('create');
   readonly categories = input<ICategory[]>([]);
@@ -93,6 +95,10 @@ export class FormCategory {
             mode === 'translate'
               ? value[`id_${field}`] || ''
               : value[controlName] || '',
+        },
+        field_types: {
+          [field]:
+            field === 'description' ? 'multiline_text' : 'seo_description',
         },
       })
       .pipe(finalize(() => (this.assistingField = null)))
@@ -182,6 +188,11 @@ export class FormCategory {
           meta_description: value[`${locale}_meta_description`] || '',
           og_description: value[`${locale}_og_description`] || '',
         },
+        field_types: {
+          description: 'multiline_text',
+          meta_description: 'seo_description',
+          og_description: 'seo_description',
+        },
       })
       .pipe(finalize(() => (this.assisting = false)))
       .subscribe({
@@ -212,6 +223,11 @@ export class FormCategory {
           description: value.id_description || '',
           meta_description: value.id_meta_description || '',
           og_description: value.id_og_description || '',
+        },
+        field_types: {
+          description: 'multiline_text',
+          meta_description: 'seo_description',
+          og_description: 'seo_description',
         },
       })
       .pipe(finalize(() => (this.assisting = false)))
@@ -253,6 +269,10 @@ export class FormCategory {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.activeTab = this.invalidTab();
+      this.notification.showError(
+        'Form kategori belum lengkap. Periksa field yang ditandai merah.',
+      );
+      this.formIssues.focusFirstInvalid();
       return;
     }
     const payload = this.payload();
@@ -270,6 +290,15 @@ export class FormCategory {
         this.category = null;
         this.activeTab = 'general';
         this.store.dispatch(new GetCategoriesAction({ type: 'product' }));
+      },
+      error: (error) => {
+        if (error?.error?.code !== 'PRODUCT_CATEGORY_CONFLICT') return;
+        this.activeTab = 'general';
+        this.form.controls.key.setErrors({
+          ...(this.form.controls.key.errors ?? {}),
+          duplicate: true,
+        });
+        this.formIssues.focusFirstInvalid('key');
       },
     });
   }
