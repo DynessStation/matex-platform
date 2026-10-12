@@ -88,7 +88,6 @@ export class Header {
     this.setting$.subscribe((setting) => {
       if (setting && setting.general) {
         this.url = setting.general.site_url;
-        document.body.classList.add(setting.general.mode!);
       }
     });
 

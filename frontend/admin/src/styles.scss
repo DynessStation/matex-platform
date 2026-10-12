@@ -331,6 +331,257 @@ body.dark-only {
 }
 
 //==================================================
+//==== ADMIN DARK MODE FOUNDATION
+//==================================================
+
+body.dark-only {
+  --admin-dark-page: #0b141d;
+  --admin-dark-surface: #1c2128;
+  --admin-dark-surface-raised: #242a33;
+  --admin-dark-surface-hover: #303743;
+  --admin-dark-border: #404754;
+  --admin-dark-border-strong: #505866;
+  --admin-dark-text: #f2f4f7;
+  --admin-dark-text-muted: #aeb6c2;
+  --admin-dark-text-soft: #858f9e;
+
+  color-scheme: dark;
+
+  .page-body-wrapper {
+    color: var(--admin-dark-text);
+
+    h1:not([class*='text-']),
+    h2:not([class*='text-']),
+    h3:not([class*='text-']),
+    h4:not([class*='text-']),
+    h5:not([class*='text-']),
+    h6:not([class*='text-']),
+    label:not([class*='text-']),
+    legend:not([class*='text-']),
+    strong:not([class*='text-']) {
+      color: var(--admin-dark-text) !important;
+    }
+
+    .text-content,
+    .text-muted,
+    .form-text,
+    .form-helper,
+    .field-help,
+    .help-text,
+    .settings-intro p {
+      color: var(--admin-dark-text-muted) !important;
+    }
+
+    .border,
+    .border-top,
+    .border-end,
+    .border-bottom,
+    .border-start,
+    hr {
+      border-color: var(--admin-dark-border) !important;
+    }
+
+    .bg-light,
+    .app-check-card {
+      border-color: var(--admin-dark-border) !important;
+      background-color: var(--admin-dark-surface-raised) !important;
+      color: var(--admin-dark-text) !important;
+    }
+
+    .app-check-card small {
+      color: var(--admin-dark-text-muted) !important;
+    }
+
+    .alert-light {
+      border-color: var(--admin-dark-border-strong) !important;
+      background-color: var(--admin-dark-surface-raised) !important;
+      color: var(--admin-dark-text) !important;
+    }
+
+    .alert-info {
+      border-color: #315f88 !important;
+      background-color: #172f47 !important;
+      color: #c8e3ff !important;
+    }
+
+    .alert-success {
+      border-color: #2f6f55 !important;
+      background-color: #17372b !important;
+      color: #bdebd6 !important;
+    }
+
+    .alert-warning {
+      border-color: #765a1c !important;
+      background-color: #3d321b !important;
+      color: #ffe3a3 !important;
+    }
+
+    .alert-danger {
+      border-color: #82424a !important;
+      background-color: #442329 !important;
+      color: #ffc7cd !important;
+    }
+
+    .alert {
+      strong,
+      p,
+      small,
+      .text-content,
+      .text-muted {
+        color: inherit !important;
+      }
+    }
+
+    // Custom admin workspaces use their own class names instead of Kartify
+    // cards, so they need to share the same dark surfaces explicitly.
+    .permission-workspace,
+    .permission-sidebar-header,
+    .permission-content,
+    .permission-content-header,
+    .audit-field,
+    .audit-info-box,
+    .settings-card,
+    .office-note,
+    .location-message,
+    .cms-preview,
+    .cms-preview-toolbar {
+      border-color: var(--admin-dark-border) !important;
+      background-color: var(--admin-dark-surface) !important;
+      color: var(--admin-dark-text) !important;
+    }
+
+    .permission-sidebar,
+    .audit-json-box,
+    .cms-preview-stage {
+      border-color: var(--admin-dark-border) !important;
+      background-color: var(--admin-dark-page) !important;
+      color: var(--admin-dark-text) !important;
+    }
+
+    .permission-section,
+    .permission-sidebar-header,
+    .permission-content-header,
+    .permission-item,
+    .audit-header,
+    .audit-section,
+    .audit-json-title,
+    .language-row {
+      border-color: var(--admin-dark-border) !important;
+    }
+
+    .permission-group-item:hover {
+      border-color: var(--admin-dark-border) !important;
+      background-color: var(--admin-dark-surface-raised) !important;
+    }
+
+    .permission-group-item.active,
+    li.category-drag-over > div {
+      border-color: #a76000 !important;
+      background-color: #332817 !important;
+    }
+
+    .permission-group-count {
+      background-color: var(--admin-dark-border) !important;
+    }
+
+    .permission-group-item.active .permission-group-count {
+      background-color: var(--theme-color) !important;
+      color: #fff !important;
+    }
+
+    .permission-description,
+    .permission-total,
+    .permission-group-progress,
+    .permission-item-key,
+    .permission-item-description,
+    .permission-footer-summary,
+    .permission-empty,
+    .audit-created,
+    .audit-field > span,
+    .audit-info-box small,
+    .audit-info-box span,
+    .location-message,
+    .form-helper,
+    .password-requirements {
+      color: var(--admin-dark-text-muted) !important;
+    }
+
+    .permission-item-title,
+    .audit-json-title {
+      color: var(--admin-dark-text) !important;
+    }
+
+    .audit-json-title {
+      background-color: var(--admin-dark-surface-raised) !important;
+    }
+
+    .audit-json-box pre,
+    .audit-field code {
+      color: #d9e2ef !important;
+    }
+
+    .all-access-card,
+    .location-map,
+    .website-page-media-empty,
+    .website-page-media-item,
+    .cms-home-section-option,
+    .cms-home-feature-item,
+    .cms-publication-current,
+    .cms-publication-option {
+      border-color: var(--admin-dark-border) !important;
+    }
+
+    .cms-preview-frame {
+      border-color: var(--admin-dark-border-strong) !important;
+    }
+
+    .category-drag-handle:hover,
+    .category-drag-handle:focus-visible {
+      background-color: #332817 !important;
+      color: #ffbd5c !important;
+    }
+  }
+
+  .dropdown-menu,
+  .modal-content,
+  .offcanvas,
+  .popover {
+    border-color: var(--admin-dark-border) !important;
+    background-color: var(--admin-dark-surface) !important;
+    color: var(--admin-dark-text) !important;
+  }
+
+  .dropdown-item {
+    color: var(--admin-dark-text);
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: var(--admin-dark-surface-hover);
+      color: #fff;
+    }
+
+    &:disabled,
+    &.disabled {
+      background-color: transparent !important;
+      color: var(--admin-dark-text-soft) !important;
+      opacity: 1;
+    }
+  }
+
+  .modal-header,
+  .modal-footer,
+  .popover-header {
+    border-color: var(--admin-dark-border) !important;
+  }
+
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(180%);
+  }
+}
+
+//==================================================
 //==== TOAST OVERRIDE
 //==================================================
 

@@ -1,3 +1,12 @@
-<div (click)="customizeLayoutDark()" class="mode" ngbTooltip="Mode">
-  <i class="ri-moon-line"></i>
+<div
+  (click)="customizeLayoutDark()"
+  (keydown.enter)="customizeLayoutDark()"
+  (keydown.space)="$event.preventDefault(); customizeLayoutDark()"
+  class="mode"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="isDark() ? 'Gunakan mode terang' : 'Gunakan mode gelap'"
+  [ngbTooltip]="isDark() ? 'Mode terang' : 'Mode gelap'"
+>
+  <i [class]="isDark() ? 'ri-sun-line' : 'ri-moon-line'"></i>
 </div>

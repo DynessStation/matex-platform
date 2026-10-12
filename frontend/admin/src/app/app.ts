@@ -8,11 +8,12 @@ import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { IValues } from './shared/interface/setting.interface';
+import { AdminThemeModeService } from './shared/services/admin-theme-mode.service';
 import { LogoutAction } from './shared/store/action/auth.action';
 import { GetCountriesAction } from './shared/store/action/country.action';
+import { GetSettingOptionAction } from './shared/store/action/setting.action';
 import { GetStatesAction } from './shared/store/action/state.action';
 import { SettingState } from './shared/store/state/setting.state';
-import { GetSettingOptionAction } from './shared/store/action/setting.action';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ export class App {
   private router = inject(Router);
   private titleService = inject(Title);
   private store = inject(Store);
+  private adminThemeMode = inject(AdminThemeModeService);
 
   setting$: Observable<IValues> = inject(Store).select(
     SettingState.setting,
@@ -40,6 +42,10 @@ export class App {
     this.store.dispatch(new GetStatesAction());
     this.store.dispatch(new GetSettingOptionAction());
     this.setting$.subscribe((setting) => {
+      if (setting?.general) {
+        this.adminThemeMode.initialize(setting.general.mode);
+      }
+
       // Set Direction
       if (setting?.general?.admin_site_language_direction === 'rtl') {
         document.getElementsByTagName('html')[0].setAttribute('dir', 'rtl');
