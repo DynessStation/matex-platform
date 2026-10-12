@@ -254,6 +254,80 @@ body.dark-only {
     background-color: #303641 !important;
     color: #aeb6c2 !important;
   }
+
+  // Kartify still assigns white and light-gray row fills to theme tables.
+  // Keep every admin table legible when the body switches to dark mode,
+  // including tables that do not use the shared app-table component.
+  .page-body-wrapper .theme-table {
+    --bs-table-color: #eef1f5;
+    --bs-table-bg: #1c2128;
+    --bs-table-border-color: #404754;
+    color: #eef1f5 !important;
+    background-color: #1c2128 !important;
+
+    thead > tr > th {
+      border-color: #404754 !important;
+      background-color: #292d36 !important;
+      color: #f5f7fa !important;
+    }
+
+    tbody > tr {
+      border-color: #404754 !important;
+
+      &:nth-child(odd) > td {
+        background-color: #1c2128 !important;
+      }
+
+      &:nth-child(even) > td {
+        background-color: #242a33 !important;
+      }
+
+      &:hover > td {
+        background-color: #303743 !important;
+      }
+
+      > td {
+        border-color: #404754 !important;
+        color: #e7ebf0 !important;
+      }
+    }
+  }
+
+  .action-dropdown-menu {
+    border-color: #505866 !important;
+    background-color: #242a33 !important;
+    color: #eef1f5 !important;
+
+    .action-dropdown-item {
+      color: #eef1f5;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: #343c48;
+        color: #fff;
+      }
+
+      &.text-danger {
+        color: #ff8080 !important;
+      }
+    }
+
+    .dropdown-divider {
+      border-color: #505866;
+    }
+  }
+}
+
+// Long names, labels, dates, and identifiers should form readable lines rather
+// than overflowing or being forced into a single row on narrow screens.
+.page-body-wrapper .theme-table {
+  .table-heading-text,
+  .table-cell-content {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
 }
 
 //==================================================

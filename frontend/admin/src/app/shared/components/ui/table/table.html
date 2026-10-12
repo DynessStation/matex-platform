@@ -189,7 +189,9 @@
                   columnHead?.sortable && onChangeTable(columnHead, 'sort')
                 "
               >
-                {{ columnHead?.title | translate }}
+                <span class="table-heading-text">
+                  {{ columnHead?.title | translate }}
+                </span>
                 @if (columnHead?.sortable) {
                   <div class="filter-arrow">
                     <div>
@@ -270,9 +272,13 @@
                   "
                 >
                   @if (columnHead?.type && columnHead?.type === 'no') {
-                    {{
-                      i + 1 + (tableData['page'] - 1) * tableData['paginate']
-                    }}
+                    <span
+                      class="table-cell-content table-cell-content--compact"
+                    >
+                      {{
+                        i + 1 + (tableData['page'] - 1) * tableData['paginate']
+                      }}
+                    </span>
                   } @else if (
                     columnHead?.type && columnHead?.type === 'image'
                   ) {
@@ -363,17 +369,21 @@
                   } @else if (
                     columnHead?.type && columnHead?.type === 'price'
                   ) {
-                    {{ columnData[columnHead?.dataField] | currencySymbol }}
+                    <span class="table-cell-content">
+                      {{ columnData[columnHead?.dataField] | currencySymbol }}
+                    </span>
                   } @else if (columnHead?.type && columnHead?.type === 'date') {
-                    {{
-                      columnData[columnHead?.dataField.toString()]
-                        | date
-                          : (columnHead?.date_format
-                              ? columnHead?.date_format
-                              : localization.dateTimeFormat())
-                          : undefined
-                          : localization.locale()
-                    }}
+                    <span class="table-cell-content">
+                      {{
+                        columnData[columnHead?.dataField.toString()]
+                          | date
+                            : (columnHead?.date_format
+                                ? columnHead?.date_format
+                                : localization.dateTimeFormat())
+                            : undefined
+                            : localization.locale()
+                      }}
+                    </span>
                   } @else if (
                     columnHead?.type && columnHead?.type === 'rating'
                   ) {
@@ -383,6 +393,7 @@
                     />
                   } @else {
                     <div
+                      class="table-cell-content"
                       [innerHtml]="
                         getNestedPropertyValue(
                           columnHead?.dataField.toString(),
