@@ -11,6 +11,7 @@ import keyhsid from "../../hsid";
 import { AuthRequest, verifyToken } from "../middleware/authJwt";
 import { requirePermission } from "../middleware/authPermission";
 import { buildAttachmentUrl } from "../../helper/attachment.helper";
+import { accessTokenCookieOptions } from "../../config/cookie.config";
 
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 import { writeAuditLog } from "../../helper/audit-log.helper";
@@ -918,9 +919,7 @@ app.post("/api/v1/admin-acct/login", multer().none(), async (req, res) => {
     });
 
     res.cookie("access_token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      ...accessTokenCookieOptions(),
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -1108,13 +1107,7 @@ app.post(
     //==== CLEAR COOKIE
     //==================================================
 
-    res.clearCookie("access_token", {
-      httpOnly: true,
-
-      secure: false,
-
-      sameSite: "lax",
-    });
+    res.clearCookie("access_token", accessTokenCookieOptions());
 
     //==================================================
     //==== AUDIT KNOWN SESSION
@@ -5099,61 +5092,6 @@ app.delete(
         "INTERNAL_SERVER_ERROR",
         "Internal Server Error",
       );
-    }
-  },
-);
-
-//================================
-
-//test hashing
-app.post("/api/v1/generate-hash", multer().none(), async (req, res) => {
-  try {
-    const { data } = req.body;
-    const saltRounds = 10;
-    const hashedText = await bcrypt.hash(data, saltRounds);
-    console.log(hashedText);
-    res.json({ success: true, hashedText });
-  } catch (error) {
-    console.error("Hashing error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-app.post("/api/v1/generate-hash-admin", multer().none(), async (req, res) => {
-  try {
-    const { data } = req.body;
-    const hashedText = keyhsid.idAdmin.encode(data);
-    res.json({ success: true, hashedText });
-  } catch (error) {
-    console.error("Hashing error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-app.post("/api/v1/generate-hash-office", multer().none(), async (req, res) => {
-  try {
-    const { data } = req.body;
-    const hashedText = keyhsid.idOffice.encode(data);
-    res.json({ success: true, hashedText });
-  } catch (error) {
-    console.error("Hashing error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-app.post(
-  "/api/v1/generate-hash-mastercomp",
-  multer().none(),
-  async (req, res) => {
-    try {
-      const { data } = req.body;
-      const hashedText = keyhsid.idMasterCompany.encode(data);
-      res.json({ success: true, hashedText });
-    } catch (error) {
-      console.error("Hashing error:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
     }
   },
 );

@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx src/app.ts",
+    "build": "node -e \"require('fs').rmSync('dist/server',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "start:prod": "node dist/server/app.js",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:contracts",
     "test:contracts": "node -e \"require('fs').rmSync('dist/tests-build',{recursive:true,force:true})\" && tsc --outDir dist/tests-build && node --test dist/tests-build/tests/*.test.js",
@@ -16,11 +18,14 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
     "hashids": "^2.3.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
     "mysql2": "^3.24.3",
@@ -29,6 +34,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

@@ -10,6 +10,23 @@ Status saat ini adalah **belum siap dipublikasikan ke produksi**. Struktur utama
 
 Audit ini sengaja belum menghapus file, rute, package, atau tabel. Penghapusan baru dilakukan setelah rute v1 dikunci, pemakaian runtime dibuktikan, backup diuji, dan ada migration yang dapat ditinjau serta dibatalkan.
 
+## Progress setelah audit
+
+### Tahap 2 — batch hardening pertama
+
+Selesai diterapkan dan diverifikasi pada 12 Oktober 2026:
+
+- Environment production public dan admin sudah memakai `matexindo.com` dan `internal.matexindo.com`, tanpa URL localhost.
+- Google Maps key yang terlanjur berada di environment terlacak sudah dikeluarkan dari source aktif. Key lama tetap harus dirotasi di Google Cloud karena pernah tercatat dalam Git.
+- Cookie autentikasi memakai `Secure` secara default saat `NODE_ENV=production`, serta mempertahankan `HttpOnly`, `SameSite=Lax`, dan path yang konsisten ketika login/logout.
+- Empat endpoint `generate-hash*` tanpa autentikasi sudah dihapus.
+- API mendapat Helmet, compression, global API rate limit, login rate limit, body-size limit, controlled proxy trust, structured request completion log, health/readiness endpoint, startup database check, fail-fast route loading, loopback bind, dan graceful shutdown.
+- Backend sekarang memiliki build khusus production dan perintah untuk menjalankan JavaScript hasil compile.
+- Dependency audit produksi backend turun dari 3 advisory menjadi 0.
+- Typecheck, backend production build, 39 contract test, public SSR build, dan admin SSR build kembali lulus setelah perubahan.
+
+Temuan lanjutan: rangkaian migration saat ini belum dapat membuat database kosong secara mandiri. Migration pertama masih mengandalkan tabel dasar lama seperti company/admin/attachment yang berasal dari dump awal. Karena itu migration runner tidak boleh dianggap selesai hanya dengan menambahkan tabel history; tahap berikutnya harus membentuk baseline schema yang dapat direproduksi, lalu menguji bootstrap database kosong dan upgrade database berisi data.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
