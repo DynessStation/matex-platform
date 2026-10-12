@@ -1,0 +1,26 @@
+<div
+  class="ai-field-action"
+  [class.is-loading]="loading"
+  [attr.aria-busy]="loading"
+>
+  <button
+    type="button"
+    class="btn ai-field-action__button"
+    [disabled]="disabled || loading"
+    (click)="requested.emit()"
+  >
+    @if (loading) {
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      <span>{{ loadingLabel }}</span>
+    } @else {
+      <i [class]="icon" aria-hidden="true"></i>
+      <span>{{ label }}</span>
+    }
+  </button>
+  @if (loading) {
+    <div class="ai-field-action__progress" role="status" aria-live="polite">
+      <span></span>
+      <small>{{ loadingLabel }}</small>
+    </div>
+  }
+</div>

@@ -1,0 +1,94 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.ai-field-action {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.ai-field-action__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid #b76600;
+  background: #fff8ed;
+  color: #8a4c00;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.ai-field-action__button:hover:not(:disabled),
+.ai-field-action__button:focus-visible {
+  border-color: var(--theme-color);
+  background: var(--theme-color);
+  color: #fff;
+}
+
+.ai-field-action.is-loading .ai-field-action__button {
+  border-color: var(--theme-color);
+  background: #fff1dc;
+  color: #713f00;
+}
+
+.ai-field-action__progress {
+  position: relative;
+  width: min(270px, 100%);
+  min-width: 210px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fff4e5;
+  padding: 7px 10px 7px;
+  color: #744100;
+  text-align: left;
+}
+
+.ai-field-action__progress > span {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 42%;
+  height: 3px;
+  border-radius: 4px;
+  background: var(--theme-color);
+  animation: auto-fill-progress 1.15s ease-in-out infinite;
+}
+
+.ai-field-action__progress small {
+  font-weight: 700;
+}
+
+@keyframes auto-fill-progress {
+  from {
+    transform: translateX(-115%);
+  }
+
+  to {
+    transform: translateX(340%);
+  }
+}
+
+:host-context(body.dark-only) {
+  .ai-field-action__button,
+  .ai-field-action.is-loading .ai-field-action__button,
+  .ai-field-action__progress {
+    border-color: #c47b20;
+    background: #30271b;
+    color: #ffd9a0;
+  }
+}
+
+@media (max-width: 575px) {
+  :host,
+  .ai-field-action,
+  .ai-field-action__button,
+  .ai-field-action__progress {
+    width: 100%;
+  }
+}

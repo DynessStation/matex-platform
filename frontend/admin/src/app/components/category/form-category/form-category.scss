@@ -25,6 +25,16 @@
 .input-group-text {
   min-height: 46px;
 }
+.category-field-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  .form-label {
+    margin: 7px 0 0;
+  }
+}
 .category-check {
   display: flex;
   gap: 8px;
@@ -98,6 +108,10 @@
   }
 }
 @media (max-width: 767px) {
+  .category-field-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .category-panel {
     padding: 18px;
   }

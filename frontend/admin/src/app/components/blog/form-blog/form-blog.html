@@ -128,49 +128,6 @@
                     <strong>EN</strong> English
                   </button>
                 </div>
-                <div class="article-assistant-bar">
-                  <div>
-                    <strong>Bantuan konten</strong>
-                    <small
-                      >Konten hanya dimasukkan ke form dan belum disimpan
-                      otomatis.</small
-                    >
-                  </div>
-                  <div class="article-assistant-actions">
-                    <button
-                      type="button"
-                      class="btn btn-light"
-                      [disabled]="
-                        assistingLocale !== null || translatingToEnglish
-                      "
-                      (click)="generateArticle(activeLocale)"
-                    >
-                      <i class="ri-magic-line"></i>
-                      {{
-                        assistingLocale === activeLocale
-                          ? 'Sedang membuat…'
-                          : 'Bantu isi artikel'
-                      }}
-                    </button>
-                    @if (activeLocale === 'en') {
-                      <button
-                        type="button"
-                        class="btn btn-primary"
-                        [disabled]="
-                          assistingLocale !== null || translatingToEnglish
-                        "
-                        (click)="copyAndTranslateToEnglish()"
-                      >
-                        <i class="ri-translate-2"></i>
-                        {{
-                          translatingToEnglish
-                            ? 'Menerjemahkan…'
-                            : 'Salin & terjemahkan dari Indonesia'
-                        }}
-                      </button>
-                    }
-                  </div>
-                </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-5">
@@ -204,9 +161,18 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label" for="id_excerpt"
-                        >Ringkasan</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label" for="id_excerpt"
+                          >Ringkasan</label
+                        >
+                        <app-ai-field-action
+                          label="Isi ringkasan otomatis"
+                          [loading]="assistingField === 'id_excerpt'"
+                          [disabled]="assistingField !== null"
+                          (requested)="assistArticleField('id', 'excerpt')"
+                        />
+                      </div>
+                      <textarea
                         id="id_excerpt"
                         class="form-control"
                         rows="3"
@@ -215,9 +181,21 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label"
-                        >Isi artikel <span>*</span></label
-                      >
+                      <div class="article-field-heading">
+                        <label class="form-label"
+                          >Isi artikel <span>*</span></label
+                        >
+                        <app-ai-field-action
+                          label="Isi artikel otomatis"
+                          loadingLabel="Sedang menyusun artikel…"
+                          [loading]="assistingField === 'id_body'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_title.value
+                          "
+                          (requested)="assistArticleField('id', 'body')"
+                        />
+                      </div>
                       @if (browser && idEditor) {
                         <div
                           class="article-rich-editor"
@@ -273,8 +251,23 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label" for="en_excerpt">Excerpt</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label" for="en_excerpt"
+                          >Excerpt</label
+                        >
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          loadingLabel="Translating the excerpt…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_excerpt'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_excerpt.value
+                          "
+                          (requested)="translateArticleField('excerpt')"
+                        />
+                      </div>
+                      <textarea
                         id="en_excerpt"
                         class="form-control"
                         rows="3"
@@ -283,9 +276,22 @@
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label"
-                        >Article body <span>*</span></label
-                      >
+                      <div class="article-field-heading">
+                        <label class="form-label"
+                          >Article body <span>*</span></label
+                        >
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          loadingLabel="Translating the article…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_body'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_body.value
+                          "
+                          (requested)="translateArticleField('body')"
+                        />
+                      </div>
                       @if (browser && enEditor) {
                         <div
                           class="article-rich-editor"
@@ -375,8 +381,18 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi SEO</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label">Deskripsi SEO</label>
+                        <app-ai-field-action
+                          label="Isi deskripsi otomatis"
+                          [loading]="assistingField === 'id_meta_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistArticleField('id', 'meta_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="3"
                         formControlName="id_meta_description"
@@ -390,8 +406,20 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Deskripsi saat dibagikan</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label"
+                          >Deskripsi saat dibagikan</label
+                        >
+                        <app-ai-field-action
+                          label="Isi deskripsi otomatis"
+                          [loading]="assistingField === 'id_og_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistArticleField('id', 'og_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="2"
                         formControlName="id_og_description"
@@ -417,8 +445,22 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">SEO description</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label">SEO description</label>
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_meta_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_meta_description.value
+                          "
+                          (requested)="
+                            translateArticleField('meta_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="3"
                         formControlName="en_meta_description"
@@ -432,9 +474,22 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label"
-                        >Social sharing description</label
-                      ><textarea
+                      <div class="article-field-heading">
+                        <label class="form-label"
+                          >Social sharing description</label
+                        >
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_og_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_og_description.value
+                          "
+                          (requested)="translateArticleField('og_description')"
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="2"
                         formControlName="en_og_description"

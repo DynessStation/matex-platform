@@ -123,6 +123,18 @@ label:not(.app-check) {
   font-weight: 600;
 }
 
+.contact-description-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.contact-description-heading label {
+  margin-top: 7px;
+}
+
 @media (max-width: 991px) {
   .office-note {
     grid-template-columns: 46px minmax(0, 1fr);
@@ -135,6 +147,10 @@ label:not(.app-check) {
 }
 
 @media (max-width: 767px) {
+  .contact-description-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .settings-intro {
     flex-direction: column;
   }

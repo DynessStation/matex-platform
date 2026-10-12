@@ -15,6 +15,8 @@ import { finalize } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
+import { AiFieldAction } from '../../shared/components/ui/ai-field-action/ai-field-action';
+import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
@@ -31,6 +33,8 @@ import { PublicContactService } from '../../shared/services/public-contact.servi
     Select2Module,
     PageWrapper,
     Button,
+    AiFieldAction,
+    LocalizedNumberInputDirective,
     HasPermissionDirective,
   ],
   templateUrl: './public-contact.html',
@@ -83,7 +87,6 @@ export class PublicContact {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: {
-          label: String(translations.controls['id_label'].value || ''),
           description: String(
             translations.controls['id_description'].value || '',
           ),
@@ -93,11 +96,10 @@ export class PublicContact {
       .subscribe({
         next: (fields) => {
           translations.patchValue({
-            en_label: fields['label'] || '',
             en_description: fields['description'] || '',
           });
           this.notifications.showSuccess(
-            'Konten English sudah diisi dari Bahasa Indonesia.',
+            'Keterangan English sudah diisi. Label tetap Anda tentukan sendiri.',
           );
         },
         error: (error) => this.showAssistantError(error),
@@ -142,7 +144,7 @@ export class PublicContact {
   private showAssistantError(error: any): void {
     this.notifications.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
     );
   }

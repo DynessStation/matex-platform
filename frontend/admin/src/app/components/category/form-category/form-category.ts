@@ -12,8 +12,10 @@ import { Store } from '@ngxs/store';
 import { filter, finalize, switchMap, take } from 'rxjs';
 
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
+import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { mediaConfig } from '../../../shared/data/media-config';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
@@ -39,6 +41,8 @@ import { CategoryState } from '../../../shared/store/state/category.state';
     ReactiveFormsModule,
     NgbModule,
     AdvanceDropdown,
+    AiFieldAction,
+    LocalizedNumberInputDirective,
     ImageUpload,
     Button,
   ],
@@ -63,6 +67,47 @@ export class FormCategory {
   activeTab = 'general';
   activeLocale: 'id' | 'en' = 'id';
   assisting = false;
+  assistingField: string | null = null;
+
+  assistCategoryField(
+    locale: 'id' | 'en',
+    field: 'description' | 'meta_description' | 'og_description',
+    mode: 'generate' | 'translate' = 'generate',
+  ) {
+    if (this.assistingField) return;
+    const value = this.form.getRawValue() as any;
+    const controlName = `${locale}_${field}`;
+    this.assistingField = controlName;
+    this.contentAssistant
+      .assist({
+        mode,
+        content_type: 'product-category',
+        source_locale: mode === 'translate' ? 'id-ID' : undefined,
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          user_written_name: value[`${locale}_name`] || '',
+          category_key: value.key || '',
+        }),
+        fields: {
+          [field]:
+            mode === 'translate'
+              ? value[`id_${field}`] || ''
+              : value[controlName] || '',
+        },
+      })
+      .pipe(finalize(() => (this.assistingField = null)))
+      .subscribe({
+        next: (fields) => {
+          this.form.get(controlName)?.setValue(fields[field] || '');
+          this.notification.showSuccess(
+            mode === 'translate'
+              ? 'Field English sudah diterjemahkan. Nama tetap Anda isi sendiri.'
+              : 'Draf field sudah diisi. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
 
   readonly form = this.fb.group({
     key: [
@@ -164,30 +209,22 @@ export class FormCategory {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: {
-          name: value.id_name || '',
           description: value.id_description || '',
-          meta_title: value.id_meta_title || '',
           meta_description: value.id_meta_description || '',
-          og_title: value.id_og_title || '',
           og_description: value.id_og_description || '',
         },
       })
       .pipe(finalize(() => (this.assisting = false)))
       .subscribe({
         next: (fields) => {
-          const name = fields['name'] || value.id_name || '';
           this.form.patchValue({
-            en_name: name,
-            en_slug: this.slugify(name || value.id_slug),
             en_description: fields['description'] || '',
-            en_meta_title: fields['meta_title'] || '',
             en_meta_description: fields['meta_description'] || '',
-            en_og_title: fields['og_title'] || '',
             en_og_description: fields['og_description'] || '',
           });
           this.activeLocale = 'en';
           this.notification.showSuccess(
-            'Konten English kategori sudah diisi dari Bahasa Indonesia.',
+            'Deskripsi English sudah diisi. Nama dan slug tetap Anda tentukan sendiri.',
           );
         },
         error: (error) => this.showAssistantError(error),
@@ -207,7 +244,7 @@ export class FormCategory {
   private showAssistantError(error: any) {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
     );
   }

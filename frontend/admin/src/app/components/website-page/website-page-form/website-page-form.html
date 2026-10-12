@@ -162,8 +162,9 @@
                     </label>
 
                     <input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="website_page_sort_order"
                       [class.is-invalid]="
@@ -378,22 +379,6 @@
 
                       {{ 'website_page.add_translation' | translate }}
                     </button>
-
-                    @if (activeLocale === 'en-US') {
-                      <button
-                        type="button"
-                        class="btn btn-light-bg ms-2"
-                        [disabled]="translatingPage"
-                        (click)="copyAndTranslatePageToEnglish()"
-                      >
-                        <i class="ri-translate-2 me-1"></i>
-                        {{
-                          translatingPage
-                            ? 'Menerjemahkan…'
-                            : 'Tambah dari versi Indonesia'
-                        }}
-                      </button>
-                    }
                   </div>
                 } @else {
                   <!--==================================================-->
@@ -419,34 +404,6 @@
                       </div>
 
                       <div class="d-flex align-items-center gap-2">
-                        <button
-                          type="button"
-                          class="btn btn-light-bg"
-                          [disabled]="generatingPage || translatingPage"
-                          (click)="generatePageDescriptions()"
-                        >
-                          <i class="ri-magic-line me-1"></i>
-                          {{
-                            generatingPage
-                              ? 'Sedang membuat…'
-                              : 'Bantu isi deskripsi'
-                          }}
-                        </button>
-                        @if (activeLocale === 'en-US') {
-                          <button
-                            type="button"
-                            class="btn btn-theme"
-                            [disabled]="generatingPage || translatingPage"
-                            (click)="copyAndTranslatePageToEnglish()"
-                          >
-                            <i class="ri-translate-2 me-1"></i>
-                            {{
-                              translatingPage
-                                ? 'Menerjemahkan…'
-                                : 'Salin & terjemahkan dari Indonesia'
-                            }}
-                          </button>
-                        }
                         @if (!isDefaultLocale(activeLocale) && !isSystemPage) {
                           <button
                             type="button"
@@ -698,10 +655,36 @@
                                           />
                                         </div>
                                         <div class="col-12">
-                                          <label class="form-label">{{
-                                            'website_page.home_section_description'
-                                              | translate
-                                          }}</label>
+                                          <div class="cms-field-heading">
+                                            <label class="form-label">{{
+                                              'website_page.home_section_description'
+                                                | translate
+                                            }}</label>
+                                            <app-ai-field-action
+                                              [label]="
+                                                activeLocale === 'en-US'
+                                                  ? 'Translate from Indonesian'
+                                                  : 'Isi ini otomatis'
+                                              "
+                                              [icon]="
+                                                activeLocale === 'en-US'
+                                                  ? 'ri-translate-2'
+                                                  : 'ri-edit-2-line'
+                                              "
+                                              [loading]="
+                                                assistingOrganizerField ===
+                                                'latex-0'
+                                              "
+                                              [disabled]="
+                                                assistingOrganizerField !== null
+                                              "
+                                              (requested)="
+                                                assistOrganizerDescription(
+                                                  'latex'
+                                                )
+                                              "
+                                            />
+                                          </div>
                                           <textarea
                                             class="form-control"
                                             rows="3"
@@ -751,6 +734,34 @@
                                                 )
                                               "
                                             />
+                                            <div class="cms-feature-action">
+                                              <app-ai-field-action
+                                                [label]="
+                                                  activeLocale === 'en-US'
+                                                    ? 'Translate description'
+                                                    : 'Isi deskripsi otomatis'
+                                                "
+                                                [icon]="
+                                                  activeLocale === 'en-US'
+                                                    ? 'ri-translate-2'
+                                                    : 'ri-edit-2-line'
+                                                "
+                                                [loading]="
+                                                  assistingOrganizerField ===
+                                                  'latex_item-' + featureIndex
+                                                "
+                                                [disabled]="
+                                                  assistingOrganizerField !==
+                                                  null
+                                                "
+                                                (requested)="
+                                                  assistOrganizerDescription(
+                                                    'latex_item',
+                                                    featureIndex
+                                                  )
+                                                "
+                                              />
+                                            </div>
                                             <textarea
                                               class="form-control"
                                               rows="3"
@@ -819,10 +830,36 @@
                                           />
                                         </div>
                                         <div class="col-12">
-                                          <label class="form-label">{{
-                                            'website_page.home_section_description'
-                                              | translate
-                                          }}</label>
+                                          <div class="cms-field-heading">
+                                            <label class="form-label">{{
+                                              'website_page.home_section_description'
+                                                | translate
+                                            }}</label>
+                                            <app-ai-field-action
+                                              [label]="
+                                                activeLocale === 'en-US'
+                                                  ? 'Translate from Indonesian'
+                                                  : 'Isi ini otomatis'
+                                              "
+                                              [icon]="
+                                                activeLocale === 'en-US'
+                                                  ? 'ri-translate-2'
+                                                  : 'ri-edit-2-line'
+                                              "
+                                              [loading]="
+                                                assistingOrganizerField ===
+                                                'advertisement-0'
+                                              "
+                                              [disabled]="
+                                                assistingOrganizerField !== null
+                                              "
+                                              (requested)="
+                                                assistOrganizerDescription(
+                                                  'advertisement'
+                                                )
+                                              "
+                                            />
+                                          </div>
                                           <textarea
                                             class="form-control"
                                             rows="3"
@@ -895,9 +932,26 @@
                       <!-- EXCERPT -->
 
                       <div class="col-12">
-                        <label class="form-label">
-                          {{ 'website_page.excerpt' | translate }}
-                        </label>
+                        <div class="cms-field-heading">
+                          <label class="form-label">
+                            {{ 'website_page.excerpt' | translate }}
+                          </label>
+                          <app-ai-field-action
+                            [label]="
+                              activeLocale === 'en-US'
+                                ? 'Translate from Indonesian'
+                                : 'Isi ini otomatis'
+                            "
+                            [icon]="
+                              activeLocale === 'en-US'
+                                ? 'ri-translate-2'
+                                : 'ri-edit-2-line'
+                            "
+                            [loading]="assistingPageField === 'excerpt'"
+                            [disabled]="assistingPageField !== null"
+                            (requested)="assistPageField('excerpt')"
+                          />
+                        </div>
 
                         <textarea
                           class="form-control"
@@ -961,12 +1015,39 @@
                                       "
                                     />
 
-                                    <label class="form-label">
-                                      {{
-                                        'about_highlight_description'
-                                          | translate
-                                      }}
-                                    </label>
+                                    <div class="cms-field-heading">
+                                      <label class="form-label">
+                                        {{
+                                          'about_highlight_description'
+                                            | translate
+                                        }}
+                                      </label>
+                                      <app-ai-field-action
+                                        [label]="
+                                          activeLocale === 'en-US'
+                                            ? 'Translate description'
+                                            : 'Isi deskripsi otomatis'
+                                        "
+                                        [icon]="
+                                          activeLocale === 'en-US'
+                                            ? 'ri-translate-2'
+                                            : 'ri-edit-2-line'
+                                        "
+                                        [loading]="
+                                          assistingOrganizerField ===
+                                          'about_item-' + featureIndex
+                                        "
+                                        [disabled]="
+                                          assistingOrganizerField !== null
+                                        "
+                                        (requested)="
+                                          assistOrganizerDescription(
+                                            'about_item',
+                                            featureIndex
+                                          )
+                                        "
+                                      />
+                                    </div>
                                     <textarea
                                       class="form-control"
                                       [class.is-invalid]="
@@ -1017,9 +1098,26 @@
                         </div>
                       } @else if (!isAboutTemplate && !isGadgetHomeTemplate) {
                         <div class="col-12">
-                          <label class="form-label">
-                            {{ 'website_page.content' | translate }}
-                          </label>
+                          <div class="cms-field-heading">
+                            <label class="form-label">
+                              {{ 'website_page.content' | translate }}
+                            </label>
+                            <app-ai-field-action
+                              [label]="
+                                activeLocale === 'en-US'
+                                  ? 'Translate from Indonesian'
+                                  : 'Isi ini otomatis'
+                              "
+                              [icon]="
+                                activeLocale === 'en-US'
+                                  ? 'ri-translate-2'
+                                  : 'ri-edit-2-line'
+                              "
+                              [loading]="assistingPageField === 'content'"
+                              [disabled]="assistingPageField !== null"
+                              (requested)="assistPageField('content')"
+                            />
+                          </div>
 
                           @if (contentEditor(); as editor) {
                             <div class="cms-rich-editor">
@@ -1200,9 +1298,26 @@
                     <!-- META DESCRIPTION -->
 
                     <div class="col-12">
-                      <label class="form-label">
-                        {{ 'website_page.meta_description' | translate }}
-                      </label>
+                      <div class="cms-field-heading">
+                        <label class="form-label">
+                          {{ 'website_page.meta_description' | translate }}
+                        </label>
+                        <app-ai-field-action
+                          [label]="
+                            activeLocale === 'en-US'
+                              ? 'Translate from Indonesian'
+                              : 'Isi ini otomatis'
+                          "
+                          [icon]="
+                            activeLocale === 'en-US'
+                              ? 'ri-translate-2'
+                              : 'ri-edit-2-line'
+                          "
+                          [loading]="assistingPageField === 'meta_description'"
+                          [disabled]="assistingPageField !== null"
+                          (requested)="assistPageField('meta_description')"
+                        />
+                      </div>
 
                       <textarea
                         class="form-control"
@@ -1347,9 +1462,28 @@
                           </div>
 
                           <div class="col-12">
-                            <label class="form-label">
-                              {{ 'website_page.og_description' | translate }}
-                            </label>
+                            <div class="cms-field-heading">
+                              <label class="form-label">
+                                {{ 'website_page.og_description' | translate }}
+                              </label>
+                              <app-ai-field-action
+                                [label]="
+                                  activeLocale === 'en-US'
+                                    ? 'Translate from Indonesian'
+                                    : 'Isi ini otomatis'
+                                "
+                                [icon]="
+                                  activeLocale === 'en-US'
+                                    ? 'ri-translate-2'
+                                    : 'ri-edit-2-line'
+                                "
+                                [loading]="
+                                  assistingPageField === 'og_description'
+                                "
+                                [disabled]="assistingPageField !== null"
+                                (requested)="assistPageField('og_description')"
+                              />
+                            </div>
 
                             <textarea
                               class="form-control"

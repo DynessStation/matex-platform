@@ -7,7 +7,9 @@ import { Store } from '@ngxs/store';
 import { finalize } from 'rxjs';
 
 import { Button } from '../../../shared/components/ui/button/button';
+import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import {
   IFaqDetail,
   IFaqPayload,
@@ -24,7 +26,14 @@ import { FaqState } from '../../../shared/store/state/faq.state';
 
 @Component({
   selector: 'app-form-faq',
-  imports: [ReactiveFormsModule, TranslateModule, FormFields, Button],
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    FormFields,
+    Button,
+    AiFieldAction,
+    LocalizedNumberInputDirective,
+  ],
   templateUrl: './form-faq.html',
   styleUrl: './form-faq.scss',
 })
@@ -35,7 +44,8 @@ export class FormFaq {
   private fb = inject(FormBuilder);
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
-  assisting = false;
+  assistingField: 'id_answer' | 'en_answer' | null = null;
+  assistingMode: 'generate' | 'translate' | null = null;
 
   readonly type = input<'create' | 'edit'>('create');
   private faq: IFaqDetail | null = null;
@@ -47,10 +57,10 @@ export class FormFaq {
     ],
     sort_order: [0, [Validators.required, Validators.min(0)]],
     status: [true],
-    id_question: ['', Validators.required],
-    id_answer: ['', Validators.required],
-    en_question: ['', Validators.required],
-    en_answer: ['', Validators.required],
+    id_question: ['', [Validators.required, Validators.maxLength(500)]],
+    id_answer: ['', [Validators.required, Validators.maxLength(50000)]],
+    en_question: ['', [Validators.required, Validators.maxLength(500)]],
+    en_answer: ['', [Validators.required, Validators.maxLength(50000)]],
   });
 
   ngOnInit(): void {
@@ -78,7 +88,10 @@ export class FormFaq {
 
   generateAnswer(locale: 'id' | 'en'): void {
     const value = this.form.getRawValue();
-    this.assisting = true;
+    const target = `${locale}_answer` as 'id_answer' | 'en_answer';
+    if (this.assistingField) return;
+    this.assistingField = target;
+    this.assistingMode = 'generate';
     this.contentAssistant
       .assist({
         mode: 'generate',
@@ -87,7 +100,12 @@ export class FormFaq {
         context: String(value[`${locale}_question`] || ''),
         fields: { answer: String(value[`${locale}_answer`] || '') },
       })
-      .pipe(finalize(() => (this.assisting = false)))
+      .pipe(
+        finalize(() => {
+          this.assistingField = null;
+          this.assistingMode = null;
+        }),
+      )
       .subscribe({
         next: (fields) => {
           this.form.controls[`${locale}_answer`].setValue(
@@ -103,7 +121,9 @@ export class FormFaq {
 
   copyAndTranslateToEnglish(): void {
     const value = this.form.getRawValue();
-    this.assisting = true;
+    if (this.assistingField) return;
+    this.assistingField = 'en_answer';
+    this.assistingMode = 'translate';
     this.contentAssistant
       .assist({
         mode: 'translate',
@@ -111,19 +131,22 @@ export class FormFaq {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: {
-          question: value.id_question || '',
           answer: value.id_answer || '',
         },
       })
-      .pipe(finalize(() => (this.assisting = false)))
+      .pipe(
+        finalize(() => {
+          this.assistingField = null;
+          this.assistingMode = null;
+        }),
+      )
       .subscribe({
         next: (fields) => {
           this.form.patchValue({
-            en_question: fields['question'] || '',
             en_answer: fields['answer'] || '',
           });
           this.notification.showSuccess(
-            'FAQ English sudah diisi dari Bahasa Indonesia.',
+            'Jawaban English sudah diisi dari Bahasa Indonesia. Pertanyaan tetap Anda tulis sendiri.',
           );
         },
         error: (error) => this.showAssistantError(error),
@@ -133,7 +156,7 @@ export class FormFaq {
   private showAssistantError(error: any): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
     );
   }

@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
-import { catchError, map, of, tap, timeout } from 'rxjs';
+import { catchError, map, of, startWith, tap, timeout } from 'rxjs';
 
 import { NoData } from '../../../shared/components/no-data/no-data';
 import { Loader } from '../../../shared/components/loader/loader';
@@ -44,9 +44,15 @@ export class Faq {
   readonly locale = this.navigation.locale();
   readonly page = signal<IPublicWebsitePage | null>(null);
   readonly pageState = signal<'loading' | 'ready' | 'missing' | 'error'>('loading');
+  readonly faqState = signal<'loading' | 'ready' | 'error'>('loading');
   readonly faq$ = this.content.getFaq(this.locale).pipe(
     map((response) => response.data?.items ?? []),
-    catchError(() => of([])),
+    tap(() => this.faqState.set('ready')),
+    catchError(() => {
+      this.faqState.set('error');
+      return of([]);
+    }),
+    startWith([]),
   );
   readonly breadcrumb: breadcrumb = {
     title: this.locale === 'en-US' ? 'Frequently Asked Questions' : 'Pertanyaan Umum',

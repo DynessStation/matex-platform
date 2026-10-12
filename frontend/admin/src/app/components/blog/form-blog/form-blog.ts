@@ -19,6 +19,7 @@ import { Editor, NgxEditorModule } from 'ngx-editor';
 import { finalize } from 'rxjs';
 
 import { Button } from '../../../shared/components/ui/button/button';
+import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import { mediaConfig } from '../../../shared/data/media-config';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
@@ -48,6 +49,7 @@ import { BlogState } from '../../../shared/store/state/blog.state';
     NgxEditorModule,
     ImageUpload,
     Button,
+    AiFieldAction,
   ],
   templateUrl: './form-blog.html',
   styleUrl: './form-blog.scss',
@@ -70,6 +72,7 @@ export class FormBlog {
   activeLocale: 'id' | 'en' = 'id';
   assistingLocale: 'id' | 'en' | null = null;
   translatingToEnglish = false;
+  assistingField: string | null = null;
   publishDate: NgbDateStruct | null = null;
   publishTime: NgbTimeStruct | null = null;
   unpublishDate: NgbDateStruct | null = null;
@@ -220,6 +223,62 @@ export class FormBlog {
         error: (error) => this.showAssistantError(error),
       });
   }
+  assistArticleField(
+    locale: 'id' | 'en',
+    field: 'excerpt' | 'body' | 'meta_description' | 'og_description',
+  ) {
+    if (this.assistingField) return;
+    const value = this.form.getRawValue() as any;
+    const controlName = `${locale}_${field}`;
+    this.assistingField = controlName;
+    this.contentAssistant
+      .assist({
+        mode: 'generate',
+        content_type: 'article',
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          user_written_title: value[`${locale}_title`],
+        }),
+        fields: { [field]: value[controlName] || '' },
+      })
+      .pipe(finalize(() => (this.assistingField = null)))
+      .subscribe({
+        next: (fields) => {
+          this.form.get(controlName)?.setValue(fields[field] || '');
+          this.notification.showSuccess(
+            'Draf field sudah diisi. Periksa fakta dan gaya bahasa sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
+
+  translateArticleField(
+    field: 'excerpt' | 'body' | 'meta_description' | 'og_description',
+  ) {
+    if (this.assistingField) return;
+    const value = this.form.getRawValue() as any;
+    const controlName = `en_${field}`;
+    this.assistingField = controlName;
+    this.contentAssistant
+      .assist({
+        mode: 'translate',
+        content_type: 'article',
+        source_locale: 'id-ID',
+        target_locale: 'en-US',
+        fields: { [field]: value[`id_${field}`] || '' },
+      })
+      .pipe(finalize(() => (this.assistingField = null)))
+      .subscribe({
+        next: (fields) => {
+          this.form.get(controlName)?.setValue(fields[field] || '');
+          this.notification.showSuccess(
+            'Field English sudah diterjemahkan. Judul tetap Anda isi sendiri.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
   copyAndTranslateToEnglish() {
     const value = this.form.getRawValue() as any;
     this.translatingToEnglish = true;
@@ -230,12 +289,9 @@ export class FormBlog {
         source_locale: 'id-ID',
         target_locale: 'en-US',
         fields: {
-          title: value.id_title || '',
           excerpt: value.id_excerpt || '',
           body: value.id_body || '',
-          meta_title: value.id_meta_title || '',
           meta_description: value.id_meta_description || '',
-          og_title: value.id_og_title || '',
           og_description: value.id_og_description || '',
         },
       })
@@ -243,18 +299,14 @@ export class FormBlog {
       .subscribe({
         next: (fields) => {
           this.form.patchValue({
-            en_title: fields['title'],
-            en_slug: this.slugify(fields['title'] || value.id_title),
             en_excerpt: fields['excerpt'],
             en_body: fields['body'],
-            en_meta_title: fields['meta_title'],
             en_meta_description: fields['meta_description'],
-            en_og_title: fields['og_title'],
             en_og_description: fields['og_description'],
           });
           this.activeLocale = 'en';
           this.notification.showSuccess(
-            'Versi English sudah diisi. Periksa hasil terjemahan sebelum menyimpan.',
+            'Deskripsi English sudah diisi. Judul dan slug tetap Anda tentukan sendiri.',
           );
         },
         error: (error) => this.showAssistantError(error),
@@ -272,7 +324,7 @@ export class FormBlog {
   private showAssistantError(error: any) {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan konten belum berhasil. Coba lagi sebentar.',
     );
   }

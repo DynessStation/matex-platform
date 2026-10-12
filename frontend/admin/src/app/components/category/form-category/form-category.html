@@ -75,8 +75,9 @@
                     <input
                       id="sort_order"
                       class="form-control"
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       formControlName="sort_order"
                     />
                   </div>
@@ -129,15 +130,6 @@
                   >
                     <strong>EN</strong> English
                   </button>
-                  <button
-                    type="button"
-                    class="ms-auto"
-                    [disabled]="assisting"
-                    (click)="copyAndTranslateToEnglish()"
-                  >
-                    <i class="ri-translate-2"></i>
-                    {{ assisting ? 'Memproses...' : 'Salin ID ke English' }}
-                  </button>
                 </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
@@ -161,14 +153,12 @@
                         class="d-flex align-items-center justify-content-between gap-2 mb-2"
                       >
                         <label class="form-label mb-0">Deskripsi</label>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-theme"
-                          [disabled]="assisting"
-                          (click)="generateDescription('id')"
-                        >
-                          <i class="ri-sparkling-line"></i> Isi otomatis
-                        </button>
+                        <app-ai-field-action
+                          label="Isi ini otomatis"
+                          [loading]="assistingField === 'id_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="assistCategoryField('id', 'description')"
+                        />
                       </div>
                       <textarea
                         class="form-control"
@@ -199,14 +189,22 @@
                         class="d-flex align-items-center justify-content-between gap-2 mb-2"
                       >
                         <label class="form-label mb-0">Description</label>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-theme"
-                          [disabled]="assisting"
-                          (click)="generateDescription('en')"
-                        >
-                          <i class="ri-sparkling-line"></i> Generate
-                        </button>
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_description.value
+                          "
+                          (requested)="
+                            assistCategoryField(
+                              'en',
+                              'description',
+                              'translate'
+                            )
+                          "
+                        />
                       </div>
                       <textarea
                         class="form-control"
@@ -282,8 +280,18 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi SEO</label
-                      ><textarea
+                      <div class="category-field-heading">
+                        <label class="form-label">Deskripsi SEO</label>
+                        <app-ai-field-action
+                          label="Isi ini otomatis"
+                          [loading]="assistingField === 'id_meta_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistCategoryField('id', 'meta_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="3"
                         formControlName="id_meta_description"
@@ -297,8 +305,20 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Deskripsi saat dibagikan</label
-                      ><textarea
+                      <div class="category-field-heading">
+                        <label class="form-label"
+                          >Deskripsi saat dibagikan</label
+                        >
+                        <app-ai-field-action
+                          label="Isi ini otomatis"
+                          [loading]="assistingField === 'id_og_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistCategoryField('id', 'og_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="2"
                         formControlName="id_og_description"
@@ -323,8 +343,26 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">SEO description</label
-                      ><textarea
+                      <div class="category-field-heading">
+                        <label class="form-label">SEO description</label>
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_meta_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_meta_description.value
+                          "
+                          (requested)="
+                            assistCategoryField(
+                              'en',
+                              'meta_description',
+                              'translate'
+                            )
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="3"
                         formControlName="en_meta_description"
@@ -338,9 +376,28 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label"
-                        >Social sharing description</label
-                      ><textarea
+                      <div class="category-field-heading">
+                        <label class="form-label"
+                          >Social sharing description</label
+                        >
+                        <app-ai-field-action
+                          label="Translate from Indonesian"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_og_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_og_description.value
+                          "
+                          (requested)="
+                            assistCategoryField(
+                              'en',
+                              'og_description',
+                              'translate'
+                            )
+                          "
+                        />
+                      </div>
+                      <textarea
                         class="form-control"
                         rows="2"
                         formControlName="en_og_description"

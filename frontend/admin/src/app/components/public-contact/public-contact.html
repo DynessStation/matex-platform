@@ -98,8 +98,9 @@
                   <label>{{ 'public_contact.order' | translate }}</label
                   ><input
                     class="form-control"
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputmode="numeric"
+                    appLocalizedNumber
                     formControlName="sort_order"
                   />
                 </div>
@@ -129,19 +130,18 @@
                     class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
                   >
                     <label class="mb-0">Label — Bahasa Indonesia</label>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-theme"
-                      [disabled]="assistingKey !== null"
-                      (click)="generateChannelDescription(index, 'id')"
-                    >
-                      <i class="ri-sparkling-line"></i> Isi keterangan
-                    </button>
                   </div>
-                  <input
-                    class="form-control"
-                    formControlName="id_label"
-                  /><textarea
+                  <input class="form-control" formControlName="id_label" />
+                  <div class="contact-description-heading">
+                    <label>Keterangan — Bahasa Indonesia</label>
+                    <app-ai-field-action
+                      label="Isi ini otomatis"
+                      [loading]="assistingKey === 'channel-' + index + '-id'"
+                      [disabled]="assistingKey !== null"
+                      (requested)="generateChannelDescription(index, 'id')"
+                    />
+                  </div>
+                  <textarea
                     class="form-control mt-2"
                     rows="2"
                     formControlName="id_description"
@@ -153,29 +153,21 @@
                     class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
                   >
                     <label class="mb-0">Label — English</label>
-                    <div class="d-flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-outline-theme"
-                        [disabled]="assistingKey !== null"
-                        (click)="copyTranslationToEnglish('channel', index)"
-                      >
-                        <i class="ri-translate-2"></i> Salin dari Indonesia
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-outline-theme"
-                        [disabled]="assistingKey !== null"
-                        (click)="generateChannelDescription(index, 'en')"
-                      >
-                        <i class="ri-sparkling-line"></i> Generate
-                      </button>
-                    </div>
                   </div>
-                  <input
-                    class="form-control"
-                    formControlName="en_label"
-                  /><textarea
+                  <input class="form-control" formControlName="en_label" />
+                  <div class="contact-description-heading">
+                    <label>Description — English</label>
+                    <app-ai-field-action
+                      label="Translate from Indonesian"
+                      icon="ri-translate-2"
+                      [loading]="
+                        assistingKey === 'channel-' + index + '-translate'
+                      "
+                      [disabled]="assistingKey !== null"
+                      (requested)="copyTranslationToEnglish('channel', index)"
+                    />
+                  </div>
+                  <textarea
                     class="form-control mt-2"
                     rows="2"
                     formControlName="en_description"
@@ -250,8 +242,9 @@
                   <label>{{ 'public_contact.order' | translate }}</label
                   ><input
                     class="form-control"
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputmode="numeric"
+                    appLocalizedNumber
                     formControlName="sort_order"
                   />
                 </div>
@@ -273,19 +266,7 @@
                   ><input class="form-control" formControlName="id_label" />
                 </div>
                 <div class="col-lg-6">
-                  <div
-                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
-                  >
-                    <label class="mb-0">Topic — English</label>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-theme"
-                      [disabled]="assistingKey !== null"
-                      (click)="copyTranslationToEnglish('topic', index)"
-                    >
-                      <i class="ri-translate-2"></i> Salin dari Indonesia
-                    </button>
-                  </div>
+                  <label class="mb-0">Topic — English</label>
                   <input class="form-control" formControlName="en_label" />
                 </div>
               </div>

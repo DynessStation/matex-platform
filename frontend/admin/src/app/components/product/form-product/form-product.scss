@@ -125,6 +125,22 @@
   color: #777;
   line-height: 1.4;
 }
+.field-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.field-heading .form-label {
+  margin: 7px 0 0;
+}
+.measurement-helper {
+  display: block;
+  margin-top: 6px;
+  color: #287a43;
+  font-weight: 700;
+}
 .field-error {
   margin-top: 6px;
   color: #e64141;
@@ -317,6 +333,10 @@
   }
   .repeater-empty {
     align-items: flex-start;
+  }
+  .field-heading {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 .content-assistant-bar {

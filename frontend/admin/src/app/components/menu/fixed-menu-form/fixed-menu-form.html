@@ -74,20 +74,7 @@
     </div>
 
     <div class="border rounded p-3 mb-4">
-      <div
-        class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"
-      >
-        <h5 class="mb-0">English</h5>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-theme"
-          [disabled]="translating"
-          (click)="copyAndTranslateToEnglish()"
-        >
-          <i class="ri-translate-2"></i>
-          {{ translating ? 'Menerjemahkan...' : 'Salin dari Indonesia' }}
-        </button>
-      </div>
+      <h5 class="mb-3">English</h5>
       <app-form-fields
         [label]="'navigation_admin.menu_label' | translate"
         [for]="'fixed_navigation_en_label'"

@@ -202,8 +202,9 @@
 
             <div class="input-group">
               <input
-                type="number"
-                min="1"
+                type="text"
+                inputmode="numeric"
+                appLocalizedNumber
                 class="form-control"
                 formControlName="attendance_radius_meter"
                 [class.is-invalid]="
@@ -581,8 +582,9 @@
               </label>
 
               <input
-                type="number"
-                min="0"
+                type="text"
+                inputmode="numeric"
+                appLocalizedNumber
                 class="form-control"
                 formControlName="public_sort_order"
               />

@@ -11,6 +11,9 @@ const { pool } = db;
 
 type AssistMode = "translate" | "generate";
 
+const protectedFieldPattern =
+  /(^|_)(title|name|question|label|heading|headline|slug|key)(_|$)/i;
+
 const cleanRecord = (value: unknown) => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const entries = Object.entries(value as Record<string, unknown>);
@@ -71,6 +74,17 @@ app.post(
         "Content assistant request is invalid",
       );
 
+    const protectedFields = Object.keys(fields).filter((key) =>
+      protectedFieldPattern.test(key),
+    );
+    if (protectedFields.length)
+      return sendError(
+        res,
+        400,
+        "CONTENT_ASSISTANT_FIELD_PROTECTED",
+        "Titles, names, labels, questions, slugs, and keys must be written by the user",
+      );
+
     const apiKey = String(process.env.OPENAI_API_KEY ?? "").trim();
     if (!apiKey)
       return sendError(
@@ -102,6 +116,7 @@ app.post(
               process.env.OPENAI_MODEL ||
               "gpt-4o-mini",
             store: false,
+            max_output_tokens: 5000,
             input: [
               {
                 role: "developer",

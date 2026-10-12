@@ -41,6 +41,36 @@
   }
 }
 
+// Consistent form geometry for admin editors and repeaters.
+.theme-form {
+  width: 100%;
+}
+
+.theme-form .row > *,
+.vertical-tabs .row > * {
+  min-width: 0;
+}
+
+.theme-form .form-control,
+.theme-form .form-select,
+.theme-form .custom-select,
+.theme-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.theme-form label.form-label {
+  display: block;
+  min-height: 20px;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.theme-form input[appLocalizedNumber] {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
 .app-check-card {
   width: 100%;
   min-height: 46px;

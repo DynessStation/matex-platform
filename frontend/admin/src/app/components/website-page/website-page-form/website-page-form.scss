@@ -483,3 +483,27 @@
     border-color: #404040;
   }
 }
+.cms-field-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .form-label {
+    margin: 7px 0 0;
+  }
+}
+
+.cms-feature-action {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0;
+}
+
+@media (max-width: 767px) {
+  .cms-field-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,31 @@
+.theme-form {
+  width: 100%;
+}
+
+.card {
+  border-color: #e1e5ea;
+}
+
+.card-body {
+  padding: clamp(18px, 2vw, 28px);
+}
+
+.faq-field-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+textarea.form-control {
+  min-height: 150px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+@media (max-width: 575px) {
+  .faq-field-tools app-ai-field-action {
+    width: 100%;
+  }
+}

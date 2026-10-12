@@ -30,6 +30,8 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { finalize } from 'rxjs';
 
 import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
+import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
 import {
   GADGET_HOME_MEDIA_RULES,
@@ -153,6 +155,8 @@ interface WebsitePageEditorMediaDraft {
     NgbModule,
     TranslateModule,
     NgxEditorModule,
+    AiFieldAction,
+    LocalizedNumberInputDirective,
     MediaModal,
     WebsitePagePreview,
   ],
@@ -195,6 +199,8 @@ export class WebsitePageForm {
   public activeLocale: WebsitePageEditorLocale = 'id-ID';
   public translatingPage = false;
   public generatingPage = false;
+  public assistingPageField: string | null = null;
+  public assistingOrganizerField: string | null = null;
 
   //==================================================
   //==== PREVIEW
@@ -1146,35 +1152,25 @@ export class WebsitePageForm {
   copyAndTranslatePageToEnglish(): void {
     const source = this.translationForm('id-ID').getRawValue();
     const fields: Record<string, string> = {
-      title: source.title,
       excerpt: source.excerpt,
       content: source.content,
-      meta_title: source.meta_title,
       meta_description: source.meta_description,
       meta_keywords: source.meta_keywords,
-      og_title: source.og_title,
       og_description: source.og_description,
     };
 
     if (this.isGadgetHomeTemplate) {
       const latex = this.homeLatexContent['id-ID'];
-      fields['home_latex_eyebrow'] = latex.eyebrow;
-      fields['home_latex_title'] = latex.title;
       fields['home_latex_description'] = latex.description;
       latex.items.forEach((item, index) => {
-        fields[`home_latex_${index}_title`] = item.title;
         fields[`home_latex_${index}_description`] = item.description;
       });
       const ad = this.homeAdvertisementContent['id-ID'];
-      fields['home_ad_label'] = ad.label;
-      fields['home_ad_title'] = ad.title;
       fields['home_ad_description'] = ad.description;
-      fields['home_ad_cta_label'] = ad.cta_label;
     }
 
     if (this.isAboutTemplate) {
       this.aboutFeatures['id-ID'].forEach((feature, index) => {
-        fields[`about_${index}_title`] = feature.title;
         fields[`about_${index}_description`] = feature.description;
       });
     }
@@ -1195,14 +1191,10 @@ export class WebsitePageForm {
         next: (translated) => {
           this.enableLanguage('en-US');
           this.translationForm('en-US').patchValue({
-            title: translated['title'],
-            slug: this.slugifyAssistant(translated['title'] || source.title),
             excerpt: translated['excerpt'],
             content: translated['content'],
-            meta_title: translated['meta_title'],
             meta_description: translated['meta_description'],
             meta_keywords: translated['meta_keywords'],
-            og_title: translated['og_title'],
             og_description: translated['og_description'],
             status: source.status,
           });
@@ -1212,11 +1204,11 @@ export class WebsitePageForm {
             this.homeLatexContent = {
               ...this.homeLatexContent,
               'en-US': {
-                eyebrow: translated['home_latex_eyebrow'] || '',
-                title: translated['home_latex_title'] || '',
+                ...this.homeLatexContent['en-US'],
                 description: translated['home_latex_description'] || '',
                 items: idLatex.items.map((_item, index) => ({
-                  title: translated[`home_latex_${index}_title`] || '',
+                  title:
+                    this.homeLatexContent['en-US'].items[index]?.title || '',
                   description:
                     translated[`home_latex_${index}_description`] || '',
                 })),
@@ -1226,10 +1218,8 @@ export class WebsitePageForm {
             this.homeAdvertisementContent = {
               ...this.homeAdvertisementContent,
               'en-US': {
-                label: translated['home_ad_label'] || '',
-                title: translated['home_ad_title'] || '',
+                ...this.homeAdvertisementContent['en-US'],
                 description: translated['home_ad_description'] || '',
-                cta_label: translated['home_ad_cta_label'] || '',
                 cta_url: idAd.cta_url,
               },
             };
@@ -1243,7 +1233,7 @@ export class WebsitePageForm {
             this.aboutFeatures = {
               ...this.aboutFeatures,
               'en-US': this.aboutFeatures['id-ID'].map((_feature, index) => ({
-                title: translated[`about_${index}_title`] || '',
+                title: this.aboutFeatures['en-US'][index]?.title || '',
                 description: translated[`about_${index}_description`] || '',
               })),
             };
@@ -1251,7 +1241,7 @@ export class WebsitePageForm {
 
           this.activeLocale = 'en-US';
           this.notification.showSuccess(
-            'Versi English dan organizer bagiannya sudah diisi. Periksa hasil terjemahan sebelum menyimpan.',
+            'Deskripsi English dan organizer sudah diisi. Semua judul dan label tetap Anda tentukan sendiri.',
           );
         },
         error: (error) => this.showContentAssistantError(error),
@@ -1296,6 +1286,111 @@ export class WebsitePageForm {
       });
   }
 
+  assistPageField(
+    field: 'excerpt' | 'content' | 'meta_description' | 'og_description',
+  ): void {
+    if (this.assistingPageField) return;
+    const locale = this.activeLocale;
+    const group = this.translationForm(locale);
+    const value = group.getRawValue();
+    const translateFromIndonesia = locale === 'en-US';
+    this.assistingPageField = field;
+    this.contentAssistant
+      .assist({
+        mode: translateFromIndonesia ? 'translate' : 'generate',
+        content_type: this.isGadgetHomeTemplate ? 'home page' : 'website page',
+        source_locale: translateFromIndonesia ? 'id-ID' : undefined,
+        target_locale: locale,
+        context: JSON.stringify({
+          user_written_title: value.title,
+          page_key: this.form.controls.website_page_key.value,
+        }),
+        fields: {
+          [field]: translateFromIndonesia
+            ? this.translationForm('id-ID').getRawValue()[field]
+            : value[field],
+        },
+      })
+      .pipe(finalize(() => (this.assistingPageField = null)))
+      .subscribe({
+        next: (generated) => {
+          group.controls[field].setValue(generated[field] || '');
+          this.notification.showSuccess(
+            translateFromIndonesia
+              ? 'Field English sudah diterjemahkan. Judul tetap Anda isi sendiri.'
+              : 'Draf field sudah diisi. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showContentAssistantError(error),
+      });
+  }
+
+  assistOrganizerDescription(
+    kind: 'latex' | 'latex_item' | 'advertisement' | 'about_item',
+    index = 0,
+  ): void {
+    if (this.assistingOrganizerField) return;
+    const locale = this.activeLocale;
+    const sourceLocale: WebsitePageEditorLocale = 'id-ID';
+    const translateFromIndonesia = locale === 'en-US';
+    const taskKey = `${kind}-${index}`;
+    let current = '';
+    let source = '';
+    let userWrittenTitle = '';
+
+    if (kind === 'latex') {
+      current = this.homeLatexContent[locale].description;
+      source = this.homeLatexContent[sourceLocale].description;
+      userWrittenTitle = this.homeLatexContent[locale].title;
+    } else if (kind === 'latex_item') {
+      current = this.homeLatexContent[locale].items[index]?.description || '';
+      source =
+        this.homeLatexContent[sourceLocale].items[index]?.description || '';
+      userWrittenTitle =
+        this.homeLatexContent[locale].items[index]?.title || '';
+    } else if (kind === 'advertisement') {
+      current = this.homeAdvertisementContent[locale].description;
+      source = this.homeAdvertisementContent[sourceLocale].description;
+      userWrittenTitle = this.homeAdvertisementContent[locale].title;
+    } else {
+      current = this.aboutFeatures[locale][index]?.description || '';
+      source = this.aboutFeatures[sourceLocale][index]?.description || '';
+      userWrittenTitle = this.aboutFeatures[locale][index]?.title || '';
+    }
+
+    this.assistingOrganizerField = taskKey;
+    this.contentAssistant
+      .assist({
+        mode: translateFromIndonesia ? 'translate' : 'generate',
+        content_type: `website-${kind}`,
+        source_locale: translateFromIndonesia ? sourceLocale : undefined,
+        target_locale: locale,
+        context: JSON.stringify({ user_written_title: userWrittenTitle }),
+        fields: { description: translateFromIndonesia ? source : current },
+      })
+      .pipe(finalize(() => (this.assistingOrganizerField = null)))
+      .subscribe({
+        next: (fields) => {
+          const description = fields['description'] || '';
+          if (kind === 'latex') {
+            this.homeLatexContent[locale].description = description;
+          } else if (kind === 'latex_item') {
+            this.updateHomeLatexItem(locale, index, 'description', description);
+          } else if (kind === 'advertisement') {
+            this.homeAdvertisementContent[locale].description = description;
+          } else {
+            this.updateAboutFeature(locale, index, 'description', description);
+          }
+          this.notification.showSuccess(
+            translateFromIndonesia
+              ? 'Deskripsi English sudah diterjemahkan. Judul tetap Anda isi sendiri.'
+              : 'Draf deskripsi sudah diisi. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showContentAssistantError(error),
+      });
+  }
+
   private slugifyAssistant(value: string): string {
     return String(value || '')
       .normalize('NFKD')
@@ -1309,7 +1404,7 @@ export class WebsitePageForm {
   private showContentAssistantError(error: any): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan konten belum berhasil. Coba lagi sebentar.',
     );
   }

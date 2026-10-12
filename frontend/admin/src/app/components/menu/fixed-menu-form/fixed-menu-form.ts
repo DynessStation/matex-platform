@@ -9,7 +9,6 @@ import {
 
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { finalize } from 'rxjs';
 
 import { Button } from '../../../shared/components/ui/button/button';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
@@ -19,8 +18,6 @@ import {
   IWebNavigationItem,
   IWebNavigationItemPayload,
 } from '../../../shared/interface/web-navigation.interface';
-import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
-import { NotificationService } from '../../../shared/services/notification.service';
 import {
   CreateWebNavigationItemAction,
   UpdateWebNavigationItemAction,
@@ -51,8 +48,6 @@ interface FixedMenuDefinition {
 export class FixedMenuForm {
   private readonly formBuilder = inject(FormBuilder);
   private readonly store = inject(Store);
-  private readonly contentAssistant = inject(ContentAssistantService);
-  private readonly notification = inject(NotificationService);
 
   readonly navigation = input<IWebNavigationDetail | null>(null);
   readonly item = input<IWebNavigationItem | null>(null);
@@ -119,7 +114,6 @@ export class FixedMenuForm {
   });
 
   submitting = false;
-  translating = false;
 
   ngOnInit(): void {
     this.populateForm();
@@ -172,35 +166,6 @@ export class FixedMenuForm {
       id_label: definition.idLabel,
       en_label: definition.enLabel,
     });
-  }
-
-  copyAndTranslateToEnglish(): void {
-    const idLabel = String(this.form.controls['id_label'].value || '').trim();
-    if (!idLabel || this.translating) return;
-    this.translating = true;
-    this.contentAssistant
-      .assist({
-        mode: 'translate',
-        content_type: 'navigation-label',
-        source_locale: 'id-ID',
-        target_locale: 'en-US',
-        fields: { label: idLabel },
-      })
-      .pipe(finalize(() => (this.translating = false)))
-      .subscribe({
-        next: (fields) => {
-          this.form.controls['en_label'].setValue(fields['label'] || idLabel);
-          this.notification.showSuccess(
-            'Label English sudah diisi dari Bahasa Indonesia.',
-          );
-        },
-        error: (error) =>
-          this.notification.showError(
-            error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
-              ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada backend.'
-              : 'Terjemahan belum berhasil. Coba lagi sebentar.',
-          ),
-      });
   }
 
   submit(): void {

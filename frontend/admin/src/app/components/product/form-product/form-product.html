@@ -148,47 +148,72 @@
                       placeholder="contoh: Bogor"
                     />
                   </div>
-                  <div class="col-md-2">
+                  <div class="col-xl-3 col-md-6">
                     <label class="form-label">Berat (gram)</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="weight_grams"
                     />
+                    @if (measurementHelper('weight_grams'); as converted) {
+                      <small class="measurement-helper"
+                        >≈ {{ converted }}</small
+                      >
+                    }
                   </div>
-                  <div class="col-md-2">
+                  <div class="col-xl-3 col-md-6">
                     <label class="form-label">Panjang (mm)</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="length_mm"
                     />
+                    @if (measurementHelper('length_mm'); as converted) {
+                      <small class="measurement-helper"
+                        >= {{ converted }}</small
+                      >
+                    }
                   </div>
-                  <div class="col-md-2">
+                  <div class="col-xl-3 col-md-6">
                     <label class="form-label">Lebar (mm)</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="width_mm"
                     />
+                    @if (measurementHelper('width_mm'); as converted) {
+                      <small class="measurement-helper"
+                        >= {{ converted }}</small
+                      >
+                    }
                   </div>
-                  <div class="col-md-2">
+                  <div class="col-xl-3 col-md-6">
                     <label class="form-label">Tinggi (mm)</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="height_mm"
                     />
+                    @if (measurementHelper('height_mm'); as converted) {
+                      <small class="measurement-helper"
+                        >= {{ converted }}</small
+                      >
+                    }
                   </div>
                   <div class="col-md-3">
                     <label class="form-label">Minimum pesanan</label
                     ><input
-                      type="number"
-                      min="1"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="min_order_qty"
                     />
@@ -196,8 +221,9 @@
                   <div class="col-md-3">
                     <label class="form-label">Lead time (hari)</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="lead_time_days"
                     />
@@ -216,8 +242,9 @@
                   <div class="col-md-3">
                     <label class="form-label">Jumlah stok</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="stock_quantity"
                     />
@@ -237,8 +264,9 @@
                   <div class="col-md-4">
                     <label class="form-label">Urutan</label
                     ><input
-                      type="number"
-                      min="0"
+                      type="text"
+                      inputmode="numeric"
+                      appLocalizedNumber
                       class="form-control"
                       formControlName="sort_order"
                     />
@@ -284,49 +312,6 @@
                     <strong>EN</strong> English
                   </button>
                 </div>
-                <div class="content-assistant-bar">
-                  <div>
-                    <strong>Bantuan konten</strong>
-                    <small
-                      >Hasil hanya mengisi form dan tetap bisa Anda sunting
-                      sebelum disimpan.</small
-                    >
-                  </div>
-                  <div class="content-assistant-actions">
-                    <button
-                      type="button"
-                      class="btn btn-outline"
-                      [disabled]="
-                        assistingLocale !== null || translatingToEnglish
-                      "
-                      (click)="generateDescriptions(activeLocale)"
-                    >
-                      <i class="ri-magic-line"></i>
-                      {{
-                        assistingLocale === activeLocale
-                          ? 'Sedang membuat…'
-                          : 'Bantu isi deskripsi'
-                      }}
-                    </button>
-                    @if (activeLocale === 'en') {
-                      <button
-                        type="button"
-                        class="btn btn-primary"
-                        [disabled]="
-                          assistingLocale !== null || translatingToEnglish
-                        "
-                        (click)="copyAndTranslateToEnglish()"
-                      >
-                        <i class="ri-translate-2"></i>
-                        {{
-                          translatingToEnglish
-                            ? 'Menerjemahkan…'
-                            : 'Salin & terjemahkan dari Indonesia'
-                        }}
-                      </button>
-                    }
-                  </div>
-                </div>
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-5">
@@ -344,15 +329,34 @@
                       ><input class="form-control" formControlName="id_name" />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Ringkasan</label
-                      ><textarea
+                      <div class="field-heading">
+                        <label class="form-label">Ringkasan</label>
+                        <app-ai-field-action
+                          label="Isi ringkasan otomatis"
+                          [loading]="assistingField === 'id_short_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistProductField('id', 'short_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         rows="3"
                         class="form-control"
                         formControlName="id_short_description"
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi lengkap</label>
+                      <div class="field-heading">
+                        <label class="form-label">Deskripsi lengkap</label>
+                        <app-ai-field-action
+                          label="Isi deskripsi otomatis"
+                          loadingLabel="Sedang menyusun deskripsi…"
+                          [loading]="assistingField === 'id_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="assistProductField('id', 'description')"
+                        />
+                      </div>
                       @if (isBrowser && idDescriptionEditor) {
                         <div class="product-rich-editor">
                           <ngx-editor-menu [editor]="idDescriptionEditor" />
@@ -410,8 +414,25 @@
                                 />
                               </div>
                               <div class="col-md-7">
-                                <label class="form-label">Nilai</label
-                                ><input
+                                <div class="field-heading">
+                                  <label class="form-label">Nilai</label>
+                                  <app-ai-field-action
+                                    label="Isi nilai otomatis"
+                                    loadingLabel="Sedang menyiapkan nilai…"
+                                    [loading]="
+                                      assistingField ===
+                                      'id_specification_' + $index
+                                    "
+                                    [disabled]="
+                                      assistingField !== null ||
+                                      !spec.get('label')?.value
+                                    "
+                                    (requested)="
+                                      assistSpecificationValue('id', $index)
+                                    "
+                                  />
+                                </div>
+                                <input
                                   class="form-control"
                                   formControlName="value"
                                   placeholder="Contoh: 100% lateks alami"
@@ -451,15 +472,43 @@
                       ><input class="form-control" formControlName="en_name" />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Summary</label
-                      ><textarea
+                      <div class="field-heading">
+                        <label class="form-label">Summary</label>
+                        <app-ai-field-action
+                          label="Translate Indonesian summary"
+                          loadingLabel="Translating the summary…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_short_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_short_description.value
+                          "
+                          (requested)="
+                            translateProductField('short_description')
+                          "
+                        />
+                      </div>
+                      <textarea
                         rows="3"
                         class="form-control"
                         formControlName="en_short_description"
                       ></textarea>
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Full description</label>
+                      <div class="field-heading">
+                        <label class="form-label">Full description</label>
+                        <app-ai-field-action
+                          label="Translate Indonesian description"
+                          loadingLabel="Translating the description…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_description.value
+                          "
+                          (requested)="translateProductField('description')"
+                        />
+                      </div>
                       @if (isBrowser && enDescriptionEditor) {
                         <div class="product-rich-editor">
                           <ngx-editor-menu [editor]="enDescriptionEditor" />
@@ -516,8 +565,28 @@
                                 />
                               </div>
                               <div class="col-md-7">
-                                <label class="form-label">Value</label
-                                ><input
+                                <div class="field-heading">
+                                  <label class="form-label">Value</label>
+                                  <app-ai-field-action
+                                    label="Translate Indonesian value"
+                                    loadingLabel="Translating the value…"
+                                    icon="ri-translate-2"
+                                    [loading]="
+                                      assistingField ===
+                                      'en_specification_' + $index
+                                    "
+                                    [disabled]="
+                                      assistingField !== null ||
+                                      !specifications('id')
+                                        .at($index)
+                                        ?.get('value')?.value
+                                    "
+                                    (requested)="
+                                      assistSpecificationValue('en', $index)
+                                    "
+                                  />
+                                </div>
+                                <input
                                   class="form-control"
                                   formControlName="value"
                                   placeholder="Example: 100% natural latex"
@@ -673,13 +742,9 @@
                               priceSymbol($index)
                             }}</span>
                             <input
-                              type="number"
-                              min="0"
-                              [step]="
-                                row.get('currency')?.value === 'USD'
-                                  ? '0.01'
-                                  : '1'
-                              "
+                              type="text"
+                              inputmode="numeric"
+                              appLocalizedNumber
                               class="form-control"
                               formControlName="amount"
                               placeholder="0"
@@ -715,8 +780,9 @@
                           <div class="col-lg-3 col-md-6">
                             <label class="form-label">Minimum pembelian</label>
                             <input
-                              type="number"
-                              min="1"
+                              type="text"
+                              inputmode="numeric"
+                              appLocalizedNumber
                               class="form-control"
                               formControlName="min_qty"
                               placeholder="Contoh: 10"
@@ -725,8 +791,9 @@
                           <div class="col-lg-3 col-md-6">
                             <label class="form-label">Maksimum pembelian</label>
                             <input
-                              type="number"
-                              min="1"
+                              type="text"
+                              inputmode="numeric"
+                              appLocalizedNumber
                               class="form-control"
                               formControlName="max_qty"
                               placeholder="Opsional"
@@ -740,8 +807,9 @@
                                 priceSymbol($index)
                               }}</span>
                               <input
-                                type="number"
-                                min="0"
+                                type="text"
+                                inputmode="numeric"
+                                appLocalizedNumber
                                 class="form-control"
                                 formControlName="compare_at"
                                 placeholder="Opsional"
@@ -921,8 +989,9 @@
                         <div class="col-lg-4 col-md-4">
                           <label class="form-label">Harga marketplace</label
                           ><input
-                            type="number"
-                            min="0"
+                            type="text"
+                            inputmode="numeric"
+                            appLocalizedNumber
                             class="form-control"
                             formControlName="price"
                             placeholder="Opsional"
@@ -1085,7 +1154,18 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">Deskripsi SEO</label
+                      <div class="field-heading">
+                        <label class="form-label">Deskripsi SEO</label>
+                        <app-ai-field-action
+                          label="Isi deskripsi SEO otomatis"
+                          loadingLabel="Sedang menyiapkan deskripsi SEO…"
+                          [loading]="assistingField === 'id_meta_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistProductField('id', 'meta_description')
+                          "
+                        />
+                      </div>
                       ><textarea
                         rows="3"
                         class="form-control"
@@ -1100,7 +1180,17 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Deskripsi OG</label
+                      <div class="field-heading">
+                        <label class="form-label">Deskripsi OG</label>
+                        <app-ai-field-action
+                          label="Isi deskripsi otomatis"
+                          [loading]="assistingField === 'id_og_description'"
+                          [disabled]="assistingField !== null"
+                          (requested)="
+                            assistProductField('id', 'og_description')
+                          "
+                        />
+                      </div>
                       ><textarea
                         rows="2"
                         class="form-control"
@@ -1125,7 +1215,22 @@
                       />
                     </div>
                     <div class="col-12">
-                      <label class="form-label">SEO description</label
+                      <div class="field-heading">
+                        <label class="form-label">SEO description</label>
+                        <app-ai-field-action
+                          label="Translate Indonesian description"
+                          loadingLabel="Translating the SEO description…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_meta_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_meta_description.value
+                          "
+                          (requested)="
+                            translateProductField('meta_description')
+                          "
+                        />
+                      </div>
                       ><textarea
                         rows="3"
                         class="form-control"
@@ -1140,7 +1245,20 @@
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">OG description</label
+                      <div class="field-heading">
+                        <label class="form-label">OG description</label>
+                        <app-ai-field-action
+                          label="Translate Indonesian description"
+                          loadingLabel="Translating the sharing description…"
+                          icon="ri-translate-2"
+                          [loading]="assistingField === 'en_og_description'"
+                          [disabled]="
+                            assistingField !== null ||
+                            !form.controls.id_og_description.value
+                          "
+                          (requested)="translateProductField('og_description')"
+                        />
+                      </div>
                       ><textarea
                         rows="2"
                         class="form-control"

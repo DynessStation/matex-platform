@@ -15,7 +15,30 @@
         </div>
         <div class="col-xxl-9 col-lg-8 col-md-7">
           @if (faq$ | async; as faqs) {
-            @if (faqs.length) {
+            @if (faqState() === 'loading') {
+              <div class="faq-state" aria-live="polite" aria-busy="true">
+                <app-loader
+                  loaderClass="loader-inline"
+                  [label]="pageMessage('Memuat pertanyaan…', 'Loading questions…')"
+                />
+              </div>
+            } @else if (faqState() === 'error') {
+              <div class="faq-state faq-state--error" role="status">
+                <h4>
+                  {{
+                    pageMessage('Pertanyaan belum dapat dimuat', 'Questions could not be loaded')
+                  }}
+                </h4>
+                <p>
+                  {{
+                    pageMessage(
+                      'Silakan coba muat ulang halaman.',
+                      'Please reload the page and try again.'
+                    )
+                  }}
+                </p>
+              </div>
+            } @else if (faqs.length) {
               <div class="accordion faq-accordion" ngbAccordion [closeOthers]="true">
                 @for (faq of faqs; track faq.key; let i = $index) {
                   <div ngbAccordionItem [collapsed]="i !== 0">
@@ -29,7 +52,7 @@
                     <div class="collapse show" ngbAccordionCollapse>
                       <div class="card-body" ngbAccordionBody>
                         <ng-template>
-                          <p>{{ faq.answer }}</p>
+                          <p class="faq-answer">{{ faq.answer }}</p>
                         </ng-template>
                       </div>
                     </div>

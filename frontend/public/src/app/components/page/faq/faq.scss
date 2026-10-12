@@ -1,0 +1,24 @@
+.faq-state {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  padding: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.faq-state--error {
+  align-content: center;
+  gap: 8px;
+
+  h4,
+  p {
+    margin: 0;
+  }
+}
+
+.faq-answer {
+  white-space: pre-line;
+}

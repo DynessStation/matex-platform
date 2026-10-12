@@ -50,7 +50,8 @@ const normalizeTranslations = (
       seen.has(locale) ||
       !question ||
       question.length > 500 ||
-      !answer
+      !answer ||
+      answer.length > 50000
     ) {
       return null;
     }

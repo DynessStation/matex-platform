@@ -41,6 +41,7 @@ import {
 } from '../../../shared/interface/office.interface';
 
 import { HasPermissionDirective } from '../../../shared/directive/has-permission.directive';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LocalizationService } from '../../../shared/services/localization.service';
 
@@ -93,6 +94,7 @@ interface OfficeMediaDraft {
     MediaModal,
     LocationPicker,
     HasPermissionDirective,
+    LocalizedNumberInputDirective,
   ],
 
   templateUrl: './form-office.html',

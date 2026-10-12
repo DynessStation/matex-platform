@@ -3,6 +3,7 @@ import { Component, inject, input, PLATFORM_ID } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
+  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -15,17 +16,20 @@ import { Editor, NgxEditorModule } from 'ngx-editor';
 import { filter, finalize, Observable, switchMap, take } from 'rxjs';
 
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
+import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import { mediaConfig } from '../../../shared/data/media-config';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import { ICategoryModel } from '../../../shared/interface/category.interface';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import {
   IProduct,
   IProductPayload,
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { GetCategoriesAction } from '../../../shared/store/action/category.action';
 import {
@@ -44,9 +48,11 @@ import { ProductState } from '../../../shared/store/state/product.state';
     NgbModule,
     Select2Module,
     AdvanceDropdown,
+    AiFieldAction,
     ImageUpload,
     Button,
     NgxEditorModule,
+    LocalizedNumberInputDirective,
   ],
   templateUrl: './form-product.html',
   styleUrl: './form-product.scss',
@@ -57,6 +63,7 @@ export class FormProduct {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private contentAssistant = inject(ContentAssistantService);
+  private localization = inject(LocalizationService);
   private notification = inject(NotificationService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly type = input<string>('create');
@@ -113,8 +120,7 @@ export class FormProduct {
   activeLocale: 'id' | 'en' = 'id';
   idDescriptionEditor?: Editor;
   enDescriptionEditor?: Editor;
-  assistingLocale: 'id' | 'en' | null = null;
-  translatingToEnglish = false;
+  assistingField: string | null = null;
   categoryIds: string[] = [];
   categoryError = false;
   pricePublicationError = false;
@@ -192,6 +198,49 @@ export class FormProduct {
   removeSpecification(locale: 'id' | 'en', index: number) {
     this.specifications(locale).removeAt(index);
   }
+
+  assistSpecificationValue(locale: 'id' | 'en', index: number): void {
+    if (this.assistingField) return;
+    const target = this.specifications(locale).at(index) as FormGroup;
+    const indonesia = this.specifications('id').at(index) as
+      FormGroup | undefined;
+    const mode = locale === 'en' ? 'translate' : 'generate';
+    const sourceValue =
+      mode === 'translate'
+        ? String(indonesia?.controls['value']?.value || '')
+        : String(target.controls['value']?.value || '');
+    const fieldKey = `${locale}_specification_${index}`;
+
+    this.assistingField = fieldKey;
+    this.contentAssistant
+      .assist({
+        mode,
+        content_type: 'product-specification',
+        source_locale: mode === 'translate' ? 'id-ID' : undefined,
+        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
+        context: JSON.stringify({
+          user_written_product_name: this.form.get(`${locale}_name`)?.value,
+          user_written_specification_name:
+            target.controls['label']?.value ||
+            indonesia?.controls['label']?.value ||
+            '',
+          sku: this.form.controls.sku.value,
+        }),
+        fields: { value: sourceValue },
+      })
+      .pipe(finalize(() => (this.assistingField = null)))
+      .subscribe({
+        next: (fields) => {
+          target.controls['value'].setValue(fields['value'] || '');
+          this.notification.showSuccess(
+            locale === 'id'
+              ? 'Nilai spesifikasi sudah diisi. Periksa kembali sebelum menyimpan.'
+              : 'Specification value filled from Indonesian. Review it before saving.',
+          );
+        },
+        error: (error) => this.showAssistantError(error),
+      });
+  }
   ngOnInit() {
     if (this.isBrowser) {
       this.idDescriptionEditor = new Editor();
@@ -236,17 +285,25 @@ export class FormProduct {
       .slice(0, 10);
   }
 
-  generateDescriptions(locale: 'id' | 'en') {
-    const prefix = locale;
+  assistProductField(
+    locale: 'id' | 'en',
+    field:
+      | 'short_description'
+      | 'description'
+      | 'meta_description'
+      | 'og_description',
+  ) {
+    if (this.assistingField) return;
     const value = this.form.getRawValue() as any;
-    this.assistingLocale = locale;
+    const controlName = `${locale}_${field}`;
+    this.assistingField = controlName;
     this.contentAssistant
       .assist({
         mode: 'generate',
         content_type: 'product',
         target_locale: locale === 'id' ? 'id-ID' : 'en-US',
         context: JSON.stringify({
-          name: value[`${prefix}_name`],
+          user_written_name: value[`${locale}_name`],
           sku: value.sku,
           product_kind: value.product_kind,
           categories: this.categoryIds,
@@ -257,103 +314,64 @@ export class FormProduct {
             height: value.height_mm,
           },
           weight_grams: value.weight_grams,
-          specifications: this.specificationPayload(prefix),
+          specifications: this.specificationPayload(locale),
         }),
-        fields: {
-          short_description: value[`${prefix}_short_description`] || '',
-          description: value[`${prefix}_description`] || '',
-          meta_description: value[`${prefix}_meta_description`] || '',
-          og_description: value[`${prefix}_og_description`] || '',
-        },
+        fields: { [field]: value[controlName] || '' },
       })
-      .pipe(finalize(() => (this.assistingLocale = null)))
+      .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
         next: (fields) => {
-          this.form.patchValue({
-            [`${prefix}_short_description`]: fields['short_description'],
-            [`${prefix}_description`]: fields['description'],
-            [`${prefix}_meta_description`]: fields['meta_description'],
-            [`${prefix}_og_description`]: fields['og_description'],
-          });
+          this.form.get(controlName)?.setValue(fields[field] || '');
           this.notification.showSuccess(
             locale === 'id'
-              ? 'Draf deskripsi berhasil dibuat. Periksa kembali sebelum menyimpan.'
-              : 'Description draft generated. Review it before saving.',
+              ? 'Draf field berhasil dibuat. Periksa kembali sebelum menyimpan.'
+              : 'Field draft generated. Review it before saving.',
           );
         },
         error: (error) => this.showAssistantError(error),
       });
   }
 
-  copyAndTranslateToEnglish() {
+  translateProductField(
+    field:
+      | 'short_description'
+      | 'description'
+      | 'meta_description'
+      | 'og_description',
+  ) {
+    if (this.assistingField) return;
     const value = this.form.getRawValue() as any;
-    const fields: Record<string, string> = {
-      name: value.id_name || '',
-      short_description: value.id_short_description || '',
-      description: value.id_description || '',
-      meta_title: value.id_meta_title || '',
-      meta_description: value.id_meta_description || '',
-      og_title: value.id_og_title || '',
-      og_description: value.id_og_description || '',
-    };
-    const sourceSpecifications = this.specifications(
-      'id',
-    ).getRawValue() as Array<{
-      label: string;
-      value: string;
-    }>;
-    sourceSpecifications.forEach((item, index) => {
-      fields[`spec_${index}_label`] = item.label;
-      fields[`spec_${index}_value`] = item.value;
-    });
-
-    this.translatingToEnglish = true;
+    const controlName = `en_${field}`;
+    this.assistingField = controlName;
     this.contentAssistant
       .assist({
         mode: 'translate',
         content_type: 'product',
         source_locale: 'id-ID',
         target_locale: 'en-US',
-        fields,
+        fields: { [field]: value[`id_${field}`] || '' },
       })
-      .pipe(finalize(() => (this.translatingToEnglish = false)))
+      .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
         next: (translated) => {
-          const englishName = translated['name'] || value.id_name || '';
-          this.form.patchValue({
-            en_name: englishName,
-            en_slug: this.slugify(englishName || value.id_slug),
-            en_short_description: translated['short_description'] || '',
-            en_description: translated['description'] || '',
-            en_meta_title: translated['meta_title'] || '',
-            en_meta_description: translated['meta_description'] || '',
-            en_og_title: translated['og_title'] || '',
-            en_og_description: translated['og_description'] || '',
-          });
-          this.specifications('en').clear();
-          sourceSpecifications.forEach((_item, index) =>
-            this.addSpecification('en', {
-              label: translated[`spec_${index}_label`] || '',
-              value: translated[`spec_${index}_value`] || '',
-            }),
-          );
-          this.activeLocale = 'en';
+          this.form.get(controlName)?.setValue(translated[field] || '');
           this.notification.showSuccess(
-            'Konten English sudah diisi dari Bahasa Indonesia. Periksa hasil terjemahan sebelum menyimpan.',
+            'Field English sudah diterjemahkan. Nama, judul, dan label tetap Anda isi sendiri.',
           );
         },
         error: (error) => this.showAssistantError(error),
       });
   }
 
-  private slugify(value: string) {
-    return String(value || '')
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 255);
+  measurementHelper(
+    controlName: 'weight_grams' | 'length_mm' | 'width_mm' | 'height_mm',
+  ) {
+    const raw = Number(this.form.get(controlName)?.value);
+    if (!Number.isFinite(raw) || raw < 0) return '';
+    if (controlName === 'weight_grams') {
+      return `${new Intl.NumberFormat(this.localization.locale(), { maximumFractionDigits: 3 }).format(raw / 1000)} kg`;
+    }
+    return `${new Intl.NumberFormat(this.localization.locale(), { maximumFractionDigits: 2 }).format(raw / 10)} cm`;
   }
 
   private showAssistantError(error: any) {
@@ -361,7 +379,7 @@ export class FormProduct {
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED';
     this.notification.showError(
       notConfigured
-        ? 'Bantuan AI belum aktif. Tambahkan OPENAI_API_KEY pada konfigurasi backend.'
+        ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
         : 'Bantuan penulisan belum berhasil. Coba lagi sebentar.',
     );
   }
