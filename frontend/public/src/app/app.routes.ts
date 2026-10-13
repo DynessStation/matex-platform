@@ -34,6 +34,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/home/home').then((m) => m.Home),
       },
       ...content,
+      {
+        path: '**',
+        loadComponent: () =>
+          import('./components/page/error-404/error-404').then((m) => m.Error404),
+      },
     ],
   },
   {

@@ -1,5 +1,4 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
@@ -37,7 +36,6 @@ export class BlogStateModel {
 })
 @Injectable()
 export class BlogState {
-  private router = inject(Router);
   private blogService = inject(BlogService);
 
   @Selector()
@@ -92,8 +90,8 @@ export class BlogState {
           ctx.patchState({ selectedBlog: result });
         },
         error: (err) => {
-          void this.router.navigate(['/404']);
-          throw new Error(err?.error?.message);
+          ctx.patchState({ selectedBlog: null });
+          throw err;
         },
       }),
     );

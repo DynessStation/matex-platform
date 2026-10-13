@@ -18,6 +18,7 @@ import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadc
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { TProduct } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
+import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
 import { RecentProductService } from '../../../shared/services/recent-product.service';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
@@ -55,6 +56,7 @@ export class Product {
   private platformId = inject<Object>(PLATFORM_ID);
   private destroyRef = inject(DestroyRef);
   private recentProducts = inject(RecentProductService);
+  private seo = inject(PublicSeoService);
 
   constructor(
     private route: ActivatedRoute,
@@ -75,6 +77,7 @@ export class Product {
       );
       this.product = product;
       this.recentProducts.add(product);
+      this.applySeo(product);
     });
 
     // For Demo Purpose only
@@ -107,8 +110,69 @@ export class Product {
   }
 
   ngOnDestroy() {
+    this.seo.clear();
     if (this.isBrowser) {
       document.body.classList.remove('stickyCart');
     }
+  }
+
+  private applySeo(product: TProduct): void {
+    const locale: 'id-ID' | 'en-US' = this.isEnglish ? 'en-US' : 'id-ID';
+    const currentPath = `${this.isEnglish ? '/en/product/' : '/produk/'}${encodeURIComponent(product.slug)}`;
+    const canonical = this.seo.canonicalUrl(currentPath, product.canonical_url);
+    const description =
+      product.meta_description || product.short_description || product.description || '';
+    const image =
+      product.product_meta_image?.original_url || product.product_thumbnail?.original_url;
+    const alternates: PublicSeoAlternate[] = [
+      {
+        locale: 'id-ID',
+        path: `/produk/${encodeURIComponent(product.localized_slugs?.['id-ID'] || product.slug)}`,
+      },
+      {
+        locale: 'en-US',
+        path: `/en/product/${encodeURIComponent(product.localized_slugs?.['en-US'] || product.slug)}`,
+      },
+    ];
+    const offer =
+      product.price_visibility === 'displayed' && Number(product.price) > 0
+        ? {
+            '@type': 'Offer',
+            priceCurrency: product.currency || 'IDR',
+            price: Number(product.sale_price || product.price),
+            availability:
+              product.stock_status === 'in_stock'
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+            url: canonical,
+          }
+        : undefined;
+
+    this.seo.apply({
+      locale,
+      title: product.meta_title || `${product.name} | MATEX`,
+      description,
+      canonicalPath: currentPath,
+      canonicalUrl: canonical,
+      alternates,
+      type: 'product',
+      socialTitle: product.og_title || product.meta_title || product.name,
+      socialDescription: product.og_description || description,
+      image,
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description: this.seo.toPlainText(description),
+        image: image ? [image] : undefined,
+        sku: product.sku || undefined,
+        brand: product.brand?.name
+          ? { '@type': 'Brand', name: product.brand.name }
+          : { '@type': 'Brand', name: 'MATEX' },
+        category: product.categories?.map((category) => category.name).join(', ') || undefined,
+        url: canonical,
+        offers: offer,
+      },
+    });
   }
 }

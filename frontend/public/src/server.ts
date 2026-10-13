@@ -22,6 +22,17 @@ const internalApiOrigin = (() => {
   }
 })();
 
+const internalPublicOrigin = (() => {
+  try {
+    return new URL(
+      process.env['MATEX_PUBLIC_INTERNAL_URL'] ||
+        `http://127.0.0.1:${Number(process.env['PORT']) || 4201}`,
+    ).origin;
+  } catch {
+    return `http://127.0.0.1:${Number(process.env['PORT']) || 4201}`;
+  }
+})();
+
 app.get('/health/ssr', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.status(200).json({
@@ -78,7 +89,27 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+    .then(async (response) => {
+      if (!response) return next();
+
+      const redirectLocation = response.headers.get('location');
+      if (response.status === 404 && redirectLocation === '/404' && req.path !== '/404') {
+        const notFoundPage = await fetch(`${internalPublicOrigin}/404`, {
+          headers: req.headers.host ? { host: req.headers.host } : undefined,
+          signal: AbortSignal.timeout(10_000),
+        });
+        const headers = new Headers(notFoundPage.headers);
+        headers.delete('location');
+        headers.set('Cache-Control', 'no-store');
+        response = new Response(await notFoundPage.text(), {
+          status: 404,
+          statusText: 'Not Found',
+          headers,
+        });
+      }
+
+      return writeResponseToNodeResponse(response, res);
+    })
     .catch(next);
 });
 
@@ -93,7 +124,7 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
       throw error;
     }
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    process.stdout.write(`Node Express server listening on http://localhost:${port}\n`);
   });
 }
 

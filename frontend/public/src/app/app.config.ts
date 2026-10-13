@@ -4,6 +4,7 @@ import {
   HttpClient,
   provideHttpClient,
   withFetch,
+  withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import {
@@ -26,6 +27,7 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { GlobalErrorHandlerInterceptor } from './core/interceptors/global-error-handler.interceptor';
 import { LoaderInterceptor } from './core/interceptors/loader.interceptor';
+import { ssrApiOriginInterceptor } from './core/interceptors/ssr-api-origin.interceptor';
 import { SeoService } from './shared/services/seo.service';
 import { AccountState } from './shared/store/state/account.state';
 import { AttributeState } from './shared/store/state/attribute.state';
@@ -94,7 +96,11 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptorsFromDi(), withFetch()),
+    provideHttpClient(
+      withInterceptors([ssrApiOriginInterceptor]),
+      withInterceptorsFromDi(),
+      withFetch(),
+    ),
     provideToastr(),
     importProvidersFrom(
       ToastrModule.forRoot({

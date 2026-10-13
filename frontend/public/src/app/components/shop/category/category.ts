@@ -1,6 +1,5 @@
-import { AsyncPipe, DOCUMENT } from '@angular/common';
-import { Component, Inject, inject } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
+import { AsyncPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -13,6 +12,7 @@ import { Params } from '../../../shared/interface/core.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
 import { LayoutService } from '../../../shared/services/layout.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
+import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
 import { GetProducts } from '../../../shared/store/action/product.action';
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
@@ -27,8 +27,7 @@ import { CollectionProducts } from '../collection/widgets/collection-products/co
 })
 export class Category {
   private store = inject(Store);
-  private meta = inject(Meta);
-  private title = inject(Title);
+  private seo = inject(PublicSeoService);
   public layoutService = inject(LayoutService);
   private navigation = inject(PublicNavigationContextService);
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
@@ -68,10 +67,7 @@ export class Category {
   private subscriptions: Subscription = new Subscription();
   public totalItems: number = 0;
 
-  constructor(
-    private route: ActivatedRoute,
-    @Inject(DOCUMENT) private document: Document,
-  ) {}
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.subscriptions.add(
@@ -109,52 +105,47 @@ export class Category {
   }
 
   private applySeo(category: ICategory) {
+    const locale: 'id-ID' | 'en-US' = this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
     const title = category.meta_title || category.name;
     const description = category.meta_description || category.description || '';
-    const canonical = this.safeCanonicalUrl(category.canonical_url);
+    const currentPath = `${locale === 'en-US' ? '/en/category/' : '/kategori/'}${encodeURIComponent(category.slug)}`;
+    const canonical = this.seo.canonicalUrl(currentPath, category.canonical_url);
     const image =
       category.category_meta_image?.original_url || category.category_image?.original_url;
-    this.title.setTitle(title);
-    this.meta.updateTag({ name: 'description', content: description });
-    this.meta.updateTag({ property: 'og:type', content: 'website' });
-    this.meta.updateTag({ property: 'og:url', content: canonical });
-    this.meta.updateTag({ property: 'og:title', content: category.og_title || title });
-    this.meta.updateTag({
-      property: 'og:description',
-      content: category.og_description || description,
+    const alternates: PublicSeoAlternate[] = [
+      {
+        locale: 'id-ID',
+        path: `/kategori/${encodeURIComponent(category.localized_slugs?.['id-ID'] || category.slug)}`,
+      },
+      {
+        locale: 'en-US',
+        path: `/en/category/${encodeURIComponent(category.localized_slugs?.['en-US'] || category.slug)}`,
+      },
+    ];
+
+    this.seo.apply({
+      locale,
+      title,
+      description,
+      canonicalPath: currentPath,
+      canonicalUrl: canonical,
+      alternates,
+      socialTitle: category.og_title || title,
+      socialDescription: category.og_description || description,
+      image,
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: category.name,
+        description: this.seo.toPlainText(description),
+        url: canonical,
+        inLanguage: locale,
+      },
     });
-    if (image) {
-      this.meta.updateTag({ property: 'og:image', content: image });
-    } else {
-      this.meta.removeTag('property="og:image"');
-    }
-    let link = this.document.querySelector<HTMLLinkElement>(
-      'link[data-product-category-canonical]',
-    );
-    if (!link) {
-      link = this.document.createElement('link');
-      link.rel = 'canonical';
-      link.setAttribute('data-product-category-canonical', '');
-      this.document.head.appendChild(link);
-    }
-    link.href = canonical;
-  }
-
-  private safeCanonicalUrl(value?: string): string {
-    const fallback = this.document.location?.href || '';
-
-    if (!value) return fallback;
-
-    try {
-      const url = new URL(value, fallback || undefined);
-      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : fallback;
-    } catch {
-      return fallback;
-    }
   }
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
-    this.document.querySelector('link[data-product-category-canonical]')?.remove();
+    this.seo.clear();
   }
 }

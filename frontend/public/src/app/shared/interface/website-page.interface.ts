@@ -2,7 +2,7 @@ export type WebsitePageClickAction = 'none' | 'internal' | 'external' | 'product
 
 export interface IPublicWebsitePage {
   key: string;
-  locale: string;
+  locale: 'id-ID' | 'en-US';
   path: string;
   title: string;
   summary: string | null;
@@ -17,7 +17,7 @@ export interface IPublicWebsitePage {
     social_title: string;
     social_description: string;
   };
-  translations: { locale: string; path: string }[];
+  translations: { locale: 'id-ID' | 'en-US'; path: string }[];
   media: {
     slot: string;
     asset_url: string;

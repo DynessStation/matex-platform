@@ -56,7 +56,7 @@ Gunakan tiga proses Node terpisah:
 | Proses | Perintah produksi | Environment utama |
 | --- | --- | --- |
 | API | `npm run start:prod` dari folder `backend` | `NODE_ENV=production`, `PORT=9200`, `PUBLIC_COMPANY_ID=1`, `PUBLIC_SITE_URL=https://matexindo.com` |
-| Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200` |
+| Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200`, `MATEX_PUBLIC_INTERNAL_URL=http://127.0.0.1:9201` |
 | Admin SSR | `npm run serve:ssr` dari folder `frontend/admin` | `NODE_ENV=production`, `PORT=9202` |
 
 Jalankan proses API dengan site user public (`matex-public`) atau user aplikasi khusus yang hanya diberi akses ke folder backend dan storage MATEX. Jangan menjalankannya sebagai user milik site lama.
@@ -98,7 +98,7 @@ Sebelum deployment pertama, jalankan `npm run db:migrate:status` dari backend. D
 - Isi `DB_HOST=127.0.0.1`, nama database, user, password, dan `DB_PORT=3306` pada environment backend.
 - Simpan unggahan di `/var/lib/matex/files` atau storage persisten lain yang dimiliki proses API.
 - Siapkan backup database dan file, lalu uji restore sebelum go-live.
-- Jangan menjalankan migration produksi sebelum baseline database kosong selesai dan sudah diuji pada salinan database.
+- Baseline database kosong sudah lulus uji lokal; tetap jalankan backup dan restore drill pada salinan produksi sebelum migration pertama di VPS.
 
 ## 6. TLS dan pengamanan jaringan
 
@@ -120,10 +120,10 @@ Aktifkan pengalihan HTTP ke HTTPS. Firewall publik cukup membuka SSH sesuai kebi
 
 Health endpoint internal dipakai oleh PM2, monitor uptime, dan pemeriksaan deployment. Jangan menganggap proses siap menerima trafik hanya karena port terbuka; API wajib mengembalikan status `ready` setelah koneksi database berhasil.
 
-## 7. Pemeriksaan sebelum DNS go-live
+## 8. Pemeriksaan sebelum DNS go-live
 
-1. `GET /health` pada API mengembalikan status hidup.
-2. `GET /ready` berhasil terhubung ke database dan storage.
+1. `GET /health/live` pada API mengembalikan status hidup.
+2. `GET /health/ready` berhasil terhubung ke database.
 3. Public dan admin dapat dirender oleh SSR tanpa fallback error.
 4. Login admin, edit/publish konten, media, produk, artikel, FAQ, kontak, dan pergantian bahasa lulus smoke test.
 5. Canonical, hreflang, `robots.txt`, sitemap, dan respons 404 sudah benar.

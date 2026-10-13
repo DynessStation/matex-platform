@@ -55,6 +55,17 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Backend typecheck dan 42 contract/regression test lulus setelah perubahan.
 - Smoke test proses lokal lulus untuk API live/ready, public SSR, admin SSR, robots, dan sitemap. Sitemap dari data development berisi 134 URL publik dan tidak memasukkan route commerce versi 2.
 
+### Tahap 4 — kontrak SEO dan status SSR
+
+Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
+
+- Produk, kategori, artikel, dan halaman website sekarang memakai satu pengelola metadata yang membersihkan tag lama ketika navigasi, membatasi canonical ke origin MATEX, serta menghasilkan Open Graph dan Twitter metadata secara konsisten.
+- Halaman bilingual menghasilkan canonical, `hreflang` Indonesia/English, dan `x-default`. Produk memakai schema `Product`, kategori memakai `CollectionPage`, artikel memakai `Article`, sedangkan halaman CMS memakai `WebPage` dan identitas organisasi pada beranda.
+- Route client yang tidak dikenal menampilkan halaman 404. Route server yang tidak dikenal, route legacy `/page/:slug`, dan halaman error eksplisit mengirim status HTTP yang sesuai.
+- Slug produk, kategori, atau artikel yang tidak ditemukan diarahkan secara internal ke halaman error lengkap sambil mempertahankan HTTP 404 dan `noindex, nofollow` pada URL asal.
+- Request API saat SSR memakai `MATEX_API_INTERNAL_URL` dan request aset runtime memakai `MATEX_PUBLIC_INTERNAL_URL`, sehingga render server tidak bergantung pada DNS atau TLS publik dari dalam VPS.
+- Build production public lulus. Smoke SSR lokal lulus untuk produk, kategori, artikel, route tidak dikenal, dan slug produk tidak dikenal. Detail terpublikasi merespons 200 dengan canonical, dua locale, `x-default`, dan JSON-LD; kedua kasus tidak ditemukan merespons 404 tanpa canonical serta dengan `noindex`.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
@@ -77,15 +88,13 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 ### P0 — wajib selesai sebelum server menerima trafik publik
 
-1. **Kontrak SEO belum selesai divalidasi.** Robots dan sitemap dinamis sudah tersedia; canonical, hreflang, structured data, serta status HTTP halaman 404 masih perlu divalidasi sebagai satu kontrak.
-2. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
-3. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
-4. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
+1. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
+2. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
+3. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
 
 ### P1 — selesai sebelum release candidate
 
-- Tambahkan security headers, compression yang terukur, request-size policy, `trust proxy` yang dibatasi, logging produksi, request ID, dan strategi backup/restore.
-- Ganti start backend berbasis `tsx src/app.ts` dengan hasil compile dan proses Node production.
+- Selesaikan strategi backup/restore, retensi log, alerting health, dan pengukuran compression/cache di staging.
 - Perbaiki lint error. Pisahkan noise formatting agar lint kembali berguna sebagai quality gate.
 - Tambahkan smoke/E2E untuk login admin, create/edit/publish konten, upload multi-media, public navigation, produk, artikel, FAQ, kontak, locale, canonical, dan respons mobile.
 - Tinjau kebijakan cache. Seluruh endpoint publik utama saat ini mengirim `Cache-Control: no-store`; ini aman dari stale content tetapi membuang peluang cache untuk katalog dan CMS yang jarang berubah.

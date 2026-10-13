@@ -184,7 +184,8 @@ export class ProductState {
           ctx.patchState({ selectedProduct: result });
         },
         error: (err) => {
-          throw new Error(err?.error?.message);
+          ctx.patchState({ selectedProduct: null });
+          throw err;
         },
       }),
       finalize(() => this.themeOptionService.preloader.set(false)),
