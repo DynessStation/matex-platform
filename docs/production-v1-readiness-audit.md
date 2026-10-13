@@ -6,7 +6,7 @@ Target admin: `https://internal.matexindo.com`
 
 ## Keputusan audit
 
-Status saat ini adalah **belum siap dipublikasikan ke produksi**, tetapi fondasi lokal utamanya sudah selesai: build ketiga aplikasi, baseline migration, hardening API, SSR/SEO, backup tooling, analitik first-party, dan console SEO dapat diverifikasi. Blocker yang tersisa terutama berada pada konten wajib, rotasi key, pengujian alur browser, serta rehearsal nyata di VPS sebelum DNS diarahkan.
+Status saat ini adalah **belum siap dipublikasikan ke produksi**, tetapi fondasi lokal utamanya sudah selesai: build ketiga aplikasi, baseline migration, hardening API, SSR/SEO, backup tooling, analitik first-party, dan console SEO dapat diverifikasi. Blocker yang tersisa terutama berada pada rotasi key, pengujian alur browser terautentikasi, serta rehearsal nyata di VPS sebelum DNS diarahkan.
 
 Audit ini sengaja belum menghapus file, rute, package, atau tabel. Penghapusan baru dilakukan setelah rute v1 dikunci, pemakaian runtime dibuktikan, backup diuji, dan ada migration yang dapat ditinjau serta dibatalkan.
 
@@ -77,6 +77,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Route client yang tidak dikenal menampilkan halaman 404. Route server yang tidak dikenal, route legacy `/page/:slug`, dan halaman error eksplisit mengirim status HTTP yang sesuai.
 - Slug produk, kategori, atau artikel yang tidak ditemukan diarahkan secara internal ke halaman error lengkap sambil mempertahankan HTTP 404 dan `noindex, nofollow` pada URL asal.
 - Request API saat SSR memakai `MATEX_API_INTERNAL_URL` dan request aset runtime memakai `MATEX_PUBLIC_INTERNAL_URL`, sehingga render server tidak bergantung pada DNS atau TLS publik dari dalam VPS.
+- Pembacaan halaman CMS tetap melewati auth/loader/toast toko, tetapi tidak lagi melewati interceptor origin SSR. Ini menutup kegagalan 503 saat domain publik belum aktif dan memastikan halaman CMS dirender melalui API loopback.
 - Build production public lulus. Smoke SSR lokal lulus untuk produk, kategori, artikel, route tidak dikenal, dan slug produk tidak dikenal. Detail terpublikasi merespons 200 dengan canonical, dua locale, `x-default`, dan JSON-LD; kedua kasus tidak ditemukan merespons 404 tanpa canonical serta dengan `noindex`.
 - Pemeriksaan pra-rilis read-only tersedia di `ops/preflight-smoke.cjs`. Tool ini menguji health API/SSR, canonical home, cache aset, robots, sitemap, kontrak 404, halaman login admin, dan kebocoran label Kartify melalui origin yang dapat diarahkan ke loopback, staging, atau domain produksi.
 
@@ -118,6 +119,7 @@ Selesai diterapkan dan diverifikasi secara lokal pada 13 Oktober 2026:
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
 | Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
 | Database lokal | Lulus | 47 tabel aplikasi dan 23 migration tercatat; fresh bootstrap seluruh 23 migration serta upgrade database lama sudah lulus. |
+| Preflight lintas aplikasi lokal | Lulus | 23 dari 23 pemeriksaan lulus dengan origin/canonical production: API live/ready, health kedua SSR, seluruh halaman wajib dua bahasa, katalog, artikel, aset/cache, robots, sitemap, kontrak 404, dan login admin. |
 
 Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktikan keamanan, konfigurasi domain, kesehatan proses, perilaku browser, dan kesiapan operasi produksi.
 
@@ -128,7 +130,6 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 1. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
 2. **Backup/restore dan penyimpanan file belum diuji di VPS.** Tool backup database/media, manifest checksum, retensi aman, verifikasi, dan restore bertarget sudah tersedia. Kepemilikan storage, backup terjadwal, salinan di luar VPS, restore drill, serta rollback release tetap harus lulus pada data staging sebelum DNS dipindah.
 3. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
-4. **Konten halaman wajib belum terpublikasi pada database yang diperiksa.** Endpoint public untuk Beranda, FAQ, Kontak, Tentang MATEX, dan Syarat & Ketentuan dalam bahasa Indonesia maupun Inggris masih mengembalikan 404. Akibatnya halaman terkait merespons 404/503 atau kehilangan metadata. Data tidak diubah otomatis; admin harus meninjau dan menerbitkan terjemahan yang benar sebelum preflight dapat lulus.
 
 ### P1 — selesai sebelum release candidate
 

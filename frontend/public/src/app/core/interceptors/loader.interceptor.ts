@@ -10,12 +10,17 @@ import {
   ShowButtonSpinnerAction,
   ShowLoaderAction,
 } from '../../shared/store/action/loader.action';
+import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {
   constructor(private store: Store) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (req.context.get(SKIP_PUBLIC_UI_INTERCEPTORS)) {
+      return next.handle(req);
+    }
+
     const isReadRequest = req.method === 'GET';
 
     void Promise.resolve(null).then(() => {
