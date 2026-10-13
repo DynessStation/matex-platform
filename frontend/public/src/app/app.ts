@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { Analytics, Values } from './shared/interface/setting.interface';
 import { Option } from './shared/interface/theme-option.interface';
 import { SeoService } from './shared/services/seo.service';
+import { PublicAnalyticsService } from './shared/services/public-analytics.service';
 import { GetCurrencies } from './shared/store/action/currency.action';
 import { GetSettingOption } from './shared/store/action/setting.action';
 import { GetThemes } from './shared/store/action/theme.action';
@@ -27,6 +28,7 @@ export class App {
   private destroyRef = inject(DestroyRef);
   private document = inject<Document>(DOCUMENT);
   seoService = inject(SeoService);
+  private firstPartyAnalytics = inject(PublicAnalyticsService);
   private platformId = inject<Object>(PLATFORM_ID);
 
   setting$: Observable<Values> = inject(Store).select(SettingState.setting) as Observable<Values>;
@@ -39,6 +41,7 @@ export class App {
   public isBrowser: boolean;
 
   constructor() {
+    this.firstPartyAnalytics.start();
     this.store.dispatch(new GetThemes());
     this.store.dispatch(new GetCurrencies({ status: 1 }));
     this.store.dispatch(new GetSettingOption());

@@ -42,7 +42,12 @@
               </div>
             </div>
             <div class="col-xxl-9 col-lg-8 col-md-7">
-              <form class="contact-right-box" [formGroup]="form" (ngSubmit)="submit()">
+              <form
+                class="contact-right-box"
+                [formGroup]="form"
+                (focusin)="trackContactStart()"
+                (ngSubmit)="submit()"
+              >
                 <h3>{{ locale === 'en-US' ? 'Send a message' : 'Kirim pesan' }}</h3>
                 @if (submission(); as result) {
                   @if (result.state === 'success') {

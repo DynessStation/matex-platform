@@ -18,6 +18,7 @@ import {
 import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { PublicContentService } from '../../../shared/services/public-content.service';
+import { PublicAnalyticsService } from '../../../shared/services/public-analytics.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
 import { WebsitePageService } from '../../../shared/services/website-page.service';
@@ -47,6 +48,7 @@ interface ContactView extends Omit<PublicContactData, 'offices'> {
 export class ContactUs {
   private fb = inject(FormBuilder);
   private content = inject(PublicContentService);
+  private analytics = inject(PublicAnalyticsService);
   private navigation = inject(PublicNavigationContextService);
   private notifications = inject(NotificationService);
   private sanitizer = inject(DomSanitizer);
@@ -85,6 +87,7 @@ export class ContactUs {
     shareReplay(1),
   );
   submitting = false;
+  private contactInteractionTracked = false;
 
   readonly breadcrumb: breadcrumb = {
     title: this.locale === 'en-US' ? 'Contact Us' : 'Hubungi Kami',
@@ -250,6 +253,7 @@ export class ContactUs {
       )
       .subscribe({
         next: (response) => {
+          this.analytics.contactSubmitted();
           const reference = response.data?.reference ?? '';
           this.submission.set({ state: 'success', reference });
           this.notifications.showSuccess(
@@ -273,5 +277,11 @@ export class ContactUs {
           });
         },
       });
+  }
+
+  trackContactStart(): void {
+    if (this.contactInteractionTracked) return;
+    this.contactInteractionTracked = true;
+    this.analytics.contactStarted();
   }
 }

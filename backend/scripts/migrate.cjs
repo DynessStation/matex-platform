@@ -11,6 +11,7 @@ const migrationFilePattern = /^\d{8}_\d{3}_[a-z0-9_-]+\.sql$/i;
 const args = new Set(process.argv.slice(2));
 const showStatusOnly = args.has('--status');
 const adoptExisting = args.has('--adopt-existing');
+const adoptionCutoffMigration = '20261011_019_enable_contact_inquiries.sql';
 
 const expectedAdoptionTables = [
   'admin_access',
@@ -274,11 +275,19 @@ async function run() {
       }
 
       await validateAdoptionTarget(connection);
-      for (const migration of migrations) {
+      const adoptionMigrations = migrations.filter(
+        (migration) => migration.fileName.localeCompare(adoptionCutoffMigration) <= 0,
+      );
+      if (!adoptionMigrations.length) {
+        throw new Error(`Adoption cutoff migration was not found: ${adoptionCutoffMigration}`);
+      }
+      for (const migration of adoptionMigrations) {
         await recordMigration(connection, migration, 'adopted', 0);
       }
-      console.log(`Adopted ${migrations.length} existing migrations without changing application data.`);
-      return;
+      console.log(
+        `Adopted ${adoptionMigrations.length} existing migrations without changing application data.`,
+      );
+      applied = await getAppliedMigrations(connection);
     }
 
     let executed = 0;

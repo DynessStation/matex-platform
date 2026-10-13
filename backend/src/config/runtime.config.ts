@@ -41,4 +41,13 @@ export const validateRuntimeConfig = (): void => {
       "AUDIT_INTEGRITY_SECRET must contain at least 32 characters in production",
     );
   }
+
+  if (
+    process.env.PUBLIC_ANALYTICS_ENABLED === "true" &&
+    (process.env.ANALYTICS_HASH_SECRET?.length ?? 0) < 32
+  ) {
+    throw new Error(
+      "ANALYTICS_HASH_SECRET must contain at least 32 characters when public analytics is enabled",
+    );
+  }
 };

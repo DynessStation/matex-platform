@@ -67,12 +67,24 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Build production public lulus. Smoke SSR lokal lulus untuk produk, kategori, artikel, route tidak dikenal, dan slug produk tidak dikenal. Detail terpublikasi merespons 200 dengan canonical, dua locale, `x-default`, dan JSON-LD; kedua kasus tidak ditemukan merespons 404 tanpa canonical serta dengan `noindex`.
 - Pemeriksaan pra-rilis read-only tersedia di `ops/preflight-smoke.cjs`. Tool ini menguji health API/SSR, canonical home, cache aset, robots, sitemap, kontrak 404, halaman login admin, dan kebocoran label Kartify melalui origin yang dapat diarahkan ke loopback, staging, atau domain produksi.
 
+### Tahap 5 — fondasi analitik first-party
+
+Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
+
+- Public dapat mengambil konfigurasi analitik dari API. Pencatatan tetap nonaktif secara default sampai pemberitahuan privasi dan keputusan aktivasi produksi selesai ditinjau.
+- Event `page_view`, `outbound_click`, `contact_start`, dan `contact_submit` memiliki allowlist serta batas payload yang ketat. Browser menghormati Do Not Track dan Global Privacy Control.
+- Sesi anonim hanya disimpan sementara di `sessionStorage`; backend menyimpan HMAC hash dan tidak menyimpan alamat IP mentah. Referrer dipangkas menjadi hostname agar query atau path sensitif tidak tersimpan.
+- Endpoint ingestion mengabaikan bot umum, menolak waktu dan path tidak valid, serta memakai UUID event unik agar retry tidak menggandakan data.
+- Endpoint admin berizin `dashboard.view` menyediakan ringkasan maksimal 90 hari: page view, pengunjung anonim, klik keluar, awal/kirim kontak, tren harian, halaman, sumber, dan negara bila trusted proxy header kelak diaktifkan.
+- Migration baru berhasil diterapkan pada database development lama. Uji endpoint nyata membuktikan event pertama tersimpan, retry UUID yang sama tidak menggandakan baris, dan data smoke-test kemudian dihapus.
+- Backend typecheck, production build, serta 47 contract/regression test lulus. Dashboard admin dan chart khusus masih perlu disambungkan ke endpoint ini.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
 | --- | --- | --- |
 | Backend TypeScript | Lulus | `npm run typecheck` berhasil. |
-| Backend contract/regression test | Lulus | 42 dari 42 test berhasil. |
+| Backend contract/regression test | Lulus | 47 dari 47 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Public lint | Lulus | 0 error dan 125 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
@@ -81,7 +93,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 | Dependency audit backend | Lulus | 0 advisory produksi. |
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
 | Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
-| Database lokal | Lulus | 46 tabel aplikasi dan 20 migration tercatat; fresh bootstrap juga lulus. |
+| Database lokal | Lulus | 47 tabel aplikasi dan 21 migration tercatat; fresh bootstrap 20 migration sebelumnya sudah lulus dan migration analitik berhasil diuji sebagai upgrade database lama. |
 
 Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktikan keamanan, konfigurasi domain, kesehatan proses, perilaku browser, dan kesiapan operasi produksi.
 
@@ -261,7 +273,7 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 ### Tahap 5 — analytics dan dashboard MATEX
 
-- Buat first-party event ingestion dan agregasi.
+- First-party event ingestion, penyimpanan aman, deduplikasi, dan endpoint ringkasan sudah diterapkan; perlu smoke ulang melalui domain staging.
 - Ganti dashboard demo dengan ringkasan MATEX.
 - Tambah halaman Analitik Publik.
 - Integrasikan GA4 realtime/historical.
