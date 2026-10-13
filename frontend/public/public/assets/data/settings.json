@@ -2,16 +2,16 @@
   "values": {
     "general": {
       "mode": "light-only",
-      "site_url": "https://angular.pixelstrap.net/kartify/",
-      "copyright": "Copyright 2024 © Kartify theme by pixelstrap",
+      "site_url": "https://matexindo.com",
+      "copyright": "Copyright 2026 © MATEX",
       "site_name": "Matex",
       "site_title": "Matex Indo Abadi - 100% Natural Latex",
       "site_tagline": "100% Natural Latex",
-      "default_timezone": "Asia/Kolkata",
+      "default_timezone": "Asia/Jakarta",
       "favicon_image_id": 10,
       "min_order_amount": 0,
       "dark_logo_image_id": 3948,
-      "product_sku_prefix": "FS",
+      "product_sku_prefix": "MTX",
       "tiny_logo_image_id": 1302,
       "default_currency_id": 1,
       "light_logo_image_id": 3950,
@@ -24,7 +24,7 @@
         "mime_type": "image/png",
         "disk": "public",
         "created_by_id": "1",
-        "created_at": "2024-06-25T11:42:51.000000Z",
+        "created_at": "2024-06-25T11:42:51Z",
         "asset_url": "/storage/3950/f6.png",
         "original_url": "/storage/3950/f6.png"
       },
@@ -35,7 +35,7 @@
         "mime_type": "image/png",
         "disk": "public",
         "created_by_id": "1",
-        "created_at": "2024-06-25T11:40:46.000000Z",
+        "created_at": "2024-06-25T11:40:46Z",
         "asset_url": "/storage/3948/12.png",
         "original_url": "/storage/3948/12.png"
       },
@@ -46,7 +46,7 @@
         "mime_type": "image/png",
         "disk": "public",
         "created_by_id": "1",
-        "created_at": "2024-05-02T08:54:01.000000Z",
+        "created_at": "2024-05-02T08:54:01Z",
         "asset_url": "/storage/10/favicon.png",
         "original_url": "/storage/10/favicon.png"
       },
@@ -57,7 +57,7 @@
         "mime_type": "image/png",
         "disk": "public",
         "created_by_id": "1",
-        "created_at": "2024-05-15T12:33:58.000000Z",
+        "created_at": "2024-05-15T12:33:58Z",
         "asset_url": "/storage/1302/Frame-44.png",
         "original_url": "/storage/1302/Frame-44.png"
       },
@@ -73,8 +73,8 @@
         "system_reserve": 0,
         "status": 1,
         "created_by_id": null,
-        "created_at": "2024-05-02T08:34:46.000000Z",
-        "updated_at": "2024-05-02T08:34:46.000000Z",
+        "created_at": "2024-05-02T08:34:46Z",
+        "updated_at": "2024-05-02T08:34:46Z",
         "deleted_at": null
       }
     },
@@ -139,7 +139,7 @@
         "mime_type": "image/png",
         "disk": "public",
         "created_by_id": "1",
-        "created_at": "2024-06-21T12:10:25.000000Z",
+        "created_at": "2024-06-21T12:10:25Z",
         "asset_url": "assets/images/inner-page/maintenance.png",
         "original_url": "/storage/3863/maintenance.png"
       }

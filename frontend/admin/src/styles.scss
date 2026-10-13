@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 //==================================================
-//==== KARTIFY THEME
+//==== TEMPLATE THEME
 //==================================================
 
 @use '../public/assets/scss/app.scss';
@@ -159,7 +159,7 @@ form .custom-select.ng-invalid.ng-touched .select2-selection {
 //==== ADMIN BUTTON CONTRAST
 //==================================================
 
-// Kartify's default light button pairs a near-white background with white
+// The template's default light button pairs a near-white background with white
 // text. Keep secondary actions neutral, bordered, and readable everywhere.
 .btn.btn-light,
 .btn.btn-light-bg,
@@ -255,7 +255,7 @@ body.dark-only {
     color: #aeb6c2 !important;
   }
 
-  // Kartify still assigns white and light-gray row fills to theme tables.
+  // The template still assigns white and light-gray row fills to theme tables.
   // Keep every admin table legible when the body switches to dark mode,
   // including tables that do not use the shared app-table component.
   .page-body-wrapper .theme-table {
@@ -432,7 +432,7 @@ body.dark-only {
       }
     }
 
-    // Custom admin workspaces use their own class names instead of Kartify
+    // Custom admin workspaces use their own class names instead of template
     // cards, so they need to share the same dark surfaces explicitly.
     .permission-workspace,
     .permission-sidebar-header,

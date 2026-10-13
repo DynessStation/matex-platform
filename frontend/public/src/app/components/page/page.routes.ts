@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { PageResolver } from '../../shared/resolver/page.resolver';
-
 export const page: Routes = [
   {
     path: 'search',
@@ -95,9 +93,6 @@ export const page: Routes = [
   },
   {
     path: 'page/:slug',
-    loadComponent: () => import('./page/page').then((m) => m.Page),
-    resolve: {
-      data: PageResolver,
-    },
+    loadComponent: () => import('./error-404/error-404').then((m) => m.Error404),
   },
 ];

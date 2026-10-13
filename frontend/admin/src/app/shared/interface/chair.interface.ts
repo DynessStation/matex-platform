@@ -6,7 +6,7 @@ import { IApiResponse } from './api-response.interface';
 
 export interface IChair {
   /**
-   * Compatibility field untuk generic Table Kartify.
+   * Compatibility field untuk generic table template.
    */
   id: any;
 

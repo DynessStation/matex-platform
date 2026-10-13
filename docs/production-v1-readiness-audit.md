@@ -27,6 +27,20 @@ Selesai diterapkan dan diverifikasi pada 12 Oktober 2026:
 
 Temuan lanjutan: rangkaian migration saat ini belum dapat membuat database kosong secara mandiri. Migration pertama masih mengandalkan tabel dasar lama seperti company/admin/attachment yang berasal dari dump awal. Karena itu migration runner tidak boleh dianggap selesai hanya dengan menambahkan tabel history; tahap berikutnya harus membentuk baseline schema yang dapat direproduksi, lalu menguji bootstrap database kosong dan upgrade database berisi data.
 
+### Tahap 2 — batch identitas, scope v1, dan dependency
+
+Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
+
+- Identitas package, output build, judul, favicon, logo admin, URL, timezone, SKU, dan copyright sudah memakai MATEX serta domain produksi.
+- Istilah vendor template dan tautan demo eksternal sudah dikeluarkan dari source serta bundle produksi. Konten legal, seller, tim, dan testimoni contoh dinonaktifkan agar tidak menjadi klaim MATEX.
+- Filter rating dan atribut dinamis disembunyikan dari katalog publik. Filter kategori dan harga tetap tersedia.
+- Cart, wishlist, dan account dipertahankan sebagai pratinjau versi 2. Checkout, compare, seller, order, dan route commerce lain diarahkan ke halaman versi 2.
+- Public/admin SSR hanya bind ke `127.0.0.1`. Port produksi ditetapkan menjadi API `9200`, public `9201`, dan admin `9202`, sehingga tidak bentrok dengan site lama pada `9000` dan `9100`.
+- Angular diperbarui ke `21.2.25`, Express dan Swiper diperbarui, dan dependency audit produksi backend, public, serta admin kini masing-masing 0 advisory.
+- Public dan admin berhasil dibuild ulang setelah upgrade dependency. Bundle hasil build juga lulus pemindaian istilah vendor lama dan pola secret yang diketahui.
+- Proses SSR public dan admin berhasil dijalankan pada `127.0.0.1:9201` dan `127.0.0.1:9202`; route utama, katalog, account/v2, checkout/v2, serta admin merespons HTTP 200. Pengambilan data production-domain belum dapat dinyatakan lulus sampai DNS, TLS, reverse proxy `/api`, dan API staging benar-benar tersedia.
+- Runbook CloudPanel untuk `72.60.77.35`, DNS, Node.js site, PM2, reverse proxy, database, TLS, firewall, serta checklist go-live tersedia di `docs/cloudpanel-production-runbook.md`.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
@@ -38,9 +52,9 @@ Temuan lanjutan: rangkaian migration saat ini belum dapat membuat database koson
 | Public lint | Gagal | 6 error dan 135 warning. Error utama adalah import duplikat. |
 | Admin lint | Gagal | 4 error dan 17.256 warning; mayoritas warning format/line ending. |
 | Frontend automated test | Belum memadai | Public hanya memiliki 1 file test; admin tidak memiliki file test. Belum ada E2E untuk alur penting. |
-| Dependency audit backend | Gagal gate | 3 advisory produksi: 1 moderate, 1 high, 1 critical. |
-| Dependency audit public | Gagal gate | 13 advisory produksi: 2 moderate, 9 high, 2 critical. |
-| Dependency audit admin | Gagal gate | 16 advisory produksi: 3 moderate, 11 high, 2 critical. |
+| Dependency audit backend | Lulus | 0 advisory produksi. |
+| Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
+| Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
 | Database lokal | Terbaca | 46 tabel aktif. Tidak ada tabel pencatat migration yang ditemukan. |
 
 Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktikan keamanan, konfigurasi domain, kesehatan proses, perilaku browser, dan kesiapan operasi produksi.
@@ -49,15 +63,11 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 ### P0 — wajib selesai sebelum server menerima trafik publik
 
-1. **URL production masih lokal.** Public production masih mengarah ke `localhost:4201` dan `127.0.0.1:3000`; admin production masih mengarah ke `localhost:4200` dan `localhost:3000`. Dokumentasi proyek yang menyebut same-origin production saat ini sudah tidak sesuai dengan file environment yang benar-benar dibuild.
-2. **Cookie login belum aman untuk HTTPS.** Cookie autentikasi admin ditulis dan dihapus dengan `secure: false`. Production harus memakai `Secure`, `HttpOnly`, `SameSite` yang dipilih secara sadar, domain/path yang sempit, serta konfigurasi proxy yang benar.
-3. **Endpoint alat bantu development masih publik.** Empat endpoint `generate-hash*` dapat dipanggil tanpa autentikasi. Endpoint tersebut harus dihapus dari runtime production.
-4. **Kunci Google Maps terhubung ke source frontend.** Credential yang pernah terekspos harus dirotasi. Browser key baru boleh berada di bundle hanya setelah dibatasi untuk HTTP referrer MATEX dan API yang diperlukan. Secret server tidak boleh masuk frontend atau Git.
-5. **Advisory dependency produksi belum bersih.** Temuan mencakup `multer`, `sharp`, Angular SSR/router, `swiper`, `ngx-editor`, `proxy-addr`, dan rantai dependensi lain. Upgrade harus dilakukan per aplikasi lalu diikuti build, contract test, dan regression test UI.
-6. **Belum ada jalur migration produksi yang repeatable.** SQL migration tersedia, tetapi tidak ada runner dan tabel riwayat migration. Deploy database manual berisiko menjalankan file dua kali atau melewatkan urutan.
-7. **API dapat hidup dalam keadaan setengah rusak.** Auto-loader mencatat kegagalan import route lalu tetap menyalakan server. Di production, kegagalan route penting harus menggagalkan startup.
-8. **Belum ada health/readiness endpoint dan graceful shutdown.** PM2/Nginx belum memiliki sinyal yang dapat dipercaya untuk menilai API dan SSR siap menerima trafik.
-9. **SEO discovery belum lengkap.** Tidak ditemukan `robots.txt` atau sitemap yang dihasilkan dari konten terpublikasi. Canonical, hreflang, dan structured data sudah ada pada beberapa halaman, tetapi belum menjadi kontrak menyeluruh.
+1. **Belum ada jalur migration produksi yang repeatable.** SQL migration masih belum dapat membangun database kosong secara mandiri dan belum memiliki baseline yang teruji.
+2. **SEO discovery belum lengkap.** Belum ada `robots.txt` dan sitemap dinamis dari konten terpublikasi; canonical, hreflang, structured data, dan status 404 masih perlu divalidasi sebagai satu kontrak.
+3. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
+4. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
+5. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
 
 ### P1 — selesai sebelum release candidate
 
@@ -69,7 +79,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 - Terapkan rate limit yang menyadari reverse proxy. Rate limit kontak saat ini disimpan di memori satu proses, sehingga hilang saat restart dan tidak sinkron bila proses diperbanyak.
 - Tentukan penyimpanan file produksi, backup, batas ukuran, malware scanning bila diperlukan, dan lifecycle file yatim.
 
-## Batas v1 dan legacy Kartify
+## Batas v1 dan legacy template
 
 Ada perbedaan antara dokumen arah produk dan route runtime sekarang. Dokumen `public-content-roadmap.md` masih memasukkan cart dan wishlist ke v1, sedangkan keputusan produk sebelumnya menempatkan first-party commerce di v2. Runtime publik sekarang masih membuka cart, checkout, wishlist, compare, seller, brand, tracking order, order detail/success, dan account commerce. Admin juga masih mendaftarkan banyak modul order, store, wallet, commission, payout, tax, shipping, coupon, refund, review, subscription, theme, dan settings bawaan template.
 
@@ -211,7 +221,7 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 - Buat backend production build/start serta migration runner dengan history table.
 - Upgrade dependency rentan secara terkendali.
 
-### Tahap 3 — kunci scope v1 dan bersihkan Kartify
+### Tahap 3 — kunci scope v1 dan bersihkan legacy template
 
 - Tetapkan matriks route v1/v2/demo.
 - Lepas route demo dari graph production.

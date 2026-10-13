@@ -57,14 +57,17 @@ export class App {
 
       // Set Favicon
       this.favIcon = document.querySelector('#appIcon');
-      if (this.favIcon && this.favIcon.href)
-        this.favIcon.href = setting?.general?.favicon_image?.asset_url!;
+      if (this.favIcon) {
+        this.favIcon.href =
+          setting?.general?.favicon_image?.asset_url ||
+          'assets/images/logo/favicon.svg';
+      }
 
       // Set site title
       this.titleService.setTitle(
         setting?.general?.site_title && setting?.general?.site_tagline
           ? `${setting?.general?.site_title} | ${setting?.general?.site_tagline}`
-          : 'Marketplace: Where Vendors Shine Together',
+          : 'MATEX Admin',
       );
     });
 

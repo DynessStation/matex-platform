@@ -20,9 +20,7 @@ export class CollectionFilterComponent {
     category: [],
     brand: [],
     tag: [],
-    rating: [],
     price: [],
-    attribute: [],
   };
 
   constructor(
@@ -35,9 +33,7 @@ export class CollectionFilterComponent {
       category: this.splitFilter('category'),
       brand: this.splitFilter('brand'),
       tag: this.splitFilter('tag'),
-      rating: this.splitFilter('rating'),
       price: this.splitFilter('price'),
-      attribute: this.splitFilter('attribute'),
     };
 
     this.filters = this.mergeFilters();
@@ -46,9 +42,6 @@ export class CollectionFilterComponent {
   remove(tag: string) {
     Object.keys(this.filtersObj).forEach((key) => {
       this.filtersObj[key] = this.filtersObj[key].filter((val: string) => {
-        if (key === 'rating') {
-          return val !== tag.replace(/^rating /, '');
-        }
         return val !== tag;
       });
     });
@@ -85,11 +78,7 @@ export class CollectionFilterComponent {
       ...this.filtersObj['category'],
       ...this.filtersObj['brand'],
       ...this.filtersObj['tag'],
-      ...this.filtersObj['rating'].map((val) =>
-        val.startsWith('rating ') ? val : `rating ${val}`,
-      ),
       ...this.filtersObj['price'],
-      ...this.filtersObj['attribute'],
     ];
   }
 

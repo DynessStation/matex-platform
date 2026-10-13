@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "kartify-angular": {
+    "matex-public": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -72,10 +72,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "kartify-angular:build:production"
+              "buildTarget": "matex-public:build:production"
             },
             "development": {
-              "buildTarget": "kartify-angular:build:development"
+              "buildTarget": "matex-public:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,6 +1,16 @@
 @if (type === 'wishlistOffcanvas') {
   <div class="offcanvas-body">
     <div class="cart-product-box">
+      <div class="v2-notice" role="status">
+        <i class="ri-information-line"></i>
+        <span>
+          {{
+            isEnglish
+              ? 'Wishlist is available as a preview and will be completed in version 2.'
+              : 'Favorit tersedia sebagai pratinjau dan akan disempurnakan pada versi 2.'
+          }}
+        </span>
+      </div>
       <ul class="product-box-list">
         @for (product of (wishlistItems$ | async)?.data; track product.id) {
           <li>
@@ -59,6 +69,19 @@
   <app-breadcrumb [breadcrumb]="breadcrumb" />
   <section class="section-t-space wishlist-section">
     <div class="custom-container">
+      <div class="v2-notice" role="status">
+        <i class="ri-information-line"></i>
+        <div>
+          <strong>{{ isEnglish ? 'Version 2 preview' : 'Pratinjau versi 2' }}</strong>
+          <span>
+            {{
+              isEnglish
+                ? 'Saved products stay on this device while the full account experience is being prepared.'
+                : 'Produk favorit tersimpan di perangkat ini selama pengalaman akun lengkap masih disiapkan.'
+            }}
+          </span>
+        </div>
+      </div>
       @if (wishlistItems && wishlistItems.length) {
         <div class="row g-sm-4 g-3 row-cols-xxl-5 row-cols-xl-4 row-cols-md-3 row-cols-2">
           @for (product of wishlistItems; track product.id) {

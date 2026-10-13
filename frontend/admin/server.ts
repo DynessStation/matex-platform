@@ -5,19 +5,9 @@ import { APP_BASE_HREF } from '@angular/common';
 import { SSR_REQUEST } from './src/app/core/tokens/ssr-request.token';
 import { CommonEngine } from '@angular/ssr/node';
 
-
 import express from 'express';
 
 import bootstrap from './src/main.server';
-import 'dotenv/config';
-
-const dbConfig = {
-  host: process.env['DB_HOST'],
-  user: process.env['DB_USER'],
-  password: process.env['DB_PASS'],
-  database: process.env['DB_NAME'],
-  port: Number(process.env['DB_PORT'])
-};
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -54,7 +44,7 @@ export function app(): express.Express {
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: browserDistFolder,
-       providers: [
+        providers: [
           {
             provide: APP_BASE_HREF,
             useValue: baseUrl,
@@ -69,10 +59,10 @@ export function app(): express.Express {
           },
         ],
       })
-      .then(html => {
+      .then((html) => {
         res.send(html);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('SSR Render Error:', err);
         res.status(500).send('Internal Server Error');
       });
@@ -82,11 +72,11 @@ export function app(): express.Express {
 }
 
 function run(): void {
-  const port = process.env['PORT'] || 4200;
+  const port = Number(process.env['PORT']) || 4200;
 
   // Start up the Node server
   const server = app();
-  server.listen(port, () => {
+  server.listen(port, '127.0.0.1', () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

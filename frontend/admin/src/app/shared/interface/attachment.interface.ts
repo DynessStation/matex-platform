@@ -37,7 +37,7 @@ export interface IAttachment {
   updated?: string;
 
   //==================================================
-  //==== KARTIFY LEGACY COMPATIBILITY
+  //==== LEGACY TEMPLATE COMPATIBILITY
   //==================================================
 
   /**

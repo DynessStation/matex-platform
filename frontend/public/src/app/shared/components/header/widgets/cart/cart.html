@@ -9,7 +9,12 @@
   <button
     class="btn icon-btn"
     type="button"
-    [attr.aria-label]="isEnglish ? 'Open cart' : 'Buka keranjang'"
+    [attr.aria-label]="
+      isEnglish
+        ? 'Open cart — planned for version 2'
+        : 'Buka keranjang — direncanakan untuk versi 2'
+    "
+    [attr.title]="isEnglish ? 'Cart — version 2' : 'Keranjang — versi 2'"
   >
     <i class="iconsax" icon-name="basket-2"></i>
   </button>
@@ -42,6 +47,16 @@
   </div>
   <div class="offcanvas-body">
     <div class="cart-product-box">
+      <div class="v2-notice" role="status">
+        <i class="ri-information-line"></i>
+        <span>
+          {{
+            isEnglish
+              ? 'Cart is available as a preview. Online checkout is planned for version 2.'
+              : 'Keranjang tersedia sebagai pratinjau. Pembayaran online direncanakan untuk versi 2.'
+          }}
+        </span>
+      </div>
       @if ((cartItem$ | async)?.length) {
         <div class="clear-box">
           <button class="btn clear-cart-button" type="button" (click)="clearCart()">

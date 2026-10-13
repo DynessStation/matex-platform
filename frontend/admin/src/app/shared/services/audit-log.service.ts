@@ -39,7 +39,7 @@ export class AuditLogService {
         }
 
         //==================================================
-        //==== KARTIFY PARAM MAPPING
+        //==== LEGACY TEMPLATE PARAM MAPPING
         //==================================================
 
         switch (key) {

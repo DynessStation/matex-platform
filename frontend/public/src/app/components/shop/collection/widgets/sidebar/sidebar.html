@@ -31,38 +31,5 @@
         </div>
       </div>
     </div>
-
-    @for (attribute of (attribute$ | async)?.data; track attribute) {
-      @if (attribute.style === 'image') {
-        <div class="accordion-item" ngbAccordionItem [collapsed]="false">
-          <h2 class="accordion-header">
-            <button class="accordion-button" type="button" ngbAccordionButton>
-              <span>{{ attribute.name }}</span>
-            </button>
-          </h2>
-          <div class="accordion-collapse collapse show" ngbAccordionCollapse>
-            <div class="accordion-body" ngbAccordionBody>
-              <app-collection-attribute-filter
-                [filter]="filter()"
-                [attribute]="attribute"
-              ></app-collection-attribute-filter>
-            </div>
-          </div>
-        </div>
-      }
-    }
-
-    <div class="accordion-item" ngbAccordionItem [collapsed]="false">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" ngbAccordionButton>
-          <span>Customer Review</span>
-        </button>
-      </h2>
-      <div class="accordion-collapse collapse show" ngbAccordionCollapse>
-        <div class="accordion-body" ngbAccordionBody>
-          <app-collection-rating-filter [filter]="filter"></app-collection-rating-filter>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

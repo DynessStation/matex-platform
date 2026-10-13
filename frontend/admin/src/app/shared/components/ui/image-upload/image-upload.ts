@@ -114,7 +114,7 @@ export class ImageUpload {
 
   /**
    * Keep `any` temporarily because many
-   * Kartify components still consume this output
+   * Legacy template components still consume this output
    * using the old attachment contract.
    */
   readonly selectedFiles = output<any>();

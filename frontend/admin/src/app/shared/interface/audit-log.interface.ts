@@ -4,7 +4,7 @@
 
 export interface IAuditLog {
   /**
-   * Compatibility field untuk generic Table Kartify.
+   * Compatibility field untuk generic table template.
    */
   id: any;
 

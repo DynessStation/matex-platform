@@ -3,6 +3,35 @@
   max-width: 860px;
 }
 
+.v2-notice {
+  align-items: flex-start;
+  background: rgba(var(--primary-color), 0.08);
+  border: 1px solid rgba(var(--primary-color), 0.24);
+  border-radius: 10px;
+  color: rgba(var(--title-color), 1);
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px 18px;
+
+  i {
+    color: rgba(var(--primary-color), 1);
+    flex: 0 0 auto;
+    font-size: 21px;
+  }
+
+  strong,
+  span {
+    display: block;
+  }
+
+  span {
+    color: rgba(var(--content-color), 1);
+    line-height: 1.5;
+    margin-top: 3px;
+  }
+}
+
 .cart-contain {
   min-width: 0;
 

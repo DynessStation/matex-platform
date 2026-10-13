@@ -1,0 +1,27 @@
+.v2-notice {
+  align-items: flex-start;
+  background: rgba(var(--primary-color), 0.08);
+  border: 1px solid rgba(var(--primary-color), 0.24);
+  border-radius: 10px;
+  color: rgba(var(--title-color), 1);
+  display: flex;
+  gap: 10px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  i {
+    color: rgba(var(--primary-color), 1);
+    flex: 0 0 auto;
+    font-size: 19px;
+  }
+
+  strong,
+  span {
+    display: block;
+  }
+
+  span {
+    color: rgba(var(--content-color), 1);
+  }
+}

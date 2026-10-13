@@ -1,5 +1,5 @@
 {
-  "name": "kartify-admin",
+  "name": "matex-admin",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -10,21 +10,21 @@
     "lint": "eslint . --ext .ts,.html",
     "lint:fix": "eslint . --ext .ts,.html --fix",
     "format": "prettier --write \"**/*.{ts,html,scss,css,js,json,md}\"",
-    "serve:ssr": "node dist/kartify-admin/server/server.mjs"
+    "serve:ssr": "node dist/matex-admin/server/server.mjs"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^21.0.3",
+    "@angular/animations": "21.2.25",
     "@angular/cdk": "^21.0.0",
-    "@angular/common": "^21.0.3",
-    "@angular/compiler": "^21.0.3",
-    "@angular/core": "^21.0.3",
-    "@angular/forms": "^21.0.3",
-    "@angular/platform-browser": "^21.0.3",
-    "@angular/platform-browser-dynamic": "^21.0.3",
-    "@angular/platform-server": "^21.0.3",
-    "@angular/router": "^21.0.3",
-    "@angular/ssr": "^21.0.2",
+    "@angular/common": "21.2.25",
+    "@angular/compiler": "21.2.25",
+    "@angular/core": "21.2.25",
+    "@angular/forms": "21.2.25",
+    "@angular/platform-browser": "21.2.25",
+    "@angular/platform-browser-dynamic": "21.2.25",
+    "@angular/platform-server": "21.2.25",
+    "@angular/router": "21.2.25",
+    "@angular/ssr": "21.2.25",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "@ngx-loading-bar/core": "^7.0.0",
     "@ngx-loading-bar/http-client": "^7.0.0",
@@ -36,7 +36,7 @@
     "apexcharts": "^4.5.0",
     "bootstrap": "^5.3.3",
     "dotenv": "^17.4.2",
-    "express": "^4.18.2",
+    "express": "4.22.3",
     "feather-icons": "^4.29.1",
     "ng-apexcharts": "1.17.0",
     "ng-select2-component": "^10.0.0",
@@ -46,17 +46,19 @@
     "ngx-print": "^2.0.0",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
-    "swiper": "^11.2.10",
+    "swiper": "14.3.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@popperjs/core": "2.11.8",
+    "@angular/localize": "21.2.25"
   },
   "devDependencies": {
     "@angular-eslint/eslint-plugin": "^20.2.0",
     "@angular-eslint/eslint-plugin-template": "^20.2.0",
     "@angular-eslint/template-parser": "^20.2.0",
-    "@angular/build": "^21.0.2",
-    "@angular/cli": "^21.0.2",
-    "@angular/compiler-cli": "^21.0.3",
+    "@angular/build": "21.2.25",
+    "@angular/cli": "21.2.25",
+    "@angular/compiler-cli": "21.2.25",
     "@types/express": "^4.17.17",
     "@types/feather-icons": "^4.29.4",
     "@types/jasmine": "~5.1.0",
@@ -97,6 +99,7 @@
       "@angular/common": "^21.0.3",
       "@angular/core": "^21.0.3",
       "rxjs": "~7.8.0"
-    }
+    },
+    "prosemirror-view": "1.42.3"
   }
 }

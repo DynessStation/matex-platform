@@ -1,0 +1,68 @@
+.v2-page {
+  align-items: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(248, 174, 15, 0.16), transparent 34%), #f4f7f4;
+  display: flex;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+.v2-card {
+  background: #fff;
+  border: 1px solid rgba(13, 65, 36, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(13, 65, 36, 0.1);
+  margin: 0 auto;
+  max-width: 680px;
+  padding: clamp(32px, 7vw, 64px);
+  text-align: center;
+  width: 100%;
+}
+
+.matex-logo {
+  display: inline-block;
+  margin-bottom: 32px;
+
+  img {
+    height: auto;
+    max-width: 210px;
+    width: 100%;
+  }
+}
+
+.version-label {
+  color: #b96f00;
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+
+h1 {
+  color: #0d4124;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+p {
+  color: #66736a;
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 auto 30px;
+  max-width: 560px;
+}
+
+.back-home {
+  align-items: center;
+  background: #0d4124;
+  border-radius: 7px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 600;
+  gap: 8px;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 22px;
+}

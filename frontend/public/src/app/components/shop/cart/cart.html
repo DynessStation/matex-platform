@@ -2,6 +2,19 @@
 
 <section class="section-block-space cart-section">
   <div class="custom-container">
+    <div class="v2-notice" role="status">
+      <i class="ri-information-line"></i>
+      <div>
+        <strong>{{ isEnglish ? 'Version 2 preview' : 'Pratinjau versi 2' }}</strong>
+        <span>
+          {{
+            isEnglish
+              ? 'You can save products here, while online checkout is still being prepared.'
+              : 'Anda dapat menyimpan produk di sini, sementara pembayaran online masih disiapkan.'
+          }}
+        </span>
+      </div>
+    </div>
     @if ((cartItem$ | async)?.length) {
       <div class="quick-box">
         <p>

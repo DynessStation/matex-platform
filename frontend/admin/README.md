@@ -1,4 +1,4 @@
-# KartifyAdminTemplate
+# MATEXAdminTemplate
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
 

@@ -105,7 +105,7 @@ export interface IAuthResponse {
 export type IAuthLogoutResponse = IApiResponse;
 
 //==================================================
-//==== LEGACY KARTIFY
+//==== LEGACY TEMPLATE
 //==================================================
 
 export interface IAuthModel {

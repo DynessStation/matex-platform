@@ -8,7 +8,7 @@ import { IAttachment } from './attachment.interface';
 
 export interface IAdminAccount {
   /**
-   * Compatibility untuk generic Table Kartify.
+   * Compatibility untuk generic table template.
    */
   id: any;
 

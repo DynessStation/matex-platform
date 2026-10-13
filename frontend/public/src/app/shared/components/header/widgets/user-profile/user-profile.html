@@ -1,5 +1,5 @@
 <a
-  [routerLink]="['/coming-soon']"
+  [routerLink]="[navigation.locale() === 'en-US' ? '/en/account' : '/account']"
   [attr.aria-label]="
     navigation.locale() === 'en-US' ? 'Account — coming soon' : 'Akun — segera hadir'
   "

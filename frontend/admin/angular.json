@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "kartify-admin": {
+    "matex-admin": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -18,7 +18,7 @@
           "builder": "@angular/build:application",
           "options": {
             "allowedCommonJsDependencies": ["apexcharts"],
-            "outputPath": "dist/kartify-admin",
+            "outputPath": "dist/matex-admin",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js", "@angular/localize/init"],
@@ -31,7 +31,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss", 
+              "src/styles.scss",
               "node_modules/swiper/swiper-bundle.min.css"
             ],
             "scripts": [],
@@ -75,10 +75,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "kartify-admin:build:production"
+              "buildTarget": "matex-admin:build:production"
             },
             "development": {
-              "buildTarget": "kartify-admin:build:development"
+              "buildTarget": "matex-admin:build:development"
             }
           },
           "defaultConfiguration": "development"

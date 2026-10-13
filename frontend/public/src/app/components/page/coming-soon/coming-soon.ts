@@ -1,22 +1,22 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
-
-import { Timer } from '../../../shared/components/widgets/timer/timer';
-import { Option } from '../../../shared/interface/theme-option.interface';
-import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
+import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 
 @Component({
   selector: 'app-coming-soon',
-  imports: [RouterModule, Timer, AsyncPipe],
+  imports: [RouterModule],
   templateUrl: './coming-soon.html',
   styleUrl: './coming-soon.scss',
 })
 export class ComingSoon {
-  themeOption$: Observable<Option> = inject(Store).select(
-    ThemeOptionState.themeOptions,
-  ) as Observable<Option>;
+  private navigation = inject(PublicNavigationContextService);
+
+  get isEnglish(): boolean {
+    return this.navigation.locale() === 'en-US';
+  }
+
+  get homePath(): string {
+    return this.isEnglish ? '/en' : '/';
+  }
 }

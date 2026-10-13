@@ -1,12 +1,11 @@
 import { Routes } from '@angular/router';
 
 import { Product } from './product/product';
-import { AuthGuard } from '../../core/guard/auth.guard';
-import { CheckoutGuard } from '../../core/guard/checkout.guard';
-import { BrandResolver } from '../../shared/resolver/brand.resolver';
 import { CategoryResolver } from '../../shared/resolver/category.resolver';
 import { ProductResolver } from '../../shared/resolver/product.resolver';
-import { StoreResolver } from '../../shared/resolver/store.resolver';
+
+const versionTwoFeature = () =>
+  import('../page/coming-soon/coming-soon').then((module) => module.ComingSoon);
 
 export const shop: Routes = [
   {
@@ -48,8 +47,7 @@ export const shop: Routes = [
   },
   {
     path: 'checkout',
-    loadComponent: () => import('./checkout/checkout').then((m) => m.Checkout),
-    canActivate: [CheckoutGuard],
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'wishlist',
@@ -61,24 +59,19 @@ export const shop: Routes = [
   },
   {
     path: 'compare',
-    loadComponent: () => import('./compare/compare').then((m) => m.Compare),
-    canActivate: [AuthGuard],
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'seller/become-seller',
-    loadComponent: () => import('./seller/seller').then((m) => m.Seller),
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'seller/stores',
-    loadComponent: () => import('./seller/seller-store/seller-store').then((m) => m.SellerStore),
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'seller/store/:slug',
-    loadComponent: () =>
-      import('./seller/seller-details/seller-details').then((m) => m.SellerDetails),
-    resolve: {
-      data: StoreResolver,
-    },
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'kategori/:slug',
@@ -101,21 +94,18 @@ export const shop: Routes = [
   },
   {
     path: 'brand/:slug',
-    loadComponent: () => import('./brand/brand').then((m) => m.Brand),
-    resolve: {
-      data: BrandResolver,
-    },
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'order/tracking',
-    loadComponent: () => import('./order-tracking/order-tracking').then((m) => m.OrderTracking),
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'order/details',
-    loadComponent: () => import('./order-details/order-details').then((m) => m.OrderDetails),
+    loadComponent: versionTwoFeature,
   },
   {
     path: 'order-success',
-    loadComponent: () => import('./order-success/order-success').then((m) => m.OrderSuccess),
+    loadComponent: versionTwoFeature,
   },
 ];

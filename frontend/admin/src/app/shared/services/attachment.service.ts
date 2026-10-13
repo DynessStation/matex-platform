@@ -150,7 +150,7 @@ export class AttachmentService {
       ...item,
 
       //==================================================
-      //==== KARTIFY LEGACY ALIAS
+      //==== LEGACY TEMPLATE ALIAS
       //==================================================
 
       id: item.id_attachment,

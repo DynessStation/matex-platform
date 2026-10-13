@@ -164,10 +164,10 @@ Product Variations (JSON Format)
     "stock_status": "in_stock",
     "sku": "FRUIT1KG08",
     "quantity": 2,
-    "variation_image_url": "https://kartify.webiots.co.in/storage/99/Watermelon_3.png",
+    "variation_image_url": "https://matexindo.com/files/example/99/Watermelon_3.png",
     "digital_files_url": [
-      "https://kartify.webiots.co.in/storage/99/Watermelon_3.png",
-      "https://kartify.webiots.co.in/storage/99/Watermelon_3.png"
+      "https://matexindo.com/files/example/99/Watermelon_3.png",
+      "https://matexindo.com/files/example/99/Watermelon_3.png"
     ],
     "attribute_values": [
       1
@@ -218,10 +218,10 @@ Product Variations (JSON Format)
     "stock_status": "in_stock",
     "sku": "FRUIT1KG08",
     "quantity": 2,
-    "variation_image_url": "https://kartify.webiots.co.in/storage/99/Watermelon_3.png",
+    "variation_image_url": "https://matexindo.com/files/example/99/Watermelon_3.png",
     "digital_files_url": [
-      "https://kartify.webiots.co.in/storage/99/Watermelon_3.png",
-      "https://kartify.webiots.co.in/storage/99/Watermelon_3.png"
+      "https://matexindo.com/files/example/99/Watermelon_3.png",
+      "https://matexindo.com/files/example/99/Watermelon_3.png"
     ],
     "attribute_values": [
       1
@@ -239,10 +239,10 @@ Product Variations (JSON Format)
     "stock_status": "in_stock",
     "sku": "FRUIT5KG08",
     "quantity": 5,
-    "variation_image_url": "https://kartify.webiots.co.in/storage/99/Watermelon_5.png",
+    "variation_image_url": "https://matexindo.com/files/example/99/Watermelon_5.png",
     "digital_files_url": [
-      "https://kartify.webiots.co.in/storage/100/digital_Watermelon_5.png",
-      "https://kartify.webiots.co.in/storage/100/digital_Watermelon_5.png"
+      "https://matexindo.com/files/example/100/digital_Watermelon_5.png",
+      "https://matexindo.com/files/example/100/digital_Watermelon_5.png"
     ],
     "attribute_values": [
       1

@@ -1,38 +1,28 @@
-@if (themeOption$ | async) {
-  <section class="coming-soon-section">
-    <div class="container-fluid h-100 p-0">
-      <div class="row g-0 h-100">
-        <div class="col-xl-6 h-100">
-          <div class="coming-soon-contain">
-            <a [routerLink]="['/']" class="coming-soon-logo">
-              <img
-                [src]="(themeOption$ | async)?.coming_soon?.theme_logo"
-                class="img-fluid"
-                alt="logo"
-              />
-            </a>
-            <h2>{{ (themeOption$ | async)?.coming_soon?.title }}</h2>
-            <p>{{ (themeOption$ | async)?.coming_soon?.description }}</p>
-            <div class="counter-box" id="countdown">
-              <app-timer [type]="'timer-three'" />
-            </div>
+<section class="v2-page">
+  <div class="v2-card">
+    <a
+      [routerLink]="homePath"
+      class="matex-logo"
+      [attr.aria-label]="isEnglish ? 'MATEX home' : 'Beranda MATEX'"
+    >
+      <img src="assets/images/logo/1.svg" alt="MATEX" />
+    </a>
 
-            <div class="form-group form-box">
-              <input type="email" class="form-control" placeholder="Enter your email" />
-              <button class="btn">{{ (themeOption$ | async)?.coming_soon?.button_text }}</button>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 d-xl-block d-none">
-          <div class="coming-soon-image">
-            <img
-              [src]="(themeOption$ | async)?.coming_soon?.image_url"
-              class="img-fluid"
-              alt="image"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-}
+    <span class="version-label">{{
+      isEnglish ? 'PLANNED FOR VERSION 2' : 'DIRENCANAKAN UNTUK VERSI 2'
+    }}</span>
+    <h1>{{ isEnglish ? 'This feature is being prepared' : 'Fitur ini sedang disiapkan' }}</h1>
+    <p>
+      {{
+        isEnglish
+          ? 'Account and online commerce features will be released after the product catalog and company information are ready.'
+          : 'Fitur akun dan transaksi online akan dirilis setelah katalog produk dan informasi perusahaan siap.'
+      }}
+    </p>
+
+    <a [routerLink]="homePath" class="back-home">
+      <i class="ri-arrow-left-line"></i>
+      {{ isEnglish ? 'Back to MATEX' : 'Kembali ke MATEX' }}
+    </a>
+  </div>
+</section>

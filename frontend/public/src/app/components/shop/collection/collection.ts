@@ -73,8 +73,6 @@ export class Collection {
     tag: '',
     sort: 'asc', // ASC, DSC
     sortBy: 'asc',
-    rating: '',
-    attribute: '',
     brand: '',
   };
 
@@ -101,8 +99,6 @@ export class Collection {
         category: params['category'] ? params['category'] : '',
         tag: params['tag'] ? params['tag'] : '',
         sortBy: params['sortBy'] ? params['sortBy'] : this.filter['sortBy'],
-        rating: params['rating'] ? params['rating'] : '',
-        attribute: params['attribute'] ? params['attribute'] : '',
         brand: params['brand'] ? params['brand'] : '',
         currency:
           params['currency'] ||
