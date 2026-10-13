@@ -6,16 +6,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
-import { INotification } from '../../interface/notification.interface';
 import { ILanguage, IValues } from '../../interface/setting.interface';
 import { NavService } from '../../services/nav.service';
 import { Languages } from './widgets/languages/languages';
 import { Mode } from './widgets/mode/mode';
-import { Notification } from './widgets/notification/notification';
 import { Profile } from './widgets/profile/profile';
 import { QuickView } from './widgets/quick-view/quick-view';
 import { Search } from './widgets/search/search';
-import { NotificationState } from '../../store/state/notification.state';
 import { SettingState } from '../../store/state/setting.state';
 
 @Component({
@@ -27,7 +24,6 @@ import { SettingState } from '../../store/state/setting.state';
     Search,
     QuickView,
     Languages,
-    Notification,
     Mode,
     Profile,
   ],
@@ -41,12 +37,6 @@ export class Header {
   setting$: Observable<IValues> = inject(Store).select(
     SettingState.setting,
   ) as Observable<IValues>;
-  notification$: Observable<INotification[]> = inject(Store).select(
-    NotificationState.notification,
-  );
-
-  public unreadNotificationCount: number;
-
   public active: boolean = false;
   public profileOpen: boolean = false;
   public open: boolean = false;
@@ -80,11 +70,6 @@ export class Header {
   constructor() {
     const document = this.document;
 
-    this.notification$.subscribe((notification) => {
-      this.unreadNotificationCount = notification?.filter(
-        (item) => !item.read_at,
-      )?.length;
-    });
     this.setting$.subscribe((setting) => {
       if (setting && setting.general) {
         this.url = setting.general.site_url;

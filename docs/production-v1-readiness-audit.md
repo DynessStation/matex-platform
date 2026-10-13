@@ -55,6 +55,19 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Backend typecheck dan 42 contract/regression test lulus setelah perubahan.
 - Smoke test proses lokal lulus untuk API live/ready, public SSR, admin SSR, robots, dan sitemap. Sitemap dari data development berisi 134 URL publik dan tidak memasukkan route commerce versi 2.
 
+### Tahap 3 — kunci router admin v1
+
+Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
+
+- Router admin production dipersempit dari 41 menjadi 18 root route yang benar-benar dipakai MATEX: dashboard/analitik/SEO, administrasi, konten website, katalog, media, FAQ, dan akun admin sendiri.
+- Route demo order, user toko, role template, attribute/tag/brand produk template, store, wallet, commission, payout, coupon, shipping, refund, review, subscription, theme, dan settings template dilepas dari graph build. Source yang masih mungkin berguna untuk versi 2 belum dihapus massal.
+- Shortcut header sekarang hanya membuka tambah produk, tambah artikel, dan pustaka media dengan permission MATEX yang benar.
+- Notifikasi demo yang membaca fixture JSON sudah dihapus dari startup, header, state, route, dan aset production. Screenshot theme-option, fixture wallet/notifikasi, serta stylesheet khusus halaman demo terkait juga dihapus.
+- Fixture JSON yang tidak lagi direferensikan bundle production juga dibuang. Direktori data admin turun menjadi delapan fixture yang masih dipakai (`badge`, `country`, `menu`, `self`, `settings`, `state`, `store`, dan `tag`); 36 fixture lain yang tidak memiliki referensi bundle dihapus.
+- Admin production build lulus setelah pemangkasan. Initial browser bundle turun dari sekitar 2,17 MB raw / 366,77 KB transfer menjadi 2,02 MB raw / 330,53 KB transfer; lazy browser chunk turun dari sekitar 262 menjadi sekitar 105.
+- Pemindaian artefak build tidak lagi menemukan `order.json`, `notifications.json`, `theme-option`, `coupon.json`, `withdrawal.json`, `license-key.json`, `vendor-wallet`, Kartify, atau Pixelstrap.
+- Smoke SSR admin membuktikan health dan login tetap merespons, sedangkan URL demo langsung seperti `/order` dan `/theme-option` sekarang menampilkan halaman tidak ditemukan tanpa label vendor lama.
+
 ### Tahap 4 — kontrak SEO dan status SSR
 
 Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
@@ -130,7 +143,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 Keputusan scope publik sudah diterapkan pada router dan diverifikasi melalui SSR lokal. Account, cart, dan wishlist tetap dapat dibuka sebagai pratinjau dengan keterangan versi 2. Checkout, compare, seller, brand, tracking order, dan route commerce langsung lain masuk ke halaman generik versi 2 serta tidak muncul pada navigasi, robots, atau sitemap. Katalog SSR hanya menampilkan filter kategori dan harga; rating, brand, serta atribut dinamis tidak tampil. Halaman yang diuji tidak lagi memuat label Kartify/Pixelstrap.
 
-Source legacy yang masih bernilai untuk versi 2 belum seluruhnya dikeluarkan dari graph build. Admin juga masih mendaftarkan banyak modul order, store, wallet, commission, payout, tax, shipping, coupon, refund, review, subscription, theme, dan settings bawaan template. Ini tetap menjadi pekerjaan pembersihan terukur, bukan alasan untuk menghapus modul atau tabel secara massal.
+Source legacy yang mungkin masih bernilai untuk versi 2 tetap disimpan di repository, tetapi route, state provider, shortcut, stylesheet halaman, preview, dan fixture demo yang terbukti tidak dipakai sudah dikeluarkan dari graph build production. Source tersisa tetap perlu diaudit per kelompok sebelum dihapus permanen; keberadaannya bukan alasan untuk menghapus modul atau tabel database secara massal.
 
 Karena route lazy tetap masuk graph build, menyembunyikan menu saja belum mengeluarkan legacy dari artefak produksi. Prosedur yang aman:
 
@@ -143,10 +156,10 @@ Karena route lazy tetap masuk graph build, menyembunyikan menu saja belum mengel
 Data ukuran yang menjadi baseline audit:
 
 - Public initial browser bundle sekitar 1,77 MB raw / 289 KB estimated transfer.
-- Admin initial browser bundle sekitar 2,17 MB raw / 366 KB estimated transfer.
+- Admin initial browser bundle sekitar 2,02 MB raw / 331 KB estimated transfer setelah route dan aset demo tahap pertama dilepas.
 - Public assets sekitar 20,65 MB, didominasi font, gambar, CSS, dan fixture data.
 - Admin assets sekitar 21,32 MB, didominasi font, gambar, fixture data, dan SCSS.
-- Admin menghasilkan sekitar 243 lazy chunks; public sekitar 46 lazy browser chunks.
+- Admin menghasilkan sekitar 105 lazy browser chunks setelah pemangkasan router tahap pertama; public sekitar 46 lazy browser chunks.
 
 Target bukan menghapus Kartify secara membabi buta. Komponen layout, responsivitas, tabel, form, chart, spacing, dan visual yang sudah baik tetap dipakai. Demo commerce, data palsu, route tidak relevan, dan aset tanpa pemakai harus keluar dari build v1.
 
@@ -273,9 +286,9 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 ### Tahap 3 — kunci scope v1 dan bersihkan legacy template
 
-- Tetapkan matriks route v1/v2/demo.
-- Lepas route demo dari graph production.
-- Bersihkan fixture, aset, package, dan source tidak terpakai per kelompok.
+- Scope route public dan admin sudah dikunci; route demo admin sudah dilepas dari graph production.
+- Fixture notifikasi/wallet, preview theme-option, source notifikasi demo, dan 36 fixture lain tanpa referensi bundle sudah dibersihkan; delapan fixture yang masih direferensikan tetap dipertahankan.
+- Lanjutkan pembersihan aset, package, state, dan source tidak terpakai per kelompok dengan build/smoke setelah setiap kelompok.
 - Buat migration drop hanya untuk tabel yang terbukti yatim.
 
 ### Tahap 4 — SEO teknis dan observability dasar

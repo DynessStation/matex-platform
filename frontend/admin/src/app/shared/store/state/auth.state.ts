@@ -1,21 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-
 import { Router } from '@angular/router';
 
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
-
 import { finalize, tap } from 'rxjs';
 
 import { IAuthAdminUser, IAuthResponse } from '../../interface/auth.interface';
-
 import { AuthService } from '../../services/auth.service';
-
 import { NotificationService } from '../../services/notification.service';
-
 import { SessionService } from '../../services/session.service';
-
 import { AccountClearAction } from '../action/account.action';
-
 import {
   AuthClearAction,
   CheckAuthAction,
@@ -25,11 +18,7 @@ import {
   UpdatePasswordAction,
   VerifyEmailOtpAction,
 } from '../action/auth.action';
-
-import { GetNotificationAction } from '../action/notification.action';
-
 import { GetSettingOptionAction } from '../action/setting.action';
-
 import { GetBadgesAction } from '../action/sidebar.action';
 
 //==================================================
@@ -175,8 +164,6 @@ export class AuthState {
 
         this.store.dispatch([
           new GetBadgesAction(),
-
-          new GetNotificationAction(),
 
           new GetSettingOptionAction(),
         ]);

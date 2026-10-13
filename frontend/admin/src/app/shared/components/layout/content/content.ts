@@ -1,19 +1,10 @@
 import { Component, inject } from '@angular/core';
-
 import { RouterModule } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-
-import { GetNotificationAction } from '../../../store/action/notification.action';
-
 import { NavService } from '../../../services/nav.service';
-
 import { Footer } from '../../footer/footer';
-
 import { Header } from '../../header/header';
-
 import { Sidebar } from '../../sidebar/sidebar';
-
 import { SidebarMenuSkeleton } from '../../ui/skeleton/sidebar-menu-skeleton/sidebar-menu-skeleton';
 
 //==================================================
@@ -36,8 +27,6 @@ export class Content {
 
   navServices = inject(NavService);
 
-  private store = inject(Store);
-
   //==================================================
   //==== CONSTRUCTOR
   //==================================================
@@ -48,11 +37,5 @@ export class Content {
     //==================================================
 
     this.navServices.sidebarLoading = false;
-
-    //==================================================
-    //==== NOTIFICATION
-    //==================================================
-
-    this.store.dispatch(new GetNotificationAction());
   }
 }

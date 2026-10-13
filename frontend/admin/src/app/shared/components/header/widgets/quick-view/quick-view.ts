@@ -15,46 +15,22 @@ import { HasPermissionDirective } from '../../../../directive/has-permission.dir
 export class QuickView {
   public quickLink = [
     {
-      title: 'add_user',
-      path: '/user/create',
-      icon: 'ri-contacts-line',
-      permission: ['user.index', 'user.create'],
-    },
-    {
       title: 'add_product',
       path: '/product/create',
       icon: 'ri-store-3-line',
-      permission: ['product.index', 'product.create'],
-    },
-    {
-      title: 'add_coupon',
-      path: '/coupon/create',
-      icon: 'ri-coupon-2-line',
-      permission: ['coupon.index', 'coupon.create'],
+      permission: 'product.create',
     },
     {
       title: 'add_blog',
       path: '/blog/create',
       icon: 'ri-article-line',
-      permission: ['blog.index', 'blog.create'],
+      permission: 'article.create',
     },
     {
-      title: 'all_orders',
-      path: '/order',
-      icon: 'ri-list-unordered',
-      permission: ['order.index'],
-    },
-    {
-      title: 'Site Settings',
-      path: '/setting',
-      icon: 'ri-settings-3-line',
-      permission: ['setting.index'],
-    },
-    {
-      title: 'Theme Settings',
-      path: '/theme-option',
-      icon: 'ri-window-line',
-      permission: ['theme_option.index'],
+      title: 'media',
+      path: '/media',
+      icon: 'ri-image-line',
+      permission: 'attachment.view',
     },
   ];
 }
