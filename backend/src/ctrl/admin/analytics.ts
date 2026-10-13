@@ -70,10 +70,16 @@ router.get(
     const parameters = [scope.idMasterComp, range.from, range.toExclusive];
 
     try {
-      const [[summary], [daily], [topPages], [sources], [locations]] =
-        await Promise.all([
-          pool.query<RowDataPacket[]>(
-            `SELECT
+      const [
+        [summary],
+        [daily],
+        [topPages],
+        [sources],
+        [locations],
+        [content],
+      ] = await Promise.all([
+        pool.query<RowDataPacket[]>(
+          `SELECT
              SUM(event_name = 'page_view') AS page_views,
              COUNT(DISTINCT CASE WHEN event_name = 'page_view' THEN session_hash END) AS visitors,
              SUM(event_name = 'outbound_click') AS outbound_clicks,
@@ -82,20 +88,20 @@ router.get(
              MAX(received_at) AS updated_at
            FROM public_analytics_event
           WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?`,
-            parameters,
-          ),
-          pool.query<RowDataPacket[]>(
-            `SELECT DATE(received_at) AS date,
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT DATE(received_at) AS date,
                   SUM(event_name = 'page_view') AS page_views,
                   COUNT(DISTINCT CASE WHEN event_name = 'page_view' THEN session_hash END) AS visitors
              FROM public_analytics_event
             WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?
             GROUP BY DATE(received_at)
             ORDER BY DATE(received_at)`,
-            parameters,
-          ),
-          pool.query<RowDataPacket[]>(
-            `SELECT path, COUNT(*) AS page_views,
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT path, COUNT(*) AS page_views,
                   COUNT(DISTINCT session_hash) AS visitors
              FROM public_analytics_event
             WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?
@@ -103,10 +109,10 @@ router.get(
             GROUP BY path
             ORDER BY page_views DESC, path
             LIMIT 10`,
-            parameters,
-          ),
-          pool.query<RowDataPacket[]>(
-            `SELECT COALESCE(NULLIF(referrer_host, ''), 'Direct') AS source,
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT COALESCE(NULLIF(referrer_host, ''), 'Direct') AS source,
                   COUNT(*) AS page_views
              FROM public_analytics_event
             WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?
@@ -114,21 +120,47 @@ router.get(
             GROUP BY COALESCE(NULLIF(referrer_host, ''), 'Direct')
             ORDER BY page_views DESC, source
             LIMIT 10`,
-            parameters,
-          ),
-          pool.query<RowDataPacket[]>(
-            `SELECT country_code, COUNT(DISTINCT session_hash) AS visitors
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT country_code, COUNT(DISTINCT session_hash) AS visitors
              FROM public_analytics_event
             WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?
               AND event_name = 'page_view' AND country_code IS NOT NULL
             GROUP BY country_code
             ORDER BY visitors DESC, country_code
             LIMIT 10`,
-            parameters,
-          ),
-        ]);
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT
+             (SELECT COUNT(*) FROM product_catalog
+               WHERE id_master_comp = ? AND product_deleted_at IS NULL) AS products_total,
+             (SELECT COUNT(*) FROM product_catalog
+               WHERE id_master_comp = ? AND product_deleted_at IS NULL
+                 AND product_status = 'published') AS products_published,
+             (SELECT COUNT(*) FROM product_catalog
+               WHERE id_master_comp = ? AND product_deleted_at IS NULL
+                 AND product_status = 'draft') AS products_draft,
+             (SELECT COUNT(*) FROM article
+               WHERE id_master_comp = ? AND article_deleted_at IS NULL) AS articles_total,
+             (SELECT COUNT(*) FROM article
+               WHERE id_master_comp = ? AND article_deleted_at IS NULL
+                 AND article_status = 'published') AS articles_published,
+             (SELECT COUNT(*) FROM article
+               WHERE id_master_comp = ? AND article_deleted_at IS NULL
+                 AND article_status IN ('draft', 'scheduled')) AS articles_pending,
+             (SELECT COUNT(*) FROM faq
+               WHERE id_master_comp = ? AND faq_deleted_at IS NULL
+                 AND faq_status = 1) AS faq_active,
+             (SELECT COUNT(*) FROM contact_inquiry
+               WHERE id_master_comp = ? AND created >= UTC_DATE()) AS inquiries_today`,
+          Array(8).fill(scope.idMasterComp),
+        ),
+      ]);
 
       const totals = summary[0] ?? {};
+      const contentTotals = content[0] ?? {};
       return sendSuccess(
         res,
         200,
@@ -137,6 +169,7 @@ router.get(
         {
           range: { from: range.fromDate, to: range.toDate, days: range.days },
           source: "matex_first_party",
+          collection_enabled: process.env.PUBLIC_ANALYTICS_ENABLED === "true",
           updated_at: totals.updated_at ?? null,
           totals: {
             page_views: Number(totals.page_views ?? 0),
@@ -163,6 +196,16 @@ router.get(
             country_code: item.country_code,
             visitors: Number(item.visitors ?? 0),
           })),
+          content: {
+            products_total: Number(contentTotals.products_total ?? 0),
+            products_published: Number(contentTotals.products_published ?? 0),
+            products_draft: Number(contentTotals.products_draft ?? 0),
+            articles_total: Number(contentTotals.articles_total ?? 0),
+            articles_published: Number(contentTotals.articles_published ?? 0),
+            articles_pending: Number(contentTotals.articles_pending ?? 0),
+            faq_active: Number(contentTotals.faq_active ?? 0),
+            inquiries_today: Number(contentTotals.inquiries_today ?? 0),
+          },
         },
       );
     } catch (error) {
