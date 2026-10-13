@@ -34,7 +34,7 @@ Di CloudPanel buka **Sites → Add Site → Create a Node.js Site**.
 - Domain Name: `matexindo.com`
 - Node.js Version: **Node 22 LTS**
 - App Port: `9201`
-- Site User: gunakan nama khusus seperti `matex-public`
+- Site User: `matexindo`
 - Password: buat password acak yang kuat dan simpan di password manager
 
 Tambahkan `www.matexindo.com` sebagai alias domain setelah site selesai dibuat.
@@ -44,7 +44,7 @@ Tambahkan `www.matexindo.com` sebagai alias domain setelah site selesai dibuat.
 - Domain Name: `internal.matexindo.com`
 - Node.js Version: **Node 22 LTS**
 - App Port: `9202`
-- Site User: gunakan nama khusus seperti `matex-admin`
+- Site User: `matexadmin`
 - Password: buat password acak yang berbeda dan simpan di password manager
 
 Port pada CloudPanel harus sama dengan `PORT` proses SSR yang dijalankan PM2.
@@ -59,7 +59,7 @@ Gunakan tiga proses Node terpisah:
 | Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200`, `MATEX_PUBLIC_INTERNAL_URL=http://127.0.0.1:9201` |
 | Admin SSR | `npm run serve:ssr` dari folder `frontend/admin` | `NODE_ENV=production`, `PORT=9202`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200`, `MATEX_ADMIN_INTERNAL_URL=http://127.0.0.1:9202` |
 
-Jalankan proses API dengan site user public (`matex-public`) atau user aplikasi khusus yang hanya diberi akses ke folder backend dan storage MATEX. Jangan menjalankannya sebagai user milik site lama.
+Jalankan proses API dengan site user public (`matexindo`). Jangan menjalankannya sebagai `root` atau user milik site lama.
 
 Build sebelum proses dijalankan:
 
@@ -93,7 +93,7 @@ crontab -e
 Tambahkan dua baris berikut, dengan nilai PATH persis dari perintah sebelumnya:
 
 ```cron
-PATH=/home/matex-public/.nvm/versions/node/v22.x.x/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/home/matexindo/.nvm/versions/node/v22.x.x/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 @reboot pm2 resurrect &> /dev/null
 ```
 
@@ -119,7 +119,7 @@ http://127.0.0.1:9200
 
 Tambahkan lokasi `/files/` ke port yang sama jika `FILE_SERVE_LOCAL=true`. Letakkan aturan `/api/` dan `/files/` sebelum fallback SSR. Teruskan `Host`, `X-Real-IP`, `X-Forwarded-For`, dan `X-Forwarded-Proto`. Fallback public tetap ke `127.0.0.1:9201`, sedangkan fallback admin tetap ke `127.0.0.1:9202`. Public SSR meneruskan `/robots.txt` dan `/sitemap.xml` ke API melalui `MATEX_API_INTERNAL_URL`, sehingga endpoint SEO tidak bergantung pada DNS publik dari dalam server.
 
-Blok yang siap disalin tersedia di `ops/nginx/matex-api-locations.conf`. Untuk masing-masing site buka **Sites → Manage → Vhost**, sisipkan kedua blok `location` tersebut di atas blok `location /` bawaan CloudPanel, lalu simpan. Jangan mengganti placeholder sertifikat, log, `server_name`, atau fallback `location /` yang dibuat CloudPanel. Editor CloudPanel menjalankan pemeriksaan sintaks dan mengembalikan konfigurasi lama bila konfigurasi baru invalid.
+Blok yang siap disalin tersedia di `ops/nginx/matex-api-locations.conf`. Untuk masing-masing site buka **Sites → Manage → Vhost**, sisipkan kedua blok `location` tersebut di atas blok `location /` bawaan CloudPanel, lalu simpan. Jangan mengganti placeholder sertifikat, log, atau fallback `location /` yang dibuat CloudPanel. Pastikan alias public tertulis tepat `www.matexindo.com`, bukan `www1.matexindo.com`. Editor CloudPanel menjalankan pemeriksaan sintaks dan mengembalikan konfigurasi lama bila konfigurasi baru invalid.
 
 Ukuran request `/api/` disetel `55m` agar upload maksimum backend `50 MB` tidak ditolak Nginx lebih awal. Route lain tetap memakai batas bawaan Vhost.
 
@@ -136,17 +136,18 @@ https://internal.matexindo.com
 Sebelum deployment pertama, jalankan `npm run db:migrate:status` dari backend. Database baru memakai `npm run db:migrate`. Database lama yang belum memiliki tabel riwayat harus dibackup dan ditinjau sebelum satu kali `npm run db:migrate:adopt`; jangan menjalankan migration biasa secara paksa pada database lama.
 
 - Buat database dan user khusus MATEX; jangan memakai user database milik site lain.
+- Identitas produksi yang sudah dibuat di CloudPanel: database `mia`, user `matexapp`, host `127.0.0.1`, port `3306`, dan hak **Read and Write**. Password tetap hanya disimpan di server/password manager.
 - Database tidak dibuka ke internet.
 - Isi `DB_HOST=127.0.0.1`, nama database, user, password, dan `DB_PORT=3306` pada environment backend.
 - Simpan unggahan di `/var/lib/matex/files` atau storage persisten lain yang dimiliki proses API.
 - Simpan backup di `/var/backups/matex`, di luar `FILE_STORAGE_ROOT`, dengan hak akses hanya untuk user proses MATEX.
 - Baseline database kosong sudah lulus uji lokal; tetap jalankan backup dan restore drill pada salinan produksi sebelum migration pertama di VPS.
 
-Jika proses API dijalankan sebagai `matex-public`, siapkan direktori persisten sekali saja:
+Karena proses API dijalankan sebagai `matexindo`, siapkan direktori persisten sekali saja:
 
 ```bash
-sudo install -d -o matex-public -g matex-public -m 0700 /var/lib/matex/files
-sudo install -d -o matex-public -g matex-public -m 0700 /var/backups/matex
+sudo install -d -o matexindo -g matexindo -m 0700 /var/lib/matex/files
+sudo install -d -o matexindo -g matexindo -m 0700 /var/backups/matex
 ```
 
 ## 6. Backup dan restore drill
