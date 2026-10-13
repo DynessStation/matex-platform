@@ -89,7 +89,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 ### P0 — wajib selesai sebelum server menerima trafik publik
 
 1. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
-2. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
+2. **Backup/restore dan penyimpanan file belum diuji di VPS.** Tool backup database/media, manifest checksum, retensi aman, verifikasi, dan restore bertarget sudah tersedia. Kepemilikan storage, backup terjadwal, salinan di luar VPS, restore drill, serta rollback release tetap harus lulus pada data staging sebelum DNS dipindah.
 3. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
 
 ### P1 — selesai sebelum release candidate
@@ -253,7 +253,9 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 ### Tahap 4 — SEO teknis dan observability dasar
 
-- Tambahkan dynamic sitemap, robots, canonical/hreflang contract, structured data, error page/status code, cache, request log, uptime/health, dan backup restore drill.
+- Dynamic sitemap, robots, canonical/hreflang, structured data produk/kategori/artikel/CMS, dan status SSR 404 sudah diterapkan dan lulus smoke lokal.
+- Tool backup database/media, checksum, verifikasi arsip, retensi, dan restore bertarget sudah diterapkan; restore drill pada salinan VPS masih wajib.
+- Cache, log rotation, uptime monitor eksternal, dan alerting masih perlu diselesaikan serta diuji di staging.
 
 ### Tahap 5 — analytics dan dashboard MATEX
 

@@ -97,10 +97,65 @@ Sebelum deployment pertama, jalankan `npm run db:migrate:status` dari backend. D
 - Database tidak dibuka ke internet.
 - Isi `DB_HOST=127.0.0.1`, nama database, user, password, dan `DB_PORT=3306` pada environment backend.
 - Simpan unggahan di `/var/lib/matex/files` atau storage persisten lain yang dimiliki proses API.
-- Siapkan backup database dan file, lalu uji restore sebelum go-live.
+- Simpan backup di `/var/backups/matex`, di luar `FILE_STORAGE_ROOT`, dengan hak akses hanya untuk user proses MATEX.
 - Baseline database kosong sudah lulus uji lokal; tetap jalankan backup dan restore drill pada salinan produksi sebelum migration pertama di VPS.
 
-## 6. TLS dan pengamanan jaringan
+Jika proses API dijalankan sebagai `matex-public`, siapkan direktori persisten sekali saja:
+
+```bash
+sudo install -d -o matex-public -g matex-public -m 0700 /var/lib/matex/files
+sudo install -d -o matex-public -g matex-public -m 0700 /var/backups/matex
+```
+
+## 6. Backup dan restore drill
+
+Perintah backup membutuhkan client MySQL/MariaDB, `tar`, dan `git`. Cek dahulu sebagai user proses API dari folder `backend`:
+
+```bash
+npm run backup:check -- --env-file .env --output-dir /var/backups/matex
+```
+
+Jika `mysqldump` atau `mysql` belum tersedia pada Ubuntu, instal paket client saja. Jangan memasang database server kedua:
+
+```bash
+sudo apt update
+sudo apt install --no-install-recommends default-mysql-client
+```
+
+Setelah pemeriksaan lulus, buat backup database dan seluruh media lokal:
+
+```bash
+npm run backup:create -- \
+  --env-file .env \
+  --output-dir /var/backups/matex \
+  --retention-days 14
+```
+
+Setiap backup disimpan pada direktori bernama `matex-<waktu UTC>` dan berisi dump database terkompresi, arsip media, serta `manifest.json` dengan checksum SHA-256. Kredensial database ditulis sementara ke file berizin `0600`, tidak dimasukkan ke argumen proses, dan dihapus setelah perintah selesai. Backup yang belum selesai memakai akhiran `.partial` dan tidak dianggap valid.
+
+Verifikasi backup terbaru tanpa mengubah database atau file:
+
+```bash
+LATEST_BACKUP="$(find /var/backups/matex -maxdepth 1 -type d -name 'matex-*' | sort | tail -n 1)"
+npm run backup:verify -- --backup "$LATEST_BACKUP"
+```
+
+Untuk drill, buat database kosong bernama `mia_restore_drill` dan beri user database MATEX akses ke database itu. Gunakan direktori file drill yang kosong dan berada di luar storage aktif:
+
+```bash
+npm run backup:restore -- \
+  --backup "$LATEST_BACKUP" \
+  --env-file .env \
+  --target-db mia_restore_drill \
+  --target-files /var/lib/matex-restore-drill/files \
+  --confirm RESTORE:mia_restore_drill
+```
+
+Setelah restore, jalankan pemeriksaan jumlah tabel/record penting pada `mia_restore_drill`, cek beberapa file media dan checksum, lalu arahkan instance API sementara ke database dan storage drill untuk smoke test baca. Hapus target drill hanya setelah hasilnya dicatat. Script menolak target database/file aktif secara bawaan; opsi live hanya untuk prosedur pemulihan insiden yang sudah mematikan proses aplikasi dan memiliki persetujuan operasional terpisah.
+
+Jadwalkan backup harian setelah satu backup manual dan restore drill lulus. Salin backup ke lokasi lain di luar VPS dengan enkripsi dan uji pemulihan dari salinan tersebut; backup yang hanya berada di VPS tidak melindungi dari kehilangan seluruh server.
+
+## 7. TLS dan pengamanan jaringan
 
 Terbitkan Let's Encrypt untuk:
 
@@ -110,7 +165,7 @@ Terbitkan Let's Encrypt untuk:
 
 Aktifkan pengalihan HTTP ke HTTPS. Firewall publik cukup membuka SSH sesuai kebijakan server, HTTP 80, HTTPS 443, dan port CloudPanel 8443 yang dibatasi ke IP pengelola bila memungkinkan. Jangan membuka `9200`, `9201`, atau `9202`.
 
-## 7. Pemeriksaan proses
+## 8. Pemeriksaan proses
 
 - API hidup: `http://127.0.0.1:9200/health/live`
 - API dan database siap: `http://127.0.0.1:9200/health/ready`
@@ -120,7 +175,7 @@ Aktifkan pengalihan HTTP ke HTTPS. Firewall publik cukup membuka SSH sesuai kebi
 
 Health endpoint internal dipakai oleh PM2, monitor uptime, dan pemeriksaan deployment. Jangan menganggap proses siap menerima trafik hanya karena port terbuka; API wajib mengembalikan status `ready` setelah koneksi database berhasil.
 
-## 8. Pemeriksaan sebelum DNS go-live
+## 9. Pemeriksaan sebelum DNS go-live
 
 1. `GET /health/live` pada API mengembalikan status hidup.
 2. `GET /health/ready` berhasil terhubung ke database.
