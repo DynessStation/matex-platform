@@ -81,7 +81,23 @@ node ops/verify-runtime.cjs
 pm2 save
 ```
 
-`ops/ecosystem.config.cjs` mengunci proses ke loopback `9200`–`9202`, satu instance per layanan, batas memori, restart delay, dan waktu shutdown. Satu instance API dipertahankan karena rate limiter v1 masih memakai memori proses. Setelah `pm2 save`, jalankan perintah `pm2 startup` dan salin perintah `sudo ...` yang dihasilkan PM2 agar proses kembali setelah reboot.
+`ops/ecosystem.config.cjs` mengunci proses ke loopback `9200`–`9202`, satu instance per layanan, batas memori, restart delay, dan waktu shutdown. Satu instance API dipertahankan karena rate limiter v1 masih memakai memori proses.
+
+CloudPanel menjalankan Node melalui Site User dan dokumentasi resminya memakai cron untuk memulihkan daftar PM2 setelah reboot. Catat PATH dari sesi SSH user aplikasi, lalu edit crontab user itu:
+
+```bash
+echo "$PATH"
+crontab -e
+```
+
+Tambahkan dua baris berikut, dengan nilai PATH persis dari perintah sebelumnya:
+
+```cron
+PATH=/home/matex-public/.nvm/versions/node/v22.x.x/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+@reboot pm2 resurrect &> /dev/null
+```
+
+Jalankan `pm2 save`, reboot VPS pada jendela pemeliharaan, lalu pastikan `pm2 status` dan `node ops/verify-runtime.cjs` tetap lulus. Jangan menyalin contoh versi `v22.x.x` apa adanya; gunakan PATH nyata dari server.
 
 Untuk deployment berikutnya, build seluruh aplikasi dahulu lalu muat ulang hanya setelah semua build lulus:
 
@@ -102,6 +118,10 @@ http://127.0.0.1:9200
 ```
 
 Tambahkan lokasi `/files/` ke port yang sama jika `FILE_SERVE_LOCAL=true`. Letakkan aturan `/api/` dan `/files/` sebelum fallback SSR. Teruskan `Host`, `X-Real-IP`, `X-Forwarded-For`, dan `X-Forwarded-Proto`. Fallback public tetap ke `127.0.0.1:9201`, sedangkan fallback admin tetap ke `127.0.0.1:9202`. Public SSR meneruskan `/robots.txt` dan `/sitemap.xml` ke API melalui `MATEX_API_INTERNAL_URL`, sehingga endpoint SEO tidak bergantung pada DNS publik dari dalam server.
+
+Blok yang siap disalin tersedia di `ops/nginx/matex-api-locations.conf`. Untuk masing-masing site buka **Sites → Manage → Vhost**, sisipkan kedua blok `location` tersebut di atas blok `location /` bawaan CloudPanel, lalu simpan. Jangan mengganti placeholder sertifikat, log, `server_name`, atau fallback `location /` yang dibuat CloudPanel. Editor CloudPanel menjalankan pemeriksaan sintaks dan mengembalikan konfigurasi lama bila konfigurasi baru invalid.
+
+Ukuran request `/api/` disetel `55m` agar upload maksimum backend `50 MB` tidak ditolak Nginx lebih awal. Route lain tetap memakai batas bawaan Vhost.
 
 Public dan admin SSR juga mengambil API serta aset terjemahan melalui loopback. Browser pengunjung tetap memakai domain HTTPS. API sudah dikonfigurasi untuk mempercayai proxy loopback dan menerima origin:
 
