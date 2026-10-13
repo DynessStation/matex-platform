@@ -71,6 +71,14 @@
       }
 
       <div class="metric-grid">
+        <article class="metric-card metric-card-live">
+          <i class="ri-pulse-line" aria-hidden="true"></i>
+          <div>
+            <span>Aktif sekarang</span>
+            <strong>{{ data.totals.active_visitors | number: '1.0-0' }}</strong>
+            <small>Terlihat dalam 5 menit terakhir</small>
+          </div>
+        </article>
         <article class="metric-card metric-card-primary">
           <i class="ri-user-3-line" aria-hidden="true"></i>
           <div>
@@ -155,11 +163,7 @@
           }
         </div>
         <footer class="panel-footer">
-          <span>
-            {{ data.range.from | date: 'dd MMM yyyy' }}–{{
-              data.range.to | date: 'dd MMM yyyy'
-            }}
-          </span>
+          <span>Otomatis diperbarui setiap 30 detik</span>
           <span>
             Terakhir masuk:
             {{

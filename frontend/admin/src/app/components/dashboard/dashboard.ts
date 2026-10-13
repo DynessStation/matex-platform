@@ -40,6 +40,7 @@ export class Dashboard {
   readonly loading = signal(true);
   readonly error = signal('');
   readonly overview = signal<IAnalyticsOverview | null>(null);
+  private refreshTimer?: ReturnType<typeof setInterval>;
 
   readonly chartPoints = computed<DashboardChartPoint[]>(() => {
     const overview = this.overview();
@@ -84,7 +85,11 @@ export class Dashboard {
   });
 
   constructor() {
-    if (isPlatformBrowser(this.platformId)) this.load();
+    if (isPlatformBrowser(this.platformId)) {
+      this.load();
+      this.refreshTimer = setInterval(() => this.load(true), 30_000);
+      this.destroyRef.onDestroy(() => clearInterval(this.refreshTimer));
+    }
   }
 
   selectRange(days: 7 | 30 | 90): void {
@@ -93,17 +98,20 @@ export class Dashboard {
     this.load();
   }
 
-  load(): void {
+  load(silent = false): void {
+    if (silent && this.loading()) return;
     const to = new Date();
     const from = new Date(to);
     from.setDate(from.getDate() - (this.selectedDays() - 1));
 
-    this.loading.set(true);
+    if (!silent) this.loading.set(true);
     this.error.set('');
     this.analytics
       .getOverview(this.dateKey(from), this.dateKey(to))
       .pipe(
-        finalize(() => this.loading.set(false)),
+        finalize(() => {
+          if (!silent) this.loading.set(false);
+        }),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({

@@ -82,6 +82,7 @@ test("analytics overview is tenant scoped and returns real content totals", asyn
       {
         page_views: 18,
         visitors: 7,
+        active_visitors: 2,
         outbound_clicks: 3,
         contact_starts: 2,
         contact_submissions: 1,
@@ -113,6 +114,7 @@ test("analytics overview is tenant scoped and returns real content totals", asyn
   assert.equal(payload.data.source, "matex_first_party");
   assert.equal(payload.data.collection_enabled, true);
   assert.equal(payload.data.totals.visitors, 7);
+  assert.equal(payload.data.totals.active_visitors, 2);
   assert.equal(payload.data.top_pages[0].path, "/produk");
   assert.equal(payload.data.content.products_total, 53);
   assert.equal(payload.data.content.articles_pending, 1);

@@ -82,6 +82,10 @@ router.get(
           `SELECT
              SUM(event_name = 'page_view') AS page_views,
              COUNT(DISTINCT CASE WHEN event_name = 'page_view' THEN session_hash END) AS visitors,
+             COUNT(DISTINCT CASE
+               WHEN event_name = 'page_view'
+                AND received_at >= UTC_TIMESTAMP() - INTERVAL 5 MINUTE
+               THEN session_hash END) AS active_visitors,
              SUM(event_name = 'outbound_click') AS outbound_clicks,
              SUM(event_name = 'contact_start') AS contact_starts,
              SUM(event_name = 'contact_submit') AS contact_submissions,
@@ -174,6 +178,7 @@ router.get(
           totals: {
             page_views: Number(totals.page_views ?? 0),
             visitors: Number(totals.visitors ?? 0),
+            active_visitors: Number(totals.active_visitors ?? 0),
             outbound_clicks: Number(totals.outbound_clicks ?? 0),
             contact_starts: Number(totals.contact_starts ?? 0),
             contact_submissions: Number(totals.contact_submissions ?? 0),

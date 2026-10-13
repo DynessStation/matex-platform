@@ -76,6 +76,16 @@
       }
 
       <div class="metric-grid">
+        <article class="metric-card metric-card-live">
+          <div class="metric-icon">
+            <i class="ri-pulse-line" aria-hidden="true"></i>
+          </div>
+          <div>
+            <span>Aktif sekarang</span>
+            <strong>{{ data.totals.active_visitors | number: '1.0-0' }}</strong>
+            <small>Terlihat dalam 5 menit terakhir</small>
+          </div>
+        </article>
         <article class="metric-card metric-card-primary">
           <div class="metric-icon">
             <i class="ri-user-3-line" aria-hidden="true"></i>
@@ -157,7 +167,7 @@
             }
           </div>
           <footer class="panel-footer">
-            <span>Sumber: analitik first-party MATEX</span>
+            <span>Otomatis diperbarui setiap 30 detik</span>
             <span>
               Terakhir masuk:
               {{

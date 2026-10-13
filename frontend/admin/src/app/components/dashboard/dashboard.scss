@@ -163,7 +163,7 @@
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 18px;
 }
@@ -224,6 +224,15 @@
 
 .metric-card-primary {
   border-color: #f0c783;
+}
+
+.metric-card-live {
+  border-color: #9fd0b2;
+
+  .metric-icon {
+    background: #e9f7ee;
+    color: #27814a;
+  }
 }
 
 .dashboard-grid {
@@ -479,6 +488,11 @@
   .summary-icon {
     background: #332817;
   }
+
+  .metric-card-live .metric-icon {
+    background: #183929;
+    color: #71d295;
+  }
 }
 
 @keyframes dashboard-spin {
@@ -495,6 +509,12 @@
   .dashboard-grid-main,
   .dashboard-grid-tables {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1499px) {
+  .metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

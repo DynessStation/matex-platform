@@ -3,6 +3,7 @@ import { IApiResponse } from './api-response.interface';
 export interface IAnalyticsTotals {
   page_views: number;
   visitors: number;
+  active_visitors: number;
   outbound_clicks: number;
   contact_starts: number;
   contact_submissions: number;

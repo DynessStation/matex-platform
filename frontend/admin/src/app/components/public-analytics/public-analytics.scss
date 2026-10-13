@@ -155,7 +155,7 @@
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 18px;
 }
@@ -212,6 +212,15 @@
 
 .metric-card-primary {
   border-color: #f0c783;
+}
+
+.metric-card-live {
+  border-color: #9fd0b2;
+
+  > i {
+    background: #e9f7ee;
+    color: #27814a;
+  }
 }
 
 .analytics-panel {
@@ -509,6 +518,11 @@
   .funnel-submit {
     background: #332817;
   }
+
+  .metric-card-live > i {
+    background: #183929;
+    color: #71d295;
+  }
 }
 
 @keyframes analytics-spin {
@@ -528,6 +542,12 @@
 
   .funnel-panel {
     grid-row: span 2;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1499px) {
+  .metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
