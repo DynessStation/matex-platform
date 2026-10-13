@@ -271,8 +271,9 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 ### Tahap 7 — release candidate dan CloudPanel
 
+- Konfigurasi PM2 tiga proses dan verifikasi health loopback sudah tersedia; tetap uji startup setelah reboot dan rollback release pada VPS.
 - Staging rehearsal, data migration, backup restore, build bersih, smoke/E2E, performance/accessibility/security checks.
-- Buat Node.js sites, PM2 ecosystem, vhost proxy, database/user, environment secret, DNS, TLS, redirect, firewall, monitoring, dan rollback.
+- Buat Node.js sites, vhost proxy, database/user, environment secret, DNS, TLS, redirect, firewall, dan monitoring.
 
 ## Gate siap produksi v1
 

@@ -57,7 +57,7 @@ Gunakan tiga proses Node terpisah:
 | --- | --- | --- |
 | API | `npm run start:prod` dari folder `backend` | `NODE_ENV=production`, `PORT=9200`, `PUBLIC_COMPANY_ID=1`, `PUBLIC_SITE_URL=https://matexindo.com` |
 | Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200`, `MATEX_PUBLIC_INTERNAL_URL=http://127.0.0.1:9201` |
-| Admin SSR | `npm run serve:ssr` dari folder `frontend/admin` | `NODE_ENV=production`, `PORT=9202` |
+| Admin SSR | `npm run serve:ssr` dari folder `frontend/admin` | `NODE_ENV=production`, `PORT=9202`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200`, `MATEX_ADMIN_INTERNAL_URL=http://127.0.0.1:9202` |
 
 Jalankan proses API dengan site user public (`matex-public`) atau user aplikasi khusus yang hanya diberi akses ke folder backend dan storage MATEX. Jangan menjalankannya sebagai user milik site lama.
 
@@ -69,7 +69,29 @@ frontend/public: npm ci lalu npm run build
 frontend/admin: npm ci lalu npm run build
 ```
 
-Jalankan dengan PM2 sebagai site user, bukan `root`. Simpan konfigurasi PM2 setelah ketiga proses sehat agar otomatis kembali setelah reboot. Nilai rahasia API disimpan pada file environment di server dan tidak dimasukkan ke Git atau bundle Angular.
+Jalankan dengan PM2 sebagai site user, bukan `root`. Satu user aplikasi dapat mengelola ketiga proses karena semuanya berasal dari satu release MATEX; user site admin hanya dipakai CloudPanel untuk kepemilikan vhost. Nilai rahasia API disimpan pada `backend/.env` di server dan tidak dimasukkan ke Git atau bundle Angular.
+
+Instal PM2 sekali sebagai user aplikasi pada versi Node yang dipilih CloudPanel:
+
+```bash
+npm install --global pm2
+cd /path/ke/repository/MATEX
+pm2 start ops/ecosystem.config.cjs
+node ops/verify-runtime.cjs
+pm2 save
+```
+
+`ops/ecosystem.config.cjs` mengunci proses ke loopback `9200`–`9202`, satu instance per layanan, batas memori, restart delay, dan waktu shutdown. Satu instance API dipertahankan karena rate limiter v1 masih memakai memori proses. Setelah `pm2 save`, jalankan perintah `pm2 startup` dan salin perintah `sudo ...` yang dihasilkan PM2 agar proses kembali setelah reboot.
+
+Untuk deployment berikutnya, build seluruh aplikasi dahulu lalu muat ulang hanya setelah semua build lulus:
+
+```bash
+pm2 startOrReload ops/ecosystem.config.cjs --update-env
+node ops/verify-runtime.cjs
+pm2 status
+```
+
+Jika verifikasi gagal, jangan arahkan trafik baru. Buka `pm2 logs --lines 200`, pulihkan release/commit terakhir yang sudah lulus, build ulang release tersebut, jalankan `startOrReload`, lalu ulangi `verify-runtime.cjs`. Backup database tidak dipulihkan untuk kegagalan kode biasa; restore database hanya dipakai jika migration atau data memang berubah dan prosedur restore sudah diputuskan.
 
 ## 4. Reverse proxy API pada kedua domain
 
@@ -81,7 +103,7 @@ http://127.0.0.1:9200
 
 Tambahkan lokasi `/files/` ke port yang sama jika `FILE_SERVE_LOCAL=true`. Letakkan aturan `/api/` dan `/files/` sebelum fallback SSR. Teruskan `Host`, `X-Real-IP`, `X-Forwarded-For`, dan `X-Forwarded-Proto`. Fallback public tetap ke `127.0.0.1:9201`, sedangkan fallback admin tetap ke `127.0.0.1:9202`. Public SSR meneruskan `/robots.txt` dan `/sitemap.xml` ke API melalui `MATEX_API_INTERNAL_URL`, sehingga endpoint SEO tidak bergantung pada DNS publik dari dalam server.
 
-API sudah dikonfigurasi untuk mempercayai proxy loopback dan menerima origin:
+Public dan admin SSR juga mengambil API serta aset terjemahan melalui loopback. Browser pengunjung tetap memakai domain HTTPS. API sudah dikonfigurasi untuk mempercayai proxy loopback dan menerima origin:
 
 ```text
 https://matexindo.com

@@ -2,11 +2,11 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { APP_BASE_HREF } from '@angular/common';
-import { SSR_REQUEST } from './src/app/core/tokens/ssr-request.token';
 import { CommonEngine } from '@angular/ssr/node';
 
 import express from 'express';
 
+import { SSR_REQUEST } from './src/app/core/tokens/ssr-request.token';
 import bootstrap from './src/main.server';
 
 // The Express app is exported so that it can be used by serverless Functions.
@@ -86,7 +86,9 @@ function run(): void {
   // Start up the Node server
   const server = app();
   server.listen(port, '127.0.0.1', () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    process.stdout.write(
+      `Node Express server listening on http://localhost:${port}\n`,
+    );
   });
 }
 
