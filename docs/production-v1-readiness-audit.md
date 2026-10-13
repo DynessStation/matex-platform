@@ -77,7 +77,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Endpoint ingestion mengabaikan bot umum, menolak waktu dan path tidak valid, serta memakai UUID event unik agar retry tidak menggandakan data.
 - Endpoint admin berizin `dashboard.view` menyediakan ringkasan maksimal 90 hari: page view, pengunjung anonim, klik keluar, awal/kirim kontak, tren harian, halaman, sumber, dan negara bila trusted proxy header kelak diaktifkan.
 - Migration baru berhasil diterapkan pada database development lama. Uji endpoint nyata membuktikan event pertama tersimpan, retry UUID yang sama tidak menggandakan baris, dan data smoke-test kemudian dihapus.
-- Backend typecheck, production build, serta 49 contract/regression test lulus. Dashboard admin sudah memakai endpoint MATEX nyata; halaman analitik khusus masih perlu ditambahkan.
+- Backend typecheck, production build, serta 49 contract/regression test lulus. Dashboard admin dan halaman Analitik Publik sudah memakai endpoint MATEX nyata.
 
 ## Hasil pemeriksaan yang sudah dijalankan
 
@@ -199,11 +199,11 @@ Gunakan session identifier acak, consent state, timestamp, route, referrer domai
 - Top produk, artikel, halaman, referrer, device, dan lokasi
 - Ringkasan Search Console terbaru dengan label waktu pembaruan yang jelas
 
-**Analitik Publik** menjadi halaman khusus untuk trend, funnel, event, lokasi, device, referrer, campaign, konten populer, dan export.
+**Analitik Publik** sudah tersedia untuk tren, funnel kontak, lokasi agregat, referrer, dan halaman populer. Device, campaign, rincian event, dan export ditambahkan setelah kontrak event serta kebutuhan operasionalnya ditetapkan.
 
 **SEO & Mesin Pencari** menjadi halaman khusus untuk Search Console, sitemap, URL inspection, PageSpeed/CrUX, dan Bing/IndexNow. Tombol tindak lanjut harus berada dekat data terkait, dengan loader, waktu sinkronisasi terakhir, status gagal, serta keterangan bahwa data Search Console tidak realtime.
 
-Dashboard sekarang membaca endpoint MATEX nyata dan menampilkan trafik, funnel kontak, status produk/artikel/FAQ, halaman teratas, serta sumber trafik. Angka store/order/revenue/review dan copy demo Kartify sudah dikeluarkan dari komponen dashboard. Halaman Analitik Publik tetap dibutuhkan untuk rincian lokasi, funnel, dan pengembangan event berikutnya.
+Dashboard sekarang membaca endpoint MATEX nyata dan menampilkan trafik, funnel kontak, status produk/artikel/FAQ, halaman teratas, serta sumber trafik. Angka store/order/revenue/review dan copy demo Kartify sudah dikeluarkan dari komponen dashboard. Halaman Analitik Publik menyediakan rincian tren, funnel, lokasi, sumber trafik, dan halaman populer dengan filter 7/30/90 hari.
 
 ## Topologi production yang disarankan
 
@@ -275,7 +275,7 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 - First-party event ingestion, penyimpanan aman, deduplikasi, dan endpoint ringkasan sudah diterapkan; perlu smoke ulang melalui domain staging.
 - Dashboard demo sudah diganti dengan ringkasan MATEX dan filter 7/30/90 hari; perlu smoke ulang dengan akun staging.
-- Tambah halaman Analitik Publik.
+- Halaman Analitik Publik untuk tren, funnel, lokasi, sumber, dan halaman populer sudah ditambahkan; perlu smoke ulang dengan akun staging.
 - Integrasikan GA4 realtime/historical.
 
 ### Tahap 6 — Search Console, performance, dan Bing

@@ -12,6 +12,15 @@ export const content: Routes = [
   },
 
   {
+    path: 'public-analytics',
+
+    canActivate: [AuthGuard],
+
+    loadChildren: () =>
+      import('../../components/public-analytics/public-analytics.routes'),
+  },
+
+  {
     path: 'admin-account',
     canActivate: [AuthGuard],
     loadChildren: () =>

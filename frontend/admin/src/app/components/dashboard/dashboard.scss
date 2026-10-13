@@ -50,6 +50,7 @@
 
 .range-button,
 .refresh-button,
+.analytics-link,
 .dashboard-message button {
   min-height: 42px;
   border: 1px solid var(--dashboard-border);
@@ -71,6 +72,14 @@
     cursor: wait;
     opacity: 0.65;
   }
+}
+
+.analytics-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
 }
 
 .refresh-button {
@@ -509,6 +518,10 @@
   .refresh-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .analytics-link {
+    width: 100%;
   }
 
   .metric-grid {

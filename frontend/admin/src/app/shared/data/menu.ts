@@ -25,6 +25,24 @@ export const menu: ISidebar[] = [
     level: 1,
   },
 
+  {
+    id: 6,
+
+    title: 'public_analytics',
+
+    path: '/public-analytics',
+
+    active: false,
+
+    icon: 'ri-line-chart-line',
+
+    type: 'sub',
+
+    level: 1,
+
+    permission: 'dashboard.view',
+  },
+
   //==================================================
   //==== ADMINISTRATION
   //==================================================

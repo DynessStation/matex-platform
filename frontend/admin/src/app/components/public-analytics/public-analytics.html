@@ -1,0 +1,322 @@
+<section class="analytics-page">
+  <div class="container-fluid">
+    <header class="analytics-heading">
+      <div>
+        <span class="analytics-kicker">Perilaku pengunjung</span>
+        <h1>Analitik Publik</h1>
+        <p>
+          Data first-party MATEX untuk memahami trafik dan tindakan pengunjung
+          tanpa menyimpan alamat IP mentah.
+        </p>
+      </div>
+      <div class="analytics-actions" aria-label="Rentang data analitik">
+        @for (days of rangeOptions; track days) {
+          <button
+            type="button"
+            class="range-button"
+            [class.active]="selectedDays() === days"
+            [disabled]="loading()"
+            (click)="selectRange(days)"
+          >
+            {{ days }} hari
+          </button>
+        }
+        <button
+          type="button"
+          class="refresh-button"
+          [disabled]="loading()"
+          (click)="load()"
+        >
+          <i
+            class="ri-refresh-line"
+            [class.spin]="loading()"
+            aria-hidden="true"
+          ></i>
+          Perbarui
+        </button>
+      </div>
+    </header>
+
+    @if (error()) {
+      <div class="analytics-message analytics-message-error" role="alert">
+        <i class="ri-error-warning-line" aria-hidden="true"></i>
+        <div>
+          <strong>Data belum termuat</strong>
+          <span>{{ error() }}</span>
+        </div>
+        <button type="button" (click)="load()">Coba lagi</button>
+      </div>
+    } @else if (loading() && !overview()) {
+      <div class="analytics-loading" role="status" aria-live="polite">
+        <span class="analytics-spinner" aria-hidden="true"></span>
+        <div>
+          <strong>Menyiapkan analitik publik</strong>
+          <span>Menghitung trafik, funnel, dan distribusi pengunjung.</span>
+        </div>
+      </div>
+    }
+
+    @if (overview(); as data) {
+      @if (!data.collection_enabled) {
+        <div class="analytics-message analytics-message-info">
+          <i class="ri-information-line" aria-hidden="true"></i>
+          <div>
+            <strong>Pencatatan pengunjung belum diaktifkan</strong>
+            <span>
+              Halaman ini sudah siap. Aktivasi event publik menunggu pengaturan
+              privasi dan environment production selesai.
+            </span>
+          </div>
+        </div>
+      }
+
+      <div class="metric-grid">
+        <article class="metric-card metric-card-primary">
+          <i class="ri-user-3-line" aria-hidden="true"></i>
+          <div>
+            <span>Pengunjung</span>
+            <strong>{{ data.totals.visitors | number: '1.0-0' }}</strong>
+            <small>Sesi anonim unik</small>
+          </div>
+        </article>
+        <article class="metric-card">
+          <i class="ri-eye-line" aria-hidden="true"></i>
+          <div>
+            <span>Page view</span>
+            <strong>{{ data.totals.page_views | number: '1.0-0' }}</strong>
+            <small>Total halaman dibuka</small>
+          </div>
+        </article>
+        <article class="metric-card">
+          <i class="ri-cursor-line" aria-hidden="true"></i>
+          <div>
+            <span>Klik keluar</span>
+            <strong>{{ data.totals.outbound_clicks | number: '1.0-0' }}</strong>
+            <small>Marketplace dan tautan luar</small>
+          </div>
+        </article>
+        <article class="metric-card">
+          <i class="ri-mail-send-line" aria-hidden="true"></i>
+          <div>
+            <span>Pesan terkirim</span>
+            <strong>{{
+              data.totals.contact_submissions | number: '1.0-0'
+            }}</strong>
+            <small>{{ contactConversion() }}% konversi form</small>
+          </div>
+        </article>
+      </div>
+
+      <article class="analytics-panel trend-panel">
+        <header class="panel-heading">
+          <div>
+            <span>Tren trafik</span>
+            <h2>Pengunjung dan page view</h2>
+          </div>
+          <div class="chart-legend">
+            <span><i class="legend-page"></i> Page view</span>
+            <span><i class="legend-visitor"></i> Pengunjung</span>
+          </div>
+        </header>
+        <div
+          class="traffic-chart"
+          role="img"
+          [attr.aria-label]="'Grafik trafik ' + data.range.days + ' hari'"
+        >
+          @for (point of chartPoints(); track trackDate($index, point)) {
+            <div
+              class="chart-column"
+              [title]="
+                point.label +
+                ': ' +
+                point.page_views +
+                ' page view, ' +
+                point.visitors +
+                ' pengunjung'
+              "
+            >
+              <div class="chart-values">
+                <span>{{ point.page_views }}</span>
+              </div>
+              <div class="chart-bars">
+                <span
+                  class="chart-bar page-view"
+                  [style.height.%]="point.pageViewHeight"
+                ></span>
+                <span
+                  class="chart-bar visitor"
+                  [style.height.%]="point.visitorHeight"
+                ></span>
+              </div>
+              <small [class.invisible]="!point.showLabel">{{
+                point.label
+              }}</small>
+            </div>
+          }
+        </div>
+        <footer class="panel-footer">
+          <span>
+            {{ data.range.from | date: 'dd MMM yyyy' }}–{{
+              data.range.to | date: 'dd MMM yyyy'
+            }}
+          </span>
+          <span>
+            Terakhir masuk:
+            {{
+              data.updated_at
+                ? (data.updated_at | date: 'dd MMM yyyy, HH:mm')
+                : 'belum ada event'
+            }}
+          </span>
+        </footer>
+      </article>
+
+      <div class="analytics-grid analytics-grid-primary">
+        <article class="analytics-panel funnel-panel">
+          <header class="panel-heading">
+            <div>
+              <span>Funnel kontak</span>
+              <h2>Dari mulai isi sampai terkirim</h2>
+            </div>
+          </header>
+          <div class="funnel">
+            <div class="funnel-step funnel-start">
+              <span>Mulai mengisi</span>
+              <strong>{{
+                data.totals.contact_starts | number: '1.0-0'
+              }}</strong>
+            </div>
+            <i class="ri-arrow-down-line" aria-hidden="true"></i>
+            <div class="funnel-step funnel-submit">
+              <span>Berhasil terkirim</span>
+              <strong>{{
+                data.totals.contact_submissions | number: '1.0-0'
+              }}</strong>
+            </div>
+          </div>
+          <div class="conversion-summary">
+            <strong>{{ contactConversion() }}%</strong>
+            <span>rasio penyelesaian form</span>
+          </div>
+        </article>
+
+        <article class="analytics-panel">
+          <header class="panel-heading">
+            <div>
+              <span>Akuisisi</span>
+              <h2>Sumber trafik</h2>
+            </div>
+          </header>
+          @if (data.sources.length) {
+            <div class="rank-list">
+              @for (source of data.sources; track source.source) {
+                <div class="rank-row">
+                  <div class="rank-label">
+                    <span>{{ source.source }}</span>
+                    <strong>{{ source.page_views | number: '1.0-0' }}</strong>
+                  </div>
+                  <div class="rank-track">
+                    <span
+                      [style.width.%]="
+                        barWidth(source.page_views, maxSourceViews())
+                      "
+                    ></span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="panel-empty">
+              <i class="ri-compass-3-line"></i>
+              <span>Belum ada sumber trafik pada rentang ini.</span>
+            </div>
+          }
+        </article>
+
+        <article class="analytics-panel">
+          <header class="panel-heading">
+            <div>
+              <span>Lokasi agregat</span>
+              <h2>Negara pengunjung</h2>
+            </div>
+          </header>
+          @if (data.locations.length) {
+            <div class="rank-list">
+              @for (location of data.locations; track location.country_code) {
+                <div class="rank-row">
+                  <div class="rank-label">
+                    <span>{{ location.country_code }}</span>
+                    <strong>{{ location.visitors | number: '1.0-0' }}</strong>
+                  </div>
+                  <div class="rank-track location-track">
+                    <span
+                      [style.width.%]="
+                        barWidth(location.visitors, maxLocationVisitors())
+                      "
+                    ></span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="panel-empty">
+              <i class="ri-map-pin-2-line"></i>
+              <span>
+                Lokasi akan tampil setelah trusted proxy negara diaktifkan.
+              </span>
+            </div>
+          }
+        </article>
+      </div>
+
+      <article class="analytics-panel pages-panel">
+        <header class="panel-heading">
+          <div>
+            <span>Minat pengunjung</span>
+            <h2>Halaman teratas</h2>
+          </div>
+          <a routerLink="/dashboard">Kembali ke dasbor</a>
+        </header>
+        @if (data.top_pages.length) {
+          <div class="table-responsive">
+            <table class="table analytics-table">
+              <thead>
+                <tr>
+                  <th>Halaman</th>
+                  <th>Distribusi view</th>
+                  <th>Pengunjung</th>
+                  <th>Page view</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (page of data.top_pages; track page.path) {
+                  <tr>
+                    <td>
+                      <span class="path-label">{{ page.path }}</span>
+                    </td>
+                    <td class="distribution-cell">
+                      <div class="rank-track">
+                        <span
+                          [style.width.%]="
+                            barWidth(page.page_views, maxPageViews())
+                          "
+                        ></span>
+                      </div>
+                    </td>
+                    <td>{{ page.visitors | number: '1.0-0' }}</td>
+                    <td>{{ page.page_views | number: '1.0-0' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="panel-empty panel-empty-wide">
+            <i class="ri-line-chart-line"></i>
+            <span>Belum ada halaman yang tercatat pada rentang ini.</span>
+          </div>
+        }
+      </article>
+    }
+  </div>
+</section>
