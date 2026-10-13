@@ -74,8 +74,8 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 | Backend contract/regression test | Lulus | 42 dari 42 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
-| Public lint | Gagal | 6 error dan 135 warning. Error utama adalah import duplikat. |
-| Admin lint | Gagal | 4 error dan 17.256 warning; mayoritas warning format/line ending. |
+| Public lint | Lulus | 0 error dan 122 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
+| Admin lint | Lulus | 0 error dan 17.236 warning; mayoritas warning format/line ending dari template lama dan perlu dinormalisasi bertahap agar diff tetap dapat ditinjau. |
 | Frontend automated test | Belum memadai | Public hanya memiliki 1 file test; admin tidak memiliki file test. Belum ada E2E untuk alur penting. |
 | Dependency audit backend | Lulus | 0 advisory produksi. |
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
@@ -95,7 +95,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 ### P1 — selesai sebelum release candidate
 
 - Selesaikan strategi backup/restore, retensi log, alerting health, dan pengukuran compression/cache di staging.
-- Perbaiki lint error. Pisahkan noise formatting agar lint kembali berguna sebagai quality gate.
+- Kurangi warning lint secara bertahap dan pisahkan perubahan format/line ending dari perubahan perilaku agar lint tetap berguna sebagai quality gate.
 - Tambahkan smoke/E2E untuk login admin, create/edit/publish konten, upload multi-media, public navigation, produk, artikel, FAQ, kontak, locale, canonical, dan respons mobile.
 - Tinjau kebijakan cache. Seluruh endpoint publik utama saat ini mengirim `Cache-Control: no-store`; ini aman dari stale content tetapi membuang peluang cache untuk katalog dan CMS yang jarang berubah.
 - Terapkan rate limit yang menyadari reverse proxy. Rate limit kontak saat ini disimpan di memori satu proses, sehingga hilang saat restart dan tidak sinkron bila proses diperbanyak.

@@ -1,9 +1,8 @@
 import { DatePipe, SlicePipe } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { IBlog } from '../../../../shared/interface/blog.interface';
-import { inject } from '@angular/core';
 import { PublicNavigationContextService } from '../../../../shared/services/public-navigation-context.service';
 
 @Component({

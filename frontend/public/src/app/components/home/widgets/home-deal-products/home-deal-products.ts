@@ -1,7 +1,6 @@
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, AsyncPipe } from '@angular/common';
 import {
   Component,
-  effect,
   ElementRef,
   inject,
   Inject,
@@ -11,13 +10,12 @@ import {
   viewChild,
   ViewChildren,
 } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 
 import { NgbRatingConfig, NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { Observable, of, switchMap, map } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
-import { toObservable } from '@angular/core/rxjs-interop';
 import SwiperCore, { Swiper } from 'swiper';
 import { Autoplay, EffectFade, Navigation, Pagination, Thumbs } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
@@ -59,14 +57,12 @@ export class HomeDealProducts {
   public dealsProduct$: Observable<Product[]> = toObservable(this.productIds).pipe(
     switchMap((ids) => {
       if (!ids || !ids.length) return of([]);
-      return this.products$.pipe(
-        map((products) => products.filter((p) => ids.includes(p.id)))
-      );
-    })
+      return this.products$.pipe(map((products) => products.filter((p) => ids.includes(p.id))));
+    }),
   );
 
   public targetProduct$: Observable<Product | undefined> = this.dealsProduct$.pipe(
-    map((products) => (products.length ? products[0] : undefined))
+    map((products) => (products.length ? products[0] : undefined)),
   );
 
   public optionDealSwiperContainer: SwiperOptions = {

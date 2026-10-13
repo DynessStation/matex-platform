@@ -437,7 +437,7 @@ export class FormOffice {
   //==================================================
 
   openMedia(): void {
-    this.mediaModal()?.openModal();
+    void this.mediaModal()?.openModal();
   }
 
   get selectedMedia(): IAttachment[] {

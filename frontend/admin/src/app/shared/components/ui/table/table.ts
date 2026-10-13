@@ -347,7 +347,7 @@ export class Table {
     event.stopPropagation();
 
     if (action.actionToPerform === 'delete') {
-      this.DeleteModal().openModal('delete', rowData);
+      void this.DeleteModal().openModal('delete', rowData);
 
       return;
     }

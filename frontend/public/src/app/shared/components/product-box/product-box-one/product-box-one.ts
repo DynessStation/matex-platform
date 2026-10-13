@@ -1,6 +1,6 @@
 import { Component, inject, input } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+
 import { Product } from '../../../interface/product.interface';
 import { ProductPricePipe } from '../../../pipe/product-price.pipe';
 
