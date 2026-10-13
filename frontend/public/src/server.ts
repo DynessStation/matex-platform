@@ -14,6 +14,41 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+const internalApiOrigin = (() => {
+  try {
+    return new URL(process.env['MATEX_API_INTERNAL_URL'] || 'http://127.0.0.1:9200').origin;
+  } catch {
+    return 'http://127.0.0.1:9200';
+  }
+})();
+
+app.get('/health/ssr', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.status(200).json({
+    status: 'ok',
+    service: 'matex-public-ssr',
+    uptime_seconds: Math.floor(process.uptime()),
+  });
+});
+
+app.get(['/robots.txt', '/sitemap.xml'], async (req, res) => {
+  try {
+    const upstream = await fetch(`${internalApiOrigin}${req.path}`, {
+      signal: AbortSignal.timeout(5_000),
+    });
+    res.status(upstream.status);
+    for (const header of ['cache-control', 'content-type'] as const) {
+      const value = upstream.headers.get(header);
+      if (value) res.setHeader(header, value);
+    }
+    res.send(await upstream.text());
+  } catch (error) {
+    console.error(`SEO endpoint proxy failed for ${req.path}`, error);
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(503).type('text/plain').send('SEO endpoint is temporarily unavailable');
+  }
+});
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.

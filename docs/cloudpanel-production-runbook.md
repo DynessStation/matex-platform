@@ -55,8 +55,8 @@ Gunakan tiga proses Node terpisah:
 
 | Proses | Perintah produksi | Environment utama |
 | --- | --- | --- |
-| API | `npm run start:prod` dari folder `backend` | `NODE_ENV=production`, `PORT=9200` |
-| Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201` |
+| API | `npm run start:prod` dari folder `backend` | `NODE_ENV=production`, `PORT=9200`, `PUBLIC_COMPANY_ID=1`, `PUBLIC_SITE_URL=https://matexindo.com` |
+| Public SSR | `npm run serve:ssr` dari folder `frontend/public` | `NODE_ENV=production`, `PORT=9201`, `MATEX_API_INTERNAL_URL=http://127.0.0.1:9200` |
 | Admin SSR | `npm run serve:ssr` dari folder `frontend/admin` | `NODE_ENV=production`, `PORT=9202` |
 
 Jalankan proses API dengan site user public (`matex-public`) atau user aplikasi khusus yang hanya diberi akses ke folder backend dan storage MATEX. Jangan menjalankannya sebagai user milik site lama.
@@ -79,7 +79,7 @@ Public dan admin memakai same-origin API. Pada Vhost Nginx kedua site, tambahkan
 http://127.0.0.1:9200
 ```
 
-Tambahkan lokasi `/files/` ke port yang sama jika `FILE_SERVE_LOCAL=true`. Letakkan aturan `/api/` dan `/files/` sebelum fallback SSR. Teruskan `Host`, `X-Real-IP`, `X-Forwarded-For`, dan `X-Forwarded-Proto`. Fallback public tetap ke `127.0.0.1:9201`, sedangkan fallback admin tetap ke `127.0.0.1:9202`.
+Tambahkan lokasi `/files/` ke port yang sama jika `FILE_SERVE_LOCAL=true`. Letakkan aturan `/api/` dan `/files/` sebelum fallback SSR. Teruskan `Host`, `X-Real-IP`, `X-Forwarded-For`, dan `X-Forwarded-Proto`. Fallback public tetap ke `127.0.0.1:9201`, sedangkan fallback admin tetap ke `127.0.0.1:9202`. Public SSR meneruskan `/robots.txt` dan `/sitemap.xml` ke API melalui `MATEX_API_INTERNAL_URL`, sehingga endpoint SEO tidak bergantung pada DNS publik dari dalam server.
 
 API sudah dikonfigurasi untuk mempercayai proxy loopback dan menerima origin:
 
@@ -90,6 +90,8 @@ https://internal.matexindo.com
 ```
 
 ## 5. Database dan file
+
+Sebelum deployment pertama, jalankan `npm run db:migrate:status` dari backend. Database baru memakai `npm run db:migrate`. Database lama yang belum memiliki tabel riwayat harus dibackup dan ditinjau sebelum satu kali `npm run db:migrate:adopt`; jangan menjalankan migration biasa secara paksa pada database lama.
 
 - Buat database dan user khusus MATEX; jangan memakai user database milik site lain.
 - Database tidak dibuka ke internet.
@@ -107,6 +109,16 @@ Terbitkan Let's Encrypt untuk:
 - `internal.matexindo.com`
 
 Aktifkan pengalihan HTTP ke HTTPS. Firewall publik cukup membuka SSH sesuai kebijakan server, HTTP 80, HTTPS 443, dan port CloudPanel 8443 yang dibatasi ke IP pengelola bila memungkinkan. Jangan membuka `9200`, `9201`, atau `9202`.
+
+## 7. Pemeriksaan proses
+
+- API hidup: `http://127.0.0.1:9200/health/live`
+- API dan database siap: `http://127.0.0.1:9200/health/ready`
+- Public SSR hidup: `http://127.0.0.1:9201/health/ssr`
+- Admin SSR hidup: `http://127.0.0.1:9202/health/ssr`
+- SEO public: `https://matexindo.com/robots.txt` dan `https://matexindo.com/sitemap.xml`
+
+Health endpoint internal dipakai oleh PM2, monitor uptime, dan pemeriksaan deployment. Jangan menganggap proses siap menerima trafik hanya karena port terbuka; API wajib mengembalikan status `ready` setelah koneksi database berhasil.
 
 ## 7. Pemeriksaan sebelum DNS go-live
 

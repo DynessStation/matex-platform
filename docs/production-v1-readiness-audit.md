@@ -41,12 +41,26 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Proses SSR public dan admin berhasil dijalankan pada `127.0.0.1:9201` dan `127.0.0.1:9202`; route utama, katalog, account/v2, checkout/v2, serta admin merespons HTTP 200. Pengambilan data production-domain belum dapat dinyatakan lulus sampai DNS, TLS, reverse proxy `/api`, dan API staging benar-benar tersedia.
 - Runbook CloudPanel untuk `72.60.77.35`, DNS, Node.js site, PM2, reverse proxy, database, TLS, firewall, serta checklist go-live tersedia di `docs/cloudpanel-production-runbook.md`.
 
+### Tahap 2 — baseline database dan discovery SEO
+
+Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
+
+- Baseline struktur inti tanpa data akun atau password hash sekarang tersedia sebagai migration pertama.
+- Migration runner memakai lock database, checksum, tabel `schema_migrations`, status, dan jalur adopsi database lama yang memvalidasi target sebelum mencatat history.
+- Seluruh 20 migration berhasil dijalankan berurutan pada database sementara yang benar-benar kosong, menghasilkan 46 tabel termasuk tabel history. Database uji langsung dihapus setelah verifikasi.
+- Database development lama berhasil diadopsi tanpa menjalankan ulang SQL dan tanpa mengubah data aplikasi; statusnya sekarang `current` dengan 20 migration tercatat.
+- Cacat nama kolom ambigu pada migration normalisasi halaman Tentang ditemukan oleh fresh bootstrap dan diperbaiki.
+- `robots.txt` dan sitemap XML dinamis hanya memuat route public v1 serta produk, kategori, artikel, dan halaman yang terpublikasi. Route commerce versi 2 dikeluarkan dari discovery mesin pencari.
+- Public dan admin SSR sekarang memiliki health endpoint khusus proses. API tetap menyediakan liveness serta readiness yang memeriksa database.
+- Backend typecheck dan 42 contract/regression test lulus setelah perubahan.
+- Smoke test proses lokal lulus untuk API live/ready, public SSR, admin SSR, robots, dan sitemap. Sitemap dari data development berisi 134 URL publik dan tidak memasukkan route commerce versi 2.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
 | --- | --- | --- |
 | Backend TypeScript | Lulus | `npm run typecheck` berhasil. |
-| Backend contract/regression test | Lulus | 39 dari 39 test berhasil. |
+| Backend contract/regression test | Lulus | 42 dari 42 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Public lint | Gagal | 6 error dan 135 warning. Error utama adalah import duplikat. |
@@ -55,7 +69,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 | Dependency audit backend | Lulus | 0 advisory produksi. |
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
 | Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
-| Database lokal | Terbaca | 46 tabel aktif. Tidak ada tabel pencatat migration yang ditemukan. |
+| Database lokal | Lulus | 46 tabel aplikasi dan 20 migration tercatat; fresh bootstrap juga lulus. |
 
 Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktikan keamanan, konfigurasi domain, kesehatan proses, perilaku browser, dan kesiapan operasi produksi.
 
@@ -63,11 +77,10 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 ### P0 — wajib selesai sebelum server menerima trafik publik
 
-1. **Belum ada jalur migration produksi yang repeatable.** SQL migration masih belum dapat membangun database kosong secara mandiri dan belum memiliki baseline yang teruji.
-2. **SEO discovery belum lengkap.** Belum ada `robots.txt` dan sitemap dinamis dari konten terpublikasi; canonical, hreflang, structured data, dan status 404 masih perlu divalidasi sebagai satu kontrak.
-3. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
-4. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
-5. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
+1. **Kontrak SEO belum selesai divalidasi.** Robots dan sitemap dinamis sudah tersedia; canonical, hreflang, structured data, serta status HTTP halaman 404 masih perlu divalidasi sebagai satu kontrak.
+2. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
+3. **Backup/restore dan penyimpanan file belum diuji.** Lokasi storage, kepemilikan user proses, backup database/file, restore drill, dan rollback release harus lulus sebelum DNS dipindah.
+4. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
 
 ### P1 — selesai sebelum release candidate
 
@@ -177,15 +190,16 @@ MATEX public dan admin adalah **Node.js site**, bukan PHP dan bukan static-only,
 Internet
    |
 CloudPanel Nginx + TLS
-   |-- matexindo.com ----------> Public Angular SSR 127.0.0.1:4201
-   |       |-- /api -----------> MATEX API 127.0.0.1:3000
-   |       `-- /files ---------> MATEX API 127.0.0.1:3000
+   |-- matexindo.com ----------> Public Angular SSR 127.0.0.1:9201
+   |       |-- /api -----------> MATEX API 127.0.0.1:9200
+   |       |-- /files ---------> MATEX API 127.0.0.1:9200
+   |       `-- /robots.txt + /sitemap.xml -> MATEX API 127.0.0.1:9200
    |
-   `-- internal.matexindo.com --> Admin Angular SSR 127.0.0.1:4200
-           |-- /api -----------> MATEX API 127.0.0.1:3000
-           `-- /files ---------> MATEX API 127.0.0.1:3000
+   `-- internal.matexindo.com --> Admin Angular SSR 127.0.0.1:9202
+           |-- /api -----------> MATEX API 127.0.0.1:9200
+           `-- /files ---------> MATEX API 127.0.0.1:9200
 
-MATEX API 127.0.0.1:3000 ------> MySQL/MariaDB via private/local connection
+MATEX API 127.0.0.1:9200 ------> MySQL/MariaDB via private/local connection
 ```
 
 PM2 menjaga tiga proses Node tetap hidup dan menghidupkannya setelah reboot. Nginx menangani TLS, redirect HTTP ke HTTPS, canonical redirect `www`, request limits, static cache, dan proxy. API tidak perlu diekspos lewat port 3000 ke internet.

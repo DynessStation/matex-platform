@@ -1,5 +1,5 @@
 -- Align the fixed About MATEX page with the fields rendered by the public
--- Kartify About template. Legacy rich text and unrelated JSON fields are no
+-- About template. Legacy rich text and unrelated JSON fields are no
 -- longer part of this page contract. Re-running this migration is safe.
 
 START TRANSACTION;
@@ -87,12 +87,12 @@ WHERE page.`website_page_key` = 'about'
   AND translation.`website_page_locale` IN ('id-ID', 'en-US')
 ON DUPLICATE KEY UPDATE
   `updated` = IF(
-    NULLIF(TRIM(`website_page_media_alt_text`), '') IS NULL,
+    NULLIF(TRIM(`website_page_media_i18n`.`website_page_media_alt_text`), '') IS NULL,
     NOW(),
-    `updated`
+    `website_page_media_i18n`.`updated`
   ),
   `website_page_media_alt_text` = COALESCE(
-    NULLIF(TRIM(`website_page_media_alt_text`), ''),
+    NULLIF(TRIM(`website_page_media_i18n`.`website_page_media_alt_text`), ''),
     VALUES(`website_page_media_alt_text`)
   );
 

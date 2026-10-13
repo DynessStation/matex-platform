@@ -23,6 +23,15 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
+  server.get('/health/ssr', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(200).json({
+      status: 'ok',
+      service: 'matex-admin-ssr',
+      uptime_seconds: Math.floor(process.uptime()),
+    });
+  });
+
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
   // Serve static files from /browser
