@@ -1,12 +1,13 @@
-import { DOCUMENT, DestroyRef, Injectable, PLATFORM_ID, inject, isDevMode } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { DOCUMENT, DestroyRef, Injectable, PLATFORM_ID, inject, isDevMode } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { distinctUntilChanged, filter, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-type PublicEventName = 'page_view' | 'outbound_click' | 'contact_start' | 'contact_submit';
+type PublicEventName =
+  'page_view' | 'outbound_click' | 'contact_start' | 'contact_submit' | 'web_vital';
 
 interface AnalyticsConfigResponse {
   data?: { enabled?: boolean };
@@ -60,6 +61,7 @@ export class PublicAnalyticsService {
         .subscribe((url) => this.trackPage(url));
       this.destroyRef.onDestroy(() => subscription.unsubscribe());
       this.listenForOutboundClicks();
+      this.listenForWebVitals();
     } catch (error) {
       if (isDevMode()) console.debug('[Analytics] Config unavailable', error);
     }
@@ -72,7 +74,7 @@ export class PublicAnalyticsService {
     this.track('page_view');
   }
 
-  private track(eventName: PublicEventName, targetKey?: string): void {
+  private track(eventName: PublicEventName, targetKey?: string, numericValue?: number): void {
     if (!this.enabled || !this.sessionId || this.privacyOptOut()) return;
     const location = this.document.location;
     const search = new URLSearchParams(location.search);
@@ -88,6 +90,7 @@ export class PublicAnalyticsService {
       utm_medium: search.get('utm_medium'),
       utm_campaign: search.get('utm_campaign'),
       target_key: targetKey || null,
+      numeric_value: Number.isFinite(numericValue) ? numericValue : null,
       occurred_at: new Date().toISOString(),
     };
 
@@ -129,6 +132,22 @@ export class PublicAnalyticsService {
     this.destroyRef.onDestroy(() =>
       this.document.removeEventListener('click', listener, { capture: true }),
     );
+  }
+
+  private listenForWebVitals(): void {
+    void import('web-vitals')
+      .then(({ onCLS, onINP, onLCP }) => {
+        const report = (metric: { name: string; value: number }) => {
+          if (!['CLS', 'INP', 'LCP'].includes(metric.name)) return;
+          this.track('web_vital', metric.name, metric.value);
+        };
+        onCLS(report);
+        onINP(report);
+        onLCP(report);
+      })
+      .catch((error) => {
+        if (isDevMode()) console.debug('[Analytics] Web Vitals unavailable', error);
+      });
   }
 
   private pathOf(url: string): string {

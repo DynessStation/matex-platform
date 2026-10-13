@@ -75,6 +75,49 @@ test("keeps only safe bounded campaign values and a referrer hostname", () => {
   assert.equal(result.utmSource?.includes("\u0000"), false);
 });
 
+test("accepts only bounded LCP, INP, and CLS web vital values", () => {
+  const metric = normalizePublicAnalyticsInput(
+    {
+      ...validPayload,
+      event_name: "web_vital",
+      target_key: "lcp",
+      numeric_value: 2487.4459,
+    },
+    secret,
+    now,
+  );
+
+  assert.ok(metric);
+  assert.equal(metric.targetKey, "LCP");
+  assert.equal(metric.numericValue, 2487.446);
+  assert.equal(
+    normalizePublicAnalyticsInput(
+      {
+        ...validPayload,
+        event_name: "web_vital",
+        target_key: "TTFB",
+        numeric_value: 100,
+      },
+      secret,
+      now,
+    ),
+    null,
+  );
+  assert.equal(
+    normalizePublicAnalyticsInput(
+      {
+        ...validPayload,
+        event_name: "web_vital",
+        target_key: "CLS",
+        numeric_value: -1,
+      },
+      secret,
+      now,
+    ),
+    null,
+  );
+});
+
 test("trusts a country header only when explicitly enabled", () => {
   assert.equal(trustedCountryCode("id", false), null);
   assert.equal(trustedCountryCode("id", true), "ID");

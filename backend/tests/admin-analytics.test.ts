@@ -93,6 +93,7 @@ test("analytics overview is tenant scoped and returns real content totals", asyn
     [{ path: "/produk", page_views: 12, visitors: 6 }],
     [{ source: "Direct", page_views: 10 }],
     [{ country_code: "ID", visitors: 7 }],
+    [{ metric: "LCP", samples: 5, average_value: 2100.125, good_percent: 80 }],
     [
       {
         products_total: 53,
@@ -116,15 +117,17 @@ test("analytics overview is tenant scoped and returns real content totals", asyn
   assert.equal(payload.data.totals.visitors, 7);
   assert.equal(payload.data.totals.active_visitors, 2);
   assert.equal(payload.data.top_pages[0].path, "/produk");
+  assert.equal(payload.data.performance[0].metric, "LCP");
+  assert.equal(payload.data.performance[0].samples, 5);
   assert.equal(payload.data.content.products_total, 53);
   assert.equal(payload.data.content.articles_pending, 1);
   assert.equal(payload.data.content.inquiries_today, 1);
 
   const analyticsCalls = calls.slice(2);
-  assert.equal(analyticsCalls.length, 6);
-  for (const call of analyticsCalls.slice(0, 5)) {
+  assert.equal(analyticsCalls.length, 7);
+  for (const call of analyticsCalls.slice(0, 6)) {
     assert.equal(call.params[0], 7);
     assert.match(call.sql, /id_master_comp = \?/);
   }
-  assert.deepEqual(analyticsCalls[5].params, Array(8).fill(7));
+  assert.deepEqual(analyticsCalls[6].params, Array(8).fill(7));
 });

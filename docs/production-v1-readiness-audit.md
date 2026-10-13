@@ -72,19 +72,19 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 
 - Public dapat mengambil konfigurasi analitik dari API. Pencatatan tetap nonaktif secara default sampai pemberitahuan privasi dan keputusan aktivasi produksi selesai ditinjau.
-- Event `page_view`, `outbound_click`, `contact_start`, dan `contact_submit` memiliki allowlist serta batas payload yang ketat. Browser menghormati Do Not Track dan Global Privacy Control.
+- Event `page_view`, `outbound_click`, `contact_start`, `contact_submit`, dan Core Web Vitals (`LCP`, `INP`, `CLS`) memiliki allowlist serta batas payload yang ketat. Browser menghormati Do Not Track dan Global Privacy Control.
 - Sesi anonim hanya disimpan sementara di `sessionStorage`; backend menyimpan HMAC hash dan tidak menyimpan alamat IP mentah. Referrer dipangkas menjadi hostname agar query atau path sensitif tidak tersimpan.
 - Endpoint ingestion mengabaikan bot umum, menolak waktu dan path tidak valid, serta memakai UUID event unik agar retry tidak menggandakan data.
 - Endpoint admin berizin `dashboard.view` menyediakan ringkasan maksimal 90 hari: page view, pengunjung anonim, pengunjung aktif 5 menit terakhir, klik keluar, awal/kirim kontak, tren harian, halaman, sumber, dan negara bila trusted proxy header kelak diaktifkan.
 - Migration baru berhasil diterapkan pada database development lama. Uji endpoint nyata membuktikan event pertama tersimpan, retry UUID yang sama tidak menggandakan baris, dan data smoke-test kemudian dihapus.
-- Backend typecheck, production build, serta 49 contract/regression test lulus. Dashboard admin dan halaman Analitik Publik sudah memakai endpoint MATEX nyata.
+- Backend typecheck, production build, serta 50 contract/regression test lulus. Dashboard admin dan halaman Analitik Publik sudah memakai endpoint MATEX nyata.
 
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
 | --- | --- | --- |
 | Backend TypeScript | Lulus | `npm run typecheck` berhasil. |
-| Backend contract/regression test | Lulus | 49 dari 49 test berhasil. |
+| Backend contract/regression test | Lulus | 50 dari 50 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Public lint | Lulus | 0 error dan 125 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
@@ -93,7 +93,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 | Dependency audit backend | Lulus | 0 advisory produksi. |
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
 | Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
-| Database lokal | Lulus | 47 tabel aplikasi dan 21 migration tercatat; fresh bootstrap seluruh 21 migration serta upgrade database lama sudah lulus. |
+| Database lokal | Lulus | 47 tabel aplikasi dan 23 migration tercatat; fresh bootstrap seluruh 23 migration serta upgrade database lama sudah lulus. |
 
 Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktikan keamanan, konfigurasi domain, kesehatan proses, perilaku browser, dan kesiapan operasi produksi.
 
@@ -148,7 +148,7 @@ Tabel berikut belum boleh langsung di-drop:
 | `article_category*` | Baru muncul di migration, belum dipakai controller | Parkir sampai organizer artikel v1 diputuskan. |
 | `article_tag*` | Baru muncul di migration, belum dipakai controller | Parkir sampai tag/internal-link artikel diputuskan. |
 | `faq_category*` | Dipakai public FAQ walau datanya dapat kosong | Pertahankan. |
-| `comp_category` | Hanya ditemukan pada dump lama | Kandidat drop setelah foreign-key check, backup, dan migration reversible. |
+| `comp_category` | Memuat dua lookup kategori perusahaan; `master_comp.id_comp_category` aktif memakai ID 1, walau schema lama belum memiliki foreign key | Pertahankan. Migration restorasi memastikan fresh bootstrap memiliki lookup yang sama tanpa menimpa data lama. |
 
 Sebelum drop apa pun, buat laporan pemakaian yang mencakup query backend, foreign key, trigger/view, row count, data unik, import script, serta kebutuhan v2. Penghapusan dilakukan lewat migration baru, bukan perintah manual langsung ke database produksi.
 
@@ -199,7 +199,7 @@ Gunakan session identifier acak, consent state, timestamp, route, referrer domai
 - Top produk, artikel, halaman, referrer, device, dan lokasi
 - Ringkasan Search Console terbaru dengan label waktu pembaruan yang jelas
 
-**Analitik Publik** sudah tersedia untuk tren, funnel kontak, lokasi agregat, referrer, dan halaman populer. Device, campaign, rincian event, dan export ditambahkan setelah kontrak event serta kebutuhan operasionalnya ditetapkan.
+**Analitik Publik** sudah tersedia untuk tren, funnel kontak, lokasi agregat, referrer, halaman populer, dan pengalaman pengguna nyata melalui LCP/INP/CLS. Device, campaign, rincian event, dan export ditambahkan setelah kontrak event serta kebutuhan operasionalnya ditetapkan.
 
 **SEO & Mesin Pencari** menjadi halaman khusus untuk Search Console, sitemap, URL inspection, PageSpeed/CrUX, dan Bing/IndexNow. Tombol tindak lanjut harus berada dekat data terkait, dengan loader, waktu sinkronisasi terakhir, status gagal, serta keterangan bahwa data Search Console tidak realtime.
 

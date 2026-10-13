@@ -76,6 +76,7 @@ router.get(
         [topPages],
         [sources],
         [locations],
+        [performance],
         [content],
       ] = await Promise.all([
         pool.query<RowDataPacket[]>(
@@ -134,6 +135,26 @@ router.get(
             GROUP BY country_code
             ORDER BY visitors DESC, country_code
             LIMIT 10`,
+          parameters,
+        ),
+        pool.query<RowDataPacket[]>(
+          `SELECT target_key AS metric,
+                  COUNT(*) AS samples,
+                  ROUND(AVG(numeric_value), 3) AS average_value,
+                  ROUND(
+                    100 * SUM(CASE
+                      WHEN target_key = 'LCP' AND numeric_value <= 2500 THEN 1
+                      WHEN target_key = 'INP' AND numeric_value <= 200 THEN 1
+                      WHEN target_key = 'CLS' AND numeric_value <= 0.1 THEN 1
+                      ELSE 0
+                    END) / COUNT(*),
+                    1
+                  ) AS good_percent
+             FROM public_analytics_event
+            WHERE id_master_comp = ? AND received_at >= ? AND received_at < ?
+              AND event_name = 'web_vital' AND numeric_value IS NOT NULL
+            GROUP BY target_key
+            ORDER BY FIELD(target_key, 'LCP', 'INP', 'CLS')`,
           parameters,
         ),
         pool.query<RowDataPacket[]>(
@@ -200,6 +221,12 @@ router.get(
           locations: locations.map((item) => ({
             country_code: item.country_code,
             visitors: Number(item.visitors ?? 0),
+          })),
+          performance: performance.map((item) => ({
+            metric: item.metric,
+            samples: Number(item.samples ?? 0),
+            average_value: Number(item.average_value ?? 0),
+            good_percent: Number(item.good_percent ?? 0),
           })),
           content: {
             products_total: Number(contentTotals.products_total ?? 0),

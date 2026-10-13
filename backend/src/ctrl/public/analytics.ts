@@ -79,8 +79,8 @@ router.post("/api/public/analytics/event", async (req, res) => {
       `INSERT IGNORE INTO public_analytics_event
         (id_master_comp, event_id, session_hash, event_name, path, locale,
          referrer_host, utm_source, utm_medium, utm_campaign, target_key,
-         country_code, occurred_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         numeric_value, country_code, occurred_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         company,
         event.eventId,
@@ -93,6 +93,7 @@ router.post("/api/public/analytics/event", async (req, res) => {
         event.utmMedium,
         event.utmCampaign,
         event.targetKey,
+        event.numericValue,
         countryCode,
         event.occurredAt,
       ],

@@ -175,6 +175,47 @@
         </footer>
       </article>
 
+      <article class="analytics-panel performance-panel">
+        <header class="panel-heading">
+          <div>
+            <span>Pengalaman pengguna nyata</span>
+            <h2>Core Web Vitals</h2>
+          </div>
+          <small>Rata-rata dari browser pengunjung pada rentang terpilih</small>
+        </header>
+        @if (data.performance.length) {
+          <div class="performance-grid">
+            @for (metric of data.performance; track metric.metric) {
+              <div class="performance-card">
+                <header>
+                  <span>{{ metric.metric }}</span>
+                  <small>{{ metric.samples }} sampel</small>
+                </header>
+                <strong>{{
+                  metricValue(metric.metric, metric.average_value)
+                }}</strong>
+                <span>{{ metricLabel(metric.metric) }}</span>
+                <div class="performance-score">
+                  <div class="rank-track performance-track">
+                    <span [style.width.%]="metric.good_percent"></span>
+                  </div>
+                  <b>{{ metric.good_percent | number: '1.0-1' }}% baik</b>
+                </div>
+                <small>{{ metricThreshold(metric.metric) }}</small>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="panel-empty panel-empty-wide">
+            <i class="ri-speed-up-line"></i>
+            <span>
+              Data performa akan tampil setelah analytics production aktif dan
+              halaman dikunjungi dari browser yang mendukung Web Vitals.
+            </span>
+          </div>
+        }
+      </article>
+
       <div class="analytics-grid analytics-grid-primary">
         <article class="analytics-panel funnel-panel">
           <header class="panel-heading">

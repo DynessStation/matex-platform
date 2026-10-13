@@ -231,8 +231,70 @@
 }
 
 .trend-panel,
+.performance-panel,
 .pages-panel {
   margin-bottom: 18px;
+}
+
+.performance-panel .panel-heading > small {
+  color: var(--analytics-muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.performance-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--analytics-border);
+  padding: 17px;
+  color: var(--analytics-text);
+
+  header,
+  .performance-score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  header span {
+    color: var(--theme-color);
+    font-weight: 700;
+  }
+
+  strong {
+    margin-top: 4px;
+    font-size: 25px;
+  }
+
+  > span,
+  small {
+    color: var(--analytics-muted);
+    font-size: 11px;
+  }
+
+  .performance-score {
+    margin-top: 5px;
+
+    b {
+      flex: 0 0 auto;
+      font-size: 12px;
+    }
+  }
+}
+
+.performance-track {
+  width: 100%;
+
+  span {
+    background: #2d9955;
+  }
 }
 
 .panel-heading {
@@ -576,6 +638,7 @@
   }
 
   .metric-grid,
+  .performance-grid,
   .analytics-grid-primary {
     grid-template-columns: 1fr;
   }

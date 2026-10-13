@@ -31,6 +31,13 @@ export interface IAnalyticsLocation {
   visitors: number;
 }
 
+export interface IAnalyticsPerformance {
+  metric: 'LCP' | 'INP' | 'CLS';
+  samples: number;
+  average_value: number;
+  good_percent: number;
+}
+
 export interface IAnalyticsContentTotals {
   products_total: number;
   products_published: number;
@@ -52,6 +59,7 @@ export interface IAnalyticsOverview {
   top_pages: IAnalyticsPage[];
   sources: IAnalyticsSource[];
   locations: IAnalyticsLocation[];
+  performance: IAnalyticsPerformance[];
   content: IAnalyticsContentTotals;
 }
 

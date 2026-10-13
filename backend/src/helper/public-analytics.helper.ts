@@ -7,6 +7,7 @@ export const PUBLIC_ANALYTICS_EVENTS = [
   "outbound_click",
   "contact_start",
   "contact_submit",
+  "web_vital",
 ] as const;
 
 export type PublicAnalyticsEventName = (typeof PUBLIC_ANALYTICS_EVENTS)[number];
@@ -22,12 +23,14 @@ export interface PublicAnalyticsInput {
   utmMedium: string | null;
   utmCampaign: string | null;
   targetKey: string | null;
+  numericValue: number | null;
   occurredAt: Date;
 }
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const eventNames = new Set<string>(PUBLIC_ANALYTICS_EVENTS);
+const webVitalNames = new Set(["LCP", "INP", "CLS"]);
 
 const text = (value: unknown, maxLength: number): string | null => {
   const clean = String(value ?? "")
@@ -63,6 +66,11 @@ export const normalizePublicAnalyticsInput = (
   const rawPath = text(body.path, 1000);
   const locale = text(body.locale, 10);
   const occurredAt = new Date(String(body.occurred_at ?? ""));
+  const targetKey = text(body.target_key, 120);
+  const rawNumericValue =
+    body.numeric_value === null || body.numeric_value === undefined
+      ? null
+      : Number(body.numeric_value);
 
   if (
     !eventId ||
@@ -84,6 +92,24 @@ export const normalizePublicAnalyticsInput = (
   const ageMs = now.getTime() - occurredAt.getTime();
   if (ageMs > 24 * 60 * 60 * 1000 || ageMs < -5 * 60 * 1000) return null;
 
+  let numericValue: number | null = null;
+  let normalizedTargetKey = targetKey;
+  if (eventName === "web_vital") {
+    normalizedTargetKey = targetKey?.toUpperCase() ?? null;
+    const maximum = normalizedTargetKey === "CLS" ? 100 : 600_000;
+    if (
+      !normalizedTargetKey ||
+      !webVitalNames.has(normalizedTargetKey) ||
+      rawNumericValue === null ||
+      !Number.isFinite(rawNumericValue) ||
+      rawNumericValue < 0 ||
+      rawNumericValue > maximum
+    ) {
+      return null;
+    }
+    numericValue = Math.round(rawNumericValue * 1000) / 1000;
+  }
+
   return {
     eventId,
     sessionHash: createHmac("sha256", hashSecret)
@@ -96,7 +122,8 @@ export const normalizePublicAnalyticsInput = (
     utmSource: text(body.utm_source, 120),
     utmMedium: text(body.utm_medium, 120),
     utmCampaign: text(body.utm_campaign, 160),
-    targetKey: text(body.target_key, 120),
+    targetKey: normalizedTargetKey,
+    numericValue,
     occurredAt,
   };
 };
