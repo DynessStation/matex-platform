@@ -1,0 +1,274 @@
+<section class="seo-page">
+  <div class="container-fluid">
+    <header class="seo-heading">
+      <div>
+        <span class="seo-kicker">Performa di mesin pencari</span>
+        <h1>SEO & Mesin Pencari</h1>
+        <p>
+          Ringkasan Search Console dan audit PageSpeed untuk matexindo.com. Data
+          pencarian Google bukan data realtime.
+        </p>
+      </div>
+      <div class="seo-actions" aria-label="Rentang Search Console">
+        @for (days of rangeOptions; track days) {
+          <button
+            type="button"
+            class="range-button"
+            [class.active]="selectedDays() === days"
+            [disabled]="loading()"
+            (click)="selectRange(days)"
+          >
+            {{ days }} hari
+          </button>
+        }
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="loading()"
+          (click)="load()"
+        >
+          <i
+            class="ri-refresh-line"
+            [class.spin]="loading()"
+            aria-hidden="true"
+          ></i>
+          Perbarui
+        </button>
+      </div>
+    </header>
+
+    @if (error()) {
+      <div class="seo-message seo-message-error" role="alert">
+        <i class="ri-error-warning-line" aria-hidden="true"></i>
+        <div>
+          <strong>Data belum termuat</strong><span>{{ error() }}</span>
+        </div>
+        <button type="button" (click)="load()">Coba lagi</button>
+      </div>
+    } @else if (loading() && !overview()) {
+      <div class="seo-message" role="status" aria-live="polite">
+        <span class="seo-spinner" aria-hidden="true"></span>
+        <div>
+          <strong>Menghubungkan data SEO</strong
+          ><span>Memeriksa konfigurasi Search Console.</span>
+        </div>
+      </div>
+    }
+
+    @if (overview(); as data) {
+      @if (!data.configured) {
+        <article class="setup-panel">
+          <div class="setup-icon">
+            <i class="ri-plug-line" aria-hidden="true"></i>
+          </div>
+          <div>
+            <span class="seo-kicker">Belum terhubung</span>
+            <h2>Hubungkan Google Search Console</h2>
+            <p>
+              Halaman admin sudah siap. Buat service account Google, aktifkan
+              Search Console API, lalu tambahkan email service account sebagai
+              pengguna properti
+              <b>sc-domain:matexindo.com</b>.
+            </p>
+            <ol>
+              <li>Verifikasi domain matexindo.com di Search Console.</li>
+              <li>
+                Buat service account dan unduh key JSON dari Google Cloud.
+              </li>
+              <li>Isi kredensial hanya di environment backend pada VPS.</li>
+            </ol>
+          </div>
+        </article>
+      } @else {
+        <div class="status-strip">
+          <i class="ri-checkbox-circle-line" aria-hidden="true"></i>
+          <div>
+            <strong>Search Console terhubung</strong>
+            <span
+              >{{ data.site_url }} · akses
+              {{ data.permission_level || 'read-only' }}</span
+            >
+          </div>
+          <small>{{ data.range.startDate }} – {{ data.range.endDate }}</small>
+        </div>
+
+        @if (data.totals; as totals) {
+          <div class="metric-grid">
+            <article>
+              <span>Klik Google</span
+              ><strong>{{ totals.clicks | number: '1.0-0' }}</strong>
+            </article>
+            <article>
+              <span>Impresi</span
+              ><strong>{{ totals.impressions | number: '1.0-0' }}</strong>
+            </article>
+            <article>
+              <span>CTR rata-rata</span
+              ><strong>{{ totals.ctr | percent: '1.1-1' }}</strong>
+            </article>
+            <article>
+              <span>Posisi rata-rata</span
+              ><strong>{{ totals.position | number: '1.1-1' }}</strong>
+            </article>
+          </div>
+        }
+
+        <div class="seo-grid">
+          <article class="data-panel">
+            <header>
+              <h2>Kueri teratas</h2>
+              <small>Berdasarkan klik</small>
+            </header>
+            @if (data.top_queries?.length) {
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Kueri</th>
+                      <th>Klik</th>
+                      <th>Impresi</th>
+                      <th>CTR</th>
+                      <th>Posisi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of data.top_queries; track row.key) {
+                      <tr>
+                        <td>{{ row.key }}</td>
+                        <td>{{ row.clicks }}</td>
+                        <td>{{ row.impressions }}</td>
+                        <td>{{ row.ctr | percent: '1.1-1' }}</td>
+                        <td>{{ row.position | number: '1.1-1' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="empty-state">Belum ada data kueri pada rentang ini.</p>
+            }
+          </article>
+          <article class="data-panel">
+            <header>
+              <h2>Halaman teratas</h2>
+              <small>Berdasarkan klik</small>
+            </header>
+            @if (data.top_pages?.length) {
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Halaman</th>
+                      <th>Klik</th>
+                      <th>Impresi</th>
+                      <th>CTR</th>
+                      <th>Posisi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of data.top_pages; track row.key) {
+                      <tr>
+                        <td class="path-cell">{{ row.key }}</td>
+                        <td>{{ row.clicks }}</td>
+                        <td>{{ row.impressions }}</td>
+                        <td>{{ row.ctr | percent: '1.1-1' }}</td>
+                        <td>{{ row.position | number: '1.1-1' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="empty-state">
+                Belum ada data halaman pada rentang ini.
+              </p>
+            }
+          </article>
+        </div>
+      }
+
+      <article class="pagespeed-panel">
+        <header>
+          <div>
+            <span class="seo-kicker">Audit sesuai permintaan</span>
+            <h2>PageSpeed & Lighthouse</h2>
+            <p>
+              Jalankan saat diperlukan. Setiap tombol memakai kuota API dan
+              hasilnya bukan trafik realtime.
+            </p>
+          </div>
+          <div class="seo-actions">
+            <button
+              type="button"
+              class="secondary-button"
+              [disabled]="
+                pageSpeedLoading() !== null || !data.page_speed_configured
+              "
+              (click)="runPageSpeed('mobile')"
+            >
+              @if (pageSpeedLoading() === 'mobile') {
+                <span class="button-spinner"></span>
+              } @else {
+                <i class="ri-smartphone-line"></i>
+              }
+              Audit mobile
+            </button>
+            <button
+              type="button"
+              class="secondary-button"
+              [disabled]="
+                pageSpeedLoading() !== null || !data.page_speed_configured
+              "
+              (click)="runPageSpeed('desktop')"
+            >
+              @if (pageSpeedLoading() === 'desktop') {
+                <span class="button-spinner"></span>
+              } @else {
+                <i class="ri-computer-line"></i>
+              }
+              Audit desktop
+            </button>
+          </div>
+        </header>
+        @if (!data.page_speed_configured) {
+          <div class="inline-note">
+            <i class="ri-information-line"></i
+            ><span
+              >Tambahkan Google PageSpeed API key di environment backend untuk
+              mengaktifkan audit.</span
+            >
+          </div>
+        }
+        @if (pageSpeedError()) {
+          <div class="inline-note inline-note-error">
+            <i class="ri-error-warning-line"></i
+            ><span>{{ pageSpeedError() }}</span>
+          </div>
+        }
+        @if (pageSpeed(); as result) {
+          <div class="score-grid">
+            <article [class]="scoreClass(result.scores?.performance || 0)">
+              <span>Performance</span
+              ><strong>{{ result.scores?.performance }}</strong>
+            </article>
+            <article [class]="scoreClass(result.scores?.accessibility || 0)">
+              <span>Accessibility</span
+              ><strong>{{ result.scores?.accessibility }}</strong>
+            </article>
+            <article [class]="scoreClass(result.scores?.best_practices || 0)">
+              <span>Best practices</span
+              ><strong>{{ result.scores?.best_practices }}</strong>
+            </article>
+            <article [class]="scoreClass(result.scores?.seo || 0)">
+              <span>SEO</span><strong>{{ result.scores?.seo }}</strong>
+            </article>
+          </div>
+          <footer>
+            <span>{{ result.strategy }} · {{ result.url }}</span
+            ><small>Audit {{ result.analyzed_at | date: 'medium' }}</small>
+          </footer>
+        }
+      </article>
+    }
+  </div>
+</section>

@@ -246,4 +246,26 @@ Perintah ini hanya melakukan request baca. Pemeriksaan mencakup live/ready API, 
 - Membuat database serta kredensial di CloudPanel.
 - Menerbitkan sertifikat TLS setelah DNS aktif.
 - Merotasi Google Maps key lama di Google Cloud Console karena pernah tercatat dalam Git.
-- Nantinya menghubungkan Search Console dan GA4 setelah domain dapat diverifikasi.
+- Menghubungkan Search Console dan PageSpeed setelah domain dapat diverifikasi dengan langkah berikut.
+
+### Hubungkan Search Console dan PageSpeed
+
+1. Buat atau pilih Google Cloud project khusus MATEX.
+2. Di **APIs & Services → Library**, aktifkan **Google Search Console API** dan **PageSpeed Insights API**.
+3. Di Google Search Console, tambahkan property tipe **Domain** untuk `matexindo.com`, lalu pasang record DNS TXT verifikasi dari Google pada pengelola DNS domain.
+4. Di Google Cloud **IAM & Admin → Service Accounts**, buat service account khusus pembacaan laporan SEO. Buat satu key JSON dan unduh sekali ke perangkat pemilik akun.
+5. Di Search Console buka property `matexindo.com` → **Settings → Users and permissions**, lalu tambahkan email service account sebagai pengguna yang dapat membaca property. Backend MATEX sendiri memakai OAuth scope read-only.
+6. Salin hanya `client_email` dan `private_key` dari JSON ke `backend/.env` pada VPS. Untuk satu baris environment, ganti line break private key dengan literal `\n` dan apit seluruh nilainya dengan tanda kutip. Jangan mengunggah file JSON ke Git atau folder public.
+7. Buat API key terpisah untuk PageSpeed. Batasi key tersebut hanya untuk **PageSpeed Insights API** dan, bila pengaturan Google Cloud mendukungnya, batasi pemanggilan dari IP VPS `72.60.77.35`.
+8. Isi konfigurasi berikut lalu reload proses API dengan `pm2 startOrReload ops/ecosystem.config.cjs --update-env`:
+
+```dotenv
+GOOGLE_SEARCH_CONSOLE_SITE_URL=sc-domain:matexindo.com
+GOOGLE_SERVICE_ACCOUNT_EMAIL=nama-service-account@project-id.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_PAGESPEED_API_KEY=isi-api-key-pagespeed
+```
+
+9. Login ke `internal.matexindo.com`, buka **SEO & Mesin Pencari**, pastikan status property tampil, lalu jalankan audit mobile dan desktop satu kali. Search Console bukan realtime; console MATEX sengaja meminta data final sampai tiga hari sebelum hari berjalan.
+
+Jika salah satu dari tiga nilai Search Console terisi sementara yang lain kosong, API production akan berhenti saat startup dengan pesan konfigurasi tidak lengkap. Ini disengaja agar deployment tidak terlihat sehat ketika credential sebenarnya rusak.

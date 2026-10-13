@@ -6,7 +6,7 @@ Target admin: `https://internal.matexindo.com`
 
 ## Keputusan audit
 
-Status saat ini adalah **belum siap dipublikasikan ke produksi**. Struktur utama CMS, katalog, artikel, media, FAQ, kontak, akses admin, dan Angular SSR sudah terbentuk. Build ketiga aplikasi juga dapat diselesaikan. Namun, konfigurasi produksi, keamanan autentikasi, dependensi, SEO teknis, test frontend, migrasi database, dan observability masih memiliki blocker yang harus dibereskan sebelum DNS diarahkan ke VPS.
+Status saat ini adalah **belum siap dipublikasikan ke produksi**, tetapi fondasi lokal utamanya sudah selesai: build ketiga aplikasi, baseline migration, hardening API, SSR/SEO, backup tooling, analitik first-party, dan console SEO dapat diverifikasi. Blocker yang tersisa terutama berada pada konten wajib, rotasi key, pengujian alur browser, serta rehearsal nyata di VPS sebelum DNS diarahkan.
 
 Audit ini sengaja belum menghapus file, rute, package, atau tabel. Penghapusan baru dilakukan setelah rute v1 dikunci, pemakaian runtime dibuktikan, backup diuji, dan ada migration yang dapat ditinjau serta dibatalkan.
 
@@ -79,12 +79,23 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Migration baru berhasil diterapkan pada database development lama. Uji endpoint nyata membuktikan event pertama tersimpan, retry UUID yang sama tidak menggandakan baris, dan data smoke-test kemudian dihapus.
 - Backend typecheck, production build, serta 50 contract/regression test lulus. Dashboard admin dan halaman Analitik Publik sudah memakai endpoint MATEX nyata.
 
+### Tahap 6 — Search Console dan PageSpeed
+
+Selesai diterapkan dan diverifikasi secara lokal pada 13 Oktober 2026:
+
+- Halaman admin **SEO & Mesin Pencari** memakai endpoint backend MATEX dan permission `dashboard.view`; tidak menempelkan halaman Google melalui iframe.
+- Search Console memakai service account, scope baca saja, property yang ditetapkan server, rentang 7/28/90 hari, dan hanya meminta data final sampai tiga hari sebelum tanggal berjalan.
+- Ringkasan menampilkan klik, impresi, CTR, posisi berbobot impresi, kueri teratas, dan halaman teratas. Saat kredensial belum tersedia, endpoint mengembalikan status belum terhubung tanpa membuat admin gagal dimuat.
+- PageSpeed Insights berjalan hanya atas perintah admin, dibatasi ke path same-origin `matexindo.com`, serta memisahkan audit mobile dan desktop.
+- Konfigurasi Google tetap opsional. Production startup menolak konfigurasi Search Console yang hanya terisi sebagian agar kesalahan secret tidak tersembunyi.
+- Backend typecheck, production build, 56 contract/regression test, targeted lint halaman admin, admin SSR build, dan dependency audit produksi backend lulus. Integrasi live tetap menunggu domain property, API, service account, dan API key milik pemilik akun.
+
 ## Hasil pemeriksaan yang sudah dijalankan
 
 | Area | Hasil | Catatan |
 | --- | --- | --- |
 | Backend TypeScript | Lulus | `npm run typecheck` berhasil. |
-| Backend contract/regression test | Lulus | 50 dari 50 test berhasil. |
+| Backend contract/regression test | Lulus | 56 dari 56 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Public lint | Lulus | 0 error dan 125 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
@@ -117,7 +128,9 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 ## Batas v1 dan legacy template
 
-Ada perbedaan antara dokumen arah produk dan route runtime sekarang. Dokumen `public-content-roadmap.md` masih memasukkan cart dan wishlist ke v1, sedangkan keputusan produk sebelumnya menempatkan first-party commerce di v2. Runtime publik sekarang masih membuka cart, checkout, wishlist, compare, seller, brand, tracking order, order detail/success, dan account commerce. Admin juga masih mendaftarkan banyak modul order, store, wallet, commission, payout, tax, shipping, coupon, refund, review, subscription, theme, dan settings bawaan template.
+Keputusan scope publik sudah diterapkan pada router dan diverifikasi melalui SSR lokal. Account, cart, dan wishlist tetap dapat dibuka sebagai pratinjau dengan keterangan versi 2. Checkout, compare, seller, brand, tracking order, dan route commerce langsung lain masuk ke halaman generik versi 2 serta tidak muncul pada navigasi, robots, atau sitemap. Katalog SSR hanya menampilkan filter kategori dan harga; rating, brand, serta atribut dinamis tidak tampil. Halaman yang diuji tidak lagi memuat label Kartify/Pixelstrap.
+
+Source legacy yang masih bernilai untuk versi 2 belum seluruhnya dikeluarkan dari graph build. Admin juga masih mendaftarkan banyak modul order, store, wallet, commission, payout, tax, shipping, coupon, refund, review, subscription, theme, dan settings bawaan template. Ini tetap menjadi pekerjaan pembersihan terukur, bukan alasan untuk menghapus modul atau tabel secara massal.
 
 Karena route lazy tetap masuk graph build, menyembunyikan menu saja belum mengeluarkan legacy dari artefak produksi. Prosedur yang aman:
 
@@ -201,7 +214,7 @@ Gunakan session identifier acak, consent state, timestamp, route, referrer domai
 
 **Analitik Publik** sudah tersedia untuk tren, funnel kontak, lokasi agregat, referrer, halaman populer, dan pengalaman pengguna nyata melalui LCP/INP/CLS. Device, campaign, rincian event, dan export ditambahkan setelah kontrak event serta kebutuhan operasionalnya ditetapkan.
 
-**SEO & Mesin Pencari** menjadi halaman khusus untuk Search Console, sitemap, URL inspection, PageSpeed/CrUX, dan Bing/IndexNow. Tombol tindak lanjut harus berada dekat data terkait, dengan loader, waktu sinkronisasi terakhir, status gagal, serta keterangan bahwa data Search Console tidak realtime.
+**SEO & Mesin Pencari** sudah menyediakan Search Console dan PageSpeed melalui API resmi dengan rentang tanggal, loader, status gagal, status konfigurasi, audit mobile/desktop, serta keterangan bahwa data pencarian tidak realtime. Sitemap, URL Inspection, CrUX, scheduled cache/sync, serta Bing/IndexNow tetap menjadi perluasan setelah koneksi Google dasar terbukti di staging.
 
 Dashboard sekarang membaca endpoint MATEX nyata dan menampilkan trafik, pengunjung aktif 5 menit terakhir, funnel kontak, status produk/artikel/FAQ, halaman teratas, serta sumber trafik. Angka store/order/revenue/review dan copy demo Kartify sudah dikeluarkan dari komponen dashboard. Dashboard dan halaman Analitik Publik memperbarui data setiap 30 detik serta menyediakan filter 7/30/90 hari.
 
@@ -280,8 +293,9 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 ### Tahap 6 — Search Console, performance, dan Bing
 
-- OAuth/server credential, scheduled sync, cache, retry, quota handling, dan audit log.
-- Tambah Search Analytics, sitemap, URL inspection, PageSpeed, CrUX, lalu Bing/IndexNow bila dipilih.
+- Search Analytics dan PageSpeed on-demand sudah diterapkan dengan server credential serta state aman saat belum dikonfigurasi.
+- Hubungkan credential nyata di staging, lalu tambahkan scheduled cache/sync, retry/quota handling, sitemap, URL Inspection, dan CrUX setelah pola penggunaan terbukti.
+- Bing/IndexNow tetap opsional setelah integrasi Google stabil.
 
 ### Tahap 7 — release candidate dan CloudPanel
 

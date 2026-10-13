@@ -43,6 +43,24 @@ export const menu: ISidebar[] = [
     permission: 'dashboard.view',
   },
 
+  {
+    id: 7,
+
+    title: 'seo_search_console',
+
+    path: '/seo-console',
+
+    active: false,
+
+    icon: 'ri-search-eye-line',
+
+    type: 'sub',
+
+    level: 1,
+
+    permission: 'dashboard.view',
+  },
+
   //==================================================
   //==== ADMINISTRATION
   //==================================================

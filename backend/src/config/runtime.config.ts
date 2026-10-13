@@ -50,4 +50,33 @@ export const validateRuntimeConfig = (): void => {
       "ANALYTICS_HASH_SECRET must contain at least 32 characters when public analytics is enabled",
     );
   }
+
+  const searchConsoleVariables = [
+    "GOOGLE_SEARCH_CONSOLE_SITE_URL",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+    "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY",
+  ] as const;
+  const configuredSearchConsoleVariables = searchConsoleVariables.filter(
+    (name) => process.env[name]?.trim(),
+  );
+  if (
+    configuredSearchConsoleVariables.length > 0 &&
+    configuredSearchConsoleVariables.length < searchConsoleVariables.length
+  ) {
+    const missingSearchConsoleVariables = searchConsoleVariables.filter(
+      (name) => !process.env[name]?.trim(),
+    );
+    throw new Error(
+      `Incomplete Search Console configuration: ${missingSearchConsoleVariables.join(", ")}`,
+    );
+  }
+
+  if (
+    process.env.GOOGLE_PAGESPEED_API_KEY?.trim() &&
+    !process.env.PUBLIC_SITE_URL?.trim()
+  ) {
+    throw new Error(
+      "PUBLIC_SITE_URL is required when GOOGLE_PAGESPEED_API_KEY is configured",
+    );
+  }
 };

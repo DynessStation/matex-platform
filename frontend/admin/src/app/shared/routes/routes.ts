@@ -21,6 +21,15 @@ export const content: Routes = [
   },
 
   {
+    path: 'seo-console',
+
+    canActivate: [AuthGuard],
+
+    loadChildren: () =>
+      import('../../components/seo-console/seo-console.routes'),
+  },
+
+  {
     path: 'admin-account',
     canActivate: [AuthGuard],
     loadChildren: () =>
