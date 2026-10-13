@@ -1,6 +1,7 @@
 # Audit kesiapan pra-produksi MATEX v1
 
-Tanggal audit: 12 Oktober 2026  
+Tanggal audit: 14 Oktober 2026
+
 Target publik: `https://matexindo.com` dan `https://www.matexindo.com`  
 Target admin: `https://internal.matexindo.com`
 
@@ -114,7 +115,7 @@ Selesai diterapkan dan diverifikasi secara lokal pada 13 Oktober 2026:
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Public lint | Lulus | 0 error dan 125 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
 | Admin lint | Lulus | 0 error dan 17.236 warning; mayoritas warning format/line ending dari template lama dan perlu dinormalisasi bertahap agar diff tetap dapat ditinjau. |
-| Frontend automated test | Belum memadai | Public hanya memiliki 1 file test; admin tidak memiliki file test. Belum ada E2E untuk alur penting. |
+| Frontend browser E2E | Lulus sebagian | 24 dari 25 skenario release-candidate lulus lokal; 1 alur login admin dilewati karena kredensial staging tidak disimpan di repository. |
 | Dependency audit backend | Lulus | 0 advisory produksi. |
 | Dependency audit public | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan dedupe lockfile. |
 | Dependency audit admin | Lulus | 0 advisory produksi setelah patch Angular/Express/Swiper dan override ProseMirror yang kompatibel. |
@@ -127,7 +128,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 ### P0 — wajib selesai sebelum server menerima trafik publik
 
-1. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
+1. **E2E terautentikasi dan alur tulis belum diuji di staging.** Suite browser read-only lokal sudah lulus 24 skenario dengan 1 login terautentikasi dilewati. Login admin, publish konten, upload media, cookie HTTPS, reverse proxy, dan alur edit perlu diuji melalui domain staging dengan akun khusus.
 2. **Backup/restore dan penyimpanan file belum diuji di VPS.** Tool backup database/media, manifest checksum, retensi aman, verifikasi, dan restore bertarget sudah tersedia. Kepemilikan storage, backup terjadwal, salinan di luar VPS, restore drill, serta rollback release tetap harus lulus pada data staging sebelum DNS dipindah.
 3. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
 
@@ -135,7 +136,7 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 
 - Selesaikan strategi backup/restore, retensi log, alerting health, dan pengukuran compression/cache di staging.
 - Kurangi warning lint secara bertahap dan pisahkan perubahan format/line ending dari perubahan perilaku agar lint tetap berguna sebagai quality gate.
-- Tambahkan E2E browser untuk login admin, create/edit/publish konten, upload multi-media, public navigation, produk, artikel, FAQ, kontak, locale, dan respons mobile. Smoke HTTP read-only pra-rilis sudah tersedia.
+- Perluas E2E browser staging ke create/edit/publish konten, upload multi-media, produk detail nyata, serta respons mobile. Public navigation, halaman wajib ID/EN, account/cart/wishlist versi 2, 404/noindex, login admin tanpa autentikasi, dan route admin lama sudah dicakup secara otomatis.
 - Tinjau kebijakan cache. Seluruh endpoint publik utama saat ini mengirim `Cache-Control: no-store`; ini aman dari stale content tetapi membuang peluang cache untuk katalog dan CMS yang jarang berubah.
 - Terapkan rate limit yang menyadari reverse proxy. Rate limit kontak saat ini disimpan di memori satu proses, sehingga hilang saat restart dan tidak sinkron bila proses diperbanyak.
 - Tentukan penyimpanan file produksi, backup, batas ukuran, malware scanning bila diperlukan, dan lifecycle file yatim.
@@ -315,6 +316,7 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 
 - Konfigurasi PM2 tiga proses dan verifikasi health loopback sudah tersedia; tetap uji startup setelah reboot dan rollback release pada VPS.
 - Smoke pra-rilis read-only lintas API, public, dan admin sudah tersedia; tetap jalankan melalui hostname staging/produksi setelah Nginx dan TLS aktif.
+- Suite browser Playwright sudah dipisahkan ke `ops/e2e` agar dependency pengujian tidak mengubah lockfile runtime. Hasil lokal terakhir 24 lulus dan 1 dilewati karena kredensial staging tidak tersedia. Pengujian ini juga menemukan lalu memverifikasi perbaikan metadata canonical yang sempat hilang setelah hydration pada beranda dan halaman CMS; alur login admin aktif hanya bila kredensial diberikan melalui environment.
 - Staging rehearsal, data migration, backup restore, build bersih, smoke/E2E, performance/accessibility/security checks.
 - Buat Node.js sites, vhost proxy, database/user, environment secret, DNS, TLS, redirect, firewall, dan monitoring.
 

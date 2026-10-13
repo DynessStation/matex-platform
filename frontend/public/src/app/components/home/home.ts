@@ -58,7 +58,6 @@ export class Home {
     distinctUntilChanged(),
     tap(() => {
       this.state.set('loading');
-      this.websiteSeo.prepare();
       this.themeOptionService.preloader.set(true);
     }),
     switchMap((theme) =>
@@ -76,6 +75,7 @@ export class Home {
         catchError((error: unknown) => {
           const missing = error instanceof HttpErrorResponse && error.status === 404;
           this.state.set(missing ? 'missing' : 'error');
+          this.websiteSeo.prepare();
           this.title.setTitle(
             `${this.message('Halaman tidak tersedia', 'Page unavailable')} | MATEX`,
           );
@@ -96,8 +96,6 @@ export class Home {
     public layoutService: LayoutService,
     public themeOptionService: ThemeOptionService,
   ) {
-    this.websiteSeo.prepare();
-
     this.destroyRef.onDestroy(() => {
       this.websiteSeo.clear();
       this.document.documentElement.lang = this.originalLang;

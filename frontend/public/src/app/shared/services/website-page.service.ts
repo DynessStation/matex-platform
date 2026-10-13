@@ -17,7 +17,10 @@ export class WebsitePageService {
         `${environment.publicApiURL}/website-page/${encodeURIComponent(locale)}/${encodeURIComponent(path)}`,
         {
           context: new HttpContext().set(SKIP_PUBLIC_UI_INTERCEPTORS, true),
-          transferCache: false,
+          // Public CMS data is safe to transfer once from SSR to hydration. This
+          // avoids a second browser request that can clear the SSR metadata while
+          // the public DNS or API route is unavailable during release checks.
+          transferCache: true,
         },
       )
       .pipe(map((response) => response.data));

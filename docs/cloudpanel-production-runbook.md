@@ -229,16 +229,44 @@ node ops/preflight-smoke.cjs
 
 Perintah ini hanya melakukan request baca. Pemeriksaan mencakup live/ready API, kedua SSR, halaman utama dan canonical, aset statis, robots, sitemap, status/noindex 404, halaman login admin, serta kebocoran label Kartify. Sebelum DNS publik dipindah, arahkan sementara kedua hostname ke `72.60.77.35` melalui file hosts komputer penguji agar jalur Nginx dan TLS yang sama ikut diperiksa.
 
+### Pemeriksaan browser release candidate
+
+Pengujian browser berada di `ops/e2e` dengan dependency dan lockfile sendiri. Pemisahan ini menjaga alat pengujian agar tidak mengubah dependency runtime public maupun admin.
+
+Pada komputer penguji yang sudah memiliki Google Chrome:
+
+```bash
+cd ops/e2e
+npm ci
+
+MATEX_PUBLIC_ORIGIN=https://matexindo.com \
+MATEX_ADMIN_ORIGIN=https://internal.matexindo.com \
+MATEX_EXPECTED_PUBLIC_ORIGIN=https://matexindo.com \
+MATEX_E2E_BROWSER_CHANNEL=chrome \
+npm test
+```
+
+Suite tanpa kredensial memeriksa halaman public ID/EN, canonical, 404/noindex, penanda versi 2 untuk account/cart/wishlist, login admin, route admin lama, dan kebocoran label template. Untuk menambahkan alur login baca-saja, isi kredensial akun staging melalui environment pada shell yang sama:
+
+```bash
+MATEX_E2E_ADMIN_IDENTITY="$STAGING_ADMIN_IDENTITY" \
+MATEX_E2E_ADMIN_PASSWORD="$STAGING_ADMIN_PASSWORD" \
+npm run test:admin
+```
+
+Jangan menyimpan kredensial tersebut di source, history deployment, atau file environment yang ikut Git. Di runner Linux tanpa Chrome, instal browser Playwright sekali dengan `npx playwright install --with-deps chromium`, lalu set `MATEX_E2E_BROWSER_CHANNEL=chromium`.
+
 ## 9. Pemeriksaan sebelum DNS go-live
 
 1. `GET /health/live` pada API mengembalikan status hidup.
 2. `GET /health/ready` berhasil terhubung ke database.
 3. `node ops/preflight-smoke.cjs` lulus melalui domain staging/production target.
-4. Login admin, edit/publish konten, media, produk, artikel, FAQ, kontak, dan pergantian bahasa lulus smoke test.
-5. Canonical, hreflang, `robots.txt`, sitemap, dan respons 404 sudah benar.
-6. Cookie login memiliki `Secure`, `HttpOnly`, dan `SameSite` yang sudah ditetapkan.
-7. Port 9200–9202 hanya bisa diakses dari server sendiri.
-8. Backup dan prosedur rollback release sudah diuji.
+4. Browser E2E tanpa kredensial lulus dan alur login staging lulus dengan kredensial dari environment.
+5. Login admin, edit/publish konten, media, produk, artikel, FAQ, kontak, dan pergantian bahasa lulus smoke test manual.
+6. Canonical, hreflang, `robots.txt`, sitemap, dan respons 404 sudah benar.
+7. Cookie login memiliki `Secure`, `HttpOnly`, dan `SameSite` yang sudah ditetapkan.
+8. Port 9200–9202 hanya bisa diakses dari server sendiri.
+9. Backup dan prosedur rollback release sudah diuji.
 
 ## Tindakan manual pemilik akun
 
