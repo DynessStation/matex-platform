@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Params } from '@angular/router';
 
@@ -20,6 +20,7 @@ import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
+import { PublicSeoService } from '../../../shared/services/public-seo.service';
 import {
   GetMoreProduct,
   GetProductByIds,
@@ -52,7 +53,10 @@ import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newslett
 export class Collection {
   private store = inject(Store);
   private destroyRef = inject(DestroyRef);
+  private document = inject(DOCUMENT);
   private navigation = inject(PublicNavigationContextService);
+  private seo = inject(PublicSeoService);
+  private originalLang = this.document.documentElement.lang;
   product$: Observable<ProductModel> = this.store.select(ProductState.product);
   themeOptions$: Observable<Option> = this.store.select(ThemeOptionState.themeOptions);
 
@@ -85,6 +89,34 @@ export class Collection {
   private recentProductIds = '';
 
   constructor(private route: ActivatedRoute) {
+    const locale: 'id-ID' | 'en-US' =
+      this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
+    this.seo.apply({
+      locale,
+      title: locale === 'en-US' ? 'Product Catalog | MATEX' : 'Katalog Produk | MATEX',
+      description:
+        locale === 'en-US'
+          ? 'Explore MATEX natural latex products and find the product information you need.'
+          : 'Jelajahi produk lateks alami MATEX dan temukan informasi produk yang Anda butuhkan.',
+      canonicalPath: locale === 'en-US' ? '/en/catalog' : '/katalog',
+      alternates: [
+        { locale: 'id-ID', path: '/katalog' },
+        { locale: 'en-US', path: '/en/catalog' },
+      ],
+      type: 'website',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: locale === 'en-US' ? 'MATEX Product Catalog' : 'Katalog Produk MATEX',
+        url: this.seo.publicUrl(locale === 'en-US' ? '/en/catalog' : '/katalog'),
+        inLanguage: locale,
+      },
+    });
+    this.destroyRef.onDestroy(() => {
+      this.seo.clear();
+      this.document.documentElement.lang = this.originalLang;
+    });
+
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const option = this.store.selectSnapshot(ThemeOptionState.themeOptions);
       this.layout =

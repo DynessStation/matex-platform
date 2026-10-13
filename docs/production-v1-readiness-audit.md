@@ -65,6 +65,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 - Slug produk, kategori, atau artikel yang tidak ditemukan diarahkan secara internal ke halaman error lengkap sambil mempertahankan HTTP 404 dan `noindex, nofollow` pada URL asal.
 - Request API saat SSR memakai `MATEX_API_INTERNAL_URL` dan request aset runtime memakai `MATEX_PUBLIC_INTERNAL_URL`, sehingga render server tidak bergantung pada DNS atau TLS publik dari dalam VPS.
 - Build production public lulus. Smoke SSR lokal lulus untuk produk, kategori, artikel, route tidak dikenal, dan slug produk tidak dikenal. Detail terpublikasi merespons 200 dengan canonical, dua locale, `x-default`, dan JSON-LD; kedua kasus tidak ditemukan merespons 404 tanpa canonical serta dengan `noindex`.
+- Pemeriksaan pra-rilis read-only tersedia di `ops/preflight-smoke.cjs`. Tool ini menguji health API/SSR, canonical home, cache aset, robots, sitemap, kontrak 404, halaman login admin, dan kebocoran label Kartify melalui origin yang dapat diarahkan ke loopback, staging, atau domain produksi.
 
 ## Hasil pemeriksaan yang sudah dijalankan
 
@@ -74,7 +75,7 @@ Selesai diterapkan dan diverifikasi pada 13 Oktober 2026:
 | Backend contract/regression test | Lulus | 42 dari 42 test berhasil. |
 | Public production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
 | Admin production build | Lulus | Angular SSR menghasilkan browser dan server bundle. |
-| Public lint | Lulus | 0 error dan 122 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
+| Public lint | Lulus | 0 error dan 125 warning. Warning tersisa menjadi utang kualitas yang tidak memblokir build. |
 | Admin lint | Lulus | 0 error dan 17.236 warning; mayoritas warning format/line ending dari template lama dan perlu dinormalisasi bertahap agar diff tetap dapat ditinjau. |
 | Frontend automated test | Belum memadai | Public hanya memiliki 1 file test; admin tidak memiliki file test. Belum ada E2E untuk alur penting. |
 | Dependency audit backend | Lulus | 0 advisory produksi. |
@@ -91,12 +92,13 @@ Build yang lulus membuktikan bahwa source dapat dikompilasi. Itu belum membuktik
 1. **Smoke/E2E produksi belum memadai.** Login admin, publish konten, upload media, katalog publik, locale, cookie HTTPS, reverse proxy, dan respons SSR perlu diuji melalui domain staging.
 2. **Backup/restore dan penyimpanan file belum diuji di VPS.** Tool backup database/media, manifest checksum, retensi aman, verifikasi, dan restore bertarget sudah tersedia. Kepemilikan storage, backup terjadwal, salinan di luar VPS, restore drill, serta rollback release tetap harus lulus pada data staging sebelum DNS dipindah.
 3. **Google Maps key lama belum dirotasi oleh pemilik akun.** Key baru hanya boleh dipakai setelah dibatasi ke referrer MATEX dan API yang benar.
+4. **Konten halaman wajib belum terpublikasi pada database yang diperiksa.** Endpoint public untuk Beranda, FAQ, Kontak, Tentang MATEX, dan Syarat & Ketentuan dalam bahasa Indonesia maupun Inggris masih mengembalikan 404. Akibatnya halaman terkait merespons 404/503 atau kehilangan metadata. Data tidak diubah otomatis; admin harus meninjau dan menerbitkan terjemahan yang benar sebelum preflight dapat lulus.
 
 ### P1 — selesai sebelum release candidate
 
 - Selesaikan strategi backup/restore, retensi log, alerting health, dan pengukuran compression/cache di staging.
 - Kurangi warning lint secara bertahap dan pisahkan perubahan format/line ending dari perubahan perilaku agar lint tetap berguna sebagai quality gate.
-- Tambahkan smoke/E2E untuk login admin, create/edit/publish konten, upload multi-media, public navigation, produk, artikel, FAQ, kontak, locale, canonical, dan respons mobile.
+- Tambahkan E2E browser untuk login admin, create/edit/publish konten, upload multi-media, public navigation, produk, artikel, FAQ, kontak, locale, dan respons mobile. Smoke HTTP read-only pra-rilis sudah tersedia.
 - Tinjau kebijakan cache. Seluruh endpoint publik utama saat ini mengirim `Cache-Control: no-store`; ini aman dari stale content tetapi membuang peluang cache untuk katalog dan CMS yang jarang berubah.
 - Terapkan rate limit yang menyadari reverse proxy. Rate limit kontak saat ini disimpan di memori satu proses, sehingga hilang saat restart dan tidak sinkron bila proses diperbanyak.
 - Tentukan penyimpanan file produksi, backup, batas ukuran, malware scanning bila diperlukan, dan lifecycle file yatim.
@@ -272,6 +274,7 @@ Refresh token, service-account JSON, API secret, SMTP password, JWT secret, dan 
 ### Tahap 7 — release candidate dan CloudPanel
 
 - Konfigurasi PM2 tiga proses dan verifikasi health loopback sudah tersedia; tetap uji startup setelah reboot dan rollback release pada VPS.
+- Smoke pra-rilis read-only lintas API, public, dan admin sudah tersedia; tetap jalankan melalui hostname staging/produksi setelah Nginx dan TLS aktif.
 - Staging rehearsal, data migration, backup restore, build bersih, smoke/E2E, performance/accessibility/security checks.
 - Buat Node.js sites, vhost proxy, database/user, environment secret, DNS, TLS, redirect, firewall, dan monitoring.
 

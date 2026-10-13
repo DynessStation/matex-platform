@@ -1,5 +1,5 @@
 import { isPlatformBrowser, DatePipe, NgClass, AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
@@ -16,6 +16,7 @@ import { breadcrumb } from '../../shared/interface/breadcrumb.interface';
 import { Option } from '../../shared/interface/theme-option.interface';
 import { BlogService } from '../../shared/services/blog.service';
 import { PublicNavigationContextService } from '../../shared/services/public-navigation-context.service';
+import { PublicSeoService } from '../../shared/services/public-seo.service';
 import { GetBlogsAction } from '../../shared/store/action/blog.action';
 import { BlogState } from '../../shared/store/state/blog.state';
 import { ThemeOptionState } from '../../shared/store/state/theme-option.state';
@@ -44,7 +45,10 @@ export class Blog {
   blogService = inject(BlogService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private document = inject(DOCUMENT);
   private navigation = inject(PublicNavigationContextService);
+  private seo = inject(PublicSeoService);
+  private originalLang = this.document.documentElement.lang;
   public isBrowser = false;
 
   blog$: Observable<IBlogModel> = inject(Store).select(BlogState.blog) as Observable<IBlogModel>;
@@ -88,7 +92,35 @@ export class Blog {
 
   public totalItems$: Observable<number> = this.blog$.pipe(map((blog) => blog?.total || 0));
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    const locale: 'id-ID' | 'en-US' =
+      this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
+    this.seo.apply({
+      locale,
+      title: locale === 'en-US' ? 'Articles | MATEX' : 'Artikel | MATEX',
+      description:
+        locale === 'en-US'
+          ? 'Read MATEX articles about natural latex products, their use, and related insights.'
+          : 'Baca artikel MATEX tentang produk lateks alami, penggunaannya, dan wawasan terkait.',
+      canonicalPath: locale === 'en-US' ? '/en/articles' : '/artikel',
+      alternates: [
+        { locale: 'id-ID', path: '/artikel' },
+        { locale: 'en-US', path: '/en/articles' },
+      ],
+      type: 'website',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: locale === 'en-US' ? 'MATEX Articles' : 'Artikel MATEX',
+        url: this.seo.publicUrl(locale === 'en-US' ? '/en/articles' : '/artikel'),
+        inLanguage: locale,
+      },
+    });
+    this.destroyRef.onDestroy(() => {
+      this.seo.clear();
+      this.document.documentElement.lang = this.originalLang;
+    });
+  }
 
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);

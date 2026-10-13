@@ -217,11 +217,23 @@ Aktifkan pengalihan HTTP ke HTTPS. Firewall publik cukup membuka SSH sesuai kebi
 
 Health endpoint internal dipakai oleh PM2, monitor uptime, dan pemeriksaan deployment. Jangan menganggap proses siap menerima trafik hanya karena port terbuka; API wajib mengembalikan status `ready` setelah koneksi database berhasil.
 
+Sesudah ketiga proses hidup dan vhost aktif, jalankan pemeriksaan pra-rilis dari root repository sebagai Site User:
+
+```bash
+MATEX_API_ORIGIN=http://127.0.0.1:9200 \
+MATEX_PUBLIC_ORIGIN=https://matexindo.com \
+MATEX_ADMIN_ORIGIN=https://internal.matexindo.com \
+MATEX_EXPECTED_PUBLIC_ORIGIN=https://matexindo.com \
+node ops/preflight-smoke.cjs
+```
+
+Perintah ini hanya melakukan request baca. Pemeriksaan mencakup live/ready API, kedua SSR, halaman utama dan canonical, aset statis, robots, sitemap, status/noindex 404, halaman login admin, serta kebocoran label Kartify. Sebelum DNS publik dipindah, arahkan sementara kedua hostname ke `72.60.77.35` melalui file hosts komputer penguji agar jalur Nginx dan TLS yang sama ikut diperiksa.
+
 ## 9. Pemeriksaan sebelum DNS go-live
 
 1. `GET /health/live` pada API mengembalikan status hidup.
 2. `GET /health/ready` berhasil terhubung ke database.
-3. Public dan admin dapat dirender oleh SSR tanpa fallback error.
+3. `node ops/preflight-smoke.cjs` lulus melalui domain staging/production target.
 4. Login admin, edit/publish konten, media, produk, artikel, FAQ, kontak, dan pergantian bahasa lulus smoke test.
 5. Canonical, hreflang, `robots.txt`, sitemap, dan respons 404 sudah benar.
 6. Cookie login memiliki `Secure`, `HttpOnly`, dan `SameSite` yang sudah ditetapkan.
