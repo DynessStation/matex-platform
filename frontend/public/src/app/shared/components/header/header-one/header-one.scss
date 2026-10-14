@@ -9,6 +9,19 @@
   z-index: 1055;
 }
 
+.header-action-button {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  color: rgba(var(--title-color), 1);
+  background: transparent;
+
+  i {
+    font-size: 26px;
+  }
+}
+
 .offcanvas-backdrop {
   z-index: 1050;
 }

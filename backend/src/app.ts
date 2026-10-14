@@ -68,7 +68,8 @@ if (storageConfig.serveLocal && storageConfig.disk === "local") {
       // serve-static's ENOENT error into a generic 500 response.
       fallthrough: true,
       index: false,
-      maxAge: "1h",
+      maxAge: "1y",
+      immutable: true,
     }),
   );
 

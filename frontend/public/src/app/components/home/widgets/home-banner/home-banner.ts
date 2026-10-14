@@ -16,6 +16,8 @@ export class HomeBanner {
   className = input<string | null>(null);
   bgImage = input<boolean>(false);
   imageClass = input<string | null>('img-fluid');
+  priority = input<boolean>(false);
+  loading = input<'eager' | 'lazy' | null>(null);
 
   get internalTarget(): string {
     const banner = this.image();

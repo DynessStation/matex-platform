@@ -4,6 +4,8 @@
   <app-loader loaderClass="request-loader" [label]="requestLoadingLabel" />
 }
 <app-header [logo]="headerLogo"></app-header>
-<router-outlet></router-outlet>
+<main id="main-content">
+  <router-outlet></router-outlet>
+</main>
 <app-footer [logo]="footerLogo"></app-footer>
 <app-back-to-top />

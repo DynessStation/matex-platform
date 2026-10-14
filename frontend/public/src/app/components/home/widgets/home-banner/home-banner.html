@@ -14,7 +14,14 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
+      <img
+        [src]="image()?.image_url"
+        [class]="imageClass()"
+        [alt]="image()?.alt_text || ''"
+        [attr.loading]="priority() ? 'eager' : loading()"
+        [attr.fetchpriority]="priority() ? 'high' : null"
+        decoding="async"
+      />
     }
   </a>
 } @else if (image()?.redirection_type !== 'none' && image()?.link) {
@@ -33,11 +40,18 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
+      <img
+        [src]="image()?.image_url"
+        [class]="imageClass()"
+        [alt]="image()?.alt_text || ''"
+        [attr.loading]="priority() ? 'eager' : loading()"
+        [attr.fetchpriority]="priority() ? 'high' : null"
+        decoding="async"
+      />
     }
   </a>
 } @else {
-  <a href="javascript:void(0)" class="{{ className() }}">
+  <div [class]="className()">
     @if (bgImage()) {
       <div
         class="bg-size h-100"
@@ -52,7 +66,14 @@
         <ng-content></ng-content>
       </div>
     } @else {
-      <img [src]="image()?.image_url" [class]="imageClass()" [alt]="image()?.alt_text || ''" />
+      <img
+        [src]="image()?.image_url"
+        [class]="imageClass()"
+        [alt]="image()?.alt_text || ''"
+        [attr.loading]="priority() ? 'eager' : loading()"
+        [attr.fetchpriority]="priority() ? 'high' : null"
+        decoding="async"
+      />
     }
-  </a>
+  </div>
 }

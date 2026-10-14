@@ -7,6 +7,7 @@
             [image]="data()?.home_selection?.main_banner!"
             [className]="'banner-box b-left'"
             [imageClass]="'img-fluid ratio-8x5'"
+            [priority]="true"
           />
         </div>
         <div class="col-4 d-xl-block d-none">
@@ -16,6 +17,7 @@
                 [image]="data()?.home_selection?.sub_banner_1!"
                 [className]="'banner-box'"
                 [imageClass]="'img-fluid ratio-8x5'"
+                loading="lazy"
               />
             </div>
             <div class="col-12">
@@ -23,6 +25,7 @@
                 [image]="data()?.home_selection?.sub_banner_2!"
                 [className]="'banner-box'"
                 [imageClass]="'img-fluid ratio-8x5'"
+                loading="lazy"
               />
             </div>
           </div>
@@ -45,6 +48,7 @@
               [className]="'banner-box ratio-11-9'"
               [imageClass]="'bg-img'"
               [bgImage]="true"
+              loading="lazy"
             />
           </div>
         }
@@ -128,6 +132,8 @@
                     <img
                       [src]="imageUrl(category.category_image, 'assets/images/placeholder/1.png')"
                       [alt]="category.name"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <h3>{{ category.name }}</h3>
@@ -167,6 +173,8 @@
                       imageUrl(product.product_thumbnail, 'assets/images/placeholder/product.png')
                     "
                     [alt]="product.name"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div class="product-copy">
@@ -218,6 +226,8 @@
                   <img
                     [src]="imageUrl(article.blog_thumbnail, 'assets/images/blog.png')"
                     [alt]="article.title"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div class="article-copy">
