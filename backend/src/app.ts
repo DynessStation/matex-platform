@@ -57,7 +57,9 @@ if (storageConfig.serveLocal && storageConfig.disk === "local") {
   app.use(
     "/files",
     express.static(storageConfig.root, {
-      fallthrough: false,
+      // Let missing files reach the shared 404 response instead of turning
+      // serve-static's ENOENT error into a generic 500 response.
+      fallthrough: true,
       index: false,
       maxAge: "1h",
     }),
