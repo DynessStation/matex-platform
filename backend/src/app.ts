@@ -56,6 +56,13 @@ app.use(
 if (storageConfig.serveLocal && storageConfig.disk === "local") {
   app.use(
     "/files",
+    (_req, res, next) => {
+      // Files are intentionally shared with the admin app on
+      // internal.matexindo.com. Helmet defaults this header to same-origin,
+      // which makes browsers reject otherwise valid image responses there.
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      next();
+    },
     express.static(storageConfig.root, {
       // Let missing files reach the shared 404 response instead of turning
       // serve-static's ENOENT error into a generic 500 response.
