@@ -139,15 +139,15 @@ Sebelum deployment pertama, jalankan `npm run db:migrate:status` dari backend. D
 - Identitas produksi yang sudah dibuat di CloudPanel: database `mia`, user `matexapp`, host `127.0.0.1`, port `3306`, dan hak **Read and Write**. Password tetap hanya disimpan di server/password manager.
 - Database tidak dibuka ke internet.
 - Isi `DB_HOST=127.0.0.1`, nama database, user, password, dan `DB_PORT=3306` pada environment backend.
-- Simpan unggahan di `/var/lib/matex/files` atau storage persisten lain yang dimiliki proses API.
-- Simpan backup di `/var/backups/matex`, di luar `FILE_STORAGE_ROOT`, dengan hak akses hanya untuk user proses MATEX.
+- Simpan unggahan di `/home/matexindo/storage/files`, di luar checkout aplikasi dan dimiliki proses API.
+- Simpan backup di `/home/matexindo/backups/matex`, di luar `FILE_STORAGE_ROOT`, dengan hak akses hanya untuk user proses MATEX.
 - Baseline database kosong sudah lulus uji lokal; tetap jalankan backup dan restore drill pada salinan produksi sebelum migration pertama di VPS.
 
-Karena proses API dijalankan sebagai `matexindo`, siapkan direktori persisten sekali saja:
+Karena proses API dijalankan sebagai `matexindo`, direktori persisten produksi disiapkan di dalam home site user agar tidak membutuhkan akses `root`:
 
 ```bash
-sudo install -d -o matexindo -g matexindo -m 0700 /var/lib/matex/files
-sudo install -d -o matexindo -g matexindo -m 0700 /var/backups/matex
+install -d -m 0700 /home/matexindo/storage/files
+install -d -m 0700 /home/matexindo/backups/matex
 ```
 
 ## 6. Backup dan restore drill
@@ -155,7 +155,7 @@ sudo install -d -o matexindo -g matexindo -m 0700 /var/backups/matex
 Perintah backup membutuhkan client MySQL/MariaDB, `tar`, dan `git`. Cek dahulu sebagai user proses API dari folder `backend`:
 
 ```bash
-npm run backup:check -- --env-file .env --output-dir /var/backups/matex
+npm run backup:check -- --env-file .env --output-dir /home/matexindo/backups/matex
 ```
 
 Jika `mysqldump` atau `mysql` belum tersedia pada Ubuntu, instal paket client saja. Jangan memasang database server kedua:
@@ -170,7 +170,7 @@ Setelah pemeriksaan lulus, buat backup database dan seluruh media lokal:
 ```bash
 npm run backup:create -- \
   --env-file .env \
-  --output-dir /var/backups/matex \
+  --output-dir /home/matexindo/backups/matex \
   --retention-days 14
 ```
 
@@ -179,7 +179,7 @@ Setiap backup disimpan pada direktori bernama `matex-<waktu UTC>` dan berisi dum
 Verifikasi backup terbaru tanpa mengubah database atau file:
 
 ```bash
-LATEST_BACKUP="$(find /var/backups/matex -maxdepth 1 -type d -name 'matex-*' | sort | tail -n 1)"
+LATEST_BACKUP="$(find /home/matexindo/backups/matex -maxdepth 1 -type d -name 'matex-*' | sort | tail -n 1)"
 npm run backup:verify -- --backup "$LATEST_BACKUP"
 ```
 
@@ -190,7 +190,7 @@ npm run backup:restore -- \
   --backup "$LATEST_BACKUP" \
   --env-file .env \
   --target-db mia_restore_drill \
-  --target-files /var/lib/matex-restore-drill/files \
+  --target-files /home/matexindo/storage-restore-drill/files \
   --confirm RESTORE:mia_restore_drill
 ```
 
