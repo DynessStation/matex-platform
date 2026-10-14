@@ -13,6 +13,16 @@ Audit ini sengaja belum menghapus file, rute, package, atau tabel. Penghapusan b
 
 ## Progress setelah audit
 
+### Checkpoint produksi — 14 Oktober 2026
+
+- Public `matexindo.com`, admin `internal.matexindo.com`, dan API sudah aktif di VPS melalui CloudPanel/Nginx dengan proses PM2 terpisah pada port loopback 9201, 9202, dan 9200.
+- Database dan media produksi sudah dimigrasikan. Backup terbaru setelah pembaruan konten tersimpan di `/home/matexindo/backups/matex/matex-20261014T072525Z`; checksum database serta arsip media lulus verifikasi.
+- Preflight melalui domain produksi lulus 23 dari 23 pemeriksaan. Browser E2E melalui domain produksi lulus 24 dari 25 skenario; satu skenario login terautentikasi dilewati karena kredensial admin tidak disimpan di repository.
+- Sertifikat TLS kedua domain valid. HTTP dialihkan ke HTTPS, canonical/hreflang/robots/sitemap dan status 404 produksi lulus pemeriksaan.
+- File media dapat dipakai oleh public dan subdomain admin melalui `Cross-Origin-Resource-Policy: cross-origin`; API selain jalur file tetap memakai kebijakan Helmet bawaan.
+- File verifikasi Google `google2d6b672547ebc9cd.html` sudah diterbitkan melalui build public dan merespons 200 dengan isi verifikasi yang tepat.
+- Sisa gerbang operasional: uji tulis terautentikasi yang terstruktur, salinan backup di luar VPS serta restore drill terbaru, keputusan aktivasi analitik setelah pemberitahuan privasi, koneksi credential Search Console/PageSpeed, dan bukti rotasi Google Maps key lama.
+
 ### Tahap 2 — batch hardening pertama
 
 Selesai diterapkan dan diverifikasi pada 12 Oktober 2026:
