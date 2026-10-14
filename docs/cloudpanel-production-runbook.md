@@ -183,6 +183,13 @@ LATEST_BACKUP="$(find /home/matexindo/backups/matex -maxdepth 1 -type d -name 'm
 npm run backup:verify -- --backup "$LATEST_BACKUP"
 ```
 
+Produksi MATEX menjalankan backup otomatis setiap hari pukul 02.15 WIB melalui
+crontab Site User. Job memakai `flock` pada
+`/home/matexindo/tmp/matex-backup.lock`, mempertahankan backup selama 14 hari,
+dan menulis hasil eksekusi terakhir ke
+`/home/matexindo/backups/matex/backup-last.log`. Jadwal lokal ini tidak
+menggantikan kebutuhan salinan backup di luar VPS.
+
 Untuk drill, buat database kosong bernama `mia_restore_drill` dan beri user database MATEX akses ke database itu. Gunakan direktori file drill yang kosong dan berada di luar storage aktif:
 
 ```bash
