@@ -9,10 +9,9 @@ INNER JOIN `website_page` page
   ON page.`id_website_page` = translation.`id_website_page`
   AND page.`id_master_comp` = translation.`id_master_comp`
 SET
-  -- MariaDB 10.4 can stringify JSON values returned by a column expression
-  -- when they are passed back into JSON_OBJECT. Building the document as
-  -- valid JSON text keeps tags and newsletter as nested objects.
-  translation.`website_page_content_json` = JSON_COMPACT(CONCAT(
+  -- Build valid JSON text directly so object values remain nested on both
+  -- MariaDB and MySQL. The column CHECK validates the final document.
+  translation.`website_page_content_json` = CONCAT(
     '{',
       '"home_contract_version":2,',
       '"latex_features":{"status":true},',
@@ -79,7 +78,7 @@ SET
         ELSE '{"status":false}'
       END,
     '}'
-  )),
+  ),
   translation.`website_page_body_html` = NULL,
   translation.`updated` = NOW()
 WHERE page.`website_page_key` = 'home'

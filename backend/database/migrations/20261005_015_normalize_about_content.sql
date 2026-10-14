@@ -9,7 +9,8 @@ INNER JOIN `website_page` page
   ON page.`id_website_page` = translation.`id_website_page`
   AND page.`id_master_comp` = translation.`id_master_comp`
 SET
-  translation.`website_page_content_json` = JSON_COMPACT(CONCAT(
+  -- Store valid JSON text directly; JSON_COMPACT is not available in MySQL.
+  translation.`website_page_content_json` = CONCAT(
     '{"about_contract_version":1,"highlights":',
     CASE
       WHEN JSON_VALID(translation.`website_page_content_json`) = 1
@@ -33,7 +34,7 @@ SET
       ELSE '[]'
     END,
     '}'
-  )),
+  ),
   translation.`website_page_body_html` = NULL,
   translation.`updated` = NOW()
 WHERE page.`website_page_key` = 'about'
