@@ -28,42 +28,56 @@ WHERE `permission_key` IN
   'cms_page.publish'
 );
 
-ALTER TABLE `web_navigation_item`
-  DROP FOREIGN KEY IF EXISTS
-    `fk_web_navigation_item_cms_page_company`,
-  DROP FOREIGN KEY IF EXISTS
-    `fk_web_navigation_item_parent`,
-  DROP CONSTRAINT IF EXISTS
-    `chk_web_navigation_item_link_type`,
-  DROP CONSTRAINT IF EXISTS
-    `chk_web_navigation_item_target_blank`,
-  DROP CONSTRAINT IF EXISTS
-    `web_navigation_item_settings_json`,
-  DROP INDEX IF EXISTS
-    `idx_web_navigation_item_cms_page`,
-  DROP INDEX IF EXISTS
-    `idx_web_navigation_item_parent`,
-  DROP INDEX IF EXISTS
-    `idx_web_navigation_item_order`,
-  DROP COLUMN IF EXISTS
-    `id_parent_web_navigation_item`,
-  DROP COLUMN IF EXISTS
-    `id_cms_page`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_link_type`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_target_blank`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_icon`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_badge_text`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_badge_color`,
-  DROP COLUMN IF EXISTS
-    `web_navigation_item_settings_json`;
+-- MySQL and MariaDB assign different names to an unnamed inline CHECK.
+-- Resolve that generated name before removing the legacy JSON column.
+SET @settings_check_name =
+(
+  SELECT `CONSTRAINT_NAME`
+  FROM `information_schema`.`TABLE_CONSTRAINTS`
+  WHERE `CONSTRAINT_SCHEMA` = DATABASE()
+    AND `TABLE_NAME` = 'web_navigation_item'
+    AND `CONSTRAINT_TYPE` = 'CHECK'
+    AND `CONSTRAINT_NAME` IN
+    (
+      'web_navigation_item_chk_1',
+      'web_navigation_item_settings_json'
+    )
+  LIMIT 1
+);
 
-CREATE INDEX IF NOT EXISTS `idx_web_navigation_item_order`
-  ON `web_navigation_item`
+SET @drop_settings_check_sql = IF
+(
+  @settings_check_name IS NULL,
+  'SELECT 1',
+  CONCAT
+  (
+    'ALTER TABLE `web_navigation_item` DROP CONSTRAINT `',
+    REPLACE(@settings_check_name, '`', '``'),
+    '`'
+  )
+);
+
+PREPARE drop_settings_check_statement FROM @drop_settings_check_sql;
+EXECUTE drop_settings_check_statement;
+DEALLOCATE PREPARE drop_settings_check_statement;
+
+ALTER TABLE `web_navigation_item`
+  DROP FOREIGN KEY `fk_web_navigation_item_cms_page_company`,
+  DROP FOREIGN KEY `fk_web_navigation_item_parent`,
+  DROP CONSTRAINT `chk_web_navigation_item_link_type`,
+  DROP CONSTRAINT `chk_web_navigation_item_target_blank`,
+  DROP INDEX `idx_web_navigation_item_cms_page`,
+  DROP INDEX `idx_web_navigation_item_parent`,
+  DROP INDEX `idx_web_navigation_item_order`,
+  DROP COLUMN `id_parent_web_navigation_item`,
+  DROP COLUMN `id_cms_page`,
+  DROP COLUMN `web_navigation_item_link_type`,
+  DROP COLUMN `web_navigation_item_target_blank`,
+  DROP COLUMN `web_navigation_item_icon`,
+  DROP COLUMN `web_navigation_item_badge_text`,
+  DROP COLUMN `web_navigation_item_badge_color`,
+  DROP COLUMN `web_navigation_item_settings_json`,
+  ADD INDEX `idx_web_navigation_item_order`
   (
     `id_web_navigation`,
     `web_navigation_item_status`,
