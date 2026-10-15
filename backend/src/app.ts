@@ -26,6 +26,11 @@ const positiveInteger = (value: string | undefined, fallback: number): number =>
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
+const isLoopbackAddress = (address: string | undefined): boolean =>
+  address === "127.0.0.1" ||
+  address === "::1" ||
+  address === "::ffff:127.0.0.1";
+
 app.disable("x-powered-by");
 app.set(
   "trust proxy",
@@ -142,6 +147,10 @@ const loginRateLimiter = rateLimit({
 const apiRateLimiter = rateLimit({
   windowMs: positiveInteger(process.env.API_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000),
   limit: positiveInteger(process.env.API_RATE_LIMIT_MAX, 600),
+  // Public/admin SSR reach the API over its loopback-only listener. Counting
+  // those server-side requests under one IP can throttle search-engine crawls
+  // even though the originating page requests come from different clients.
+  skip: (req) => isLoopbackAddress(req.ip),
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: {

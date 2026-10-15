@@ -138,6 +138,10 @@ Ukuran request `/api/` disetel `55m` agar upload maksimum backend `50 MB` tidak 
 
 Public dan admin SSR juga mengambil API serta aset terjemahan melalui loopback. Browser pengunjung tetap memakai domain HTTPS. API sudah dikonfigurasi untuk mempercayai proxy loopback dan menerima origin:
 
+Panggilan API internal dari SSR melalui loopback tidak memakai kuota global rate
+limit. Trafik browser yang diteruskan Nginx tetap dibatasi berdasarkan IP klien,
+sedangkan endpoint login memiliki limiter terpisah.
+
 ```text
 https://matexindo.com
 https://www.matexindo.com
