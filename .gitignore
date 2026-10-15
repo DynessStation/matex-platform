@@ -82,3 +82,4 @@ desktop.ini
 #==================================================
 
 frontend/admin/src/environments/environment.development.ts
+frontend/admin/src/environments/environment.production.generated.ts

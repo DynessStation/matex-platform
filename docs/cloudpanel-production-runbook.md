@@ -109,6 +109,19 @@ pm2 status
 
 Jika verifikasi gagal, jangan arahkan trafik baru. Buka `pm2 logs --lines 200`, pulihkan release/commit terakhir yang sudah lulus, build ulang release tersebut, jalankan `startOrReload`, lalu ulangi `verify-runtime.cjs`. Backup database tidak dipulihkan untuk kegagalan kode biasa; restore database hanya dipakai jika migration atau data memang berubah dan prosedur restore sudah diputuskan.
 
+Deployment rutin dari branch `main` dijalankan sebagai user aplikasi dengan:
+
+```bash
+cd /home/matexindo/htdocs/matexindo.com
+bash ops/deploy-production.sh
+```
+
+Script hanya menerima fast-forward, menolak tracked file yang berubah di VPS,
+berhenti jika menemukan migration baru, lalu memasang dependency, membangun,
+dan me-restart proses yang memang berubah. Nilai khusus admin production disimpan
+pada `frontend/admin/.env.production` dengan izin `0600`; file ini diabaikan Git
+dan dipakai untuk menghasilkan environment Angular saat build.
+
 ## 4. Reverse proxy API pada kedua domain
 
 Public dan admin memakai same-origin API. Pada Vhost Nginx kedua site, tambahkan lokasi khusus `/api/` yang meneruskan request ke:
