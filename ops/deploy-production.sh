@@ -4,6 +4,7 @@ set -Eeuo pipefail
 REPOSITORY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REMOTE_NAME="${MATEX_DEPLOY_REMOTE:-origin}"
 BRANCH_NAME="${MATEX_DEPLOY_BRANCH:-main}"
+DEPLOY_STATE_FILE="$REPOSITORY_ROOT/.git/matex-deployed-commit"
 
 cd "$REPOSITORY_ROOT"
 
@@ -44,8 +45,17 @@ git fetch --prune "$REMOTE_NAME" "$BRANCH_NAME"
 CURRENT_COMMIT="$(git rev-parse HEAD)"
 TARGET_REF="$REMOTE_NAME/$BRANCH_NAME"
 TARGET_COMMIT="$(git rev-parse "$TARGET_REF")"
+DEPLOYED_COMMIT="$CURRENT_COMMIT"
 
-if [[ "$CURRENT_COMMIT" == "$TARGET_COMMIT" ]]; then
+if [[ -f "$DEPLOY_STATE_FILE" ]]; then
+  DEPLOYED_COMMIT="$(tr -d '[:space:]' < "$DEPLOY_STATE_FILE")"
+  if ! git cat-file -e "$DEPLOYED_COMMIT^{commit}" 2>/dev/null; then
+    echo "The recorded deployed commit is invalid: $DEPLOYED_COMMIT" >&2
+    exit 1
+  fi
+fi
+
+if [[ "$CURRENT_COMMIT" == "$TARGET_COMMIT" && "$DEPLOYED_COMMIT" == "$TARGET_COMMIT" ]]; then
   echo "Production is already on $(git rev-parse --short HEAD)."
   exit 0
 fi
@@ -55,7 +65,12 @@ if ! git merge-base --is-ancestor "$CURRENT_COMMIT" "$TARGET_COMMIT"; then
   exit 1
 fi
 
-CHANGED_FILES="$(git diff --name-only "$CURRENT_COMMIT" "$TARGET_COMMIT")"
+if ! git merge-base --is-ancestor "$DEPLOYED_COMMIT" "$TARGET_COMMIT"; then
+  echo "The last successfully deployed commit cannot fast-forward to $TARGET_REF." >&2
+  exit 1
+fi
+
+CHANGED_FILES="$(git diff --name-only "$DEPLOYED_COMMIT" "$TARGET_COMMIT")"
 
 if grep -q '^backend/database/migrations/' <<<"$CHANGED_FILES"; then
   echo "A database migration is included. Follow the migration and backup runbook before deploying." >&2
@@ -77,7 +92,9 @@ if [[ "$ADMIN_CHANGED" == true && ! -f frontend/admin/.env.production ]]; then
   exit 1
 fi
 
-git merge --ff-only "$TARGET_REF"
+if [[ "$CURRENT_COMMIT" != "$TARGET_COMMIT" ]]; then
+  git merge --ff-only "$TARGET_REF"
+fi
 
 if [[ "$BACKEND_CHANGED" == true ]]; then
   (cd backend && npm ci && npm run build)
@@ -104,5 +121,9 @@ if [[ "$BACKEND_CHANGED" == true || "$PUBLIC_CHANGED" == true || "$ADMIN_CHANGED
   node ops/verify-runtime.cjs
   pm2 save
 fi
+
+DEPLOY_STATE_TEMP="${DEPLOY_STATE_FILE}.tmp"
+printf '%s\n' "$TARGET_COMMIT" > "$DEPLOY_STATE_TEMP"
+mv "$DEPLOY_STATE_TEMP" "$DEPLOY_STATE_FILE"
 
 echo "Deployed $(git rev-parse --short HEAD) from $TARGET_REF."

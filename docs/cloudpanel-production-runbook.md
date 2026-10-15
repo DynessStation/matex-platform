@@ -122,6 +122,10 @@ dan me-restart proses yang memang berubah. Nilai khusus admin production disimpa
 pada `frontend/admin/.env.production` dengan izin `0600`; file ini diabaikan Git
 dan dipakai untuk menghasilkan environment Angular saat build.
 
+Commit yang benar-benar selesai deploy dicatat di `.git/matex-deployed-commit`.
+Jika build atau restart gagal setelah checkout maju, menjalankan script kembali
+akan mengulang perubahan sejak deploy terakhir yang berhasil.
+
 ## 4. Reverse proxy API pada kedua domain
 
 Public dan admin memakai same-origin API. Pada Vhost Nginx kedua site, tambahkan lokasi khusus `/api/` yang meneruskan request ke:
