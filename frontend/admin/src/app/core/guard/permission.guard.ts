@@ -1,4 +1,6 @@
-import { inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
+import { inject, PLATFORM_ID } from '@angular/core';
 
 import { CanActivateFn, Router } from '@angular/router';
 
@@ -16,6 +18,16 @@ import {
 //==================================================
 
 export const PermissionGuard: CanActivateFn = (route) => {
+  //==================================================
+  //==== SERVER RENDER
+  //==== Permissions live in browser storage, so the server cannot see them.
+  //==== Same as AuthGuard: let the browser decide; the API still enforces access.
+  //==================================================
+
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+    return true;
+  }
+
   //==================================================
   //==== INJECT
   //==================================================

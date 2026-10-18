@@ -546,6 +546,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="article?.thumbnail ?? null"
                         (selectedFiles)="media('thumbnail_id', $event)"
                       />
@@ -568,6 +569,7 @@
                       ><app-image-upload
                         [multipleImage]="false"
                         [accept]="[mediaConfig.image]"
+                        [collection]="'media_library'"
                         [image]="article?.og_image ?? null"
                         (selectedFiles)="media('og_image_id', $event)"
                       />
