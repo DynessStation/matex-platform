@@ -192,9 +192,10 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database production **identik** dengan database lokal `matex_dev`, Ubuntu 24.04 up to date, file `.env` berizin `600`, firewall hanya membuka SSH/80/443/CloudPanel (MySQL, Redis, FTP, dan port lama tertutup dari internet), dan backup harian berjalan jam 02:15 WIB dengan retensi 14 hari.
 
-**V-1 — SSH menerima login password dan login root** · P1 · Terbukti
+**V-1 — SSH menerima login password dan login root** · P1 · **Selesai (untuk root)**
 - `PasswordAuthentication yes` dan `PermitRootLogin yes`. Siapa pun di internet bisa mencoba menebak password root.
-- Saran: login root hanya dengan SSH key, dan matikan login password. Harus dikerjakan hati-hati supaya pemilik tidak terkunci di luar server.
+- Perbaikan: kunci SSH PC pemilik dipasang untuk root, lalu `/etc/ssh/sshd_config.d/10-matex-root-key-only.conf` membuat root **hanya bisa login dengan kunci**. Untuk membatalkan: hapus file itu lalu `systemctl reload ssh`.
+- Sengaja tidak diubah: login password untuk user lain. VPS ini juga dipakai proyek lain (user site CloudPanel seperti `gibadmin`, `remora`, `paskasindo-gibapi`) yang mungkin login dengan password. fail2ban sudah aktif memblokir tebakan password berulang.
 
 **V-2 — Backup belum disalin ke luar VPS** · P1 · Terbukti
 - `rclone` sudah terpasang tetapi belum punya tujuan. Kalau VPS rusak total, backup ikut hilang.
@@ -204,15 +205,16 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 - `ops/deploy-production.sh` memakai `node` pertama di PATH (Node 18 sistem) saat dijalankan lewat SSH non-interaktif. Pencarian Node nvm di skrip juga tidak pernah berhasil karena salah kedalaman folder.
 - Perbaikan: skrip selalu memakai Node dari nvm dan menolak jalan kalau Node di bawah versi 20.
 
-**V-4 — Log PM2 tidak dirotasi** · P3 · Terbukti
-- Saran: pasang `pm2-logrotate`.
+**V-4 — Log PM2 tidak dirotasi** · P3 · **Selesai**
+- `pm2-logrotate` terpasang: rotasi harian atau saat log mencapai 10 MB, simpan 14 file, dikompres.
 
 **V-5 — Izin percobaan dan izin lama masih ada** · P3 · **Selesai**
 - `contoh.view`, `dummy.vie`, `test_module.view`, dan `category_product.*` tidak dipakai kode.
 - Perbaikan: migration `20261018_024_retire_unused_permissions.sql` mencabut izin-izin itu dari profil akses lalu soft-delete (status 99), sama seperti tombol hapus di admin. Daftar izin di admin sekarang tepat 51, sesuai yang dipakai kode.
 
 **V-6 — User database boleh login dari host mana saja** · P3 · Terbukti
-- `matexapp@'%'` dan MySQL mendengarkan di semua interface. Risikonya kecil karena firewall menutup port 3306, tapi sebaiknya dibatasi ke `localhost`.
+- `matexapp@'%'` dan MySQL mendengarkan di semua interface.
+- Keputusan: **risiko diterima**. Port 3306 terbukti tertutup firewall dari internet, CloudPanel memang membuat user database dengan pola ini, dan mengubahnya manual butuh kredensial master MySQL serta bisa membuat panel CloudPanel tidak sinkron.
 
 ---
 
