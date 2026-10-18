@@ -1,7 +1,7 @@
 {
   "format": 1,
   "source": "company 1 on mia",
-  "exported_at": "2026-10-18T16:09:47.418Z",
+  "exported_at": "2026-10-18T16:40:58.938Z",
   "pages": [
     {
       "website_page_key": "about",
@@ -847,13 +847,13 @@
         {
           "faq_locale": "en-US",
           "faq_question": "How to purchase Matex products? Are there any marketplaces available?",
-          "faq_answer": "Currently, you can view a complete list of our product categories directly on the platform matexindo.com. For purchases through our internal platform, that feature will be available in the next version update. In the meantime, you can inquire about product availability by directly contacting us via email at info@matexindonesia.com or via WhatsApp/Phone at Taufik Hidayat (+6281355538777).\n\nAdditionally, you can shop for our official products online through our official store on external marketplaces such as Shopee, TikTok Shop, and Tokopedia (more marketplaces will follow soon).",
+          "faq_answer": "Currently, you can view a complete list of our product categories directly on the platform matexindo.com. For purchases through our internal platform, that feature will be available in the next version update. In the meantime, you can inquire about product availability by directly contacting us via email at info@matexindo.com or via WhatsApp/Phone at Taufik Hidayat (+6281355538777).\n\nAdditionally, you can shop for our official products online through our official store on external marketplaces such as Shopee, TikTok Shop, and Tokopedia (more marketplaces will follow soon).",
           "faq_i18n_status": 1
         },
         {
           "faq_locale": "id-ID",
           "faq_question": "Bagaimana cara membeli produk Matex? Apakah sudah ada marketplace?",
-          "faq_answer": "Saat ini, Anda dapat melihat daftar lengkap kategori produk kami langsung di platform matexindo.com. Untuk pembelian melalui platform internal kami, fitur tersebut akan segera hadir pada pembaruan versi berikutnya. Untuk saat ini, Anda bisa menanyakan ketersediaan produk secara langsung dengan menghubungi kontak kami di email info@matexindonesia.com atau WhatsApp/Telepon ke Taufik Hidayat (+6281355538777).\n\nSelain itu, Anda juga dapat berbelanja produk resmi kami secara online melalui toko resmi kami di marketplace eksternal seperti Shopee, TikTok Shop, dan Tokopedia (marketplace lainnya akan segera menyusul).",
+          "faq_answer": "Saat ini, Anda dapat melihat daftar lengkap kategori produk kami langsung di platform matexindo.com. Untuk pembelian melalui platform internal kami, fitur tersebut akan segera hadir pada pembaruan versi berikutnya. Untuk saat ini, Anda bisa menanyakan ketersediaan produk secara langsung dengan menghubungi kontak kami di email info@matexindo.com atau WhatsApp/Telepon ke Taufik Hidayat (+6281355538777).\n\nSelain itu, Anda juga dapat berbelanja produk resmi kami secara online melalui toko resmi kami di marketplace eksternal seperti Shopee, TikTok Shop, dan Tokopedia (marketplace lainnya akan segera menyusul).",
           "faq_i18n_status": 1
         }
       ]
@@ -887,13 +887,13 @@
         {
           "faq_locale": "en-US",
           "faq_question": "How to collaborate or establish a business partnership with Matex?",
-          "faq_answer": "We are always open to opportunities for collaboration, distribution, and other business partnerships. You can contact our team directly via email at info@matexindonesia.com, call Taufik Hidayat at +6281355538777, or fill out the partnership form available on our Contact page.",
+          "faq_answer": "We are always open to opportunities for collaboration, distribution, and other business partnerships.\nYou can contact our team directly via email at info@matexindo.com,\ncall Taufik Hidayat at +6281355538777,\nor fill out the partnership form available on our Contact page.",
           "faq_i18n_status": 1
         },
         {
           "faq_locale": "id-ID",
           "faq_question": "Bagaimana cara berkolaborasi atau menjalin kerjasama bisnis dengan Matex?",
-          "faq_answer": "Kami selalu terbuka untuk peluang kerjasama, distribusi, maupun kemitraan bisnis lainnya. Anda dapat menghubungi tim kami secara langsung melalui email info@matexindonesia.com, menelepon Taufik Hidayat di +6281355538777, atau mengisi formulir kemitraan yang tersedia di halaman Kontak kami.",
+          "faq_answer": "Kami selalu terbuka untuk peluang kerjasama, distribusi, maupun kemitraan bisnis lainnya. Anda dapat menghubungi tim kami secara langsung melalui email info@matexindo.com, menelepon Taufik Hidayat di +6281355538777, atau mengisi formulir kemitraan yang tersedia di halaman Kontak kami.",
           "faq_i18n_status": 1
         }
       ]
