@@ -7,6 +7,7 @@ import { NgbRatingConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
+import { DevEnvironmentBadge } from './shared/components/dev-environment-badge/dev-environment-badge';
 import { Analytics, Values } from './shared/interface/setting.interface';
 import { Option } from './shared/interface/theme-option.interface';
 import { SeoService } from './shared/services/seo.service';
@@ -19,7 +20,7 @@ import { ThemeOptionState } from './shared/store/state/theme-option.state';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, DevEnvironmentBadge],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

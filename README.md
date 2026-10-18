@@ -19,6 +19,10 @@ Production runs on Percona Server 8.4, so use a MySQL 8.4 database locally. Run 
 
 Do not use `npm run build` plus `serve:ssr` for local testing: production builds call the production domains.
 
+Non-production builds (`npm start`, the e2e stack) show a striped bar on top, a `DEV <api host>` label in the bottom-left corner, and a `[DEV]` prefix on the browser tab title, so a local tab is not mistaken for production. Production builds render none of it.
+
+The admin dev server runs without server-side rendering (`"ssr": false` in its `development` configuration): admin pages sit behind a login and do not need SSR, and the dev server cannot pass the login cookie to SSR. Production and the e2e stack still render admin pages on the server.
+
 To build an empty database from the repository (for example a new local or staging database), run from `backend`:
 
 1. `npm run db:migrate` creates every table and the full admin permission catalog.

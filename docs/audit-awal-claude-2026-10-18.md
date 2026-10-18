@@ -194,9 +194,15 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - `PermissionGuard` ikut berjalan saat SSR, padahal daftar izin admin tersimpan di browser, sehingga di server selalu kosong. Membuka langsung (atau refresh) halaman seperti Media membuat server merender dashboard dulu, lalu browser membetulkannya. Di mode dev halamannya benar-benar terlempar ke dashboard.
 - Perbaikan: guard dilewati saat SSR, sama seperti `AuthGuard`. Browser tetap memeriksa izin, dan API tetap menolak akses tanpa izin.
 
-**FE-006 — Mode dev (`ng serve`) admin tidak meneruskan cookie saat SSR** · P3 · Terbukti
+**FE-006 — Mode dev (`ng serve`) admin tidak meneruskan cookie saat SSR** · P3 · **Selesai**
 - Cookie login hanya diteruskan oleh `frontend/admin/server.ts` (dipakai production). `ng serve` tidak memakai file itu, sehingga refresh halaman data (misalnya Produk) di mode dev bisa melempar ke halaman login. Production tidak terdampak.
-- Saran: pindahkan penerusan cookie ke mekanisme request bawaan Angular SSR yang dipakai baik oleh dev server maupun production.
+- Dicoba dulu: token `REQUEST` bawaan Angular. Terbukti kosong di dev server admin, karena `server.ts` admin memakai mesin SSR lama (`CommonEngine`). Memigrasikan `server.ts` ke mesin baru dinilai terlalu berisiko untuk masalah yang hanya ada di mode dev.
+- Perbaikan: SSR dimatikan khusus untuk konfigurasi `development` admin (`"ssr": false`). Admin adalah alat internal di balik login yang tidak butuh SEO. Production dan test e2e tetap memakai SSR.
+- Catatan lanjutan (opsional): kalau suatu saat admin dimigrasikan ke `AngularNodeAppEngine` seperti public, SSR di mode dev bisa diaktifkan lagi.
+
+**FE-009 — Komponen `LegacyApp` yang tidak dipakai di public** · P3 · **Selesai**
+- `frontend/public/src/app/legacy-app.ts` tidak diimpor di mana pun, tetapi tetap di-compile dan memakai template `app.html` yang sama dengan `App`. Perubahan apa pun pada `app.html` bisa membuat build gagal tanpa alasan yang jelas (ini terjadi saat menambahkan tanda DEV).
+- Perbaikan: file dihapus (tetap tersedia di riwayat Git).
 
 **FE-007 — Pemilih gambar tertutup sendiri setelah mengunggah gambar baru** · P2 · **Selesai**
 - Setelah unggahan berhasil, modal pemilih tertutup sendiri (alasan: `Dismissed with: undefined`) sebelum admin sempat memilih gambarnya. Berlaku untuk semua pemilih gambar (artikel, produk, kategori, kantor).
@@ -269,7 +275,7 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB), FE-006. FE-003, FE-005, FE-007, FE-008, dan DB-007 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, dan DB-007 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |

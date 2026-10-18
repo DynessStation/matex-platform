@@ -7,6 +7,7 @@ import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
+import { DevEnvironmentBadge } from './shared/components/dev-environment-badge/dev-environment-badge';
 import { IValues } from './shared/interface/setting.interface';
 import { AdminThemeModeService } from './shared/services/admin-theme-mode.service';
 import { LogoutAction } from './shared/store/action/auth.action';
@@ -17,7 +18,7 @@ import { SettingState } from './shared/store/state/setting.state';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LoadingBarRouterModule],
+  imports: [RouterOutlet, LoadingBarRouterModule, DevEnvironmentBadge],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
