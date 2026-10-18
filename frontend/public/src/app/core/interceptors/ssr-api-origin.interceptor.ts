@@ -3,6 +3,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 
 import { environment } from '../../../environments/environment';
+import { resolveInternalOrigin } from '../utils/ssr-internal-origin';
 
 export const ssrApiOriginInterceptor: HttpInterceptorFn = (request, next) => {
   if (!isPlatformServer(inject(PLATFORM_ID))) return next(request);
@@ -16,14 +17,11 @@ export const ssrApiOriginInterceptor: HttpInterceptorFn = (request, next) => {
     return next(request);
   }
 
-  const configuredOrigin =
-    typeof process !== 'undefined' ? process.env['MATEX_API_INTERNAL_URL'] : undefined;
-  let internalApiOrigin = 'http://127.0.0.1:9200';
-  try {
-    internalApiOrigin = new URL(configuredOrigin || internalApiOrigin).origin;
-  } catch {
-    // Keep the loopback-only production default when the runtime value is invalid.
-  }
+  const internalApiOrigin = resolveInternalOrigin(
+    'MATEX_API_INTERNAL_URL',
+    'http://127.0.0.1:9200',
+    environment.publicApiURL,
+  );
 
   if (request.url.startsWith(publicApi.href)) {
     const internalUrl = `${internalApiOrigin}${requestUrl.pathname}${requestUrl.search}`;
@@ -35,15 +33,12 @@ export const ssrApiOriginInterceptor: HttpInterceptorFn = (request, next) => {
     return next(request);
   }
 
-  const configuredPublicOrigin =
-    typeof process !== 'undefined' ? process.env['MATEX_PUBLIC_INTERNAL_URL'] : undefined;
   const defaultPort = typeof process !== 'undefined' ? process.env['PORT'] || '4201' : '4201';
-  let internalPublicOrigin = `http://127.0.0.1:${defaultPort}`;
-  try {
-    internalPublicOrigin = new URL(configuredPublicOrigin || internalPublicOrigin).origin;
-  } catch {
-    // Keep the loopback-only production default when the runtime value is invalid.
-  }
+  const internalPublicOrigin = resolveInternalOrigin(
+    'MATEX_PUBLIC_INTERNAL_URL',
+    `http://127.0.0.1:${defaultPort}`,
+    environment.publicSiteURL,
+  );
 
   const internalUrl = `${internalPublicOrigin}${requestUrl.pathname}${requestUrl.search}`;
   return next(request.clone({ url: internalUrl }));

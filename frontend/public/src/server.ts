@@ -9,6 +9,9 @@ import {
 
 import express from 'express';
 
+import { resolveInternalOrigin } from './app/core/utils/ssr-internal-origin';
+import { environment } from './environments/environment';
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
@@ -23,24 +26,17 @@ const angularApp = new AngularNodeAppEngine({
   ],
 });
 
-const internalApiOrigin = (() => {
-  try {
-    return new URL(process.env['MATEX_API_INTERNAL_URL'] || 'http://127.0.0.1:9200').origin;
-  } catch {
-    return 'http://127.0.0.1:9200';
-  }
-})();
+const internalApiOrigin = resolveInternalOrigin(
+  'MATEX_API_INTERNAL_URL',
+  'http://127.0.0.1:9200',
+  environment.publicApiURL,
+);
 
-const internalPublicOrigin = (() => {
-  try {
-    return new URL(
-      process.env['MATEX_PUBLIC_INTERNAL_URL'] ||
-        `http://127.0.0.1:${Number(process.env['PORT']) || 4201}`,
-    ).origin;
-  } catch {
-    return `http://127.0.0.1:${Number(process.env['PORT']) || 4201}`;
-  }
-})();
+const internalPublicOrigin = resolveInternalOrigin(
+  'MATEX_PUBLIC_INTERNAL_URL',
+  `http://127.0.0.1:${Number(process.env['PORT']) || 4201}`,
+  environment.publicSiteURL,
+);
 
 app.get('/health/ssr', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
