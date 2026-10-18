@@ -16,6 +16,9 @@
 **/tmp/
 **/playwright-report/
 **/test-results/
+**/playwright-report-write/
+**/test-results-write/
+ops/e2e/.write-state.json
 
 #==================================================
 #==== ENVIRONMENT / SECRETS

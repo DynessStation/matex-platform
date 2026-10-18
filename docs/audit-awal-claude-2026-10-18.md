@@ -146,6 +146,11 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **DB-006 — Tidak ada migration "mundur"** · Info
 - Kalau migration bermasalah, jalan pulangnya restore dari backup. Ini wajar karena tooling backup sudah ada.
 
+**DB-008 — Website publik di database baru masih kosong** · P2 · Terbukti
+- Migration yang mengisi halaman bawaan (Beranda, Tentang, Kontak, menu navigasi) hanya mengisi untuk perusahaan yang **sudah ada saat migration dijalankan**. Di database baru, perusahaan baru dibuat belakangan oleh `admin:create-first`, sehingga halaman-halaman itu tidak pernah terbentuk dan Beranda menjawab 404.
+- Dampak: pemulihan dari nol atau server staging baru punya admin yang berfungsi, tetapi website publiknya kosong.
+- Saran: buat isi bawaan per perusahaan sebagai langkah yang bisa dijalankan setelah perusahaan dibuat (misalnya bagian dari `admin:create-first`, atau perintah terpisah), tanpa mengubah migration lama.
+
 ### Backend
 
 **BE-001 — Beberapa file controller sangat besar** · P2 · Terbukti
@@ -176,11 +181,30 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **FE-004 — Public `ng serve` default ke port 4200** · P3 · Terbukti
 - Padahal konfigurasi dev public mengharapkan port 4201. Sementara ini sudah dicatat di README (`npm start -- --port 4201`).
 
+*Temuan FE-005 sampai FE-008 ditemukan saat membangun test otomatis (Fase 2).*
+
+**FE-005 — Halaman admin berizin dibelokkan saat dirender server** · P2 · **Selesai**
+- `PermissionGuard` ikut berjalan saat SSR, padahal daftar izin admin tersimpan di browser, sehingga di server selalu kosong. Membuka langsung (atau refresh) halaman seperti Media membuat server merender dashboard dulu, lalu browser membetulkannya. Di mode dev halamannya benar-benar terlempar ke dashboard.
+- Perbaikan: guard dilewati saat SSR, sama seperti `AuthGuard`. Browser tetap memeriksa izin, dan API tetap menolak akses tanpa izin.
+
+**FE-006 — Mode dev (`ng serve`) admin tidak meneruskan cookie saat SSR** · P3 · Terbukti
+- Cookie login hanya diteruskan oleh `frontend/admin/server.ts` (dipakai production). `ng serve` tidak memakai file itu, sehingga refresh halaman data (misalnya Produk) di mode dev bisa melempar ke halaman login. Production tidak terdampak.
+- Saran: pindahkan penerusan cookie ke mekanisme request bawaan Angular SSR yang dipakai baik oleh dev server maupun production.
+
+**FE-007 — Unggah gambar baru dari pemilih gambar di formulir artikel belum mulus** · P2 · Terbukti, belum diperbaiki
+- Setelah FE-008 diperbaiki, gambar berhasil terunggah, tetapi modal kadang tertutup tanpa memasang gambar, atau tetap terbuka dengan daftar yang terus dirender ulang. Memilih gambar yang sudah ada berjalan normal (dan diuji otomatis).
+- Saran: selidiki alur setelah upload di `media-modal` saat mode pilih, lalu tambahkan skenario test-nya.
+
+**FE-008 — Pemilih gambar artikel tidak bisa mengunggah gambar baru** · P2 · **Selesai**
+- `app-image-upload` di formulir artikel tidak diberi `collection`, sehingga unggahan baru langsung ditolak di browser ("collection required").
+- Perbaikan: kedua pemilih gambar artikel memakai koleksi `media_library`, sama seperti formulir kategori.
+
 ### Build, deploy, test, dan dokumentasi
 
-**TEST-001 — Test frontend hampir tidak ada** · P2 · Terbukti
+**TEST-001 — Test frontend hampir tidak ada** · P2 · **Sebagian selesai**
 - Public 1 file test, admin 0. Backend punya 56 test kontrak, dan ada 3 file test browser (Playwright).
 - Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
+- Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, akun admin, dan FE-007.
 
 **OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · Dugaan (berdasarkan dokumen sendiri)
 - `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
@@ -237,13 +261,13 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003 dan DB-007 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB), FE-006, FE-007. FE-003, FE-005, FE-008, dan DB-007 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
-| Integritas data | DB-003, DB-005 (DB-001 selesai) |
+| Integritas data | DB-003, DB-008 (DB-001 dan DB-005 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
 | Maintainability | BE-001, BE-002, FE-001, FE-002 |
 | Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
-| Kekurangan test | TEST-001 |
+| Kekurangan test | TEST-001 (sebagian selesai) |
 | Kekurangan dokumentasi | DOC-001 |
 
 ---
@@ -259,9 +283,11 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Selesai bila: database baru dari repo bisa langsung dipakai login, dan admin tanpa izin ditolak saat memakai asisten AI.
 - Risiko: migration baru wajib diuji di database kosong **dan** di salinan database lama sebelum masuk production.
 
-**Fase 2 — Jaring pengaman test**
+**Fase 2 — Jaring pengaman test** · **Selesai di lokal 18 Oktober 2026**
 - Test browser untuk alur admin yang mengubah data, memakai akun test khusus (bukan akun asli).
 - Selesai bila: simpan produk, upload media, dan publish artikel teruji otomatis.
+- Hasil: `npm run test:write`, 4 skenario. Selama membangunnya ditemukan FE-005 sampai FE-008 dan DB-008.
+- Lanjutan: FE-007, DB-008, lalu skenario kantor, jabatan, dan akun admin.
 
 **Fase 3 — Operasional**
 - OPS-001: salinan backup di luar VPS + satu kali latihan restore.
