@@ -1,0 +1,259 @@
+# Laporan Audit Awal Matex Platform v1.0.10
+
+Tanggal: 18 Oktober 2026
+Disusun oleh: Claude (asisten teknis), untuk Hardyness
+Dasar pemeriksaan: source code di `D:\PROGRAMMING\MATEX` (sama persis dengan GitHub `main`), hasil build/test/lint lokal, database lokal, dan dua pengecekan read-only di VPS yang dijalankan Hardyness sendiri.
+
+Cara membaca laporan ini:
+
+- **Terbukti** artinya sudah dicek langsung dan ada buktinya.
+- **Dugaan** artinya masuk akal tapi belum dibuktikan.
+- Prioritas: **P0** darurat, **P1** penting segera, **P2** perlu dikerjakan di fase perbaikan, **P3** perapian, **Info** catatan saja.
+
+---
+
+## Bagian 1 — Ringkasan untuk pengambil keputusan
+
+**Kesimpulan singkat: proyek ini dalam kondisi sehat dan siap dilanjutkan, tidak perlu ditulis ulang.**
+
+Matex Platform sudah live di production (website publik, admin internal, dan API). Pondasinya lebih rapi dari yang dikira: keamanan login dan hak akses sudah dipikirkan matang, ada catatan aktivitas (audit log), backup, pengecekan otomatis sebelum rilis, dan semua aplikasi berhasil di-build tanpa error.
+
+Masalah yang ditemukan sebagian besar bukan "rusak", tapi **utang kerapian** dan **beberapa celah kecil** yang wajar untuk proyek yang dikembangkan cepat oleh satu orang.
+
+**Kekuatan utama**
+
+- Hak akses admin dicek ketat di setiap halaman (per perusahaan, status akun, dan izin per fitur).
+- Database tertata: 51 tabel, relasi antartabel dijaga, dan bisa dibangun ulang lewat migration.
+- Semua pengecekan otomatis lulus: 56 test backend, 3 build aplikasi, dan 0 celah keamanan di library.
+- Dokumentasi operasional (runbook server, backup, prosedur deploy) sudah ada dan detail.
+
+**Risiko terpenting**
+
+1. **Database tidak bisa dibangun utuh hanya dari repo.** Kalau server hilang total dan backup juga hilang, database baru dari repo tidak punya akun admin dan izin dasar, sehingga admin tidak bisa login. (DB-001, P1)
+2. **Fitur asisten AI bisa dipakai semua admin tanpa batasan izin**, jadi kuota OpenAI bisa terkuras. (SEC-002, P2)
+3. **Beberapa file kode sangat besar** (sampai 5.000 baris), sehingga makin lama makin sulit diubah dengan aman. (BE-001, P2)
+4. **Hampir tidak ada test otomatis untuk tampilan (frontend).** Perubahan di admin/public hanya bisa dicek manual. (TEST-001, P2)
+
+**Langkah awal yang disarankan**
+
+Perbaiki DB-001 dan SEC-002 dulu (perubahan kecil, dampak besar), lalu bertahap rapikan kode besar sambil menambah test.
+
+---
+
+## Bagian 2 — Kesiapan environment dan akses
+
+| Komponen | Status | Bukti | Kendala | Tindakan |
+|---|---|---|---|---|
+| GitHub (baca & push) | Berhasil | `git ls-remote` dan push `d3905ab` berhasil | — | — |
+| GitHub CLI (`gh`) | Tidak ada | Perintah `gh` tidak ditemukan | Belum bisa bikin PR atau cek CI dari sini | Opsional: `winget install GitHub.cli` lalu `gh auth login` |
+| Folder proyek lokal | Berhasil | `D:\PROGRAMMING\MATEX`, sama dengan GitHub | — | — |
+| Baca/tulis file & terminal | Berhasil | Edit, build, dan commit dari sesi Claude | — | — |
+| Node.js / npm | Berhasil | Node 24.19, npm 11.17 | — | — |
+| Database lokal | Berhasil | MySQL 8.4.10 di port 3307, DB `matex_dev` | Harus dinyalakan manual setiap habis restart Windows | Lihat README bagian Local Development |
+| Database production | Dicek tidak langsung | VPS: Percona 8.4.10, migration 23/23 cocok | Claude tidak punya akses VPS (disengaja) | Akses read-only bisa dibuka nanti kalau perlu |
+| Percakapan Codex lama | Gagal | Link share ChatGPT menolak (403) | Butuh login ChatGPT | Konteks didapat dari memori lokal Codex dan riwayat Git |
+| Aplikasi Codex | Masih berjalan di komputer ini | Proses `codex`/`ChatGPT` aktif | Dua asisten bisa mengedit file yang sama bersamaan | Jangan biarkan dua asisten mengedit bersamaan (tidak perlu dicabut) |
+
+**Soal koneksi ChatGPT/Codex:** tidak ada konflik teknis. Koneksi GitHub, token, dan integrasi Codex boleh tetap ada. Satu-satunya risiko nyata adalah dua asisten mengubah file atau server di waktu yang sama. Cukup pastikan hanya satu yang bekerja dalam satu waktu.
+
+---
+
+## Bagian 3 — Peta proyek
+
+```text
+Browser pengunjung ──► matexindo.com (public, Angular SSR, port 9201) ──┐
+Browser admin ───────► internal.matexindo.com (admin, Angular SSR, 9202) ┼──► API Express (9200) ──► MySQL/Percona 8.4
+                                                                         │         │
+                                                         Nginx/CloudPanel di depan  └──► Folder file media
+```
+
+| Folder | Isi |
+|---|---|
+| `backend/` | API (Express 5 + TypeScript). Route otomatis dimuat dari `src/ctrl/admin` dan `src/ctrl/public`. |
+| `backend/database/migrations/` | 23 file perubahan struktur database, dijalankan berurutan. |
+| `frontend/public/` | Website publik (Angular 21, SSR untuk SEO). Berbasis template Kartify yang sudah disesuaikan. |
+| `frontend/admin/` | Panel admin internal (Angular 21, SSR). Juga berbasis Kartify. |
+| `ops/` | PM2, Nginx, skrip deploy, pengecekan sebelum rilis, test browser (Playwright). |
+| `docs/` | Runbook production, audit kesiapan v1, panduan platform. |
+
+**Lingkup v1 (sudah diputuskan):** profil perusahaan, katalog produk, artikel, FAQ, kontak, dan SEO. Fitur toko online (keranjang, checkout, dan sejenisnya) **diparkir untuk v2**.
+
+---
+
+## Bagian 4 — Temuan teknis
+
+### Keamanan
+
+**SEC-001 — Google Maps API key lama ada di riwayat Git** · P1 · **Selesai**
+- Lokasi: riwayat commit `348fe4d` dan `c6904c5`.
+- Masalah: key pernah ikut ter-commit. Menghapusnya dari kode tidak menghapusnya dari riwayat Git.
+- Status: **Hardyness melaporkan key sudah dirotasi** di Google Cloud Console. Key lama di riwayat Git sudah tidak berlaku, jadi tidak perlu menulis ulang riwayat Git.
+
+**SEC-002 — Asisten AI bisa dipakai semua admin tanpa izin khusus** · P2 · **Selesai**
+- Lokasi: `backend/src/ctrl/admin/content-assistant.ts`.
+- Masalah: endpoint ini hanya mengecek "sudah login", tidak mengecek izin fitur seperti endpoint lain. Satu permintaan bisa mengirim sampai sekitar 190 ribu karakter ke OpenAI.
+- Perbaikan: ditambah izin baru `content_assistant.use`. API menolak admin tanpa izin ini (403), dan tombol AI di admin disembunyikan untuk mereka. Supaya editor yang sekarang memakai fitur AI tidak kehilangan akses, migration otomatis memberikan izin ini ke profil akses yang sudah boleh mengedit konten.
+- Masih bisa ditambah nanti: batas pemakaian per admin.
+
+**SEC-003 — Logout tidak membatalkan token yang sudah dicuri** · P3 · Terbukti
+- Login memakai token berlaku 24 jam di cookie. Logout menghapus cookie, tapi token yang (misalnya) sudah dicuri tetap berlaku sampai habis masanya.
+- Yang sudah aman: akun yang dinonaktifkan langsung ditolak, karena status akun dicek ke database di setiap permintaan.
+- Saran: cukup dicatat dulu. Tidak mendesak untuk skala sekarang.
+
+**SEC-004 — Upload file menampung semua file di memori** · P3 · Terbukti
+- Satu upload bisa membawa 10 file × 50 MB yang ditampung di RAM server. Tipe video dipercaya dari keterangan browser.
+- Yang sudah aman: gambar selalu diproses ulang (dikompres dan dibersihkan), sehingga file gambar berbahaya ikut "dicuci". Fitur ini hanya untuk admin yang login.
+- Saran: turunkan batas atau simpan sementara ke disk kalau upload video jadi sering.
+
+**SEC-005 — Isi artikel (HTML) tidak dibersihkan di server** · Info
+- Saat ini aman, karena Angular otomatis membuang script berbahaya saat menampilkan.
+- Perlu diingat untuk nanti: kalau aplikasi mobile (Ionic) atau email ikut menampilkan isi artikel, bersihkan HTML-nya juga.
+
+**SEC-006 — Ada dump database di folder `tmp/`** · Info
+- `tmp/canonical-import-*/database.sql` tidak ikut Git (aman), tapi kemungkinan berisi data akun. Jangan disalin ke Google Drive atau flashdisk bersama.
+
+### Database
+
+**DB-001 — Database baru dari repo tidak bisa dipakai login** · P1 · **Selesai**
+- Bukti awal: database baru yang dibangun murni dari 23 migration hanya berisi 2 izin. Data perusahaan dan akun admin tidak ada sama sekali, dan izin dasar seperti `office.view`, `dashboard.view`, `admin_access.*` tidak ada di file SQL mana pun di repo.
+- Perbaikan:
+  - Migration `20261018_023_seed_base_admin_permissions.sql` berisi semua izin yang dicek API. Izin yang sudah ada di production **tidak diubah**, hanya yang belum ada yang ditambahkan.
+  - Perintah baru `npm run admin:create-first` membuat perusahaan (kalau belum ada), kantor, jabatan, profil "Super Admin", dan admin pertama. Password diketik saat dijalankan dan tidak pernah disimpan di repo. Perintah ini menolak berjalan kalau sudah ada admin.
+  - File lama di `database/seeds/` dihapus karena seluruh isinya sudah tercakup migration ini.
+- Pengujian: database kosong + migration + admin pertama berhasil login dan membuka menu admin. Di salinan database lama, migration hanya menambah 4 izin baru dan tidak mengubah satu pun baris lama.
+
+**DB-007 — Izin kelola akun admin tidak pernah ada di database** · P1 · **Selesai** (temuan baru saat mengerjakan DB-001)
+- API mengecek `admin_account.create`, `admin_account.update`, dan `admin_account.delete`, tetapi ketiganya tidak pernah ada di database.
+- Dampak: hanya super-admin (`is_all_access`) yang bisa menambah, mengubah, atau menghapus akun admin, dan profil akses lain tidak bisa diberi hak itu sama sekali.
+- Perbaikan: ketiganya ditambahkan oleh migration yang sama. Izin baru ini **tidak otomatis diberikan** ke siapa pun, jadi admin yang perlu harus diberi lewat menu Access Profiles.
+
+**DB-002 — Migration 013 tidak bisa jalan di MariaDB** · P2 · Terbukti
+- Lokasi: `backend/database/migrations/20261004_013_remove_legacy_cms.sql`, yang diubah di commit `03ee67c` agar cocok dengan MySQL 8.
+- Masalah: di MariaDB (XAMPP), membangun database baru gagal di migration ini. Di MySQL 8 dan Percona (production) lancar.
+- Penting: **file ini jangan diedit lagi**, karena production mencatat checksum versi sekarang. Cukup tetapkan bahwa database dev wajib MySQL 8.4 (sudah dilakukan hari ini).
+- Catatan: dokumen `production-v1-readiness-audit.md` menyebut "fresh bootstrap lulus". Itu benar sebelum 14 Oktober, tapi sejak itu hanya lulus di MySQL 8.
+
+**DB-003 — Beberapa relasi tidak dikunci di database** · P3 · Terbukti
+- `office.id_master_comp` dan `master_comp.id_comp_category` tidak punya foreign key, jadi database tidak mencegah data yatim. Kode aplikasi sudah menjaga ini, tapi database tidak.
+
+**DB-004 — Daftar izin bersifat global** · P3 · Terbukti
+- Tabel `admin_permission` tidak dibedakan per perusahaan. Admin perusahaan mana pun yang punya izin "ubah permission" bisa mengubah daftar izin untuk semua perusahaan.
+- Saat ini tidak masalah karena baru satu perusahaan. Perlu diputuskan sebelum benar-benar multi-perusahaan.
+
+**DB-005 — Ada data izin percobaan di database dev** · Info
+- Database lokal berisi grup izin "Contoh", "dummy group permission", dan "Test Module". Perlu dicek apakah ikut ada di production.
+
+**DB-006 — Tidak ada migration "mundur"** · Info
+- Kalau migration bermasalah, jalan pulangnya restore dari backup. Ini wajar karena tooling backup sudah ada.
+
+### Backend
+
+**BE-001 — Beberapa file controller sangat besar** · P2 · Terbukti
+- `auth.ts` 5.099 baris (isinya login sekaligus kelola akun admin), `office.ts` 4.076, `web-navigation.ts` 2.622, `admin-access.ts` 2.316.
+- Dampak: sulit dibaca, rawan efek samping saat diubah, dan sulit dites.
+- Saran: pecah bertahap saat fitur terkait akan diubah, bukan sekaligus.
+
+**BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
+- Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
+
+**BE-003 — Hal yang sudah benar di backend** · Info
+- Semua query database memakai parameter (aman dari SQL injection), perubahan data dibungkus transaksi, data dicek kepemilikannya per perusahaan sebelum diubah, dan ada rate limit untuk login dan API.
+
+### Frontend
+
+**FE-001 — Banyak modul sisa template Kartify yang tidak dipakai** · P2 · Terbukti
+- Admin punya sekitar 27 folder modul (order, wallet, coupon, store, dan lain-lain) yang tidak lagi punya halaman. Sudah dikeluarkan dari build, tapi file-nya masih ada.
+- Sesuai keputusan sebelumnya, ini sengaja disimpan untuk referensi v2. Perlu dirapikan bertahap.
+
+**FE-002 — Ribuan peringatan lint di admin** · P3 · Terbukti
+- Admin: 17.114 peringatan, sekitar 97% hanya soal format (spasi, akhir baris). Public: 133 peringatan. Error: 0.
+- Saran: rapikan format dalam satu commit khusus, terpisah dari perubahan fitur.
+
+**FE-003 — Default SSR untuk development salah** · P2 · **Sudah diperbaiki**
+- Saat dijalankan lokal, SSR admin/public diarahkan ke port production (9200), sehingga muncul "fetch failed".
+- Diperbaiki di commit `d3905ab` (sudah di GitHub). Perilaku production tidak berubah.
+
+**FE-004 — Public `ng serve` default ke port 4200** · P3 · Terbukti
+- Padahal konfigurasi dev public mengharapkan port 4201. Sementara ini sudah dicatat di README (`npm start -- --port 4201`).
+
+### Build, deploy, test, dan dokumentasi
+
+**TEST-001 — Test frontend hampir tidak ada** · P2 · Terbukti
+- Public 1 file test, admin 0. Backend punya 56 test kontrak, dan ada 3 file test browser (Playwright).
+- Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
+
+**OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · Dugaan (berdasarkan dokumen sendiri)
+- `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
+
+**DOC-001 — README dan memori lama sudah ketinggalan** · P3 · Terbukti
+- README masih menyebut "Phase 4.8". Catatan Codex menyebut `product.ts` masih kosong, padahal sekarang sudah 899 baris.
+
+---
+
+## Bagian 5 — Hal yang sudah baik (pertahankan)
+
+- **Keamanan akses admin:** setiap permintaan mengecek akun aktif, perusahaan yang sama, dan izin fitur, plus perlindungan khusus untuk super-admin.
+- **Audit log** dengan pembersihan data sensitif dan pengecekan integritas.
+- **API production sudah diperkeras:** Helmet, kompresi, rate limit, batas ukuran body, health check, dan shutdown yang rapi.
+- **Upload gambar aman:** semua gambar diproses ulang lewat `sharp`, dan nama file diacak.
+- **Migration runner** punya lock, checksum, dan mode adopsi database lama. Inilah yang menangkap masalah DB-002 hari ini.
+- **Analitik ramah privasi:** tanpa IP mentah, menghormati Do Not Track, dan dimatikan sampai kebijakan privasi siap.
+- **SEO matang:** canonical, hreflang ID/EN, JSON-LD, sitemap dinamis, dan status 404 yang benar.
+- **Dokumentasi operasional** (runbook CloudPanel, backup/restore, preflight) detail dan bisa diikuti.
+- **Keputusan scope v1/v2** jelas dan konsisten diterapkan di router, sitemap, dan navigasi.
+
+---
+
+## Bagian 6 — Daftar utang teknis
+
+| Jenis | Item |
+|---|---|
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003 dan DB-007 sudah diperbaiki. |
+| Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
+| Integritas data | DB-003, DB-005 (DB-001 selesai) |
+| Arsitektur | DB-004 (izin global vs multi-perusahaan) |
+| Maintainability | BE-001, BE-002, FE-001, FE-002 |
+| Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
+| Kekurangan test | TEST-001 |
+| Kekurangan dokumentasi | DOC-001 |
+
+---
+
+## Bagian 7 — Roadmap yang disarankan
+
+**Fase 0 — Environment (selesai hari ini)**
+DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan README Local Development.
+
+**Fase 1 — Perbaikan kecil berdampak besar** · **Selesai di lokal 18 Oktober 2026** (belum di-deploy ke production)
+- SEC-002: tambah izin untuk asisten AI.
+- DB-001: migration izin dasar + perintah aman membuat admin pertama.
+- Selesai bila: database baru dari repo bisa langsung dipakai login, dan admin tanpa izin ditolak saat memakai asisten AI.
+- Risiko: migration baru wajib diuji di database kosong **dan** di salinan database lama sebelum masuk production.
+
+**Fase 2 — Jaring pengaman test**
+- Test browser untuk alur admin yang mengubah data, memakai akun test khusus (bukan akun asli).
+- Selesai bila: simpan produk, upload media, dan publish artikel teruji otomatis.
+
+**Fase 3 — Operasional**
+- OPS-001: salinan backup di luar VPS + satu kali latihan restore.
+- DB-005: cek dan bersihkan izin percobaan di production lewat migration.
+
+**Fase 4 — Kerapian bertahap**
+- BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah.
+- FE-002: satu commit khusus format.
+- FE-001: rapikan modul sisa Kartify per kelompok.
+
+**Fase 5 — Lanjut fitur**
+Fitur baru v1, lalu persiapan v2 (commerce), aplikasi mobile, dan keputusan semi-open-source.
+
+---
+
+## Bagian 8 — Titik mulai yang disarankan
+
+**Mulai dari DB-001 (izin dasar sebagai migration), digabung dengan SEC-002.**
+
+- **Kenapa:** dua-duanya kecil, menutup risiko nyata (pemulihan bencana dan biaya AI), dan membuat database test bisa dibuat kapan saja. Itu syarat untuk Fase 2 (test otomatis).
+- **Persiapan:** daftar izin lengkap diambil dari database lokal `matex_dev` (salinan `mia`). Hardyness perlu memutuskan izin percobaan mana ("Contoh", "Test Module", dan seterusnya) yang dibuang.
+- **File yang kemungkinan berubah:** migration baru di `backend/database/migrations/`, `backend/src/ctrl/admin/content-assistant.ts`, skrip kecil baru di `backend/scripts/` untuk membuat admin pertama, dan README.
+- **Risiko kalau dikerjakan tanpa persiapan:** migration izin yang salah bisa menggandakan atau menghapus izin di production. Karena itu migration harus memakai pola "tambah kalau belum ada" dan diuji di salinan database production terlebih dahulu.
+- **Kriteria berhasil:** (1) database kosong + migration + skrip admin menghasilkan admin yang bisa login dengan menu lengkap; (2) migration yang sama di salinan `matex_dev` tidak mengubah data yang sudah ada; (3) admin tanpa izin mendapat 403 saat memakai asisten AI; (4) semua test dan build tetap lulus.
