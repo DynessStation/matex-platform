@@ -77,8 +77,7 @@ export default defineConfig({
     {
       command: `${npx} ng build --configuration e2e && node dist/matex-public-e2e/server/server.mjs`,
       cwd: `${repoRoot}/frontend/public`,
-      // The home page needs seeded website pages (see audit DB-008); the article list does not.
-      url: `${stack.publicOrigin}/artikel`,
+      url: `${stack.publicOrigin}/`,
       env: { ...(process.env as Record<string, string>), PORT: "4301" },
       reuseExistingServer,
       timeout: 300_000,

@@ -48,6 +48,20 @@ async function uploadThroughModal(page: Page): Promise<void> {
   await modal.locator("#media_upload_btn").click();
 }
 
+test("a fresh install shows the default website content (audit DB-008)", async ({ page }) => {
+  const response = await page.goto(`${stack.publicOrigin}/`);
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('a[href="/tentang-matex"]').first()).toBeVisible();
+
+  // The home banners come from the seeded media-library images.
+  const banner = page.locator('img[src*="/files/media-library/"]').first();
+  await expect(banner).toBeVisible();
+  expect(await banner.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+
+  const about = await page.goto(`${stack.publicOrigin}/tentang-matex`);
+  expect(about?.status()).toBe(200);
+});
+
 test("admin can log in and reach the dashboard", async ({ page }) => {
   await login(page);
   await expect(page.locator("body")).toContainText(/Dasbor|Dashboard/);

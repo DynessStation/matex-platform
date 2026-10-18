@@ -146,10 +146,15 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **DB-006 — Tidak ada migration "mundur"** · Info
 - Kalau migration bermasalah, jalan pulangnya restore dari backup. Ini wajar karena tooling backup sudah ada.
 
-**DB-008 — Website publik di database baru masih kosong** · P2 · Terbukti
+**DB-008 — Website publik di database baru masih kosong** · P2 · **Selesai**
 - Migration yang mengisi halaman bawaan (Beranda, Tentang, Kontak, menu navigasi) hanya mengisi untuk perusahaan yang **sudah ada saat migration dijalankan**. Di database baru, perusahaan baru dibuat belakangan oleh `admin:create-first`, sehingga halaman-halaman itu tidak pernah terbentuk dan Beranda menjawab 404.
 - Dampak: pemulihan dari nol atau server staging baru punya admin yang berfungsi, tetapi website publiknya kosong.
-- Saran: buat isi bawaan per perusahaan sebagai langkah yang bisa dijalankan setelah perusahaan dibuat (misalnya bagian dari `admin:create-first`, atau perintah terpisah), tanpa mengubah migration lama.
+- Perbaikan: konten website matexindo.com diekspor sekali secara read-only dari production ke `backend/database/seeds/company-defaults/` (6 halaman, 10 gambar, menu, 2 kanal kontak, 4 topik form kontak, 4 FAQ). `admin:create-first` otomatis memasangnya saat membuat perusahaan baru, atau lewat `npm run db:seed:company-defaults`. Email penerima form kontak sengaja tidak disalin. Diuji: konten hasil pengisian identik dengan ekspor production, dan Beranda publik di database baru tampil (skenario e2e baru).
+
+**CONTENT-001 — Dua jawaban FAQ menyebut alamat email di domain yang tidak ada** · P1 · Terbukti, belum diperbaiki
+- FAQ "Cara pembelian produk" dan "Kerjasama dan partnership" (ID dan EN) yang tampil di matexindo.com menyebut alamat `@matexindonesia.com`. Domain itu **tidak terdaftar** (DNS: *Non-existent domain*), sehingga email pengunjung ke alamat itu pasti gagal terkirim. Domain `matexindo.com` punya mail server yang aktif.
+- Dampak bisnis: calon pembeli dan calon mitra yang mengikuti petunjuk FAQ tidak pernah sampai ke tim MATEX.
+- Saran: ganti alamatnya lewat admin (menu FAQ) ke alamat `@matexindo.com` yang benar, lalu ekspor ulang isi bawaan (`npm run db:export:company-defaults`). Konten ini sengaja tidak diubah oleh Claude karena merupakan keputusan bisnis.
 
 ### Backend
 
@@ -264,7 +269,8 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 |---|---|
 | Bug aktual | DB-002 (migration 013 di MariaDB), FE-006. FE-003, FE-005, FE-007, FE-008, dan DB-007 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
-| Integritas data | DB-003, DB-008 (DB-001 dan DB-005 selesai) |
+| Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
+| Konten bisnis | CONTENT-001 (email FAQ ke domain yang tidak ada) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
 | Maintainability | BE-001, BE-002, FE-001, FE-002 |
 | Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
@@ -288,7 +294,7 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Test browser untuk alur admin yang mengubah data, memakai akun test khusus (bukan akun asli).
 - Selesai bila: simpan produk, upload media, dan publish artikel teruji otomatis.
 - Hasil: `npm run test:write`, 4 skenario. Selama membangunnya ditemukan FE-005 sampai FE-008 dan DB-008.
-- Lanjutan: DB-008, lalu skenario kantor, jabatan, dan akun admin. (FE-007 selesai.)
+- Lanjutan: skenario kantor, jabatan, dan akun admin. (FE-007 dan DB-008 selesai.)
 
 **Fase 3 — Operasional**
 - OPS-001: salinan backup di luar VPS + satu kali latihan restore.

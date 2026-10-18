@@ -24,6 +24,10 @@ To build an empty database from the repository (for example a new local or stagi
 1. `npm run db:migrate` creates every table and the full admin permission catalog.
 2. `npm run admin:create-first -- --name "Full Name" --alias Alias --email you@example.com --phone +628123456789` creates the first all-access admin. The password is prompted for, never passed as a flag, and the command refuses to run once any admin exists.
 
+When step 2 creates the company, it also copies the default website content (pages, page images, navigation, contact channels and topics, FAQs) from `backend/database/seeds/company-defaults/`, so the public site works immediately. Images go to `FILE_STORAGE_ROOT`. Contact-form recipient emails are deliberately not included; set them in the admin panel. Skip this with `--no-defaults`, or run it later with `npm run db:seed:company-defaults -- --company-id <id>` (it refuses to overwrite a company that already has pages).
+
+The defaults are a snapshot of the live matexindo.com content. To refresh them after editing the site, run `npm run db:export:company-defaults -- --company-id 1 --out database/seeds/company-defaults` on the server (read-only) and commit the result.
+
 During server-side rendering, both frontends reach the API and their own assets through loopback origins:
 
 | Variable | Used by | Production value (`ops/ecosystem.config.cjs`) | Default in development builds |

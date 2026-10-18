@@ -4,11 +4,17 @@
 // Usage (from backend/):
 //   npm run admin:create-first -- --name "Full Name" --alias Alias --email a@b.c --phone +628123456789
 //   Optional: --company-name "PT Example" --company-alias EXA (used only when no company exists yet)
+//             --no-defaults (skip copying the default website content into a newly created company)
+//
+// When it creates the company, it then runs scripts/seed-company-defaults.cjs so the
+// public website starts with the default MATEX pages, navigation, contacts and FAQs.
 //
 // The password is never accepted as a flag. It is read from a hidden prompt, or
 // from stdin when stdin is not a terminal (two lines: password and confirmation).
 // The script refuses to run when any admin account already exists.
 
+const { spawnSync } = require("node:child_process");
+const path = require("node:path");
 const readline = require("node:readline");
 
 require("dotenv").config({ quiet: true });
@@ -58,6 +64,10 @@ function parseFlags(argv) {
       throw new Error(
         "Do not pass the password as a flag; it is prompted for instead.",
       );
+    }
+    if (match[1] === "no-defaults") {
+      flags["no-defaults"] = true;
+      continue;
     }
     flags[match[1]] = String(argv[index + 1] ?? "").trim();
     index += 1;
@@ -242,6 +252,11 @@ async function run() {
           ? `Created company id ${idMasterComp}. Set PUBLIC_COMPANY_ID=${idMasterComp} in backend/.env.`
           : `Used existing company id ${idMasterComp}.`,
       );
+      return {
+        seedCompanyId:
+          companyCreated && !flags["no-defaults"] ? idMasterComp : null,
+        adminId: account.insertId,
+      };
     } catch (error) {
       await connection.rollback();
       throw error;
@@ -252,7 +267,31 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+// Runs after the admin is committed, so a seeding failure never undoes the account.
+function seedDefaults({ seedCompanyId, adminId }) {
+  if (!seedCompanyId) return;
+  const result = spawnSync(
+    process.execPath,
+    [
+      path.join(__dirname, "seed-company-defaults.cjs"),
+      "--company-id",
+      String(seedCompanyId),
+      "--admin-id",
+      String(adminId),
+    ],
+    { stdio: "inherit", env: process.env },
+  );
+  if (result.status !== 0) {
+    console.error(
+      `Default website content was not added. Fix the error above, then run: npm run db:seed:company-defaults -- --company-id ${seedCompanyId}`,
+    );
+    process.exitCode = 1;
+  }
+}
+
+run()
+  .then(seedDefaults)
+  .catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });

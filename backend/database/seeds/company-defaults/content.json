@@ -1,0 +1,902 @@
+{
+  "format": 1,
+  "source": "company 1 on mia",
+  "exported_at": "2026-10-18T16:09:47.418Z",
+  "pages": [
+    {
+      "website_page_key": "about",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": "2026-09-22 12:58:22",
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "about-matex",
+          "website_page_title": "About MATEX",
+          "website_page_summary": "MATEX is a leading innovator and trusted manufacturer dedicated to delivering premium material solutions based on 100% natural latex. Built upon a foundation of quality, sustainability, and comfort, our company journey is driven by a passion to transform natural resources into high-standard products that excel in the global market.\n\nSince our inception, we have positioned ourselves not merely as a material supplier, but as a strategic partner across various industries. We understand that every application requires specific characteristics—ranging from personal ergonomics and modern furniture solutions to pet comfort products and specialized functional applications in manufacturing.",
+          "website_page_body_html": null,
+          "website_page_content_json": "{\"about_contract_version\":1,\"highlights\":[{\"title\":\"100% Natural Latex\",\"description\":\"High-quality material processed directly from selected sap, safe for health, and eco-friendly.\"},{\"title\":\"Maximum Durability\",\"description\":\"Long-lasting products with high elasticity structure that do not sag easily for long-term use.\"},{\"title\":\"Versatile Solution\",\"description\":\"Flexibly designed for various modern industrial needs down to your beloved pets' comfort.\"}]}",
+          "website_page_seo_title": "About MATEX",
+          "website_page_seo_description": "Learn more about MATEX and our journey as 100% natural latex producent in Indonesia.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index,follow",
+          "website_page_canonical_url": "https://matexindo.com/en/about-matex",
+          "website_page_social_title": "About MATEX",
+          "website_page_social_description": "Learn more about MATEX and our journey as 100% natural latex producent in Indonesia.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "tentang-matex",
+          "website_page_title": "Tentang MATEX",
+          "website_page_summary": "Pelopor Solusi Material & Produk Natural Latex Berkualitas Tinggi\nMATEX hadir sebagai inovator terdepan dan produsen tepercaya yang berdedikasi dalam menghadirkan solusi material berbasis 100% natural latex (getah karet alam alami). Didirikan atas dasar komitmen terhadap mutu, keberlanjutan, dan kenyamanan, perjalanan perusahaan kami dibangun dari semangat untuk mengolah kekayaan alam lokal menjadi produk berstandar tinggi yang mampu bersaing di pasar global.\n\nSejak awal berdiri, kami memosisikan diri bukan sekadar sebagai penyedia material, melainkan sebagai mitra strategis bagi berbagai industri. Kami memahami bahwa setiap kebutuhan memiliki karakteristik yang berbeda—mulai dari kenyamanan personal, kebutuhan furnitur modern, solusi perlengkapan hewan peliharaan (pet supplies), hingga aplikasi teknis di ranah industri manufaktur.",
+          "website_page_body_html": null,
+          "website_page_content_json": "{\"about_contract_version\":1,\"highlights\":[{\"title\":\"Latex 100% Alami\",\"description\":\"Material berkualitas tinggi yang diproses langsung dari getah pilihan, aman bagi kesehatan, dan ramah lingkungan.\"},{\"title\":\"Durabilitas Maksimal\",\"description\":\"Produk tahan lama dengan struktur elastisitas tinggi yang tidak mudah kempes untuk penggunaan jangka panjang.\"},{\"title\":\"Solusi Serbaguna\",\"description\":\"Dirancang fleksibel untuk berbagai kebutuhan industri modern hingga kenyamanan hewan kesayangan Anda.\"}]}",
+          "website_page_seo_title": "Tentang MATEX",
+          "website_page_seo_description": "Mengenal MATEX dan perjalanan perusahaan sebagai penyedia produk 100% natural latex di Indonesia.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index,follow",
+          "website_page_canonical_url": "https://matexindo.com/tentang-matex",
+          "website_page_social_title": "Tentang MATEX",
+          "website_page_social_description": "Mengenal MATEX dan perjalanan perusahaan sebagai penyedia produk 100% natural latex di Indonesia.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": [
+        {
+          "website_page_media_slot": "about_content",
+          "website_page_media_sort_order": 0,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/about-about_content-0.webp",
+            "name": "tentang-matex",
+            "original_name": "tentang-matex.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 1920,
+            "height": 1215
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": "tentang matex",
+              "website_page_media_alt_text": "tentang matex"
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "tentang matex",
+              "website_page_media_alt_text": "tentang matex"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "website_page_key": "career",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": null,
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "careers",
+          "website_page_title": "Careers",
+          "website_page_summary": "Opportunities to join MATEX will be available on this page.",
+          "website_page_body_html": "<p>There are currently no published job openings.</p><p>Please check this page again for future opportunities to join MATEX.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "Careers at MATEX",
+          "website_page_seo_description": "Job openings and opportunities to join MATEX.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "Careers at MATEX",
+          "website_page_social_description": "Job openings and opportunities to join MATEX.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "karir",
+          "website_page_title": "Karir",
+          "website_page_summary": "Informasi kesempatan bergabung dengan MATEX akan tersedia di halaman ini.",
+          "website_page_body_html": "<p>Saat ini belum ada informasi lowongan yang dipublikasikan.</p><p>Silakan kunjungi kembali halaman ini untuk pembaruan kesempatan bergabung dengan MATEX.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "Karir di MATEX",
+          "website_page_seo_description": "Informasi lowongan dan kesempatan bergabung dengan MATEX.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "Karir di MATEX",
+          "website_page_social_description": "Informasi lowongan dan kesempatan bergabung dengan MATEX.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": []
+    },
+    {
+      "website_page_key": "contact",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": null,
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "contact-us",
+          "website_page_title": "Contact Us",
+          "website_page_summary": "Contact the MATEX team through the available channels.",
+          "website_page_body_html": null,
+          "website_page_content_json": null,
+          "website_page_seo_title": "Contact MATEX",
+          "website_page_seo_description": null,
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "Contact MATEX",
+          "website_page_social_description": null,
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "kontak",
+          "website_page_title": "Hubungi Kami",
+          "website_page_summary": "Hubungi tim MATEX melalui kanal yang tersedia.",
+          "website_page_body_html": null,
+          "website_page_content_json": null,
+          "website_page_seo_title": "Hubungi MATEX",
+          "website_page_seo_description": null,
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "Hubungi MATEX",
+          "website_page_social_description": null,
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": []
+    },
+    {
+      "website_page_key": "faq",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": null,
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "faq",
+          "website_page_title": "Frequently Asked Questions",
+          "website_page_summary": "Find answers regarding MATEX's company, products, and services.",
+          "website_page_body_html": "<h1>Frequently Asked Questions</h1>\n<p>Welcome to the Frequently Asked Questions page! Here, you can find various information regarding the company, products, and services we offer.</p>\n<h2>Question Categories</h2>\n<ul>\n    <li><strong>Products:</strong> Information about our product offerings and features.</li>\n    <li><strong>Services:</strong> Details about the services you can access.</li>\n    <li><strong>Purchasing:</strong> How to shop and customer support.</li>\n</ul>\n<p>If you can’t find the answer you’re looking for, feel free to contact us directly.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "MATEX FAQ",
+          "website_page_seo_description": "Get answers to common questions about MATEX, including product information, services, and customer support.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "MATEX FAQ",
+          "website_page_social_description": "Find important information about MATEX on our Frequently Asked Questions page, including the products and services we offer.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "faq",
+          "website_page_title": "Pertanyaan Umum",
+          "website_page_summary": "Temukan jawaban seputar perusahaan, produk, dan layanan yang ditawarkan oleh MATEX.",
+          "website_page_body_html": "<h1>Pertanyaan Umum</h1>\n<p>Selamat datang di halaman Pertanyaan Umum! Di sini, Anda dapat menemukan informasi mengenai perusahaan, produk, dan layanan yang kami tawarkan.</p>\n<h2>Kategori Pertanyaan</h2>\n<ul>\n    <li><strong>Produk:</strong> Temukan informasi tentang penawaran dan fitur produk kami.</li>\n    <li><strong>Layanan:</strong> Dapatkan detail mengenai layanan yang tersedia untuk Anda.</li>\n    <li><strong>Pembelian:</strong> Pelajari cara berbelanja dan akses dukungan pelanggan.</li>\n</ul>\n<p>Jika Anda tidak menemukan jawaban yang Anda cari, silakan hubungi kami langsung untuk bantuan lebih lanjut.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "FAQ MATEX",
+          "website_page_seo_description": "Dapatkan jawaban atas pertanyaan umum mengenai MATEX, termasuk informasi produk, layanan, dan dukungan pelanggan yang kami sediakan.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index, follow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "FAQ MATEX",
+          "website_page_social_description": "Temukan informasi penting tentang MATEX di halaman Pertanyaan Umum kami, termasuk produk dan layanan yang kami sediakan.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": []
+    },
+    {
+      "website_page_key": "home",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": "2026-09-23 16:29:54",
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "home",
+          "website_page_title": "MATEX",
+          "website_page_summary": null,
+          "website_page_body_html": null,
+          "website_page_content_json": "{\"home_contract_version\":3,\"latex_features\":{\"status\":true,\"eyebrow\":\"MATEX EXCELLENCE\",\"title\":\"Why Choose 100% Natural Latex?\",\"description\":\"The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.\",\"items\":[{\"title\":\"High Elasticity & Responsiveness\",\"description\":\"Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.\"},{\"title\":\"Damping & Load Support\",\"description\":\"Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.\"},{\"title\":\"Hypoallergenic & Hygienic\",\"description\":\"Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.\"},{\"title\":\"Harmful Chemical Free\",\"description\":\"Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.\"},{\"title\":\"Airflow & Pinhole Structure\",\"description\":\"Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.\"},{\"title\":\"Versatile Applications\",\"description\":\"From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.\"},{\"title\":\"Long-Lasting Durability\",\"description\":\"Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.\"},{\"title\":\"Eco-Friendly & Sustainable\",\"description\":\"Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.\"}]},\"categories\":{\"status\":true},\"products\":{\"status\":true},\"articles\":{\"status\":true},\"tags\":{\"status\":false},\"newsletter\":{\"status\":false},\"advertisement\":{\"status\":false,\"label\":\"MATEX PROMOTION\",\"title\":\"Need a natural latex solution for your business?\",\"description\":\"Talk with our team about product specifications, availability, and partnership opportunities.\",\"cta_label\":\"Contact MATEX\",\"cta_url\":\"/en/contact-us\"}}",
+          "website_page_seo_title": "MATEX INDO ABADI",
+          "website_page_seo_description": "100% Natural Latex - The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index,follow",
+          "website_page_canonical_url": "https://matexindo.com/en",
+          "website_page_social_title": "MATEX INDO ABADI | 🌿 100% NATURAL LATEX",
+          "website_page_social_description": "100% Natural Latex - The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "home",
+          "website_page_title": "MATEX",
+          "website_page_summary": null,
+          "website_page_body_html": null,
+          "website_page_content_json": "{\"home_contract_version\":3,\"latex_features\":{\"status\":true,\"eyebrow\":\"KEUNGGULAN MATEX\",\"title\":\"Kenapa Harus 100% Natural Latex?\",\"description\":\"Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.\",\"items\":[{\"title\":\"Elastisitas & Respon Tinggi\",\"description\":\"Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.\"},{\"title\":\"Peredam & Penopang Beban\",\"description\":\"Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.\"},{\"title\":\"Hipoalergenik & Higienis\",\"description\":\"Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.\"},{\"title\":\"Bebas Bahan Kimia Berbahaya\",\"description\":\"Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.\"},{\"title\":\"Sirkulasi Udara & Pinhole\",\"description\":\"Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.\"},{\"title\":\"Fleksibel Berbagai Aplikasi\",\"description\":\"Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.\"},{\"title\":\"Daya Tahan Jangka Panjang\",\"description\":\"Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.\"},{\"title\":\"Ramah Lingkungan (Eco-Friendly)\",\"description\":\"Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.\"}]},\"categories\":{\"status\":true},\"products\":{\"status\":true},\"articles\":{\"status\":true},\"tags\":{\"status\":false},\"newsletter\":{\"status\":false},\"advertisement\":{\"status\":true,\"label\":\"PROMOSI MATEX\",\"title\":\"Butuh solusi lateks alami untuk bisnis Anda?\",\"description\":\"Diskusikan spesifikasi produk, ketersediaan, dan peluang kerja sama bersama tim kami.\",\"cta_label\":\"Hubungi MATEX\",\"cta_url\":\"/kontak\"}}",
+          "website_page_seo_title": "MATEX INDO ABADI",
+          "website_page_seo_description": "100% Natural Latex - Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "index,follow",
+          "website_page_canonical_url": "https://matexindo.com",
+          "website_page_social_title": "MATEX INDO ABADI | 🌿 100% NATURAL LATEX",
+          "website_page_social_description": "100% Natural Latex - Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": [
+        {
+          "website_page_media_slot": "home_advertisement",
+          "website_page_media_sort_order": 7,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_advertisement-7.webp",
+            "name": "41522fc8-149a-491e-aed8-3e94797c02c4",
+            "original_name": "41522fc8-149a-491e-aed8-3e94797c02c4.jpg",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 1024,
+            "height": 318
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_main",
+          "website_page_media_sort_order": 0,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "internal",
+          "website_page_media_click_target": "/tentang-matex",
+          "file": {
+            "path": "media/home-home_main-0.webp",
+            "name": "main-banner-100-natural-latex-clickhere",
+            "original_name": "main-banner-100-natural-latex-clickhere.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 1299,
+            "height": 720
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Main Banner",
+              "website_page_media_alt_text": "main-banner"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_side_1",
+          "website_page_media_sort_order": 1,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_side_1-1.webp",
+            "name": "banner-home-samping-atas-latex-mattress-2",
+            "original_name": "banner-home-samping-atas-latex-mattress-2.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 700,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "banner samping atas",
+              "website_page_media_alt_text": "banner-samping-atas"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_side_2",
+          "website_page_media_sort_order": 2,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_side_2-2.webp",
+            "name": "banner-home-samping-bawah-latex-sheet",
+            "original_name": "banner-home-samping-bawah-latex-sheet.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 700,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Banner Samping Bawah",
+              "website_page_media_alt_text": "banner-samping-bawah"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_tile_1",
+          "website_page_media_sort_order": 3,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_tile_1-3.webp",
+            "name": "bannerkotak1",
+            "original_name": "bannerkotak1.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 586,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Banner Kotak 1",
+              "website_page_media_alt_text": "banner-kotak-1"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_tile_2",
+          "website_page_media_sort_order": 4,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_tile_2-4.webp",
+            "name": "bannerkotak2",
+            "original_name": "bannerkotak2.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 586,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Banner Kotak 2",
+              "website_page_media_alt_text": "banner-kotak-2"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_tile_3",
+          "website_page_media_sort_order": 5,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_tile_3-5.webp",
+            "name": "bannerkotak3",
+            "original_name": "bannerkotak3.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 586,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Banner Kotak 3",
+              "website_page_media_alt_text": "banner-kotak-3"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "home_tile_4",
+          "website_page_media_sort_order": 6,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-home_tile_4-6.webp",
+            "name": "bannerkotak4",
+            "original_name": "bannerkotak4.webp",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 586,
+            "height": 492
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": "Banner kotak 4",
+              "website_page_media_alt_text": "banner-kotak-4"
+            }
+          ]
+        },
+        {
+          "website_page_media_slot": "og",
+          "website_page_media_sort_order": 8,
+          "website_page_media_is_visible": 1,
+          "website_page_media_click_action": "none",
+          "website_page_media_click_target": null,
+          "file": {
+            "path": "media/home-og-8.webp",
+            "name": "48cb9018-e292-4612-8002-d92b95db2884",
+            "original_name": "48cb9018-e292-4612-8002-d92b95db2884.jpg",
+            "mime_type": "image/webp",
+            "extension": "webp",
+            "width": 1024,
+            "height": 541
+          },
+          "translations": [
+            {
+              "website_page_media_locale": "en-US",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            },
+            {
+              "website_page_media_locale": "id-ID",
+              "website_page_media_caption": null,
+              "website_page_media_alt_text": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "website_page_key": "terms",
+      "website_page_default_locale": "id-ID",
+      "website_page_is_published": 1,
+      "website_page_publish_at": null,
+      "website_page_unpublish_at": null,
+      "translations": [
+        {
+          "website_page_locale": "en-US",
+          "website_page_path": "terms-and-conditions",
+          "website_page_title": "Terms & Conditions",
+          "website_page_summary": "Welcome to our site. By accessing or using our services, you agree to be bound by the following terms and conditions. Please read carefully before proceeding.",
+          "website_page_body_html": "<h1>Terms &amp; Conditions</h1><p>Welcome to our Terms &amp; Conditions page. By accessing and using the services we offer, you agree to comply with the following terms and conditions. If you do not agree with these terms and conditions, please do not use our services.</p><h2>1. Acceptance of Terms</h2><p>Your use of our services indicates that you have read and agreed to these terms and conditions. We reserve the right to modify these terms and conditions at any time without prior notice. Changes will be announced on this page.</p><h2>2. Use of Service</h2><p>You agree to use our services only for lawful purposes and in accordance with applicable laws. You are not permitted to misuse our services in any form.</p><h2>3. User Responsibility</h2><p>You are responsible for all actions taken through your account. Ensure that the information you provide is accurate and up to date.</p><h2>4. Limitation of Liability</h2><p>We are not liable for any loss or damage that may arise from the use of this service, whether direct or indirect.</p><h2>5. Applicable Law</h2><p>These terms and conditions are governed by the laws applicable in the Republic of Indonesia.</p><h2>6. Contact Us</h2><p>If you have any questions about these terms and conditions, please contact us using the contact information available on our site.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "Terms & Conditions",
+          "website_page_seo_description": "Find the terms and conditions for using our services. Please read carefully to understand your rights and obligations when using our products.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "noindex,nofollow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "Terms & Conditions",
+          "website_page_social_description": "Find the terms and conditions applicable to the use of our services. This page explains all the conditions you need to know before using our products and services.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        },
+        {
+          "website_page_locale": "id-ID",
+          "website_page_path": "syarat-ketentuan",
+          "website_page_title": "Syarat & Ketentuan",
+          "website_page_summary": "Selamat datang di situs kami. Dengan mengakses atau menggunakan layanan kami, Anda setuju untuk terikat oleh syarat dan ketentuan berikut. Mohon membaca dengan seksama sebelum melanjutkan.",
+          "website_page_body_html": "<h1>Syarat &amp; Ketentuan</h1><p>Selamat datang di halaman Syarat &amp; Ketentuan kami. Dengan mengakses dan menggunakan layanan yang kami tawarkan, Anda setuju untuk mematuhi syarat dan ketentuan berikut. Jika Anda tidak setuju dengan syarat dan ketentuan ini, mohon untuk tidak menggunakan layanan kami.</p><h2>1. Penerimaan Syarat</h2><p>Penggunaan layanan kami mengindikasikan bahwa Anda telah membaca dan menyetujui syarat dan ketentuan ini. Kami berhak untuk mengubah syarat dan ketentuan ini kapan saja tanpa pemberitahuan terlebih dahulu. Perubahan akan diumumkan di halaman ini.</p><h2>2. Penggunaan Layanan</h2><p>Anda setuju untuk menggunakan layanan kami hanya untuk tujuan yang sah dan sesuai dengan hukum yang berlaku. Anda tidak diperbolehkan untuk menyalahgunakan layanan kami dalam bentuk apapun.</p><h2>3. Tanggung Jawab Pengguna</h2><p>Anda bertanggung jawab atas semua aksi yang dilakukan melalui akun Anda. Pastikan informasi yang Anda berikan adalah akurat dan terbaru.</p><h2>4. Pembatasan Tanggung Jawab</h2><p>Kami tidak bertanggung jawab atas kerugian atau kerusakan yang mungkin timbul dari penggunaan layanan ini, baik secara langsung maupun tidak langsung.</p><h2>5. Hukum yang Berlaku</h2><p>Syarat dan ketentuan ini diatur oleh hukum yang berlaku di wilayah Republik Indonesia.</p><h2>6. Kontak Kami</h2><p>Jika Anda memiliki pertanyaan tentang syarat dan ketentuan ini, silakan hubungi kami melalui informasi kontak yang tersedia di situs kami.</p>",
+          "website_page_content_json": null,
+          "website_page_seo_title": "Syarat & Ketentuan",
+          "website_page_seo_description": "Temukan syarat dan ketentuan penggunaan layanan kami. Bacalah dengan seksama untuk memahami hak dan kewajiban Anda saat menggunakan produk kami.",
+          "website_page_seo_keywords": null,
+          "website_page_seo_robots": "noindex,nofollow",
+          "website_page_canonical_url": null,
+          "website_page_social_title": "syarat dan ketentuan",
+          "website_page_social_description": "Temukan syarat dan ketentuan yang berlaku untuk penggunaan layanan kami. Halaman ini menjelaskan semua ketentuan yang perlu Anda ketahui sebelum menggunakan produk dan layanan kami.",
+          "website_page_schema_json": null,
+          "website_page_translation_is_published": 1
+        }
+      ],
+      "media": []
+    }
+  ],
+  "navigations": [
+    {
+      "web_navigation_key": "primary",
+      "web_navigation_name": "Header Website",
+      "web_navigation_location": "header",
+      "web_navigation_default_locale": "id-ID",
+      "web_navigation_status": 1,
+      "web_navigation_settings_json": null,
+      "web_navigation_deleted_at": null,
+      "items": [
+        {
+          "web_navigation_item_key": "home",
+          "web_navigation_item_sort_order": 0,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "Home",
+              "web_navigation_item_path": "/en",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Beranda",
+              "web_navigation_item_path": "/",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        },
+        {
+          "web_navigation_item_key": "about",
+          "web_navigation_item_sort_order": 1,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "About MATEX",
+              "web_navigation_item_path": "/en/about-matex",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Tentang MATEX",
+              "web_navigation_item_path": "/tentang-matex",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        },
+        {
+          "web_navigation_item_key": "categories",
+          "web_navigation_item_sort_order": 2,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "Category",
+              "web_navigation_item_path": "/en/catalog",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Kategori",
+              "web_navigation_item_path": "/katalog",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        },
+        {
+          "web_navigation_item_key": "products",
+          "web_navigation_item_sort_order": 3,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "Product",
+              "web_navigation_item_path": "/en/catalog",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Produk",
+              "web_navigation_item_path": "/katalog",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        },
+        {
+          "web_navigation_item_key": "articles",
+          "web_navigation_item_sort_order": 4,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "Blog",
+              "web_navigation_item_path": "/en/articles",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Artikel",
+              "web_navigation_item_path": "/artikel",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        },
+        {
+          "web_navigation_item_key": "contact",
+          "web_navigation_item_sort_order": 5,
+          "web_navigation_item_status": 1,
+          "web_navigation_item_deleted_at": null,
+          "translations": [
+            {
+              "web_navigation_item_locale": "en-US",
+              "web_navigation_item_label": "Contact",
+              "web_navigation_item_path": "/en/contact-us",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            },
+            {
+              "web_navigation_item_locale": "id-ID",
+              "web_navigation_item_label": "Hubungi",
+              "web_navigation_item_path": "/kontak",
+              "web_navigation_item_url": null,
+              "web_navigation_item_i18n_status": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "contact_topics": [
+    {
+      "contact_inquiry_topic_key": "product-information",
+      "contact_inquiry_topic_sort_order": 0,
+      "contact_inquiry_topic_status": 1,
+      "translations": [
+        {
+          "contact_inquiry_topic_locale": "en-US",
+          "contact_inquiry_topic_label": "Product Information",
+          "contact_inquiry_topic_i18n_status": 1
+        },
+        {
+          "contact_inquiry_topic_locale": "id-ID",
+          "contact_inquiry_topic_label": "Informasi Produk",
+          "contact_inquiry_topic_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "contact_inquiry_topic_key": "quotation-and-sales",
+      "contact_inquiry_topic_sort_order": 1,
+      "contact_inquiry_topic_status": 1,
+      "translations": [
+        {
+          "contact_inquiry_topic_locale": "en-US",
+          "contact_inquiry_topic_label": "Quotation & Sales",
+          "contact_inquiry_topic_i18n_status": 1
+        },
+        {
+          "contact_inquiry_topic_locale": "id-ID",
+          "contact_inquiry_topic_label": "Penawaran & Pembelian",
+          "contact_inquiry_topic_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "contact_inquiry_topic_key": "partnership",
+      "contact_inquiry_topic_sort_order": 2,
+      "contact_inquiry_topic_status": 1,
+      "translations": [
+        {
+          "contact_inquiry_topic_locale": "en-US",
+          "contact_inquiry_topic_label": "Partnership & Collaboration",
+          "contact_inquiry_topic_i18n_status": 1
+        },
+        {
+          "contact_inquiry_topic_locale": "id-ID",
+          "contact_inquiry_topic_label": "Kemitraan & Kerja Sama",
+          "contact_inquiry_topic_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "contact_inquiry_topic_key": "other",
+      "contact_inquiry_topic_sort_order": 3,
+      "contact_inquiry_topic_status": 1,
+      "translations": [
+        {
+          "contact_inquiry_topic_locale": "en-US",
+          "contact_inquiry_topic_label": "Other",
+          "contact_inquiry_topic_i18n_status": 1
+        },
+        {
+          "contact_inquiry_topic_locale": "id-ID",
+          "contact_inquiry_topic_label": "Lainnya",
+          "contact_inquiry_topic_i18n_status": 1
+        }
+      ]
+    }
+  ],
+  "contact_channels": [
+    {
+      "public_contact_channel_key": "whatsapp-sales",
+      "public_contact_channel_type": "whatsapp",
+      "public_contact_channel_value": "+6281355538777",
+      "public_contact_channel_url": null,
+      "public_contact_channel_is_primary": 1,
+      "public_contact_channel_is_public": 1,
+      "public_contact_channel_sort_order": 0,
+      "public_contact_channel_settings_json": null,
+      "public_contact_channel_deleted_at": null,
+      "translations": [
+        {
+          "public_contact_channel_locale": "en-US",
+          "public_contact_channel_label": "Taufik Hidayat",
+          "public_contact_channel_description": "The admin is active during operating hours; please check the service operating hours in the office information section.",
+          "public_contact_channel_i18n_status": 1
+        },
+        {
+          "public_contact_channel_locale": "id-ID",
+          "public_contact_channel_label": "Taufik Hidayat",
+          "public_contact_channel_description": "Admin aktif sesuai jam operasional, silahkan lihat detail jam operasional service di bagian informasi kantor.",
+          "public_contact_channel_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "public_contact_channel_key": "email-sales",
+      "public_contact_channel_type": "email",
+      "public_contact_channel_value": "info@matexindo.com",
+      "public_contact_channel_url": null,
+      "public_contact_channel_is_primary": 0,
+      "public_contact_channel_is_public": 1,
+      "public_contact_channel_sort_order": 1,
+      "public_contact_channel_settings_json": null,
+      "public_contact_channel_deleted_at": null,
+      "translations": [
+        {
+          "public_contact_channel_locale": "en-US",
+          "public_contact_channel_label": "Official Email Address",
+          "public_contact_channel_description": "We will respond to your incoming messages within 24 hours, every day.",
+          "public_contact_channel_i18n_status": 1
+        },
+        {
+          "public_contact_channel_locale": "id-ID",
+          "public_contact_channel_label": "Alamat Email Resmi",
+          "public_contact_channel_description": "Kami akan merespon pesan masuk dari Anda dalam waktu 24 jam, setiap hari.",
+          "public_contact_channel_i18n_status": 1
+        }
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "faq_key": "tentang-matex-dan-produk",
+      "faq_sort_order": 1,
+      "faq_status": 1,
+      "faq_deleted_at": null,
+      "translations": [
+        {
+          "faq_locale": "en-US",
+          "faq_question": "What is Matex Indo Abadi and what products do they offer?",
+          "faq_answer": "Matex Indo Abadi (MIA) is a leading manufacturer that produces a variety of quality products made from 100% natural latex. Our product range includes latex mattresses, bedding accessories (pillows and bolsters), latex sheets, pet accessories, motorcycle seats, and much more. We are committed to providing natural comfort and optimal sleep health for our customers.",
+          "faq_i18n_status": 1
+        },
+        {
+          "faq_locale": "id-ID",
+          "faq_question": "Apa itu Matex Indo Abadi dan produk apa saja yang ditawarkan?",
+          "faq_answer": "Matex Indo Abadi (MIA) adalah produsen dan manufaktur terkemuka yang memproduksi berbagai produk berkualitas berbahan 100% natural latex. Rangkaian produk kami meliputi kasur latex, aksesoris tempat tidur (bantal dan guling), latex lembaran (sheet), aksesoris hewan peliharaan (pet accessories), jok motor, dan masih banyak lagi. Kami berkomitmen untuk menghadirkan kenyamanan alami dan kesehatan tidur yang optimal bagi pelanggan.",
+          "faq_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "faq_key": "cara-pembelian-produk",
+      "faq_sort_order": 2,
+      "faq_status": 1,
+      "faq_deleted_at": null,
+      "translations": [
+        {
+          "faq_locale": "en-US",
+          "faq_question": "How to purchase Matex products? Are there any marketplaces available?",
+          "faq_answer": "Currently, you can view a complete list of our product categories directly on the platform matexindo.com. For purchases through our internal platform, that feature will be available in the next version update. In the meantime, you can inquire about product availability by directly contacting us via email at info@matexindonesia.com or via WhatsApp/Phone at Taufik Hidayat (+6281355538777).\n\nAdditionally, you can shop for our official products online through our official store on external marketplaces such as Shopee, TikTok Shop, and Tokopedia (more marketplaces will follow soon).",
+          "faq_i18n_status": 1
+        },
+        {
+          "faq_locale": "id-ID",
+          "faq_question": "Bagaimana cara membeli produk Matex? Apakah sudah ada marketplace?",
+          "faq_answer": "Saat ini, Anda dapat melihat daftar lengkap kategori produk kami langsung di platform matexindo.com. Untuk pembelian melalui platform internal kami, fitur tersebut akan segera hadir pada pembaruan versi berikutnya. Untuk saat ini, Anda bisa menanyakan ketersediaan produk secara langsung dengan menghubungi kontak kami di email info@matexindonesia.com atau WhatsApp/Telepon ke Taufik Hidayat (+6281355538777).\n\nSelain itu, Anda juga dapat berbelanja produk resmi kami secara online melalui toko resmi kami di marketplace eksternal seperti Shopee, TikTok Shop, dan Tokopedia (marketplace lainnya akan segera menyusul).",
+          "faq_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "faq_key": "edukasi-dan-wawasan-latex",
+      "faq_sort_order": 3,
+      "faq_status": 1,
+      "faq_deleted_at": null,
+      "translations": [
+        {
+          "faq_locale": "en-US",
+          "faq_question": "Where can I read information about the differences between 100% natural latex and synthetic latex?",
+          "faq_answer": "Matex not only produces products but is also dedicated to being a hub for information and insights about the latex industry. You can find various educational articles regarding the detailed differences between 100% natural latex and synthetic latex, care tips, and the latest industry trends on the Articles page of our website.",
+          "faq_i18n_status": 1
+        },
+        {
+          "faq_locale": "id-ID",
+          "faq_question": "Di mana saya bisa membaca informasi seputar perbedaan latex 100% natural dan sintetis?",
+          "faq_answer": "Matex tidak hanya sekadar memproduksi barang, tetapi juga berdedikasi menjadi pusat informasi dan wawasan seputar industri latex. Anda dapat menemukan berbagai artikel edukatif mengenai perbedaan mendetail antara latex 100% natural dan sintetis, tips perawatan, serta tren industri terkecil melalui halaman Artikel di website kami.",
+          "faq_i18n_status": 1
+        }
+      ]
+    },
+    {
+      "faq_key": "kerjasama-dan-partnership",
+      "faq_sort_order": 4,
+      "faq_status": 1,
+      "faq_deleted_at": null,
+      "translations": [
+        {
+          "faq_locale": "en-US",
+          "faq_question": "How to collaborate or establish a business partnership with Matex?",
+          "faq_answer": "We are always open to opportunities for collaboration, distribution, and other business partnerships. You can contact our team directly via email at info@matexindonesia.com, call Taufik Hidayat at +6281355538777, or fill out the partnership form available on our Contact page.",
+          "faq_i18n_status": 1
+        },
+        {
+          "faq_locale": "id-ID",
+          "faq_question": "Bagaimana cara berkolaborasi atau menjalin kerjasama bisnis dengan Matex?",
+          "faq_answer": "Kami selalu terbuka untuk peluang kerjasama, distribusi, maupun kemitraan bisnis lainnya. Anda dapat menghubungi tim kami secara langsung melalui email info@matexindonesia.com, menelepon Taufik Hidayat di +6281355538777, atau mengisi formulir kemitraan yang tersedia di halaman Kontak kami.",
+          "faq_i18n_status": 1
+        }
+      ]
+    }
+  ]
+}

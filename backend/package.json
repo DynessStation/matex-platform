@@ -13,6 +13,8 @@
     "db:migrate": "node scripts/migrate.cjs",
     "db:migrate:status": "node scripts/migrate.cjs --status",
     "db:migrate:adopt": "node scripts/migrate.cjs --adopt-existing",
+    "db:seed:company-defaults": "node scripts/seed-company-defaults.cjs",
+    "db:export:company-defaults": "node scripts/export-company-defaults.cjs",
     "admin:create-first": "node scripts/create-first-admin.cjs",
     "backup:check": "node scripts/ops/backup-production.cjs --check",
     "backup:create": "node scripts/ops/backup-production.cjs",

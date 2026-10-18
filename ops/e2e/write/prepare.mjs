@@ -2,7 +2,8 @@
 //
 //   1. Drop and recreate the e2e database (name must end with _e2e).
 //   2. Apply every migration (backend/scripts/migrate.cjs).
-//   3. Create the first admin (backend/scripts/create-first-admin.cjs) with a random password.
+//   3. Create the first admin (backend/scripts/create-first-admin.cjs) with a random password;
+//      it also seeds the default website content (pages, images, navigation, FAQs).
 //   4. Write the generated credentials to a git-ignored state file for the tests.
 //
 // Database host/port/user/password come from backend/.env; only the database name differs.
@@ -36,7 +37,15 @@ try {
   await connection.end();
 }
 
-const childEnv = { ...process.env, DB_NAME: stack.databaseName };
+// Fresh storage first: creating the first admin also copies the default website images into it.
+fs.rmSync(stack.storageRoot, { recursive: true, force: true });
+fs.mkdirSync(stack.storageRoot, { recursive: true });
+
+const childEnv = {
+  ...process.env,
+  DB_NAME: stack.databaseName,
+  FILE_STORAGE_ROOT: stack.storageRoot,
+};
 
 // Call the backend scripts directly with Node (no shell), so arguments with spaces stay intact.
 function run(script, args = [], input) {
@@ -76,9 +85,6 @@ run(
   ],
   `${admin.password}\n${admin.password}\n`,
 );
-
-fs.rmSync(stack.storageRoot, { recursive: true, force: true });
-fs.mkdirSync(stack.storageRoot, { recursive: true });
 
 fs.writeFileSync(stack.stateFile, JSON.stringify({ admin }, null, 2), { mode: 0o600 });
 console.log(`Prepared ${stack.databaseName} and ${stack.storageRoot}.`);
