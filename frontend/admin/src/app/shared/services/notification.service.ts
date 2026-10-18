@@ -16,10 +16,18 @@ export class NotificationService {
 
   public notification: boolean = true;
 
-  showSuccess(message: string): void {
+  // By default a success message also closes every open modal (template behaviour many
+  // forms rely on). Pass { dismissModals: false } when the success happens inside a modal
+  // that must stay open, such as uploading from the media picker.
+  showSuccess(
+    message: string,
+    options: { dismissModals?: boolean } = {},
+  ): void {
     this.alertSubject.next({ type: 'success', message: message });
     this.zone.run(() => {
-      this.modalService.dismissAll();
+      if (options.dismissModals !== false) {
+        this.modalService.dismissAll();
+      }
       if (this.notification) {
         this.toastr.success(message);
       }

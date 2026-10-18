@@ -110,8 +110,10 @@ export class AttachmentState {
           },
         });
 
+        // Keep the media picker open so the new upload can be selected right away.
         this.notificationService.showSuccess(
           this.apiMessageService.resolveResponse(result),
+          { dismissModals: false },
         );
       }),
     );

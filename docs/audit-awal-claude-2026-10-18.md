@@ -191,9 +191,10 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Cookie login hanya diteruskan oleh `frontend/admin/server.ts` (dipakai production). `ng serve` tidak memakai file itu, sehingga refresh halaman data (misalnya Produk) di mode dev bisa melempar ke halaman login. Production tidak terdampak.
 - Saran: pindahkan penerusan cookie ke mekanisme request bawaan Angular SSR yang dipakai baik oleh dev server maupun production.
 
-**FE-007 — Unggah gambar baru dari pemilih gambar di formulir artikel belum mulus** · P2 · Terbukti, belum diperbaiki
-- Setelah FE-008 diperbaiki, gambar berhasil terunggah, tetapi modal kadang tertutup tanpa memasang gambar, atau tetap terbuka dengan daftar yang terus dirender ulang. Memilih gambar yang sudah ada berjalan normal (dan diuji otomatis).
-- Saran: selidiki alur setelah upload di `media-modal` saat mode pilih, lalu tambahkan skenario test-nya.
+**FE-007 — Pemilih gambar tertutup sendiri setelah mengunggah gambar baru** · P2 · **Selesai**
+- Setelah unggahan berhasil, modal pemilih tertutup sendiri (alasan: `Dismissed with: undefined`) sebelum admin sempat memilih gambarnya. Berlaku untuk semua pemilih gambar (artikel, produk, kategori, kantor).
+- Akar masalah: `NotificationService.showSuccess()` (warisan template) selalu memanggil `modalService.dismissAll()`, sehingga notifikasi "Lampiran berhasil diunggah" ikut menutup semua modal.
+- Perbaikan: `showSuccess()` diberi opsi `{ dismissModals: false }` dan hanya dipakai oleh unggahan media. Perilaku 70 pemanggil lain tidak berubah. Skenario artikel di `npm run test:write` sekarang mengunggah thumbnail baru dari dalam pemilih.
 
 **FE-008 — Pemilih gambar artikel tidak bisa mengunggah gambar baru** · P2 · **Selesai**
 - `app-image-upload` di formulir artikel tidak diberi `collection`, sehingga unggahan baru langsung ditolak di browser ("collection required").
@@ -204,7 +205,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **TEST-001 — Test frontend hampir tidak ada** · P2 · **Sebagian selesai**
 - Public 1 file test, admin 0. Backend punya 56 test kontrak, dan ada 3 file test browser (Playwright).
 - Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
-- Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, akun admin, dan FE-007.
+- Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, dan akun admin.
 
 **OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · Dugaan (berdasarkan dokumen sendiri)
 - `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
@@ -261,7 +262,7 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB), FE-006, FE-007. FE-003, FE-005, FE-008, dan DB-007 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB), FE-006. FE-003, FE-005, FE-007, FE-008, dan DB-007 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
 | Integritas data | DB-003, DB-008 (DB-001 dan DB-005 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
@@ -287,7 +288,7 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Test browser untuk alur admin yang mengubah data, memakai akun test khusus (bukan akun asli).
 - Selesai bila: simpan produk, upload media, dan publish artikel teruji otomatis.
 - Hasil: `npm run test:write`, 4 skenario. Selama membangunnya ditemukan FE-005 sampai FE-008 dan DB-008.
-- Lanjutan: FE-007, DB-008, lalu skenario kantor, jabatan, dan akun admin.
+- Lanjutan: DB-008, lalu skenario kantor, jabatan, dan akun admin. (FE-007 selesai.)
 
 **Fase 3 — Operasional**
 - OPS-001: salinan backup di luar VPS + satu kali latihan restore.

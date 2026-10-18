@@ -145,11 +145,13 @@ test("admin can publish an article that appears on the public site", async ({ pa
   await page.locator("input[formcontrolname=en_title]").fill(`Test Article ${run}`);
   await typeInEditor(page, 0, "Automated test article body.");
 
-  // Pick the image uploaded to the media library in the previous test.
-  // (Uploading a new image from inside this picker is tracked separately as audit FE-007.)
+  // Upload a new thumbnail from inside the picker (audit FE-007/FE-008), then insert it.
+  // New uploads are listed first in the picker's library tab.
   await openTab(page, "Media");
   await page.locator("li.choosefile-input").first().click();
+  await uploadThroughModal(page);
   const modal = page.locator(".modal-content");
+  await expect(modal.locator(".nav-link.active")).toContainText(/Pilih File|Select File/);
   const card = modal.locator(".library-box label").first();
   await expect(card).toBeVisible();
   await card.click();
