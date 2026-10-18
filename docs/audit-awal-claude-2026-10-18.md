@@ -188,6 +188,32 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **DOC-001 — README dan memori lama sudah ketinggalan** · P3 · Terbukti
 - README masih menyebut "Phase 4.8". Catatan Codex menyebut `product.ts` masih kosong, padahal sekarang sudah 899 baris.
 
+### Server production (VPS) — diaudit 18 Oktober 2026 lewat SSH
+
+Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database production **identik** dengan database lokal `matex_dev`, Ubuntu 24.04 up to date, file `.env` berizin `600`, firewall hanya membuka SSH/80/443/CloudPanel (MySQL, Redis, FTP, dan port lama tertutup dari internet), dan backup harian berjalan jam 02:15 WIB dengan retensi 14 hari.
+
+**V-1 — SSH menerima login password dan login root** · P1 · Terbukti
+- `PasswordAuthentication yes` dan `PermitRootLogin yes`. Siapa pun di internet bisa mencoba menebak password root.
+- Saran: login root hanya dengan SSH key, dan matikan login password. Harus dikerjakan hati-hati supaya pemilik tidak terkunci di luar server.
+
+**V-2 — Backup belum disalin ke luar VPS** · P1 · Terbukti
+- `rclone` sudah terpasang tetapi belum punya tujuan. Kalau VPS rusak total, backup ikut hilang.
+- Saran: salin otomatis ke Google Drive dalam bentuk terenkripsi (dump database berisi data akun).
+
+**V-3 — Skrip deploy bisa memakai Node 18** · P2 · **Selesai**
+- `ops/deploy-production.sh` memakai `node` pertama di PATH (Node 18 sistem) saat dijalankan lewat SSH non-interaktif. Pencarian Node nvm di skrip juga tidak pernah berhasil karena salah kedalaman folder.
+- Perbaikan: skrip selalu memakai Node dari nvm dan menolak jalan kalau Node di bawah versi 20.
+
+**V-4 — Log PM2 tidak dirotasi** · P3 · Terbukti
+- Saran: pasang `pm2-logrotate`.
+
+**V-5 — Izin percobaan dan izin lama masih ada** · P3 · **Selesai**
+- `contoh.view`, `dummy.vie`, `test_module.view`, dan `category_product.*` tidak dipakai kode.
+- Perbaikan: migration `20261018_024_retire_unused_permissions.sql` mencabut izin-izin itu dari profil akses lalu soft-delete (status 99), sama seperti tombol hapus di admin. Daftar izin di admin sekarang tepat 51, sesuai yang dipakai kode.
+
+**V-6 — User database boleh login dari host mana saja** · P3 · Terbukti
+- `matexapp@'%'` dan MySQL mendengarkan di semua interface. Risikonya kecil karena firewall menutup port 3306, tapi sebaiknya dibatasi ke `localhost`.
+
 ---
 
 ## Bagian 5 — Hal yang sudah baik (pertahankan)

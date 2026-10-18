@@ -24,13 +24,22 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
   exit 1
 fi
 
-if ! command -v node >/dev/null 2>&1; then
-  NODE_DIRECTORY="$(find "$HOME/.nvm/versions/node" -mindepth 2 -maxdepth 2 -type f -name node -printf '%h\n' 2>/dev/null | sort -V | tail -n 1)"
-  if [[ -z "$NODE_DIRECTORY" ]]; then
-    echo "Node.js was not found in PATH or under ~/.nvm/versions/node." >&2
-    exit 1
-  fi
+# Prefer the nvm-managed Node.js that PM2 runs. Non-interactive SSH sessions do
+# not load nvm, so the first `node` on PATH can be the older system package.
+NODE_DIRECTORY="$(find "$HOME/.nvm/versions/node" -mindepth 3 -maxdepth 3 -type f -path '*/bin/node' -printf '%h\n' 2>/dev/null | sort -V | tail -n 1)"
+if [[ -n "$NODE_DIRECTORY" ]]; then
   export PATH="$NODE_DIRECTORY:$PATH"
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js was not found in PATH or under ~/.nvm/versions/node." >&2
+  exit 1
+fi
+
+NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]')"
+if (( NODE_MAJOR < 20 )); then
+  echo "Node.js $(node -v) is too old; Angular 21 builds need Node.js 20 or newer." >&2
+  exit 1
 fi
 
 for command_name in npm pm2; do
