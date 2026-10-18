@@ -208,8 +208,38 @@ Produksi MATEX menjalankan backup otomatis setiap hari pukul 02.15 WIB melalui
 crontab Site User. Job memakai `flock` pada
 `/home/matexindo/tmp/matex-backup.lock`, mempertahankan backup selama 14 hari,
 dan menulis hasil eksekusi terakhir ke
-`/home/matexindo/backups/matex/backup-last.log`. Jadwal lokal ini tidak
-menggantikan kebutuhan salinan backup di luar VPS.
+`/home/matexindo/backups/matex/backup-last.log`.
+
+### Salinan off-site terenkripsi (Google Drive)
+
+Setelah backup lokal berhasil, job yang sama menjalankan `bash ops/backup-offsite.sh`.
+Script ini menyalin setiap backup yang lengkap ke remote rclone `gdrive-crypt:`,
+mencocokkan backup terbaru dengan `rclone cryptcheck`, lalu menghapus salinan
+remote yang lebih tua dari 30 hari (`MATEX_OFFSITE_RETENTION_DAYS`).
+
+- `gdrive:` adalah Google Drive dengan scope `drive.file`, sehingga rclone hanya
+  melihat file buatannya sendiri.
+- `gdrive-crypt:` mengenkripsi nama dan isi file ke folder `MATEX-Backups`.
+  **Password enkripsinya disimpan pemilik di password manager.** Tanpa password
+  itu, salinan di Drive tidak bisa dibuka.
+- Konfigurasi ada di `/home/matexindo/.config/rclone/rclone.conf` (izin `600`).
+  Jangan menampilkan isinya, karena file itu memuat token Google.
+
+Menyambungkan ulang Google Drive (misalnya setelah akses dicabut) tanpa
+menampilkan token:
+
+```bash
+ssh -t -L 53682:127.0.0.1:53682 matexindo@72.60.77.35
+rclone config delete gdrive
+rclone config create gdrive drive scope=drive.file config_is_local=true >/dev/null
+```
+
+Buka link `http://127.0.0.1:53682/auth?...` yang muncul di browser PC, lalu izinkan akses.
+
+Memulihkan dari Google Drive ketika VPS hilang: pasang rclone, buat ulang
+`gdrive` seperti di atas, buat remote crypt dengan password yang sama, lalu
+`rclone copy gdrive-crypt:matex-<waktu> ./matex-<waktu>` dan jalankan
+`npm run backup:verify -- --backup ./matex-<waktu>` sebelum restore.
 
 Untuk drill, buat database kosong bernama `mia_restore_drill` dan beri user database MATEX akses ke database itu. Gunakan direktori file drill yang kosong dan berada di luar storage aktif:
 

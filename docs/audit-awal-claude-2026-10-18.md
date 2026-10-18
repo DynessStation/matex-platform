@@ -197,9 +197,10 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 - Perbaikan: kunci SSH PC pemilik dipasang untuk root, lalu `/etc/ssh/sshd_config.d/10-matex-root-key-only.conf` membuat root **hanya bisa login dengan kunci**. Untuk membatalkan: hapus file itu lalu `systemctl reload ssh`.
 - Sengaja tidak diubah: login password untuk user lain. VPS ini juga dipakai proyek lain (user site CloudPanel seperti `gibadmin`, `remora`, `paskasindo-gibapi`) yang mungkin login dengan password. fail2ban sudah aktif memblokir tebakan password berulang.
 
-**V-2 — Backup belum disalin ke luar VPS** · P1 · Terbukti
+**V-2 — Backup belum disalin ke luar VPS** · P1 · **Selesai**
 - `rclone` sudah terpasang tetapi belum punya tujuan. Kalau VPS rusak total, backup ikut hilang.
-- Saran: salin otomatis ke Google Drive dalam bentuk terenkripsi (dump database berisi data akun).
+- Perbaikan: remote `gdrive-crypt:` (Google Drive, scope `drive.file`, nama dan isi file terenkripsi) dan `ops/backup-offsite.sh` yang berjalan setelah backup malam, dengan retensi 30 hari di Drive. Sudah diuji: unggah, `cryptcheck`, unduh balik, lalu `backup:verify` lulus.
+- Catatan kejadian: saat setup pertama, token Google sempat tercetak ke terminal dan terbaca di sesi Claude. Token itu sudah dicabut langsung ke Google (refresh ditolak dengan `invalid_grant`), lalu Drive disambungkan ulang tanpa menampilkan token.
 
 **V-3 — Skrip deploy bisa memakai Node 18** · P2 · **Selesai**
 - `ops/deploy-production.sh` memakai `node` pertama di PATH (Node 18 sistem) saat dijalankan lewat SSH non-interaktif. Pencarian Node nvm di skrip juga tidak pernah berhasil karena salah kedalaman folder.
