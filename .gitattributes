@@ -4,6 +4,7 @@
 *.js    text eol=lf
 *.mjs   text eol=lf
 *.cjs   text eol=lf
+*.sh    text eol=lf
 # Migration checksums are computed from raw file bytes, so every checkout must match production.
 *.sql   text eol=lf
 *.json  text eol=lf
