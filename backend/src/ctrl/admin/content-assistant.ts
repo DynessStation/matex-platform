@@ -5,6 +5,7 @@ import db = require("../../db");
 import { getAdminScope } from "../../helper/admin-scope.helper";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 import { AuthRequest, verifyToken } from "../middleware/authJwt";
+import { requirePermission } from "../middleware/authPermission";
 
 const app = express();
 const { pool } = db;
@@ -140,6 +141,7 @@ const extractOutputText = (response: any) => {
 app.post(
   "/api/v1/content-assistant",
   verifyToken,
+  requirePermission("content_assistant.use"),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success)

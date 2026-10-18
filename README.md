@@ -19,6 +19,11 @@ Production runs on Percona Server 8.4, so use a MySQL 8.4 database locally. Run 
 
 Do not use `npm run build` plus `serve:ssr` for local testing: production builds call the production domains.
 
+To build an empty database from the repository (for example a new local or staging database), run from `backend`:
+
+1. `npm run db:migrate` creates every table and the full admin permission catalog.
+2. `npm run admin:create-first -- --name "Full Name" --alias Alias --email you@example.com --phone +628123456789` creates the first all-access admin. The password is prompted for, never passed as a flag, and the command refuses to run once any admin exists.
+
 During server-side rendering, both frontends reach the API and their own assets through loopback origins:
 
 | Variable | Used by | Production value (`ops/ecosystem.config.cjs`) | Default in development builds |

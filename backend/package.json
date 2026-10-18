@@ -13,6 +13,7 @@
     "db:migrate": "node scripts/migrate.cjs",
     "db:migrate:status": "node scripts/migrate.cjs --status",
     "db:migrate:adopt": "node scripts/migrate.cjs --adopt-existing",
+    "admin:create-first": "node scripts/create-first-admin.cjs",
     "backup:check": "node scripts/ops/backup-production.cjs --check",
     "backup:create": "node scripts/ops/backup-production.cjs",
     "backup:verify": "node scripts/ops/restore-production.cjs --verify-only",
