@@ -36,6 +36,7 @@ _Dibuat: 20 Oktober 2026._
 | U-5 | Drawer bantuan | Drawer kanan berisi panduan admin per halaman dengan penanda (#), melompat ke bagian yang diklik. Isinya diambil dari panduan admin yang sudah ada (`docs/PANDUAN PENGGUNAAN ... 1.0.10`), disimpan sebagai file teks di frontend supaya mudah diperbarui | Belum |
 | U-6 | Tombol perbarui dengan jeda | Satu komponen: indikator memuat saat ditekan, lalu hitung mundur di dalam tombol (nonaktif) selama jeda. Dasbor 2 menit, Analitik Publik dan SEO 5 menit (SEO memanggil Google, kuotanya terbatas) | Belum |
 | U-7 | Tombol kembali di form | Satu komponen tombol "Kembali" di kepala form, menuju list asalnya (dengan query terakhir) | Belum |
+| U-15 | Pratinjau gambar (tambahan pemilik 20 Okt) | Satu komponen lightbox: setiap gambar (kotak media, pustaka Media, gambar di tabel) saat di-hover menampilkan ikon mata; klik membuka gambar penuh di layar. Gambar dari kumpulan (galeri, Media) bisa digeser sebelum/berikutnya (carousel); gambar tunggal (misalnya foto profil di tabel akun) tampil sendiri tanpa navigasi. Tutup dengan Esc, klik di luar, atau tombol tutup; bisa dengan keyboard | Belum |
 
 ### Per halaman
 
