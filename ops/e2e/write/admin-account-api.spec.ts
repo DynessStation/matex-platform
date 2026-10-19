@@ -1,46 +1,13 @@
-import fs from "node:fs";
+import { expect, test, type APIRequestContext } from "@playwright/test";
 
-import { expect, request, test, type APIRequestContext, type APIResponse } from "@playwright/test";
+import { admin, apiContext, expectCode, login, runId, runNumber, saveRecording } from "./api-contract";
 
-import { stack } from "./stack.mjs";
-
-// API contract for the admin session and admin-account endpoints (backend/src/ctrl/admin/auth.ts).
-// It pins status codes, response codes, and the key fields, so refactors of that controller can
-// be checked against real MySQL behavior. Runs against the isolated e2e API only.
+// API contract for the admin session and admin-account endpoints
+// (backend/src/ctrl/admin/auth.ts and ctrl/admin/admin-account/). It pins status codes, response
+// codes, and the key fields, so refactors can be checked against real MySQL behavior.
 test.describe.configure({ mode: "serial" });
 
-const { admin } = JSON.parse(fs.readFileSync(stack.stateFile, "utf8")) as {
-  admin: { identity: string; password: string };
-};
-const run = Date.now().toString(36).slice(-6);
 const base = "/api/v1/admin-acct";
-
-type Body = {
-  success: boolean;
-  code?: string;
-  data?: any;
-  pagination?: Record<string, number | boolean>;
-};
-
-async function expectCode(response: APIResponse, status: number, code?: string): Promise<Body> {
-  const body = (await response.json()) as Body;
-  expect({ status: response.status(), code: body.code }).toEqual({
-    status,
-    code: code ?? body.code,
-  });
-  return body;
-}
-
-async function session(identity: string, password: string): Promise<APIRequestContext> {
-  const context = await request.newContext({ baseURL: stack.apiOrigin });
-  const body = await expectCode(
-    await context.post(`${base}/login`, { data: { identity, password } }),
-    200,
-    "AUTH_LOGIN_SUCCESS",
-  );
-  expect(body.data.id_admin_acct).toBeTruthy();
-  return context;
-}
 
 let anonymous: APIRequestContext;
 let owner: APIRequestContext;
@@ -50,17 +17,18 @@ let createdId = "";
 
 const newAccount = {
   name: "Akun Uji Kontrak",
-  alias: `Kontrak${run}`,
-  email_1: `kontrak.${run}@example.invalid`,
-  phone_1: `+62810${Date.now().toString().slice(-7)}`,
-  password: `Kontrak-${run}-9`,
+  alias: `Kontrak${runId}`,
+  email_1: `kontrak.${runId}@example.invalid`,
+  phone_1: `+62810${String(runNumber).padStart(7, "0")}`,
+  password: `Kontrak-${runId}-9`,
 };
 
 test.beforeAll(async () => {
-  anonymous = await request.newContext({ baseURL: stack.apiOrigin });
+  anonymous = await apiContext();
 });
 
 test.afterAll(async () => {
+  await saveRecording("admin-account-api", ["admin_acct", "audit_log"]);
   await anonymous?.dispose();
   await owner?.dispose();
 });
@@ -88,7 +56,7 @@ test("login rejects missing fields and wrong passwords", async () => {
 });
 
 test("login opens a session that /me reports", async () => {
-  owner = await session(admin.identity, admin.password);
+  owner = await login(admin.identity, admin.password);
   const me = await expectCode(await owner.get(`${base}/me`), 200, "AUTH_AUTHENTICATED");
   expect(me.data).toMatchObject({ alias: "E2EAdmin", email_1: admin.identity });
   ownerId = me.data.id_admin_acct;
@@ -201,7 +169,7 @@ test("update changes the account", async () => {
 });
 
 test("an account without admin-account permissions can use /me but not the account list", async () => {
-  const limited = await session(newAccount.email_1, newAccount.password);
+  const limited = await login(newAccount.email_1, newAccount.password);
   try {
     // /me and /select/* are registered before /:id; if that order breaks, /me hits the
     // permission-guarded detail route instead.

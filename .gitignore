@@ -18,7 +18,9 @@
 **/test-results/
 **/playwright-report-write/
 **/test-results-write/
+**/test-results-api/
 ops/e2e/.write-state.json
+ops/e2e/recordings/
 
 #==================================================
 #==== ENVIRONMENT / SECRETS

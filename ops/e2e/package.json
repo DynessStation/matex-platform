@@ -7,7 +7,8 @@
     "test": "playwright test",
     "test:public": "playwright test tests/public.spec.ts",
     "test:admin": "playwright test tests/admin.spec.ts",
-    "test:write": "node write/prepare.mjs && playwright test -c playwright.write.config.ts"
+    "test:write": "node write/prepare.mjs && playwright test -c playwright.write.config.ts",
+    "test:api": "node write/prepare.mjs && playwright test -c playwright.api.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0"
