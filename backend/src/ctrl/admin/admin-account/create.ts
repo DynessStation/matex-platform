@@ -9,6 +9,7 @@ import { requirePermission } from '../../../middleware/auth-permission.middlewar
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { resolveAdminProfilePhoto } from './profile-photo';
+import { isValidEmail } from '../../../helper/input.helper';
 
 const { pool } = db;
 
@@ -87,9 +88,7 @@ router.post(
 
       // Email validation
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(cleanEmail1) || (cleanEmail2 && !emailRegex.test(cleanEmail2))) {
+      if (!isValidEmail(cleanEmail1) || (cleanEmail2 && !isValidEmail(cleanEmail2))) {
         return sendError(res, 400, 'ADMIN_ACCOUNT_EMAIL_INVALID', 'Invalid email address');
       }
 

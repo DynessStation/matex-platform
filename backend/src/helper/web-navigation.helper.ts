@@ -4,6 +4,7 @@ import {
   isFixedWebNavigationKey,
 } from '../config/web-navigation.config';
 import keyhsid from '../hsid';
+import { parseFlag } from './input.helper';
 
 export interface NormalizedNavigationItemTranslation {
   locale: string;
@@ -49,18 +50,6 @@ export const decodeWebNavigationItemId = (value: unknown): number | null => {
   return id;
 };
 
-const normalizeFlag = (value: unknown): 0 | 1 | null => {
-  if (value === true || value === 1 || value === '1' || value === 'true') {
-    return 1;
-  }
-
-  if (value === false || value === 0 || value === '0' || value === 'false') {
-    return 0;
-  }
-
-  return null;
-};
-
 export const normalizeNavigationItemInput = (
   body: any,
   defaultLocale: string,
@@ -77,7 +66,7 @@ export const normalizeNavigationItemInput = (
     };
   }
 
-  const status = normalizeFlag(body?.web_navigation_item_status ?? 1);
+  const status = parseFlag(body?.web_navigation_item_status ?? 1);
 
   if (status === null) {
     return {
@@ -140,7 +129,7 @@ export const normalizeNavigationItemInput = (
       };
     }
 
-    const translationStatus = normalizeFlag(rawTranslation?.status ?? 1);
+    const translationStatus = parseFlag(rawTranslation?.status ?? 1);
 
     if (translationStatus === null) {
       return {

@@ -3,6 +3,7 @@ import { RowDataPacket } from 'mysql2';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { parseJsonValue } from '../../helper/json.helper';
 
 const router = Router();
 
@@ -20,17 +21,6 @@ const PUBLIC_MEDIA_SLOTS = [
   'gallery',
   'og',
 ] as const;
-
-const parseJsonValue = (value: unknown): unknown | null => {
-  if (value === null || value === undefined) return null;
-  if (typeof value !== 'string') return value;
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
-};
 
 // Public company scope is deployment-owned.
 // No request parameter, cookie, or header may override it.

@@ -1,22 +1,6 @@
 // Navigation metadata: key and field validation, settings JSON parsing.
 import { isPublicContentLocale } from '../../../config/public-content.config';
 
-export const parseJsonValue = (value: unknown): unknown | null => {
-  if (value === null || value === undefined || value === '') {
-    return null;
-  }
-
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
-};
-
 export type NavigationMetadataResult =
   | {
       success: true;

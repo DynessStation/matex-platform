@@ -13,6 +13,7 @@ import { sendError } from '../../helper/api-response.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { parseJsonValue } from '../../helper/json.helper';
 
 // App
 
@@ -115,22 +116,6 @@ const decodeAuditLogId = (value: unknown): number | null => {
 };
 
 // JSON value
-
-const parseJsonValue = (value: unknown): unknown => {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
-};
 
 // String query
 
@@ -746,13 +731,13 @@ app.get(
 
       // JSON data
 
-      const beforeData = parseJsonValue(item.before_data);
+      const beforeData = parseJsonValue(item.before_data, { onInvalid: 'raw' });
 
-      const afterData = parseJsonValue(item.after_data);
+      const afterData = parseJsonValue(item.after_data, { onInvalid: 'raw' });
 
-      const changedFields = parseJsonValue(item.changed_fields);
+      const changedFields = parseJsonValue(item.changed_fields, { onInvalid: 'raw' });
 
-      const metadata = parseJsonValue(item.metadata);
+      const metadata = parseJsonValue(item.metadata, { onInvalid: 'raw' });
 
       // Integrity payload
 

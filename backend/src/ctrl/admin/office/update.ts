@@ -8,14 +8,14 @@ import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 
 import { getSessionScope, sessionHasPermission, decodeOfficeId } from './scope';
+import { validateOperatingHours } from './input';
 import {
-  nullableString,
-  normalizeFlag,
-  slugify,
   isValidEmail,
   isValidHttpUrl,
-  validateOperatingHours,
-} from './input';
+  nullableString,
+  slugFromText,
+  toFlag,
+} from '../../../helper/input.helper';
 import {
   resolveOfficeAttachments,
   insertOperatingHours,
@@ -156,7 +156,7 @@ router.put(
         return sendError(res, 400, 'OFFICE_LONGITUDE_INVALID', 'Invalid longitude');
       }
 
-      const attendanceEnabled = normalizeFlag(attendance_enabled, 0);
+      const attendanceEnabled = toFlag(attendance_enabled, 0);
 
       const numericRadius =
         attendance_radius_meter === null ||
@@ -188,11 +188,11 @@ router.put(
 
       // Public
 
-      const isPublic = normalizeFlag(is_public, 0);
+      const isPublic = toFlag(is_public, 0);
 
       const rawSlug = nullableString(public_slug);
 
-      const cleanSlug = isPublic === 1 ? slugify(rawSlug ?? cleanName) : null;
+      const cleanSlug = isPublic === 1 ? slugFromText(rawSlug ?? cleanName) : null;
 
       const sortOrderRaw = Number(public_sort_order ?? 0);
 

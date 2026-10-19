@@ -8,7 +8,7 @@ import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middlewar
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
 import { getSessionScope, decodeNavigationId } from './scope';
-import { parseJsonValue } from './metadata';
+import { parseJsonValue } from '../../../helper/json.helper';
 
 const { pool } = db;
 

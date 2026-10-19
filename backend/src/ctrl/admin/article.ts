@@ -14,16 +14,13 @@ import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { decodeId } from '../../helper/id.helper';
+import { contentSlug } from '../../helper/input.helper';
 
 const app = express();
 const { pool } = db;
 const statuses = new Set(['draft', 'published', 'scheduled', 'archived']);
 
-const decode = (value: unknown, codec: any): number | null => {
-  const id = Number(codec.decode(String(value ?? ''))[0]);
-  return Number.isSafeInteger(id) && id > 0 ? id : null;
-};
-const slugify = (value: unknown) => normalizePublicContentKey(value).slice(0, 255);
 const dateOrNull = (value: unknown): string | null => {
   if (!value) return null;
   const date = new Date(String(value));
@@ -39,8 +36,8 @@ const payloadOf = (body: any) => {
   const status = String(body?.status ?? 'draft');
   const publishedAt = dateOrNull(body?.published_at);
   const unpublishedAt = dateOrNull(body?.unpublished_at);
-  const thumbnailId = body?.thumbnail_id ? decode(body.thumbnail_id, keyhsid.idAttachment) : null;
-  const ogImageId = body?.og_image_id ? decode(body.og_image_id, keyhsid.idAttachment) : null;
+  const thumbnailId = body?.thumbnail_id ? decodeId(body.thumbnail_id, keyhsid.idAttachment) : null;
+  const ogImageId = body?.og_image_id ? decodeId(body.og_image_id, keyhsid.idAttachment) : null;
   if (
     !key ||
     key.length > 120 ||
@@ -56,7 +53,7 @@ const payloadOf = (body: any) => {
   const seen = new Set<string>();
   for (const item of body.translations) {
     const locale = String(item?.locale ?? '');
-    const slug = slugify(item?.slug);
+    const slug = contentSlug(item?.slug);
     const title = text(item?.title, 500);
     const articleBody = String(item?.body ?? '').trim();
     if (
@@ -189,7 +186,7 @@ app.get(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idArticle);
+    const id = decodeId(req.params.id, keyhsid.idArticle);
     if (!id) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM article WHERE id_article=? AND id_master_comp=? AND article_deleted_at IS NULL`,
@@ -400,7 +397,7 @@ app.post('/api/v1/articles', verifyToken, requirePermission('article.create'), (
   save(req, res, null),
 );
 app.put('/api/v1/articles/:id', verifyToken, requirePermission('article.update'), (req, res) => {
-  const id = decode(req.params.id, keyhsid.idArticle);
+  const id = decodeId(req.params.id, keyhsid.idArticle);
   return id ? save(req, res, id) : sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
 });
 app.patch(
@@ -410,7 +407,7 @@ app.patch(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idArticle),
+    const id = decodeId(req.params.id, keyhsid.idArticle),
       status = String(req.body?.status ?? '');
     if (!id || !statuses.has(status))
       return sendError(res, 400, 'ARTICLE_STATUS_INVALID', 'Invalid article status');
@@ -428,7 +425,7 @@ app.delete(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idArticle);
+    const id = decodeId(req.params.id, keyhsid.idArticle);
     if (!id) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     await pool.query(
       `UPDATE article SET article_deleted_at=NOW(),id_updated_by=? WHERE id_article=? AND id_master_comp=?`,

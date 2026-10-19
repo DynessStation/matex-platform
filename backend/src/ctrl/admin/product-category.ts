@@ -14,29 +14,21 @@ import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { decodeId } from '../../helper/id.helper';
+import { contentSlug, trimTo } from '../../helper/input.helper';
 
 const app = express();
 const { pool } = db;
 const statuses = new Set(['draft', 'published', 'archived']);
 
-const decode = (value: unknown, codec: any): number | null => {
-  const id = Number(codec.decode(String(value ?? ''))[0]);
-  return Number.isSafeInteger(id) && id > 0 ? id : null;
-};
-const clean = (value: unknown, max: number) =>
-  String(value ?? '')
-    .trim()
-    .slice(0, max);
-const slugify = (value: unknown) => normalizePublicContentKey(value).slice(0, 255);
-
 const payloadOf = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
   const status = String(body?.status ?? 'draft');
-  const parentId = body?.parent_id ? decode(body.parent_id, keyhsid.idProductCategory) : null;
+  const parentId = body?.parent_id ? decodeId(body.parent_id, keyhsid.idProductCategory) : null;
   const media = {
-    image: body?.image_id ? decode(body.image_id, keyhsid.idAttachment) : null,
-    icon: body?.icon_id ? decode(body.icon_id, keyhsid.idAttachment) : null,
-    og: body?.og_image_id ? decode(body.og_image_id, keyhsid.idAttachment) : null,
+    image: body?.image_id ? decodeId(body.image_id, keyhsid.idAttachment) : null,
+    icon: body?.icon_id ? decodeId(body.icon_id, keyhsid.idAttachment) : null,
+    og: body?.og_image_id ? decodeId(body.og_image_id, keyhsid.idAttachment) : null,
   };
   if (
     !key ||
@@ -54,20 +46,20 @@ const payloadOf = (body: any) => {
   const seen = new Set<string>();
   for (const item of body.translations) {
     const locale = String(item?.locale ?? '');
-    const slug = slugify(item?.slug);
-    const name = clean(item?.name, 255);
+    const slug = contentSlug(item?.slug);
+    const name = trimTo(item?.name, 255);
     if (!isPublicContentLocale(locale) || seen.has(locale) || !slug || !name) return null;
     seen.add(locale);
     translations.push({
       locale,
       slug,
       name,
-      description: clean(item?.description, 4000) || null,
-      metaTitle: clean(item?.meta_title, 255) || null,
-      metaDescription: clean(item?.meta_description, 500) || null,
-      canonicalUrl: clean(item?.canonical_url, 1000) || null,
-      ogTitle: clean(item?.og_title, 255) || null,
-      ogDescription: clean(item?.og_description, 500) || null,
+      description: trimTo(item?.description, 4000) || null,
+      metaTitle: trimTo(item?.meta_title, 255) || null,
+      metaDescription: trimTo(item?.meta_description, 500) || null,
+      canonicalUrl: trimTo(item?.canonical_url, 1000) || null,
+      ogTitle: trimTo(item?.og_title, 255) || null,
+      ogDescription: trimTo(item?.og_description, 500) || null,
       status: Number(item?.status) === 0 ? 0 : 1,
     });
   }
@@ -147,7 +139,7 @@ app.get(
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : 'id-ID';
-    const search = clean(req.query.search, 200);
+    const search = trimTo(req.query.search, 200);
     const like = `%${search}%`;
     try {
       const [rows] = await pool.query<RowDataPacket[]>(
@@ -186,7 +178,7 @@ app.patch(
       return sendError(res, 400, 'PRODUCT_CATEGORY_ORDER_INVALID', 'Category order is invalid');
 
     const items = rawItems.map((item: any) => ({
-      id: decode(item?.id, keyhsid.idProductCategory),
+      id: decodeId(item?.id, keyhsid.idProductCategory),
       sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
     }));
     if (items.some((item: any) => !item.id))
@@ -270,7 +262,7 @@ app.get(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idProductCategory);
+    const id = decodeId(req.params.id, keyhsid.idProductCategory);
     if (!id) return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM product_category WHERE id_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL`,
@@ -528,7 +520,7 @@ app.put(
   verifyToken,
   requirePermission('product_category.update'),
   (req, res) => {
-    const id = decode(req.params.id, keyhsid.idProductCategory);
+    const id = decodeId(req.params.id, keyhsid.idProductCategory);
     return id
       ? save(req, res, id)
       : sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
@@ -541,7 +533,7 @@ app.delete(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idProductCategory);
+    const id = decodeId(req.params.id, keyhsid.idProductCategory);
     if (!id) return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [children] = await pool.query<RowDataPacket[]>(
       `SELECT id_product_category FROM product_category WHERE id_parent_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL LIMIT 1`,

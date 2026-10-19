@@ -8,6 +8,7 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { validateWebsiteHomeMedia } from '../../config/website-home.config';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { parseJsonValue } from '../../helper/json.helper';
 
 const router = Router();
 const FIXED_PAGE_KEYS = new Set(['home', 'about', 'contact', 'faq', 'terms', 'career']);
@@ -102,16 +103,6 @@ const getSessionScope = async (req: AuthRequest): Promise<SessionScope> => {
     idAdminAcct: Number(account.id_admin_acct),
     idMasterComp: Number(account.id_master_comp),
   };
-};
-
-const parseJsonValue = (value: unknown): unknown | null => {
-  if (value === null || value === undefined) return null;
-  if (typeof value !== 'string') return value;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
 };
 
 const getEffectiveStatus = (

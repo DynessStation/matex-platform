@@ -15,6 +15,8 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { normalizeProductMediaSortOrder } from '../../helper/product-media.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { decodeId } from '../../helper/id.helper';
+import { trimTo } from '../../helper/input.helper';
 
 const app = express();
 const { pool } = db;
@@ -25,20 +27,12 @@ const priceVisibilities = new Set(['displayed', 'contact', 'hidden']);
 const priceTypes = new Set(['end_user', 'wholesale']);
 const priceCurrencies = new Set(['IDR', 'USD']);
 const roles = new Set(['thumbnail', 'gallery', 'og', 'size_chart', 'document']);
-const decode = (value: unknown, codec: any) => {
-  const id = Number(codec.decode(String(value ?? ''))[0]);
-  return Number.isSafeInteger(id) && id > 0 ? id : null;
-};
-const clean = (value: unknown, max: number) =>
-  String(value ?? '')
-    .trim()
-    .slice(0, max);
 const numberOrNull = (value: unknown) =>
   value === '' || value == null || !Number.isFinite(Number(value)) ? null : Number(value);
 
 const parsePayload = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
-  const sku = clean(body?.sku, 120);
+  const sku = trimTo(body?.sku, 120);
   const status = String(body?.status ?? 'draft');
   const productType = String(body?.product_type ?? 'physical');
   const stockStatus = String(body?.stock_status ?? 'in_stock');
@@ -62,24 +56,24 @@ const parsePayload = (body: any) => {
   for (const item of body.translations) {
     const locale = String(item?.locale ?? '');
     const slug = normalizePublicContentKey(item?.slug).slice(0, 255);
-    const name = clean(item?.name, 255);
+    const name = trimTo(item?.name, 255);
     if (!isPublicContentLocale(locale) || locales.has(locale) || !slug || !name) return null;
     locales.add(locale);
     translations.push({
       locale,
       slug,
       name,
-      shortDescription: clean(item?.short_description, 4000) || null,
+      shortDescription: trimTo(item?.short_description, 4000) || null,
       description:
         String(item?.description ?? '')
           .trim()
           .slice(0, 100000) || null,
       specifications: item?.specifications ?? null,
-      metaTitle: clean(item?.meta_title, 255) || null,
-      metaDescription: clean(item?.meta_description, 500) || null,
-      canonicalUrl: clean(item?.canonical_url, 1000) || null,
-      ogTitle: clean(item?.og_title, 255) || null,
-      ogDescription: clean(item?.og_description, 500) || null,
+      metaTitle: trimTo(item?.meta_title, 255) || null,
+      metaDescription: trimTo(item?.meta_description, 500) || null,
+      canonicalUrl: trimTo(item?.canonical_url, 1000) || null,
+      ogTitle: trimTo(item?.og_title, 255) || null,
+      ogDescription: trimTo(item?.og_description, 500) || null,
       status: Number(item?.status) === 0 ? 0 : 1,
     });
   }
@@ -88,13 +82,13 @@ const parsePayload = (body: any) => {
   const categoryIds = [
     ...new Set(
       (Array.isArray(body?.category_ids) ? body.category_ids : [])
-        .map((id: unknown) => decode(id, keyhsid.idProductCategory))
+        .map((id: unknown) => decodeId(id, keyhsid.idProductCategory))
         .filter(Boolean),
     ),
   ] as number[];
   if (!categoryIds.length) return null;
   const media = (Array.isArray(body?.media) ? body.media : []).map((item: any, index: number) => ({
-    id: decode(item?.id, keyhsid.idAttachment),
+    id: decodeId(item?.id, keyhsid.idAttachment),
     role: String(item?.role ?? 'gallery'),
     // Zero is a valid first position. Using `|| index` here made the first
     // gallery item inherit its position in the whole media array. When a
@@ -113,9 +107,9 @@ const parsePayload = (body: any) => {
     return null;
   const prices = (Array.isArray(body?.prices) ? body.prices : []).map(
     (item: any, index: number) => ({
-      type: clean(item?.type, 40),
-      label: clean(item?.label, 120) || null,
-      currency: clean(item?.currency || 'IDR', 3).toUpperCase(),
+      type: trimTo(item?.type, 40),
+      label: trimTo(item?.label, 120) || null,
+      currency: trimTo(item?.currency || 'IDR', 3).toUpperCase(),
       amount: numberOrNull(item?.amount),
       compareAt: numberOrNull(item?.compare_at),
       minQty: numberOrNull(item?.min_qty),
@@ -157,12 +151,12 @@ const parsePayload = (body: any) => {
   }
   const marketplaces = (Array.isArray(body?.marketplaces) ? body.marketplaces : []).map(
     (item: any, index: number) => ({
-      provider: clean(item?.provider, 50),
-      label: clean(item?.label, 120) || null,
-      url: clean(item?.url, 1000),
-      sku: clean(item?.sku, 120) || null,
+      provider: trimTo(item?.provider, 50),
+      label: trimTo(item?.label, 120) || null,
+      url: trimTo(item?.url, 1000),
+      sku: trimTo(item?.sku, 120) || null,
       price: numberOrNull(item?.price),
-      currency: clean(item?.currency || 'IDR', 3).toUpperCase(),
+      currency: trimTo(item?.currency || 'IDR', 3).toUpperCase(),
       isPrimary: item?.is_primary ? 1 : 0,
       isActive: item?.is_active === false ? 0 : 1,
       sortOrder: Math.max(0, Number(item?.sort_order) || index),
@@ -215,14 +209,14 @@ const parsePayload = (body: any) => {
     prices,
     marketplaces,
     translations,
-    kind: clean(body?.product_kind, 120) || null,
-    unit: clean(body?.unit, 40) || null,
-    barcode: clean(body?.barcode, 120) || null,
-    manufacturerCode: clean(body?.manufacturer_code, 120) || null,
-    countryOrigin: clean(body?.country_origin, 100) || null,
-    provinceOrigin: clean(body?.origin_province, 100) || null,
-    cityOrigin: clean(body?.origin_city, 100) || null,
-    hsCode: clean(body?.hs_code, 50) || null,
+    kind: trimTo(body?.product_kind, 120) || null,
+    unit: trimTo(body?.unit, 40) || null,
+    barcode: trimTo(body?.barcode, 120) || null,
+    manufacturerCode: trimTo(body?.manufacturer_code, 120) || null,
+    countryOrigin: trimTo(body?.country_origin, 100) || null,
+    provinceOrigin: trimTo(body?.origin_province, 100) || null,
+    cityOrigin: trimTo(body?.origin_city, 100) || null,
+    hsCode: trimTo(body?.hs_code, 50) || null,
     weight,
     length,
     width,
@@ -360,7 +354,7 @@ app.get(
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : 'id-ID';
-    const search = clean(req.query.search, 200),
+    const search = trimTo(req.query.search, 200),
       like = `%${search}%`;
     const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
     const paginate = Math.min(100, Math.max(1, Math.floor(Number(req.query.paginate) || 15)));
@@ -410,7 +404,7 @@ app.get(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idProduct);
+    const id = decodeId(req.params.id, keyhsid.idProduct);
     if (!id) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     try {
       const [rows] = await pool.query<RowDataPacket[]>(
@@ -737,7 +731,7 @@ app.put(
   verifyToken,
   requirePermission('product.update'),
   (req: AuthRequest, res: Response) => {
-    const id = decode(req.params.id, keyhsid.idProduct);
+    const id = decodeId(req.params.id, keyhsid.idProduct);
     return id ? save(req, res, id) : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
@@ -748,7 +742,7 @@ app.patch(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idProduct),
+    const id = decodeId(req.params.id, keyhsid.idProduct),
       status = String(req.body?.status ?? '');
     if (!id || !statuses.has(status))
       return sendError(res, 400, 'PRODUCT_STATUS_INVALID', 'Invalid product status');
@@ -768,7 +762,7 @@ app.delete(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const id = decode(req.params.id, keyhsid.idProduct);
+    const id = decodeId(req.params.id, keyhsid.idProduct);
     if (!id) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     const [result] = await pool.query<ResultSetHeader>(
       `UPDATE product_catalog SET product_status='archived',product_deleted_at=NOW(),id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,

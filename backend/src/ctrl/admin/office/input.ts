@@ -1,3 +1,4 @@
+import { toFlag } from '../../../helper/input.helper';
 // Input normalizers and operating-hour validation for office create and update.
 
 export interface OfficeOperatingHourInput {
@@ -27,62 +28,6 @@ export type OperatingHourResult =
       code: string;
       message: string;
     };
-
-// Nullable string
-
-export const nullableString = (value: unknown): string | null => {
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  const clean = value.trim();
-
-  return clean || null;
-};
-
-// Boolean flag
-
-export const normalizeFlag = (value: unknown, fallback: 0 | 1 = 0): 0 | 1 => {
-  if (value === true || value === 1 || value === '1' || value === 'true') {
-    return 1;
-  }
-
-  if (value === false || value === 0 || value === '0' || value === 'false') {
-    return 0;
-  }
-
-  return fallback;
-};
-
-// Slugify
-
-export const slugify = (value: string): string => {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-};
-
-// Email
-
-export const isValidEmail = (value: string): boolean => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-};
-
-// HTTP URL
-
-export const isValidHttpUrl = (value: string): boolean => {
-  try {
-    const url = new URL(value);
-
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
 
 // Time
 
@@ -138,7 +83,7 @@ export const validateOperatingHours = (value: unknown): OperatingHourResult => {
 
     const sequence = item?.sequence === undefined ? 1 : Number(item.sequence);
 
-    const isClosed = normalizeFlag(item?.is_closed, 0);
+    const isClosed = toFlag(item?.is_closed, 0);
 
     // Day
 

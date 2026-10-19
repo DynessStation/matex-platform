@@ -9,7 +9,8 @@ import { requirePermission } from '../../../middleware/auth-permission.middlewar
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 
 import { getSessionScope, decodeNavigationId } from './scope';
-import { parseJsonValue, normalizeNavigationMetadata } from './metadata';
+import { normalizeNavigationMetadata } from './metadata';
+import { parseJsonValue } from '../../../helper/json.helper';
 
 const { pool } = db;
 

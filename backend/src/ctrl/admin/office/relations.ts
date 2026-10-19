@@ -1,7 +1,8 @@
 // Office photos and operating hours: availability checks, inserts, and audit formatting.
 import keyhsid from '../../../hsid';
 
-import { NormalizedOfficeOperatingHour, nullableString, normalizeFlag } from './input';
+import { NormalizedOfficeOperatingHour } from './input';
+import { nullableString, toFlag } from '../../../helper/input.helper';
 
 export interface OfficeAttachmentInput {
   id_attachment: string;
@@ -137,7 +138,7 @@ export const resolveOfficeAttachments = async (
       attachmentRole: role,
       caption,
       sortOrder,
-      isPublic: normalizeFlag(item?.is_public, 1),
+      isPublic: toFlag(item?.is_public, 1),
     });
   }
 
