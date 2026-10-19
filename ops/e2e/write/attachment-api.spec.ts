@@ -185,6 +185,7 @@ test('list, paging, sorting, and filters', async () => {
   );
   const list = await expectCode(await ownRows(), 200);
   expect(list.pagination).toMatchObject({ total: 3, length: 3, has_more: false });
+  expect(list.data[0]).toMatchObject({ usage_total: 0, usage: [] });
   expect(list.data[0]).toMatchObject({ file_size: expect.any(Number), width: expect.any(Number) });
 
   const oldest = await expectCode(await ownRows({ sort: 'OLDEST' }), 200);
@@ -279,6 +280,16 @@ test('delete refuses files in use and removes the rest', async () => {
   expect(remainingIds).toEqual(expect.arrayContaining([photo, categoryImage]));
   expect(remainingIds).not.toEqual(expect.arrayContaining([libraryIds[0]]));
   expect(remainingIds).not.toEqual(expect.arrayContaining([libraryIds[2]]));
+  // Each file shows where it is used (D-5).
+  const usageOf = (id: string) => remaining.data.find((item: any) => item.id_attachment === id);
+  expect(usageOf(photo)).toMatchObject({
+    usage_total: 1,
+    usage: [{ source: 'admin_account.profile_photo', total: 1 }],
+  });
+  expect(usageOf(categoryImage)).toMatchObject({
+    usage_total: 1,
+    usage: [{ source: 'product_category.attachment', total: 1 }],
+  });
   expect(remaining.pagination).toMatchObject({ total: totalBefore + 2 });
 });
 

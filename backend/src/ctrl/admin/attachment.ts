@@ -271,6 +271,15 @@ router.get(
       [...params, limit, offset],
     );
 
+    // Where each file on this page is used (D-5), from the same tables the delete check reads.
+    const ids = (rows as any[]).map((item) => Number(item.id_attachment));
+    const usageById = new Map<number, { source: string; total: number }[]>();
+    for (const reference of ids.length ? await getAttachmentReferences(ids) : []) {
+      const usage = usageById.get(reference.idAttachment) ?? [];
+      usage.push({ source: reference.source, total: reference.total });
+      usageById.set(reference.idAttachment, usage);
+    }
+
     const data = (rows as any[]).map((item) => ({
       id_attachment: keyhsid.idAttachment.encode(item.id_attachment),
       collection_name: item.collection_name,
@@ -285,6 +294,11 @@ router.get(
       width: item.width,
       height: item.height,
       asset_url: buildAttachmentUrl(item.storage_path),
+      usage_total: (usageById.get(Number(item.id_attachment)) ?? []).reduce(
+        (sum, usage) => sum + usage.total,
+        0,
+      ),
+      usage: usageById.get(Number(item.id_attachment)) ?? [],
       created: item.created,
       updated: item.updated,
     }));
