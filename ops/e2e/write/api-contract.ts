@@ -141,6 +141,34 @@ export async function createAdminAccount(
   return { id: body.data.id_admin_acct, identity: account.email_1, password: account.password };
 }
 
+/** Creates an access profile granting exactly `permissionKeys` and returns its id. */
+export async function createAccessProfile(
+  context: APIRequestContext,
+  name: string,
+  permissionKeys: string[],
+): Promise<string> {
+  const matrix = await expectCode(await context.get('/api/v1/admin-access/permission-matrix'), 200);
+  const idByKey = new Map<string, string>();
+  for (const group of matrix.data) {
+    for (const permission of group.permissions) {
+      idByKey.set(permission.permission_key, permission.id_admin_permission);
+    }
+  }
+  const permissions = permissionKeys.map((key) => {
+    const id = idByKey.get(key);
+    if (!id) throw new Error(`Unknown permission ${key}`);
+    return id;
+  });
+  const created = await expectCode(
+    await context.post('/api/v1/admin-access', {
+      data: { access_name: `${name} ${runId}`, permissions },
+    }),
+    201,
+    'ADMIN_ACCESS_CREATED',
+  );
+  return created.data.id_admin_access as string;
+}
+
 /** Uploads write/fixtures/sample.png into an attachment collection and returns its id. */
 export async function uploadSample(
   context: APIRequestContext,

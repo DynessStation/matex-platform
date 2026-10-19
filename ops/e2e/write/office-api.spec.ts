@@ -4,6 +4,7 @@ import {
   admin,
   adminReferences,
   apiContext,
+  createAccessProfile,
   createAdminAccount,
   expectCode,
   login,
@@ -261,8 +262,103 @@ test('update replaces fields, hours, and photos', async () => {
   expect(detail.data.attachments).toHaveLength(1);
 });
 
+test.fixme('update validates like create (audit BE-006)', async () => {
+  const data = {
+    ...newOffice(),
+    attachments: [{ id_attachment: coverId, attachment_role: 'cover' }],
+  };
+  const update = (patch: Record<string, unknown>) =>
+    owner.put(`${base}/${officeId}`, { data: { ...data, ...patch } });
+  await expectCode(await update({ office_code: 'X'.repeat(51) }), 400, 'OFFICE_CODE_TOO_LONG');
+  await expectCode(await update({ office_name: 'N'.repeat(256) }), 400, 'OFFICE_NAME_TOO_LONG');
+  await expectCode(
+    await update({ office_name: '!!!', public_slug: '' }),
+    400,
+    'OFFICE_PUBLIC_SLUG_REQUIRED',
+  );
+
+  // Another office of the company already uses this name.
+  const list = await expectCode(await owner.get(base), 200);
+  const other = list.data.find((office: any) => office.id_office !== officeId);
+  expect(other).toBeTruthy();
+  await expectCode(
+    await update({ office_name: other.office_name.toUpperCase() }),
+    409,
+    'OFFICE_ALREADY_EXISTS',
+  );
+});
+
+test('list paging and sorting', async () => {
+  const first = await expectCode(
+    await owner.get(base, { params: { ord: 'office_name', srt: 'true', limit: '1', page: '1' } }),
+    200,
+  );
+  expect(first.data).toHaveLength(1);
+  expect(first.pagination).toMatchObject({ page: 1, limit: 1, length: 1, has_more: true });
+  const second = await expectCode(
+    await owner.get(base, { params: { ord: 'office_name', srt: 'true', limit: '1', page: '2' } }),
+    200,
+  );
+  expect(second.pagination).toMatchObject({ page: 2, limit: 1 });
+  expect(second.data[0].office_name < first.data[0].office_name).toBe(true);
+  await expectCode(await owner.get(base, { params: { ord: 'unknown', limit: '500' } }), 200).then(
+    (body) => expect(body.pagination).toMatchObject({ limit: 100 }),
+  );
+});
+
+test('office photos need attachment.view', async () => {
+  const accessId = await createAccessProfile(owner, 'Kantor Tanpa Media', [
+    'office.view',
+    'office.create',
+    'office.update',
+  ]);
+  const account = await createAdminAccount(
+    owner,
+    'KantorMedia',
+    await adminReferences(owner, { id_access: accessId }),
+  );
+  const editor = await login(account.identity, account.password);
+  try {
+    const withoutMedia = {
+      ...newOffice(),
+      office_code: `${code}-M`,
+      office_name: 'Kantor Uji Tanpa Media',
+      is_public: 0,
+      attachments: [],
+    };
+    await expectCode(
+      await editor.post(base, {
+        data: { ...withoutMedia, attachments: [{ id_attachment: galleryId }] },
+      }),
+      403,
+      'OFFICE_ATTACHMENT_ACCESS_DENIED',
+    );
+    const created = await expectCode(
+      await editor.post(base, { data: withoutMedia }),
+      201,
+      'OFFICE_CREATED',
+    );
+    const id = created.data.id_office;
+    await expectCode(
+      await editor.put(`${base}/${id}`, {
+        data: { ...withoutMedia, attachments: [{ id_attachment: galleryId }] },
+      }),
+      403,
+      'OFFICE_ATTACHMENT_ACCESS_DENIED',
+    );
+    await expectCode(
+      await editor.put(`${base}/${id}`, { data: { ...withoutMedia, city: 'Cimahi' } }),
+      200,
+      'OFFICE_UPDATED',
+    );
+  } finally {
+    await editor.dispose();
+  }
+});
+
 test('an account without office permissions is refused', async () => {
-  const references = await adminReferences(owner);
+  const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Kantor', []);
+  const references = await adminReferences(owner, { id_access: noPermissions });
   const account = await createAdminAccount(owner, 'Kantor', references);
   const limited = await login(account.identity, account.password);
   try {
@@ -285,7 +381,11 @@ test('status changes and delete rules', async () => {
     400,
     'OFFICE_INVALID_STATUS',
   );
-  await expectCode(await owner.patch(`${base}/${officeId}/status`, { data: { status: 1 } }), 200);
+  await expectCode(
+    await owner.patch(`${base}/${officeId}/status`, { data: { status: 1 } }),
+    200,
+    'OFFICE_ALREADY_ACTIVE',
+  );
   await expectCode(await owner.delete(`${base}/${officeId}`), 409, 'OFFICE_MUST_BE_INACTIVE');
 
   // An admin assigned to the office blocks its deletion.
@@ -300,8 +400,17 @@ test('status changes and delete rules', async () => {
     200,
     'OFFICE_DEACTIVATED',
   );
-  await expectCode(await owner.patch(`${base}/${officeId}/status`, { data: { status: 0 } }), 200);
-  await expectCode(await owner.delete(`${base}/${officeId}`), 409, 'OFFICE_HAS_ADMIN_REFERENCES');
+  await expectCode(
+    await owner.patch(`${base}/${officeId}/status`, { data: { status: 0 } }),
+    200,
+    'OFFICE_ALREADY_INACTIVE',
+  );
+  const blocked = await expectCode(
+    await owner.delete(`${base}/${officeId}`),
+    409,
+    'OFFICE_HAS_ADMIN_REFERENCES',
+  );
+  expect(blocked.data).toEqual({ assigned_accounts: 1 });
 
   await expectCode(
     await owner.patch(`/api/v1/admin-acct/${member.id}/status`, { data: { admin_acct_status: 0 } }),

@@ -4,6 +4,7 @@ import {
   admin,
   adminReferences,
   apiContext,
+  createAccessProfile,
   createAdminAccount,
   expectCode,
   login,
@@ -273,7 +274,12 @@ test('status changes, and only the primary navigation is public', async () => {
 });
 
 test('an account without navigation permissions is refused', async () => {
-  const account = await createAdminAccount(owner, 'Navigasi', await adminReferences(owner));
+  const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Navigasi', []);
+  const account = await createAdminAccount(
+    owner,
+    'Navigasi',
+    await adminReferences(owner, { id_access: noPermissions }),
+  );
   const limited = await login(account.identity, account.password);
   try {
     await expectCode(await limited.get(base), 403, 'AUTH_PERMISSION_DENIED');
