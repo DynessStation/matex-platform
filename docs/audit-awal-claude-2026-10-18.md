@@ -168,7 +168,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Fase 4E: `office.ts` dipecah ke `ctrl/admin/office/` (`scope.ts`, `input.ts`, `relations.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`), didahului test kontrak `office-api.spec.ts`. Rekaman respons dan isi tabel identik sebelum dan sesudahnya. Tidak ada bug baru.
 - Fase 4F: `admin-access.ts` dipecah ke `ctrl/admin/admin-access/` (`scope.ts`, `permissions.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`), didahului test kontrak `admin-access-api.spec.ts`. Test itu juga membuktikan izin yang diberikan ke profil akses benar-benar berlaku. Rekaman identik. Tidak ada bug baru.
 - Fase 4G: `web-navigation.ts` dipecah ke `ctrl/admin/web-navigation/` (`scope.ts`, `metadata.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`, `items.ts`, `reorder.ts`), didahului test kontrak `web-navigation-api.spec.ts`. Rekaman identik. Tidak ada bug baru.
-- Kini tidak ada controller backend di atas 1.850 baris. Controller 1.000–1.850 baris (`attachment.ts`, `chair.ts`, `admin-permission.ts`, `website-page.ts`, `audit-log.ts`) dipecah dengan cara yang sama saat fiturnya diubah (Fase 4H di `docs/konsep-kerapian-kode.md`).
+- Kini tidak ada controller backend di atas 1.850 baris. Controller 1.000–1.850 baris (`attachment.ts`, `chair.ts`, `admin-permission.ts`, `website-page.ts`, `audit-log.ts`) dipecah dengan cara yang sama saat fiturnya diubah (Fase 4H di `docs/standar-kode.md`).
 
 **BE-004 — ID dengan karakter tidak valid membuat server error 500** · P3 · **Selesai (Fase 4C)**
 - Library `hashids` versi 2 melempar error bila ID berisi karakter di luar alfabetnya (misalnya URL yang diketik manual atau diubah), sementara semua kode mengharapkan hasil kosong untuk ID tidak valid. Contoh: `GET /api/v1/admin-acct/select/office?id_master_comp=abc-def` menjawab 500, bukan 400.
@@ -181,7 +181,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
 - Struktur folder juga tidak konsisten: middleware Express ada di `src/ctrl/middleware/` dengan nama camelCase (`authJwt.ts`), dan `src/helpers.ts` sudah tidak dipakai.
-- Fase 4D (19 Oktober 2026): middleware dipindah ke `src/middleware/` (`auth-jwt.middleware.ts`, `auth-permission.middleware.ts`, `request-context.middleware.ts`) dan `src/helpers.ts` dihapus. Rekaman test kontrak identik sebelum dan sesudahnya. Struktur target dan konvensi nama ada di `docs/konsep-kerapian-kode.md`. Penyeragaman gaya penulisan di dalam file dilakukan saat file itu dipecah atau diubah.
+- Fase 4D (19 Oktober 2026): middleware dipindah ke `src/middleware/` (`auth-jwt.middleware.ts`, `auth-permission.middleware.ts`, `request-context.middleware.ts`) dan `src/helpers.ts` dihapus. Rekaman test kontrak identik sebelum dan sesudahnya. Struktur target dan konvensi nama ada di `docs/standar-kode.md`. Penyeragaman gaya penulisan di dalam file dilakukan saat file itu dipecah atau diubah.
 
 **BE-003 — Hal yang sudah benar di backend** · Info
 - Semua query database memakai parameter (aman dari SQL injection), perubahan data dibungkus transaksi, data dicek kepemilikannya per perusahaan sebelum diubah, dan ada rate limit untuk login dan API.
@@ -318,6 +318,8 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 ## Bagian 7 — Roadmap yang disarankan
 
+> Roadmap terbaru (posisi sekarang, tahap berikutnya, dan ujung sementara) ada di `docs/peta-jalan.md`. Bagian ini disimpan sebagai catatan awal.
+
 **Fase 0 — Environment (selesai hari ini)**
 DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan README Local Development.
 
@@ -339,7 +341,7 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Saran rutin: ulangi latihan restore setiap 3 bulan, dan setiap sebelum migration besar.
 
 **Fase 4 — Kerapian bertahap**
-- BE-001: pecah controller besar, masing-masing didahului test kontrak API. **`auth.ts` (4C), `office.ts` (4E), `admin-access.ts` (4F), `web-navigation.ts` (4G) selesai.** Struktur backend dirapikan di 4D. Rencana lanjutan ada di `docs/konsep-kerapian-kode.md`.
+- BE-001: pecah controller besar, masing-masing didahului test kontrak API. **`auth.ts` (4C), `office.ts` (4E), `admin-access.ts` (4F), `web-navigation.ts` (4G) selesai.** Struktur backend dirapikan di 4D. Rencana lanjutan ada di `docs/standar-kode.md`.
 - FE-002: satu commit khusus format. **Selesai (4B).**
 - FE-001: rapikan modul sisa Kartify per kelompok. **Selesai (4A).**
 - FE-010: buat build CSS admin deterministik. **Selesai (4B).**

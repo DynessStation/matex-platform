@@ -12,7 +12,7 @@ import { backendRoot, stack } from "./stack.mjs";
 // the rows of the tables a spec names are written to <folder>/<spec>.json, with values that
 // change on every run (timestamps, uuids, tokens, hashes) masked. Record on a fresh database
 // (`npm run test:api`) before and after a refactor and compare the two files: they must be
-// identical. See docs/konsep-kerapian-kode.md.
+// identical. See docs/standar-kode.md.
 
 export const { admin } = JSON.parse(fs.readFileSync(stack.stateFile, "utf8")) as {
   admin: { identity: string; password: string };

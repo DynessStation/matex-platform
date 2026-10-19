@@ -9,6 +9,13 @@ MATEX platform repository.
 - `backend` - API server
 - `docs` - Project documentation
 
+## Project Docs
+
+- `docs/peta-jalan.md`: where the project stands, what comes next, and the current milestone.
+- `docs/standar-kode.md`: code standards, the standard module pattern, and the refactoring workflow.
+- `docs/audit-awal-claude-2026-10-18.md`: audit findings and their fix history.
+- `docs/cloudpanel-production-runbook.md`: production server operations.
+
 ## Local Development
 
 Production runs on Percona Server 8.4, so use a MySQL 8.4 database locally. Run each app from its own folder:
@@ -73,11 +80,11 @@ One-time local setup for the write suite: the database user in `backend/.env` ne
 
 While writing tests, start the stack once and rerun against it with `MATEX_E2E_REUSE=1 npx playwright test -c playwright.write.config.ts`.
 
-`npm run test:api` runs only the API contract specs (`write/*-api.spec.ts`) against the e2e API, without building the frontends, so it finishes in seconds. With `MATEX_E2E_RECORD=recordings/<name>` it also writes every checked response and the rows of the tables each spec names to `recordings/<name>/<spec>.json` (git-ignored), with timestamps, uuids, and tokens masked. Record before and after a refactor and compare the files to prove the API behaves the same. The full workflow is in `docs/konsep-kerapian-kode.md`.
+`npm run test:api` runs only the API contract specs (`write/*-api.spec.ts`) against the e2e API, without building the frontends, so it finishes in seconds. With `MATEX_E2E_RECORD=recordings/<name>` it also writes every checked response and the rows of the tables each spec names to `recordings/<name>/<spec>.json` (git-ignored), with timestamps, uuids, and tokens masked. Record before and after a refactor and compare the files to prove the API behaves the same. The full workflow is in `docs/standar-kode.md`.
 
-## Current Baseline
+## Current Status
 
-Phase 4.8 stabilization complete.
+See `docs/peta-jalan.md` for the current production commit, completed phases, and the next milestone.
 
 ## Security
 
