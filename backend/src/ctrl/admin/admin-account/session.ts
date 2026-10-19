@@ -1,474 +1,183 @@
 // Admin session: login, logout, and the current session (/me).
 import express = require('express');
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
-import bcrypt from 'bcrypt';
-import keyhsid from '../../../hsid';
-import db = require('../../../db');
 
-import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
-import { buildAttachmentUrl } from '../../../helper/attachment.helper';
+import db = require('../../../db');
 import { accessTokenCookieOptions } from '../../../config/cookie.config';
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+
+import { readPermissionKeys, SESSION_ACCOUNT_SELECT, sessionAccountDto } from './records';
 
 const { pool } = db;
 
 const router = express.Router();
 
-// Mask login identity
-
+/** Identity for logs without exposing it: "ad***@example.com" or "***1234". */
 const maskLoginIdentity = (value: unknown): string | null => {
   const clean = String(value ?? '').trim();
-
-  if (!clean) {
-    return null;
-  }
-
-  // Email
-
+  if (!clean) return null;
   if (clean.includes('@')) {
     const [local, domain] = clean.split('@');
-
-    if (!domain) {
-      return '***';
-    }
-
-    const visibleLocal = local.slice(0, 2);
-
-    return `${visibleLocal}***@${domain}`;
+    return domain ? `${local.slice(0, 2)}***@${domain}` : '***';
   }
-
-  // Phone / other identity
-
-  if (clean.length <= 4) {
-    return '***';
-  }
-
-  return `***${clean.slice(-4)}`;
+  return clean.length <= 4 ? '***' : `***${clean.slice(-4)}`;
 };
 
-// login
-router.post('/api/v1/admin-acct/login', multer().none(), async (req, res) => {
-  const { body } = req;
+const securityAudit = (req: Request, user: any, extra: Record<string, unknown>) =>
+  writeAuditLog({
+    req,
+    writeMode: 'best_effort',
+    idMasterComp: Number(user.id_master_comp),
+    category: 'security',
+    module: 'auth',
+    actorType: 'admin',
+    actorId: Number(user.id_admin_acct),
+    actorLabel: user.alias ?? null,
+    entityType: 'admin_account',
+    entityId: Number(user.id_admin_acct),
+    entityLabel: user.alias ?? null,
+    ...extra,
+  } as Parameters<typeof writeAuditLog>[0]);
 
-  try {
-    const { identity, password } = body;
+router.post('/api/v1/admin-acct/login', multer().none(), async (req: Request, res: Response) => {
+  const { identity, password } = req.body;
+  if (!identity || !password) {
+    return sendError(
+      res,
+      400,
+      'AUTH_LOGIN_FIELDS_REQUIRED',
+      'Email/Phone and password are required',
+    );
+  }
 
-    // Validation
+  const [rows] = await pool.query(
+    `${SESSION_ACCOUNT_SELECT} WHERE (aa.email_1 = ? OR aa.phone_1 = ?) LIMIT 1`,
+    [identity, identity],
+  );
+  const user = (rows as any[])[0];
+  const invalidCredentials = () =>
+    sendError(res, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid email/phone or password');
 
-    if (!identity || !password) {
-      return sendError(
-        res,
-        400,
-        'AUTH_LOGIN_FIELDS_REQUIRED',
-        'Email/Phone and password are required',
-      );
-    }
-
-    // Get account
-
-    const query = `
-            SELECT
-                aa.id_admin_acct,
-                aa.id_master_comp,
-                aa.id_office,
-                aa.password,
-                aa.name,
-                aa.alias,
-                aa.email_1,
-                aa.email_2,
-                aa.phone_1,
-                aa.phone_2,
-                aa.id_profile_photo,
-
-                pa.id_attachment AS profile_attachment_id,
-                pa.collection_name AS profile_collection_name,
-                pa.name AS profile_name,
-                pa.original_name AS profile_original_name,
-                pa.file_name AS profile_file_name,
-                pa.mime_type AS profile_mime_type,
-                pa.extension AS profile_extension,
-                pa.disk AS profile_disk,
-                pa.storage_path AS profile_storage_path,
-                pa.file_size AS profile_file_size,
-                pa.width AS profile_width,
-                pa.height AS profile_height,
-                aa.id_chair,
-                aa.id_access,
-                aa.is_all_access,
-                aa.admin_acct_status,
-
-                mc.comp_name,
-                mc.comp_alias,
-
-                o.office_name,
-                o.address,
-
-                ch.chair_name,
-                ch.chair_description,
-
-                ac.access_name,
-                ac.admin_access_status
-
-            FROM admin_acct aa
-
-            INNER JOIN master_comp mc
-                ON aa.id_master_comp = mc.id_master_comp
-
-            INNER JOIN office o
-                ON aa.id_office = o.id_office
-
-            INNER JOIN chair ch
-                ON aa.id_chair = ch.id_chair
-
-            INNER JOIN admin_access ac
-                ON aa.id_access = ac.id_admin_access
-
-            LEFT JOIN attachment pa
-                ON aa.id_profile_photo = pa.id_attachment
-                AND pa.collection_name = 'admin_profile'
-                AND pa.attachment_status = 1
-                AND pa.deleted_at IS NULL
-
-            WHERE (
-                aa.email_1 = ?
-                OR aa.phone_1 = ?
-            )
-
-            LIMIT 1
-        `;
-
-    const [rows] = await pool.query(query, [identity, identity]);
-
-    const users = rows as any[];
-
-    if (users.length === 0) {
-      // Audit failed login
-
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        eventCode: 'auth.login.failed',
-        category: 'security',
-        module: 'auth',
-        action: 'login',
-        actorType: 'admin',
-        actorId: null,
-        actorLabel: null,
-        entityType: 'admin_account',
-        entityId: null,
-        entityLabel: maskLoginIdentity(identity),
-        outcome: 'failure',
-        metadata: {
-          reason: 'account_not_found',
-          identity_hint: maskLoginIdentity(identity),
-        },
-        httpStatus: 401,
-      });
-
-      return sendError(res, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid email/phone or password');
-    }
-
-    const user = users[0];
-
-    // Verify password
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      // Audit failed login
-
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp: Number(user.id_master_comp),
-        eventCode: 'auth.login.failed',
-        category: 'security',
-        module: 'auth',
-        action: 'login',
-        actorType: 'admin',
-        actorId: Number(user.id_admin_acct),
-        actorLabel: user.alias ?? null,
-        entityType: 'admin_account',
-        entityId: Number(user.id_admin_acct),
-        entityLabel: user.alias ?? null,
-        outcome: 'failure',
-        metadata: {
-          reason: 'password_mismatch',
-          identity_hint: maskLoginIdentity(identity),
-        },
-        httpStatus: 401,
-      });
-
-      return sendError(res, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid email/phone or password');
-    }
-
-    // Account status
-
-    if (Number(user.admin_acct_status) !== 1) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp: Number(user.id_master_comp),
-        eventCode: 'auth.login.denied',
-        category: 'security',
-        module: 'auth',
-        action: 'login',
-        actorType: 'admin',
-        actorId: Number(user.id_admin_acct),
-        actorLabel: user.alias ?? null,
-        entityType: 'admin_account',
-        entityId: Number(user.id_admin_acct),
-        entityLabel: user.alias ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'account_inactive',
-        },
-        httpStatus: 403,
-      });
-
-      return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-    }
-
-    // Access profile status
-
-    if (Number(user.is_all_access) !== 1 && Number(user.admin_access_status) !== 1) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp: Number(user.id_master_comp),
-        eventCode: 'auth.login.denied',
-        category: 'security',
-        module: 'auth',
-        action: 'login',
-        actorType: 'admin',
-        actorId: Number(user.id_admin_acct),
-        actorLabel: user.alias ?? null,
-        entityType: 'admin_account',
-        entityId: Number(user.id_admin_acct),
-        entityLabel: user.alias ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'access_profile_inactive',
-          id_access: Number(user.id_access),
-        },
-        httpStatus: 403,
-      });
-
-      return sendError(
-        res,
-        403,
-        'AUTH_ACCESS_PROFILE_INACTIVE',
-        'Your access profile is not active',
-      );
-    }
-
-    // Permission check
-
-    const permissionQuery = `
-            SELECT
-                ap.permission_key
-
-            FROM admin_access_permission aap
-
-            INNER JOIN admin_permission ap
-                ON aap.id_admin_permission = ap.id_admin_permission
-
-            WHERE aap.id_admin_access = ?
-                AND ap.permission_status = 1
-
-            ORDER BY ap.id_admin_permission ASC
-        `;
-
-    const [permissionRows] = await pool.query(permissionQuery, [user.id_access]);
-
-    const permissionData = permissionRows as any[];
-
-    const permissions = permissionData.map((item) => item.permission_key);
-
-    // Generate JWT
-
-    const payload = {
-      id_admin_acct: user.id_admin_acct,
-      alias: user.alias,
-      id_access: user.id_access,
-    };
-
-    const secretKey = process.env.JWT_SECRET;
-
-    if (!secretKey) {
-      throw new Error('JWT_SECRET is not configured');
-    }
-
-    const jwtExpiresIn: jwt.SignOptions['expiresIn'] =
-      (process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']) || '24h';
-
-    if (!jwtExpiresIn) {
-      throw new Error('JWT_EXPIRES_IN is not configured');
-    }
-
-    const token = jwt.sign(payload, secretKey as jwt.Secret, {
-      expiresIn: jwtExpiresIn,
-    });
-
-    res.cookie('access_token', token, {
-      ...accessTokenCookieOptions(),
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    const decodedToken = jwt.decode(token) as jwt.JwtPayload;
-
-    const tokenIssuedAt = decodedToken.iat ? decodedToken.iat * 1000 : null;
-
-    const tokenExpiresAt = decodedToken.exp ? decodedToken.exp * 1000 : null;
-
-    // Profile photo
-
-    const profilePhoto = user.profile_attachment_id
-      ? {
-          id_attachment: keyhsid.idAttachment.encode(user.profile_attachment_id),
-          collection_name: user.profile_collection_name,
-          name: user.profile_name,
-          original_name: user.profile_original_name,
-          file_name: user.profile_file_name,
-          mime_type: user.profile_mime_type,
-          extension: user.profile_extension,
-          disk: user.profile_disk,
-          storage_path: user.profile_storage_path,
-          file_size: Number(user.profile_file_size),
-          width: user.profile_width,
-          height: user.profile_height,
-          asset_url: buildAttachmentUrl(user.profile_storage_path),
-        }
-      : null;
-
-    // Audit login success
-
+  if (!user) {
     await writeAuditLog({
       req,
       writeMode: 'best_effort',
-      idMasterComp: Number(user.id_master_comp),
-      eventCode: 'auth.login.succeeded',
+      eventCode: 'auth.login.failed',
       category: 'security',
       module: 'auth',
       action: 'login',
       actorType: 'admin',
-      actorId: Number(user.id_admin_acct),
-      actorLabel: user.alias ?? null,
+      actorId: null,
+      actorLabel: null,
       entityType: 'admin_account',
-      entityId: Number(user.id_admin_acct),
-      entityLabel: user.alias ?? null,
-      outcome: 'success',
-      metadata: {
-        id_office: Number(user.id_office),
-        id_access: Number(user.id_access),
-        is_all_access: Number(user.is_all_access),
-      },
-      httpStatus: 200,
+      entityId: null,
+      entityLabel: maskLoginIdentity(identity),
+      outcome: 'failure',
+      metadata: { reason: 'account_not_found', identity_hint: maskLoginIdentity(identity) },
+      httpStatus: 401,
     });
-
-    // Response
-
-    return res.status(200).json({
-      success: true,
-      code: 'AUTH_LOGIN_SUCCESS',
-      message: 'Login successful',
-      session: {
-        issued_at: tokenIssuedAt,
-        expires_at: tokenExpiresAt,
-      },
-      data: {
-        id_admin_acct: keyhsid.idAdmin.encode(user.id_admin_acct),
-        name: user.name,
-        alias: user.alias,
-        email_1: user.email_1,
-        email_2: user.email_2,
-        phone_1: user.phone_1,
-        phone_2: user.phone_2,
-        id_profile_photo: profilePhoto?.id_attachment ?? null,
-        profile_photo: profilePhoto,
-        master_comp: {
-          id_master_comp: keyhsid.idMasterCompany.encode(user.id_master_comp),
-          comp_name: user.comp_name,
-          comp_alias: user.comp_alias,
-        },
-        office: {
-          id_office: keyhsid.idOffice.encode(user.id_office),
-          office_name: user.office_name,
-          address: user.address,
-        },
-        chair: {
-          id_chair: keyhsid.idChair.encode(user.id_chair),
-          chair_name: user.chair_name,
-          chair_description: user.chair_description,
-        },
-        access: {
-          id_access: keyhsid.idAdminAccess.encode(user.id_access),
-          access_name: user.access_name,
-          permissions: permissions,
-        },
-        is_all_access: user.is_all_access,
-      },
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
+    return invalidCredentials();
   }
+
+  if (!(await bcrypt.compare(password, user.password))) {
+    await securityAudit(req, user, {
+      eventCode: 'auth.login.failed',
+      action: 'login',
+      outcome: 'failure',
+      metadata: { reason: 'password_mismatch', identity_hint: maskLoginIdentity(identity) },
+      httpStatus: 401,
+    });
+    return invalidCredentials();
+  }
+
+  if (Number(user.admin_acct_status) !== 1) {
+    await securityAudit(req, user, {
+      eventCode: 'auth.login.denied',
+      action: 'login',
+      outcome: 'denied',
+      metadata: { reason: 'account_inactive' },
+      httpStatus: 403,
+    });
+    return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
+  }
+
+  if (Number(user.is_all_access) !== 1 && Number(user.admin_access_status) !== 1) {
+    await securityAudit(req, user, {
+      eventCode: 'auth.login.denied',
+      action: 'login',
+      outcome: 'denied',
+      metadata: { reason: 'access_profile_inactive', id_access: Number(user.id_access) },
+      httpStatus: 403,
+    });
+    return sendError(res, 403, 'AUTH_ACCESS_PROFILE_INACTIVE', 'Your access profile is not active');
+  }
+
+  const permissions = await readPermissionKeys(user.id_access);
+
+  const secretKey = process.env.JWT_SECRET;
+  if (!secretKey) throw new Error('JWT_SECRET is not configured');
+  const token = jwt.sign(
+    { id_admin_acct: user.id_admin_acct, alias: user.alias, id_access: user.id_access },
+    secretKey,
+    {
+      expiresIn: (process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']) || '24h',
+    },
+  );
+  res.cookie('access_token', token, { ...accessTokenCookieOptions(), maxAge: 24 * 60 * 60 * 1000 });
+  const decoded = jwt.decode(token) as jwt.JwtPayload;
+
+  await securityAudit(req, user, {
+    eventCode: 'auth.login.succeeded',
+    action: 'login',
+    outcome: 'success',
+    metadata: {
+      id_office: Number(user.id_office),
+      id_access: Number(user.id_access),
+      is_all_access: Number(user.is_all_access),
+    },
+    httpStatus: 200,
+  });
+
+  return res.status(200).json({
+    success: true,
+    code: 'AUTH_LOGIN_SUCCESS',
+    message: 'Login successful',
+    session: {
+      issued_at: decoded.iat ? decoded.iat * 1000 : null,
+      expires_at: decoded.exp ? decoded.exp * 1000 : null,
+    },
+    data: sessionAccountDto(user, permissions),
+  });
 });
 
-// Logout
-
-router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res) => {
+// Logout always succeeds and clears the cookie; a valid token only adds the audit entry.
+router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res: Response) => {
   const token = req.cookies?.access_token;
-
   let logoutUser: jwt.JwtPayload | null = null;
-
-  // Optional token verify
-
   if (token && process.env.JWT_SECRET) {
     try {
       logoutUser = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
     } catch {
-      // Invalid / expired token
-      //==== LOGOUT MUST STILL SUCCEED
+      // Invalid or expired token: still log out.
     }
   }
 
-  // Clear cookie
-
   res.clearCookie('access_token', accessTokenCookieOptions());
 
-  // Audit known session
-
-  const logoutAdminId = Number(logoutUser?.id_admin_acct);
-
-  if (Number.isInteger(logoutAdminId) && logoutAdminId > 0) {
+  const idAdminAcct = Number(logoutUser?.id_admin_acct);
+  if (Number.isInteger(idAdminAcct) && idAdminAcct > 0) {
     try {
       const [rows] = await pool.query(
-        `
-              SELECT
-                id_admin_acct,
-
-                id_master_comp,
-
-                alias
-
-              FROM admin_acct
-
-              WHERE id_admin_acct = ?
-
-              LIMIT 1
-            `,
-        [logoutAdminId],
+        'SELECT id_admin_acct, id_master_comp, alias FROM admin_acct WHERE id_admin_acct = ? LIMIT 1',
+        [idAdminAcct],
       );
-
-      const users = rows as any[];
-
-      if (users.length) {
-        const user = users[0];
-
+      const user = (rows as any[])[0];
+      if (user) {
         await writeAuditLog({
           req,
           writeMode: 'best_effort',
@@ -478,18 +187,16 @@ router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res) => {
           module: 'auth',
           action: 'logout',
           actorType: 'admin',
-          actorId: logoutAdminId,
+          actorId: idAdminAcct,
           actorLabel: user.alias ?? logoutUser?.alias ?? null,
           entityType: 'admin_account',
-          entityId: logoutAdminId,
+          entityId: idAdminAcct,
           entityLabel: user.alias ?? null,
           outcome: 'success',
           httpStatus: 200,
         });
       }
     } catch (error) {
-      // Logout must not fail because audit lookup fails
-
       console.error('Logout audit error:', error);
     }
   }
@@ -497,374 +204,114 @@ router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res) => {
   return sendSuccess(res, 200, 'AUTH_LOGOUT_SUCCESS', 'Logout successful');
 });
 
-// Me / current session
-
-router.get('/api/v1/admin-acct/me', verifyToken, async (req: AuthRequest, res) => {
-  try {
-    // Session identity
-
-    const idAdminAcct = req.user?.id_admin_acct;
-
-    if (!idAdminAcct) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        eventCode: 'auth.session.invalid',
-        category: 'security',
-        module: 'auth',
-        action: 'session',
-        actorType: 'admin',
-        actorId: null,
-        actorLabel: req.user?.alias ?? null,
-        entityType: 'admin_account',
-        entityId: null,
-        entityLabel: req.user?.alias ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'missing_admin_identity',
-        },
-        httpStatus: 401,
-      });
-
-      return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-    }
-
-    // Current account
-
-    const query = `
-        SELECT
-          aa.id_admin_acct,
-
-          aa.id_master_comp,
-          aa.id_office,
-
-          aa.name,
-          aa.alias,
-
-          aa.email_1,
-          aa.email_2,
-
-          aa.phone_1,
-          aa.phone_2,
-
-          aa.id_profile_photo,
-
-          pa.id_attachment
-            AS profile_attachment_id,
-
-          pa.collection_name
-            AS profile_collection_name,
-
-          pa.name
-            AS profile_name,
-
-          pa.original_name
-            AS profile_original_name,
-
-          pa.file_name
-            AS profile_file_name,
-
-          pa.mime_type
-            AS profile_mime_type,
-
-          pa.extension
-            AS profile_extension,
-
-          pa.disk
-            AS profile_disk,
-
-          pa.storage_path
-            AS profile_storage_path,
-
-          pa.file_size
-            AS profile_file_size,
-
-          pa.width
-            AS profile_width,
-
-          pa.height
-            AS profile_height,
-
-          aa.id_chair,
-          aa.id_access,
-
-          aa.is_all_access,
-          aa.admin_acct_status,
-
-          mc.comp_name,
-          mc.comp_alias,
-
-          o.office_name,
-          o.address,
-
-          ch.chair_name,
-          ch.chair_description,
-
-          ac.access_name,
-
-          ac.id_master_comp
-            AS access_master_comp,
-
-          ac.admin_access_status
-
-        FROM admin_acct aa
-
-        INNER JOIN master_comp mc
-          ON aa.id_master_comp =
-            mc.id_master_comp
-
-        INNER JOIN office o
-          ON aa.id_office =
-            o.id_office
-
-        INNER JOIN chair ch
-          ON aa.id_chair =
-            ch.id_chair
-
-        INNER JOIN admin_access ac
-          ON aa.id_access =
-            ac.id_admin_access
-
-        LEFT JOIN attachment pa
-          ON aa.id_profile_photo =
-            pa.id_attachment
-
-          AND pa.collection_name =
-            'admin_profile'
-
-          AND pa.attachment_status = 1
-
-          AND pa.deleted_at IS NULL
-
-        WHERE aa.id_admin_acct = ?
-
-        LIMIT 1
-      `;
-
-    const [rows] = await pool.query(query, [idAdminAcct]);
-
-    const users = rows as any[];
-
-    // Account not found
-
-    if (!users.length) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        eventCode: 'auth.session.invalid',
-        category: 'security',
-        module: 'auth',
-        action: 'session',
-        actorType: 'admin',
-        actorId: idAdminAcct,
-        actorLabel: req.user?.alias ?? null,
-        entityType: 'admin_account',
-        entityId: idAdminAcct,
-        entityLabel: req.user?.alias ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'account_not_found',
-        },
-        httpStatus: 401,
-      });
-
-      return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-    }
-
-    const user = users[0];
-
-    const idMasterComp = Number(user.id_master_comp);
-
-    const actorAlias = user.alias ?? req.user?.alias ?? null;
-
-    // Account status
-
-    if (Number(user.admin_acct_status) !== 1) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp,
-        eventCode: 'auth.account.inactive',
-        category: 'security',
-        module: 'auth',
-        action: 'session',
-        actorType: 'admin',
-        actorId: idAdminAcct,
-        actorLabel: actorAlias,
-        entityType: 'admin_account',
-        entityId: idAdminAcct,
-        entityLabel: actorAlias,
-        outcome: 'denied',
-        metadata: {
-          reason: 'account_inactive',
-        },
-        httpStatus: 403,
-      });
-
-      return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-    }
-
-    // Access company consistency
-
-    if (Number(user.access_master_comp) !== idMasterComp) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp,
-        eventCode: 'auth.access_company_mismatch',
-        category: 'security',
-        module: 'auth',
-        action: 'session',
-        actorType: 'admin',
-        actorId: idAdminAcct,
-        actorLabel: actorAlias,
-        entityType: 'admin_access',
-        entityId: Number(user.id_access),
-        entityLabel: user.access_name ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'access_company_mismatch',
-          account_master_comp: idMasterComp,
-          access_master_comp: Number(user.access_master_comp),
-          id_access: Number(user.id_access),
-        },
-        httpStatus: 403,
-      });
-
-      return sendError(
-        res,
-        403,
-        'AUTH_ACCESS_COMPANY_MISMATCH',
-        'Access profile does not belong to your company',
-      );
-    }
-
-    // Access profile status
-
-    if (Number(user.is_all_access) !== 1 && Number(user.admin_access_status) !== 1) {
-      await writeAuditLog({
-        req,
-        writeMode: 'best_effort',
-        idMasterComp,
-        eventCode: 'auth.access_profile.inactive',
-        category: 'access_control',
-        module: 'auth',
-        action: 'session',
-        actorType: 'admin',
-        actorId: idAdminAcct,
-        actorLabel: actorAlias,
-        entityType: 'admin_access',
-        entityId: Number(user.id_access),
-        entityLabel: user.access_name ?? null,
-        outcome: 'denied',
-        metadata: {
-          reason: 'access_profile_inactive',
-          id_access: Number(user.id_access),
-        },
-        httpStatus: 403,
-      });
-
-      return sendError(
-        res,
-        403,
-        'AUTH_ACCESS_PROFILE_INACTIVE',
-        'Your access profile is not active',
-      );
-    }
-
-    // Profile photo
-
-    const profilePhoto = user.profile_attachment_id
-      ? {
-          id_attachment: keyhsid.idAttachment.encode(user.profile_attachment_id),
-          collection_name: user.profile_collection_name,
-          name: user.profile_name,
-          original_name: user.profile_original_name,
-          file_name: user.profile_file_name,
-          mime_type: user.profile_mime_type,
-          extension: user.profile_extension,
-          disk: user.profile_disk,
-          storage_path: user.profile_storage_path,
-          file_size: Number(user.profile_file_size),
-          width: user.profile_width,
-          height: user.profile_height,
-          asset_url: buildAttachmentUrl(user.profile_storage_path),
-        }
-      : null;
-
-    // Permissions
-
-    const permissionQuery = `
-        SELECT
-          ap.permission_key
-
-        FROM admin_access_permission aap
-
-        INNER JOIN admin_permission ap
-          ON aap.id_admin_permission =
-            ap.id_admin_permission
-
-        WHERE aap.id_admin_access = ?
-          AND ap.permission_status = 1
-
-        ORDER BY
-          ap.id_admin_permission ASC
-      `;
-
-    const [permissionRows] = await pool.query(permissionQuery, [user.id_access]);
-
-    const permissionData = permissionRows as any[];
-
-    const permissions = permissionData.map((item) => item.permission_key);
-
-    // Response
-
-    return res.status(200).json({
-      success: true,
-      code: 'AUTH_AUTHENTICATED',
-      message: 'Authenticated',
-      session: {
-        issued_at: req.user?.issued_at ?? null,
-        expires_at: req.user?.expires_at ?? null,
-      },
-      data: {
-        id_admin_acct: keyhsid.idAdmin.encode(user.id_admin_acct),
-        name: user.name,
-        alias: user.alias,
-        email_1: user.email_1,
-        email_2: user.email_2,
-        phone_1: user.phone_1,
-        phone_2: user.phone_2,
-        id_profile_photo: profilePhoto?.id_attachment ?? null,
-        profile_photo: profilePhoto,
-        master_comp: {
-          id_master_comp: keyhsid.idMasterCompany.encode(user.id_master_comp),
-          comp_name: user.comp_name,
-          comp_alias: user.comp_alias,
-        },
-        office: {
-          id_office: keyhsid.idOffice.encode(user.id_office),
-          office_name: user.office_name,
-          address: user.address,
-        },
-        chair: {
-          id_chair: keyhsid.idChair.encode(user.id_chair),
-          chair_name: user.chair_name,
-          chair_description: user.chair_description,
-        },
-        access: {
-          id_access: keyhsid.idAdminAccess.encode(user.id_access),
-          access_name: user.access_name,
-          permissions,
-        },
-        is_all_access: user.is_all_access,
+router.get('/api/v1/admin-acct/me', verifyToken, async (req: AuthRequest, res: Response) => {
+  const idAdminAcct = req.user?.id_admin_acct;
+  const sessionDenied = (entityId: number | null, reason: string) =>
+    writeAuditLog({
+      req,
+      writeMode: 'best_effort',
+      eventCode: 'auth.session.invalid',
+      category: 'security',
+      module: 'auth',
+      action: 'session',
+      actorType: 'admin',
+      actorId: entityId,
+      actorLabel: req.user?.alias ?? null,
+      entityType: 'admin_account',
+      entityId,
+      entityLabel: req.user?.alias ?? null,
+      outcome: 'denied',
+      metadata: { reason },
+      httpStatus: 401,
+    });
+
+  if (!idAdminAcct) {
+    await sessionDenied(null, 'missing_admin_identity');
+    return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
+  }
+
+  const [rows] = await pool.query(`${SESSION_ACCOUNT_SELECT} WHERE aa.id_admin_acct = ? LIMIT 1`, [
+    idAdminAcct,
+  ]);
+  const user = (rows as any[])[0];
+  if (!user) {
+    await sessionDenied(idAdminAcct, 'account_not_found');
+    return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
+  }
+
+  const idMasterComp = Number(user.id_master_comp);
+  const actorAlias = user.alias ?? req.user?.alias ?? null;
+  const accessAudit = (extra: Record<string, unknown>) =>
+    writeAuditLog({
+      req,
+      writeMode: 'best_effort',
+      idMasterComp,
+      module: 'auth',
+      action: 'session',
+      actorType: 'admin',
+      actorId: idAdminAcct,
+      actorLabel: actorAlias,
+      outcome: 'denied',
+      httpStatus: 403,
+      ...extra,
+    } as Parameters<typeof writeAuditLog>[0]);
+
+  if (Number(user.admin_acct_status) !== 1) {
+    await accessAudit({
+      eventCode: 'auth.account.inactive',
+      category: 'security',
+      entityType: 'admin_account',
+      entityId: idAdminAcct,
+      entityLabel: actorAlias,
+      metadata: { reason: 'account_inactive' },
+    });
+    return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
+  }
+
+  if (Number(user.access_master_comp) !== idMasterComp) {
+    await accessAudit({
+      eventCode: 'auth.access_company_mismatch',
+      category: 'security',
+      entityType: 'admin_access',
+      entityId: Number(user.id_access),
+      entityLabel: user.access_name ?? null,
+      metadata: {
+        reason: 'access_company_mismatch',
+        account_master_comp: idMasterComp,
+        access_master_comp: Number(user.access_master_comp),
+        id_access: Number(user.id_access),
       },
     });
-  } catch (error) {
-    console.error('Get authenticated user error:', error);
-
-    return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
+    return sendError(
+      res,
+      403,
+      'AUTH_ACCESS_COMPANY_MISMATCH',
+      'Access profile does not belong to your company',
+    );
   }
+
+  if (Number(user.is_all_access) !== 1 && Number(user.admin_access_status) !== 1) {
+    await accessAudit({
+      eventCode: 'auth.access_profile.inactive',
+      category: 'access_control',
+      entityType: 'admin_access',
+      entityId: Number(user.id_access),
+      entityLabel: user.access_name ?? null,
+      metadata: { reason: 'access_profile_inactive', id_access: Number(user.id_access) },
+    });
+    return sendError(res, 403, 'AUTH_ACCESS_PROFILE_INACTIVE', 'Your access profile is not active');
+  }
+
+  return res.status(200).json({
+    success: true,
+    code: 'AUTH_AUTHENTICATED',
+    message: 'Authenticated',
+    session: {
+      issued_at: req.user?.issued_at ?? null,
+      expires_at: req.user?.expires_at ?? null,
+    },
+    data: sessionAccountDto(user, await readPermissionKeys(user.id_access)),
+  });
 });
 
 export default router;
