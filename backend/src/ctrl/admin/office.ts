@@ -6,9 +6,9 @@ import keyhsid from "../../hsid";
 
 import { buildAttachmentUrl } from "../../helper/attachment.helper";
 
-import { AuthRequest, verifyToken } from "../middleware/authJwt";
+import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
 
-import { requirePermission } from "../middleware/authPermission";
+import { requirePermission } from "../../middleware/auth-permission.middleware";
 
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 

@@ -1,6 +1,6 @@
 import { Pool } from "mysql2/promise";
 
-import { AuthRequest } from "../ctrl/middleware/authJwt";
+import { AuthRequest } from "../middleware/auth-jwt.middleware";
 
 export type AdminScopeResult =
   | {

@@ -12,7 +12,7 @@ import path from "path";
 
 import { validateRuntimeConfig } from "./config/runtime.config";
 import storageConfig from "./config/storage.config";
-import { requestContextMiddleware } from "./ctrl/middleware/request-context.middleware";
+import { requestContextMiddleware } from "./middleware/request-context.middleware";
 import { pool } from "./db";
 
 validateRuntimeConfig();

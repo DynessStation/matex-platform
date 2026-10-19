@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 
 import { randomUUID } from "crypto";
 
-import { AuthRequest } from "./authJwt";
+import { AuthRequest } from "./auth-jwt.middleware";
 
 //==================================================
 //==== REQUEST CONTEXT

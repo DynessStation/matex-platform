@@ -3,7 +3,7 @@ import express = require("express");
 import keyhsid from "../../../hsid";
 import db = require("../../../db");
 
-import { AuthRequest, verifyToken } from "../../middleware/authJwt";
+import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
 import { sendError } from "../../../helper/api-response.helper";
 
 const { pool } = db;

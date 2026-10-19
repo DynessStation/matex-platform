@@ -3,8 +3,8 @@ import express = require("express");
 import keyhsid from "../../../hsid";
 import db = require("../../../db");
 
-import { AuthRequest, verifyToken } from "../../middleware/authJwt";
-import { requirePermission } from "../../middleware/authPermission";
+import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
+import { requirePermission } from "../../../middleware/auth-permission.middleware";
 import { buildAttachmentUrl } from "../../../helper/attachment.helper";
 import { sendError } from "../../../helper/api-response.helper";
 

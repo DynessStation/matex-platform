@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from "express";
 
 import jwt from "jsonwebtoken";
 
-import { sendError } from "../../helper/api-response.helper";
+import { sendError } from "../helper/api-response.helper";
 
-import { writeAuditLog } from "../../helper/audit-log.helper";
+import { writeAuditLog } from "../helper/audit-log.helper";
 
 //==================================================
 //==== AUTH USER

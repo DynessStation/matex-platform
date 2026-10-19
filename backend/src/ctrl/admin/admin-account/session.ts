@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 import keyhsid from "../../../hsid";
 import db = require("../../../db");
 
-import { AuthRequest, verifyToken } from "../../middleware/authJwt";
+import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
 import { buildAttachmentUrl } from "../../../helper/attachment.helper";
 import { accessTokenCookieOptions } from "../../../config/cookie.config";
 import { sendError, sendSuccess } from "../../../helper/api-response.helper";

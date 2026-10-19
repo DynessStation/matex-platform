@@ -14,9 +14,9 @@ import { verifyAuditIntegrityHash } from "../../helper/audit-integrity.helper";
 
 import { sendError } from "../../helper/api-response.helper";
 
-import { AuthRequest, verifyToken } from "../middleware/authJwt";
+import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
 
-import { requirePermission } from "../middleware/authPermission";
+import { requirePermission } from "../../middleware/auth-permission.middleware";
 
 //==================================================
 //==== APP

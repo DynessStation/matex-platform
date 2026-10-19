@@ -13,8 +13,8 @@ import { buildAttachmentUrl } from "../../helper/attachment.helper";
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 import { writeAuditLog } from "../../helper/audit-log.helper";
 import { normalizeProductMediaSortOrder } from "../../helper/product-media.helper";
-import { AuthRequest, verifyToken } from "../middleware/authJwt";
-import { requirePermission } from "../middleware/authPermission";
+import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
+import { requirePermission } from "../../middleware/auth-permission.middleware";
 
 const app = express();
 const { pool } = db;

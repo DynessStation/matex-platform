@@ -8,9 +8,9 @@ import keyhsid from "../../hsid";
 
 import { sendError, sendSuccess } from "../../helper/api-response.helper";
 
-import { AuthRequest, verifyToken } from "../middleware/authJwt";
+import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
 
-import { requirePermission } from "../middleware/authPermission";
+import { requirePermission } from "../../middleware/auth-permission.middleware";
 
 import { isPublicContentLocale } from "../../config/public-content.config";
 

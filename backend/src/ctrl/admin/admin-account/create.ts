@@ -4,8 +4,8 @@ import bcrypt from "bcrypt";
 import keyhsid from "../../../hsid";
 import db = require("../../../db");
 
-import { AuthRequest, verifyToken } from "../../middleware/authJwt";
-import { requirePermission } from "../../middleware/authPermission";
+import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
+import { requirePermission } from "../../../middleware/auth-permission.middleware";
 import { sendError, sendSuccess } from "../../../helper/api-response.helper";
 import { writeAuditLog } from "../../../helper/audit-log.helper";
 import { resolveAdminProfilePhoto } from "./profile-photo";

@@ -1,6 +1,6 @@
 import { PoolConnection } from "mysql2/promise";
 
-import { AuditRequest } from "../ctrl/middleware/request-context.middleware";
+import { AuditRequest } from "../middleware/request-context.middleware";
 
 //==================================================
 //==== ACTOR

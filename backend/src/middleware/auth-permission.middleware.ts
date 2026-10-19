@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
 
-import db = require("../../db");
+import db = require("../db");
 
-import { sendError } from "../../helper/api-response.helper";
+import { sendError } from "../helper/api-response.helper";
 
-import { writeAuditLog } from "../../helper/audit-log.helper";
+import { writeAuditLog } from "../helper/audit-log.helper";
 
-import { AuthRequest } from "./authJwt";
+import { AuthRequest } from "./auth-jwt.middleware";
 
 //==================================================
 //==== DATABASE
