@@ -8,9 +8,12 @@
     "test:public": "playwright test tests/public.spec.ts",
     "test:admin": "playwright test tests/admin.spec.ts",
     "test:write": "node write/prepare.mjs && playwright test -c playwright.write.config.ts",
-    "test:api": "node write/prepare.mjs && playwright test -c playwright.api.config.ts"
+    "test:api": "node write/prepare.mjs && playwright test -c playwright.api.config.ts",
+    "format": "prettier --write \"*.ts\" \"tests/**/*.ts\" \"write/**/*.{ts,mjs}\" \"../*.cjs\"",
+    "format:check": "prettier --check \"*.ts\" \"tests/**/*.ts\" \"write/**/*.{ts,mjs}\" \"../*.cjs\""
   },
   "devDependencies": {
-    "@playwright/test": "1.64.0"
+    "@playwright/test": "1.64.0",
+    "prettier": "3.9.6"
   }
 }

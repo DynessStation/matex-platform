@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }],
+    "typescript/no-explicit-any": "warn",
+    "eqeqeq": ["warn", "always", { "null": "ignore" }],
+    "max-lines": ["warn", { "max": 800, "skipBlankLines": true, "skipComments": true }]
+  },
+  "ignorePatterns": ["dist/**", "node_modules/**"]
+}
