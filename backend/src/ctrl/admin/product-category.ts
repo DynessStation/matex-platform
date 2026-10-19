@@ -16,6 +16,7 @@ import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug, trimTo } from '../../helper/input.helper';
+import { withTransaction } from '../../helper/transaction.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -423,6 +424,25 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       categoryId = insert.insertId;
     }
+    // The slug index is unique, so the upsert below would otherwise overwrite another
+    // category's translation instead of failing (BE-013).
+    for (const item of payload.translations) {
+      const [taken] = await connection.query<RowDataPacket[]>(
+        `SELECT id_product_category FROM product_category_i18n
+         WHERE id_master_comp=? AND product_category_locale=? AND product_category_slug=?
+           AND id_product_category<>? LIMIT 1`,
+        [scope.idMasterComp, item.locale, item.slug, categoryId],
+      );
+      if (taken.length) {
+        await connection.rollback();
+        return sendError(
+          res,
+          409,
+          'PRODUCT_CATEGORY_CONFLICT',
+          'Category key or localized slug already exists',
+        );
+      }
+    }
     for (const item of payload.translations) {
       await connection.query(
         `INSERT INTO product_category_i18n(id_product_category,id_master_comp,product_category_locale,product_category_slug,product_category_name,product_category_description,product_category_meta_title,product_category_meta_description,product_category_canonical_url,product_category_og_title,product_category_og_description,product_category_i18n_status)
@@ -546,10 +566,42 @@ router.delete(
         'PRODUCT_CATEGORY_HAS_CHILDREN',
         'Move or delete child categories first',
       );
-    await pool.query(
-      `UPDATE product_category SET product_category_deleted_at=NOW(),id_updated_by=? WHERE id_product_category=? AND id_master_comp=?`,
-      [scope.idAdminAcct, id, scope.idMasterComp],
-    );
+    const found = await withTransaction(pool, async (connection) => {
+      const [rows] = await connection.query<RowDataPacket[]>(
+        `SELECT product_category_key, product_category_status FROM product_category
+         WHERE id_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL
+         FOR UPDATE`,
+        [id, scope.idMasterComp],
+      );
+      if (!rows.length) return false;
+      await connection.query(
+        `UPDATE product_category SET product_category_deleted_at=NOW(),id_updated_by=? WHERE id_product_category=? AND id_master_comp=?`,
+        [scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'product_category.deleted',
+        category: 'data_change',
+        module: 'product_category',
+        action: 'delete',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'product_category',
+        entityId: id,
+        entityLabel: rows[0].product_category_key,
+        before: { status: rows[0].product_category_status },
+        after: { deleted: true },
+        httpStatus: 200,
+      });
+      return true;
+    });
+    if (!found) {
+      return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
+    }
     return sendSuccess(
       res,
       200,
