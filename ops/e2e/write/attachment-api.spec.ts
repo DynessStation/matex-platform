@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import { expect, test, type APIRequestContext } from '@playwright/test';
@@ -139,6 +140,36 @@ test('upload stores images as webp', async () => {
     'ATTACHMENTS_UPLOADED',
   );
   expect(several.data).toHaveLength(2);
+  // Videos must really be videos: the content is checked, not only the browser's label.
+  await expectCode(
+    await upload('product_media', [
+      file('fake.mp4', 'video/mp4', Buffer.from('not a video at all')),
+    ]),
+    400,
+    'ATTACHMENT_FILE_TYPE_NOT_ALLOWED',
+  );
+  const mp4 = Buffer.concat([
+    Buffer.from([0, 0, 0, 0x18]),
+    Buffer.from('ftypmp42', 'latin1'),
+    Buffer.alloc(64),
+  ]);
+  const video = await expectCode(
+    await upload('product_media', [file(`video-${runId}.mp4`, 'video/mp4', mp4)]),
+    201,
+    'ATTACHMENT_UPLOADED',
+  );
+  expect(video.data[0]).toMatchObject({
+    mime_type: 'video/mp4',
+    extension: 'mp4',
+    file_size: mp4.length,
+    width: null,
+  });
+  await expectCode(await owner.delete(`${base}/${video.data[0].id_attachment}`), 200);
+
+  // Uploads pass through temporary files, which are removed afterwards.
+  const temporary = path.join(os.tmpdir(), 'matex-upload');
+  expect(fs.existsSync(temporary) ? fs.readdirSync(temporary) : []).toEqual([]);
+
   libraryIds = [
     single.data[0].id_attachment,
     ...several.data.map((item: any) => item.id_attachment),

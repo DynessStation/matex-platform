@@ -4,6 +4,12 @@ import { NextFunction, Response } from 'express';
 
 import multer from 'multer';
 
+import fs from 'fs/promises';
+
+import os from 'os';
+
+import path from 'path';
+
 import db = require('../../db');
 
 import keyhsid from '../../hsid';
@@ -200,7 +206,8 @@ export const getAttachmentReferences = async (
 // Multer
 
 const upload = multer({
-  storage: multer.memoryStorage(),
+  // Uploads go to temporary files, not memory (SEC-004); the route removes them afterwards.
+  dest: path.join(os.tmpdir(), 'matex-upload'),
   limits: {
     // Hard global limit
     // Collection-specific validation still applies after Multer. This ceiling
@@ -828,6 +835,12 @@ app.post(
       if (connection) {
         connection.release();
       }
+
+      // Remove temporary upload files
+
+      const uploaded = Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : [];
+
+      await Promise.allSettled(uploaded.map((item) => fs.unlink(item.path)));
     }
   },
 );

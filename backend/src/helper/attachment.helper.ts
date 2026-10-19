@@ -65,6 +65,29 @@ export const deleteStoredAttachment = async (storagePath: string): Promise<void>
   }
 };
 
+// Video signatures
+
+// The first bytes each accepted video type must start with, so a file is not trusted on the
+// browser's MIME label alone (images are checked by decoding them with sharp).
+const videoSignatures: Record<string, (head: Buffer) => boolean> = {
+  'video/mp4': (head) => head.subarray(4, 8).toString('latin1') === 'ftyp',
+  'video/webm': (head) => head.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3])),
+  'video/ogg': (head) => head.subarray(0, 4).toString('latin1') === 'OggS',
+};
+
+// The first bytes of an upload, from disk (multer diskStorage) or memory.
+const readHead = async (file: Express.Multer.File, length: number): Promise<Buffer> => {
+  if (!file.path) return file.buffer.subarray(0, length);
+  const handle = await fs.open(file.path, 'r');
+  try {
+    const head = Buffer.alloc(length);
+    const { bytesRead } = await handle.read(head, 0, length, 0);
+    return head.subarray(0, bytesRead);
+  } finally {
+    await handle.close();
+  }
+};
+
 // Store attachment
 
 export const storeAttachment = async (
@@ -128,6 +151,10 @@ export const storeAttachment = async (
     throw new Error('Attachment collection does not support this file type');
   }
 
+  if (!isImage && !videoSignatures[file.mimetype]?.(await readHead(file, 12))) {
+    throw new Error('Unsupported attachment type');
+  }
+
   const fileName = `${generatedName}.${extension}`;
 
   // Storage path
@@ -147,7 +174,8 @@ export const storeAttachment = async (
   // Process image
 
   if (!isImage) {
-    await fs.writeFile(absolutePath, file.buffer);
+    if (file.path) await fs.copyFile(file.path, absolutePath);
+    else await fs.writeFile(absolutePath, file.buffer);
 
     return {
       collection_name: collection,
@@ -168,7 +196,7 @@ export const storeAttachment = async (
   let info: sharp.OutputInfo;
 
   try {
-    info = await sharp(file.buffer, {
+    info = await sharp(file.path ?? file.buffer, {
       failOn: 'error',
     })
       // Auto rotate from exif
