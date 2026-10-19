@@ -5,6 +5,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import db = require('../../db');
 import keyhsid from '../../hsid';
 import { decodeId } from '../../helper/id.helper';
+import { sortColumn } from '../../helper/list-query.helper';
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContentLocale,
@@ -96,7 +97,7 @@ router.get(
       created: 'f.created',
       status: 'f.faq_status',
     };
-    const sortField = sortFields[String(req.query.field ?? '')];
+    const sortField = sortColumn(sortFields, req.query.field, '');
     const sortDirection = String(req.query.sort ?? '').toLowerCase() === 'desc' ? 'DESC' : 'ASC';
     const orderBy = sortField
       ? `${sortField} ${sortDirection}, f.id_faq ASC`
