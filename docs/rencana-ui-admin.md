@@ -16,9 +16,9 @@ _Dibuat: 20 Oktober 2026._
 
 | ID | Butir | Rencana | Status |
 | --- | --- | --- | --- |
-| D-1 | Kategori yang punya produk tidak boleh dinonaktifkan atau dihapus (keputusan pemilik) | Kategori yang masih dipakai produk (produk yang belum dihapus) ditolak saat diubah ke status selain `published` atau saat dihapus: 409 dengan jumlah produknya. Hapus juga melepas media kategori, supaya gambarnya bisa dihapus dari Media. Foreign key `RESTRICT` sudah ada, tapi tidak pernah terpicu karena hapus kategori hanya soft delete | Belum |
-| D-2 | Jumlah produk per kategori | List kategori admin membawa `product_count` (untuk tampilan di halaman kategori dan filter produk) | Belum |
-| D-3 | Navigasi "primary" tidak boleh dihapus (keputusan pemilik) | Navigasi `primary` ditolak saat dihapus, dinonaktifkan, atau diganti kuncinya: 409. Alur rapinya ada di U-9 | Belum |
+| D-1 | Kategori yang punya produk tidak boleh dinonaktifkan atau dihapus (keputusan pemilik) | Kategori yang masih dipakai produk (produk yang belum dihapus) ditolak saat diubah ke status selain `published` atau saat dihapus: 409 dengan jumlah produknya. Hapus juga melepas media kategori, supaya gambarnya bisa dihapus dari Media. Foreign key `RESTRICT` sudah ada, tapi tidak pernah terpicu karena hapus kategori hanya soft delete | Selesai 20 Okt. Berlaku untuk perubahan dari published; kategori draft tetap boleh diisi produk (untuk menyiapkan kategori sebelum terbit) |
+| D-2 | Jumlah produk per kategori | List kategori admin membawa `product_count` (untuk tampilan di halaman kategori dan filter produk) | Selesai 20 Okt |
+| D-3 | Navigasi "primary" tidak boleh dihapus (keputusan pemilik) | Navigasi `primary` ditolak saat dihapus, dinonaktifkan, atau diganti kuncinya: 409. Alur rapinya ada di U-9 | Selesai 20 Okt (tombol di admin dirapikan di U-9) |
 | D-4 | Format list seragam (5D lama) | Satu bentuk pagination untuk semua list: data, `total` (sesuai filter), `total_all` (tanpa filter, untuk teks "Menampilkan x dari y"), `page`, `limit`. Dikerjakan bersama tabel baru (U-3), modul per modul | Belum |
 | D-5 | Jumlah pemakaian media | List media membawa jumlah pemakaian per tempat (beranda, produk, artikel, dan seterusnya), dari daftar `REFERENCES` yang sudah ada | Belum |
 | D-6 | Filter produk per kategori | List produk admin menerima `category` | Belum |

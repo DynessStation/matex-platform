@@ -7,8 +7,9 @@ _Terakhir diperbarui: 19 Oktober 2026._
 ## Posisi sekarang
 
 - **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `7bf1314` (deploy 20 Oktober 2026, backup sebelum deploy `matex-20261019T170910Z`). Fase 5A sampai 5C lanjutan sudah live.
+- **Belum di-deploy:** 5D D-1 sampai D-3 (aturan kategori dan navigasi primary), tanpa migration.
 - **Kondisi:** fondasi operasional aman (backup terenkripsi di luar VPS, restore sudah dilatih, SSH root hanya dengan kunci, log dirotasi). Semua modul admin generasi lama sudah satu pola dan dijaga test kontrak.
-- **Test:** backend 84 unit test; e2e 118 test (113 kontrak API + 5 browser). Semuanya lulus.
+- **Test:** backend 84 unit test; e2e 119 test (114 kontrak API + 5 browser). Semuanya lulus.
 
 ## Yang sudah selesai
 
@@ -46,7 +47,7 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 | 5B Fondasi bersama ✅ | Scope sesi diambil sekali oleh middleware lalu dibaca dari `req`; helper input, ID, list query, JSON, transaksi, `HttpError`, dan penanganan error pusat, semua dengan unit test; salinan kembar langsung diganti | **Selesai 19 Okt:** modul generasi baru menjalankan 1 query akun per request (sebelumnya 2); rekaman identik |
 | 5C Pindah ke pola ✅ | Modul dipindah satu per satu, test kontrak dulu, mengikuti checklist di `standar-kode.md` | **Selesai 19 Okt:** `office` (3.115 → 1.327 baris), `admin-access` (1.742 → ±830), `web-navigation` (2.654 → ±1.250), `admin-account` (3.912 → 1.574), `chair` (1.150 → 420), `admin-permission` (1.074 → 431), `audit-log` (838 → 296), `attachment` (1.386 → 528), `website-page` (976 → 787, jadi folder). Tidak ada lagi salinan `getSessionScope`; rekaman tiap modul identik. Bug yang ditemukan di jalan: BE-006 sampai BE-010, SEC-003, SEC-004, SEC-007 |
 | 5C lanjutan ✅ | Modul generasi baru yang punya kode gagal sendiri diberi test kontrak dulu, lalu `try/catch` diganti `onFailure` | **Selesai 20 Okt:** `faq`, `public-contact`, `article`, `product-category`, `product` (jadi folder), `analytics`, dan semua route publik; rekaman identik. Tersisa hanya `try/catch` yang memetakan layanan luar ke 502/503 (`seo-console`, `content-assistant`, beacon analytics, sitemap). Bug di jalan: BE-011, BE-012, BE-013 |
-| 5D Aturan data (berikutnya) | Keputusan pemilik 20 Okt dan data yang dibutuhkan UI baru, daftar lengkap di `rencana-ui-admin.md` (D-1 sampai D-6): kategori yang masih punya produk tidak bisa dinonaktifkan atau dihapus; navigasi `primary` tidak bisa dihapus; jumlah produk per kategori, jumlah pemakaian media, filter produk per kategori; satu format list (`total` dan `total_all`) dikerjakan bersama tabel baru di 6D | Semua butir D berstatus selesai, dengan test kontrak |
+| 5D Aturan data (berjalan: D-1 sampai D-3 selesai 20 Okt) | Keputusan pemilik 20 Okt dan data yang dibutuhkan UI baru, daftar lengkap di `rencana-ui-admin.md` (D-1 sampai D-6): kategori yang masih punya produk tidak bisa dinonaktifkan atau dihapus; navigasi `primary` tidak bisa dihapus; jumlah produk per kategori, jumlah pemakaian media, filter produk per kategori; satu format list (`total` dan `total_all`) dikerjakan bersama tabel baru di 6D | Semua butir D berstatus selesai, dengan test kontrak |
 
 ### Fase 6: Frontend satu pola
 
