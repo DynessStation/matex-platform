@@ -1,13 +1,22 @@
 import { Pool } from 'mysql2/promise';
 
+import db = require('../db');
+
 import { AuthRequest } from '../middleware/auth-jwt.middleware';
 
+// The signed-in admin's scope: who they are and which company, office, and access profile they
+// act in. requirePermission() loads it once per request and stores it on req.adminScope, so
+// handlers behind that middleware read it without querying the account again.
+export interface AdminScope {
+  idAdminAcct: number;
+  idMasterComp: number;
+  idOffice: number;
+  idAccess: number;
+  isAllAccess: number;
+}
+
 export type AdminScopeResult =
-  | {
-      success: true;
-      idAdminAcct: number;
-      idMasterComp: number;
-    }
+  | ({ success: true } & AdminScope)
   | {
       success: false;
       status: number;
@@ -15,7 +24,14 @@ export type AdminScopeResult =
       message: string;
     };
 
-export const getAdminScope = async (req: AuthRequest, pool: Pool): Promise<AdminScopeResult> => {
+export const getAdminScope = async (
+  req: AuthRequest,
+  pool: Pool = db.pool,
+): Promise<AdminScopeResult> => {
+  if (req.adminScope) {
+    return { success: true, ...req.adminScope };
+  }
+
   const idAdminAcct = Number(req.user?.id_admin_acct);
 
   if (!Number.isSafeInteger(idAdminAcct) || idAdminAcct <= 0) {
@@ -29,7 +45,7 @@ export const getAdminScope = async (req: AuthRequest, pool: Pool): Promise<Admin
 
   const [rows] = await pool.query(
     `
-      SELECT id_admin_acct, id_master_comp, admin_acct_status
+      SELECT id_admin_acct, id_master_comp, id_office, id_access, is_all_access, admin_acct_status
       FROM admin_acct
       WHERE id_admin_acct = ?
       LIMIT 1
@@ -48,9 +64,13 @@ export const getAdminScope = async (req: AuthRequest, pool: Pool): Promise<Admin
     };
   }
 
-  return {
-    success: true,
+  req.adminScope = {
     idAdminAcct,
     idMasterComp: Number(account.id_master_comp),
+    idOffice: Number(account.id_office),
+    idAccess: Number(account.id_access),
+    isAllAccess: Number(account.is_all_access),
   };
+
+  return { success: true, ...req.adminScope };
 };

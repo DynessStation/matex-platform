@@ -57,7 +57,6 @@ const authenticatedRows = () => [
       admin_access_status: 1,
     },
   ],
-  [{ id_admin_acct: 9, id_master_comp: 7, admin_acct_status: 1 }],
 ];
 
 test('analytics overview rejects an invalid date range before analytics queries', async () => {
@@ -120,7 +119,9 @@ test('analytics overview is tenant scoped and returns real content totals', asyn
   assert.equal(payload.data.content.articles_pending, 1);
   assert.equal(payload.data.content.inquiries_today, 1);
 
-  const analyticsCalls = calls.slice(2);
+  // One account query (requirePermission); the handler reuses its scope instead of querying again.
+  assert.match(calls[0].sql, /FROM admin_acct/);
+  const analyticsCalls = calls.slice(1);
   assert.equal(analyticsCalls.length, 7);
   for (const call of analyticsCalls.slice(0, 6)) {
     assert.equal(call.params[0], 7);

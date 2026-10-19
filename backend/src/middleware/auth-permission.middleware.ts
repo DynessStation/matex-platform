@@ -6,6 +6,8 @@ import { sendError } from '../helper/api-response.helper';
 
 import { writeAuditLog } from '../helper/audit-log.helper';
 
+import type { AdminScope } from '../helper/admin-scope.helper';
+
 import { AuthRequest } from './auth-jwt.middleware';
 
 // Database
@@ -61,6 +63,7 @@ export const requirePermission =
               aa.alias,
 
               aa.id_master_comp,
+              aa.id_office,
               aa.id_access,
 
               aa.is_all_access,
@@ -191,9 +194,20 @@ export const requirePermission =
         return;
       }
 
+      // Handlers read the scope from req instead of querying the account again.
+
+      const scope: AdminScope = {
+        idAdminAcct: Number(idAdminAcct),
+        idMasterComp,
+        idOffice: Number(account.id_office),
+        idAccess,
+        isAllAccess: Number(account.is_all_access),
+      };
+
       // Full company access
 
-      if (Number(account.is_all_access) === 1) {
+      if (scope.isAllAccess === 1) {
+        req.adminScope = scope;
         next();
 
         return;
@@ -292,6 +306,7 @@ export const requirePermission =
 
       // Allowed
 
+      req.adminScope = scope;
       next();
     } catch (error) {
       console.error('Permission middleware error:', error);

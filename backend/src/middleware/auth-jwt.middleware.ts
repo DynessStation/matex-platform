@@ -6,6 +6,8 @@ import { sendError } from '../helper/api-response.helper';
 
 import { writeAuditLog } from '../helper/audit-log.helper';
 
+import type { AdminScope } from '../helper/admin-scope.helper';
+
 // Auth user
 
 export interface AuthUser extends jwt.JwtPayload {
@@ -20,6 +22,8 @@ export interface AuthUser extends jwt.JwtPayload {
 
 export interface AuthRequest extends Request {
   user?: AuthUser;
+  /** Set by requirePermission() or getAdminScope(); see helper/admin-scope.helper.ts. */
+  adminScope?: AdminScope;
 }
 
 // Verify token
