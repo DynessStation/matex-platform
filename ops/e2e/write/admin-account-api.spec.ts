@@ -3,8 +3,8 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
 import { admin, apiContext, expectCode, login, runId, runNumber, saveRecording } from "./api-contract";
 
 // API contract for the admin session and admin-account endpoints
-// (backend/src/ctrl/admin/auth.ts and ctrl/admin/admin-account/). It pins status codes, response
-// codes, and the key fields, so refactors can be checked against real MySQL behavior.
+// (backend/src/ctrl/admin/admin-account.ts and its ./admin-account folder). It pins status codes,
+// response codes, and the key fields, so refactors can be checked against real MySQL behavior.
 test.describe.configure({ mode: "serial" });
 
 const base = "/api/v1/admin-acct";

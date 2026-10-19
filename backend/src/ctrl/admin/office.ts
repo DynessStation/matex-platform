@@ -5,10 +5,10 @@ import createRoutes from "./office/create";
 import updateRoutes from "./office/update";
 import deleteRoutes from "./office/delete";
 
-// Office management, all under /api/v1/office.
+// Office management, under /api/v1/office.
 //
-// The route modules live in ./office, a folder the route auto-loader in app.ts does not scan,
-// so this file registers them. Their paths do not overlap, so the order is not significant.
+// The route modules live in ./office, which the auto-loader in app.ts does not scan,
+// so this file registers them. Order does not matter: their paths do not overlap.
 // Contract: ops/e2e/write/office-api.spec.ts.
 const app = express();
 

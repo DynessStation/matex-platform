@@ -7,11 +7,11 @@ import deleteRoutes from "./web-navigation/delete";
 import itemsRoutes from "./web-navigation/items";
 import reorderRoutes from "./web-navigation/reorder";
 
-// Website navigation and its menu items, all under /api/v1/web-navigation.
+// Website navigation and its menu items, under /api/v1/web-navigation.
 //
-// The route modules live in ./web-navigation, a folder the route auto-loader in app.ts does
-// not scan, so this file registers them. Their paths do not overlap, so the order is not
-// significant. Contract: ops/e2e/write/web-navigation-api.spec.ts.
+// The route modules live in ./web-navigation, which the auto-loader in app.ts does not scan,
+// so this file registers them. Order does not matter: their paths do not overlap.
+// Contract: ops/e2e/write/web-navigation-api.spec.ts.
 const app = express();
 
 app.use(readRoutes);

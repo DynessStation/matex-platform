@@ -13,3 +13,8 @@ export const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
+
+// Log pool-level errors instead of letting an unhandled 'error' event crash the process.
+pool.on("error" as any, (err) => {
+  console.error(err);
+});

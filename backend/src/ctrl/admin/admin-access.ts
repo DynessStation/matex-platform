@@ -5,11 +5,11 @@ import createRoutes from "./admin-access/create";
 import updateRoutes from "./admin-access/update";
 import deleteRoutes from "./admin-access/delete";
 
-// Access profiles and the permission matrix, all under /api/v1/admin-access.
+// Access profiles and the permission matrix, under /api/v1/admin-access.
 //
-// The route modules live in ./admin-access, a folder the route auto-loader in app.ts does not
-// scan, so this file registers them. Keep read first: it registers /permission-matrix before
-// /:id, and Express matches routes in registration order.
+// The route modules live in ./admin-access, which the auto-loader in app.ts does not scan,
+// so this file registers them. Order matters inside read: /permission-matrix must come before
+// /:id, because Express matches routes in registration order.
 // Contract: ops/e2e/write/admin-access-api.spec.ts.
 const app = express();
 

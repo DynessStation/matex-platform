@@ -15,7 +15,7 @@ Status temuan dan riwayat perbaikan dicatat di `docs/audit-awal-claude-2026-10-1
 
 ## Alur kerja standar per modul
 
-Langkah ini dipakai untuk setiap controller backend yang dipecah. Contoh lengkapnya `auth.ts` di Fase 4C.
+Langkah ini dipakai untuk setiap controller backend yang dipecah. Contoh lengkapnya `admin-account.ts` (dulu `auth.ts`) di Fase 4C.
 
 1. **Petakan.** Daftar route (method, path, izin), helper yang dipakai bersama, dan urutan route yang penting. Express mencocokkan route sesuai urutan daftar, jadi path tetap seperti `/me` harus didaftarkan sebelum `/:id`.
 2. **Tulis test kontrak API** di `ops/e2e/write/<modul>-api.spec.ts`. Test berjalan ke MySQL asli di stack e2e yang terisolasi. Isinya: kode status, kode respons, field utama, aturan keamanan (izin, scope perusahaan/kantor), dan validasi input. Jalankan dengan `npm run test:api` di `ops/e2e`.
