@@ -160,10 +160,20 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 ### Backend
 
-**BE-001 — Beberapa file controller sangat besar** · P2 · Terbukti
+**BE-001 — Beberapa file controller sangat besar** · P2 · **Sebagian selesai (Fase 4C, 19 Oktober 2026)**
 - `auth.ts` 5.099 baris (isinya login sekaligus kelola akun admin), `office.ts` 4.076, `web-navigation.ts` 2.622, `admin-access.ts` 2.316.
 - Dampak: sulit dibaca, rawan efek samping saat diubah, dan sulit dites.
 - Saran: pecah bertahap saat fitur terkait akan diubah, bukan sekaligus.
+- `auth.ts` sudah dipecah ke `ctrl/admin/admin-account/`: `session.ts` (login, logout, `/me`), `select.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`, dan `profile-photo.ts`. Isi handler dipindah apa adanya. `auth.ts` kini hanya mengatur urutan route, karena `/me` dan `/select/*` harus terdaftar sebelum `/:id`, dan folder itu sengaja tidak di-load otomatis. Bukti: rekaman 76 request (seluruh respons JSON beserta isi tabel `admin_acct` dan `audit_log` sesudahnya) identik sebelum dan sesudah pemecahan. Test kontrak gagal bila urutan route dibalik.
+- Sisa: `office.ts`, `web-navigation.ts`, `admin-access.ts`, dipecah saat fiturnya akan diubah, dengan test kontrak lebih dulu.
+
+**BE-004 — ID dengan karakter tidak valid membuat server error 500** · P3 · **Selesai (Fase 4C)**
+- Library `hashids` versi 2 melempar error bila ID berisi karakter di luar alfabetnya (misalnya URL yang diketik manual atau diubah), sementara semua kode mengharapkan hasil kosong untuk ID tidak valid. Contoh: `GET /api/v1/admin-acct/select/office?id_master_comp=abc-def` menjawab 500, bukan 400.
+- Perbaikan: `src/hsid.ts` mengembalikan hasil kosong untuk ID tidak valid. Ke-32 pemanggil sudah memperlakukan hasil kosong sebagai ID tidak valid, jadi semuanya kini menjawab 400/404. Ada unit test (`tests/hsid.test.ts`).
+
+**BE-005 — Detail akun admin yang sudah dihapus masih bisa dibuka** · P3 · **Selesai (Fase 4C)**
+- Hapus akun admin adalah soft delete (status 99). List, ubah, ubah status, dan hapus sudah menyaring status 0/1, tapi `GET /api/v1/admin-acct/:id` tidak, sehingga akun terhapus masih tampil lewat URL detail. Login akun itu tetap ditolak.
+- Perbaikan: query detail ikut menyaring status 0/1, sehingga akun terhapus menjawab 404.
 
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
@@ -228,6 +238,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Public 1 file test, admin 0. Backend punya 56 test kontrak, dan ada 3 file test browser (Playwright).
 - Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
 - Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, dan akun admin.
+- Fase 4C: `write/admin-account-api.spec.ts` menguji kontrak API sesi admin dan akun admin (13 endpoint: kode status, kode respons, field utama, aturan keamanan seperti tidak boleh menonaktifkan atau menghapus diri sendiri, dan urutan route) ke MySQL asli. Suite kini 15 skenario. Belum dicakup: kantor dan jabatan.
 
 **OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · **Selesai**
 - `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
@@ -287,12 +298,12 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, dan DB-007 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004, dan BE-005 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
-| Maintainability | BE-001, BE-002 (FE-001, FE-002, dan FE-010 selesai) |
+| Maintainability | BE-001 (sebagian), BE-002 (FE-001, FE-002, dan FE-010 selesai) |
 | Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
 | Kekurangan test | TEST-001 (sebagian selesai) |
 | Kekurangan dokumentasi | DOC-001 |
@@ -322,7 +333,7 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Saran rutin: ulangi latihan restore setiap 3 bulan, dan setiap sebelum migration besar.
 
 **Fase 4 — Kerapian bertahap**
-- BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah.
+- BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah. **`auth.ts` selesai (4C)**, didahului test kontrak API; `office.ts` menyusul.
 - FE-002: satu commit khusus format. **Selesai (4B).**
 - FE-001: rapikan modul sisa Kartify per kelompok. **Selesai (4A).**
 - FE-010: buat build CSS admin deterministik. **Selesai (4B).**
