@@ -87,7 +87,12 @@ Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi
 | `audit-log.helper.ts` | `writeAuditLog` |
 | `attachment.helper.ts` | `storeAttachment` (validasi per koleksi, gambar jadi WebP, cek isi video), `buildAttachmentUrl`, `deleteStoredAttachment` |
 
-Aturan lintas modul: tabel baru yang menunjuk `attachment` wajib ditambahkan ke daftar `REFERENCES` di `ctrl/admin/attachment.ts`, supaya file yang masih dipakai tidak bisa dihapus (BE-009).
+Aturan lintas modul:
+
+- Tabel baru yang menunjuk `attachment` wajib ditambahkan ke daftar `REFERENCES` di `ctrl/admin/attachment.ts`, supaya file yang masih dipakai tidak bisa dihapus (BE-009).
+- `INSERT ... ON DUPLICATE KEY UPDATE` hanya untuk tabel yang index uniknya cuma kunci baris itu sendiri. Kalau ada index unik lain (misalnya slug), cek bentrok dengan baris lain dulu dan tolak dengan 409; kalau tidak, MySQL diam-diam mengubah baris milik data lain (BE-013).
+- Ubah status dan hapus mengunci barisnya dulu, menjawab 404 kalau datanya tidak ada, dan menulis audit log seperti perubahan lain (BE-012).
+- `try/catch` di route hanya untuk memetakan kegagalan layanan luar (502/503) atau membersihkan file; kode gagal 500 milik modul memakai `onFailure`.
 
 ### Checklist memindahkan modul lama ke pola standar (Fase 5C)
 

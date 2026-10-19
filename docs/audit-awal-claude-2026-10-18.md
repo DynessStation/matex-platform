@@ -205,13 +205,26 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Pesan error dari fungsi penyimpan file tidak lagi sama dengan yang dicari route upload, sehingga misalnya file .txt ke Media dijawab 500, bukan 400 `ATTACHMENT_FILE_TYPE_NOT_ALLOWED`.
 - Perbaikan: fungsi penyimpan file langsung menolak dengan kode yang tepat (`HttpError`). Ada test kontraknya.
 
+**BE-011 — Parameter urutan list bisa membuat error 500 (modul generasi baru)** · P3 · **Selesai (Fase 5C, 20 Oktober 2026)**
+- Bug yang sama dengan BE-007, di list FAQ, artikel, dan produk: `?field=toString` memasukkan teks fungsi JavaScript ke `ORDER BY`.
+- Perbaikan: ketiganya memakai `sortColumn`. Ada test kontraknya.
+
+**BE-012 — Ubah status dan hapus tidak dicek dan tidak diaudit** · P3 · **Selesai (Fase 5C, 20 Oktober 2026)**
+- Artikel: ubah status dan hapus menjawab "berhasil" untuk ID yang tidak ada, sudah terhapus, atau milik perusahaan lain. Kategori produk: hapus juga begitu. Artikel, kategori, dan produk tidak menulis audit log untuk ubah status dan hapus, padahal modul lain menulis.
+- Perbaikan: jawabannya 404 untuk data yang tidak ada, dan setiap ubah status dan hapus tercatat di audit log. Ada test kontraknya.
+
+**BE-013 — Slug yang sama menimpa terjemahan artikel atau kategori lain** · P2 · **Selesai (Fase 5C, 20 Oktober 2026)**
+- Terjemahan artikel dan kategori produk disimpan dengan `INSERT ... ON DUPLICATE KEY UPDATE`, dan tabelnya punya index unik untuk slug. Kalau slug artikel baru sama dengan artikel lain, MySQL tidak menolak: terjemahan artikel lain itu yang ditimpa dengan isi baru, artikel baru tersimpan tanpa terjemahan, dan API menjawab berhasil. Kategori produk sama. Produk aman (menghapus lalu menulis ulang, dengan cek slug di awal).
+- Dicek baca-saja di production 20 Oktober: 4 artikel dan 4 kategori, semuanya masih punya kedua terjemahan. Belum ada yang rusak.
+- Perbaikan: slug yang dipakai artikel/kategori lain ditolak dengan 409 sebelum disimpan. Ada test kontraknya, termasuk bukti isi artikel lama tidak berubah.
+
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
 - Struktur folder juga tidak konsisten: middleware Express ada di `src/ctrl/middleware/` dengan nama camelCase (`authJwt.ts`), dan `src/helpers.ts` sudah tidak dipakai.
 - Fase 4D (19 Oktober 2026): middleware dipindah ke `src/middleware/` (`auth-jwt.middleware.ts`, `auth-permission.middleware.ts`, `request-context.middleware.ts`) dan `src/helpers.ts` dihapus. Rekaman test kontrak identik sebelum dan sesudahnya. Struktur target dan konvensi nama ada di `docs/standar-kode.md`. Penyeragaman gaya penulisan di dalam file dilakukan saat file itu dipecah atau diubah.
 - Fase 5A (19 Oktober 2026): satu config Prettier di root dan Oxlint untuk backend. Komentar pembatas dan baris kosong berlebihan dirapatkan dalam satu commit format murni (syntax tree 122 file identik, tercatat di `.git-blame-ignore-revs`). Lint backend 0 error. Sisa BE-002 (dua generasi pola kode) dikerjakan di Fase 5B–5C.
 - Fase 5B (19 Oktober 2026): helper bersama (`helper/input`, `id`, `list-query`, `json`, `transaction`, `http-error`) dan penanganan error pusat; scope sesi dimuat sekali per request oleh `requirePermission`. Salinan fungsi yang identik di office, web-navigation, article, product, product-category, website-page, audit-log, dan admin-account diganti. Sisa: salinan `getSessionScope` dan pola lama per modul (Fase 5C).
-- Fase 5C (19 Oktober 2026): semua 9 modul generasi lama dipindah ke pola standar dengan test kontrak; tidak ada lagi salinan `getSessionScope`, dan semua modul route memakai `express.Router()`. Sisa: modul generasi baru yang masih menulis `try/catch` sendiri (lihat peta jalan, 5C lanjutan).
+- Fase 5C (19 Oktober 2026): semua 9 modul generasi lama dipindah ke pola standar dengan test kontrak; tidak ada lagi salinan `getSessionScope`, dan semua modul route memakai `express.Router()`. Lanjutan 20 Oktober: modul generasi baru (`faq`, `public-contact`, `article`, `product-category`, `product`, `analytics`, dan route publik) juga di pola standar dengan test kontrak; `try/catch` yang hanya menjawab 500 diganti `onFailure`. Yang tersisa hanya `try/catch` yang memang memetakan kegagalan layanan luar ke 502/503.
 
 **BE-003 — Hal yang sudah benar di backend** · Info
 - Semua query database memakai parameter (aman dari SQL injection), perubahan data dibungkus transaksi, data dicek kepemilikannya per perusahaan sebelum diubah, dan ada rate limit untuk login dan API.
@@ -334,13 +347,13 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004 sampai BE-010, SEC-003, SEC-004, dan SEC-007 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004 sampai BE-013, SEC-003, SEC-004, dan SEC-007 sudah diperbaiki. |
 | Risiko keamanan | Tidak ada yang terbuka (SEC-001 sampai SEC-004 dan SEC-007 selesai; SEC-005 dan SEC-006 hanya catatan) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
 | Maintainability | BE-001 (4 file terbesar selesai), BE-002 (struktur folder selesai; FE-001, FE-002, dan FE-010 selesai) |
-| Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
+| Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). List produk publik memuat semua produk lalu memotong halaman di memori: aman untuk 53 produk, perlu dipindah ke SQL kalau katalog membesar. |
 | Kekurangan test | TEST-001 (sebagian selesai) |
 | Kekurangan dokumentasi | DOC-001 |
 
