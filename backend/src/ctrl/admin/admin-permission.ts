@@ -11,7 +11,7 @@ import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { parseListQuery, sortColumn, sortDirection } from '../../helper/list-query.helper';
+import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -137,6 +137,12 @@ router.get(
       searchValues,
     );
     const total = Number((totalRows as any[])[0]?.total ?? 0);
+    // Rows before search, for "x of y" in the admin table.
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM admin_permission WHERE permission_status IN (0, 1)`,
+      [],
+    );
 
     const [rows] = await pool.query(
       `${PERMISSION_SELECT}
@@ -158,7 +164,14 @@ router.get(
     return res.status(200).json({
       success: true,
       data,
-      pagination: { total, page, limit, length: data.length, pagerows: Math.ceil(total / limit) },
+      pagination: {
+        total,
+        total_all: totalAll,
+        page,
+        limit,
+        length: data.length,
+        pagerows: Math.ceil(total / limit),
+      },
     });
   },
 );

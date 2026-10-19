@@ -7,7 +7,7 @@ import keyhsid from '../../../hsid';
 import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
-import { parseListQuery, sortColumn } from '../../../helper/list-query.helper';
+import { parseListQuery, sortColumn, countOf } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
@@ -68,6 +68,13 @@ router.get(
       params,
     );
     const total = Number((totalRows as any[])[0].total);
+    // Rows before search and filters, for "x of y" in the admin table.
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM admin_acct aa
+       WHERE aa.id_master_comp = ? AND (? = 1 OR aa.id_office = ?) AND aa.admin_acct_status IN (0, 1)`,
+      [scope.idMasterComp, scope.isAllAccess, scope.idOffice],
+    );
 
     const [rows] = await pool.query(
       `SELECT aa.id_admin_acct, mc.id_master_comp, mc.comp_name, mc.comp_alias, o.id_office,
@@ -105,6 +112,7 @@ router.get(
       data,
       pagination: {
         total,
+        total_all: totalAll,
         page,
         limit,
         length: data.length,

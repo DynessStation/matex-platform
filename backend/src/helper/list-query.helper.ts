@@ -41,6 +41,16 @@ export const sortColumn = (
   fallback: string,
 ): string => (typeof key === 'string' && Object.hasOwn(columns, key) ? columns[key] : fallback);
 
+/** The `total` column of a COUNT query. */
+export const countOf = async (
+  executor: { query: (sql: string, values: unknown[]) => Promise<any> },
+  sql: string,
+  params: unknown[],
+): Promise<number> => {
+  const [rows] = await executor.query(sql, params);
+  return Number(rows[0]?.total ?? 0);
+};
+
 /** 'desc' or 'true' -> DESC, 'asc' or 'false' -> ASC, anything else -> `fallback`. */
 export const sortDirection = (value: unknown, fallback: 'ASC' | 'DESC'): 'ASC' | 'DESC' => {
   if (value === 'desc' || value === 'true') return 'DESC';

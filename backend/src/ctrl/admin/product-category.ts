@@ -8,6 +8,7 @@ import { PoolConnection } from 'mysql2/promise';
 
 import db = require('../../db');
 import keyhsid from '../../hsid';
+import { countOf } from '../../helper/list-query.helper';
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContentLocale,
@@ -464,6 +465,12 @@ router.get(
     return sendSuccess(res, 200, 'PRODUCT_CATEGORIES_LISTED', 'Product categories loaded', {
       data: makeTree(data),
       total: data.length,
+      total_all: await countOf(
+        pool,
+        `SELECT COUNT(*) AS total FROM product_category
+         WHERE id_master_comp = ? AND product_category_deleted_at IS NULL`,
+        [scope.idMasterComp],
+      ),
     });
   },
 );

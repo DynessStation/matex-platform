@@ -26,7 +26,7 @@ import {
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { parseListQuery, sortColumn } from '../../helper/list-query.helper';
+import { parseListQuery, sortColumn, countOf } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -251,6 +251,14 @@ router.get(
       params,
     );
     const total = Number((totalRows as any[])[0]?.total ?? 0);
+    // Rows before search and filters, for "x of y" in the admin table.
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM attachment a
+       WHERE a.attachment_status = 1 AND a.deleted_at IS NULL AND a.id_master_comp = ?
+         AND (? = 1 OR a.id_office = ?)`,
+      [scope.idMasterComp, scope.isAllAccess === 1 ? 1 : 0, scope.idOffice],
+    );
 
     const [rows] = await pool.query(
       `SELECT a.id_attachment, a.collection_name, a.name, a.original_name, a.file_name,
@@ -288,6 +296,7 @@ router.get(
         page,
         limit,
         total,
+        total_all: totalAll,
         length: data.length,
         total_pages: Math.ceil(total / limit),
         has_more: offset + data.length < total,

@@ -20,7 +20,7 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug } from '../../helper/input.helper';
-import { sortColumn } from '../../helper/list-query.helper';
+import { sortColumn, countOf } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -409,6 +409,12 @@ router.get(
         blog_thumbnail: row.id_attachment ? mediaDto(row) : null,
       })),
       total: Number(counts[0]?.total ?? 0),
+      total_all: await countOf(
+        pool,
+        `SELECT COUNT(*) AS total FROM article
+         WHERE id_master_comp = ? AND article_deleted_at IS NULL`,
+        [scope.idMasterComp],
+      ),
       current_page: page,
       per_page: limit,
     });

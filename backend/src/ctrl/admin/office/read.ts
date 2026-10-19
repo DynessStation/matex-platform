@@ -8,7 +8,12 @@ import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError } from '../../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { decodeId } from '../../../helper/id.helper';
-import { parseListQuery, sortColumn, sortDirection } from '../../../helper/list-query.helper';
+import {
+  parseListQuery,
+  sortColumn,
+  sortDirection,
+  countOf,
+} from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
@@ -53,6 +58,12 @@ router.get(
       [scope.idMasterComp, ...searchParams],
     );
     const total = Number((totalRows as any[])[0]?.total ?? 0);
+    // Rows before search and filters, for "x of y" in the admin table.
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM office WHERE id_master_comp = ? AND status IN (0, 1)`,
+      [scope.idMasterComp],
+    );
 
     const [rows] = await pool.query(
       `SELECT o.id_office, o.office_code, o.office_name, o.office_description, o.address, o.city,
@@ -112,6 +123,7 @@ router.get(
         page,
         limit,
         total,
+        total_all: totalAll,
         length: data.length,
         pagerows: Math.ceil(total / limit),
         total_pages: Math.ceil(total / limit),

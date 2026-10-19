@@ -11,7 +11,7 @@ import { sendError } from '../../helper/api-response.helper';
 import { verifyAuditIntegrityHash } from '../../helper/audit-integrity.helper';
 import { decodeId } from '../../helper/id.helper';
 import { parseJsonValue } from '../../helper/json.helper';
-import { parseListQuery, sortColumn, sortDirection } from '../../helper/list-query.helper';
+import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
@@ -165,6 +165,12 @@ router.get(
       params,
     );
     const total = Number((totalRows as any[])[0]?.total ?? 0);
+    // Rows before search and filters, for "x of y" in the admin table.
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM audit_log al WHERE ${COMPANY_SCOPE}`,
+      [scope.idMasterComp, scope.idMasterComp],
+    );
 
     const [rows] = await pool.query(
       `SELECT ${LIST_COLUMNS},
@@ -197,6 +203,7 @@ router.get(
         page,
         limit,
         total,
+        total_all: totalAll,
         length: data.length,
         pagerows: Math.ceil(total / limit),
         total_pages: Math.ceil(total / limit),

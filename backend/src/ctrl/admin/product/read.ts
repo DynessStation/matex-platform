@@ -10,7 +10,7 @@ import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { trimTo } from '../../../helper/input.helper';
-import { sortColumn } from '../../../helper/list-query.helper';
+import { sortColumn, countOf } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 import { onFailure } from '../../../middleware/error-handler.middleware';
@@ -65,6 +65,12 @@ router.get(
     return sendSuccess(res, 200, 'PRODUCTS_LISTED', 'Products loaded', {
       data: await hydrate(rows, scope.idMasterComp, locale),
       total: Number(countRows[0]?.total ?? 0),
+      total_all: await countOf(
+        pool,
+        `SELECT COUNT(*) AS total FROM product_catalog
+         WHERE id_master_comp = ? AND product_deleted_at IS NULL`,
+        [scope.idMasterComp],
+      ),
       current_page: page,
       per_page: paginate,
     });
