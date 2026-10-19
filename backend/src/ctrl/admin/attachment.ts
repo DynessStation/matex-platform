@@ -173,16 +173,26 @@ export const getAttachmentReferences = async (
     });
   }
 
-  // Future references
-  //
-  // Product thumbnail
-  // Product gallery
-  // Category image
-  // Company logo
-  // Office logo
-  // Article media handled above.
-  //
-  // Tambahkan checker di sini saat modulnya dibuat.
+  // Product media and product category image, icon, and share image.
+  for (const [table, source] of [
+    ['product_catalog_attachment', 'product.attachment'],
+    ['product_category_attachment', 'product_category.attachment'],
+  ]) {
+    const [rows] = await executor.query(
+      `SELECT id_attachment, COUNT(*) AS total FROM ${table}
+       WHERE id_attachment IN (${placeholders}) GROUP BY id_attachment`,
+      ids,
+    );
+    for (const row of rows as any[]) {
+      references.push({
+        idAttachment: Number(row.id_attachment),
+        source,
+        total: Number(row.total),
+      });
+    }
+  }
+
+  // Every table with a foreign key to attachment must be checked here.
 
   return references;
 };
@@ -772,13 +782,14 @@ app.post(
           code: 'ATTACHMENT_COLLECTION_INVALID',
           message: 'Invalid attachment collection',
         },
-        'Attachment collection does not support image processing': {
+        // Messages thrown by storeAttachment (helper/attachment.helper.ts).
+        'Attachment collection does not support this file type': {
           code: 'ATTACHMENT_IMAGE_PROCESSING_UNSUPPORTED',
-          message: 'Attachment collection does not support image processing',
+          message: 'Attachment collection does not support this file type',
         },
-        'Unsupported image type': {
+        'Unsupported attachment type': {
           code: 'ATTACHMENT_FILE_TYPE_NOT_ALLOWED',
-          message: 'Unsupported image type',
+          message: 'Unsupported attachment type',
         },
         'File size exceeds the allowed limit': {
           code: 'ATTACHMENT_FILE_TOO_LARGE',
