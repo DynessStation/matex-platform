@@ -4,6 +4,7 @@ import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
 const scopeOf = (locale: unknown) => {
@@ -220,35 +221,37 @@ const hydrate = async (
   });
 };
 
-router.get('/api/public/products/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const scope = scopeOf(req.params.locale);
-  if (!scope) return sendError(res, 404, 'PRODUCTS_NOT_FOUND', 'Products not found');
-  const search = String(req.query.search ?? '')
-      .trim()
-      .slice(0, 200),
-    like = `%${search}%`;
-  const categories = String(req.query.category ?? '')
-    .split(',')
-    .map((x) => x.trim())
-    .filter(Boolean)
-    .slice(0, 20);
-  const categoryIds = String(req.query.category_ids ?? '')
-    .split(',')
-    .map(Number)
-    .filter((value) => Number.isSafeInteger(value) && value > 0)
-    .slice(0, 50);
-  const ids = String(req.query.ids ?? '')
-    .split(',')
-    .map(Number)
-    .filter((value) => Number.isSafeInteger(value) && value > 0)
-    .slice(0, 100);
-  const excludedId = Number(req.query.exclude_id);
-  const page = positiveInt(req.query.page, 1, 100000),
-    paginate = positiveInt(req.query.paginate, 100, 100),
-    preferredCurrency = currencyCode(req.query.currency);
-  const sortBy = String(req.query.sortBy ?? 'asc');
-  try {
+router.get(
+  '/api/public/products/:locale',
+  onFailure('PRODUCTS_UNAVAILABLE', 'Unable to load products'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const scope = scopeOf(req.params.locale);
+    if (!scope) return sendError(res, 404, 'PRODUCTS_NOT_FOUND', 'Products not found');
+    const search = String(req.query.search ?? '')
+        .trim()
+        .slice(0, 200),
+      like = `%${search}%`;
+    const categories = String(req.query.category ?? '')
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .slice(0, 20);
+    const categoryIds = String(req.query.category_ids ?? '')
+      .split(',')
+      .map(Number)
+      .filter((value) => Number.isSafeInteger(value) && value > 0)
+      .slice(0, 50);
+    const ids = String(req.query.ids ?? '')
+      .split(',')
+      .map(Number)
+      .filter((value) => Number.isSafeInteger(value) && value > 0)
+      .slice(0, 100);
+    const excludedId = Number(req.query.exclude_id);
+    const page = positiveInt(req.query.page, 1, 100000),
+      paginate = positiveInt(req.query.paginate, 100, 100),
+      preferredCurrency = currencyCode(req.query.currency);
+    const sortBy = String(req.query.sortBy ?? 'asc');
     const needsCategoryJoin = categories.length > 0 || categoryIds.length > 0;
     const categoryJoin = needsCategoryJoin
       ? ` JOIN product_catalog_category pc_filter ON pc_filter.id_product=p.id_product JOIN product_category_i18n ci_filter ON ci_filter.id_product_category=pc_filter.id_product_category AND ci_filter.product_category_locale=i.product_locale`
@@ -305,16 +308,15 @@ router.get('/api/public/products/:locale', async (req, res) => {
       page,
       paginate,
     });
-  } catch (error) {
-    console.error('[Public product] list failed', error);
-    return sendError(res, 500, 'PRODUCTS_UNAVAILABLE', 'Unable to load products');
-  }
-});
-router.get('/api/public/products/:locale/:slug', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const scope = scopeOf(req.params.locale);
-  if (!scope) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
-  try {
+  },
+);
+router.get(
+  '/api/public/products/:locale/:slug',
+  onFailure('PRODUCT_UNAVAILABLE', 'Unable to load product'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const scope = scopeOf(req.params.locale);
+    if (!scope) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `${base} WHERE ${where} AND i.product_slug=? LIMIT 1`,
       [scope.company, scope.locale, req.params.slug],
@@ -327,9 +329,6 @@ router.get('/api/public/products/:locale/:slug', async (req, res) => {
       currencyCode(req.query.currency),
     );
     return sendSuccess(res, 200, 'PRODUCT_FOUND', 'Product loaded', product);
-  } catch (error) {
-    console.error('[Public product] detail failed', error);
-    return sendError(res, 500, 'PRODUCT_UNAVAILABLE', 'Unable to load product');
-  }
-});
+  },
+);
 export default router;

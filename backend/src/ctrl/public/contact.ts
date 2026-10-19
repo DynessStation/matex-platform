@@ -5,6 +5,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 import { sendContactInquiryMail } from '../../service/contact-inquiry-mail.service';
 
 const router = Router();
@@ -32,16 +33,18 @@ const channelUrl = (type: string, value: string, configured: unknown) => {
   return safePublicUrl(configured);
 };
 
-router.get('/api/public/contact/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const company = Number(process.env.PUBLIC_COMPANY_ID);
-  const locale = String(req.params.locale ?? '');
-  if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, 'CONTACT_UNAVAILABLE', 'Contact is not configured');
-  if (!isPublicContentLocale(locale))
-    return sendError(res, 404, 'CONTACT_NOT_FOUND', 'Contact not found');
+router.get(
+  '/api/public/contact/:locale',
+  onFailure('CONTACT_UNAVAILABLE', 'Unable to load contact'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const company = Number(process.env.PUBLIC_COMPANY_ID);
+    const locale = String(req.params.locale ?? '');
+    if (!Number.isSafeInteger(company) || company <= 0)
+      return sendError(res, 503, 'CONTACT_UNAVAILABLE', 'Contact is not configured');
+    if (!isPublicContentLocale(locale))
+      return sendError(res, 404, 'CONTACT_NOT_FOUND', 'Contact not found');
 
-  try {
     const [channels] = await pool.query<RowDataPacket[]>(
       `SELECT c.public_contact_channel_key AS channel_key,
         c.public_contact_channel_type AS type,
@@ -133,60 +136,59 @@ router.get('/api/public/contact/:locale', async (req, res) => {
         };
       }),
     });
-  } catch (error) {
-    console.error('[Public Contact] Failed to load', error);
-    return sendError(res, 500, 'CONTACT_UNAVAILABLE', 'Unable to load contact');
-  }
-});
+  },
+);
 
-router.post('/api/public/contact-inquiry', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const company = Number(process.env.PUBLIC_COMPANY_ID);
-  if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, 'CONTACT_UNAVAILABLE', 'Contact is not configured');
+router.post(
+  '/api/public/contact-inquiry',
+  onFailure('CONTACT_INQUIRY_FAILED', 'Unable to send message'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const company = Number(process.env.PUBLIC_COMPANY_ID);
+    if (!Number.isSafeInteger(company) || company <= 0)
+      return sendError(res, 503, 'CONTACT_UNAVAILABLE', 'Contact is not configured');
 
-  if (String(req.body?.website ?? '').trim())
-    return sendSuccess(res, 202, 'CONTACT_INQUIRY_ACCEPTED', 'Message received', null);
+    if (String(req.body?.website ?? '').trim())
+      return sendSuccess(res, 202, 'CONTACT_INQUIRY_ACCEPTED', 'Message received', null);
 
-  const locale = String(req.body?.locale ?? '');
-  const topicKey = String(req.body?.topic_key ?? '').trim();
-  const name = String(req.body?.name ?? '').trim();
-  const email = String(req.body?.email ?? '').trim() || null;
-  const phone = String(req.body?.phone ?? '').trim() || null;
-  const message = String(req.body?.message ?? '').trim();
-  const consent = req.body?.consent === true;
+    const locale = String(req.body?.locale ?? '');
+    const topicKey = String(req.body?.topic_key ?? '').trim();
+    const name = String(req.body?.name ?? '').trim();
+    const email = String(req.body?.email ?? '').trim() || null;
+    const phone = String(req.body?.phone ?? '').trim() || null;
+    const message = String(req.body?.message ?? '').trim();
+    const consent = req.body?.consent === true;
 
-  if (
-    !isPublicContentLocale(locale) ||
-    !topicKey ||
-    !name ||
-    name.length > 255 ||
-    (!email && !phone) ||
-    (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
-    (phone && phone.length > 50) ||
-    !message ||
-    message.length > 5000 ||
-    !consent
-  )
-    return sendError(res, 400, 'CONTACT_INQUIRY_INVALID', 'Complete the required contact fields');
+    if (
+      !isPublicContentLocale(locale) ||
+      !topicKey ||
+      !name ||
+      name.length > 255 ||
+      (!email && !phone) ||
+      (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
+      (phone && phone.length > 50) ||
+      !message ||
+      message.length > 5000 ||
+      !consent
+    )
+      return sendError(res, 400, 'CONTACT_INQUIRY_INVALID', 'Complete the required contact fields');
 
-  const ipHash = createHash('sha256')
-    .update(String(req.ip ?? 'unknown'))
-    .digest();
-  const rateKey = ipHash.toString('hex');
-  const now = Date.now();
-  const recent = (attempts.get(rateKey) ?? []).filter((time) => now - time < WINDOW_MS);
-  if (recent.length >= MAX_ATTEMPTS)
-    return sendError(
-      res,
-      429,
-      'CONTACT_INQUIRY_RATE_LIMITED',
-      'Please wait before sending another message',
-    );
-  recent.push(now);
-  attempts.set(rateKey, recent);
+    const ipHash = createHash('sha256')
+      .update(String(req.ip ?? 'unknown'))
+      .digest();
+    const rateKey = ipHash.toString('hex');
+    const now = Date.now();
+    const recent = (attempts.get(rateKey) ?? []).filter((time) => now - time < WINDOW_MS);
+    if (recent.length >= MAX_ATTEMPTS)
+      return sendError(
+        res,
+        429,
+        'CONTACT_INQUIRY_RATE_LIMITED',
+        'Please wait before sending another message',
+      );
+    recent.push(now);
+    attempts.set(rateKey, recent);
 
-  try {
     const [topicRows] = await pool.query<RowDataPacket[]>(
       `SELECT q.id_contact_inquiry_topic,
         q.contact_inquiry_topic_recipient_email AS recipient_email,
@@ -266,10 +268,7 @@ router.post('/api/public/contact-inquiry', async (req, res) => {
     return sendSuccess(res, 201, 'CONTACT_INQUIRY_CREATED', 'Message received successfully', {
       reference,
     });
-  } catch (error) {
-    console.error('[Public Contact] Failed to save inquiry', error);
-    return sendError(res, 500, 'CONTACT_INQUIRY_FAILED', 'Unable to send message');
-  }
-});
+  },
+);
 
 export default router;

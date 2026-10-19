@@ -8,6 +8,7 @@ import {
 } from '../../config/web-navigation.config';
 import { pool } from '../../db';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
 
@@ -24,25 +25,27 @@ type PublicNavigationItem = {
   path: string;
 };
 
-router.get('/api/public/navigation/:key/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
+router.get(
+  '/api/public/navigation/:key/:locale',
+  onFailure('NAVIGATION_UNAVAILABLE', 'Unable to load navigation'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
 
-  const company = Number(process.env.PUBLIC_COMPANY_ID);
+    const company = Number(process.env.PUBLIC_COMPANY_ID);
 
-  if (!Number.isSafeInteger(company) || company <= 0) {
-    return sendError(res, 503, 'NAVIGATION_UNAVAILABLE', 'Navigation is not configured');
-  }
+    if (!Number.isSafeInteger(company) || company <= 0) {
+      return sendError(res, 503, 'NAVIGATION_UNAVAILABLE', 'Navigation is not configured');
+    }
 
-  const key = String(req.params.key ?? '')
-    .trim()
-    .toLowerCase();
-  const locale = String(req.params.locale ?? '').trim();
+    const key = String(req.params.key ?? '')
+      .trim()
+      .toLowerCase();
+    const locale = String(req.params.locale ?? '').trim();
 
-  if (key !== 'primary' || !isPublicContentLocale(locale)) {
-    return sendError(res, 404, 'NAVIGATION_NOT_FOUND', 'Navigation not found');
-  }
+    if (key !== 'primary' || !isPublicContentLocale(locale)) {
+      return sendError(res, 404, 'NAVIGATION_NOT_FOUND', 'Navigation not found');
+    }
 
-  try {
     const [navigationRows] = await pool.query<RowDataPacket[]>(
       `
         SELECT
@@ -131,11 +134,7 @@ router.get('/api/public/navigation/:key/:locale', async (req, res) => {
       locale,
       items,
     });
-  } catch (error) {
-    console.error('[Public Navigation] Failed to load navigation', error);
-
-    return sendError(res, 500, 'NAVIGATION_UNAVAILABLE', 'Unable to load navigation');
-  }
-});
+  },
+);
 
 export default router;

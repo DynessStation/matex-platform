@@ -3,6 +3,7 @@ import { RowDataPacket } from 'mysql2';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 import { parseJsonValue } from '../../helper/json.helper';
 
 const router = Router();
@@ -24,25 +25,27 @@ const PUBLIC_MEDIA_SLOTS = [
 
 // Public company scope is deployment-owned.
 // No request parameter, cookie, or header may override it.
-router.get('/api/public/website-page/:locale/:path', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
+router.get(
+  '/api/public/website-page/:locale/:path',
+  onFailure('WEBSITE_UNAVAILABLE', 'Unable to load page'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
 
-  const company = Number(process.env.PUBLIC_COMPANY_ID);
-  if (!Number.isSafeInteger(company) || company <= 0) {
-    return sendError(res, 503, 'WEBSITE_UNAVAILABLE', 'Website content is not configured');
-  }
+    const company = Number(process.env.PUBLIC_COMPANY_ID);
+    if (!Number.isSafeInteger(company) || company <= 0) {
+      return sendError(res, 503, 'WEBSITE_UNAVAILABLE', 'Website content is not configured');
+    }
 
-  const locale = String(req.params.locale);
-  const pagePath = String(req.params.path);
-  if (
-    !SUPPORTED_LOCALES.has(locale) ||
-    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pagePath) ||
-    pagePath.length > 191
-  ) {
-    return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Page not found');
-  }
+    const locale = String(req.params.locale);
+    const pagePath = String(req.params.path);
+    if (
+      !SUPPORTED_LOCALES.has(locale) ||
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pagePath) ||
+      pagePath.length > 191
+    ) {
+      return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Page not found');
+    }
 
-  try {
     const [pages] = await pool.query<RowDataPacket[]>(
       `
         SELECT
@@ -173,10 +176,7 @@ router.get('/api/public/website-page/:locale/:path', async (req, res) => {
         click_target: item.click_target ?? null,
       })),
     });
-  } catch (error) {
-    console.error('[Public Website] Failed to load page', error);
-    return sendError(res, 500, 'WEBSITE_UNAVAILABLE', 'Unable to load page');
-  }
-});
+  },
+);
 
 export default router;

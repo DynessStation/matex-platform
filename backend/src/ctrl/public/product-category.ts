@@ -4,6 +4,7 @@ import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
 const publicScope = (locale: unknown) => {
@@ -98,12 +99,14 @@ const withLocalizedSlugs = async (rows: RowDataPacket[], company: number) => {
   );
 };
 
-router.get('/api/public/product-categories/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const scope = publicScope(req.params.locale);
-  if (!scope)
-    return sendError(res, 404, 'PRODUCT_CATEGORIES_NOT_FOUND', 'Product categories not found');
-  try {
+router.get(
+  '/api/public/product-categories/:locale',
+  onFailure('PRODUCT_CATEGORIES_UNAVAILABLE', 'Unable to load product categories'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const scope = publicScope(req.params.locale);
+    if (!scope)
+      return sendError(res, 404, 'PRODUCT_CATEGORIES_NOT_FOUND', 'Product categories not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `${select} WHERE ${where} ORDER BY c.product_category_sort_order,i.product_category_name`,
       [scope.company, scope.locale],
@@ -113,23 +116,17 @@ router.get('/api/public/product-categories/:locale', async (req, res) => {
       data: tree(data),
       total: data.length,
     });
-  } catch (error) {
-    console.error('[Public product category] list failed', error);
-    return sendError(
-      res,
-      500,
-      'PRODUCT_CATEGORIES_UNAVAILABLE',
-      'Unable to load product categories',
-    );
-  }
-});
+  },
+);
 
-router.get('/api/public/product-categories/:locale/:slug', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const scope = publicScope(req.params.locale);
-  if (!scope)
-    return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
-  try {
+router.get(
+  '/api/public/product-categories/:locale/:slug',
+  onFailure('PRODUCT_CATEGORY_UNAVAILABLE', 'Unable to load product category'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const scope = publicScope(req.params.locale);
+    if (!scope)
+      return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `${select} WHERE ${where} AND i.product_category_slug=? LIMIT 1`,
       [scope.company, scope.locale, req.params.slug],
@@ -138,10 +135,7 @@ router.get('/api/public/product-categories/:locale/:slug', async (req, res) => {
       return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [category] = await withLocalizedSlugs(rows, scope.company);
     return sendSuccess(res, 200, 'PRODUCT_CATEGORY_FOUND', 'Product category loaded', category);
-  } catch (error) {
-    console.error('[Public product category] detail failed', error);
-    return sendError(res, 500, 'PRODUCT_CATEGORY_UNAVAILABLE', 'Unable to load product category');
-  }
-});
+  },
+);
 
 export default router;

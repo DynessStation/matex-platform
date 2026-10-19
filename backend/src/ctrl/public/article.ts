@@ -4,6 +4,7 @@ import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
 const scope = (locale: unknown) => {
@@ -52,15 +53,17 @@ const dto = (row: any, detail = false) => ({
   created_at: row.article_published_at ?? row.created,
   updated_at: row.updated,
 });
-router.get('/api/public/articles/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const s = scope(req.params.locale);
-  if (!s) return sendError(res, 404, 'ARTICLES_NOT_FOUND', 'Articles not found');
-  const page = Math.max(1, Number(req.query.page) || 1),
-    limit = Math.min(50, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 12)),
-    search = String(req.query.search ?? '').trim(),
-    like = `%${search}%`;
-  try {
+router.get(
+  '/api/public/articles/:locale',
+  onFailure('ARTICLES_UNAVAILABLE', 'Unable to load articles'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const s = scope(req.params.locale);
+    if (!s) return sendError(res, 404, 'ARTICLES_NOT_FOUND', 'Articles not found');
+    const page = Math.max(1, Number(req.query.page) || 1),
+      limit = Math.min(50, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 12)),
+      search = String(req.query.search ?? '').trim(),
+      like = `%${search}%`;
     const [counts] = await pool.query<RowDataPacket[]>(
       `SELECT COUNT(*) total FROM article a JOIN article_i18n i ON i.id_article=a.id_article AND i.id_master_comp=a.id_master_comp WHERE ${publicWhere} AND (?='' OR i.article_title LIKE ? OR i.article_excerpt LIKE ?)`,
       [s.company, s.locale, search, like, like],
@@ -75,25 +78,21 @@ router.get('/api/public/articles/:locale', async (req, res) => {
       current_page: page,
       per_page: limit,
     });
-  } catch (error) {
-    console.error('[Public article] list failed', error);
-    return sendError(res, 500, 'ARTICLES_UNAVAILABLE', 'Unable to load articles');
-  }
-});
-router.get('/api/public/articles/:locale/:slug', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const s = scope(req.params.locale);
-  if (!s) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
-  try {
+  },
+);
+router.get(
+  '/api/public/articles/:locale/:slug',
+  onFailure('ARTICLE_UNAVAILABLE', 'Unable to load article'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const s = scope(req.params.locale);
+    if (!s) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `${baseSelect} WHERE ${publicWhere} AND i.article_slug=? LIMIT 1`,
       [s.company, s.locale, req.params.slug],
     );
     if (!rows.length) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     return sendSuccess(res, 200, 'ARTICLE_FOUND', 'Article loaded', dto(rows[0], true));
-  } catch (error) {
-    console.error('[Public article] detail failed', error);
-    return sendError(res, 500, 'ARTICLE_UNAVAILABLE', 'Unable to load article');
-  }
-});
+  },
+);
 export default router;

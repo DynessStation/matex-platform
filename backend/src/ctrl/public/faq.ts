@@ -4,19 +4,23 @@ import { RowDataPacket } from 'mysql2';
 import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
 
-router.get('/api/public/faq/:locale', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  const company = Number(process.env.PUBLIC_COMPANY_ID);
-  const locale = String(req.params.locale ?? '');
+router.get(
+  '/api/public/faq/:locale',
+  onFailure('FAQ_UNAVAILABLE', 'Unable to load FAQ'),
+  async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const company = Number(process.env.PUBLIC_COMPANY_ID);
+    const locale = String(req.params.locale ?? '');
 
-  if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, 'FAQ_UNAVAILABLE', 'FAQ is not configured');
-  if (!isPublicContentLocale(locale)) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
+    if (!Number.isSafeInteger(company) || company <= 0)
+      return sendError(res, 503, 'FAQ_UNAVAILABLE', 'FAQ is not configured');
+    if (!isPublicContentLocale(locale))
+      return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
 
-  try {
     const [rows] = await pool.query<RowDataPacket[]>(
       `
         SELECT f.faq_key AS faq_key, f.faq_sort_order AS sort_order,
@@ -55,10 +59,7 @@ router.get('/api/public/faq/:locale', async (req, res) => {
           : null,
       })),
     });
-  } catch (error) {
-    console.error('[Public FAQ] Failed to load', error);
-    return sendError(res, 500, 'FAQ_UNAVAILABLE', 'Unable to load FAQ');
-  }
-});
+  },
+);
 
 export default router;
