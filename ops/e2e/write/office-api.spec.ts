@@ -249,7 +249,7 @@ test("status changes and delete rules", async () => {
   await expectCode(await owner.delete(`${base}/${officeId}`), 409, "OFFICE_MUST_BE_INACTIVE");
 
   // An admin assigned to the office blocks its deletion.
-  const references = await adminReferences(owner, officeId);
+  const references = await adminReferences(owner, { id_office: officeId });
   const member = await createAdminAccount(owner, "Anggota", references);
   await expectCode(await owner.get(`${base}/${officeId}`), 200).then((detail) =>
     expect(detail.data.admin_count).toBe(1),

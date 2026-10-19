@@ -82,21 +82,24 @@ export type AdminReferences = {
   id_access: string;
 };
 
-/** The first company, office, chair, and access profile offered by the admin-account selects. */
+/**
+ * The first company, office, chair, and access profile offered by the admin-account selects,
+ * with any of them replaced by `overrides`.
+ */
 export async function adminReferences(
   context: APIRequestContext,
-  office?: string,
+  overrides: Partial<AdminReferences> = {},
 ): Promise<AdminReferences> {
   const select = async (kind: string, params: Record<string, string> = {}) => {
     const body = await expectCode(await context.get(`/api/v1/admin-acct/select/${kind}`, { params }), 200);
     return body.data[0].value as string;
   };
-  const company = await select("company");
+  const company = overrides.id_master_comp ?? (await select("company"));
   return {
     id_master_comp: company,
-    id_office: office ?? (await select("office", { id_master_comp: company })),
-    id_chair: await select("chair", { id_master_comp: company }),
-    id_access: await select("access", { id_master_comp: company }),
+    id_office: overrides.id_office ?? (await select("office", { id_master_comp: company })),
+    id_chair: overrides.id_chair ?? (await select("chair", { id_master_comp: company })),
+    id_access: overrides.id_access ?? (await select("access", { id_master_comp: company })),
   };
 }
 
@@ -164,5 +167,5 @@ export async function saveRecording(spec: string, tables: string[]): Promise<voi
     await connection.end();
   }
   fs.mkdirSync(recordDir, { recursive: true });
-  fs.writeFileSync(path.join(recordDir, `${spec}.json`), `${JSON.stringify({ responses: recorded, rows }, null, 1)}\n`);
+  fs.writeFileSync(path.join(recordDir, `${spec}.json`), `${JSON.stringify({ responses: recorded.splice(0), rows }, null, 1)}\n`);
 }
