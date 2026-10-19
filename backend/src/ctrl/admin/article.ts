@@ -16,6 +16,8 @@ import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug } from '../../helper/input.helper';
+import { sortColumn } from '../../helper/list-query.helper';
+import { withTransaction } from '../../helper/transaction.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -132,7 +134,7 @@ router.get(
       title: 'i.article_title',
       created_at: 'a.created',
     };
-    const sortField = sortFields[String(req.query.field ?? '')];
+    const sortField = sortColumn(sortFields, req.query.field, '');
     const sortDirection = String(req.query.sort ?? '').toLowerCase() === 'asc' ? 'ASC' : 'DESC';
     const orderBy = sortField
       ? `${sortField} ${sortDirection}, a.id_article DESC`
@@ -310,6 +312,24 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       articleId = insert.insertId;
     }
+    // The slug index is unique, so the upsert below would otherwise overwrite another
+    // article's translation instead of failing (BE-013).
+    for (const t of payload.translations) {
+      const [taken] = await cx.query<RowDataPacket[]>(
+        `SELECT id_article FROM article_i18n
+         WHERE id_master_comp=? AND article_locale=? AND article_slug=? AND id_article<>? LIMIT 1`,
+        [scope.idMasterComp, t.locale, t.slug, articleId],
+      );
+      if (taken.length) {
+        await cx.rollback();
+        return sendError(
+          res,
+          409,
+          'ARTICLE_CONFLICT',
+          'Article key or localized slug already exists',
+        );
+      }
+    }
     for (const t of payload.translations)
       await cx.query(
         `INSERT INTO article_i18n(id_article,id_master_comp,article_locale,article_slug,article_title,article_excerpt,article_body,article_meta_title,article_meta_description,article_canonical_url,article_og_title,article_og_description,article_schema_json,article_i18n_status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE article_slug=VALUES(article_slug),article_title=VALUES(article_title),article_excerpt=VALUES(article_excerpt),article_body=VALUES(article_body),article_meta_title=VALUES(article_meta_title),article_meta_description=VALUES(article_meta_description),article_canonical_url=VALUES(article_canonical_url),article_og_title=VALUES(article_og_title),article_og_description=VALUES(article_og_description),article_schema_json=VALUES(article_schema_json),article_i18n_status=VALUES(article_i18n_status)`,
@@ -411,10 +431,39 @@ router.patch(
       status = String(req.body?.status ?? '');
     if (!id || !statuses.has(status))
       return sendError(res, 400, 'ARTICLE_STATUS_INVALID', 'Invalid article status');
-    await pool.query(
-      `UPDATE article SET article_status=?,article_published_at=CASE WHEN ?='published' AND article_published_at IS NULL THEN NOW() ELSE article_published_at END,id_updated_by=? WHERE id_article=? AND id_master_comp=? AND article_deleted_at IS NULL`,
-      [status, status, scope.idAdminAcct, id, scope.idMasterComp],
-    );
+    const found = await withTransaction(pool, async (connection) => {
+      const [rows] = await connection.query<RowDataPacket[]>(
+        `SELECT article_key, article_status FROM article
+         WHERE id_article=? AND id_master_comp=? AND article_deleted_at IS NULL FOR UPDATE`,
+        [id, scope.idMasterComp],
+      );
+      if (!rows.length) return false;
+      await connection.query(
+        `UPDATE article SET article_status=?,article_published_at=CASE WHEN ?='published' AND article_published_at IS NULL THEN NOW() ELSE article_published_at END,id_updated_by=? WHERE id_article=? AND id_master_comp=? AND article_deleted_at IS NULL`,
+        [status, status, scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'article.status_updated',
+        category: 'data_change',
+        module: 'article',
+        action: 'update_status',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'article',
+        entityId: id,
+        entityLabel: rows[0].article_key,
+        before: { status: rows[0].article_status },
+        after: { status },
+        httpStatus: 200,
+      });
+      return true;
+    });
+    if (!found) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     return sendSuccess(res, 200, 'ARTICLE_STATUS_UPDATED', 'Article status updated', null);
   },
 );
@@ -427,10 +476,39 @@ router.delete(
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decodeId(req.params.id, keyhsid.idArticle);
     if (!id) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
-    await pool.query(
-      `UPDATE article SET article_deleted_at=NOW(),id_updated_by=? WHERE id_article=? AND id_master_comp=?`,
-      [scope.idAdminAcct, id, scope.idMasterComp],
-    );
+    const found = await withTransaction(pool, async (connection) => {
+      const [rows] = await connection.query<RowDataPacket[]>(
+        `SELECT article_key, article_status FROM article
+         WHERE id_article=? AND id_master_comp=? AND article_deleted_at IS NULL FOR UPDATE`,
+        [id, scope.idMasterComp],
+      );
+      if (!rows.length) return false;
+      await connection.query(
+        `UPDATE article SET article_deleted_at=NOW(),id_updated_by=? WHERE id_article=? AND id_master_comp=?`,
+        [scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'article.deleted',
+        category: 'data_change',
+        module: 'article',
+        action: 'delete',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'article',
+        entityId: id,
+        entityLabel: rows[0].article_key,
+        before: { status: rows[0].article_status },
+        after: { deleted: true },
+        httpStatus: 200,
+      });
+      return true;
+    });
+    if (!found) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     return sendSuccess(res, 200, 'ARTICLE_DELETED', 'Article moved to trash', null);
   },
 );
