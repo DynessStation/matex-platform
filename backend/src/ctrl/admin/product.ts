@@ -17,6 +17,8 @@ import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { trimTo } from '../../helper/input.helper';
+import { sortColumn } from '../../helper/list-query.helper';
+import { withTransaction } from '../../helper/transaction.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -363,7 +365,7 @@ router.get(
       name: 'i.product_name',
       sku: 'p.product_sku',
     };
-    const sortField = sortFields[String(req.query.field ?? '')] ?? null;
+    const sortField = sortColumn(sortFields, req.query.field, '');
     const sortDirection = req.query.sort === 'desc' ? 'DESC' : 'ASC';
     const orderBy = sortField
       ? `${sortField} ${sortDirection}, p.id_product ASC`
@@ -746,11 +748,39 @@ router.patch(
       status = String(req.body?.status ?? '');
     if (!id || !statuses.has(status))
       return sendError(res, 400, 'PRODUCT_STATUS_INVALID', 'Invalid product status');
-    const [result] = await pool.query<ResultSetHeader>(
-      `UPDATE product_catalog SET product_status=?,id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
-      [status, scope.idAdminAcct, id, scope.idMasterComp],
-    );
-    return result.affectedRows
+    const found = await withTransaction(pool, async (connection) => {
+      const [rows] = await connection.query<RowDataPacket[]>(
+        `SELECT product_sku, product_status FROM product_catalog
+         WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL FOR UPDATE`,
+        [id, scope.idMasterComp],
+      );
+      if (!rows.length) return false;
+      await connection.query(
+        `UPDATE product_catalog SET product_status=?,id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
+        [status, scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'product.status_updated',
+        category: 'data_change',
+        module: 'product',
+        action: 'update_status',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'product',
+        entityId: id,
+        entityLabel: rows[0].product_sku,
+        before: { status: rows[0].product_status },
+        after: { status },
+        httpStatus: 200,
+      });
+      return true;
+    });
+    return found
       ? sendSuccess(res, 200, 'PRODUCT_STATUS_UPDATED', 'Product status updated', null)
       : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
@@ -764,11 +794,39 @@ router.delete(
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decodeId(req.params.id, keyhsid.idProduct);
     if (!id) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
-    const [result] = await pool.query<ResultSetHeader>(
-      `UPDATE product_catalog SET product_status='archived',product_deleted_at=NOW(),id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
-      [scope.idAdminAcct, id, scope.idMasterComp],
-    );
-    return result.affectedRows
+    const found = await withTransaction(pool, async (connection) => {
+      const [rows] = await connection.query<RowDataPacket[]>(
+        `SELECT product_sku, product_status FROM product_catalog
+         WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL FOR UPDATE`,
+        [id, scope.idMasterComp],
+      );
+      if (!rows.length) return false;
+      await connection.query(
+        `UPDATE product_catalog SET product_status='archived',product_deleted_at=NOW(),id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
+        [scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      await writeAuditLog({
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'product.deleted',
+        category: 'data_change',
+        module: 'product',
+        action: 'delete',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'product',
+        entityId: id,
+        entityLabel: rows[0].product_sku,
+        before: { status: rows[0].product_status },
+        after: { deleted: true },
+        httpStatus: 200,
+      });
+      return true;
+    });
+    return found
       ? sendSuccess(res, 200, 'PRODUCT_DELETED', 'Product archived', null)
       : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
