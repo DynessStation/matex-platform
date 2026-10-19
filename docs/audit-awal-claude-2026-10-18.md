@@ -95,10 +95,11 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Perbaikan: ditambah izin baru `content_assistant.use`. API menolak admin tanpa izin ini (403), dan tombol AI di admin disembunyikan untuk mereka. Supaya editor yang sekarang memakai fitur AI tidak kehilangan akses, migration otomatis memberikan izin ini ke profil akses yang sudah boleh mengedit konten.
 - Masih bisa ditambah nanti: batas pemakaian per admin.
 
-**SEC-003 — Logout tidak membatalkan token yang sudah dicuri** · P3 · Terbukti
+**SEC-003 — Logout tidak membatalkan token yang sudah dicuri** · P3 · **Selesai (Fase 5C, 19 Oktober 2026)**
 - Login memakai token berlaku 24 jam di cookie. Logout menghapus cookie, tapi token yang (misalnya) sudah dicuri tetap berlaku sampai habis masanya.
 - Yang sudah aman: akun yang dinonaktifkan langsung ditolak, karena status akun dicek ke database di setiap permintaan.
 - Saran: cukup dicatat dulu. Tidak mendesak untuk skala sekarang.
+- Perbaikan: kolom `admin_acct.token_version` (migration 025). Token membawa versi itu; `verifyToken` menolak token yang versinya sudah lewat, dan logout menaikkan versi sehingga semua sesi akun itu (termasuk token salinan) berakhir. Token lama tanpa versi dianggap versi 0, jadi deploy tidak mengeluarkan siapa pun. Ada test kontrak dan unit test.
 
 **SEC-004 — Upload file menampung semua file di memori** · P3 · Terbukti
 - Satu upload bisa membawa 10 file × 50 MB yang ditampung di RAM server. Tipe video dipercaya dari keterangan browser.
@@ -181,6 +182,14 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **BE-006 — Update kantor melewati tiga pengecekan yang ada di create** · P3 · **Selesai (Fase 5C)**
 - Create kantor menolak kode di atas 50 karakter, nama di atas 255 karakter, dan kantor publik tanpa slug yang valid; update tidak. Kode yang kepanjangan sampai ke MySQL dan berakhir error 500, dan kantor publik bisa tersimpan tanpa slug.
 - Ditemukan saat menyiapkan pemindahan modul `office` ke pola standar. Perbaikan: update menjalankan pengecekan yang sama (lalu keduanya memakai satu `readOfficeInput`). Ada test kontraknya.
+
+**BE-007 — Parameter urutan list bisa membuat error 500** · P3 · **Selesai (Fase 5C)**
+- Lima list (profil akses, akun admin, izin, log audit, jabatan) mencari kolom urutan (`?ord=`, `?field=`) di objek biasa, sehingga `ord=toString` memasukkan teks fungsi JavaScript ke `ORDER BY` dan MySQL menjawab error. Teksnya tidak bisa dikendalikan penyerang, tapi tetap membuat 500.
+- Perbaikan: helper `sortColumn` yang hanya menerima kunci yang memang didaftarkan; semua list memakainya.
+
+**BE-008 — Admin full-access tidak melihat akun kantor lain di daftar akun** · P2 · **Selesai (Fase 5C)**
+- Daftar akun admin selalu menyaring ke kantor admin yang login, termasuk admin full-access. Padahal dropdown kantor menawarkan semua kantor ke admin full-access, dan detail/ubah/hapus mengizinkannya. Akibatnya akun yang dibuat di kantor lain tidak pernah muncul di daftar.
+- Perbaikan: saringan kantor hanya untuk admin tanpa full-access. Ada test kontraknya.
 
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
@@ -310,8 +319,8 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004, BE-005, dan BE-006 sudah diperbaiki. |
-| Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004 sampai BE-008, dan SEC-003 sudah diperbaiki. |
+| Risiko keamanan | SEC-004 (SEC-001, SEC-002, dan SEC-003 selesai) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |

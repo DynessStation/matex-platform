@@ -52,7 +52,9 @@ Nama file di dalam folder modul:
 | `create.ts` | tambah data |
 | `update.ts` | ubah data dan ubah status |
 | `delete.ts` | hapus data |
-| `<nama-urusan>.ts` | fungsi bantu khusus modul itu, misalnya `input.ts`, `permissions.ts`, `items.ts` |
+| `input.ts` | semua aturan input modul: baca dan validasi body, termasuk cek unik ke database |
+| `records.ts` | langkah database yang dipakai bersama route modul (kunci baris, baca relasi, bentuk data respons dan audit) |
+| `<nama-urusan>.ts` | urusan khusus lain, misalnya `permissions.ts` (profil akses), `items.ts` dan `reorder.ts` (navigasi) |
 
 File pendaftar memakai satu templat komentar: apa modulnya, path API-nya, apakah urutan route penting (dan kenapa), serta file test kontraknya. Path tetap seperti `/me` atau `/permission-matrix` harus didaftarkan sebelum `/:id`, karena Express mencocokkan route sesuai urutan pendaftaran.
 
@@ -71,13 +73,14 @@ Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi
 
 | Helper | Isi |
 | --- | --- |
-| `admin-scope.helper.ts` | `getAdminScope`: admin, perusahaan, kantor, profil akses, full-access |
+| `admin-scope.helper.ts` | `getAdminScope` (admin, perusahaan, kantor, profil akses, full-access) dan `adminHasPermission` |
 | `input.helper.ts` | `nullableString`, `trimTo`, `toFlag` / `parseFlag`, `slugFromText`, `contentSlug`, `isValidEmail`, `isValidHttpUrl` |
 | `id.helper.ts` | `decodeId(value, codec)` untuk ID hashids |
-| `list-query.helper.ts` | `parseListQuery` (page, limit, search) dan `sortDirection` |
+| `list-query.helper.ts` | `parseListQuery` (page, limit, search), `sortColumn` (hanya kolom yang didaftarkan), dan `sortDirection` |
 | `json.helper.ts` | `parseJsonValue` untuk kolom JSON |
 | `transaction.helper.ts` | `withTransaction` |
 | `http-error.helper.ts` | `HttpError` |
+| `middleware/error-handler.middleware.ts` | `onFailure(kode, pesan, { duplicate })`: kode 500/409 milik route, untuk modul yang API-nya punya kode gagal sendiri |
 | `api-response.helper.ts` | `sendSuccess`, `sendError` |
 | `audit-log.helper.ts` | `writeAuditLog` |
 

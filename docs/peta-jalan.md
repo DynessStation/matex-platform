@@ -31,6 +31,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 | 19 Okt | Audit lanjutan | Penamaan modul diseragamkan; semua di atas di-deploy ke production (`e46d5fa`) |
 | 19 Okt | 5A | Format dan lint backend seragam (Prettier root config, Oxlint); 0 error lint |
 | 19 Okt | 5B | Fondasi bersama: scope sesi sekali per request, helper input/ID/list/JSON/transaksi, `HttpError`; salinan kembar diganti |
+| 19 Okt | 5C (sebagian) | `office`, `admin-access`, `web-navigation`, `admin-account` di pola standar; BE-006/007/008 diperbaiki; SEC-003 (logout mencabut semua sesi, migration 025) |
 
 ## Ke mana selanjutnya
 
@@ -42,7 +43,7 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 | --- | --- | --- |
 | 5A Gaya ✅ | Satu config Prettier di root; Oxlint untuk backend (TypeScript 7 belum didukung ESLint); satu commit format murni; 1.397 baris komentar pembatas dan 2.215 celah kosong dirapatkan | **Selesai 19 Okt:** lint backend 0 error (309 warning = daftar utang 5C); syntax tree 122 file identik |
 | 5B Fondasi bersama ✅ | Scope sesi diambil sekali oleh middleware lalu dibaca dari `req`; helper input, ID, list query, JSON, transaksi, `HttpError`, dan penanganan error pusat, semua dengan unit test; salinan kembar langsung diganti | **Selesai 19 Okt:** modul generasi baru menjalankan 1 query akun per request (sebelumnya 2); rekaman identik |
-| 5C Pindah ke pola (berjalan) | Modul dipindah satu per satu, test kontrak dulu, mengikuti checklist di `standar-kode.md`. **Selesai: `office`** (3.115 → 1.327 baris; bug BE-006 diperbaiki). Belum punya test: `chair`, `audit-log`, `admin-permission`, `attachment`, `website-page`. Sudah punya: `office`, `admin-access`, `web-navigation`, `admin-account`. Lalu penyesuaian kecil di modul generasi baru | Tidak ada salinan `getSessionScope` atau fungsi bantu kembar; rekaman tiap modul identik |
+| 5C Pindah ke pola (berjalan) | Modul dipindah satu per satu, test kontrak dulu, mengikuti checklist di `standar-kode.md`. **Selesai: `office`** (3.115 → 1.327 baris), **`admin-access`** (1.742 → ±830), **`web-navigation`** (2.654 → ±1.250), **`admin-account`** (3.912 → 1.574). Bug yang ditemukan dan diperbaiki di jalan: BE-006, BE-007, BE-008, dan SEC-003. Belum punya test: `chair`, `audit-log`, `admin-permission`, `attachment`, `website-page`. Sudah punya: `office`, `admin-access`, `web-navigation`, `admin-account`. Lalu penyesuaian kecil di modul generasi baru | Tidak ada salinan `getSessionScope` atau fungsi bantu kembar; rekaman tiap modul identik |
 | 5D Keputusan seragam | Satu format pagination dan satu cara soft delete. Ini mengubah perilaku, jadi dikerjakan bersama frontend di Fase 6 dan, bila perlu, dengan migration | Satu format di seluruh API |
 
 ### Fase 6: Frontend satu pola
@@ -76,7 +77,6 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 
 | ID | Ringkas | Rencana |
 | --- | --- | --- |
-| SEC-003 | Logout tidak membatalkan token yang sudah dicuri | Saat modul `admin-account` (sesi) dipindah di 5C: kolom `token_version`, dicek terpusat di `verifyToken`, dinaikkan saat logout (butuh migration) |
 | SEC-004 | Upload menampung file di memori | Saat modul `attachment` dirapikan (5C) |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
 | DB-003 | Beberapa relasi belum dikunci foreign key | Bersama migration 5D |
