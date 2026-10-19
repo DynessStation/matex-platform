@@ -56,6 +56,12 @@ git checkout kartify-reference-v1 -- frontend/admin/src/app/components/coupon
 
 Kartify is a visual reference; its demo data and fixtures are not MATEX business logic.
 
+## Code Formatting
+
+Both frontends are formatted with Prettier. Run `npm run format` in `frontend/admin` or `frontend/public` before committing; it formats `src` only, so the vendor Kartify styles under `public/assets` stay as shipped. Keep formatting-only changes in their own commit.
+
+The one-time formatting commit is listed in `.git-blame-ignore-revs`. GitHub skips it automatically; for local `git blame`, run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once.
+
 ## Browser Tests
 
 `ops/e2e` has two Playwright suites:

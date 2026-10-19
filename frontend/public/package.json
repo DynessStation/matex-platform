@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "eslint . --ext .ts,.html",
     "lint:fix": "eslint . --ext .ts,.html --fix",
-    "format": "prettier --write \"**/*.{ts,html,scss,css,js,json,md}\"",
+    "format": "prettier --write \"src/**/*.{ts,html,scss,css}\"",
     "serve:ssr": "node dist/matex-public/server/server.mjs",
     "dev:ssr": "ng serve && npm run serve:ssr"
   },
