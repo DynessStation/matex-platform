@@ -1,30 +1,26 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from 'crypto';
 
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader } from 'mysql2';
 
-import db = require("../db");
+import db = require('../db');
 
 import {
   AuditSource,
   WriteAuditLogOptions,
   WriteAuditLogResult,
-} from "../interface/audit-log.interface";
+} from '../interface/audit-log.interface';
 
-import { getChangedFields } from "./audit-diff.helper";
+import { getChangedFields } from './audit-diff.helper';
 
-import { createAuditIntegrityHash } from "./audit-integrity.helper";
+import { createAuditIntegrityHash } from './audit-integrity.helper';
 
-import { sanitizeAuditData } from "./audit-sanitizer.helper";
+import { sanitizeAuditData } from './audit-sanitizer.helper';
 
-//==================================================
-//==== DATABASE
-//==================================================
+// Database
 
 const { pool } = db;
 
-//==================================================
-//==== JSON
-//==================================================
+// JSON
 
 const toJson = (value: unknown): string | null => {
   if (value === undefined || value === null) {
@@ -34,13 +30,9 @@ const toJson = (value: unknown): string | null => {
   return JSON.stringify(value);
 };
 
-//==================================================
-//==== STRING VALUE
-//==================================================
+// String value
 
-const toStringValue = (
-  value: string | number | null | undefined,
-): string | null => {
+const toStringValue = (value: string | number | null | undefined): string | null => {
   if (value === null || value === undefined) {
     return null;
   }
@@ -48,17 +40,13 @@ const toStringValue = (
   return String(value);
 };
 
-//==================================================
-//==== DATABASE DATETIME
-//==================================================
+// Database datetime
 
 const getDatabaseDateTime = (value: Date): string => {
-  return value.toISOString().slice(0, 23).replace("T", " ");
+  return value.toISOString().slice(0, 23).replace('T', ' ');
 };
 
-//==================================================
-//==== ROUTE PATH
-//==================================================
+// Route path
 
 const getRoutePath = (options: WriteAuditLogOptions): string | null => {
   const req = options.req;
@@ -80,16 +68,14 @@ const getRoutePath = (options: WriteAuditLogOptions): string | null => {
    */
   const originalUrl = req.originalUrl;
 
-  if (typeof originalUrl === "string" && originalUrl) {
-    return originalUrl.split("?")[0] || null;
+  if (typeof originalUrl === 'string' && originalUrl) {
+    return originalUrl.split('?')[0] || null;
   }
 
   return req.path || null;
 };
 
-//==================================================
-//==== IP
-//==================================================
+// IP
 
 const getIpAddress = (options: WriteAuditLogOptions): string | null => {
   const req = options.req;
@@ -108,9 +94,7 @@ const getIpAddress = (options: WriteAuditLogOptions): string | null => {
   return req.ip || req.socket?.remoteAddress || null;
 };
 
-//==================================================
-//==== SOURCE
-//==================================================
+// Source
 
 const getSource = (options: WriteAuditLogOptions): AuditSource => {
   if (options.source) {
@@ -120,31 +104,27 @@ const getSource = (options: WriteAuditLogOptions): AuditSource => {
   const source = options.req?.auditContext?.source;
 
   switch (source) {
-    case "admin_web":
-    case "public_web":
-    case "api":
-    case "system":
-    case "job":
-    case "integration":
+    case 'admin_web':
+    case 'public_web':
+    case 'api':
+    case 'system':
+    case 'job':
+    case 'integration':
       return source;
 
     default:
-      return options.req ? "api" : "system";
+      return options.req ? 'api' : 'system';
   }
 };
 
-//==================================================
-//==== WRITE AUDIT LOG
-//==================================================
+// Write audit log
 
 export const writeAuditLog = async (
   options: WriteAuditLogOptions,
 ): Promise<WriteAuditLogResult> => {
   const req = options.req;
 
-  //==================================================
-  //==== REQUEST CONTEXT
-  //==================================================
+  // Request context
 
   const requestId = req?.auditContext?.requestId ?? randomUUID();
 
@@ -152,17 +132,13 @@ export const writeAuditLog = async (
 
   const startedAt = req?.auditContext?.startedAt ?? Date.now();
 
-  //==================================================
-  //==== CREATED
-  //==================================================
+  // Created
 
   const createdDate = new Date();
 
   const created = getDatabaseDateTime(createdDate);
 
-  //==================================================
-  //==== SANITIZE
-  //==================================================
+  // Sanitize
 
   const sanitizedBefore = sanitizeAuditData(options.before);
 
@@ -170,9 +146,7 @@ export const writeAuditLog = async (
 
   const sanitizedMetadata = sanitizeAuditData(options.metadata);
 
-  //==================================================
-  //==== DIFF
-  //==================================================
+  // Diff
 
   const changedFields =
     options.changedFields ??
@@ -180,100 +154,60 @@ export const writeAuditLog = async (
       ? getChangedFields(sanitizedBefore, sanitizedAfter)
       : null);
 
-  //==================================================
-  //==== ACTOR
-  //==================================================
+  // Actor
 
-  const actorType =
-    options.actorType ?? (req?.user?.id_admin_acct ? "admin" : "system");
+  const actorType = options.actorType ?? (req?.user?.id_admin_acct ? 'admin' : 'system');
 
   const actorId = options.actorId ?? req?.user?.id_admin_acct ?? null;
 
   const actorLabel = options.actorLabel ?? req?.user?.alias ?? null;
 
-  //==================================================
-  //==== SOURCE / OUTCOME
-  //==================================================
+  // Source / outcome
 
   const source = getSource(options);
 
-  const outcome = options.outcome ?? "success";
+  const outcome = options.outcome ?? 'success';
 
-  //==================================================
-  //==== HTTP
-  //==================================================
+  // HTTP
 
   const routePath = getRoutePath(options);
 
-  const durationMs = Math.max(
-    0,
+  const durationMs = Math.max(0, Date.now() - startedAt);
 
-    Date.now() - startedAt,
-  );
-
-  //==================================================
-  //==== INTEGRITY PAYLOAD
-  //==================================================
+  // Integrity payload
 
   const integrityPayload = {
     version: 1,
-
     id_master_comp: options.idMasterComp ?? null,
-
     request_id: requestId,
-
     correlation_id: correlationId,
-
     event_code: options.eventCode,
-
     category: options.category,
-
     module: options.module,
-
     action: options.action,
-
     actor_type: actorType,
-
     actor_id: toStringValue(actorId),
-
     actor_label: actorLabel,
-
     entity_type: options.entityType ?? null,
-
     entity_id: toStringValue(options.entityId),
-
     entity_label: options.entityLabel ?? null,
-
     source,
-
     outcome,
-
     http_method: req?.method ?? null,
-
     route_path: routePath,
-
     http_status: options.httpStatus ?? null,
-
     before_data: sanitizedBefore ?? null,
-
     after_data: sanitizedAfter ?? null,
-
     changed_fields: changedFields,
-
     metadata: sanitizedMetadata ?? null,
-
     created,
   };
 
-  //==================================================
-  //==== HASH
-  //==================================================
+  // Hash
 
   const integrityHash = createAuditIntegrityHash(integrityPayload);
 
-  //==================================================
-  //==== QUERY
-  //==================================================
+  // Query
 
   const query = `
       INSERT INTO audit_log
@@ -364,69 +298,39 @@ export const writeAuditLog = async (
       )
     `;
 
-  //==================================================
-  //==== PARAMS
-  //==================================================
+  // Params
 
   const params = [
     options.idMasterComp ?? null,
-
     requestId,
-
     correlationId,
-
     options.eventCode,
-
     options.category,
-
     options.module,
-
     options.action,
-
     actorType,
-
     toStringValue(actorId),
-
     actorLabel,
-
     options.entityType ?? null,
-
     toStringValue(options.entityId),
-
     options.entityLabel ?? null,
-
     source,
-
     outcome,
-
     req?.method ?? null,
-
     routePath,
-
     options.httpStatus ?? null,
-
     getIpAddress(options),
-
-    req?.get("user-agent") ?? null,
-
+    req?.get('user-agent') ?? null,
     toJson(sanitizedBefore),
-
     toJson(sanitizedAfter),
-
     toJson(changedFields),
-
     toJson(sanitizedMetadata),
-
     durationMs,
-
     integrityHash,
-
     created,
   ];
 
-  //==================================================
-  //==== EXECUTE
-  //==================================================
+  // Execute
 
   try {
     const executor = options.connection ?? pool;
@@ -437,37 +341,26 @@ export const writeAuditLog = async (
 
     return {
       success: true,
-
       idAuditLog: Number(insertResult.insertId),
-
       requestId,
-
       correlationId,
-
       integrityHash,
     };
   } catch (error) {
-    console.error("Audit log write error:", error);
+    console.error('Audit log write error:', error);
 
-    //==================================================
-    //==== STRICT MODE
-    //==================================================
+    // Strict mode
 
-    if (options.writeMode === "strict") {
+    if (options.writeMode === 'strict') {
       throw error;
     }
 
-    //==================================================
-    //==== BEST EFFORT
-    //==================================================
+    // Best effort
 
     return {
       success: false,
-
       requestId,
-
       correlationId,
-
       integrityHash,
     };
   }

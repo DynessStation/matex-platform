@@ -1,55 +1,48 @@
-import express = require("express");
-import { Response } from "express";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import db = require("../../db");
-import keyhsid from "../../hsid";
+import express = require('express');
+import { Response } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import db = require('../../db');
+import keyhsid from '../../hsid';
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContentLocale,
   normalizePublicContentKey,
-} from "../../config/public-content.config";
-import { getAdminScope } from "../../helper/admin-scope.helper";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
-import { writeAuditLog } from "../../helper/audit-log.helper";
-import { normalizeProductMediaSortOrder } from "../../helper/product-media.helper";
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+} from '../../config/public-content.config';
+import { getAdminScope } from '../../helper/admin-scope.helper';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { writeAuditLog } from '../../helper/audit-log.helper';
+import { normalizeProductMediaSortOrder } from '../../helper/product-media.helper';
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 const app = express();
 const { pool } = db;
-const statuses = new Set(["draft", "published", "archived"]);
-const types = new Set(["physical", "service", "digital"]);
-const stocks = new Set([
-  "in_stock",
-  "out_of_stock",
-  "preorder",
-  "made_to_order",
-]);
-const priceVisibilities = new Set(["displayed", "contact", "hidden"]);
-const priceTypes = new Set(["end_user", "wholesale"]);
-const priceCurrencies = new Set(["IDR", "USD"]);
-const roles = new Set(["thumbnail", "gallery", "og", "size_chart", "document"]);
+const statuses = new Set(['draft', 'published', 'archived']);
+const types = new Set(['physical', 'service', 'digital']);
+const stocks = new Set(['in_stock', 'out_of_stock', 'preorder', 'made_to_order']);
+const priceVisibilities = new Set(['displayed', 'contact', 'hidden']);
+const priceTypes = new Set(['end_user', 'wholesale']);
+const priceCurrencies = new Set(['IDR', 'USD']);
+const roles = new Set(['thumbnail', 'gallery', 'og', 'size_chart', 'document']);
 const decode = (value: unknown, codec: any) => {
-  const id = Number(codec.decode(String(value ?? ""))[0]);
+  const id = Number(codec.decode(String(value ?? ''))[0]);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 const clean = (value: unknown, max: number) =>
-  String(value ?? "")
+  String(value ?? '')
     .trim()
     .slice(0, max);
 const numberOrNull = (value: unknown) =>
-  value === "" || value == null || !Number.isFinite(Number(value))
-    ? null
-    : Number(value);
+  value === '' || value == null || !Number.isFinite(Number(value)) ? null : Number(value);
 
 const parsePayload = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
   const sku = clean(body?.sku, 120);
-  const status = String(body?.status ?? "draft");
-  const productType = String(body?.product_type ?? "physical");
-  const stockStatus = String(body?.stock_status ?? "in_stock");
-  const priceVisibility = String(body?.price_visibility ?? "contact");
+  const status = String(body?.status ?? 'draft');
+  const productType = String(body?.product_type ?? 'physical');
+  const stockStatus = String(body?.stock_status ?? 'in_stock');
+  const priceVisibility = String(body?.price_visibility ?? 'contact');
   const isFeatured = body?.is_featured ? 1 : 0;
   if (
     !key ||
@@ -67,11 +60,10 @@ const parsePayload = (body: any) => {
   const translations: any[] = [];
   const locales = new Set<string>();
   for (const item of body.translations) {
-    const locale = String(item?.locale ?? "");
+    const locale = String(item?.locale ?? '');
     const slug = normalizePublicContentKey(item?.slug).slice(0, 255);
     const name = clean(item?.name, 255);
-    if (!isPublicContentLocale(locale) || locales.has(locale) || !slug || !name)
-      return null;
+    if (!isPublicContentLocale(locale) || locales.has(locale) || !slug || !name) return null;
     locales.add(locale);
     translations.push({
       locale,
@@ -79,7 +71,7 @@ const parsePayload = (body: any) => {
       name,
       shortDescription: clean(item?.short_description, 4000) || null,
       description:
-        String(item?.description ?? "")
+        String(item?.description ?? '')
           .trim()
           .slice(0, 100000) || null,
       specifications: item?.specifications ?? null,
@@ -91,8 +83,7 @@ const parsePayload = (body: any) => {
       status: Number(item?.status) === 0 ? 0 : 1,
     });
   }
-  if (!PUBLIC_CONTENT_LOCALES.every((locale) => locales.has(locale)))
-    return null;
+  if (!PUBLIC_CONTENT_LOCALES.every((locale) => locales.has(locale))) return null;
 
   const categoryIds = [
     ...new Set(
@@ -102,32 +93,29 @@ const parsePayload = (body: any) => {
     ),
   ] as number[];
   if (!categoryIds.length) return null;
-  const media = (Array.isArray(body?.media) ? body.media : []).map(
-    (item: any, index: number) => ({
-      id: decode(item?.id, keyhsid.idAttachment),
-      role: String(item?.role ?? "gallery"),
-      // Zero is a valid first position. Using `|| index` here made the first
-      // gallery item inherit its position in the whole media array. When a
-      // thumbnail and OG image preceded it, the third gallery item then got
-      // the same order and the payload was rejected as invalid.
-      sortOrder: normalizeProductMediaSortOrder(item?.sort_order, index),
-    }),
-  );
+  const media = (Array.isArray(body?.media) ? body.media : []).map((item: any, index: number) => ({
+    id: decode(item?.id, keyhsid.idAttachment),
+    role: String(item?.role ?? 'gallery'),
+    // Zero is a valid first position. Using `|| index` here made the first
+    // gallery item inherit its position in the whole media array. When a
+    // thumbnail and OG image preceded it, the third gallery item then got
+    // the same order and the payload was rejected as invalid.
+    sortOrder: normalizeProductMediaSortOrder(item?.sort_order, index),
+  }));
   if (media.some((item: any) => !item.id || !roles.has(item.role))) return null;
-  const gallery = media.filter((item: any) => item.role === "gallery");
+  const gallery = media.filter((item: any) => item.role === 'gallery');
   if (
     gallery.length > 10 ||
-    media.filter((item: any) => item.role === "thumbnail").length > 1 ||
-    media.filter((item: any) => item.role === "og").length > 1 ||
-    new Set(media.map((item: any) => `${item.role}:${item.sortOrder}`)).size !==
-      media.length
+    media.filter((item: any) => item.role === 'thumbnail').length > 1 ||
+    media.filter((item: any) => item.role === 'og').length > 1 ||
+    new Set(media.map((item: any) => `${item.role}:${item.sortOrder}`)).size !== media.length
   )
     return null;
   const prices = (Array.isArray(body?.prices) ? body.prices : []).map(
     (item: any, index: number) => ({
       type: clean(item?.type, 40),
       label: clean(item?.label, 120) || null,
-      currency: clean(item?.currency || "IDR", 3).toUpperCase(),
+      currency: clean(item?.currency || 'IDR', 3).toUpperCase(),
       amount: numberOrNull(item?.amount),
       compareAt: numberOrNull(item?.compare_at),
       minQty: numberOrNull(item?.min_qty),
@@ -150,37 +138,36 @@ const parsePayload = (body: any) => {
   )
     return null;
   const publicConsumerCurrencies = prices
-    .filter((item: any) => item.isPublic && item.type === "end_user")
+    .filter((item: any) => item.isPublic && item.type === 'end_user')
     .map((item: any) => item.currency);
   const activePublicConsumerPrices = prices.filter(
-    (item: any) => item.isPublic && item.isActive && item.type === "end_user",
+    (item: any) => item.isPublic && item.isActive && item.type === 'end_user',
   );
   const activePublicCurrencies = new Set(
     activePublicConsumerPrices.map((item: any) => item.currency),
   );
   if (
-    new Set(publicConsumerCurrencies).size !==
-      publicConsumerCurrencies.length ||
-    (priceVisibility === "displayed" &&
-      !["IDR", "USD"].every((currency) => activePublicCurrencies.has(currency)))
+    new Set(publicConsumerCurrencies).size !== publicConsumerCurrencies.length ||
+    (priceVisibility === 'displayed' &&
+      !['IDR', 'USD'].every((currency) => activePublicCurrencies.has(currency)))
   )
     return null;
   for (const item of prices) {
-    if (item.type !== "end_user") item.isPublic = 0;
+    if (item.type !== 'end_user') item.isPublic = 0;
   }
-  const marketplaces = (
-    Array.isArray(body?.marketplaces) ? body.marketplaces : []
-  ).map((item: any, index: number) => ({
-    provider: clean(item?.provider, 50),
-    label: clean(item?.label, 120) || null,
-    url: clean(item?.url, 1000),
-    sku: clean(item?.sku, 120) || null,
-    price: numberOrNull(item?.price),
-    currency: clean(item?.currency || "IDR", 3).toUpperCase(),
-    isPrimary: item?.is_primary ? 1 : 0,
-    isActive: item?.is_active === false ? 0 : 1,
-    sortOrder: Math.max(0, Number(item?.sort_order) || index),
-  }));
+  const marketplaces = (Array.isArray(body?.marketplaces) ? body.marketplaces : []).map(
+    (item: any, index: number) => ({
+      provider: clean(item?.provider, 50),
+      label: clean(item?.label, 120) || null,
+      url: clean(item?.url, 1000),
+      sku: clean(item?.sku, 120) || null,
+      price: numberOrNull(item?.price),
+      currency: clean(item?.currency || 'IDR', 3).toUpperCase(),
+      isPrimary: item?.is_primary ? 1 : 0,
+      isActive: item?.is_active === false ? 0 : 1,
+      sortOrder: Math.max(0, Number(item?.sort_order) || index),
+    }),
+  );
   if (
     marketplaces.some(
       (item: any) =>
@@ -196,12 +183,8 @@ const parsePayload = (body: any) => {
     if (!item.isActive) item.isPrimary = 0;
   }
   const activeMarketplaces = marketplaces.filter((item: any) => item.isActive);
-  if (activeMarketplaces.filter((item: any) => item.isPrimary).length > 1)
-    return null;
-  if (
-    activeMarketplaces.length &&
-    !activeMarketplaces.some((item: any) => item.isPrimary)
-  ) {
+  if (activeMarketplaces.filter((item: any) => item.isPrimary).length > 1) return null;
+  if (activeMarketplaces.length && !activeMarketplaces.some((item: any) => item.isPrimary)) {
     activeMarketplaces[0].isPrimary = 1;
   }
 
@@ -258,22 +241,18 @@ const mediaDto = (row: any) => ({
   id_attachment: keyhsid.idAttachment.encode(Number(row.id_attachment)),
   asset_url: buildAttachmentUrl(row.storage_path),
   original_url: buildAttachmentUrl(row.storage_path),
-  name: row.name ?? "",
+  name: row.name ?? '',
   width: row.width == null ? null : Number(row.width),
   height: row.height == null ? null : Number(row.height),
-  mime_type: row.mime_type ?? "",
+  mime_type: row.mime_type ?? '',
   role: row.product_attachment_role,
   sort_order: Number(row.product_attachment_sort_order),
 });
 
-const hydrate = async (
-  rows: RowDataPacket[],
-  company: number,
-  locale: string,
-) => {
+const hydrate = async (rows: RowDataPacket[], company: number, locale: string) => {
   if (!rows.length) return [];
   const ids = rows.map((row) => Number(row.id_product));
-  const marks = ids.map(() => "?").join(",");
+  const marks = ids.map(() => '?').join(',');
   const [categories] = await pool.query<RowDataPacket[]>(
     `SELECT pc.id_product,c.id_product_category,i.product_category_name,i.product_category_slug
      FROM product_catalog_category pc JOIN product_category c ON c.id_product_category=pc.id_product_category AND c.id_master_comp=pc.id_master_comp
@@ -297,9 +276,7 @@ const hydrate = async (
   );
   return rows.map((row) => {
     const id = Number(row.id_product);
-    const productMedia = media
-      .filter((item) => Number(item.id_product) === id)
-      .map(mediaDto);
+    const productMedia = media.filter((item) => Number(item.id_product) === id).map(mediaDto);
     const productPrices = prices
       .filter((item) => Number(item.id_product) === id)
       .map((item) => ({
@@ -309,59 +286,44 @@ const hydrate = async (
         currency: item.product_price_currency,
         amount: Number(item.product_price_amount),
         compare_at:
-          item.product_price_compare_at == null
-            ? null
-            : Number(item.product_price_compare_at),
-        min_qty:
-          item.product_price_min_qty == null
-            ? null
-            : Number(item.product_price_min_qty),
-        max_qty:
-          item.product_price_max_qty == null
-            ? null
-            : Number(item.product_price_max_qty),
+          item.product_price_compare_at == null ? null : Number(item.product_price_compare_at),
+        min_qty: item.product_price_min_qty == null ? null : Number(item.product_price_min_qty),
+        max_qty: item.product_price_max_qty == null ? null : Number(item.product_price_max_qty),
         starts_at: item.product_price_starts_at,
         ends_at: item.product_price_ends_at,
         is_public: Boolean(item.product_price_is_public),
         is_active: Boolean(item.product_price_is_active),
         sort_order: Number(item.product_price_sort_order),
       }));
-    const publicPrice =
-      productPrices.find((item) => item.is_public) ?? productPrices[0];
+    const publicPrice = productPrices.find((item) => item.is_public) ?? productPrices[0];
     return {
       ...row,
       id: keyhsid.idProduct.encode(id),
       key: row.product_key,
       sku: row.product_sku,
       name: row.product_name ?? row.product_key,
-      slug: row.product_slug ?? "",
-      short_description: row.product_short_description ?? "",
-      description: row.product_description ?? "",
+      slug: row.product_slug ?? '',
+      short_description: row.product_short_description ?? '',
+      description: row.product_description ?? '',
       product_type: row.product_type,
       product_kind: row.product_kind,
       origin_province: row.product_origin_province,
       origin_city: row.product_origin_city,
       status: row.product_status,
       stock_status: row.product_stock_status,
-      quantity:
-        row.product_stock_quantity == null
-          ? 0
-          : Number(row.product_stock_quantity),
+      quantity: row.product_stock_quantity == null ? 0 : Number(row.product_stock_quantity),
       price_visibility: row.product_price_visibility,
       price: publicPrice?.amount ?? 0,
       sale_price: publicPrice?.amount ?? 0,
       is_featured: Boolean(row.product_is_featured),
       sort_order: Number(row.product_sort_order),
-      product_thumbnail:
-        productMedia.find((item) => item.role === "thumbnail") ?? null,
-      product_galleries: productMedia.filter((item) => item.role === "gallery"),
+      product_thumbnail: productMedia.find((item) => item.role === 'thumbnail') ?? null,
+      product_galleries: productMedia.filter((item) => item.role === 'gallery'),
       media: productMedia,
       categories: categories
         .filter((item) => Number(item.id_product) === id)
         .map((item) => ({
-          id: keyhsid.idProductCategory.encode(
-            Number(item.id_product_category),
-          ),
+          id: keyhsid.idProductCategory.encode(Number(item.id_product_category)),
           name: item.product_category_name,
           slug: item.product_category_slug,
         })),
@@ -375,9 +337,7 @@ const hydrate = async (
           url: item.product_marketplace_url,
           sku: item.product_marketplace_sku,
           price:
-            item.product_marketplace_price == null
-              ? null
-              : Number(item.product_marketplace_price),
+            item.product_marketplace_price == null ? null : Number(item.product_marketplace_price),
           currency: item.product_marketplace_currency,
           is_primary: Boolean(item.product_marketplace_is_primary),
           is_active: Boolean(item.product_marketplace_is_active),
@@ -393,33 +353,27 @@ const baseSelect = `SELECT p.*,i.product_slug,i.product_name,i.product_short_des
  LEFT JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.product_locale=?`;
 
 app.get(
-  "/api/v1/products",
+  '/api/v1/products',
   verifyToken,
-  requirePermission("product.view"),
+  requirePermission('product.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
-    if (!scope.success)
-      return sendError(res, scope.status, scope.code, scope.message);
-    const locale = isPublicContentLocale(req.query.locale)
-      ? String(req.query.locale)
-      : "id-ID";
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
+    const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : 'id-ID';
     const search = clean(req.query.search, 200),
       like = `%${search}%`;
     const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
-    const paginate = Math.min(
-      100,
-      Math.max(1, Math.floor(Number(req.query.paginate) || 15)),
-    );
+    const paginate = Math.min(100, Math.max(1, Math.floor(Number(req.query.paginate) || 15)));
     const offset = (page - 1) * paginate;
     const sortFields: Record<string, string> = {
-      name: "i.product_name",
-      sku: "p.product_sku",
+      name: 'i.product_name',
+      sku: 'p.product_sku',
     };
-    const sortField = sortFields[String(req.query.field ?? "")] ?? null;
-    const sortDirection = req.query.sort === "desc" ? "DESC" : "ASC";
+    const sortField = sortFields[String(req.query.field ?? '')] ?? null;
+    const sortDirection = req.query.sort === 'desc' ? 'DESC' : 'ASC';
     const orderBy = sortField
       ? `${sortField} ${sortDirection}, p.id_product ASC`
-      : "p.product_sort_order ASC, i.product_name ASC";
+      : 'p.product_sort_order ASC, i.product_name ASC';
     try {
       const [countRows] = await pool.query<RowDataPacket[]>(
         `SELECT COUNT(DISTINCT p.id_product) AS total
@@ -433,54 +387,37 @@ app.get(
         `${baseSelect} WHERE p.id_master_comp=? AND p.product_deleted_at IS NULL
       AND (?='' OR p.product_key LIKE ? OR p.product_sku LIKE ? OR i.product_name LIKE ?)
       ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
-        [
-          locale,
-          scope.idMasterComp,
-          search,
-          like,
-          like,
-          like,
-          paginate,
-          offset,
-        ],
+        [locale, scope.idMasterComp, search, like, like, like, paginate, offset],
       );
       const data = await hydrate(rows, scope.idMasterComp, locale);
-      return sendSuccess(res, 200, "PRODUCTS_LISTED", "Products loaded", {
+      return sendSuccess(res, 200, 'PRODUCTS_LISTED', 'Products loaded', {
         data,
         total: Number(countRows[0]?.total ?? 0),
         current_page: page,
         per_page: paginate,
       });
     } catch (error) {
-      console.error("[Product] list failed", error);
-      return sendError(
-        res,
-        500,
-        "PRODUCT_LIST_FAILED",
-        "Unable to load products",
-      );
+      console.error('[Product] list failed', error);
+      return sendError(res, 500, 'PRODUCT_LIST_FAILED', 'Unable to load products');
     }
   },
 );
 
 app.get(
-  "/api/v1/products/:id",
+  '/api/v1/products/:id',
   verifyToken,
-  requirePermission("product.view"),
+  requirePermission('product.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
-    if (!scope.success)
-      return sendError(res, scope.status, scope.code, scope.message);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decode(req.params.id, keyhsid.idProduct);
-    if (!id)
-      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+    if (!id) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     try {
       const [rows] = await pool.query<RowDataPacket[]>(
         `SELECT * FROM product_catalog WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
         [id, scope.idMasterComp],
       );
-      if (!rows.length)
-        return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+      if (!rows.length) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
       const [translations] = await pool.query<RowDataPacket[]>(
         `SELECT product_locale locale,product_slug slug,product_name name,
       product_short_description short_description,product_description description,product_specifications_json specifications,
@@ -489,19 +426,14 @@ app.get(
       FROM product_catalog_i18n WHERE id_product=? AND id_master_comp=? ORDER BY product_locale`,
         [id, scope.idMasterComp],
       );
-      const [product] = await hydrate(rows, scope.idMasterComp, "id-ID");
-      return sendSuccess(res, 200, "PRODUCT_FOUND", "Product loaded", {
+      const [product] = await hydrate(rows, scope.idMasterComp, 'id-ID');
+      return sendSuccess(res, 200, 'PRODUCT_FOUND', 'Product loaded', {
         ...product,
         translations,
       });
     } catch (error) {
-      console.error("[Product] detail failed", error);
-      return sendError(
-        res,
-        500,
-        "PRODUCT_LOAD_FAILED",
-        "Unable to load product",
-      );
+      console.error('[Product] detail failed', error);
+      return sendError(res, 500, 'PRODUCT_LOAD_FAILED', 'Unable to load product');
     }
   },
 );
@@ -509,16 +441,10 @@ app.get(
 const save = async (req: AuthRequest, res: Response, id: number | null) => {
   const updating = Boolean(id);
   const scope = await getAdminScope(req, pool);
-  if (!scope.success)
-    return sendError(res, scope.status, scope.code, scope.message);
+  if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
   const payload = parsePayload(req.body);
   if (!payload)
-    return sendError(
-      res,
-      400,
-      "PRODUCT_PAYLOAD_INVALID",
-      "Product data is incomplete or invalid",
-    );
+    return sendError(res, 400, 'PRODUCT_PAYLOAD_INVALID', 'Product data is incomplete or invalid');
   const cx = await pool.getConnection();
   try {
     await cx.beginTransaction();
@@ -535,20 +461,12 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       await cx.rollback();
       const duplicate = duplicateProducts[0];
       if (String(duplicate.product_key) === payload.key)
-        return sendError(
-          res,
-          409,
-          "PRODUCT_KEY_EXISTS",
-          "Kunci internal produk sudah digunakan",
-          { field: "key" },
-        );
-      return sendError(
-        res,
-        409,
-        "PRODUCT_SKU_EXISTS",
-        "SKU produk sudah digunakan",
-        { field: "sku" },
-      );
+        return sendError(res, 409, 'PRODUCT_KEY_EXISTS', 'Kunci internal produk sudah digunakan', {
+          field: 'key',
+        });
+      return sendError(res, 409, 'PRODUCT_SKU_EXISTS', 'SKU produk sudah digunakan', {
+        field: 'sku',
+      });
     }
     for (const translation of payload.translations) {
       const [duplicateSlugs] = await cx.query<RowDataPacket[]>(
@@ -556,22 +474,16 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
          WHERE id_master_comp=? AND product_locale=? AND product_slug=?
            AND (? IS NULL OR id_product<>?)
          LIMIT 1`,
-        [
-          scope.idMasterComp,
-          translation.locale,
-          translation.slug,
-          id,
-          id,
-        ],
+        [scope.idMasterComp, translation.locale, translation.slug, id, id],
       );
       if (duplicateSlugs.length) {
         await cx.rollback();
         return sendError(
           res,
           409,
-          "PRODUCT_SLUG_EXISTS",
+          'PRODUCT_SLUG_EXISTS',
           `Alamat produk ${translation.locale} sudah digunakan`,
-          { field: "slug", locale: translation.locale },
+          { field: 'slug', locale: translation.locale },
         );
       }
     }
@@ -582,7 +494,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!exists.length) {
         await cx.rollback();
-        return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+        return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
       }
       await cx.query(
         `UPDATE product_catalog SET product_key=?,product_sku=?,product_type=?,product_kind=?,product_status=?,product_unit=?,product_barcode=?,product_manufacturer_code=?,product_country_origin=?,product_origin_province=?,product_origin_city=?,product_hs_code=?,product_weight_grams=?,product_length_mm=?,product_width_mm=?,product_height_mm=?,product_min_order_qty=?,product_lead_time_days=?,product_manage_stock=?,product_stock_quantity=?,product_stock_status=?,product_price_visibility=?,product_internal_commerce_enabled=?,product_is_featured=?,product_sort_order=?,id_updated_by=? WHERE id_product=? AND id_master_comp=?`,
@@ -653,10 +565,10 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       id = result.insertId;
     }
-    await cx.query(
-      `DELETE FROM product_catalog_i18n WHERE id_product=? AND id_master_comp=?`,
-      [id, scope.idMasterComp],
-    );
+    await cx.query(`DELETE FROM product_catalog_i18n WHERE id_product=? AND id_master_comp=?`, [
+      id,
+      scope.idMasterComp,
+    ]);
     for (const item of payload.translations)
       await cx.query(
         `INSERT INTO product_catalog_i18n(id_product,id_master_comp,product_locale,product_slug,product_name,product_short_description,product_description,product_specifications_json,product_meta_title,product_meta_description,product_canonical_url,product_og_title,product_og_description,product_i18n_status) VALUES(?,?,?,?,?,?,?,JSON_EXTRACT(?, '$'),?,?,?,?,?,?)`,
@@ -668,9 +580,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           item.name,
           item.shortDescription,
           item.description,
-          item.specifications == null
-            ? null
-            : JSON.stringify(item.specifications),
+          item.specifications == null ? null : JSON.stringify(item.specifications),
           item.metaTitle,
           item.metaDescription,
           item.canonicalUrl,
@@ -679,10 +589,10 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           item.status,
         ],
       );
-    await cx.query(
-      `DELETE FROM product_catalog_category WHERE id_product=? AND id_master_comp=?`,
-      [id, scope.idMasterComp],
-    );
+    await cx.query(`DELETE FROM product_catalog_category WHERE id_product=? AND id_master_comp=?`, [
+      id,
+      scope.idMasterComp,
+    ]);
     for (let index = 0; index < payload.categoryIds.length; index++) {
       const categoryId = payload.categoryIds[index];
       const [valid] = await cx.query<RowDataPacket[]>(
@@ -691,12 +601,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!valid.length) {
         await cx.rollback();
-        return sendError(
-          res,
-          400,
-          "PRODUCT_CATEGORY_INVALID",
-          "Selected category is unavailable",
-        );
+        return sendError(res, 400, 'PRODUCT_CATEGORY_INVALID', 'Selected category is unavailable');
       }
       await cx.query(
         `INSERT INTO product_catalog_category(id_product,id_product_category,id_master_comp,is_primary,sort_order) VALUES(?,?,?,?,?)`,
@@ -714,26 +619,21 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!valid.length) {
         await cx.rollback();
-        return sendError(
-          res,
-          400,
-          "PRODUCT_MEDIA_INVALID",
-          "Selected media is unavailable",
-        );
+        return sendError(res, 400, 'PRODUCT_MEDIA_INVALID', 'Selected media is unavailable');
       }
-      const mime = String(valid[0].mime_type ?? "");
-      const isImage = mime.startsWith("image/");
-      const isVideo = ["video/mp4", "video/webm", "video/ogg"].includes(mime);
+      const mime = String(valid[0].mime_type ?? '');
+      const isImage = mime.startsWith('image/');
+      const isVideo = ['video/mp4', 'video/webm', 'video/ogg'].includes(mime);
       if (
-        ((item.role === "thumbnail" || item.role === "og") && !isImage) ||
-        (item.role === "gallery" && !isImage && !isVideo)
+        ((item.role === 'thumbnail' || item.role === 'og') && !isImage) ||
+        (item.role === 'gallery' && !isImage && !isVideo)
       ) {
         await cx.rollback();
         return sendError(
           res,
           400,
-          "PRODUCT_MEDIA_TYPE_INVALID",
-          "Thumbnail and social media must be images; gallery media may be images or supported videos",
+          'PRODUCT_MEDIA_TYPE_INVALID',
+          'Thumbnail and social media must be images; gallery media may be images or supported videos',
         );
       }
       await cx.query(
@@ -741,10 +641,10 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
         [id, scope.idMasterComp, item.id, item.role, item.sortOrder],
       );
     }
-    await cx.query(
-      `DELETE FROM product_catalog_price WHERE id_product=? AND id_master_comp=?`,
-      [id, scope.idMasterComp],
-    );
+    await cx.query(`DELETE FROM product_catalog_price WHERE id_product=? AND id_master_comp=?`, [
+      id,
+      scope.idMasterComp,
+    ]);
     for (const item of payload.prices)
       await cx.query(
         `INSERT INTO product_catalog_price(id_product,id_master_comp,product_price_type,product_price_label,product_price_currency,product_price_amount,product_price_compare_at,product_price_min_qty,product_price_max_qty,product_price_starts_at,product_price_ends_at,product_price_is_public,product_price_is_active,product_price_sort_order) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -789,16 +689,16 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     await writeAuditLog({
       req,
       connection: cx,
-      writeMode: "strict",
+      writeMode: 'strict',
       idMasterComp: scope.idMasterComp,
-      eventCode: updating ? "product.updated" : "product.created",
-      category: "data_change",
-      module: "product",
-      action: updating ? "update" : "create",
-      actorType: "admin",
+      eventCode: updating ? 'product.updated' : 'product.created',
+      category: 'data_change',
+      module: 'product',
+      action: updating ? 'update' : 'create',
+      actorType: 'admin',
       actorId: scope.idAdminAcct,
       actorLabel: req.user?.alias ?? null,
-      entityType: "product",
+      entityType: 'product',
       entityId: id!,
       entityLabel: payload.sku,
     });
@@ -806,93 +706,77 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     return sendSuccess(
       res,
       updating ? 200 : 201,
-      updating ? "PRODUCT_UPDATED" : "PRODUCT_CREATED",
-      updating ? "Product updated" : "Product created",
+      updating ? 'PRODUCT_UPDATED' : 'PRODUCT_CREATED',
+      updating ? 'Product updated' : 'Product created',
       { id: keyhsid.idProduct.encode(id!) },
     );
   } catch (error: any) {
     await cx.rollback();
-    console.error("[Product] save failed", error);
-    if (error?.code === "ER_DUP_ENTRY")
+    console.error('[Product] save failed', error);
+    if (error?.code === 'ER_DUP_ENTRY')
       return sendError(
         res,
         409,
-        "PRODUCT_DUPLICATE",
-        "Product key, SKU, or localized slug already exists",
+        'PRODUCT_DUPLICATE',
+        'Product key, SKU, or localized slug already exists',
       );
-    return sendError(res, 500, "PRODUCT_SAVE_FAILED", "Unable to save product");
+    return sendError(res, 500, 'PRODUCT_SAVE_FAILED', 'Unable to save product');
   } finally {
     cx.release();
   }
 };
 
 app.post(
-  "/api/v1/products",
+  '/api/v1/products',
   verifyToken,
-  requirePermission("product.create"),
+  requirePermission('product.create'),
   (req: AuthRequest, res: Response) => save(req, res, null),
 );
 app.put(
-  "/api/v1/products/:id",
+  '/api/v1/products/:id',
   verifyToken,
-  requirePermission("product.update"),
+  requirePermission('product.update'),
   (req: AuthRequest, res: Response) => {
     const id = decode(req.params.id, keyhsid.idProduct);
-    return id
-      ? save(req, res, id)
-      : sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+    return id ? save(req, res, id) : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
 app.patch(
-  "/api/v1/products/:id/status",
+  '/api/v1/products/:id/status',
   verifyToken,
-  requirePermission("product.update"),
+  requirePermission('product.update'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
-    if (!scope.success)
-      return sendError(res, scope.status, scope.code, scope.message);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decode(req.params.id, keyhsid.idProduct),
-      status = String(req.body?.status ?? "");
+      status = String(req.body?.status ?? '');
     if (!id || !statuses.has(status))
-      return sendError(
-        res,
-        400,
-        "PRODUCT_STATUS_INVALID",
-        "Invalid product status",
-      );
+      return sendError(res, 400, 'PRODUCT_STATUS_INVALID', 'Invalid product status');
     const [result] = await pool.query<ResultSetHeader>(
       `UPDATE product_catalog SET product_status=?,id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
       [status, scope.idAdminAcct, id, scope.idMasterComp],
     );
     return result.affectedRows
-      ? sendSuccess(
-          res,
-          200,
-          "PRODUCT_STATUS_UPDATED",
-          "Product status updated",
-          null,
-        )
-      : sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+      ? sendSuccess(res, 200, 'PRODUCT_STATUS_UPDATED', 'Product status updated', null)
+      : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
 app.delete(
-  "/api/v1/products/:id",
+  '/api/v1/products/:id',
   verifyToken,
-  requirePermission("product.delete"),
+  requirePermission('product.delete'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
-    if (!scope.success)
-      return sendError(res, scope.status, scope.code, scope.message);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decode(req.params.id, keyhsid.idProduct);
-    if (!id)
-      return sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+    if (!id) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     const [result] = await pool.query<ResultSetHeader>(
       `UPDATE product_catalog SET product_status='archived',product_deleted_at=NOW(),id_updated_by=? WHERE id_product=? AND id_master_comp=? AND product_deleted_at IS NULL`,
       [scope.idAdminAcct, id, scope.idMasterComp],
     );
     return result.affectedRows
-      ? sendSuccess(res, 200, "PRODUCT_DELETED", "Product archived", null)
-      : sendError(res, 404, "PRODUCT_NOT_FOUND", "Product not found");
+      ? sendSuccess(res, 200, 'PRODUCT_DELETED', 'Product archived', null)
+      : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
 

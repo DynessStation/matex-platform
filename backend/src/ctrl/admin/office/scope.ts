@@ -1,49 +1,37 @@
 // Session scope, permission lookup, and office id decoding shared by the office routes.
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest } from "../../../middleware/auth-jwt.middleware";
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest } from '../../../middleware/auth-jwt.middleware';
 
 const { pool } = db;
 
 export type SessionScopeResult =
   | {
       success: true;
-
       idAdminAcct: number;
-
       idMasterComp: number;
-
       idOffice: number;
-
       idAccess: number;
-
       isAllAccess: number;
     }
   | {
       success: false;
-
       status: number;
-
       code: string;
-
       message: string;
     };
 
-//==================================================
-//==== SESSION SCOPE
-//==================================================
+// Session scope
 
-export const getSessionScope = async (
-  req: AuthRequest,
-): Promise<SessionScopeResult> => {
+export const getSessionScope = async (req: AuthRequest): Promise<SessionScopeResult> => {
   const idAdminAcct = req.user?.id_admin_acct;
 
   if (!idAdminAcct) {
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -71,10 +59,9 @@ export const getSessionScope = async (
   if (!users.length) {
     return {
       success: false,
-
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -83,58 +70,42 @@ export const getSessionScope = async (
   if (Number(user.admin_acct_status) !== 1) {
     return {
       success: false,
-
       status: 403,
-      code: "AUTH_ACCOUNT_INACTIVE",
-      message: "Your account is not active",
+      code: 'AUTH_ACCOUNT_INACTIVE',
+      message: 'Your account is not active',
     };
   }
 
   return {
     success: true,
-
     idAdminAcct: Number(user.id_admin_acct),
-
     idMasterComp: Number(user.id_master_comp),
-
     idOffice: Number(user.id_office),
-
     idAccess: Number(user.id_access),
-
     isAllAccess: Number(user.is_all_access),
   };
 };
 
-//==================================================
-//==== SESSION HAS PERMISSION
-//==================================================
+// Session has permission
 
 export const sessionHasPermission = async (
   executor: any,
-
   scope: Extract<SessionScopeResult, { success: true }>,
-
   permissionKey: string,
 ): Promise<boolean> => {
-  //==================================================
-  //==== FULL ACCESS
-  //==================================================
+  // Full access
 
   if (scope.isAllAccess === 1) {
     return true;
   }
 
-  //==================================================
-  //==== ACCESS PROFILE
-  //==================================================
+  // Access profile
 
   if (!Number.isInteger(scope.idAccess) || scope.idAccess <= 0) {
     return false;
   }
 
-  //==================================================
-  //==== PERMISSION
-  //==================================================
+  // Permission
 
   const [rows] = await executor.query(
     `
@@ -161,12 +132,10 @@ export const sessionHasPermission = async (
   return (rows as any[]).length > 0;
 };
 
-//==================================================
-//==== DECODE OFFICE
-//==================================================
+// Decode office
 
 export const decodeOfficeId = (value: unknown): number | null => {
-  const encoded = String(value ?? "").trim();
+  const encoded = String(value ?? '').trim();
 
   if (!encoded) {
     return null;

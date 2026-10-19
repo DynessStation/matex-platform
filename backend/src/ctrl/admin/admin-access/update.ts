@@ -1,71 +1,47 @@
 // Update an access profile and change its status.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, decodeAdminAccessId } from "./scope";
+import { getSessionScope, decodeAdminAccessId } from './scope';
 import {
   resolvePermissionIds,
   getPermissionKeysByIds,
   getAccessPermissionKeys,
   getPermissionDiff,
-} from "./permissions";
+} from './permissions';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== ADMIN ACCESS - UPDATE
-//==================================================
+// Admin access - update
 
 router.put(
-  "/api/v1/admin-access/:id",
-
+  '/api/v1/admin-access/:id',
   verifyToken,
-
-  requirePermission("admin_access.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_access.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const { id } = req.params;
 
-      const {
-        access_name,
+      const { access_name, access_description, permissions } = req.body;
 
-        access_description,
-
-        permissions,
-      } = req.body;
-
-      //==================================================
-      //==== ACCESS ID
-      //==================================================
+      // Access ID
 
       const idAccess = decodeAdminAccessId(id);
 
       if (!idAccess) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_INVALID_ID",
-          "Invalid admin access identifier",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_INVALID_ID', 'Invalid admin access identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -73,56 +49,39 @@ router.put(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
-      const cleanName =
-        typeof access_name === "string" ? access_name.trim() : "";
+      const cleanName = typeof access_name === 'string' ? access_name.trim() : '';
 
       const cleanDescription =
-        typeof access_description === "string" && access_description.trim()
+        typeof access_description === 'string' && access_description.trim()
           ? access_description.trim()
           : null;
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_NAME_REQUIRED",
-          "Access name is required",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_NAME_REQUIRED', 'Access name is required');
       }
 
       if (cleanName.length > 255) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_NAME_TOO_LONG",
-          "Access name is too long",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_NAME_TOO_LONG', 'Access name is too long');
       }
 
       if (cleanDescription && cleanDescription.length > 500) {
         return sendError(
           res,
           400,
-          "ADMIN_ACCESS_DESCRIPTION_TOO_LONG",
-          "Access description is too long",
+          'ADMIN_ACCESS_DESCRIPTION_TOO_LONG',
+          'Access description is too long',
         );
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET ACCESS
-      //==================================================
+      // Target access
 
       const [targetRows] = await connection.query(
         `
@@ -151,29 +110,16 @@ router.put(
       if (!(targetRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCESS_NOT_FOUND",
-          "Admin access not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCESS_NOT_FOUND', 'Admin access not found');
       }
 
       const targetAccess = (targetRows as any[])[0];
 
-      //==================================================
-      //==== AUDIT BEFORE PERMISSIONS
-      //==================================================
+      // Audit before permissions
 
-      const beforePermissionKeys = await getAccessPermissionKeys(
-        connection,
+      const beforePermissionKeys = await getAccessPermissionKeys(connection, idAccess);
 
-        idAccess,
-      );
-
-      //==================================================
-      //==== DUPLICATE NAME
-      //==================================================
+      // Duplicate name
 
       const [duplicateRows] = await connection.query(
         `
@@ -196,23 +142,12 @@ router.put(
       if ((duplicateRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCESS_NAME_EXISTS",
-          "Access name is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCESS_NAME_EXISTS', 'Access name is already in use');
       }
 
-      //==================================================
-      //==== RESOLVE PERMISSIONS
-      //==================================================
+      // Resolve permissions
 
-      const permissionResult = await resolvePermissionIds(
-        connection,
-
-        permissions,
-      );
+      const permissionResult = await resolvePermissionIds(connection, permissions);
 
       if (!permissionResult.success) {
         await connection.rollback();
@@ -225,19 +160,11 @@ router.put(
         );
       }
 
-      //==================================================
-      //==== AUDIT AFTER PERMISSIONS
-      //==================================================
+      // Audit after permissions
 
-      const afterPermissionKeys = await getPermissionKeysByIds(
-        connection,
+      const afterPermissionKeys = await getPermissionKeysByIds(connection, permissionResult.ids);
 
-        permissionResult.ids,
-      );
-
-      //==================================================
-      //==== UPDATE ACCESS
-      //==================================================
+      // Update access
 
       await connection.query(
         `
@@ -256,9 +183,7 @@ router.put(
         [cleanName, cleanDescription, idAccess, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== REPLACE PERMISSION MAPPING
-      //==================================================
+      // Replace permission mapping
 
       await connection.query(
         `
@@ -270,13 +195,9 @@ router.put(
       );
 
       if (permissionResult.ids.length) {
-        const valuesSql = permissionResult.ids.map(() => "(?, ?)").join(", ");
+        const valuesSql = permissionResult.ids.map(() => '(?, ?)').join(', ');
 
-        const values = permissionResult.ids.flatMap((idPermission) => [
-          idAccess,
-
-          idPermission,
-        ]);
+        const values = permissionResult.ids.flatMap((idPermission) => [idAccess, idPermission]);
 
         await connection.query(
           `
@@ -293,9 +214,7 @@ router.put(
         );
       }
 
-      //==================================================
-      //==== AUDIT ACCESS CHANGE
-      //==================================================
+      // Audit access change
 
       const accessChanged =
         String(targetAccess.access_name) !== cleanName ||
@@ -304,122 +223,72 @@ router.put(
       if (accessChanged) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "admin_access.updated",
-
-          category: "access_control",
-
-          module: "admin_access",
-
-          action: "update",
-
-          actorType: "admin",
-
+          eventCode: 'admin_access.updated',
+          category: 'access_control',
+          module: 'admin_access',
+          action: 'update',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "admin_access",
-
+          entityType: 'admin_access',
           entityId: idAccess,
-
           entityLabel: cleanName,
-
           before: {
             access_name: targetAccess.access_name,
-
             access_description: targetAccess.access_description ?? null,
           },
-
           after: {
             access_name: cleanName,
-
             access_description: cleanDescription,
           },
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== AUDIT PERMISSION CHANGE
-      //==================================================
+      // Audit permission change
 
-      const permissionDiff = getPermissionDiff(
-        beforePermissionKeys,
-
-        afterPermissionKeys,
-      );
+      const permissionDiff = getPermissionDiff(beforePermissionKeys, afterPermissionKeys);
 
       if (permissionDiff.changed) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "admin_access.permissions_changed",
-
-          category: "access_control",
-
-          module: "admin_access",
-
-          action: "permissions_change",
-
-          actorType: "admin",
-
+          eventCode: 'admin_access.permissions_changed',
+          category: 'access_control',
+          module: 'admin_access',
+          action: 'permissions_change',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "admin_access",
-
+          entityType: 'admin_access',
           entityId: idAccess,
-
           entityLabel: cleanName,
-
           before: {
             permissions: beforePermissionKeys,
           },
-
           after: {
             permissions: afterPermissionKeys,
           },
-
           metadata: {
             added_permissions: permissionDiff.added,
-
             removed_permissions: permissionDiff.removed,
           },
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        200,
-        "ADMIN_ACCESS_UPDATED",
-        "Admin access updated successfully",
-        {
-          id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
-        },
-      );
+      return sendSuccess(res, 200, 'ADMIN_ACCESS_UPDATED', 'Admin access updated successfully', {
+        id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -427,14 +296,9 @@ router.put(
         } catch {}
       }
 
-      console.error("Update admin access error:", error);
+      console.error('Update admin access error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -443,22 +307,13 @@ router.put(
   },
 );
 
-//==================================================
-//==== ADMIN ACCESS - UPDATE STATUS
-//==================================================
+// Admin access - update status
 
 router.patch(
-  "/api/v1/admin-access/:id/status",
-
+  '/api/v1/admin-access/:id/status',
   verifyToken,
-
-  requirePermission("admin_access.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_access.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
@@ -466,39 +321,23 @@ router.patch(
 
       const { admin_access_status } = req.body;
 
-      //==================================================
-      //==== ACCESS ID
-      //==================================================
+      // Access ID
 
       const idAccess = decodeAdminAccessId(id);
 
       if (!idAccess) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_INVALID_ID",
-          "Invalid admin access identifier",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_INVALID_ID', 'Invalid admin access identifier');
       }
 
-      //==================================================
-      //==== STATUS
-      //==================================================
+      // Status
 
       const newStatus = Number(admin_access_status);
 
       if (![0, 1].includes(newStatus)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_INVALID_STATUS",
-          "Invalid admin access status",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_INVALID_STATUS', 'Invalid admin access status');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -506,17 +345,13 @@ router.patch(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [accessRows] = await connection.query(
         `
@@ -545,38 +380,25 @@ router.patch(
       if (!accesses.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCESS_NOT_FOUND",
-          "Admin access not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCESS_NOT_FOUND', 'Admin access not found');
       }
 
       const access = accesses[0];
 
-      //==================================================
-      //==== PREVENT SELF ROLE DEACTIVATION
-      //==================================================
+      // Prevent self role deactivation
 
-      if (
-        newStatus === 0 &&
-        scope.isAllAccess !== 1 &&
-        scope.idAccess === idAccess
-      ) {
+      if (newStatus === 0 && scope.isAllAccess !== 1 && scope.idAccess === idAccess) {
         await connection.rollback();
 
         return sendError(
           res,
           403,
-          "ADMIN_ACCESS_SELF_DEACTIVATION_FORBIDDEN",
-          "You cannot deactivate your own access profile",
+          'ADMIN_ACCESS_SELF_DEACTIVATION_FORBIDDEN',
+          'You cannot deactivate your own access profile',
         );
       }
 
-      //==================================================
-      //==== SAME STATUS
-      //==================================================
+      // Same status
 
       if (Number(access.admin_access_status) === newStatus) {
         await connection.rollback();
@@ -584,23 +406,16 @@ router.patch(
         return sendSuccess(
           res,
           200,
-          newStatus === 1
-            ? "ADMIN_ACCESS_ALREADY_ACTIVE"
-            : "ADMIN_ACCESS_ALREADY_INACTIVE",
-          newStatus === 1
-            ? "Admin access is already active"
-            : "Admin access is already inactive",
+          newStatus === 1 ? 'ADMIN_ACCESS_ALREADY_ACTIVE' : 'ADMIN_ACCESS_ALREADY_INACTIVE',
+          newStatus === 1 ? 'Admin access is already active' : 'Admin access is already inactive',
           {
             id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
-
             admin_access_status: newStatus,
           },
         );
       }
 
-      //==================================================
-      //==== AFFECTED NORMAL ACCOUNTS
-      //==================================================
+      // Affected normal accounts
 
       const [accountRows] = await connection.query(
         `
@@ -619,9 +434,7 @@ router.patch(
 
       const affectedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await connection.query(
         `
@@ -638,78 +451,52 @@ router.patch(
         [newStatus, idAccess, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "admin_access.status_changed",
-
-        category: "access_control",
-
-        module: "admin_access",
-
-        action: "status_change",
-
-        actorType: "admin",
-
+        eventCode: 'admin_access.status_changed',
+        category: 'access_control',
+        module: 'admin_access',
+        action: 'status_change',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_access",
-
+        entityType: 'admin_access',
         entityId: idAccess,
-
         entityLabel: access.access_name,
-
         before: {
           admin_access_status: Number(access.admin_access_status),
         },
-
         after: {
           admin_access_status: newStatus,
         },
-
         metadata: {
-          transition: newStatus === 1 ? "activated" : "deactivated",
-
+          transition: newStatus === 1 ? 'activated' : 'deactivated',
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         200,
-        newStatus === 1 ? "ADMIN_ACCESS_ACTIVATED" : "ADMIN_ACCESS_DEACTIVATED",
+        newStatus === 1 ? 'ADMIN_ACCESS_ACTIVATED' : 'ADMIN_ACCESS_DEACTIVATED',
         newStatus === 1
-          ? "Admin access activated successfully"
-          : "Admin access deactivated successfully",
+          ? 'Admin access activated successfully'
+          : 'Admin access deactivated successfully',
         {
           id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
-
           admin_access_status: newStatus,
-
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
       );
@@ -720,14 +507,9 @@ router.patch(
         } catch {}
       }
 
-      console.error("Update admin access status error:", error);
+      console.error('Update admin access status error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

@@ -1,63 +1,49 @@
-import express = require("express");
+import express = require('express');
 
-import db = require("../../db");
+import db = require('../../db');
 
-import keyhsid from "../../hsid";
+import keyhsid from '../../hsid';
 
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-import { writeAuditLog } from "../../helper/audit-log.helper";
+import { writeAuditLog } from '../../helper/audit-log.helper';
 
-//==================================================
-//==== APP
-//==================================================
+// App
 
 const app = express();
 
 const { pool } = db;
 
-//==================================================
-//==== TYPES
-//==================================================
+// Types
 
 type SessionScopeResult =
   | {
       success: true;
-
       idAdminAcct: number;
-
       idMasterComp: number;
     }
   | {
       success: false;
-
       status: number;
-
       code: string;
-
       message: string;
     };
 
-//==================================================
-//==== SESSION SCOPE
-//==================================================
+// Session scope
 
-const getSessionScope = async (
-  req: AuthRequest,
-): Promise<SessionScopeResult> => {
+const getSessionScope = async (req: AuthRequest): Promise<SessionScopeResult> => {
   const idAdminAcct = req.user?.id_admin_acct;
 
   if (!idAdminAcct) {
     return {
       success: false,
-
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -82,10 +68,9 @@ const getSessionScope = async (
   if (!users.length) {
     return {
       success: false,
-
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -94,28 +79,23 @@ const getSessionScope = async (
   if (Number(user.admin_acct_status) !== 1) {
     return {
       success: false,
-
       status: 403,
-      code: "AUTH_ACCOUNT_INACTIVE",
-      message: "Your account is not active",
+      code: 'AUTH_ACCOUNT_INACTIVE',
+      message: 'Your account is not active',
     };
   }
 
   return {
     success: true,
-
     idAdminAcct: Number(user.id_admin_acct),
-
     idMasterComp: Number(user.id_master_comp),
   };
 };
 
-//==================================================
-//==== DECODE CHAIR ID
-//==================================================
+// Decode chair ID
 
 const decodeChairId = (value: unknown): number | null => {
-  if (typeof value !== "string" || !value.trim()) {
+  if (typeof value !== 'string' || !value.trim()) {
     return null;
   }
 
@@ -130,67 +110,42 @@ const decodeChairId = (value: unknown): number | null => {
   return idChair;
 };
 
-//==================================================
-//==== LIST QUERY
-//==================================================
+// List query
 
 const getListQuery = (query: any) => {
-  const parsedPage =
-    typeof query.page === "string" && query.page !== ""
-      ? Number(query.page)
-      : 1;
+  const parsedPage = typeof query.page === 'string' && query.page !== '' ? Number(query.page) : 1;
 
   const parsedLimit =
-    typeof query.limit === "string" && query.limit !== ""
-      ? Number(query.limit)
-      : 15;
+    typeof query.limit === 'string' && query.limit !== '' ? Number(query.limit) : 15;
 
   const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const limit =
-    Number.isFinite(parsedLimit) && parsedLimit > 0
-      ? Math.min(parsedLimit, 100)
-      : 15;
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 15;
 
   const offset = (page - 1) * limit;
 
-  const search = typeof query.search === "string" ? query.search.trim() : "";
+  const search = typeof query.search === 'string' ? query.search.trim() : '';
 
   const searchValue = `%${search}%`;
 
   return {
     page,
-
     limit,
-
     offset,
-
     search,
-
     searchValue,
   };
 };
 
-//==================================================
-//==== CHAIR - GET LIST
-//==================================================
+// Chair - get list
 
 app.get(
-  "/api/v1/chair",
-
+  '/api/v1/chair',
   verifyToken,
-
-  requirePermission("chair.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.view'),
+  async (req: AuthRequest, res) => {
     try {
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -198,39 +153,29 @@ app.get(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== QUERY
-      //==================================================
+      // Query
 
       const { page, limit, offset, searchValue } = getListQuery(req.query);
 
-      //==================================================
-      //==== SORT
-      //==================================================
+      // Sort
 
-      const order = typeof req.query.ord === "string" ? req.query.ord : "";
+      const order = typeof req.query.ord === 'string' ? req.query.ord : '';
 
       const sort = req.query.srt;
 
       const allowedOrder: Record<string, string> = {
-        id: "ch.id_chair",
-
-        chair_name: "ch.chair_name",
-
-        admin_count: "admin_count",
-
-        created: "ch.created",
-
-        updated: "ch.updated",
+        id: 'ch.id_chair',
+        chair_name: 'ch.chair_name',
+        admin_count: 'admin_count',
+        created: 'ch.created',
+        updated: 'ch.updated',
       };
 
-      const orderQuery = allowedOrder[order] ?? "ch.id_chair";
+      const orderQuery = allowedOrder[order] ?? 'ch.id_chair';
 
-      const sortQuery = sort === "desc" || sort === "true" ? "DESC" : "ASC";
+      const sortQuery = sort === 'desc' || sort === 'true' ? 'DESC' : 'ASC';
 
-      //==================================================
-      //==== COUNT
-      //==================================================
+      // Count
 
       const [totalRows] = await pool.query(
         `
@@ -254,9 +199,7 @@ app.get(
 
       const total = Number((totalRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -314,84 +257,49 @@ app.get(
 
       const data = (rows as any[]).map((item) => ({
         id_chair: keyhsid.idChair.encode(item.id_chair),
-
         chair_name: item.chair_name,
-
         chair_description: item.chair_description,
-
         admin_count: Number(item.admin_count ?? 0),
-
         chair_status: Number(item.chair_status),
-
-        status_label: Number(item.chair_status) === 1 ? "Active" : "Inactive",
-
+        status_label: Number(item.chair_status) === 1 ? 'Active' : 'Inactive',
         created: item.created,
-
         updated: item.updated,
       }));
 
       return res.status(200).json({
         success: true,
-
         data,
-
         pagination: {
           page,
-
           limit,
-
           total,
-
           length: data.length,
-
           pagerows: Math.ceil(total / limit),
-
           total_pages: Math.ceil(total / limit),
-
           has_more: offset + data.length < total,
         },
       });
     } catch (error) {
-      console.error("Get chair list error:", error);
+      console.error('Get chair list error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== CHAIR - CREATE
-//==================================================
+// Chair - create
 
 app.post(
-  "/api/v1/chair",
-
+  '/api/v1/chair',
   verifyToken,
-
-  requirePermission("chair.create"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.create'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
-      const {
-        chair_name,
+      const { chair_name, chair_description } = req.body;
 
-        chair_description,
-      } = req.body;
-
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -399,50 +307,32 @@ app.post(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
-      const cleanName = typeof chair_name === "string" ? chair_name.trim() : "";
+      const cleanName = typeof chair_name === 'string' ? chair_name.trim() : '';
 
       const cleanDescription =
-        typeof chair_description === "string" && chair_description.trim()
+        typeof chair_description === 'string' && chair_description.trim()
           ? chair_description.trim()
           : null;
 
-      //==================================================
-      //==== VALIDATE
-      //==================================================
+      // Validate
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_NAME_REQUIRED",
-          "Position name is required",
-        );
+        return sendError(res, 400, 'CHAIR_NAME_REQUIRED', 'Position name is required');
       }
 
       if (cleanName.length > 255) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_NAME_TOO_LONG",
-          "Position name is too long",
-        );
+        return sendError(res, 400, 'CHAIR_NAME_TOO_LONG', 'Position name is too long');
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== DUPLICATE
-      //==================================================
+      // Duplicate
 
       const [duplicateRows] = await connection.query(
         `
@@ -466,17 +356,10 @@ app.post(
       if ((duplicateRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          409,
-          "CHAIR_ALREADY_EXISTS",
-          "Position name is already in use",
-        );
+        return sendError(res, 409, 'CHAIR_ALREADY_EXISTS', 'Position name is already in use');
       }
 
-      //==================================================
-      //==== INSERT
-      //==================================================
+      // Insert
 
       const [insertResult] = await connection.query(
         `
@@ -514,69 +397,40 @@ app.post(
 
       const idChair = Number((insertResult as any).insertId);
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "chair.created",
-
-        category: "data_change",
-
-        module: "chair",
-
-        action: "create",
-
-        actorType: "admin",
-
+        eventCode: 'chair.created',
+        category: 'data_change',
+        module: 'chair',
+        action: 'create',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "chair",
-
+        entityType: 'chair',
         entityId: idChair,
-
         entityLabel: cleanName,
-
         after: {
           chair_name: cleanName,
-
           chair_description: cleanDescription,
-
           chair_status: 1,
         },
-
         httpStatus: 201,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
-      return sendSuccess(
-        res,
-        201,
-        "CHAIR_CREATED",
-        "Position created successfully",
-        {
-          id_chair: keyhsid.idChair.encode(idChair),
-        },
-      );
+      return sendSuccess(res, 201, 'CHAIR_CREATED', 'Position created successfully', {
+        id_chair: keyhsid.idChair.encode(idChair),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -584,14 +438,9 @@ app.post(
         } catch {}
       }
 
-      console.error("Create chair error:", error);
+      console.error('Create chair error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -600,43 +449,25 @@ app.post(
   },
 );
 
-//==================================================
-//==== CHAIR - GET DETAIL
-//==================================================
+// Chair - get detail
 
 app.get(
-  "/api/v1/chair/:id",
-
+  '/api/v1/chair/:id',
   verifyToken,
-
-  requirePermission("chair.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.view'),
+  async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
 
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       const idChair = decodeChairId(id);
 
       if (!idChair) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_INVALID_ID",
-          "Invalid position identifier",
-        );
+        return sendError(res, 400, 'CHAIR_INVALID_ID', 'Invalid position identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -644,9 +475,7 @@ app.get(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -688,91 +517,55 @@ app.get(
       const chairs = rows as any[];
 
       if (!chairs.length) {
-        return sendError(res, 404, "CHAIR_NOT_FOUND", "Position not found");
+        return sendError(res, 404, 'CHAIR_NOT_FOUND', 'Position not found');
       }
 
       const chair = chairs[0];
 
       return res.status(200).json({
         success: true,
-
         data: {
           id_chair: keyhsid.idChair.encode(chair.id_chair),
-
           chair_name: chair.chair_name,
-
           chair_description: chair.chair_description,
-
           chair_status: Number(chair.chair_status),
-
-          status_label:
-            Number(chair.chair_status) === 1 ? "Active" : "Inactive",
-
+          status_label: Number(chair.chair_status) === 1 ? 'Active' : 'Inactive',
           admin_count: Number(chair.admin_count ?? 0),
-
           created: chair.created,
-
           updated: chair.updated,
         },
       });
     } catch (error) {
-      console.error("Get chair detail error:", error);
+      console.error('Get chair detail error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== CHAIR - UPDATE
-//==================================================
+// Chair - update
 
 app.put(
-  "/api/v1/chair/:id",
-
+  '/api/v1/chair/:id',
   verifyToken,
-
-  requirePermission("chair.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const { id } = req.params;
 
-      const {
-        chair_name,
+      const { chair_name, chair_description } = req.body;
 
-        chair_description,
-      } = req.body;
-
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       const idChair = decodeChairId(id);
 
       if (!idChair) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_INVALID_ID",
-          "Invalid position identifier",
-        );
+        return sendError(res, 400, 'CHAIR_INVALID_ID', 'Invalid position identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -780,50 +573,32 @@ app.put(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
-      const cleanName = typeof chair_name === "string" ? chair_name.trim() : "";
+      const cleanName = typeof chair_name === 'string' ? chair_name.trim() : '';
 
       const cleanDescription =
-        typeof chair_description === "string" && chair_description.trim()
+        typeof chair_description === 'string' && chair_description.trim()
           ? chair_description.trim()
           : null;
 
-      //==================================================
-      //==== VALIDATE
-      //==================================================
+      // Validate
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_NAME_REQUIRED",
-          "Position name is required",
-        );
+        return sendError(res, 400, 'CHAIR_NAME_REQUIRED', 'Position name is required');
       }
 
       if (cleanName.length > 255) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_NAME_TOO_LONG",
-          "Position name is too long",
-        );
+        return sendError(res, 400, 'CHAIR_NAME_TOO_LONG', 'Position name is too long');
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [targetRows] = await connection.query(
         `
@@ -854,14 +629,12 @@ app.put(
       if (!chairs.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "CHAIR_NOT_FOUND", "Position not found");
+        return sendError(res, 404, 'CHAIR_NOT_FOUND', 'Position not found');
       }
 
       const chair = chairs[0];
 
-      //==================================================
-      //==== DUPLICATE
-      //==================================================
+      // Duplicate
 
       const [duplicateRows] = await connection.query(
         `
@@ -886,49 +659,32 @@ app.put(
       if ((duplicateRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          409,
-          "CHAIR_ALREADY_EXISTS",
-          "Position name is already in use",
-        );
+        return sendError(res, 409, 'CHAIR_ALREADY_EXISTS', 'Position name is already in use');
       }
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         chair_name: chair.chair_name,
-
         chair_description: chair.chair_description ?? null,
-
         chair_status: Number(chair.chair_status),
       };
 
-      //==================================================
-      //==== AUDIT AFTER
-      //==================================================
+      // Audit after
 
       const auditAfter = {
         chair_name: cleanName,
-
         chair_description: cleanDescription,
-
         chair_status: Number(chair.chair_status),
       };
 
-      //==================================================
-      //==== CHANGE CHECK
-      //==================================================
+      // Change check
 
       const changed =
         auditBefore.chair_name !== auditAfter.chair_name ||
         auditBefore.chair_description !== auditAfter.chair_description;
 
-      //==================================================
-      //==== UPDATE + AUDIT
-      //==================================================
+      // Update + audit
 
       if (changed) {
         await connection.query(
@@ -948,66 +704,38 @@ app.put(
           [cleanName, cleanDescription, idChair, scope.idMasterComp],
         );
 
-        //==================================================
-        //==== AUDIT
-        //==================================================
+        // Audit
 
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "chair.updated",
-
-          category: "data_change",
-
-          module: "chair",
-
-          action: "update",
-
-          actorType: "admin",
-
+          eventCode: 'chair.updated',
+          category: 'data_change',
+          module: 'chair',
+          action: 'update',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "chair",
-
+          entityType: 'chair',
           entityId: idChair,
-
           entityLabel: cleanName,
-
           before: auditBefore,
-
           after: auditAfter,
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
-      return sendSuccess(
-        res,
-        200,
-        "CHAIR_UPDATED",
-        "Position updated successfully",
-        {
-          id_chair: keyhsid.idChair.encode(idChair),
-        },
-      );
+      return sendSuccess(res, 200, 'CHAIR_UPDATED', 'Position updated successfully', {
+        id_chair: keyhsid.idChair.encode(idChair),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -1015,14 +743,9 @@ app.put(
         } catch {}
       }
 
-      console.error("Update chair error:", error);
+      console.error('Update chair error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -1031,22 +754,13 @@ app.put(
   },
 );
 
-//==================================================
-//==== CHAIR - UPDATE STATUS
-//==================================================
+// Chair - update status
 
 app.patch(
-  "/api/v1/chair/:id/status",
-
+  '/api/v1/chair/:id/status',
   verifyToken,
-
-  requirePermission("chair.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
@@ -1054,39 +768,23 @@ app.patch(
 
       const { chair_status } = req.body;
 
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       const idChair = decodeChairId(id);
 
       if (!idChair) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_INVALID_ID",
-          "Invalid position identifier",
-        );
+        return sendError(res, 400, 'CHAIR_INVALID_ID', 'Invalid position identifier');
       }
 
-      //==================================================
-      //==== STATUS
-      //==================================================
+      // Status
 
       const newStatus = Number(chair_status);
 
       if (![0, 1].includes(newStatus)) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_INVALID_STATUS",
-          "Invalid position status",
-        );
+        return sendError(res, 400, 'CHAIR_INVALID_STATUS', 'Invalid position status');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -1094,17 +792,13 @@ app.patch(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [rows] = await connection.query(
         `
@@ -1133,14 +827,12 @@ app.patch(
       if (!chairs.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "CHAIR_NOT_FOUND", "Position not found");
+        return sendError(res, 404, 'CHAIR_NOT_FOUND', 'Position not found');
       }
 
       const chair = chairs[0];
 
-      //==================================================
-      //==== SAME STATUS
-      //==================================================
+      // Same status
 
       if (Number(chair.chair_status) === newStatus) {
         await connection.rollback();
@@ -1148,21 +840,16 @@ app.patch(
         return sendSuccess(
           res,
           200,
-          newStatus === 1 ? "CHAIR_ALREADY_ACTIVE" : "CHAIR_ALREADY_INACTIVE",
-          newStatus === 1
-            ? "Position is already active"
-            : "Position is already inactive",
+          newStatus === 1 ? 'CHAIR_ALREADY_ACTIVE' : 'CHAIR_ALREADY_INACTIVE',
+          newStatus === 1 ? 'Position is already active' : 'Position is already inactive',
           {
             id_chair: keyhsid.idChair.encode(idChair),
-
             chair_status: newStatus,
           },
         );
       }
 
-      //==================================================
-      //==== AFFECTED ACCOUNTS
-      //==================================================
+      // Affected accounts
 
       const [accountRows] = await connection.query(
         `
@@ -1180,9 +867,7 @@ app.patch(
 
       const affectedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await connection.query(
         `
@@ -1199,78 +884,50 @@ app.patch(
         [newStatus, idChair, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "chair.status_changed",
-
-        category: "data_change",
-
-        module: "chair",
-
-        action: "status_change",
-
-        actorType: "admin",
-
+        eventCode: 'chair.status_changed',
+        category: 'data_change',
+        module: 'chair',
+        action: 'status_change',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "chair",
-
+        entityType: 'chair',
         entityId: idChair,
-
         entityLabel: chair.chair_name,
-
         before: {
           chair_status: Number(chair.chair_status),
         },
-
         after: {
           chair_status: newStatus,
         },
-
         metadata: {
-          transition: newStatus === 1 ? "activated" : "deactivated",
-
+          transition: newStatus === 1 ? 'activated' : 'deactivated',
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         200,
-        newStatus === 1 ? "CHAIR_ACTIVATED" : "CHAIR_DEACTIVATED",
-        newStatus === 1
-          ? "Position activated successfully"
-          : "Position deactivated successfully",
+        newStatus === 1 ? 'CHAIR_ACTIVATED' : 'CHAIR_DEACTIVATED',
+        newStatus === 1 ? 'Position activated successfully' : 'Position deactivated successfully',
         {
           id_chair: keyhsid.idChair.encode(idChair),
-
           chair_status: newStatus,
-
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
       );
@@ -1281,14 +938,9 @@ app.patch(
         } catch {}
       }
 
-      console.error("Update chair status error:", error);
+      console.error('Update chair status error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -1297,45 +949,27 @@ app.patch(
   },
 );
 
-//==================================================
-//==== CHAIR - DELETE
-//==================================================
+// Chair - delete
 
 app.delete(
-  "/api/v1/chair/:id",
-
+  '/api/v1/chair/:id',
   verifyToken,
-
-  requirePermission("chair.delete"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('chair.delete'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const { id } = req.params;
 
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       const idChair = decodeChairId(id);
 
       if (!idChair) {
-        return sendError(
-          res,
-          400,
-          "CHAIR_INVALID_ID",
-          "Invalid position identifier",
-        );
+        return sendError(res, 400, 'CHAIR_INVALID_ID', 'Invalid position identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -1343,17 +977,13 @@ app.delete(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [rows] = await connection.query(
         `
@@ -1384,14 +1014,12 @@ app.delete(
       if (!chairs.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "CHAIR_NOT_FOUND", "Position not found");
+        return sendError(res, 404, 'CHAIR_NOT_FOUND', 'Position not found');
       }
 
       const chair = chairs[0];
 
-      //==================================================
-      //==== MUST BE INACTIVE
-      //==================================================
+      // Must be inactive
 
       if (Number(chair.chair_status) !== 0) {
         await connection.rollback();
@@ -1399,14 +1027,12 @@ app.delete(
         return sendError(
           res,
           409,
-          "CHAIR_MUST_BE_INACTIVE",
-          "Deactivate the position before deleting it",
+          'CHAIR_MUST_BE_INACTIVE',
+          'Deactivate the position before deleting it',
         );
       }
 
-      //==================================================
-      //==== ACCOUNT REFERENCES
-      //==================================================
+      // Account references
 
       const [referenceRows] = await connection.query(
         `
@@ -1430,29 +1056,23 @@ app.delete(
         return sendError(
           res,
           409,
-          "CHAIR_HAS_ADMIN_REFERENCES",
-          "Position is still assigned to one or more admin accounts",
+          'CHAIR_HAS_ADMIN_REFERENCES',
+          'Position is still assigned to one or more admin accounts',
           {
             assigned_accounts: references,
           },
         );
       }
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         chair_name: chair.chair_name,
-
         chair_description: chair.chair_description ?? null,
-
         chair_status: Number(chair.chair_status),
       };
 
-      //==================================================
-      //==== SOFT DELETE
-      //==================================================
+      // Soft delete
 
       await connection.query(
         `
@@ -1469,73 +1089,43 @@ app.delete(
         [idChair, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "chair.deleted",
-
-        category: "data_change",
-
-        module: "chair",
-
-        action: "delete",
-
-        actorType: "admin",
-
+        eventCode: 'chair.deleted',
+        category: 'data_change',
+        module: 'chair',
+        action: 'delete',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "chair",
-
+        entityType: 'chair',
         entityId: idChair,
-
         entityLabel: chair.chair_name,
-
         before: auditBefore,
-
         after: {
           ...auditBefore,
-
           chair_status: 99,
         },
-
         metadata: {
-          delete_type: "soft_delete",
+          delete_type: 'soft_delete',
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
-      return sendSuccess(
-        res,
-        200,
-        "CHAIR_DELETED",
-        "Position deleted successfully",
-        {
-          id_chair: keyhsid.idChair.encode(idChair),
-        },
-      );
+      return sendSuccess(res, 200, 'CHAIR_DELETED', 'Position deleted successfully', {
+        id_chair: keyhsid.idChair.encode(idChair),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -1543,14 +1133,9 @@ app.delete(
         } catch {}
       }
 
-      console.error("Delete chair error:", error);
+      console.error('Delete chair error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -1559,8 +1144,6 @@ app.delete(
   },
 );
 
-//==================================================
-//==== ROUTER
-//==================================================
+// Router
 
 export default app;

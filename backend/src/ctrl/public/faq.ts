@@ -1,21 +1,20 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
 
-import { isPublicContentLocale } from "../../config/public-content.config";
-import { pool } from "../../db";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { isPublicContentLocale } from '../../config/public-content.config';
+import { pool } from '../../db';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
 const router = Router();
 
-router.get("/api/public/faq/:locale", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/faq/:locale', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const company = Number(process.env.PUBLIC_COMPANY_ID);
-  const locale = String(req.params.locale ?? "");
+  const locale = String(req.params.locale ?? '');
 
   if (!Number.isSafeInteger(company) || company <= 0)
-    return sendError(res, 503, "FAQ_UNAVAILABLE", "FAQ is not configured");
-  if (!isPublicContentLocale(locale))
-    return sendError(res, 404, "FAQ_NOT_FOUND", "FAQ not found");
+    return sendError(res, 503, 'FAQ_UNAVAILABLE', 'FAQ is not configured');
+  if (!isPublicContentLocale(locale)) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
 
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -42,20 +41,23 @@ router.get("/api/public/faq/:locale", async (req, res) => {
       [locale, locale, company],
     );
 
-    return sendSuccess(res, 200, "FAQ_FOUND", "FAQ loaded", {
+    return sendSuccess(res, 200, 'FAQ_FOUND', 'FAQ loaded', {
       locale,
       items: rows.map((row) => ({
         key: row.faq_key,
         question: row.question,
         answer: row.answer,
         category: row.category_key
-          ? { key: row.category_key, name: row.category_name ?? row.category_key }
+          ? {
+              key: row.category_key,
+              name: row.category_name ?? row.category_key,
+            }
           : null,
       })),
     });
   } catch (error) {
-    console.error("[Public FAQ] Failed to load", error);
-    return sendError(res, 500, "FAQ_UNAVAILABLE", "Unable to load FAQ");
+    console.error('[Public FAQ] Failed to load', error);
+    return sendError(res, 500, 'FAQ_UNAVAILABLE', 'Unable to load FAQ');
   }
 });
 

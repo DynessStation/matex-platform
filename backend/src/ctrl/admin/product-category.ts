@@ -1,37 +1,38 @@
-import express = require("express");
-import { Response } from "express";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import db = require("../../db");
-import keyhsid from "../../hsid";
+import express = require('express');
+import { Response } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import db = require('../../db');
+import keyhsid from '../../hsid';
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContentLocale,
   normalizePublicContentKey,
-} from "../../config/public-content.config";
-import { getAdminScope } from "../../helper/admin-scope.helper";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
-import { writeAuditLog } from "../../helper/audit-log.helper";
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+} from '../../config/public-content.config';
+import { getAdminScope } from '../../helper/admin-scope.helper';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { writeAuditLog } from '../../helper/audit-log.helper';
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 const app = express();
 const { pool } = db;
-const statuses = new Set(["draft", "published", "archived"]);
+const statuses = new Set(['draft', 'published', 'archived']);
 
 const decode = (value: unknown, codec: any): number | null => {
-  const id = Number(codec.decode(String(value ?? ""))[0]);
+  const id = Number(codec.decode(String(value ?? ''))[0]);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
-const clean = (value: unknown, max: number) => String(value ?? "").trim().slice(0, max);
+const clean = (value: unknown, max: number) =>
+  String(value ?? '')
+    .trim()
+    .slice(0, max);
 const slugify = (value: unknown) => normalizePublicContentKey(value).slice(0, 255);
 
 const payloadOf = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
-  const status = String(body?.status ?? "draft");
-  const parentId = body?.parent_id
-    ? decode(body.parent_id, keyhsid.idProductCategory)
-    : null;
+  const status = String(body?.status ?? 'draft');
+  const parentId = body?.parent_id ? decode(body.parent_id, keyhsid.idProductCategory) : null;
   const media = {
     image: body?.image_id ? decode(body.image_id, keyhsid.idAttachment) : null,
     icon: body?.icon_id ? decode(body.icon_id, keyhsid.idAttachment) : null,
@@ -46,12 +47,13 @@ const payloadOf = (body: any) => {
     (body?.icon_id && !media.icon) ||
     (body?.og_image_id && !media.og) ||
     !Array.isArray(body?.translations)
-  ) return null;
+  )
+    return null;
 
   const translations: any[] = [];
   const seen = new Set<string>();
   for (const item of body.translations) {
-    const locale = String(item?.locale ?? "");
+    const locale = String(item?.locale ?? '');
     const slug = slugify(item?.slug);
     const name = clean(item?.name, 255);
     if (!isPublicContentLocale(locale) || seen.has(locale) || !slug || !name) return null;
@@ -87,10 +89,10 @@ const attachmentDto = (row: any, prefix: string) =>
         id_attachment: keyhsid.idAttachment.encode(Number(row[`${prefix}_id`])),
         asset_url: buildAttachmentUrl(row[`${prefix}_path`]),
         original_url: buildAttachmentUrl(row[`${prefix}_path`]),
-        name: row[`${prefix}_name`] ?? "",
+        name: row[`${prefix}_name`] ?? '',
         width: row[`${prefix}_width`] == null ? null : Number(row[`${prefix}_width`]),
         height: row[`${prefix}_height`] == null ? null : Number(row[`${prefix}_height`]),
-        mime_type: row[`${prefix}_mime`] ?? "",
+        mime_type: row[`${prefix}_mime`] ?? '',
       }
     : null;
 
@@ -113,14 +115,14 @@ const listDto = (row: any) => ({
     : null,
   key: row.product_category_key,
   name: row.product_category_name ?? row.product_category_key,
-  slug: row.product_category_slug ?? "",
-  description: row.product_category_description ?? "",
-  type: "product",
+  slug: row.product_category_slug ?? '',
+  description: row.product_category_description ?? '',
+  type: 'product',
   status: row.product_category_status,
   is_featured: Boolean(row.product_category_is_featured),
   sort_order: Number(row.product_category_sort_order ?? 0),
-  category_image: attachmentDto(row, "image"),
-  category_icon: attachmentDto(row, "icon"),
+  category_image: attachmentDto(row, 'image'),
+  category_icon: attachmentDto(row, 'icon'),
   created_at: row.created,
   updated_at: row.updated,
   subcategories: [] as any[],
@@ -130,20 +132,21 @@ const makeTree = (items: any[]) => {
   const byId = new Map(items.map((item) => [item.id, item]));
   const roots: any[] = [];
   for (const item of items) {
-    if (item.parent_id && byId.has(item.parent_id)) byId.get(item.parent_id).subcategories.push(item);
+    if (item.parent_id && byId.has(item.parent_id))
+      byId.get(item.parent_id).subcategories.push(item);
     else roots.push(item);
   }
   return roots;
 };
 
 app.get(
-  "/api/v1/product-categories",
+  '/api/v1/product-categories',
   verifyToken,
-  requirePermission("product_category.view"),
+  requirePermission('product_category.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : "id-ID";
+    const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : 'id-ID';
     const search = clean(req.query.search, 200);
     const like = `%${search}%`;
     try {
@@ -154,60 +157,54 @@ app.get(
         [locale, scope.idMasterComp, search, like, like],
       );
       const data = rows.map(listDto);
-      return sendSuccess(res, 200, "PRODUCT_CATEGORIES_LISTED", "Product categories loaded", {
+      return sendSuccess(res, 200, 'PRODUCT_CATEGORIES_LISTED', 'Product categories loaded', {
         data: makeTree(data),
         total: data.length,
       });
     } catch (error) {
-      console.error("[Product category] list failed", error);
-      return sendError(res, 500, "PRODUCT_CATEGORY_LIST_FAILED", "Unable to load product categories");
+      console.error('[Product category] list failed', error);
+      return sendError(
+        res,
+        500,
+        'PRODUCT_CATEGORY_LIST_FAILED',
+        'Unable to load product categories',
+      );
     }
   },
 );
 
 app.patch(
-  "/api/v1/product-categories/reorder",
+  '/api/v1/product-categories/reorder',
   verifyToken,
-  requirePermission("product_category.update"),
+  requirePermission('product_category.update'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
-    if (!scope.success)
-      return sendError(res, scope.status, scope.code, scope.message);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
     const rawItems = Array.isArray(req.body?.items) ? req.body.items : [];
     if (!rawItems.length || rawItems.length > 500)
-      return sendError(
-        res,
-        400,
-        "PRODUCT_CATEGORY_ORDER_INVALID",
-        "Category order is invalid",
-      );
+      return sendError(res, 400, 'PRODUCT_CATEGORY_ORDER_INVALID', 'Category order is invalid');
 
     const items = rawItems.map((item: any) => ({
       id: decode(item?.id, keyhsid.idProductCategory),
       sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
     }));
     if (items.some((item: any) => !item.id))
-      return sendError(
-        res,
-        400,
-        "PRODUCT_CATEGORY_ORDER_INVALID",
-        "Category order is invalid",
-      );
+      return sendError(res, 400, 'PRODUCT_CATEGORY_ORDER_INVALID', 'Category order is invalid');
 
     const uniqueIds = new Set(items.map((item: any) => item.id));
     if (uniqueIds.size !== items.length)
       return sendError(
         res,
         400,
-        "PRODUCT_CATEGORY_ORDER_DUPLICATE",
-        "Category order contains duplicate items",
+        'PRODUCT_CATEGORY_ORDER_DUPLICATE',
+        'Category order contains duplicate items',
       );
 
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
-      const marks = items.map(() => "?").join(",");
+      const marks = items.map(() => '?').join(',');
       const [existing] = await connection.query<RowDataPacket[]>(
         `SELECT id_product_category FROM product_category
          WHERE id_master_comp=? AND product_category_deleted_at IS NULL
@@ -219,8 +216,8 @@ app.patch(
         return sendError(
           res,
           404,
-          "PRODUCT_CATEGORY_NOT_FOUND",
-          "One or more categories were not found",
+          'PRODUCT_CATEGORY_NOT_FOUND',
+          'One or more categories were not found',
         );
       }
 
@@ -236,35 +233,29 @@ app.patch(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "product_category.reordered",
-        category: "data_change",
-        module: "product_category",
-        action: "reorder",
-        actorType: "admin",
+        eventCode: 'product_category.reordered',
+        category: 'data_change',
+        module: 'product_category',
+        action: 'reorder',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "product_category",
+        entityType: 'product_category',
         after: items,
         httpStatus: 200,
       });
       await connection.commit();
-      return sendSuccess(
-        res,
-        200,
-        "PRODUCT_CATEGORY_REORDERED",
-        "Urutan kategori disimpan",
-        null,
-      );
+      return sendSuccess(res, 200, 'PRODUCT_CATEGORY_REORDERED', 'Urutan kategori disimpan', null);
     } catch (error) {
       await connection.rollback();
-      console.error("[Product category] reorder failed", error);
+      console.error('[Product category] reorder failed', error);
       return sendError(
         res,
         500,
-        "PRODUCT_CATEGORY_REORDER_FAILED",
-        "Unable to reorder product categories",
+        'PRODUCT_CATEGORY_REORDER_FAILED',
+        'Unable to reorder product categories',
       );
     } finally {
       connection.release();
@@ -273,19 +264,20 @@ app.patch(
 );
 
 app.get(
-  "/api/v1/product-categories/:id",
+  '/api/v1/product-categories/:id',
   verifyToken,
-  requirePermission("product_category.view"),
+  requirePermission('product_category.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const id = decode(req.params.id, keyhsid.idProductCategory);
-    if (!id) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
+    if (!id) return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM product_category WHERE id_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL`,
       [id, scope.idMasterComp],
     );
-    if (!rows.length) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
+    if (!rows.length)
+      return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [translations] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM product_category_i18n WHERE id_product_category=? ORDER BY product_category_locale`,
       [id],
@@ -298,31 +290,43 @@ app.get(
     const mediaDto = (role: string) => {
       const item = mediaByRole.get(role);
       return item
-        ? attachmentDto({ [`${role}_id`]: item.id_attachment, [`${role}_path`]: item.storage_path, [`${role}_name`]: item.name, [`${role}_width`]: item.width, [`${role}_height`]: item.height, [`${role}_mime`]: item.mime_type }, role)
+        ? attachmentDto(
+            {
+              [`${role}_id`]: item.id_attachment,
+              [`${role}_path`]: item.storage_path,
+              [`${role}_name`]: item.name,
+              [`${role}_width`]: item.width,
+              [`${role}_height`]: item.height,
+              [`${role}_mime`]: item.mime_type,
+            },
+            role,
+          )
         : null;
     };
     const row = rows[0];
-    return sendSuccess(res, 200, "PRODUCT_CATEGORY_FOUND", "Product category loaded", {
+    return sendSuccess(res, 200, 'PRODUCT_CATEGORY_FOUND', 'Product category loaded', {
       id: req.params.id,
-      parent_id: row.id_parent_product_category ? keyhsid.idProductCategory.encode(Number(row.id_parent_product_category)) : null,
+      parent_id: row.id_parent_product_category
+        ? keyhsid.idProductCategory.encode(Number(row.id_parent_product_category))
+        : null,
       key: row.product_category_key,
-      type: "product",
+      type: 'product',
       status: row.product_category_status,
       is_featured: Boolean(row.product_category_is_featured),
       sort_order: Number(row.product_category_sort_order),
-      category_image: mediaDto("image"),
-      category_icon: mediaDto("icon"),
-      category_meta_image: mediaDto("og"),
+      category_image: mediaDto('image'),
+      category_icon: mediaDto('icon'),
+      category_meta_image: mediaDto('og'),
       translations: translations.map((item) => ({
         locale: item.product_category_locale,
         slug: item.product_category_slug,
         name: item.product_category_name,
-        description: item.product_category_description ?? "",
-        meta_title: item.product_category_meta_title ?? "",
-        meta_description: item.product_category_meta_description ?? "",
-        canonical_url: item.product_category_canonical_url ?? "",
-        og_title: item.product_category_og_title ?? "",
-        og_description: item.product_category_og_description ?? "",
+        description: item.product_category_description ?? '',
+        meta_title: item.product_category_meta_title ?? '',
+        meta_description: item.product_category_meta_description ?? '',
+        canonical_url: item.product_category_canonical_url ?? '',
+        og_title: item.product_category_og_title ?? '',
+        og_description: item.product_category_og_description ?? '',
         status: Number(item.product_category_i18n_status),
       })),
     });
@@ -333,8 +337,20 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   const scope = await getAdminScope(req, pool);
   if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
   const payload = payloadOf(req.body);
-  if (!payload) return sendError(res, 400, "PRODUCT_CATEGORY_PAYLOAD_INVALID", "Complete valid Indonesian and English category content");
-  if (id && payload.parentId === id) return sendError(res, 400, "PRODUCT_CATEGORY_PARENT_INVALID", "A category cannot be its own parent");
+  if (!payload)
+    return sendError(
+      res,
+      400,
+      'PRODUCT_CATEGORY_PAYLOAD_INVALID',
+      'Complete valid Indonesian and English category content',
+    );
+  if (id && payload.parentId === id)
+    return sendError(
+      res,
+      400,
+      'PRODUCT_CATEGORY_PARENT_INVALID',
+      'A category cannot be its own parent',
+    );
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
@@ -345,7 +361,12 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!parent.length) {
         await connection.rollback();
-        return sendError(res, 400, "PRODUCT_CATEGORY_PARENT_INVALID", "Selected parent category is unavailable");
+        return sendError(
+          res,
+          400,
+          'PRODUCT_CATEGORY_PARENT_INVALID',
+          'Selected parent category is unavailable',
+        );
       }
       if (id) {
         let ancestorId: number | null = payload.parentId;
@@ -356,8 +377,8 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
             return sendError(
               res,
               400,
-              "PRODUCT_CATEGORY_PARENT_INVALID",
-              "A category cannot be moved below one of its descendants",
+              'PRODUCT_CATEGORY_PARENT_INVALID',
+              'A category cannot be moved below one of its descendants',
             );
           }
           visited.add(ancestorId);
@@ -380,16 +401,33 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!exists.length) {
         await connection.rollback();
-        return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
+        return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
       }
       await connection.query(
         `UPDATE product_category SET id_parent_product_category=?,product_category_key=?,product_category_status=?,product_category_is_featured=?,product_category_sort_order=?,id_updated_by=? WHERE id_product_category=?`,
-        [payload.parentId, payload.key, payload.status, payload.isFeatured, payload.sortOrder, scope.idAdminAcct, id],
+        [
+          payload.parentId,
+          payload.key,
+          payload.status,
+          payload.isFeatured,
+          payload.sortOrder,
+          scope.idAdminAcct,
+          id,
+        ],
       );
     } else {
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO product_category(id_master_comp,id_parent_product_category,product_category_key,product_category_status,product_category_is_featured,product_category_sort_order,id_created_by,id_updated_by) VALUES(?,?,?,?,?,?,?,?)`,
-        [scope.idMasterComp, payload.parentId, payload.key, payload.status, payload.isFeatured, payload.sortOrder, scope.idAdminAcct, scope.idAdminAcct],
+        [
+          scope.idMasterComp,
+          payload.parentId,
+          payload.key,
+          payload.status,
+          payload.isFeatured,
+          payload.sortOrder,
+          scope.idAdminAcct,
+          scope.idAdminAcct,
+        ],
       );
       categoryId = insert.insertId;
     }
@@ -397,11 +435,26 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       await connection.query(
         `INSERT INTO product_category_i18n(id_product_category,id_master_comp,product_category_locale,product_category_slug,product_category_name,product_category_description,product_category_meta_title,product_category_meta_description,product_category_canonical_url,product_category_og_title,product_category_og_description,product_category_i18n_status)
          VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE product_category_slug=VALUES(product_category_slug),product_category_name=VALUES(product_category_name),product_category_description=VALUES(product_category_description),product_category_meta_title=VALUES(product_category_meta_title),product_category_meta_description=VALUES(product_category_meta_description),product_category_canonical_url=VALUES(product_category_canonical_url),product_category_og_title=VALUES(product_category_og_title),product_category_og_description=VALUES(product_category_og_description),product_category_i18n_status=VALUES(product_category_i18n_status)`,
-        [categoryId, scope.idMasterComp, item.locale, item.slug, item.name, item.description, item.metaTitle, item.metaDescription, item.canonicalUrl, item.ogTitle, item.ogDescription, item.status],
+        [
+          categoryId,
+          scope.idMasterComp,
+          item.locale,
+          item.slug,
+          item.name,
+          item.description,
+          item.metaTitle,
+          item.metaDescription,
+          item.canonicalUrl,
+          item.ogTitle,
+          item.ogDescription,
+          item.status,
+        ],
       );
     }
-    await connection.query(`DELETE FROM product_category_attachment WHERE id_product_category=?`, [categoryId]);
-    for (const role of ["image", "icon", "og"] as const) {
+    await connection.query(`DELETE FROM product_category_attachment WHERE id_product_category=?`, [
+      categoryId,
+    ]);
+    for (const role of ['image', 'icon', 'og'] as const) {
       const attachmentId = payload.media[role];
       if (!attachmentId) continue;
       const [valid] = await connection.query<RowDataPacket[]>(
@@ -410,7 +463,12 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       );
       if (!valid.length) {
         await connection.rollback();
-        return sendError(res, 400, "PRODUCT_CATEGORY_MEDIA_INVALID", "Selected media is unavailable");
+        return sendError(
+          res,
+          400,
+          'PRODUCT_CATEGORY_MEDIA_INVALID',
+          'Selected media is unavailable',
+        );
       }
       await connection.query(
         `INSERT INTO product_category_attachment(id_product_category,id_master_comp,id_attachment,product_category_attachment_role) VALUES(?,?,?,?)`,
@@ -420,53 +478,94 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     await writeAuditLog({
       req,
       connection,
-      writeMode: "strict",
+      writeMode: 'strict',
       idMasterComp: scope.idMasterComp,
-      eventCode: id ? "product_category.updated" : "product_category.created",
-      category: "data_change",
-      module: "product_category",
-      action: id ? "update" : "create",
-      actorType: "admin",
+      eventCode: id ? 'product_category.updated' : 'product_category.created',
+      category: 'data_change',
+      module: 'product_category',
+      action: id ? 'update' : 'create',
+      actorType: 'admin',
       actorId: scope.idAdminAcct,
       actorLabel: req.user?.alias ?? null,
-      entityType: "product_category",
+      entityType: 'product_category',
       entityId: categoryId!,
       entityLabel: payload.key,
       after: payload,
       httpStatus: id ? 200 : 201,
     });
     await connection.commit();
-    return sendSuccess(res, id ? 200 : 201, id ? "PRODUCT_CATEGORY_UPDATED" : "PRODUCT_CATEGORY_CREATED", id ? "Product category updated" : "Product category created", { id: keyhsid.idProductCategory.encode(categoryId!) });
+    return sendSuccess(
+      res,
+      id ? 200 : 201,
+      id ? 'PRODUCT_CATEGORY_UPDATED' : 'PRODUCT_CATEGORY_CREATED',
+      id ? 'Product category updated' : 'Product category created',
+      { id: keyhsid.idProductCategory.encode(categoryId!) },
+    );
   } catch (error: any) {
     await connection.rollback();
-    if (error?.code === "ER_DUP_ENTRY") return sendError(res, 409, "PRODUCT_CATEGORY_CONFLICT", "Category key or localized slug already exists");
-    console.error("[Product category] save failed", error);
-    return sendError(res, 500, "PRODUCT_CATEGORY_SAVE_FAILED", "Unable to save product category");
+    if (error?.code === 'ER_DUP_ENTRY')
+      return sendError(
+        res,
+        409,
+        'PRODUCT_CATEGORY_CONFLICT',
+        'Category key or localized slug already exists',
+      );
+    console.error('[Product category] save failed', error);
+    return sendError(res, 500, 'PRODUCT_CATEGORY_SAVE_FAILED', 'Unable to save product category');
   } finally {
     connection.release();
   }
 };
 
-app.post("/api/v1/product-categories", verifyToken, requirePermission("product_category.create"), (req, res) => save(req, res, null));
-app.put("/api/v1/product-categories/:id", verifyToken, requirePermission("product_category.update"), (req, res) => {
-  const id = decode(req.params.id, keyhsid.idProductCategory);
-  return id ? save(req, res, id) : sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
-});
-app.delete("/api/v1/product-categories/:id", verifyToken, requirePermission("product_category.delete"), async (req: AuthRequest, res: Response) => {
-  const scope = await getAdminScope(req, pool);
-  if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-  const id = decode(req.params.id, keyhsid.idProductCategory);
-  if (!id) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
-  const [children] = await pool.query<RowDataPacket[]>(
-    `SELECT id_product_category FROM product_category WHERE id_parent_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL LIMIT 1`,
-    [id, scope.idMasterComp],
-  );
-  if (children.length) return sendError(res, 409, "PRODUCT_CATEGORY_HAS_CHILDREN", "Move or delete child categories first");
-  await pool.query(
-    `UPDATE product_category SET product_category_deleted_at=NOW(),id_updated_by=? WHERE id_product_category=? AND id_master_comp=?`,
-    [scope.idAdminAcct, id, scope.idMasterComp],
-  );
-  return sendSuccess(res, 200, "PRODUCT_CATEGORY_DELETED", "Product category moved to trash", null);
-});
+app.post(
+  '/api/v1/product-categories',
+  verifyToken,
+  requirePermission('product_category.create'),
+  (req, res) => save(req, res, null),
+);
+app.put(
+  '/api/v1/product-categories/:id',
+  verifyToken,
+  requirePermission('product_category.update'),
+  (req, res) => {
+    const id = decode(req.params.id, keyhsid.idProductCategory);
+    return id
+      ? save(req, res, id)
+      : sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
+  },
+);
+app.delete(
+  '/api/v1/product-categories/:id',
+  verifyToken,
+  requirePermission('product_category.delete'),
+  async (req: AuthRequest, res: Response) => {
+    const scope = await getAdminScope(req, pool);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
+    const id = decode(req.params.id, keyhsid.idProductCategory);
+    if (!id) return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
+    const [children] = await pool.query<RowDataPacket[]>(
+      `SELECT id_product_category FROM product_category WHERE id_parent_product_category=? AND id_master_comp=? AND product_category_deleted_at IS NULL LIMIT 1`,
+      [id, scope.idMasterComp],
+    );
+    if (children.length)
+      return sendError(
+        res,
+        409,
+        'PRODUCT_CATEGORY_HAS_CHILDREN',
+        'Move or delete child categories first',
+      );
+    await pool.query(
+      `UPDATE product_category SET product_category_deleted_at=NOW(),id_updated_by=? WHERE id_product_category=? AND id_master_comp=?`,
+      [scope.idAdminAcct, id, scope.idMasterComp],
+    );
+    return sendSuccess(
+      res,
+      200,
+      'PRODUCT_CATEGORY_DELETED',
+      'Product category moved to trash',
+      null,
+    );
+  },
+);
 
 export default app;

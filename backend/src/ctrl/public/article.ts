@@ -1,16 +1,14 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
-import { isPublicContentLocale } from "../../config/public-content.config";
-import { pool } from "../../db";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
+import { isPublicContentLocale } from '../../config/public-content.config';
+import { pool } from '../../db';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
 const router = Router();
 const scope = (locale: unknown) => {
   const company = Number(process.env.PUBLIC_COMPANY_ID);
-  return Number.isSafeInteger(company) &&
-    company > 0 &&
-    isPublicContentLocale(locale)
+  return Number.isSafeInteger(company) && company > 0 && isPublicContentLocale(locale)
     ? { company, locale }
     : null;
 };
@@ -19,7 +17,7 @@ const image = (row: any, prefix: string) =>
     ? {
         asset_url: buildAttachmentUrl(row[`${prefix}_path`]),
         original_url: buildAttachmentUrl(row[`${prefix}_path`]),
-        name: row[`${prefix}_name`] ?? "",
+        name: row[`${prefix}_name`] ?? '',
         width: row[`${prefix}_width`] ?? null,
         height: row[`${prefix}_height`] ?? null,
       }
@@ -31,45 +29,36 @@ const dto = (row: any, detail = false) => ({
   title: row.article_title,
   slug: row.article_slug,
   localized_slugs: {
-    "id-ID": row.localized_slug_id ?? row.article_slug,
-    "en-US": row.localized_slug_en ?? row.article_slug,
+    'id-ID': row.localized_slug_id ?? row.article_slug,
+    'en-US': row.localized_slug_en ?? row.article_slug,
   },
-  description: row.article_excerpt ?? "",
-  content: detail ? row.article_body : "",
+  description: row.article_excerpt ?? '',
+  content: detail ? row.article_body : '',
   status: true,
   meta_title: row.article_meta_title ?? row.article_title,
-  meta_description: row.article_meta_description ?? row.article_excerpt ?? "",
-  canonical_url: row.article_canonical_url ?? "",
+  meta_description: row.article_meta_description ?? row.article_excerpt ?? '',
+  canonical_url: row.article_canonical_url ?? '',
   og_title: row.article_og_title ?? row.article_meta_title ?? row.article_title,
   og_description:
-    row.article_og_description ??
-    row.article_meta_description ??
-    row.article_excerpt ??
-    "",
-  schema_json: row.article_schema_json
-    ? JSON.parse(row.article_schema_json)
-    : null,
-  blog_thumbnail: image(row, "thumbnail"),
-  blog_meta_image: image(row, "og") ?? image(row, "thumbnail"),
+    row.article_og_description ?? row.article_meta_description ?? row.article_excerpt ?? '',
+  schema_json: row.article_schema_json ? JSON.parse(row.article_schema_json) : null,
+  blog_thumbnail: image(row, 'thumbnail'),
+  blog_meta_image: image(row, 'og') ?? image(row, 'thumbnail'),
   categories: [],
   tags: [],
   is_featured: Boolean(row.article_is_featured),
   is_sticky: Boolean(row.article_is_sticky),
-  created_by: { name: "MATEX", profile_image: null },
+  created_by: { name: 'MATEX', profile_image: null },
   created_at: row.article_published_at ?? row.created,
   updated_at: row.updated,
 });
-router.get("/api/public/articles/:locale", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/articles/:locale', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const s = scope(req.params.locale);
-  if (!s)
-    return sendError(res, 404, "ARTICLES_NOT_FOUND", "Articles not found");
+  if (!s) return sendError(res, 404, 'ARTICLES_NOT_FOUND', 'Articles not found');
   const page = Math.max(1, Number(req.query.page) || 1),
-    limit = Math.min(
-      50,
-      Math.max(1, Number(req.query.limit ?? req.query.paginate) || 12),
-    ),
-    search = String(req.query.search ?? "").trim(),
+    limit = Math.min(50, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 12)),
+    search = String(req.query.search ?? '').trim(),
     like = `%${search}%`;
   try {
     const [counts] = await pool.query<RowDataPacket[]>(
@@ -80,43 +69,31 @@ router.get("/api/public/articles/:locale", async (req, res) => {
       `${baseSelect} WHERE ${publicWhere} AND (?='' OR i.article_title LIKE ? OR i.article_excerpt LIKE ?) ORDER BY a.article_is_sticky DESC,COALESCE(a.article_published_at,a.created) DESC LIMIT ? OFFSET ?`,
       [s.company, s.locale, search, like, like, limit, (page - 1) * limit],
     );
-    return sendSuccess(res, 200, "ARTICLES_FOUND", "Articles loaded", {
+    return sendSuccess(res, 200, 'ARTICLES_FOUND', 'Articles loaded', {
       data: rows.map((r) => dto(r)),
       total: Number(counts[0]?.total ?? 0),
       current_page: page,
       per_page: limit,
     });
   } catch (error) {
-    console.error("[Public article] list failed", error);
-    return sendError(
-      res,
-      500,
-      "ARTICLES_UNAVAILABLE",
-      "Unable to load articles",
-    );
+    console.error('[Public article] list failed', error);
+    return sendError(res, 500, 'ARTICLES_UNAVAILABLE', 'Unable to load articles');
   }
 });
-router.get("/api/public/articles/:locale/:slug", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/articles/:locale/:slug', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const s = scope(req.params.locale);
-  if (!s) return sendError(res, 404, "ARTICLE_NOT_FOUND", "Article not found");
+  if (!s) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
       `${baseSelect} WHERE ${publicWhere} AND i.article_slug=? LIMIT 1`,
       [s.company, s.locale, req.params.slug],
     );
-    if (!rows.length)
-      return sendError(res, 404, "ARTICLE_NOT_FOUND", "Article not found");
-    return sendSuccess(
-      res,
-      200,
-      "ARTICLE_FOUND",
-      "Article loaded",
-      dto(rows[0], true),
-    );
+    if (!rows.length) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
+    return sendSuccess(res, 200, 'ARTICLE_FOUND', 'Article loaded', dto(rows[0], true));
   } catch (error) {
-    console.error("[Public article] detail failed", error);
-    return sendError(res, 500, "ARTICLE_UNAVAILABLE", "Unable to load article");
+    console.error('[Public article] detail failed', error);
+    return sendError(res, 500, 'ARTICLE_UNAVAILABLE', 'Unable to load article');
   }
 });
 export default router;

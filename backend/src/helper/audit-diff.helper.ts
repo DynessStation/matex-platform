@@ -1,33 +1,20 @@
-//==================================================
-//==== PLAIN OBJECT
-//==================================================
+// Plain object
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return (
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    !(value instanceof Date)
+    value !== null && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)
   );
 };
 
-//==================================================
-//==== SAME VALUE
-//==================================================
+// Same value
 
 const isSameValue = (before: unknown, after: unknown): boolean => {
   return JSON.stringify(before) === JSON.stringify(after);
 };
 
-//==================================================
-//==== CHANGED FIELDS
-//==================================================
+// Changed fields
 
-export const getChangedFields = (
-  before: unknown,
-  after: unknown,
-  parentPath = "",
-): string[] => {
+export const getChangedFields = (before: unknown, after: unknown, parentPath = ''): string[] => {
   if (isSameValue(before, after)) {
     return [];
   }

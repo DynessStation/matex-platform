@@ -1,68 +1,37 @@
-import { PoolConnection } from "mysql2/promise";
+import { PoolConnection } from 'mysql2/promise';
 
-import { AuditRequest } from "../middleware/request-context.middleware";
+import { AuditRequest } from '../middleware/request-context.middleware';
 
-//==================================================
-//==== ACTOR
-//==================================================
+// Actor
 
-export type AuditActorType =
-  | "admin"
-  | "client"
-  | "system"
-  | "job"
-  | "integration";
+export type AuditActorType = 'admin' | 'client' | 'system' | 'job' | 'integration';
 
-//==================================================
-//==== CATEGORY
-//==================================================
+// Category
 
 export type AuditCategory =
-  | "data_change"
-  | "security"
-  | "access_control"
-  | "file"
-  | "system"
-  | "business"
-  | "integration";
+  'data_change' | 'security' | 'access_control' | 'file' | 'system' | 'business' | 'integration';
 
-//==================================================
-//==== OUTCOME
-//==================================================
+// Outcome
 
-export type AuditOutcome = "success" | "failure" | "denied";
+export type AuditOutcome = 'success' | 'failure' | 'denied';
 
-//==================================================
-//==== SOURCE
-//==================================================
+// Source
 
-export type AuditSource =
-  | "admin_web"
-  | "public_web"
-  | "api"
-  | "system"
-  | "job"
-  | "integration";
+export type AuditSource = 'admin_web' | 'public_web' | 'api' | 'system' | 'job' | 'integration';
 
-//==================================================
-//==== WRITE MODE
-//==================================================
+// Write mode
 
-export type AuditWriteMode = "best_effort" | "strict";
+export type AuditWriteMode = 'best_effort' | 'strict';
 
-//==================================================
-//==== WRITE OPTIONS
-//==================================================
+// Write options
 
 export interface WriteAuditLogOptions {
   req?: AuditRequest;
-
   /**
    * Dipakai kalau business operation
    * sedang berada dalam DB transaction.
    */
   connection?: PoolConnection;
-
   /**
    * Default best_effort:
    * business process tidak gagal hanya
@@ -72,56 +41,32 @@ export interface WriteAuditLogOptions {
    * error audit dilempar kembali.
    */
   writeMode?: AuditWriteMode;
-
   idMasterComp?: number | null;
-
   eventCode: string;
-
   category: AuditCategory;
-
   module: string;
-
   action: string;
-
   actorType?: AuditActorType;
-
   actorId?: string | number | null;
-
   actorLabel?: string | null;
-
   entityType?: string | null;
-
   entityId?: string | number | null;
-
   entityLabel?: string | null;
-
   source?: AuditSource;
-
   outcome?: AuditOutcome;
-
   httpStatus?: number | null;
-
   before?: unknown;
-
   after?: unknown;
-
   metadata?: unknown;
-
   changedFields?: string[] | null;
 }
 
-//==================================================
-//==== WRITE RESULT
-//==================================================
+// Write result
 
 export interface WriteAuditLogResult {
   success: boolean;
-
   idAuditLog?: number;
-
   requestId: string;
-
   correlationId: string;
-
   integrityHash: string | null;
 }

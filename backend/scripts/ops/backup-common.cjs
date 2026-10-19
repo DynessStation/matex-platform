@@ -1,21 +1,21 @@
-const crypto = require("node:crypto");
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
-const { spawn, spawnSync } = require("node:child_process");
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { spawn, spawnSync } = require('node:child_process');
 
 function parseArgs(argv) {
   const result = {};
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
-    if (!token.startsWith("--")) {
+    if (!token.startsWith('--')) {
       throw new Error(`Unexpected argument: ${token}`);
     }
 
     const key = token.slice(2);
     const next = argv[index + 1];
-    if (!next || next.startsWith("--")) {
+    if (!next || next.startsWith('--')) {
       result[key] = true;
       continue;
     }
@@ -32,7 +32,7 @@ function loadEnvironment(envFile) {
     throw new Error(`Environment file was not found: ${envFile}`);
   }
 
-  require("dotenv").config({
+  require('dotenv').config({
     path: envFile,
     override: false,
     quiet: true,
@@ -40,7 +40,7 @@ function loadEnvironment(envFile) {
 }
 
 function requiredEnvironment(name) {
-  const value = String(process.env[name] ?? "").trim();
+  const value = String(process.env[name] ?? '').trim();
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
@@ -49,32 +49,32 @@ function requiredEnvironment(name) {
 
 function mysqlConnectionFromEnvironment() {
   return {
-    host: requiredEnvironment("DB_HOST"),
-    port: String(process.env.DB_PORT ?? "3306").trim(),
-    user: requiredEnvironment("DB_USER"),
-    password: requiredEnvironment("DB_PASS"),
-    database: requiredEnvironment("DB_NAME"),
+    host: requiredEnvironment('DB_HOST'),
+    port: String(process.env.DB_PORT ?? '3306').trim(),
+    user: requiredEnvironment('DB_USER'),
+    password: requiredEnvironment('DB_PASS'),
+    database: requiredEnvironment('DB_NAME'),
   };
 }
 
 function escapeOptionFileValue(value) {
-  return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 function createMysqlDefaultsFile(connection) {
   const filePath = path.join(
     os.tmpdir(),
-    `matex-mysql-${process.pid}-${crypto.randomBytes(8).toString("hex")}.cnf`,
+    `matex-mysql-${process.pid}-${crypto.randomBytes(8).toString('hex')}.cnf`,
   );
   const body = [
-    "[client]",
+    '[client]',
     `host="${escapeOptionFileValue(connection.host)}"`,
     `port="${escapeOptionFileValue(connection.port)}"`,
     `user="${escapeOptionFileValue(connection.user)}"`,
     `password="${escapeOptionFileValue(connection.password)}"`,
-    "protocol=tcp",
-    "",
-  ].join("\n");
+    'protocol=tcp',
+    '',
+  ].join('\n');
 
   fs.writeFileSync(filePath, body, { mode: 0o600 });
   fs.chmodSync(filePath, 0o600);
@@ -82,8 +82,8 @@ function createMysqlDefaultsFile(connection) {
 }
 
 function commandVersion(command) {
-  const result = spawnSync(command, ["--version"], {
-    encoding: "utf8",
+  const result = spawnSync(command, ['--version'], {
+    encoding: 'utf8',
     windowsHide: true,
   });
 
@@ -105,25 +105,25 @@ function requireCommand(command) {
 function runCommand(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      stdio: options.stdio ?? ["ignore", "pipe", "pipe"],
+      stdio: options.stdio ?? ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
       ...options,
     });
-    let stdout = "";
-    let stderr = "";
+    let stdout = '';
+    let stderr = '';
 
-    child.stdout?.on("data", (chunk) => {
+    child.stdout?.on('data', (chunk) => {
       stdout += chunk.toString();
     });
-    child.stderr?.on("data", (chunk) => {
+    child.stderr?.on('data', (chunk) => {
       stderr += chunk.toString();
     });
-    child.on("error", reject);
-    child.on("close", (code) => {
+    child.on('error', reject);
+    child.on('close', (code) => {
       if (code !== 0) {
         reject(
           new Error(
-            `${command} exited with code ${code}${stderr.trim() ? `: ${stderr.trim()}` : ""}`,
+            `${command} exited with code ${code}${stderr.trim() ? `: ${stderr.trim()}` : ''}`,
           ),
         );
         return;
@@ -135,11 +135,11 @@ function runCommand(command, args, options = {}) {
 
 function sha256File(filePath) {
   return new Promise((resolve, reject) => {
-    const hash = crypto.createHash("sha256");
+    const hash = crypto.createHash('sha256');
     const input = fs.createReadStream(filePath);
-    input.on("error", reject);
-    input.on("data", (chunk) => hash.update(chunk));
-    input.on("end", () => resolve(hash.digest("hex")));
+    input.on('error', reject);
+    input.on('data', (chunk) => hash.update(chunk));
+    input.on('end', () => resolve(hash.digest('hex')));
   });
 }
 

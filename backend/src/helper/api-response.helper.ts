@@ -1,24 +1,16 @@
-import { Response } from "express";
+import { Response } from 'express';
 
-//==================================================
-//==== API RESPONSE
-//==================================================
+// API response
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
-
   code: string;
-
   message: string;
-
   data?: T;
-
   meta?: unknown;
 }
 
-//==================================================
-//==== SUCCESS RESPONSE
-//==================================================
+// Success response
 
 export const sendSuccess = <T = unknown>(
   res: Response,
@@ -40,9 +32,7 @@ export const sendSuccess = <T = unknown>(
   return res.status(status).json(response);
 };
 
-//==================================================
-//==== ERROR RESPONSE
-//==================================================
+// Error response
 
 export const sendError = <T = unknown>(
   res: Response,

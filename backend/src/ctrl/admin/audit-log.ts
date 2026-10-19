@@ -1,71 +1,51 @@
-import express = require("express");
+import express = require('express');
 
-import db = require("../../db");
+import db = require('../../db');
 
-import keyhsid from "../../hsid";
+import keyhsid from '../../hsid';
 
-import {
-  AuditCategory,
-  AuditOutcome,
-  AuditSource,
-} from "../../interface/audit-log.interface";
+import { AuditCategory, AuditOutcome, AuditSource } from '../../interface/audit-log.interface';
 
-import { verifyAuditIntegrityHash } from "../../helper/audit-integrity.helper";
+import { verifyAuditIntegrityHash } from '../../helper/audit-integrity.helper';
 
-import { sendError } from "../../helper/api-response.helper";
+import { sendError } from '../../helper/api-response.helper';
 
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-//==================================================
-//==== APP
-//==================================================
+// App
 
 const app = express();
 
 const { pool } = db;
 
-//==================================================
-//==== TYPES
-//==================================================
+// Types
 
 type SessionScopeResult =
   | {
       success: true;
-
       idAdminAcct: number;
-
       idMasterComp: number;
     }
   | {
       success: false;
-
       status: number;
-
       code: string;
-
       message: string;
     };
 
-//==================================================
-//==== SESSION SCOPE
-//==================================================
+// Session scope
 
-const getSessionScope = async (
-  req: AuthRequest,
-): Promise<SessionScopeResult> => {
+const getSessionScope = async (req: AuthRequest): Promise<SessionScopeResult> => {
   const idAdminAcct = req.user?.id_admin_acct;
 
   if (!idAdminAcct) {
     return {
       success: false,
-
       status: 401,
-
-      code: "AUTH_SESSION_INVALID",
-
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -92,12 +72,9 @@ const getSessionScope = async (
   if (!users.length) {
     return {
       success: false,
-
       status: 401,
-
-      code: "AUTH_SESSION_INVALID",
-
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -106,30 +83,23 @@ const getSessionScope = async (
   if (Number(user.admin_acct_status) !== 1) {
     return {
       success: false,
-
       status: 403,
-
-      code: "AUTH_ACCOUNT_INACTIVE",
-
-      message: "Your account is not active",
+      code: 'AUTH_ACCOUNT_INACTIVE',
+      message: 'Your account is not active',
     };
   }
 
   return {
     success: true,
-
     idAdminAcct: Number(user.id_admin_acct),
-
     idMasterComp: Number(user.id_master_comp),
   };
 };
 
-//==================================================
-//==== DECODE AUDIT LOG ID
-//==================================================
+// Decode audit log ID
 
 const decodeAuditLogId = (value: unknown): number | null => {
-  if (typeof value !== "string" || !value.trim()) {
+  if (typeof value !== 'string' || !value.trim()) {
     return null;
   }
 
@@ -144,16 +114,14 @@ const decodeAuditLogId = (value: unknown): number | null => {
   return idAuditLog;
 };
 
-//==================================================
-//==== JSON VALUE
-//==================================================
+// JSON value
 
 const parseJsonValue = (value: unknown): unknown => {
   if (value === null || value === undefined) {
     return null;
   }
 
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return value;
   }
 
@@ -164,12 +132,10 @@ const parseJsonValue = (value: unknown): unknown => {
   }
 };
 
-//==================================================
-//==== STRING QUERY
-//==================================================
+// String query
 
 const getQueryString = (value: unknown): string | null => {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return null;
   }
 
@@ -178,15 +144,9 @@ const getQueryString = (value: unknown): string | null => {
   return clean ? clean : null;
 };
 
-//==================================================
-//==== ENUM QUERY
-//==================================================
+// Enum query
 
-const getEnumQuery = <T extends string>(
-  value: unknown,
-
-  allowed: readonly T[],
-): T | null => {
+const getEnumQuery = <T extends string>(value: unknown, allowed: readonly T[]): T | null => {
   const clean = getQueryString(value);
 
   if (!clean) {
@@ -196,35 +156,25 @@ const getEnumQuery = <T extends string>(
   return allowed.includes(clean as T) ? (clean as T) : null;
 };
 
-//==================================================
-//==== DATABASE DATETIME
-//==================================================
+// Database datetime
 
 const getDatabaseDateTime = (value: Date): string => {
-  return value.toISOString().slice(0, 23).replace("T", " ");
+  return value.toISOString().slice(0, 23).replace('T', ' ');
 };
 
-//==================================================
-//==== DATE QUERY
-//==================================================
+// Date query
 
-const getDateQuery = (
-  value: unknown,
-
-  endOfDay = false,
-): string | null => {
+const getDateQuery = (value: unknown, endOfDay = false): string | null => {
   const clean = getQueryString(value);
 
   if (!clean) {
     return null;
   }
 
-  //==================================================
-  //==== DATE ONLY
-  //==================================================
+  // Date only
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
-    const suffix = endOfDay ? "T23:59:59.999Z" : "T00:00:00.000Z";
+    const suffix = endOfDay ? 'T23:59:59.999Z' : 'T00:00:00.000Z';
 
     const parsed = new Date(`${clean}${suffix}`);
 
@@ -235,9 +185,7 @@ const getDateQuery = (
     return getDatabaseDateTime(parsed);
   }
 
-  //==================================================
-  //==== ISO / DATETIME
-  //==================================================
+  // Iso / datetime
 
   const parsed = new Date(clean);
 
@@ -248,79 +196,57 @@ const getDateQuery = (
   return getDatabaseDateTime(parsed);
 };
 
-//==================================================
-//==== LIST QUERY
-//==================================================
+// List query
 
 const getListQuery = (query: any) => {
-  const parsedPage =
-    typeof query.page === "string" && query.page !== ""
-      ? Number(query.page)
-      : 1;
+  const parsedPage = typeof query.page === 'string' && query.page !== '' ? Number(query.page) : 1;
 
   const parsedLimit =
-    typeof query.limit === "string" && query.limit !== ""
-      ? Number(query.limit)
-      : 20;
+    typeof query.limit === 'string' && query.limit !== '' ? Number(query.limit) : 20;
 
   const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const limit =
-    Number.isFinite(parsedLimit) && parsedLimit > 0
-      ? Math.min(parsedLimit, 100)
-      : 20;
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 20;
 
   const offset = (page - 1) * limit;
 
-  const search = typeof query.search === "string" ? query.search.trim() : "";
+  const search = typeof query.search === 'string' ? query.search.trim() : '';
 
   const searchValue = `%${search}%`;
 
   return {
     page,
-
     limit,
-
     offset,
-
     search,
-
     searchValue,
   };
 };
 
-//==================================================
-//==== ALLOWED ENUMS
-//==================================================
+// Allowed enums
 
 const allowedCategories: readonly AuditCategory[] = [
-  "data_change",
-  "security",
-  "access_control",
-  "file",
-  "system",
-  "business",
-  "integration",
+  'data_change',
+  'security',
+  'access_control',
+  'file',
+  'system',
+  'business',
+  'integration',
 ];
 
-const allowedOutcomes: readonly AuditOutcome[] = [
-  "success",
-  "failure",
-  "denied",
-];
+const allowedOutcomes: readonly AuditOutcome[] = ['success', 'failure', 'denied'];
 
 const allowedSources: readonly AuditSource[] = [
-  "admin_web",
-  "public_web",
-  "api",
-  "system",
-  "job",
-  "integration",
+  'admin_web',
+  'public_web',
+  'api',
+  'system',
+  'job',
+  'integration',
 ];
 
-//==================================================
-//==== COMPANY SCOPE SQL
-//==================================================
+// Company scope SQL
 
 /**
  * Audit biasa:
@@ -371,26 +297,15 @@ const companyScopeSql = `
   )
 `;
 
-//==================================================
-//==== AUDIT LOG - GET LIST
-//==================================================
+// Audit log - get list
 
 app.get(
-  "/api/v1/audit-log",
-
+  '/api/v1/audit-log',
   verifyToken,
-
-  requirePermission("audit_log.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('audit_log.view'),
+  async (req: AuthRequest, res) => {
     try {
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -398,15 +313,11 @@ app.get(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== PAGINATION
-      //==================================================
+      // Pagination
 
       const { page, limit, offset, searchValue } = getListQuery(req.query);
 
-      //==================================================
-      //==== FILTERS
-      //==================================================
+      // Filters
 
       const category = getEnumQuery(req.query.category, allowedCategories);
 
@@ -436,13 +347,10 @@ app.get(
 
       const dateTo = getDateQuery(req.query.date_to, true);
 
-      //==================================================
-      //==== WHERE
-      //==================================================
+      // Where
 
       const where: string[] = [
         companyScopeSql,
-
         `
             (
               al.event_code LIKE ?
@@ -479,7 +387,6 @@ app.get(
       const params: any[] = [
         scope.idMasterComp,
         scope.idMasterComp,
-
         searchValue,
         searchValue,
         searchValue,
@@ -490,135 +397,119 @@ app.get(
         searchValue,
       ];
 
-      //==================================================
-      //==== OPTIONAL FILTERS
-      //==================================================
+      // Optional filters
 
       if (category) {
-        where.push("al.category = ?");
+        where.push('al.category = ?');
 
         params.push(category);
       }
 
       if (outcome) {
-        where.push("al.outcome = ?");
+        where.push('al.outcome = ?');
 
         params.push(outcome);
       }
 
       if (source) {
-        where.push("al.source = ?");
+        where.push('al.source = ?');
 
         params.push(source);
       }
 
       if (module) {
-        where.push("al.module = ?");
+        where.push('al.module = ?');
 
         params.push(module);
       }
 
       if (action) {
-        where.push("al.action = ?");
+        where.push('al.action = ?');
 
         params.push(action);
       }
 
       if (eventCode) {
-        where.push("al.event_code = ?");
+        where.push('al.event_code = ?');
 
         params.push(eventCode);
       }
 
       if (actorType) {
-        where.push("al.actor_type = ?");
+        where.push('al.actor_type = ?');
 
         params.push(actorType);
       }
 
       if (actorId) {
-        where.push("al.actor_id = ?");
+        where.push('al.actor_id = ?');
 
         params.push(actorId);
       }
 
       if (entityType) {
-        where.push("al.entity_type = ?");
+        where.push('al.entity_type = ?');
 
         params.push(entityType);
       }
 
       if (entityId) {
-        where.push("al.entity_id = ?");
+        where.push('al.entity_id = ?');
 
         params.push(entityId);
       }
 
       if (requestId) {
-        where.push("al.request_id = ?");
+        where.push('al.request_id = ?');
 
         params.push(requestId);
       }
 
       if (correlationId) {
-        where.push("al.correlation_id = ?");
+        where.push('al.correlation_id = ?');
 
         params.push(correlationId);
       }
 
       if (dateFrom) {
-        where.push("al.created >= ?");
+        where.push('al.created >= ?');
 
         params.push(dateFrom);
       }
 
       if (dateTo) {
-        where.push("al.created <= ?");
+        where.push('al.created <= ?');
 
         params.push(dateTo);
       }
 
-      const whereSql = where.join("\n AND ");
+      const whereSql = where.join('\n AND ');
 
-      //==================================================
-      //==== SORT
-      //==================================================
+      // Sort
 
-      const order = typeof req.query.ord === "string" ? req.query.ord : "";
+      const order = typeof req.query.ord === 'string' ? req.query.ord : '';
 
       const sort = req.query.srt;
 
       const allowedOrder: Record<string, string> = {
-        id: "al.id_audit_log",
-
-        event_code: "al.event_code",
-
-        category: "al.category",
-
-        module: "al.module",
-
-        action: "al.action",
-
-        actor: "al.actor_label",
-
-        entity: "al.entity_label",
-
-        outcome: "al.outcome",
-
-        http_status: "al.http_status",
-
-        duration_ms: "al.duration_ms",
-
-        created: "al.created",
+        id: 'al.id_audit_log',
+        event_code: 'al.event_code',
+        category: 'al.category',
+        module: 'al.module',
+        action: 'al.action',
+        actor: 'al.actor_label',
+        entity: 'al.entity_label',
+        outcome: 'al.outcome',
+        http_status: 'al.http_status',
+        duration_ms: 'al.duration_ms',
+        created: 'al.created',
       };
 
-      const orderQuery = allowedOrder[order] ?? "al.id_audit_log";
+      const orderQuery = allowedOrder[order] ?? 'al.id_audit_log';
 
-      const sortQuery = sort === "asc" || sort === "false" ? "ASC" : "DESC";
+      const sortQuery = sort === 'asc' || sort === 'false' ? 'ASC' : 'DESC';
 
-      //==================================================
-      //==== COUNT
-      //==================================================
+      // Count
 
       const [totalRows] = await pool.query(
         `
@@ -635,9 +526,7 @@ app.get(
 
       const total = Number((totalRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -701,137 +590,78 @@ app.get(
 
       const data = (rows as any[]).map((item) => ({
         id_audit_log: keyhsid.idAuditLog.encode(item.id_audit_log),
-
         id_master_comp:
-          item.id_master_comp === null
-            ? null
-            : keyhsid.idMasterCompany.encode(item.id_master_comp),
-
+          item.id_master_comp === null ? null : keyhsid.idMasterCompany.encode(item.id_master_comp),
         request_id: item.request_id,
-
         correlation_id: item.correlation_id,
-
         event_code: item.event_code,
-
         category: item.category,
-
         module: item.module,
-
         action: item.action,
-
         actor: {
           type: item.actor_type,
-
           id: item.actor_id,
-
           label: item.actor_label,
         },
-
         entity: {
           type: item.entity_type,
-
           id: item.entity_id,
-
           label: item.entity_label,
         },
-
         source: item.source,
-
         outcome: item.outcome,
-
         http: {
           method: item.http_method,
-
           route: item.route_path,
-
           status: item.http_status === null ? null : Number(item.http_status),
         },
-
         ip_address: item.ip_address,
-
-        duration_ms:
-          item.duration_ms === null ? null : Number(item.duration_ms),
-
+        duration_ms: item.duration_ms === null ? null : Number(item.duration_ms),
         integrity_version: Number(item.integrity_version),
-
         has_integrity: Number(item.has_integrity) === 1,
-
         created: item.created,
       }));
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return res.status(200).json({
         success: true,
-
         data,
-
         pagination: {
           page,
-
           limit,
-
           total,
-
           length: data.length,
-
           pagerows: Math.ceil(total / limit),
-
           total_pages: Math.ceil(total / limit),
-
           has_more: offset + data.length < total,
         },
       });
     } catch (error) {
-      console.error("Get audit log list error:", error);
+      console.error('Get audit log list error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== AUDIT LOG - GET DETAIL
-//==================================================
+// Audit log - get detail
 
 app.get(
-  "/api/v1/audit-log/:id",
-
+  '/api/v1/audit-log/:id',
   verifyToken,
-
-  requirePermission("audit_log.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('audit_log.view'),
+  async (req: AuthRequest, res) => {
     try {
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       const idAuditLog = decodeAuditLogId(req.params.id);
 
       if (!idAuditLog) {
-        return sendError(
-          res,
-          400,
-          "AUDIT_LOG_INVALID_ID",
-          "Invalid audit log identifier",
-        );
+        return sendError(res, 400, 'AUDIT_LOG_INVALID_ID', 'Invalid audit log identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -839,9 +669,7 @@ app.get(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -911,19 +739,12 @@ app.get(
       const logs = rows as any[];
 
       if (!logs.length) {
-        return sendError(
-          res,
-          404,
-          "AUDIT_LOG_NOT_FOUND",
-          "Audit log not found",
-        );
+        return sendError(res, 404, 'AUDIT_LOG_NOT_FOUND', 'Audit log not found');
       }
 
       const item = logs[0];
 
-      //==================================================
-      //==== JSON DATA
-      //==================================================
+      // JSON data
 
       const beforeData = parseJsonValue(item.before_data);
 
@@ -933,172 +754,99 @@ app.get(
 
       const metadata = parseJsonValue(item.metadata);
 
-      //==================================================
-      //==== INTEGRITY PAYLOAD
-      //==================================================
+      // Integrity payload
 
       const integrityPayload = {
         version: Number(item.integrity_version),
-
-        id_master_comp:
-          item.id_master_comp === null ? null : Number(item.id_master_comp),
-
+        id_master_comp: item.id_master_comp === null ? null : Number(item.id_master_comp),
         request_id: item.request_id,
-
         correlation_id: item.correlation_id,
-
         event_code: item.event_code,
-
         category: item.category,
-
         module: item.module,
-
         action: item.action,
-
         actor_type: item.actor_type,
-
         actor_id: item.actor_id === null ? null : String(item.actor_id),
-
         actor_label: item.actor_label,
-
         entity_type: item.entity_type,
-
         entity_id: item.entity_id === null ? null : String(item.entity_id),
-
         entity_label: item.entity_label,
-
         source: item.source,
-
         outcome: item.outcome,
-
         http_method: item.http_method,
-
         route_path: item.route_path,
-
-        http_status:
-          item.http_status === null ? null : Number(item.http_status),
-
+        http_status: item.http_status === null ? null : Number(item.http_status),
         before_data: beforeData,
-
         after_data: afterData,
-
         changed_fields: changedFields,
-
         metadata,
-
         created: item.created_integrity,
       };
 
-      //==================================================
-      //==== INTEGRITY VERIFY
-      //==================================================
+      // Integrity verify
 
       const integrityValid =
         Number(item.integrity_version) === 1 &&
-        verifyAuditIntegrityHash(
-          integrityPayload,
+        verifyAuditIntegrityHash(integrityPayload, item.integrity_hash ?? null);
 
-          item.integrity_hash ?? null,
-        );
-
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return res.status(200).json({
         success: true,
-
         data: {
           id_audit_log: keyhsid.idAuditLog.encode(item.id_audit_log),
-
           id_master_comp:
             item.id_master_comp === null
               ? null
               : keyhsid.idMasterCompany.encode(item.id_master_comp),
-
           request_id: item.request_id,
-
           correlation_id: item.correlation_id,
-
           event_code: item.event_code,
-
           category: item.category,
-
           module: item.module,
-
           action: item.action,
-
           actor: {
             type: item.actor_type,
-
             id: item.actor_id,
-
             label: item.actor_label,
           },
-
           entity: {
             type: item.entity_type,
-
             id: item.entity_id,
-
             label: item.entity_label,
           },
-
           source: item.source,
-
           outcome: item.outcome,
-
           http: {
             method: item.http_method,
-
             route: item.route_path,
-
             status: item.http_status === null ? null : Number(item.http_status),
-
             ip_address: item.ip_address,
-
             user_agent: item.user_agent,
           },
-
           changes: {
             before: beforeData,
-
             after: afterData,
-
             changed_fields: changedFields,
           },
-
           metadata,
-
-          duration_ms:
-            item.duration_ms === null ? null : Number(item.duration_ms),
-
+          duration_ms: item.duration_ms === null ? null : Number(item.duration_ms),
           integrity: {
             version: Number(item.integrity_version),
-
             hash: item.integrity_hash,
-
             valid: integrityValid,
           },
-
           created: item.created,
         },
       });
     } catch (error) {
-      console.error("Get audit log detail error:", error);
+      console.error('Get audit log detail error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== ROUTER
-//==================================================
+// Router
 
 export default app;

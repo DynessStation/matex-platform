@@ -1,30 +1,25 @@
 // Navigation list and detail.
-import express = require("express");
-import { Response } from "express";
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
+import express = require('express');
+import { Response } from 'express';
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
-import { getSessionScope, decodeNavigationId } from "./scope";
-import { parseJsonValue } from "./metadata";
+import { getSessionScope, decodeNavigationId } from './scope';
+import { parseJsonValue } from './metadata';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== WEB NAVIGATION - LIST
-//==================================================
+// Web navigation - list
 
 router.get(
-  "/api/v1/web-navigation",
-
+  '/api/v1/web-navigation',
   verifyToken,
-
-  requirePermission("web_navigation.view"),
-
+  requirePermission('web_navigation.view'),
   async (req: AuthRequest, res: Response) => {
     try {
       const scope = await getSessionScope(req);
@@ -108,62 +103,40 @@ router.get(
       );
 
       const navigations = (rows as any[]).map((row) => ({
-        id_web_navigation: keyhsid.idWebNavigation.encode(
-          Number(row.id_web_navigation),
-        ),
-
+        id_web_navigation: keyhsid.idWebNavigation.encode(Number(row.id_web_navigation)),
         key: row.web_navigation_key,
-
         name: row.web_navigation_name,
-
         location: row.web_navigation_location,
-
         default_locale: row.web_navigation_default_locale,
-
         status: Number(row.web_navigation_status),
-
         item_count: Number(row.item_count ?? 0),
-
         active_item_count: Number(row.active_item_count ?? 0),
-
         created: row.created,
-
         updated: row.updated,
       }));
 
-      return sendSuccess(
-        res,
-        200,
-        "WEB_NAVIGATION_LIST_FOUND",
-        "Web navigation loaded",
-        {
-          navigations,
-        },
-      );
+      return sendSuccess(res, 200, 'WEB_NAVIGATION_LIST_FOUND', 'Web navigation loaded', {
+        navigations,
+      });
     } catch (error) {
-      console.error("[Web Navigation] Failed to load navigation list", error);
+      console.error('[Web Navigation] Failed to load navigation list', error);
 
       return sendError(
         res,
         500,
-        "WEB_NAVIGATION_LIST_UNAVAILABLE",
-        "Unable to load web navigation",
+        'WEB_NAVIGATION_LIST_UNAVAILABLE',
+        'Unable to load web navigation',
       );
     }
   },
 );
 
-//==================================================
-//==== WEB NAVIGATION - DETAIL
-//==================================================
+// Web navigation - detail
 
 router.get(
-  "/api/v1/web-navigation/:id",
-
+  '/api/v1/web-navigation/:id',
   verifyToken,
-
-  requirePermission("web_navigation.view"),
-
+  requirePermission('web_navigation.view'),
   async (req: AuthRequest, res: Response) => {
     try {
       const idNavigation = decodeNavigationId(req.params.id);
@@ -172,8 +145,8 @@ router.get(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -220,12 +193,7 @@ router.get(
       const navigations = navigationRows as any[];
 
       if (!navigations.length) {
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
@@ -306,13 +274,9 @@ router.get(
 
         translations.push({
           locale: row.web_navigation_item_locale,
-
           label: row.web_navigation_item_label,
-
           path: row.web_navigation_item_path,
-
           url: row.web_navigation_item_url,
-
           status: Number(row.web_navigation_item_i18n_status),
         });
 
@@ -324,56 +288,31 @@ router.get(
 
         return {
           id_web_navigation_item: keyhsid.idWebNavigationItem.encode(itemId),
-
           key: item.web_navigation_item_key,
           sort_order: Number(item.web_navigation_item_sort_order),
           status: Number(item.web_navigation_item_status),
           translations: translationsByItem.get(itemId) ?? [],
-
           created: item.created,
-
           updated: item.updated,
         };
       });
 
-      return sendSuccess(
-        res,
-        200,
-        "WEB_NAVIGATION_FOUND",
-        "Web navigation loaded",
-        {
-          id_web_navigation: keyhsid.idWebNavigation.encode(
-            Number(navigation.id_web_navigation),
-          ),
-
-          key: navigation.web_navigation_key,
-
-          name: navigation.web_navigation_name,
-
-          location: navigation.web_navigation_location,
-
-          default_locale: navigation.web_navigation_default_locale,
-
-          status: Number(navigation.web_navigation_status),
-
-          settings: parseJsonValue(navigation.web_navigation_settings_json),
-
-          items,
-
-          created: navigation.created,
-
-          updated: navigation.updated,
-        },
-      );
+      return sendSuccess(res, 200, 'WEB_NAVIGATION_FOUND', 'Web navigation loaded', {
+        id_web_navigation: keyhsid.idWebNavigation.encode(Number(navigation.id_web_navigation)),
+        key: navigation.web_navigation_key,
+        name: navigation.web_navigation_name,
+        location: navigation.web_navigation_location,
+        default_locale: navigation.web_navigation_default_locale,
+        status: Number(navigation.web_navigation_status),
+        settings: parseJsonValue(navigation.web_navigation_settings_json),
+        items,
+        created: navigation.created,
+        updated: navigation.updated,
+      });
     } catch (error) {
-      console.error("[Web Navigation] Failed to load navigation detail", error);
+      console.error('[Web Navigation] Failed to load navigation detail', error);
 
-      return sendError(
-        res,
-        500,
-        "WEB_NAVIGATION_UNAVAILABLE",
-        "Unable to load web navigation",
-      );
+      return sendError(res, 500, 'WEB_NAVIGATION_UNAVAILABLE', 'Unable to load web navigation');
     }
   },
 );

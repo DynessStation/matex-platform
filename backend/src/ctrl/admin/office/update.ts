@@ -1,13 +1,13 @@
 // Update an office and change its status.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, sessionHasPermission, decodeOfficeId } from "./scope";
+import { getSessionScope, sessionHasPermission, decodeOfficeId } from './scope';
 import {
   nullableString,
   normalizeFlag,
@@ -15,7 +15,7 @@ import {
   isValidEmail,
   isValidHttpUrl,
   validateOperatingHours,
-} from "./input";
+} from './input';
 import {
   resolveOfficeAttachments,
   insertOperatingHours,
@@ -24,40 +24,26 @@ import {
   toAuditOfficeAttachments,
   isSameAuditValue,
   getOfficeAttachmentDiff,
-} from "./relations";
+} from './relations';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== OFFICE - UPDATE
-//==================================================
+// Office - update
 
 router.put(
-  "/api/v1/office/:id",
-
+  '/api/v1/office/:id',
   verifyToken,
-
-  requirePermission("office.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const idOffice = decodeOfficeId(req.params.id);
 
       if (!idOffice) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_INVALID_ID",
-          "Invalid office identifier",
-        );
+        return sendError(res, 400, 'OFFICE_INVALID_ID', 'Invalid office identifier');
       }
 
       const scope = await getSessionScope(req);
@@ -68,85 +54,52 @@ router.put(
 
       const {
         office_code,
-
         office_name,
-
         office_description,
-
         address,
-
         city,
-
         province,
-
         postal_code,
-
         email,
-
         phone,
-
         lat,
-
         lng,
-
         attendance_enabled,
-
         attendance_radius_meter,
-
         website_url,
-
         is_public,
-
         public_slug,
-
         public_sort_order,
-
         google_place_id,
-
         google_maps_url,
-
         google_business_url,
-
         operating_hours,
-
         attachments,
       } = req.body;
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
-      const cleanCode = String(office_code ?? "")
+      const cleanCode = String(office_code ?? '')
         .trim()
         .toUpperCase();
 
-      const cleanName = String(office_name ?? "").trim();
+      const cleanName = String(office_name ?? '').trim();
 
       if (!cleanCode) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_CODE_REQUIRED",
-          "Office code is required",
-        );
+        return sendError(res, 400, 'OFFICE_CODE_REQUIRED', 'Office code is required');
       }
 
       if (!/^[A-Z0-9_-]+$/.test(cleanCode)) {
         return sendError(
           res,
           400,
-          "OFFICE_CODE_INVALID",
-          "Office code contains invalid characters",
+          'OFFICE_CODE_INVALID',
+          'Office code contains invalid characters',
         );
       }
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_NAME_REQUIRED",
-          "Office name is required",
-        );
+        return sendError(res, 400, 'OFFICE_NAME_REQUIRED', 'Office name is required');
       }
 
       const cleanDescription = nullableString(office_description);
@@ -172,12 +125,7 @@ router.put(
       const cleanGoogleBusinessUrl = nullableString(google_business_url);
 
       if (cleanEmail && !isValidEmail(cleanEmail)) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_EMAIL_INVALID",
-          "Invalid office email address",
-        );
+        return sendError(res, 400, 'OFFICE_EMAIL_INVALID', 'Invalid office email address');
       }
 
       if (
@@ -185,46 +133,27 @@ router.put(
           (value) => value && !isValidHttpUrl(value),
         )
       ) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_URLS_INVALID",
-          "One or more office URLs are invalid",
-        );
+        return sendError(res, 400, 'OFFICE_URLS_INVALID', 'One or more office URLs are invalid');
       }
 
-      //==================================================
-      //==== LOCATION / ATTENDANCE
-      //==================================================
+      // Location / attendance
 
-      const numericLat =
-        lat === null || lat === undefined || lat === "" ? null : Number(lat);
+      const numericLat = lat === null || lat === undefined || lat === '' ? null : Number(lat);
 
-      const numericLng =
-        lng === null || lng === undefined || lng === "" ? null : Number(lng);
+      const numericLng = lng === null || lng === undefined || lng === '' ? null : Number(lng);
 
       if (
         numericLat !== null &&
         (!Number.isFinite(numericLat) || numericLat < -90 || numericLat > 90)
       ) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_LATITUDE_INVALID",
-          "Invalid latitude",
-        );
+        return sendError(res, 400, 'OFFICE_LATITUDE_INVALID', 'Invalid latitude');
       }
 
       if (
         numericLng !== null &&
         (!Number.isFinite(numericLng) || numericLng < -180 || numericLng > 180)
       ) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_LONGITUDE_INVALID",
-          "Invalid longitude",
-        );
+        return sendError(res, 400, 'OFFICE_LONGITUDE_INVALID', 'Invalid longitude');
       }
 
       const attendanceEnabled = normalizeFlag(attendance_enabled, 0);
@@ -232,19 +161,16 @@ router.put(
       const numericRadius =
         attendance_radius_meter === null ||
         attendance_radius_meter === undefined ||
-        attendance_radius_meter === ""
+        attendance_radius_meter === ''
           ? null
           : Number(attendance_radius_meter);
 
-      if (
-        numericRadius !== null &&
-        (!Number.isInteger(numericRadius) || numericRadius <= 0)
-      ) {
+      if (numericRadius !== null && (!Number.isInteger(numericRadius) || numericRadius <= 0)) {
         return sendError(
           res,
           400,
-          "OFFICE_ATTENDANCE_RADIUS_INVALID",
-          "Attendance radius must be greater than zero",
+          'OFFICE_ATTENDANCE_RADIUS_INVALID',
+          'Attendance radius must be greater than zero',
         );
       }
 
@@ -255,14 +181,12 @@ router.put(
         return sendError(
           res,
           400,
-          "OFFICE_LOCATION_AND_ATTENDANCE_RADIUS_REQUIRED",
-          "Location and attendance radius are required when attendance is enabled",
+          'OFFICE_LOCATION_AND_ATTENDANCE_RADIUS_REQUIRED',
+          'Location and attendance radius are required when attendance is enabled',
         );
       }
 
-      //==================================================
-      //==== PUBLIC
-      //==================================================
+      // Public
 
       const isPublic = normalizeFlag(is_public, 0);
 
@@ -275,32 +199,21 @@ router.put(
       const publicSortOrder =
         Number.isInteger(sortOrderRaw) && sortOrderRaw >= 0 ? sortOrderRaw : 0;
 
-      //==================================================
-      //==== HOURS
-      //==================================================
+      // Hours
 
       const hourResult = validateOperatingHours(operating_hours ?? []);
 
       if (!hourResult.success) {
-        return sendError(
-          res,
-          hourResult.status,
-          hourResult.code,
-          hourResult.message,
-        );
+        return sendError(res, hourResult.status, hourResult.code, hourResult.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [targetRows] = await connection.query(
         `
@@ -355,14 +268,12 @@ router.put(
       if (!offices.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "OFFICE_NOT_FOUND", "Office not found");
+        return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
       }
 
       const currentOffice = offices[0];
 
-      //==================================================
-      //==== CURRENT OPERATING HOURS
-      //==================================================
+      // Current operating hours
 
       const [currentHourRows] = await connection.query(
         `
@@ -388,9 +299,7 @@ router.put(
         [idOffice],
       );
 
-      //==================================================
-      //==== CURRENT ATTACHMENTS
-      //==================================================
+      // Current attachments
 
       const [currentAttachmentRows] = await connection.query(
         `
@@ -424,15 +333,11 @@ router.put(
         [idOffice],
       );
 
-      //==================================================
-      //==== ATTACHMENTS
-      //==================================================
+      // Attachments
 
       const attachmentResult = await resolveOfficeAttachments(
         connection,
-
         scope.idMasterComp,
-
         attachments ?? [],
       );
 
@@ -447,9 +352,7 @@ router.put(
         );
       }
 
-      //==================================================
-      //==== DUPLICATE
-      //==================================================
+      // Duplicate
 
       const [duplicateRows] = await connection.query(
         `
@@ -489,8 +392,8 @@ router.put(
         return sendError(
           res,
           409,
-          "OFFICE_ALREADY_EXISTS",
-          "Office code or office name is already in use",
+          'OFFICE_ALREADY_EXISTS',
+          'Office code or office name is already in use',
         );
       }
 
@@ -521,178 +424,111 @@ router.put(
           return sendError(
             res,
             409,
-            "OFFICE_PUBLIC_SLUG_EXISTS",
-            "Public office slug is already in use",
+            'OFFICE_PUBLIC_SLUG_EXISTS',
+            'Public office slug is already in use',
           );
         }
       }
 
-      //==================================================
-      //==== AUDIT CORE BEFORE
-      //==================================================
+      // Audit core before
 
       const coreBefore = {
         office_code: currentOffice.office_code,
-
         office_name: currentOffice.office_name,
-
         office_description: currentOffice.office_description ?? null,
-
         address: currentOffice.address ?? null,
-
         city: currentOffice.city ?? null,
-
         province: currentOffice.province ?? null,
-
         postal_code: currentOffice.postal_code ?? null,
-
         email: currentOffice.email ?? null,
-
         phone: currentOffice.phone ?? null,
-
         lat: currentOffice.lat === null ? null : Number(currentOffice.lat),
-
         lng: currentOffice.lng === null ? null : Number(currentOffice.lng),
-
         attendance_enabled: Number(currentOffice.attendance_enabled),
-
         attendance_radius_meter:
           currentOffice.attendance_radius_meter === null
             ? null
             : Number(currentOffice.attendance_radius_meter),
-
         google_place_id: currentOffice.google_place_id ?? null,
-
         google_maps_url: currentOffice.google_maps_url ?? null,
-
         google_business_url: currentOffice.google_business_url ?? null,
       };
 
-      //==================================================
-      //==== AUDIT CORE AFTER
-      //==================================================
+      // Audit core after
 
       const coreAfter = {
         office_code: cleanCode,
-
         office_name: cleanName,
-
         office_description: cleanDescription,
-
         address: cleanAddress,
-
         city: cleanCity,
-
         province: cleanProvince,
-
         postal_code: cleanPostalCode,
-
         email: cleanEmail,
-
         phone: cleanPhone,
-
         lat: numericLat,
-
         lng: numericLng,
-
         attendance_enabled: attendanceEnabled,
-
         attendance_radius_meter: attendanceEnabled === 1 ? numericRadius : null,
-
         google_place_id: cleanGooglePlaceId,
-
         google_maps_url: cleanGoogleMapsUrl,
-
         google_business_url: cleanGoogleBusinessUrl,
       };
 
-      //==================================================
-      //==== AUDIT PUBLICATION
-      //==================================================
+      // Audit publication
 
       const publicationBefore = {
         website_url: currentOffice.website_url ?? null,
-
         is_public: Number(currentOffice.is_public),
-
         public_slug: currentOffice.public_slug ?? null,
-
         public_sort_order: Number(currentOffice.public_sort_order ?? 0),
       };
 
       const publicationAfter = {
         website_url: cleanWebsiteUrl,
-
         is_public: isPublic,
-
         public_slug: cleanSlug,
-
         public_sort_order: publicSortOrder,
       };
 
-      //==================================================
-      //==== AUDIT CHILD DATA
-      //==================================================
+      // Audit child data
 
       const hoursBefore = toAuditOperatingHours(currentHourRows as any[]);
 
       const hoursAfter = toAuditOperatingHours(hourResult.data);
 
-      const attachmentsBefore = toAuditOfficeAttachments(
-        currentAttachmentRows as any[],
-      );
+      const attachmentsBefore = toAuditOfficeAttachments(currentAttachmentRows as any[]);
 
       const attachmentsAfter = toAuditOfficeAttachments(attachmentResult.data);
 
-      //==================================================
-      //==== CHANGE CHECK
-      //==================================================
+      // Change check
 
       const coreChanged = !isSameAuditValue(coreBefore, coreAfter);
 
-      const publicationChanged = !isSameAuditValue(
-        publicationBefore,
-        publicationAfter,
-      );
+      const publicationChanged = !isSameAuditValue(publicationBefore, publicationAfter);
 
       const hoursChanged = !isSameAuditValue(hoursBefore, hoursAfter);
 
-      const mediaChanged = !isSameAuditValue(
-        attachmentsBefore,
-        attachmentsAfter,
-      );
+      const mediaChanged = !isSameAuditValue(attachmentsBefore, attachmentsAfter);
 
-      //==================================================
-      //==== MEDIA PERMISSION
-      //==================================================
+      // Media permission
 
       if (mediaChanged) {
-        const canViewAttachments = await sessionHasPermission(
-          connection,
-
-          scope,
-
-          "attachment.view",
-        );
+        const canViewAttachments = await sessionHasPermission(connection, scope, 'attachment.view');
 
         if (!canViewAttachments) {
           await connection.rollback();
 
           return sendError(
             res,
-
             403,
-
-            "OFFICE_ATTACHMENT_ACCESS_DENIED",
-
-            "Attachment access is required to modify office media",
+            'OFFICE_ATTACHMENT_ACCESS_DENIED',
+            'Attachment access is required to modify office media',
           );
         }
       }
 
-      //==================================================
-      //==== UPDATE OFFICE
-      //==================================================
+      // Update office
 
       if (coreChanged || publicationChanged) {
         await connection.query(
@@ -748,55 +584,32 @@ router.put(
             `,
           [
             cleanCode,
-
             cleanName,
-
             cleanDescription,
-
             cleanAddress,
-
             cleanCity,
-
             cleanProvince,
-
             cleanPostalCode,
-
             cleanEmail,
-
             cleanPhone,
-
             numericLat,
-
             numericLng,
-
             attendanceEnabled,
-
             attendanceEnabled === 1 ? numericRadius : null,
-
             cleanWebsiteUrl,
-
             isPublic,
-
             cleanSlug,
-
             publicSortOrder,
-
             cleanGooglePlaceId,
-
             cleanGoogleMapsUrl,
-
             cleanGoogleBusinessUrl,
-
             idOffice,
-
             scope.idMasterComp,
           ],
         );
       }
 
-      //==================================================
-      //==== REPLACE HOURS
-      //==================================================
+      // Replace hours
 
       if (hoursChanged) {
         await connection.query(
@@ -808,18 +621,10 @@ router.put(
           [idOffice],
         );
 
-        await insertOperatingHours(
-          connection,
-
-          idOffice,
-
-          hourResult.data,
-        );
+        await insertOperatingHours(connection, idOffice, hourResult.data);
       }
 
-      //==================================================
-      //==== REPLACE ATTACHMENTS
-      //==================================================
+      // Replace attachments
 
       if (mediaChanged) {
         await connection.query(
@@ -831,218 +636,126 @@ router.put(
           [idOffice],
         );
 
-        await insertOfficeAttachments(
-          connection,
-
-          idOffice,
-
-          attachmentResult.data,
-        );
+        await insertOfficeAttachments(connection, idOffice, attachmentResult.data);
       }
 
-      //==================================================
-      //==== AUDIT CORE
-      //==================================================
+      // Audit core
 
       if (coreChanged) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "office.updated",
-
-          category: "data_change",
-
-          module: "office",
-
-          action: "update",
-
-          actorType: "admin",
-
+          eventCode: 'office.updated',
+          category: 'data_change',
+          module: 'office',
+          action: 'update',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "office",
-
+          entityType: 'office',
           entityId: idOffice,
-
           entityLabel: cleanName,
-
           before: coreBefore,
-
           after: coreAfter,
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== AUDIT PUBLICATION
-      //==================================================
+      // Audit publication
 
       if (publicationChanged) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "office.publication_changed",
-
-          category: "data_change",
-
-          module: "office",
-
-          action: "publication_change",
-
-          actorType: "admin",
-
+          eventCode: 'office.publication_changed',
+          category: 'data_change',
+          module: 'office',
+          action: 'publication_change',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "office",
-
+          entityType: 'office',
           entityId: idOffice,
-
           entityLabel: cleanName,
-
           before: publicationBefore,
-
           after: publicationAfter,
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== AUDIT OPERATING HOURS
-      //==================================================
+      // Audit operating hours
 
       if (hoursChanged) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "office.operating_hours_changed",
-
-          category: "data_change",
-
-          module: "office",
-
-          action: "operating_hours_change",
-
-          actorType: "admin",
-
+          eventCode: 'office.operating_hours_changed',
+          category: 'data_change',
+          module: 'office',
+          action: 'operating_hours_change',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "office",
-
+          entityType: 'office',
           entityId: idOffice,
-
           entityLabel: cleanName,
-
           before: {
             operating_hours: hoursBefore,
           },
-
           after: {
             operating_hours: hoursAfter,
           },
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== AUDIT MEDIA
-      //==================================================
+      // Audit media
 
       if (mediaChanged) {
-        const attachmentDiff = getOfficeAttachmentDiff(
-          attachmentsBefore,
-
-          attachmentsAfter,
-        );
+        const attachmentDiff = getOfficeAttachmentDiff(attachmentsBefore, attachmentsAfter);
 
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
+          writeMode: 'strict',
           idMasterComp: scope.idMasterComp,
-
-          eventCode: "office.media_changed",
-
-          category: "file",
-
-          module: "office",
-
-          action: "media_change",
-
-          actorType: "admin",
-
+          eventCode: 'office.media_changed',
+          category: 'file',
+          module: 'office',
+          action: 'media_change',
+          actorType: 'admin',
           actorId: scope.idAdminAcct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "office",
-
+          entityType: 'office',
           entityId: idOffice,
-
           entityLabel: cleanName,
-
           before: {
             attachments: attachmentsBefore,
           },
-
           after: {
             attachments: attachmentsAfter,
           },
-
           metadata: {
             added_attachment_ids: attachmentDiff.added,
-
             removed_attachment_ids: attachmentDiff.removed,
           },
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        200,
-        "OFFICE_UPDATED",
-        "Office updated successfully",
-        {
-          id_office: keyhsid.idOffice.encode(idOffice),
-        },
-      );
+      return sendSuccess(res, 200, 'OFFICE_UPDATED', 'Office updated successfully', {
+        id_office: keyhsid.idOffice.encode(idOffice),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -1050,14 +763,9 @@ router.put(
         } catch {}
       }
 
-      console.error("Update office error:", error);
+      console.error('Update office error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -1066,45 +774,26 @@ router.put(
   },
 );
 
-//==================================================
-//==== OFFICE - UPDATE STATUS
-//==================================================
+// Office - update status
 
 router.patch(
-  "/api/v1/office/:id/status",
-
+  '/api/v1/office/:id/status',
   verifyToken,
-
-  requirePermission("office.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const idOffice = decodeOfficeId(req.params.id);
 
       if (!idOffice) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_INVALID_ID",
-          "Invalid office identifier",
-        );
+        return sendError(res, 400, 'OFFICE_INVALID_ID', 'Invalid office identifier');
       }
 
       const newStatus = Number(req.body?.status);
 
       if (![0, 1].includes(newStatus)) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_INVALID_STATUS",
-          "Invalid office status",
-        );
+        return sendError(res, 400, 'OFFICE_INVALID_STATUS', 'Invalid office status');
       }
 
       const scope = await getSessionScope(req);
@@ -1113,17 +802,13 @@ router.patch(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [officeRows] = await connection.query(
         `
@@ -1154,14 +839,12 @@ router.patch(
       if (!offices.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "OFFICE_NOT_FOUND", "Office not found");
+        return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
       }
 
       const office = offices[0];
 
-      //==================================================
-      //==== SAME STATUS
-      //==================================================
+      // Same status
 
       if (Number(office.status) === newStatus) {
         await connection.rollback();
@@ -1169,21 +852,16 @@ router.patch(
         return sendSuccess(
           res,
           200,
-          newStatus === 1 ? "OFFICE_ALREADY_ACTIVE" : "OFFICE_ALREADY_INACTIVE",
-          newStatus === 1
-            ? "Office is already active"
-            : "Office is already inactive",
+          newStatus === 1 ? 'OFFICE_ALREADY_ACTIVE' : 'OFFICE_ALREADY_INACTIVE',
+          newStatus === 1 ? 'Office is already active' : 'Office is already inactive',
           {
             id_office: keyhsid.idOffice.encode(idOffice),
-
             status: newStatus,
           },
         );
       }
 
-      //==================================================
-      //==== AFFECTED ACCOUNTS
-      //==================================================
+      // Affected accounts
 
       const [accountRows] = await connection.query(
         `
@@ -1204,9 +882,7 @@ router.patch(
 
       const affectedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await connection.query(
         `
@@ -1224,74 +900,48 @@ router.patch(
         [newStatus, idOffice, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "office.status_changed",
-
-        category: "data_change",
-
-        module: "office",
-
-        action: "status_change",
-
-        actorType: "admin",
-
+        eventCode: 'office.status_changed',
+        category: 'data_change',
+        module: 'office',
+        action: 'status_change',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "office",
-
+        entityType: 'office',
         entityId: idOffice,
-
         entityLabel: office.office_name,
-
         before: {
           status: Number(office.status),
         },
-
         after: {
           status: newStatus,
         },
-
         metadata: {
-          transition: newStatus === 1 ? "activated" : "deactivated",
-
+          transition: newStatus === 1 ? 'activated' : 'deactivated',
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
       return sendSuccess(
         res,
         200,
-        newStatus === 1 ? "OFFICE_ACTIVATED" : "OFFICE_DEACTIVATED",
-        newStatus === 1
-          ? "Office activated successfully"
-          : "Office deactivated successfully",
+        newStatus === 1 ? 'OFFICE_ACTIVATED' : 'OFFICE_DEACTIVATED',
+        newStatus === 1 ? 'Office activated successfully' : 'Office deactivated successfully',
         {
           id_office: keyhsid.idOffice.encode(idOffice),
-
           status: newStatus,
-
           affected_accounts: newStatus === 0 ? affectedAccounts : 0,
         },
       );
@@ -1302,14 +952,9 @@ router.patch(
         } catch {}
       }
 
-      console.error("Update office status error:", error);
+      console.error('Update office status error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

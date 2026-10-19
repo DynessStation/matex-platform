@@ -1,31 +1,26 @@
 // Update navigation metadata and change its status.
-import express = require("express");
-import { Response } from "express";
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import { Response } from 'express';
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, decodeNavigationId } from "./scope";
-import { parseJsonValue, normalizeNavigationMetadata } from "./metadata";
+import { getSessionScope, decodeNavigationId } from './scope';
+import { parseJsonValue, normalizeNavigationMetadata } from './metadata';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== WEB NAVIGATION - UPDATE METADATA
-//==================================================
+// Web navigation - update metadata
 
 router.put(
-  "/api/v1/web-navigation/:id",
-
+  '/api/v1/web-navigation/:id',
   verifyToken,
-
-  requirePermission("web_navigation.update"),
-
+  requirePermission('web_navigation.update'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -36,8 +31,8 @@ router.put(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -92,12 +87,7 @@ router.put(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const before = navigations[0];
@@ -137,16 +127,16 @@ router.put(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "web_navigation.updated",
-        category: "data_change",
-        module: "web_navigation",
-        action: "update",
-        actorType: "admin",
+        eventCode: 'web_navigation.updated',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: 'update',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation",
+        entityType: 'web_navigation',
         entityId: idNavigation,
         entityLabel: metadata.name,
         before: {
@@ -173,8 +163,8 @@ router.put(
       return sendSuccess(
         res,
         200,
-        "WEB_NAVIGATION_UPDATED",
-        "Web navigation updated successfully",
+        'WEB_NAVIGATION_UPDATED',
+        'Web navigation updated successfully',
         {
           id_web_navigation: keyhsid.idWebNavigation.encode(idNavigation),
         },
@@ -186,31 +176,21 @@ router.put(
         } catch {}
       }
 
-      console.error("[Web Navigation] Failed to update navigation", error);
+      console.error('[Web Navigation] Failed to update navigation', error);
 
-      return sendError(
-        res,
-        500,
-        "WEB_NAVIGATION_UPDATE_FAILED",
-        "Unable to update web navigation",
-      );
+      return sendError(res, 500, 'WEB_NAVIGATION_UPDATE_FAILED', 'Unable to update web navigation');
     } finally {
       connection?.release();
     }
   },
 );
 
-//==================================================
-//==== WEB NAVIGATION - ACTIVATE / DEACTIVATE
-//==================================================
+// Web navigation - activate / deactivate
 
 router.patch(
-  "/api/v1/web-navigation/:id/status",
-
+  '/api/v1/web-navigation/:id/status',
   verifyToken,
-
-  requirePermission("web_navigation.publish"),
-
+  requirePermission('web_navigation.publish'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -221,8 +201,8 @@ router.patch(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -232,8 +212,8 @@ router.patch(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_STATUS_INVALID",
-          "Web navigation status must be 0 or 1",
+          'WEB_NAVIGATION_STATUS_INVALID',
+          'Web navigation status must be 0 or 1',
         );
       }
 
@@ -276,12 +256,7 @@ router.patch(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
@@ -307,19 +282,16 @@ router.patch(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode:
-          status === 1
-            ? "web_navigation.activated"
-            : "web_navigation.deactivated",
-        category: "data_change",
-        module: "web_navigation",
-        action: status === 1 ? "publish" : "unpublish",
-        actorType: "admin",
+        eventCode: status === 1 ? 'web_navigation.activated' : 'web_navigation.deactivated',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: status === 1 ? 'publish' : 'unpublish',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation",
+        entityType: 'web_navigation',
         entityId: idNavigation,
         entityLabel: navigation.web_navigation_name,
         before: {
@@ -336,15 +308,12 @@ router.patch(
       return sendSuccess(
         res,
         200,
+        status === 1 ? 'WEB_NAVIGATION_ACTIVATED' : 'WEB_NAVIGATION_DEACTIVATED',
         status === 1
-          ? "WEB_NAVIGATION_ACTIVATED"
-          : "WEB_NAVIGATION_DEACTIVATED",
-        status === 1
-          ? "Web navigation activated successfully"
-          : "Web navigation deactivated successfully",
+          ? 'Web navigation activated successfully'
+          : 'Web navigation deactivated successfully',
         {
           id_web_navigation: keyhsid.idWebNavigation.encode(idNavigation),
-
           status,
         },
       );
@@ -355,16 +324,13 @@ router.patch(
         } catch {}
       }
 
-      console.error(
-        "[Web Navigation] Failed to change navigation status",
-        error,
-      );
+      console.error('[Web Navigation] Failed to change navigation status', error);
 
       return sendError(
         res,
         500,
-        "WEB_NAVIGATION_STATUS_UPDATE_FAILED",
-        "Unable to change web navigation status",
+        'WEB_NAVIGATION_STATUS_UPDATE_FAILED',
+        'Unable to change web navigation status',
       );
     } finally {
       connection?.release();

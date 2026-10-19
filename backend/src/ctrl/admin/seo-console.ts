@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router, Response } from 'express';
 
 import {
   SearchConsoleRow,
@@ -7,10 +7,10 @@ import {
   searchConsoleClient,
   searchConsoleDateRange,
   searchConsoleTotals,
-} from "../../helper/google-seo.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+} from '../../helper/google-seo.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 const router = Router();
 
@@ -46,7 +46,7 @@ interface PageSpeedResponse {
 
 const mappedRows = (rows: SearchConsoleRow[] = []) =>
   rows.map((row) => ({
-    key: row.keys?.[0] ?? "",
+    key: row.keys?.[0] ?? '',
     clicks: Number(row.clicks ?? 0),
     impressions: Number(row.impressions ?? 0),
     ctr: Number(row.ctr ?? 0),
@@ -54,18 +54,18 @@ const mappedRows = (rows: SearchConsoleRow[] = []) =>
   }));
 
 router.get(
-  "/api/v1/seo-console/overview",
+  '/api/v1/seo-console/overview',
   verifyToken,
-  requirePermission("dashboard.view"),
+  requirePermission('dashboard.view'),
   async (req: AuthRequest, res: Response) => {
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader('Cache-Control', 'no-store');
     const range = searchConsoleDateRange(req.query.days);
     if (!range) {
       return sendError(
         res,
         400,
-        "SEO_RANGE_INVALID",
-        "Search Console range must be 7, 28, or 90 days",
+        'SEO_RANGE_INVALID',
+        'Search Console range must be 7, 28, or 90 days',
       );
     }
 
@@ -73,7 +73,7 @@ router.get(
     const client = searchConsoleClient(configuration);
     const siteUrl = configuration.searchConsole.siteUrl;
     if (!client || !siteUrl) {
-      return sendSuccess(res, 200, "SEO_CONSOLE_NOT_CONFIGURED", "SEO console is not configured", {
+      return sendSuccess(res, 200, 'SEO_CONSOLE_NOT_CONFIGURED', 'SEO console is not configured', {
         configured: false,
         site_url: siteUrl,
         range,
@@ -85,14 +85,14 @@ router.get(
     const query = (dimensions: string[], rowLimit: number) =>
       client.request<SearchConsoleQueryResponse>({
         url: `${endpoint}/searchAnalytics/query`,
-        method: "POST",
+        method: 'POST',
         timeout: 15_000,
         data: {
           startDate: range.startDate,
           endDate: range.endDate,
           dimensions,
           rowLimit,
-          dataState: "final",
+          dataState: 'final',
         },
       });
 
@@ -102,13 +102,13 @@ router.get(
           url: endpoint,
           timeout: 10_000,
         }),
-        query(["date"], 100),
-        query(["query"], 10),
-        query(["page"], 10),
+        query(['date'], 100),
+        query(['query'], 10),
+        query(['page'], 10),
       ]);
       const dailyRows = daily.data.rows ?? [];
 
-      return sendSuccess(res, 200, "SEO_CONSOLE_FOUND", "Search Console data loaded", {
+      return sendSuccess(res, 200, 'SEO_CONSOLE_FOUND', 'Search Console data loaded', {
         configured: true,
         site_url: site.data.siteUrl ?? siteUrl,
         permission_level: site.data.permissionLevel ?? null,
@@ -126,27 +126,27 @@ router.get(
         page_speed_configured: configuration.pageSpeed.configured,
       });
     } catch (error) {
-      console.error("[SEO Console] Search Console request failed", error);
+      console.error('[SEO Console] Search Console request failed', error);
       return sendError(
         res,
         502,
-        "SEO_CONSOLE_UNAVAILABLE",
-        "Search Console could not be reached or the service account lacks property access",
+        'SEO_CONSOLE_UNAVAILABLE',
+        'Search Console could not be reached or the service account lacks property access',
       );
     }
   },
 );
 
 router.get(
-  "/api/v1/seo-console/pagespeed",
+  '/api/v1/seo-console/pagespeed',
   verifyToken,
-  requirePermission("dashboard.view"),
+  requirePermission('dashboard.view'),
   async (req: AuthRequest, res: Response) => {
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader('Cache-Control', 'no-store');
     const configuration = googleSeoConfiguration();
     const pageSpeed = configuration.pageSpeed;
     if (!pageSpeed.configured || !pageSpeed.siteUrl || !pageSpeed.apiKey) {
-      return sendSuccess(res, 200, "PAGESPEED_NOT_CONFIGURED", "PageSpeed is not configured", {
+      return sendSuccess(res, 200, 'PAGESPEED_NOT_CONFIGURED', 'PageSpeed is not configured', {
         configured: false,
       });
     }
@@ -156,8 +156,8 @@ router.get(
       return sendError(
         res,
         400,
-        "PAGESPEED_TARGET_INVALID",
-        "PageSpeed path or strategy is invalid",
+        'PAGESPEED_TARGET_INVALID',
+        'PageSpeed path or strategy is invalid',
       );
     }
 
@@ -166,8 +166,8 @@ router.get(
       strategy: target.strategy,
       key: pageSpeed.apiKey,
     });
-    for (const category of ["performance", "accessibility", "best-practices", "seo"]) {
-      params.append("category", category);
+    for (const category of ['performance', 'accessibility', 'best-practices', 'seo']) {
+      params.append('category', category);
     }
 
     try {
@@ -182,7 +182,7 @@ router.get(
       const categories = payload.lighthouseResult?.categories ?? {};
       const audits = payload.lighthouseResult?.audits ?? {};
 
-      return sendSuccess(res, 200, "PAGESPEED_FOUND", "PageSpeed audit loaded", {
+      return sendSuccess(res, 200, 'PAGESPEED_FOUND', 'PageSpeed audit loaded', {
         configured: true,
         url: payload.lighthouseResult?.finalUrl ?? target.url,
         strategy: target.strategy,
@@ -191,24 +191,19 @@ router.get(
         scores: {
           performance: Math.round(Number(categories.performance?.score ?? 0) * 100),
           accessibility: Math.round(Number(categories.accessibility?.score ?? 0) * 100),
-          best_practices: Math.round(Number(categories["best-practices"]?.score ?? 0) * 100),
+          best_practices: Math.round(Number(categories['best-practices']?.score ?? 0) * 100),
           seo: Math.round(Number(categories.seo?.score ?? 0) * 100),
         },
         metrics: {
-          lcp_ms: Number(audits["largest-contentful-paint"]?.numericValue ?? 0),
-          inp_ms: Number(audits["interaction-to-next-paint"]?.numericValue ?? 0),
-          cls: Number(audits["cumulative-layout-shift"]?.numericValue ?? 0),
-          ttfb_ms: Number(audits["server-response-time"]?.numericValue ?? 0),
+          lcp_ms: Number(audits['largest-contentful-paint']?.numericValue ?? 0),
+          inp_ms: Number(audits['interaction-to-next-paint']?.numericValue ?? 0),
+          cls: Number(audits['cumulative-layout-shift']?.numericValue ?? 0),
+          ttfb_ms: Number(audits['server-response-time']?.numericValue ?? 0),
         },
       });
     } catch (error) {
-      console.error("[SEO Console] PageSpeed request failed", error);
-      return sendError(
-        res,
-        502,
-        "PAGESPEED_UNAVAILABLE",
-        "PageSpeed audit could not be completed",
-      );
+      console.error('[SEO Console] PageSpeed request failed', error);
+      return sendError(res, 502, 'PAGESPEED_UNAVAILABLE', 'PageSpeed audit could not be completed');
     }
   },
 );

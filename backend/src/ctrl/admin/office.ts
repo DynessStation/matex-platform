@@ -1,9 +1,9 @@
-import express = require("express");
+import express = require('express');
 
-import readRoutes from "./office/read";
-import createRoutes from "./office/create";
-import updateRoutes from "./office/update";
-import deleteRoutes from "./office/delete";
+import readRoutes from './office/read';
+import createRoutes from './office/create';
+import updateRoutes from './office/update';
+import deleteRoutes from './office/delete';
 
 // Office management, under /api/v1/office.
 //

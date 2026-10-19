@@ -1,12 +1,9 @@
-import {
-  PUBLIC_CONTENT_LOCALES,
-  isPublicContentLocale,
-} from "../config/public-content.config";
+import { PUBLIC_CONTENT_LOCALES, isPublicContentLocale } from '../config/public-content.config';
 import {
   getFixedWebNavigationPath,
   isFixedWebNavigationKey,
-} from "../config/web-navigation.config";
-import keyhsid from "../hsid";
+} from '../config/web-navigation.config';
+import keyhsid from '../hsid';
 
 export interface NormalizedNavigationItemTranslation {
   locale: string;
@@ -35,7 +32,7 @@ export type NormalizeNavigationItemResult =
     };
 
 export const decodeWebNavigationItemId = (value: unknown): number | null => {
-  const encodedId = String(value ?? "").trim();
+  const encodedId = String(value ?? '').trim();
 
   if (!encodedId) {
     return null;
@@ -53,11 +50,11 @@ export const decodeWebNavigationItemId = (value: unknown): number | null => {
 };
 
 const normalizeFlag = (value: unknown): 0 | 1 | null => {
-  if (value === true || value === 1 || value === "1" || value === "true") {
+  if (value === true || value === 1 || value === '1' || value === 'true') {
     return 1;
   }
 
-  if (value === false || value === 0 || value === "0" || value === "false") {
+  if (value === false || value === 0 || value === '0' || value === 'false') {
     return 0;
   }
 
@@ -68,15 +65,15 @@ export const normalizeNavigationItemInput = (
   body: any,
   defaultLocale: string,
 ): NormalizeNavigationItemResult => {
-  const key = String(body?.web_navigation_item_key ?? "")
+  const key = String(body?.web_navigation_item_key ?? '')
     .trim()
     .toLowerCase();
 
   if (!isFixedWebNavigationKey(key)) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_KEY_INVALID",
-      message: "Navigation item is not part of the fixed website header",
+      code: 'WEB_NAVIGATION_ITEM_KEY_INVALID',
+      message: 'Navigation item is not part of the fixed website header',
     };
   }
 
@@ -85,8 +82,8 @@ export const normalizeNavigationItemInput = (
   if (status === null) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_STATUS_INVALID",
-      message: "Navigation item status must be 0 or 1",
+      code: 'WEB_NAVIGATION_ITEM_STATUS_INVALID',
+      message: 'Navigation item status must be 0 or 1',
     };
   }
 
@@ -95,16 +92,16 @@ export const normalizeNavigationItemInput = (
   if (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 2147483647) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_SORT_INVALID",
-      message: "Invalid navigation item sort order",
+      code: 'WEB_NAVIGATION_ITEM_SORT_INVALID',
+      message: 'Invalid navigation item sort order',
     };
   }
 
   if (!Array.isArray(body?.translations)) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_TRANSLATIONS_REQUIRED",
-      message: "Navigation item translations are required",
+      code: 'WEB_NAVIGATION_ITEM_TRANSLATIONS_REQUIRED',
+      message: 'Navigation item translations are required',
     };
   }
 
@@ -113,12 +110,12 @@ export const normalizeNavigationItemInput = (
   const translations: NormalizedNavigationItemTranslation[] = [];
 
   for (const rawTranslation of body.translations) {
-    const locale = String(rawTranslation?.locale ?? "").trim();
+    const locale = String(rawTranslation?.locale ?? '').trim();
 
     if (!isPublicContentLocale(locale)) {
       return {
         success: false,
-        code: "WEB_NAVIGATION_ITEM_LOCALE_UNSUPPORTED",
+        code: 'WEB_NAVIGATION_ITEM_LOCALE_UNSUPPORTED',
         message: `Unsupported locale: ${locale}`,
       };
     }
@@ -126,19 +123,19 @@ export const normalizeNavigationItemInput = (
     if (locales.has(locale)) {
       return {
         success: false,
-        code: "WEB_NAVIGATION_ITEM_LOCALE_DUPLICATE",
+        code: 'WEB_NAVIGATION_ITEM_LOCALE_DUPLICATE',
         message: `Duplicate locale: ${locale}`,
       };
     }
 
     locales.add(locale);
 
-    const label = String(rawTranslation?.label ?? "").trim();
+    const label = String(rawTranslation?.label ?? '').trim();
 
     if (!label || label.length > 255) {
       return {
         success: false,
-        code: "WEB_NAVIGATION_ITEM_LABEL_INVALID",
+        code: 'WEB_NAVIGATION_ITEM_LABEL_INVALID',
         message: `Invalid label for locale ${locale}`,
       };
     }
@@ -148,7 +145,7 @@ export const normalizeNavigationItemInput = (
     if (translationStatus === null) {
       return {
         success: false,
-        code: "WEB_NAVIGATION_ITEM_TRANSLATION_STATUS_INVALID",
+        code: 'WEB_NAVIGATION_ITEM_TRANSLATION_STATUS_INVALID',
         message: `Invalid translation status for locale ${locale}`,
       };
     }
@@ -164,28 +161,25 @@ export const normalizeNavigationItemInput = (
 
   if (
     PUBLIC_CONTENT_LOCALES.some(
-      (locale) =>
-        !translations.some((translation) => translation.locale === locale),
+      (locale) => !translations.some((translation) => translation.locale === locale),
     )
   ) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_TRANSLATIONS_REQUIRED",
-      message: "Indonesian and English labels are required",
+      code: 'WEB_NAVIGATION_ITEM_TRANSLATIONS_REQUIRED',
+      message: 'Indonesian and English labels are required',
     };
   }
 
   const defaultTranslation = translations.find(
-    (translation) =>
-      translation.locale === defaultLocale && translation.status === 1,
+    (translation) => translation.locale === defaultLocale && translation.status === 1,
   );
 
   if (!defaultTranslation) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_ITEM_DEFAULT_TRANSLATION_REQUIRED",
-      message:
-        "An active translation for the navigation default locale is required",
+      code: 'WEB_NAVIGATION_ITEM_DEFAULT_TRANSLATION_REQUIRED',
+      message: 'An active translation for the navigation default locale is required',
     };
   }
 

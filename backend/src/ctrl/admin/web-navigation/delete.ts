@@ -1,29 +1,24 @@
 // Delete (soft delete) a navigation.
-import express = require("express");
-import { Response } from "express";
-import db = require("../../../db");
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import { Response } from 'express';
+import db = require('../../../db');
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, decodeNavigationId } from "./scope";
+import { getSessionScope, decodeNavigationId } from './scope';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== WEB NAVIGATION - DELETE
-//==================================================
+// Web navigation - delete
 
 router.delete(
-  "/api/v1/web-navigation/:id",
-
+  '/api/v1/web-navigation/:id',
   verifyToken,
-
-  requirePermission("web_navigation.delete"),
-
+  requirePermission('web_navigation.delete'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -34,8 +29,8 @@ router.delete(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -105,12 +100,7 @@ router.delete(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
@@ -160,16 +150,16 @@ router.delete(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "web_navigation.deleted",
-        category: "data_change",
-        module: "web_navigation",
-        action: "delete",
-        actorType: "admin",
+        eventCode: 'web_navigation.deleted',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: 'delete',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation",
+        entityType: 'web_navigation',
         entityId: idNavigation,
         entityLabel: navigation.web_navigation_name,
         before: {
@@ -186,19 +176,14 @@ router.delete(
           location: navigation.web_navigation_location,
           status: 0,
           item_count: Number(navigation.item_count ?? 0),
-          deleted_at: "set",
+          deleted_at: 'set',
         },
         httpStatus: 200,
       });
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        200,
-        "WEB_NAVIGATION_DELETED",
-        "Web navigation deleted successfully",
-      );
+      return sendSuccess(res, 200, 'WEB_NAVIGATION_DELETED', 'Web navigation deleted successfully');
     } catch (error) {
       if (connection) {
         try {
@@ -206,14 +191,9 @@ router.delete(
         } catch {}
       }
 
-      console.error("[Web Navigation] Failed to delete navigation", error);
+      console.error('[Web Navigation] Failed to delete navigation', error);
 
-      return sendError(
-        res,
-        500,
-        "WEB_NAVIGATION_DELETE_FAILED",
-        "Unable to delete web navigation",
-      );
+      return sendError(res, 500, 'WEB_NAVIGATION_DELETE_FAILED', 'Unable to delete web navigation');
     } finally {
       connection?.release();
     }

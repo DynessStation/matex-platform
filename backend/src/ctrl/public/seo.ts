@@ -1,7 +1,7 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
 
-import { pool } from "../../db";
+import { pool } from '../../db';
 
 const router = Router();
 
@@ -11,16 +11,14 @@ type SitemapEntry = {
 };
 
 const publicSiteUrl = (): string => {
-  const configured = String(
-    process.env.PUBLIC_SITE_URL ?? "https://matexindo.com",
-  ).trim();
+  const configured = String(process.env.PUBLIC_SITE_URL ?? 'https://matexindo.com').trim();
 
   try {
     const url = new URL(configured);
-    if (!/^https?:$/.test(url.protocol)) throw new Error("unsupported protocol");
+    if (!/^https?:$/.test(url.protocol)) throw new Error('unsupported protocol');
     return url.origin;
   } catch {
-    return "https://matexindo.com";
+    return 'https://matexindo.com';
   }
 };
 
@@ -29,28 +27,25 @@ const companyId = (): number | null => {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
 };
 
-const localizedPath = (
-  locale: unknown,
-  idPath: string,
-  englishPath: string,
-): string => (String(locale) === "en-US" ? englishPath : idPath);
+const localizedPath = (locale: unknown, idPath: string, englishPath: string): string =>
+  String(locale) === 'en-US' ? englishPath : idPath;
 
 const pagePath = (row: RowDataPacket): string => {
   const locale = String(row.locale);
-  const path = encodeURIComponent(String(row.slug_or_path ?? ""));
+  const path = encodeURIComponent(String(row.slug_or_path ?? ''));
 
   switch (String(row.content_type)) {
-    case "home":
-      return localizedPath(locale, "/", "/en");
-    case "contact":
-      return localizedPath(locale, "/kontak", "/en/contact-us");
-    case "faq":
-      return localizedPath(locale, "/faq", "/en/faq");
-    case "product":
+    case 'home':
+      return localizedPath(locale, '/', '/en');
+    case 'contact':
+      return localizedPath(locale, '/kontak', '/en/contact-us');
+    case 'faq':
+      return localizedPath(locale, '/faq', '/en/faq');
+    case 'product':
       return localizedPath(locale, `/produk/${path}`, `/en/product/${path}`);
-    case "category":
+    case 'category':
       return localizedPath(locale, `/kategori/${path}`, `/en/category/${path}`);
-    case "article":
+    case 'article':
       return localizedPath(locale, `/artikel/${path}`, `/en/article/${path}`);
     default:
       return localizedPath(locale, `/${path}`, `/en/${path}`);
@@ -59,27 +54,22 @@ const pagePath = (row: RowDataPacket): string => {
 
 const xmlEscape = (value: string): string =>
   value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
 
 const lastModified = (value: unknown): string | null => {
   if (!value) return null;
   const parsed = value instanceof Date ? value : new Date(String(value));
-  return Number.isNaN(parsed.getTime())
-    ? null
-    : parsed.toISOString().slice(0, 10);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().slice(0, 10);
 };
 
-export const buildSitemapXml = (
-  siteUrl: string,
-  entries: SitemapEntry[],
-): string => {
+export const buildSitemapXml = (siteUrl: string, entries: SitemapEntry[]): string => {
   const unique = new Map<string, unknown>();
   for (const entry of entries) {
-    if (!entry.location.startsWith("/")) continue;
+    if (!entry.location.startsWith('/')) continue;
     const previous = unique.get(entry.location);
     if (!previous || lastModified(entry.lastModified)) {
       unique.set(entry.location, entry.lastModified);
@@ -91,23 +81,23 @@ export const buildSitemapXml = (
     .map(([location, modified]) => {
       const date = lastModified(modified);
       return [
-        "  <url>",
+        '  <url>',
         `    <loc>${xmlEscape(`${siteUrl}${location}`)}</loc>`,
         date ? `    <lastmod>${date}</lastmod>` : null,
-        "  </url>",
+        '  </url>',
       ]
         .filter(Boolean)
-        .join("\n");
+        .join('\n');
     })
-    .join("\n");
+    .join('\n');
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     urls,
-    "</urlset>",
-    "",
-  ].join("\n");
+    '</urlset>',
+    '',
+  ].join('\n');
 };
 
 const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]> => {
@@ -177,10 +167,10 @@ const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]>
   );
 
   const indexPages: SitemapEntry[] = [
-    { location: "/katalog" },
-    { location: "/en/catalog" },
-    { location: "/artikel" },
-    { location: "/en/articles" },
+    { location: '/katalog' },
+    { location: '/en/catalog' },
+    { location: '/artikel' },
+    { location: '/en/articles' },
   ];
 
   return [
@@ -192,53 +182,52 @@ const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]>
   ];
 };
 
-router.get("/robots.txt", (_req, res) => {
+router.get('/robots.txt', (_req, res) => {
   const siteUrl = publicSiteUrl();
-  res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=3600");
-  res.status(200).send(
-    [
-      "User-agent: *",
-      "Allow: /",
-      "Disallow: /account",
-      "Disallow: /cart",
-      "Disallow: /checkout",
-      "Disallow: /compare",
-      "Disallow: /coming-soon",
-      "Disallow: /en/account",
-      "Disallow: /en/cart",
-      "Disallow: /en/search",
-      "Disallow: /en/wishlist",
-      "Disallow: /maintenance",
-      "Disallow: /order",
-      "Disallow: /search",
-      "Disallow: /seller",
-      "Disallow: /wishlist",
-      `Sitemap: ${siteUrl}/sitemap.xml`,
-      "",
-    ].join("\n"),
-  );
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res
+    .status(200)
+    .send(
+      [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /account',
+        'Disallow: /cart',
+        'Disallow: /checkout',
+        'Disallow: /compare',
+        'Disallow: /coming-soon',
+        'Disallow: /en/account',
+        'Disallow: /en/cart',
+        'Disallow: /en/search',
+        'Disallow: /en/wishlist',
+        'Disallow: /maintenance',
+        'Disallow: /order',
+        'Disallow: /search',
+        'Disallow: /seller',
+        'Disallow: /wishlist',
+        `Sitemap: ${siteUrl}/sitemap.xml`,
+        '',
+      ].join('\n'),
+    );
 });
 
-router.get("/sitemap.xml", async (_req, res) => {
+router.get('/sitemap.xml', async (_req, res) => {
   const idMasterComp = companyId();
   if (!idMasterComp) {
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(503).type("text/plain").send("Sitemap is not configured");
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(503).type('text/plain').send('Sitemap is not configured');
   }
 
   try {
-    const xml = buildSitemapXml(
-      publicSiteUrl(),
-      await loadSitemapEntries(idMasterComp),
-    );
-    res.setHeader("Content-Type", "application/xml; charset=utf-8");
-    res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+    const xml = buildSitemapXml(publicSiteUrl(), await loadSitemapEntries(idMasterComp));
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
     return res.status(200).send(xml);
   } catch (error) {
-    console.error("[Public SEO] Sitemap generation failed", error);
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(503).type("text/plain").send("Sitemap is temporarily unavailable");
+    console.error('[Public SEO] Sitemap generation failed', error);
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(503).type('text/plain').send('Sitemap is temporarily unavailable');
   }
 });
 

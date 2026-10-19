@@ -1,29 +1,29 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
-import { pool } from "../../db";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
+import { pool } from '../../db';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
 const router = Router();
 
-const SUPPORTED_LOCALES = new Set(["id-ID", "en-US"]);
+const SUPPORTED_LOCALES = new Set(['id-ID', 'en-US']);
 const PUBLIC_MEDIA_SLOTS = [
-  "home_main",
-  "home_side_1",
-  "home_side_2",
-  "home_tile_1",
-  "home_tile_2",
-  "home_tile_3",
-  "home_tile_4",
-  "home_advertisement",
-  "about_content",
-  "gallery",
-  "og",
+  'home_main',
+  'home_side_1',
+  'home_side_2',
+  'home_tile_1',
+  'home_tile_2',
+  'home_tile_3',
+  'home_tile_4',
+  'home_advertisement',
+  'about_content',
+  'gallery',
+  'og',
 ] as const;
 
 const parseJsonValue = (value: unknown): unknown | null => {
   if (value === null || value === undefined) return null;
-  if (typeof value !== "string") return value;
+  if (typeof value !== 'string') return value;
 
   try {
     return JSON.parse(value);
@@ -34,17 +34,12 @@ const parseJsonValue = (value: unknown): unknown | null => {
 
 // Public company scope is deployment-owned.
 // No request parameter, cookie, or header may override it.
-router.get("/api/public/website-page/:locale/:path", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/website-page/:locale/:path', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
 
   const company = Number(process.env.PUBLIC_COMPANY_ID);
   if (!Number.isSafeInteger(company) || company <= 0) {
-    return sendError(
-      res,
-      503,
-      "WEBSITE_UNAVAILABLE",
-      "Website content is not configured",
-    );
+    return sendError(res, 503, 'WEBSITE_UNAVAILABLE', 'Website content is not configured');
   }
 
   const locale = String(req.params.locale);
@@ -54,7 +49,7 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pagePath) ||
     pagePath.length > 191
   ) {
-    return sendError(res, 404, "WEBSITE_PAGE_NOT_FOUND", "Page not found");
+    return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Page not found');
   }
 
   try {
@@ -100,7 +95,7 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
 
     const page = pages[0];
     if (!page) {
-      return sendError(res, 404, "WEBSITE_PAGE_NOT_FOUND", "Page not found");
+      return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Page not found');
     }
 
     const [translations] = await pool.query<RowDataPacket[]>(
@@ -147,7 +142,7 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
             'image/avif'
           )
           AND relation.website_page_media_slot IN (
-            ${PUBLIC_MEDIA_SLOTS.map(() => "?").join(", ")}
+            ${PUBLIC_MEDIA_SLOTS.map(() => '?').join(', ')}
           )
         ORDER BY
           relation.website_page_media_sort_order,
@@ -156,7 +151,7 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
       [locale, page.id_website_page, company, ...PUBLIC_MEDIA_SLOTS],
     );
 
-    return sendSuccess(res, 200, "WEBSITE_PAGE_FOUND", "Page loaded", {
+    return sendSuccess(res, 200, 'WEBSITE_PAGE_FOUND', 'Page loaded', {
       key: page.website_page_key,
       locale: page.website_page_locale,
       path: page.website_page_path,
@@ -166,34 +161,31 @@ router.get("/api/public/website-page/:locale/:path", async (req, res) => {
       content: parseJsonValue(page.website_page_content_json),
       seo: {
         title: page.website_page_seo_title || page.website_page_title,
-        description:
-          page.website_page_seo_description || page.website_page_summary || "",
-        keywords: page.website_page_seo_keywords || "",
-        robots: page.website_page_seo_robots || "index, follow",
+        description: page.website_page_seo_description || page.website_page_summary || '',
+        keywords: page.website_page_seo_keywords || '',
+        robots: page.website_page_seo_robots || 'index, follow',
         canonical_url: page.website_page_canonical_url,
         social_title:
-          page.website_page_social_title ||
-          page.website_page_seo_title ||
-          page.website_page_title,
+          page.website_page_social_title || page.website_page_seo_title || page.website_page_title,
         social_description:
           page.website_page_social_description ||
           page.website_page_seo_description ||
           page.website_page_summary ||
-          "",
+          '',
       },
       translations,
       media: media.map((item) => ({
         slot: item.slot,
         asset_url: buildAttachmentUrl(item.storage_path),
-        alt_text: item.alt_text ?? item.name ?? "",
-        caption: item.caption ?? "",
-        click_action: item.click_action ?? "none",
+        alt_text: item.alt_text ?? item.name ?? '',
+        caption: item.caption ?? '',
+        click_action: item.click_action ?? 'none',
         click_target: item.click_target ?? null,
       })),
     });
   } catch (error) {
-    console.error("[Public Website] Failed to load page", error);
-    return sendError(res, 500, "WEBSITE_UNAVAILABLE", "Unable to load page");
+    console.error('[Public Website] Failed to load page', error);
+    return sendError(res, 500, 'WEBSITE_UNAVAILABLE', 'Unable to load page');
   }
 });
 

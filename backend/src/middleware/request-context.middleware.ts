@@ -1,37 +1,28 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Response } from 'express';
 
-import { randomUUID } from "crypto";
+import { randomUUID } from 'crypto';
 
-import { AuthRequest } from "./auth-jwt.middleware";
+import { AuthRequest } from './auth-jwt.middleware';
 
-//==================================================
-//==== REQUEST CONTEXT
-//==================================================
+// Request context
 
 export interface RequestAuditContext {
   requestId: string;
-
   correlationId: string;
-
   startedAt: number;
-
   source: string;
 }
 
-//==================================================
-//==== REQUEST
-//==================================================
+// Request
 
 export interface AuditRequest extends AuthRequest {
   auditContext?: RequestAuditContext;
 }
 
-//==================================================
-//==== VALID CORRELATION ID
-//==================================================
+// Valid correlation ID
 
 const getCorrelationId = (value: unknown): string | null => {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return null;
   }
 
@@ -48,15 +39,12 @@ const getCorrelationId = (value: unknown): string | null => {
    * Kalau nanti microservice/integration butuh
    * format correlation lain, baru kita perluas.
    */
-  const uuidPattern =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
   return uuidPattern.test(cleanValue) ? cleanValue : null;
 };
 
-//==================================================
-//==== MIDDLEWARE
-//==================================================
+// Middleware
 
 export const requestContextMiddleware = (
   req: AuditRequest,
@@ -65,25 +53,20 @@ export const requestContextMiddleware = (
 ): void => {
   const requestId = randomUUID();
 
-  const incomingCorrelationId = getCorrelationId(
-    req.header("x-correlation-id"),
-  );
+  const incomingCorrelationId = getCorrelationId(req.header('x-correlation-id'));
 
   const correlationId = incomingCorrelationId ?? requestId;
 
   req.auditContext = {
     requestId,
-
     correlationId,
-
     startedAt: Date.now(),
-
-    source: "admin_web",
+    source: 'admin_web',
   };
 
-  res.setHeader("X-Request-ID", requestId);
+  res.setHeader('X-Request-ID', requestId);
 
-  res.setHeader("X-Correlation-ID", correlationId);
+  res.setHeader('X-Correlation-ID', correlationId);
 
   next();
 };

@@ -1,57 +1,44 @@
 // Create an admin account.
-import express = require("express");
-import bcrypt from "bcrypt";
-import keyhsid from "../../../hsid";
-import db = require("../../../db");
+import express = require('express');
+import bcrypt from 'bcrypt';
+import keyhsid from '../../../hsid';
+import db = require('../../../db');
 
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
-import { resolveAdminProfilePhoto } from "./profile-photo";
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
+import { resolveAdminProfilePhoto } from './profile-photo';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== ADMIN ACCOUNT - CREATE
-//==================================================
+// Admin account - create
 
 router.post(
-  "/api/v1/admin-acct",
-
+  '/api/v1/admin-acct',
   verifyToken,
-
-  requirePermission("admin_account.create"),
-
+  requirePermission('admin_account.create'),
   async (req: AuthRequest, res) => {
     try {
       const {
         name,
         alias,
-
         email_1,
         email_2,
-
         phone_1,
         phone_2,
-
         id_profile_photo,
-
         id_master_comp,
         id_office,
         id_chair,
         id_access,
-
         is_all_access,
-
         password,
       } = req.body;
 
-      //==================================================
-      //==== REQUIRED VALIDATION
-      //==================================================
+      // Required validation
 
       if (
         !name ||
@@ -67,14 +54,12 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_REQUIRED_FIELDS_MISSING",
-          "Required fields are missing",
+          'ADMIN_ACCOUNT_REQUIRED_FIELDS_MISSING',
+          'Required fields are missing',
         );
       }
 
-      //==================================================
-      //==== NORMALIZE INPUT
-      //==================================================
+      // Normalize input
 
       const cleanName = String(name).trim();
 
@@ -88,71 +73,35 @@ router.post(
 
       const cleanPhone2 = phone_2 ? String(phone_2).trim() : null;
 
-      //==================================================
-      //==== NAME VALIDATION
-      //==================================================
+      // Name validation
 
       if (cleanName.length > 50 || !/^[\p{L}\s.,'-]+$/u.test(cleanName)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_NAME_INVALID",
-          "Invalid name format",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_NAME_INVALID', 'Invalid name format');
       }
 
-      //==================================================
-      //==== ALIAS VALIDATION
-      //==================================================
+      // Alias validation
 
       if (cleanAlias.length > 15 || !/^[a-zA-Z0-9]+$/.test(cleanAlias)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_ALIAS_INVALID",
-          "Invalid alias format",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_ALIAS_INVALID', 'Invalid alias format');
       }
 
-      //==================================================
-      //==== EMAIL VALIDATION
-      //==================================================
+      // Email validation
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (
-        !emailRegex.test(cleanEmail1) ||
-        (cleanEmail2 && !emailRegex.test(cleanEmail2))
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_EMAIL_INVALID",
-          "Invalid email address",
-        );
+      if (!emailRegex.test(cleanEmail1) || (cleanEmail2 && !emailRegex.test(cleanEmail2))) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_EMAIL_INVALID', 'Invalid email address');
       }
 
-      //==================================================
-      //==== PHONE VALIDATION
-      //==================================================
+      // Phone validation
 
       const phoneRegex = /^\+[1-9]\d{6,14}$/;
 
-      if (
-        !phoneRegex.test(cleanPhone1) ||
-        (cleanPhone2 && !phoneRegex.test(cleanPhone2))
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_PHONE_INVALID",
-          "Invalid phone number",
-        );
+      if (!phoneRegex.test(cleanPhone1) || (cleanPhone2 && !phoneRegex.test(cleanPhone2))) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_PHONE_INVALID', 'Invalid phone number');
       }
 
-      //==================================================
-      //==== PASSWORD VALIDATION
-      //==================================================
+      // Password validation
 
       const cleanPassword = String(password);
 
@@ -162,20 +111,12 @@ router.post(
         /\s/.test(cleanPassword) ||
         !/[^a-zA-Z]/.test(cleanPassword)
       ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_PASSWORD_INVALID",
-          "Invalid password format",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_PASSWORD_INVALID', 'Invalid password format');
       }
 
-      //==================================================
-      //==== DECODE HASHIDS
-      //==================================================
+      // Decode hashids
 
-      const decodedMasterComp =
-        keyhsid.idMasterCompany.decode(id_master_comp)[0];
+      const decodedMasterComp = keyhsid.idMasterCompany.decode(id_master_comp)[0];
 
       const decodedOffice = keyhsid.idOffice.decode(id_office)[0];
 
@@ -208,19 +149,17 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_REFERENCE_INVALID",
-          "Invalid reference identifier",
+          'ADMIN_ACCOUNT_REFERENCE_INVALID',
+          'Invalid reference identifier',
         );
       }
 
-      //==================================================
-      //==== SESSION ACCOUNT
-      //==================================================
+      // Session account
 
       const sessionAdminId = req.user?.id_admin_acct;
 
       if (!sessionAdminId) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const [sessionRows] = await pool.query(
@@ -243,18 +182,13 @@ router.post(
       const sessionUsers = sessionRows as any[];
 
       if (!sessionUsers.length) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const sessionUser = sessionUsers[0];
 
       if (Number(sessionUser.admin_acct_status) !== 1) {
-        return sendError(
-          res,
-          403,
-          "AUTH_ACCOUNT_INACTIVE",
-          "Your account is not active",
-        );
+        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
       }
 
       const sessionCompany = Number(sessionUser.id_master_comp);
@@ -263,35 +197,29 @@ router.post(
 
       const sessionAllAccess = Number(sessionUser.is_all_access);
 
-      //==================================================
-      //==== COMPANY HARD BOUNDARY
-      //==================================================
+      // Company hard boundary
 
       if (idMasterComp !== sessionCompany) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_CREATE_COMPANY_SCOPE_FORBIDDEN",
-          "You cannot create an account outside your company",
+          'ADMIN_ACCOUNT_CREATE_COMPANY_SCOPE_FORBIDDEN',
+          'You cannot create an account outside your company',
         );
       }
 
-      //==================================================
-      //==== OFFICE SCOPE
-      //==================================================
+      // Office scope
 
       if (sessionAllAccess !== 1 && idOffice !== sessionOffice) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_CREATE_OFFICE_SCOPE_FORBIDDEN",
-          "You cannot create an account outside your assigned office",
+          'ADMIN_ACCOUNT_CREATE_OFFICE_SCOPE_FORBIDDEN',
+          'You cannot create an account outside your assigned office',
         );
       }
 
-      //==================================================
-      //==== FULL ACCESS
-      //==================================================
+      // Full access
 
       const requestedAllAccess = is_all_access ? 1 : 0;
 
@@ -299,14 +227,12 @@ router.post(
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_FULL_ACCESS_GRANT_FORBIDDEN",
-          "You are not allowed to grant full company access",
+          'ADMIN_ACCOUNT_FULL_ACCESS_GRANT_FORBIDDEN',
+          'You are not allowed to grant full company access',
         );
       }
 
-      //==================================================
-      //==== VALIDATE COMPANY
-      //==================================================
+      // Validate company
 
       const [companyRows] = await pool.query(
         `
@@ -327,14 +253,12 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_COMPANY_NOT_AVAILABLE",
-          "Company is not available",
+          'ADMIN_ACCOUNT_COMPANY_NOT_AVAILABLE',
+          'Company is not available',
         );
       }
 
-      //==================================================
-      //==== VALIDATE OFFICE + COMPANY
-      //==================================================
+      // Validate office + company
 
       const [officeRows] = await pool.query(
         `
@@ -356,24 +280,18 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_OFFICE_COMPANY_MISMATCH",
-          "Office does not belong to the selected company",
+          'ADMIN_ACCOUNT_OFFICE_COMPANY_MISMATCH',
+          'Office does not belong to the selected company',
         );
       }
 
-      //==================================================
-      //==== VALIDATE PROFILE PHOTO
-      //==================================================
+      // Validate profile photo
 
-      const profilePhotoResult = await resolveAdminProfilePhoto(
-        id_profile_photo,
-        {
-          idMasterComp,
-          idOffice,
-
-          isAllAccess: sessionAllAccess,
-        },
-      );
+      const profilePhotoResult = await resolveAdminProfilePhoto(id_profile_photo, {
+        idMasterComp,
+        idOffice,
+        isAllAccess: sessionAllAccess,
+      });
 
       if (!profilePhotoResult.success) {
         return sendError(
@@ -386,9 +304,7 @@ router.post(
 
       const idProfilePhoto = profilePhotoResult.idAttachment;
 
-      //==================================================
-      //==== VALIDATE CHAIR + COMPANY
-      //==================================================
+      // Validate chair + company
 
       const [chairRows] = await pool.query(
         `
@@ -410,13 +326,11 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_CHAIR_NOT_AVAILABLE",
-          "Position is not available for the selected company",
+          'ADMIN_ACCOUNT_CHAIR_NOT_AVAILABLE',
+          'Position is not available for the selected company',
         );
       }
-      //==================================================
-      //==== VALIDATE ACCESS + COMPANY
-      //==================================================
+      // Validate access + company
 
       const [accessRows] = await pool.query(
         `
@@ -438,14 +352,12 @@ router.post(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE",
-          "Access profile is not available for the selected company",
+          'ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE',
+          'Access profile is not available for the selected company',
         );
       }
 
-      //==================================================
-      //==== CHECK ALIAS DUPLICATE
-      //==================================================
+      // Check alias duplicate
 
       const [aliasRows] = await pool.query(
         `
@@ -463,23 +375,16 @@ router.post(
       );
 
       if ((aliasRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_ALIAS_EXISTS",
-          "Alias is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_ALIAS_EXISTS', 'Alias is already in use');
       }
 
-      //==================================================
-      //==== CHECK EMAIL DUPLICATE
-      //==================================================
+      // Check email duplicate
 
-      const emailValues = [cleanEmail1, cleanEmail2].filter(
-        (value): value is string => Boolean(value),
+      const emailValues = [cleanEmail1, cleanEmail2].filter((value): value is string =>
+        Boolean(value),
       );
 
-      const emailPlaceholders = emailValues.map(() => "?").join(", ");
+      const emailPlaceholders = emailValues.map(() => '?').join(', ');
 
       const [emailRows] = await pool.query(
         `
@@ -502,23 +407,16 @@ router.post(
       );
 
       if ((emailRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_EMAIL_EXISTS",
-          "Email address is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_EMAIL_EXISTS', 'Email address is already in use');
       }
 
-      //==================================================
-      //==== CHECK PHONE DUPLICATE
-      //==================================================
+      // Check phone duplicate
 
-      const phoneValues = [cleanPhone1, cleanPhone2].filter(
-        (value): value is string => Boolean(value),
+      const phoneValues = [cleanPhone1, cleanPhone2].filter((value): value is string =>
+        Boolean(value),
       );
 
-      const phonePlaceholders = phoneValues.map(() => "?").join(", ");
+      const phonePlaceholders = phoneValues.map(() => '?').join(', ');
 
       const [phoneRows] = await pool.query(
         `
@@ -541,23 +439,14 @@ router.post(
       );
 
       if ((phoneRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_PHONE_EXISTS",
-          "Phone number is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_PHONE_EXISTS', 'Phone number is already in use');
       }
 
-      //==================================================
-      //==== PASSWORD
-      //==================================================
+      // Password
 
       const passwordHash = await bcrypt.hash(cleanPassword, 12);
 
-      //==================================================
-      //==== UUID
-      //==================================================
+      // UUID
 
       let accountUuid = 0;
 
@@ -583,9 +472,7 @@ router.post(
         uuidAvailable = !(uuidRows as any[]).length;
       }
 
-      //==================================================
-      //==== INSERT
-      //==================================================
+      // Insert
 
       const [insertResult] = await pool.query(
         `
@@ -657,109 +544,63 @@ router.post(
         [
           idMasterComp,
           idOffice,
-
           passwordHash,
-
           cleanName,
           cleanAlias,
-
           cleanEmail1,
           cleanEmail2,
-
           cleanPhone1,
           cleanPhone2,
-
           idProfilePhoto,
-
           accountUuid,
-
           idChair,
           idAccess,
-
           requestedAllAccess,
         ],
       );
 
       const insertData = insertResult as any;
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         idMasterComp,
-
-        eventCode: "admin_account.created",
-
-        category: "data_change",
-
-        module: "admin_account",
-
-        action: "create",
-
-        actorType: "admin",
-
+        eventCode: 'admin_account.created',
+        category: 'data_change',
+        module: 'admin_account',
+        action: 'create',
+        actorType: 'admin',
         actorId: sessionAdminId,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_account",
-
+        entityType: 'admin_account',
         entityId: insertData.insertId,
-
         entityLabel: cleanName,
-
         after: {
           id_master_comp: idMasterComp,
-
           id_office: idOffice,
-
           name: cleanName,
-
           alias: cleanAlias,
-
           email_1: cleanEmail1,
-
           email_2: cleanEmail2,
-
           phone_1: cleanPhone1,
-
           phone_2: cleanPhone2,
-
           id_profile_photo: idProfilePhoto,
-
           id_chair: idChair,
-
           id_access: idAccess,
-
           is_all_access: requestedAllAccess,
-
           admin_acct_status: 1,
         },
-
         httpStatus: 201,
       });
 
-      return sendSuccess(
-        res,
-        201,
-        "ADMIN_ACCOUNT_CREATED",
-        "Admin account created successfully",
-        {
-          id_admin_acct: keyhsid.idAdmin.encode(insertData.insertId),
-        },
-      );
+      return sendSuccess(res, 201, 'ADMIN_ACCOUNT_CREATED', 'Admin account created successfully', {
+        id_admin_acct: keyhsid.idAdmin.encode(insertData.insertId),
+      });
     } catch (error) {
-      console.error("Create admin account error:", error);
+      console.error('Create admin account error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );

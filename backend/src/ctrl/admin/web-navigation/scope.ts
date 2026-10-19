@@ -1,7 +1,7 @@
 // Session scope and navigation id decoding shared by the navigation routes.
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest } from "../../../middleware/auth-jwt.middleware";
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest } from '../../../middleware/auth-jwt.middleware';
 
 const { pool } = db;
 
@@ -18,17 +18,15 @@ export type SessionScopeResult =
       message: string;
     };
 
-export const getSessionScope = async (
-  req: AuthRequest,
-): Promise<SessionScopeResult> => {
+export const getSessionScope = async (req: AuthRequest): Promise<SessionScopeResult> => {
   const idAdminAcct = Number(req.user?.id_admin_acct);
 
   if (!Number.isInteger(idAdminAcct) || idAdminAcct <= 0) {
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -54,8 +52,8 @@ export const getSessionScope = async (
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -65,8 +63,8 @@ export const getSessionScope = async (
     return {
       success: false,
       status: 403,
-      code: "AUTH_ACCOUNT_INACTIVE",
-      message: "Your account is not active",
+      code: 'AUTH_ACCOUNT_INACTIVE',
+      message: 'Your account is not active',
     };
   }
 
@@ -78,7 +76,7 @@ export const getSessionScope = async (
 };
 
 export const decodeNavigationId = (value: unknown): number | null => {
-  const encodedId = String(value ?? "").trim();
+  const encodedId = String(value ?? '').trim();
 
   if (!encodedId) {
     return null;

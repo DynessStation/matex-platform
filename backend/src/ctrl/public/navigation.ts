@@ -1,13 +1,13 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
 
-import { isPublicContentLocale } from "../../config/public-content.config";
+import { isPublicContentLocale } from '../../config/public-content.config';
 import {
   getFixedWebNavigationPath,
   isFixedWebNavigationKey,
-} from "../../config/web-navigation.config";
-import { pool } from "../../db";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+} from '../../config/web-navigation.config';
+import { pool } from '../../db';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
 const router = Router();
 
@@ -24,27 +24,22 @@ type PublicNavigationItem = {
   path: string;
 };
 
-router.get("/api/public/navigation/:key/:locale", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/navigation/:key/:locale', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
 
   const company = Number(process.env.PUBLIC_COMPANY_ID);
 
   if (!Number.isSafeInteger(company) || company <= 0) {
-    return sendError(
-      res,
-      503,
-      "NAVIGATION_UNAVAILABLE",
-      "Navigation is not configured",
-    );
+    return sendError(res, 503, 'NAVIGATION_UNAVAILABLE', 'Navigation is not configured');
   }
 
-  const key = String(req.params.key ?? "")
+  const key = String(req.params.key ?? '')
     .trim()
     .toLowerCase();
-  const locale = String(req.params.locale ?? "").trim();
+  const locale = String(req.params.locale ?? '').trim();
 
-  if (key !== "primary" || !isPublicContentLocale(locale)) {
-    return sendError(res, 404, "NAVIGATION_NOT_FOUND", "Navigation not found");
+  if (key !== 'primary' || !isPublicContentLocale(locale)) {
+    return sendError(res, 404, 'NAVIGATION_NOT_FOUND', 'Navigation not found');
   }
 
   try {
@@ -68,20 +63,13 @@ router.get("/api/public/navigation/:key/:locale", async (req, res) => {
     const navigation = navigationRows[0];
 
     if (!navigation) {
-      return sendError(
-        res,
-        404,
-        "NAVIGATION_NOT_FOUND",
-        "Navigation not found",
-      );
+      return sendError(res, 404, 'NAVIGATION_NOT_FOUND', 'Navigation not found');
     }
 
-    const configuredDefaultLocale = String(
-      navigation.web_navigation_default_locale ?? "",
-    );
+    const configuredDefaultLocale = String(navigation.web_navigation_default_locale ?? '');
     const defaultLocale = isPublicContentLocale(configuredDefaultLocale)
       ? configuredDefaultLocale
-      : "id-ID";
+      : 'id-ID';
 
     const [itemRows] = await pool.query<NavigationRow[]>(
       `
@@ -119,17 +107,13 @@ router.get("/api/public/navigation/:key/:locale", async (req, res) => {
     const items: PublicNavigationItem[] = [];
 
     for (const row of itemRows) {
-      const storedKey = String(row.web_navigation_item_key ?? "")
+      const storedKey = String(row.web_navigation_item_key ?? '')
         .trim()
         .toLowerCase();
-      const normalizedKey = storedKey === "blog" ? "articles" : storedKey;
-      const label = String(row.label ?? "").trim();
+      const normalizedKey = storedKey === 'blog' ? 'articles' : storedKey;
+      const label = String(row.label ?? '').trim();
 
-      if (
-        !isFixedWebNavigationKey(normalizedKey) ||
-        !label ||
-        seenKeys.has(normalizedKey)
-      ) {
+      if (!isFixedWebNavigationKey(normalizedKey) || !label || seenKeys.has(normalizedKey)) {
         continue;
       }
 
@@ -141,21 +125,16 @@ router.get("/api/public/navigation/:key/:locale", async (req, res) => {
       });
     }
 
-    return sendSuccess(res, 200, "NAVIGATION_FOUND", "Navigation loaded", {
+    return sendSuccess(res, 200, 'NAVIGATION_FOUND', 'Navigation loaded', {
       key: navigation.web_navigation_key,
       location: navigation.web_navigation_location,
       locale,
       items,
     });
   } catch (error) {
-    console.error("[Public Navigation] Failed to load navigation", error);
+    console.error('[Public Navigation] Failed to load navigation', error);
 
-    return sendError(
-      res,
-      500,
-      "NAVIGATION_UNAVAILABLE",
-      "Unable to load navigation",
-    );
+    return sendError(res, 500, 'NAVIGATION_UNAVAILABLE', 'Unable to load navigation');
   }
 });
 

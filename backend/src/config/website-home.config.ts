@@ -15,7 +15,7 @@ export interface WebsiteHomeMediaRule {
  */
 export const WEBSITE_HOME_MEDIA_RULES = {
   home_main: {
-    label: "Main banner",
+    label: 'Main banner',
     recommendedWidth: 3528,
     recommendedHeight: 1956,
     minWidth: 1299,
@@ -24,7 +24,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_side_1: {
-    label: "Top side banner",
+    label: 'Top side banner',
     recommendedWidth: 1400,
     recommendedHeight: 984,
     minWidth: 700,
@@ -33,7 +33,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_side_2: {
-    label: "Bottom side banner",
+    label: 'Bottom side banner',
     recommendedWidth: 1400,
     recommendedHeight: 984,
     minWidth: 700,
@@ -42,7 +42,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_tile_1: {
-    label: "Tile banner 1",
+    label: 'Tile banner 1',
     recommendedWidth: 1172,
     recommendedHeight: 984,
     minWidth: 586,
@@ -51,7 +51,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_tile_2: {
-    label: "Tile banner 2",
+    label: 'Tile banner 2',
     recommendedWidth: 1172,
     recommendedHeight: 984,
     minWidth: 586,
@@ -60,7 +60,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_tile_3: {
-    label: "Tile banner 3",
+    label: 'Tile banner 3',
     recommendedWidth: 1172,
     recommendedHeight: 984,
     minWidth: 586,
@@ -69,7 +69,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_tile_4: {
-    label: "Tile banner 4",
+    label: 'Tile banner 4',
     recommendedWidth: 1172,
     recommendedHeight: 984,
     minWidth: 586,
@@ -78,7 +78,7 @@ export const WEBSITE_HOME_MEDIA_RULES = {
     required: true,
   },
   home_advertisement: {
-    label: "Home promotion banner",
+    label: 'Home promotion banner',
     recommendedWidth: 1600,
     recommendedHeight: 500,
     minWidth: 960,
@@ -101,23 +101,23 @@ export const validateWebsiteHomeMedia = (
   const rule = WEBSITE_HOME_MEDIA_RULES[slot as WebsiteHomeMediaSlot];
   if (!rule) return null;
 
-  if (!["image/jpeg", "image/png", "image/webp"].includes(media.mimeType)) {
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(media.mimeType)) {
     return {
-      code: "WEBSITE_HOME_MEDIA_TYPE_INVALID",
+      code: 'WEBSITE_HOME_MEDIA_TYPE_INVALID',
       message: `${rule.label} must use JPEG, PNG, or WebP`,
     };
   }
 
   if (!media.width || !media.height) {
     return {
-      code: "WEBSITE_HOME_MEDIA_DIMENSIONS_MISSING",
+      code: 'WEBSITE_HOME_MEDIA_DIMENSIONS_MISSING',
       message: `${rule.label} has no readable image dimensions`,
     };
   }
 
   if (media.width < rule.minWidth || media.height < rule.minHeight) {
     return {
-      code: "WEBSITE_HOME_MEDIA_TOO_SMALL",
+      code: 'WEBSITE_HOME_MEDIA_TOO_SMALL',
       message: `${rule.label} must be at least ${rule.minWidth} x ${rule.minHeight}px`,
     };
   }
@@ -128,7 +128,7 @@ export const validateWebsiteHomeMedia = (
 
   if (ratioDifference > rule.ratioTolerance) {
     return {
-      code: "WEBSITE_HOME_MEDIA_RATIO_INVALID",
+      code: 'WEBSITE_HOME_MEDIA_RATIO_INVALID',
       message: `${rule.label} must follow the ${rule.recommendedWidth}:${rule.recommendedHeight} aspect ratio`,
     };
   }

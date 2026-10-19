@@ -1,13 +1,13 @@
 // Create an office.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, sessionHasPermission } from "./scope";
+import { getSessionScope, sessionHasPermission } from './scope';
 import {
   nullableString,
   normalizeFlag,
@@ -15,35 +15,26 @@ import {
   isValidEmail,
   isValidHttpUrl,
   validateOperatingHours,
-} from "./input";
+} from './input';
 import {
   resolveOfficeAttachments,
   insertOperatingHours,
   insertOfficeAttachments,
   toAuditOperatingHours,
   toAuditOfficeAttachments,
-} from "./relations";
+} from './relations';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== OFFICE - CREATE
-//==================================================
+// Office - create
 
 router.post(
-  "/api/v1/office",
-
+  '/api/v1/office',
   verifyToken,
-
-  requirePermission("office.create"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.create'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
@@ -55,59 +46,36 @@ router.post(
 
       const {
         office_code,
-
         office_name,
-
         office_description,
-
         address,
-
         city,
-
         province,
-
         postal_code,
-
         email,
-
         phone,
-
         lat,
-
         lng,
-
         attendance_enabled,
-
         attendance_radius_meter,
-
         website_url,
-
         is_public,
-
         public_slug,
-
         public_sort_order,
-
         google_place_id,
-
         google_maps_url,
-
         google_business_url,
-
         operating_hours,
-
         attachments,
       } = req.body;
 
-      //==================================================
-      //==== BASIC DATA
-      //==================================================
+      // Basic data
 
-      const cleanCode = String(office_code ?? "")
+      const cleanCode = String(office_code ?? '')
         .trim()
         .toUpperCase();
 
-      const cleanName = String(office_name ?? "").trim();
+      const cleanName = String(office_name ?? '').trim();
 
       const cleanDescription = nullableString(office_description);
 
@@ -131,117 +99,63 @@ router.post(
 
       const cleanGoogleBusinessUrl = nullableString(google_business_url);
 
-      //==================================================
-      //==== REQUIRED
-      //==================================================
+      // Required
 
       if (!cleanCode) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_CODE_REQUIRED",
-          "Office code is required",
-        );
+        return sendError(res, 400, 'OFFICE_CODE_REQUIRED', 'Office code is required');
       }
 
       if (!/^[A-Z0-9_-]+$/.test(cleanCode)) {
         return sendError(
           res,
           400,
-          "OFFICE_CODE_INVALID",
-          "Office code contains invalid characters",
+          'OFFICE_CODE_INVALID',
+          'Office code contains invalid characters',
         );
       }
 
       if (cleanCode.length > 50) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_CODE_TOO_LONG",
-          "Office code is too long",
-        );
+        return sendError(res, 400, 'OFFICE_CODE_TOO_LONG', 'Office code is too long');
       }
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_NAME_REQUIRED",
-          "Office name is required",
-        );
+        return sendError(res, 400, 'OFFICE_NAME_REQUIRED', 'Office name is required');
       }
 
       if (cleanName.length > 255) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_NAME_TOO_LONG",
-          "Office name is too long",
-        );
+        return sendError(res, 400, 'OFFICE_NAME_TOO_LONG', 'Office name is too long');
       }
 
-      //==================================================
-      //==== EMAIL / URL
-      //==================================================
+      // Email / URL
 
       if (cleanEmail && !isValidEmail(cleanEmail)) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_EMAIL_INVALID",
-          "Invalid office email address",
-        );
+        return sendError(res, 400, 'OFFICE_EMAIL_INVALID', 'Invalid office email address');
       }
 
-      const urls = [
-        cleanWebsiteUrl,
-
-        cleanGoogleMapsUrl,
-
-        cleanGoogleBusinessUrl,
-      ];
+      const urls = [cleanWebsiteUrl, cleanGoogleMapsUrl, cleanGoogleBusinessUrl];
 
       if (urls.some((value) => value && !isValidHttpUrl(value))) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_URLS_INVALID",
-          "One or more office URLs are invalid",
-        );
+        return sendError(res, 400, 'OFFICE_URLS_INVALID', 'One or more office URLs are invalid');
       }
 
-      //==================================================
-      //==== LOCATION
-      //==================================================
+      // Location
 
-      const numericLat =
-        lat === null || lat === undefined || lat === "" ? null : Number(lat);
+      const numericLat = lat === null || lat === undefined || lat === '' ? null : Number(lat);
 
-      const numericLng =
-        lng === null || lng === undefined || lng === "" ? null : Number(lng);
+      const numericLng = lng === null || lng === undefined || lng === '' ? null : Number(lng);
 
       if (
         numericLat !== null &&
         (!Number.isFinite(numericLat) || numericLat < -90 || numericLat > 90)
       ) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_LATITUDE_INVALID",
-          "Invalid latitude",
-        );
+        return sendError(res, 400, 'OFFICE_LATITUDE_INVALID', 'Invalid latitude');
       }
 
       if (
         numericLng !== null &&
         (!Number.isFinite(numericLng) || numericLng < -180 || numericLng > 180)
       ) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_LONGITUDE_INVALID",
-          "Invalid longitude",
-        );
+        return sendError(res, 400, 'OFFICE_LONGITUDE_INVALID', 'Invalid longitude');
       }
 
       const attendanceEnabled = normalizeFlag(attendance_enabled, 0);
@@ -249,19 +163,16 @@ router.post(
       const numericRadius =
         attendance_radius_meter === null ||
         attendance_radius_meter === undefined ||
-        attendance_radius_meter === ""
+        attendance_radius_meter === ''
           ? null
           : Number(attendance_radius_meter);
 
-      if (
-        numericRadius !== null &&
-        (!Number.isInteger(numericRadius) || numericRadius <= 0)
-      ) {
+      if (numericRadius !== null && (!Number.isInteger(numericRadius) || numericRadius <= 0)) {
         return sendError(
           res,
           400,
-          "OFFICE_ATTENDANCE_RADIUS_INVALID",
-          "Attendance radius must be greater than zero",
+          'OFFICE_ATTENDANCE_RADIUS_INVALID',
+          'Attendance radius must be greater than zero',
         );
       }
 
@@ -272,14 +183,12 @@ router.post(
         return sendError(
           res,
           400,
-          "OFFICE_LOCATION_AND_ATTENDANCE_RADIUS_REQUIRED",
-          "Location and attendance radius are required when attendance is enabled",
+          'OFFICE_LOCATION_AND_ATTENDANCE_RADIUS_REQUIRED',
+          'Location and attendance radius are required when attendance is enabled',
         );
       }
 
-      //==================================================
-      //==== PUBLIC
-      //==================================================
+      // Public
 
       const isPublic = normalizeFlag(is_public, 0);
 
@@ -291,8 +200,8 @@ router.post(
         return sendError(
           res,
           400,
-          "OFFICE_PUBLIC_SLUG_REQUIRED",
-          "Public slug is required for public office",
+          'OFFICE_PUBLIC_SLUG_REQUIRED',
+          'Public slug is required for public office',
         );
       }
 
@@ -301,69 +210,44 @@ router.post(
       const publicSortOrder =
         Number.isInteger(sortOrderRaw) && sortOrderRaw >= 0 ? sortOrderRaw : 0;
 
-      //==================================================
-      //==== OPERATING HOURS
-      //==================================================
+      // Operating hours
 
       const hourResult = validateOperatingHours(operating_hours ?? []);
 
       if (!hourResult.success) {
-        return sendError(
-          res,
-          hourResult.status,
-          hourResult.code,
-          hourResult.message,
-        );
+        return sendError(res, hourResult.status, hourResult.code, hourResult.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== ATTACHMENTS
-      //==================================================
+      // Attachments
 
-      //==================================================
-      //==== ATTACHMENT ACCESS
-      //==================================================
+      // Attachment access
 
-      const hasRequestedAttachments =
-        Array.isArray(attachments) && attachments.length > 0;
+      const hasRequestedAttachments = Array.isArray(attachments) && attachments.length > 0;
 
       if (hasRequestedAttachments) {
-        const canViewAttachments = await sessionHasPermission(
-          connection,
-
-          scope,
-
-          "attachment.view",
-        );
+        const canViewAttachments = await sessionHasPermission(connection, scope, 'attachment.view');
 
         if (!canViewAttachments) {
           await connection.rollback();
 
           return sendError(
             res,
-
             403,
-
-            "OFFICE_ATTACHMENT_ACCESS_DENIED",
-
-            "Attachment access is required to assign office media",
+            'OFFICE_ATTACHMENT_ACCESS_DENIED',
+            'Attachment access is required to assign office media',
           );
         }
       }
 
       const attachmentResult = await resolveOfficeAttachments(
         connection,
-
         scope.idMasterComp,
-
         attachments ?? [],
       );
 
@@ -378,9 +262,7 @@ router.post(
         );
       }
 
-      //==================================================
-      //==== DUPLICATE CODE / NAME
-      //==================================================
+      // Duplicate code / name
 
       const [duplicateRows] = await connection.query(
         `
@@ -422,14 +304,12 @@ router.post(
         return sendError(
           res,
           409,
-          "OFFICE_ALREADY_EXISTS",
-          "Office code or office name is already in use",
+          'OFFICE_ALREADY_EXISTS',
+          'Office code or office name is already in use',
         );
       }
 
-      //==================================================
-      //==== DUPLICATE PUBLIC SLUG
-      //==================================================
+      // Duplicate public slug
 
       if (cleanSlug) {
         const [slugRows] = await connection.query(
@@ -456,15 +336,13 @@ router.post(
           return sendError(
             res,
             409,
-            "OFFICE_PUBLIC_SLUG_EXISTS",
-            "Public office slug is already in use",
+            'OFFICE_PUBLIC_SLUG_EXISTS',
+            'Public office slug is already in use',
           );
         }
       }
 
-      //==================================================
-      //==== INSERT OFFICE
-      //==================================================
+      // Insert office
 
       const [insertResult] = await connection.query(
         `
@@ -551,171 +429,89 @@ router.post(
           `,
         [
           scope.idMasterComp,
-
           cleanCode,
-
           cleanName,
-
           cleanDescription,
-
           cleanAddress,
-
           cleanCity,
-
           cleanProvince,
-
           cleanPostalCode,
-
           cleanEmail,
-
           cleanPhone,
-
           numericLat,
-
           numericLng,
-
           attendanceEnabled,
-
           attendanceEnabled === 1 ? numericRadius : null,
-
           cleanWebsiteUrl,
-
           isPublic,
-
           cleanSlug,
-
           publicSortOrder,
-
           cleanGooglePlaceId,
-
           cleanGoogleMapsUrl,
-
           cleanGoogleBusinessUrl,
         ],
       );
 
       const idOffice = Number((insertResult as any).insertId);
 
-      //==================================================
-      //==== CHILD DATA
-      //==================================================
+      // Child data
 
-      await insertOperatingHours(
-        connection,
+      await insertOperatingHours(connection, idOffice, hourResult.data);
 
-        idOffice,
+      await insertOfficeAttachments(connection, idOffice, attachmentResult.data);
 
-        hourResult.data,
-      );
-
-      await insertOfficeAttachments(
-        connection,
-
-        idOffice,
-
-        attachmentResult.data,
-      );
-
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "office.created",
-
-        category: "data_change",
-
-        module: "office",
-
-        action: "create",
-
-        actorType: "admin",
-
+        eventCode: 'office.created',
+        category: 'data_change',
+        module: 'office',
+        action: 'create',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "office",
-
+        entityType: 'office',
         entityId: idOffice,
-
         entityLabel: cleanName,
-
         after: {
           office_code: cleanCode,
-
           office_name: cleanName,
-
           office_description: cleanDescription,
-
           address: cleanAddress,
-
           city: cleanCity,
-
           province: cleanProvince,
-
           postal_code: cleanPostalCode,
-
           email: cleanEmail,
-
           phone: cleanPhone,
-
           lat: numericLat,
-
           lng: numericLng,
-
           attendance_enabled: attendanceEnabled,
-
-          attendance_radius_meter:
-            attendanceEnabled === 1 ? numericRadius : null,
-
+          attendance_radius_meter: attendanceEnabled === 1 ? numericRadius : null,
           google_place_id: cleanGooglePlaceId,
-
           google_maps_url: cleanGoogleMapsUrl,
-
           google_business_url: cleanGoogleBusinessUrl,
-
           website_url: cleanWebsiteUrl,
-
           is_public: isPublic,
-
           public_slug: cleanSlug,
-
           public_sort_order: publicSortOrder,
-
           operating_hours: toAuditOperatingHours(hourResult.data),
-
           attachments: toAuditOfficeAttachments(attachmentResult.data),
-
           status: 1,
         },
-
         httpStatus: 201,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        201,
-        "OFFICE_CREATED",
-        "Office created successfully",
-        {
-          id_office: keyhsid.idOffice.encode(idOffice),
-        },
-      );
+      return sendSuccess(res, 201, 'OFFICE_CREATED', 'Office created successfully', {
+        id_office: keyhsid.idOffice.encode(idOffice),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -723,14 +519,9 @@ router.post(
         } catch {}
       }
 
-      console.error("Create office error:", error);
+      console.error('Create office error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

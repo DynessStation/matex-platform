@@ -1,6 +1,6 @@
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer, { Transporter } from 'nodemailer';
 
-export type ContactInquiryMailStatus = "sent" | "skipped" | "failed";
+export type ContactInquiryMailStatus = 'sent' | 'skipped' | 'failed';
 
 export interface ContactInquiryMailInput {
   reference: string;
@@ -22,29 +22,28 @@ export interface ContactInquiryMailResult {
 
 let transporter: Transporter | null | undefined;
 
-const cleanEnv = (name: string): string =>
-  String(process.env[name] ?? "").trim();
+const cleanEnv = (name: string): string => String(process.env[name] ?? '').trim();
 
 const escapeHtml = (value: string): string =>
   value.replace(
     /[&<>"']/g,
     (character) =>
       ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
       })[character] ?? character,
   );
 
 const mailTransport = (): Transporter | null => {
   if (transporter !== undefined) return transporter;
 
-  const host = cleanEnv("SMTP_HOST");
-  const user = cleanEnv("SMTP_USER");
-  const pass = cleanEnv("SMTP_PASS");
-  const port = Math.max(1, Number(cleanEnv("SMTP_PORT")) || 587);
+  const host = cleanEnv('SMTP_HOST');
+  const user = cleanEnv('SMTP_USER');
+  const pass = cleanEnv('SMTP_PASS');
+  const port = Math.max(1, Number(cleanEnv('SMTP_PORT')) || 587);
   if (!host || !user || !pass) {
     transporter = null;
     return transporter;
@@ -53,7 +52,7 @@ const mailTransport = (): Transporter | null => {
   transporter = nodemailer.createTransport({
     host,
     port,
-    secure: cleanEnv("SMTP_SECURE").toLowerCase() === "true" || port === 465,
+    secure: cleanEnv('SMTP_SECURE').toLowerCase() === 'true' || port === 465,
     auth: { user, pass },
     connectionTimeout: 8_000,
     greetingTimeout: 8_000,
@@ -66,20 +65,20 @@ export const sendContactInquiryMail = async (
   input: ContactInquiryMailInput,
 ): Promise<ContactInquiryMailResult> => {
   if (!input.recipient) {
-    return { status: "skipped", error: "Recipient email is not configured" };
+    return { status: 'skipped', error: 'Recipient email is not configured' };
   }
   const transport = mailTransport();
   if (!transport) {
     return {
-      status: "skipped",
-      error: "SMTP_HOST, SMTP_USER, or SMTP_PASS is not configured",
+      status: 'skipped',
+      error: 'SMTP_HOST, SMTP_USER, or SMTP_PASS is not configured',
     };
   }
 
-  const fromEmail = cleanEnv("SMTP_FROM_EMAIL") || cleanEnv("SMTP_USER");
-  const fromName = cleanEnv("SMTP_FROM_NAME") || "MATEX Website";
-  const contact = [input.email, input.phone].filter(Boolean).join(" / ") || "-";
-  const source = input.sourcePath || "-";
+  const fromEmail = cleanEnv('SMTP_FROM_EMAIL') || cleanEnv('SMTP_USER');
+  const fromName = cleanEnv('SMTP_FROM_NAME') || 'MATEX Website';
+  const contact = [input.email, input.phone].filter(Boolean).join(' / ') || '-';
+  const source = input.sourcePath || '-';
   const createdAt = input.createdAt.toISOString();
   const subject = `[${input.reference}] ${input.topic} - ${input.name}`;
   const text = [
@@ -90,9 +89,9 @@ export const sendContactInquiryMail = async (
     `Bahasa: ${input.locale}`,
     `Halaman: ${source}`,
     `Waktu: ${createdAt}`,
-    "",
+    '',
     input.message,
-  ].join("\n");
+  ].join('\n');
   const html = `
     <h2>Pesan baru dari website MATEX</h2>
     <p><strong>Referensi:</strong> ${escapeHtml(input.reference)}</p>
@@ -115,14 +114,10 @@ export const sendContactInquiryMail = async (
       text,
       html,
     });
-    return { status: "sent" };
+    return { status: 'sent' };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown mail delivery error";
-    console.error(
-      `[Contact Inquiry] Email delivery failed for ${input.reference}:`,
-      message,
-    );
-    return { status: "failed", error: message.slice(0, 1000) };
+    const message = error instanceof Error ? error.message : 'Unknown mail delivery error';
+    console.error(`[Contact Inquiry] Email delivery failed for ${input.reference}:`, message);
+    return { status: 'failed', error: message.slice(0, 1000) };
   }
 };

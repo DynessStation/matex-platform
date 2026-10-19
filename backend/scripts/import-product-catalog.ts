@@ -1,9 +1,9 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { RowDataPacket } from "mysql2";
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { RowDataPacket } from 'mysql2';
 
-import { pool } from "../src/db";
-import { writeAuditLog } from "../src/helper/audit-log.helper";
+import { pool } from '../src/db';
+import { writeAuditLog } from '../src/helper/audit-log.helper';
 
 type TranslationSeed = {
   slug: string;
@@ -21,10 +21,7 @@ type CategorySeed = {
   key: string;
   source_name: string;
   sort_order: number;
-  translations: Record<
-    "id-ID" | "en-US",
-    Pick<TranslationSeed, "slug" | "name">
-  >;
+  translations: Record<'id-ID' | 'en-US', Pick<TranslationSeed, 'slug' | 'name'>>;
 };
 
 type ProductSeed = {
@@ -33,7 +30,7 @@ type ProductSeed = {
   category_key: string;
   key: string;
   sku: string;
-  product_type: "physical";
+  product_type: 'physical';
   product_kind: string | null;
   unit: string | null;
   barcode: string | null;
@@ -48,15 +45,15 @@ type ProductSeed = {
   height_mm: number | null;
   min_order_qty: number;
   lead_time_days: number | null;
-  stock_status: "in_stock" | "preorder";
+  stock_status: 'in_stock' | 'preorder';
   is_featured: boolean;
   sort_order: number;
-  status: "draft";
-  translations: Record<"id-ID" | "en-US", TranslationSeed>;
+  status: 'draft';
+  translations: Record<'id-ID' | 'en-US', TranslationSeed>;
   prices: Array<{
     type: string;
     label: string;
-    currency: "IDR" | "USD";
+    currency: 'IDR' | 'USD';
     amount: number;
     is_public: boolean;
   }>;
@@ -67,53 +64,41 @@ type CatalogSeed = {
   source: string;
   company_id: number;
   actor_admin_id: number;
-  import_mode: "replace";
-  publication_status: "draft";
+  import_mode: 'replace';
+  publication_status: 'draft';
   categories: CategorySeed[];
   products: ProductSeed[];
 };
 
-const SEED_PATH = resolve(
-  process.cwd(),
-  "database/seeds/data/20261010_product_catalog.json",
-);
+const SEED_PATH = resolve(process.cwd(), 'database/seeds/data/20261010_product_catalog.json');
 
 const requireReplaceFlag = () => {
-  if (!process.argv.includes("--replace")) {
-    throw new Error("Refusing to replace catalog without the --replace flag");
+  if (!process.argv.includes('--replace')) {
+    throw new Error('Refusing to replace catalog without the --replace flag');
   }
 };
 
 const verifySeed = (seed: CatalogSeed) => {
-  if (seed.schema_version !== 1 || seed.import_mode !== "replace") {
-    throw new Error("Unsupported product seed contract");
+  if (seed.schema_version !== 1 || seed.import_mode !== 'replace') {
+    throw new Error('Unsupported product seed contract');
   }
-  if (seed.publication_status !== "draft") {
-    throw new Error("This importer only accepts draft product seeds");
+  if (seed.publication_status !== 'draft') {
+    throw new Error('This importer only accepts draft product seeds');
   }
   if (seed.categories.length !== 4 || seed.products.length !== 53) {
-    throw new Error("Expected exactly 4 categories and 53 products");
+    throw new Error('Expected exactly 4 categories and 53 products');
   }
   const keys = new Set(seed.products.map((item) => item.key));
   const skus = new Set(seed.products.map((item) => item.sku.toLowerCase()));
-  if (
-    keys.size !== seed.products.length ||
-    skus.size !== seed.products.length
-  ) {
-    throw new Error("Product keys and SKUs must be unique");
+  if (keys.size !== seed.products.length || skus.size !== seed.products.length) {
+    throw new Error('Product keys and SKUs must be unique');
   }
   for (const product of seed.products) {
-    if (product.status !== "draft")
-      throw new Error(`${product.sku} is not draft`);
-    if (
-      !seed.categories.some((category) => category.key === product.category_key)
-    ) {
+    if (product.status !== 'draft') throw new Error(`${product.sku} is not draft`);
+    if (!seed.categories.some((category) => category.key === product.category_key)) {
       throw new Error(`${product.sku} references an unknown category`);
     }
-    if (
-      product.prices.length !== 4 ||
-      product.prices.some((price) => price.amount == null)
-    ) {
+    if (product.prices.length !== 4 || product.prices.some((price) => price.amount == null)) {
       throw new Error(`${product.sku} does not have the four required prices`);
     }
   }
@@ -121,7 +106,7 @@ const verifySeed = (seed: CatalogSeed) => {
 
 const main = async () => {
   requireReplaceFlag();
-  const seed = JSON.parse(readFileSync(SEED_PATH, "utf8")) as CatalogSeed;
+  const seed = JSON.parse(readFileSync(SEED_PATH, 'utf8')) as CatalogSeed;
   verifySeed(seed);
 
   const connection = await pool.getConnection();
@@ -141,23 +126,21 @@ const main = async () => {
       !actor ||
       Number(actor.admin_acct_status) !== 1 ||
       Number(actor.is_all_access) !== 1 ||
-      String(actor.access_name).toLowerCase() !== "super admin"
+      String(actor.access_name).toLowerCase() !== 'super admin'
     ) {
-      throw new Error("Configured import actor is not an active Super Admin");
+      throw new Error('Configured import actor is not an active Super Admin');
     }
 
-    await connection.query(
-      `DELETE FROM product_catalog WHERE id_master_comp = ?`,
-      [seed.company_id],
-    );
+    await connection.query(`DELETE FROM product_catalog WHERE id_master_comp = ?`, [
+      seed.company_id,
+    ]);
     await connection.query(
       `UPDATE product_category SET id_parent_product_category = NULL WHERE id_master_comp = ?`,
       [seed.company_id],
     );
-    await connection.query(
-      `DELETE FROM product_category WHERE id_master_comp = ?`,
-      [seed.company_id],
-    );
+    await connection.query(`DELETE FROM product_category WHERE id_master_comp = ?`, [
+      seed.company_id,
+    ]);
 
     const categoryIds = new Map<string, number>();
     for (const category of seed.categories) {
@@ -176,7 +159,7 @@ const main = async () => {
         ],
       );
       categoryIds.set(category.key, Number(result.insertId));
-      for (const locale of ["id-ID", "en-US"] as const) {
+      for (const locale of ['id-ID', 'en-US'] as const) {
         const translation = category.translations[locale];
         await connection.query(
           `INSERT INTO product_category_i18n
@@ -184,13 +167,7 @@ const main = async () => {
              product_category_slug, product_category_name,
              product_category_i18n_status)
            VALUES (?, ?, ?, ?, ?, 1)`,
-          [
-            result.insertId,
-            seed.company_id,
-            locale,
-            translation.slug,
-            translation.name,
-          ],
+          [result.insertId, seed.company_id, locale, translation.slug, translation.name],
         );
       }
     }
@@ -247,7 +224,7 @@ const main = async () => {
         [productId, categoryId, seed.company_id],
       );
 
-      for (const locale of ["id-ID", "en-US"] as const) {
+      for (const locale of ['id-ID', 'en-US'] as const) {
         const translation = product.translations[locale];
         await connection.query(
           `INSERT INTO product_catalog_i18n
@@ -265,9 +242,7 @@ const main = async () => {
             translation.name,
             translation.short_description ?? null,
             translation.description ?? null,
-            translation.specifications == null
-              ? null
-              : JSON.stringify(translation.specifications),
+            translation.specifications == null ? null : JSON.stringify(translation.specifications),
             translation.meta_title ?? null,
             translation.meta_description ?? null,
             translation.og_title ?? null,
@@ -318,27 +293,25 @@ const main = async () => {
     };
     for (const [key, value] of Object.entries(expected)) {
       if (Number(counts[key]) !== value) {
-        throw new Error(
-          `Import count mismatch for ${key}: ${counts[key]} != ${value}`,
-        );
+        throw new Error(`Import count mismatch for ${key}: ${counts[key]} != ${value}`);
       }
     }
 
     await writeAuditLog({
       connection,
-      writeMode: "strict",
+      writeMode: 'strict',
       idMasterComp: seed.company_id,
-      eventCode: "product_catalog.workbook_imported",
-      category: "integration",
-      module: "product",
-      action: "replace_import",
-      actorType: "admin",
+      eventCode: 'product_catalog.workbook_imported',
+      category: 'integration',
+      module: 'product',
+      action: 'replace_import',
+      actorType: 'admin',
       actorId: seed.actor_admin_id,
       actorLabel: actor.alias || actor.name,
-      entityType: "product_catalog_import",
-      entityId: "20261010",
+      entityType: 'product_catalog_import',
+      entityId: '20261010',
       entityLabel: seed.source,
-      source: "integration",
+      source: 'integration',
       after: counts,
       metadata: {
         source_file: seed.source,

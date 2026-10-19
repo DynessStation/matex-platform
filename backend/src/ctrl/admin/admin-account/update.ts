@@ -1,29 +1,24 @@
 // Update an admin account and change its status.
-import express = require("express");
-import keyhsid from "../../../hsid";
-import db = require("../../../db");
+import express = require('express');
+import keyhsid from '../../../hsid';
+import db = require('../../../db');
 
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
-import { resolveAdminProfilePhoto } from "./profile-photo";
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
+import { resolveAdminProfilePhoto } from './profile-photo';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== ADMIN ACCOUNT - UPDATE
-//==================================================
+// Admin account - update
 
 router.put(
-  "/api/v1/admin-acct/:id",
-
+  '/api/v1/admin-acct/:id',
   verifyToken,
-
-  requirePermission("admin_account.update"),
-
+  requirePermission('admin_account.update'),
   async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
@@ -31,57 +26,37 @@ router.put(
       const {
         name,
         alias,
-
         email_1,
         email_2,
-
         phone_1,
         phone_2,
-
         id_profile_photo,
-
         id_master_comp,
         id_office,
         id_chair,
         id_access,
-
         is_all_access,
       } = req.body;
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const sessionAdminId = req.user?.id_admin_acct;
 
       if (!sessionAdminId) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
-      //==================================================
-      //==== TARGET ID
-      //==================================================
+      // Target ID
 
       const decodedAdminAcct = keyhsid.idAdmin.decode(String(id))[0];
 
       const idAdminAcct = Number(decodedAdminAcct);
 
-      if (
-        !decodedAdminAcct ||
-        !Number.isInteger(idAdminAcct) ||
-        idAdminAcct <= 0
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_INVALID_ID",
-          "Invalid admin account identifier",
-        );
+      if (!decodedAdminAcct || !Number.isInteger(idAdminAcct) || idAdminAcct <= 0) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_INVALID_ID', 'Invalid admin account identifier');
       }
 
-      //==================================================
-      //==== REQUIRED
-      //==================================================
+      // Required
 
       if (
         !name ||
@@ -96,14 +71,12 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_REQUIRED_FIELDS_MISSING",
-          "Required fields are missing",
+          'ADMIN_ACCOUNT_REQUIRED_FIELDS_MISSING',
+          'Required fields are missing',
         );
       }
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
       const cleanName = String(name).trim();
 
@@ -117,62 +90,31 @@ router.put(
 
       const cleanPhone2 = phone_2 ? String(phone_2).trim() : null;
 
-      //==================================================
-      //==== VALIDATION
-      //==================================================
+      // Validation
 
       if (cleanName.length > 50 || !/^[\p{L}\s.,'-]+$/u.test(cleanName)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_NAME_INVALID",
-          "Invalid name format",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_NAME_INVALID', 'Invalid name format');
       }
 
       if (cleanAlias.length > 15 || !/^[a-zA-Z0-9]+$/.test(cleanAlias)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_ALIAS_INVALID",
-          "Invalid alias format",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_ALIAS_INVALID', 'Invalid alias format');
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (
-        !emailRegex.test(cleanEmail1) ||
-        (cleanEmail2 && !emailRegex.test(cleanEmail2))
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_EMAIL_INVALID",
-          "Invalid email address",
-        );
+      if (!emailRegex.test(cleanEmail1) || (cleanEmail2 && !emailRegex.test(cleanEmail2))) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_EMAIL_INVALID', 'Invalid email address');
       }
 
       const phoneRegex = /^\+[1-9]\d{6,14}$/;
 
-      if (
-        !phoneRegex.test(cleanPhone1) ||
-        (cleanPhone2 && !phoneRegex.test(cleanPhone2))
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_PHONE_INVALID",
-          "Invalid phone number",
-        );
+      if (!phoneRegex.test(cleanPhone1) || (cleanPhone2 && !phoneRegex.test(cleanPhone2))) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_PHONE_INVALID', 'Invalid phone number');
       }
 
-      //==================================================
-      //==== DECODE REFERENCES
-      //==================================================
+      // Decode references
 
-      const decodedMasterComp =
-        keyhsid.idMasterCompany.decode(id_master_comp)[0];
+      const decodedMasterComp = keyhsid.idMasterCompany.decode(id_master_comp)[0];
 
       const decodedOffice = keyhsid.idOffice.decode(id_office)[0];
 
@@ -205,14 +147,12 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_REFERENCE_INVALID",
-          "Invalid reference identifier",
+          'ADMIN_ACCOUNT_REFERENCE_INVALID',
+          'Invalid reference identifier',
         );
       }
 
-      //==================================================
-      //==== GET SESSION ACCOUNT
-      //==================================================
+      // Get session account
 
       const [sessionRows] = await pool.query(
         `
@@ -234,18 +174,13 @@ router.put(
       const sessionUsers = sessionRows as any[];
 
       if (!sessionUsers.length) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const sessionUser = sessionUsers[0];
 
       if (Number(sessionUser.admin_acct_status) !== 1) {
-        return sendError(
-          res,
-          403,
-          "AUTH_ACCOUNT_INACTIVE",
-          "Your account is not active",
-        );
+        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
       }
 
       const sessionCompany = Number(sessionUser.id_master_comp);
@@ -254,9 +189,7 @@ router.put(
 
       const sessionAllAccess = Number(sessionUser.is_all_access);
 
-      //==================================================
-      //==== GET TARGET ACCOUNT
-      //==================================================
+      // Get target account
 
       const [targetRows] = await pool.query(
         `
@@ -296,121 +229,85 @@ router.put(
       const targetUsers = targetRows as any[];
 
       if (!targetUsers.length) {
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCOUNT_NOT_FOUND",
-          "Admin account not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCOUNT_NOT_FOUND', 'Admin account not found');
       }
 
       const targetUser = targetUsers[0];
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         id_master_comp: Number(targetUser.id_master_comp),
-
         id_office: Number(targetUser.id_office),
-
         name: targetUser.name,
-
         alias: targetUser.alias,
-
         email_1: targetUser.email_1,
-
         email_2: targetUser.email_2,
-
         phone_1: targetUser.phone_1,
-
         phone_2: targetUser.phone_2,
-
-        id_profile_photo: targetUser.id_profile_photo
-          ? Number(targetUser.id_profile_photo)
-          : null,
-
+        id_profile_photo: targetUser.id_profile_photo ? Number(targetUser.id_profile_photo) : null,
         id_chair: Number(targetUser.id_chair),
-
         id_access: Number(targetUser.id_access),
-
         is_all_access: Number(targetUser.is_all_access),
-
         admin_acct_status: Number(targetUser.admin_acct_status),
       };
 
-      //==================================================
-      //==== TARGET COMPANY SCOPE
-      //==================================================
+      // Target company scope
 
       if (Number(targetUser.id_master_comp) !== sessionCompany) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN",
-          "You do not have access to this company account",
+          'ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN',
+          'You do not have access to this company account',
         );
       }
 
-      //==================================================
-      //==== TARGET OFFICE SCOPE
-      //==================================================
+      // Target office scope
 
-      if (
-        sessionAllAccess !== 1 &&
-        Number(targetUser.id_office) !== sessionOffice
-      ) {
+      if (sessionAllAccess !== 1 && Number(targetUser.id_office) !== sessionOffice) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN",
-          "You do not have access to this office account",
+          'ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN',
+          'You do not have access to this office account',
         );
       }
 
-      //==================================================
-      //==== PROTECT FULL ACCESS TARGET
-      //==================================================
+      // Protect full access target
 
       if (Number(targetUser.is_all_access) === 1 && sessionAllAccess !== 1) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_FULL_ACCESS_UPDATE_FORBIDDEN",
-          "You are not allowed to update a full-access account",
+          'ADMIN_ACCOUNT_FULL_ACCESS_UPDATE_FORBIDDEN',
+          'You are not allowed to update a full-access account',
         );
       }
 
-      //==================================================
-      //==== DESTINATION COMPANY
-      //==================================================
+      // Destination company
 
       if (idMasterComp !== sessionCompany) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_MOVE_COMPANY_FORBIDDEN",
-          "You cannot move this account outside your company",
+          'ADMIN_ACCOUNT_MOVE_COMPANY_FORBIDDEN',
+          'You cannot move this account outside your company',
         );
       }
 
-      //==================================================
-      //==== DESTINATION OFFICE
-      //==================================================
+      // Destination office
 
       if (sessionAllAccess !== 1 && idOffice !== sessionOffice) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_MOVE_OFFICE_FORBIDDEN",
-          "You cannot move this account outside your assigned office",
+          'ADMIN_ACCOUNT_MOVE_OFFICE_FORBIDDEN',
+          'You cannot move this account outside your assigned office',
         );
       }
 
-      //==================================================
-      //==== REQUESTED FULL ACCESS
-      //==================================================
+      // Requested full access
 
       const requestedAllAccess = is_all_access ? 1 : 0;
 
@@ -418,14 +315,12 @@ router.put(
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_FULL_ACCESS_GRANT_FORBIDDEN",
-          "You are not allowed to grant full company access",
+          'ADMIN_ACCOUNT_FULL_ACCESS_GRANT_FORBIDDEN',
+          'You are not allowed to grant full company access',
         );
       }
 
-      //==================================================
-      //==== PREVENT LAST FULL ACCESS LOSS
-      //==================================================
+      // Prevent last full access loss
 
       if (Number(targetUser.is_all_access) === 1 && requestedAllAccess === 0) {
         const [fullAccessRows] = await pool.query(
@@ -443,23 +338,19 @@ router.put(
           [sessionCompany, idAdminAcct],
         );
 
-        const remainingFullAccess = Number(
-          (fullAccessRows as any[])[0]?.total ?? 0,
-        );
+        const remainingFullAccess = Number((fullAccessRows as any[])[0]?.total ?? 0);
 
         if (remainingFullAccess === 0) {
           return sendError(
             res,
             409,
-            "ADMIN_ACCOUNT_LAST_FULL_ACCESS_REQUIRED",
-            "At least one active full-access account must remain in the company",
+            'ADMIN_ACCOUNT_LAST_FULL_ACCESS_REQUIRED',
+            'At least one active full-access account must remain in the company',
           );
         }
       }
 
-      //==================================================
-      //==== VALIDATE COMPANY
-      //==================================================
+      // Validate company
 
       const [companyRows] = await pool.query(
         `
@@ -480,14 +371,12 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_COMPANY_NOT_AVAILABLE",
-          "Company is not available",
+          'ADMIN_ACCOUNT_COMPANY_NOT_AVAILABLE',
+          'Company is not available',
         );
       }
 
-      //==================================================
-      //==== VALIDATE OFFICE
-      //==================================================
+      // Validate office
 
       const [officeRows] = await pool.query(
         `
@@ -509,29 +398,23 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_OFFICE_COMPANY_MISMATCH",
-          "Office does not belong to the selected company",
+          'ADMIN_ACCOUNT_OFFICE_COMPANY_MISMATCH',
+          'Office does not belong to the selected company',
         );
       }
 
-      //==================================================
-      //==== PROFILE PHOTO
-      //==================================================
+      // Profile photo
 
       let idProfilePhoto: number | null = targetUser.id_profile_photo
         ? Number(targetUser.id_profile_photo)
         : null;
 
       if (id_profile_photo !== undefined) {
-        const profilePhotoResult = await resolveAdminProfilePhoto(
-          id_profile_photo,
-          {
-            idMasterComp,
-            idOffice,
-
-            isAllAccess: sessionAllAccess,
-          },
-        );
+        const profilePhotoResult = await resolveAdminProfilePhoto(id_profile_photo, {
+          idMasterComp,
+          idOffice,
+          isAllAccess: sessionAllAccess,
+        });
 
         if (!profilePhotoResult.success) {
           return sendError(
@@ -545,9 +428,7 @@ router.put(
         idProfilePhoto = profilePhotoResult.idAttachment;
       }
 
-      //==================================================
-      //==== VALIDATE CHAIR + COMPANY
-      //==================================================
+      // Validate chair + company
 
       const [chairRows] = await pool.query(
         `
@@ -569,14 +450,12 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_CHAIR_NOT_AVAILABLE",
-          "Position is not available for the selected company",
+          'ADMIN_ACCOUNT_CHAIR_NOT_AVAILABLE',
+          'Position is not available for the selected company',
         );
       }
 
-      //==================================================
-      //==== VALIDATE ACCESS + COMPANY
-      //==================================================
+      // Validate access + company
 
       const [accessRows] = await pool.query(
         `
@@ -598,14 +477,12 @@ router.put(
         return sendError(
           res,
           400,
-          "ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE",
-          "Access profile is not available for the selected company",
+          'ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE',
+          'Access profile is not available for the selected company',
         );
       }
 
-      //==================================================
-      //==== ALIAS DUPLICATE
-      //==================================================
+      // Alias duplicate
 
       const [aliasRows] = await pool.query(
         `
@@ -624,23 +501,16 @@ router.put(
       );
 
       if ((aliasRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_ALIAS_EXISTS",
-          "Alias is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_ALIAS_EXISTS', 'Alias is already in use');
       }
 
-      //==================================================
-      //==== EMAIL DUPLICATE
-      //==================================================
+      // Email duplicate
 
-      const emailValues = [cleanEmail1, cleanEmail2].filter(
-        (value): value is string => Boolean(value),
+      const emailValues = [cleanEmail1, cleanEmail2].filter((value): value is string =>
+        Boolean(value),
       );
 
-      const emailPlaceholders = emailValues.map(() => "?").join(", ");
+      const emailPlaceholders = emailValues.map(() => '?').join(', ');
 
       const [emailRows] = await pool.query(
         `
@@ -665,23 +535,16 @@ router.put(
       );
 
       if ((emailRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_EMAIL_EXISTS",
-          "Email address is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_EMAIL_EXISTS', 'Email address is already in use');
       }
 
-      //==================================================
-      //==== PHONE DUPLICATE
-      //==================================================
+      // Phone duplicate
 
-      const phoneValues = [cleanPhone1, cleanPhone2].filter(
-        (value): value is string => Boolean(value),
+      const phoneValues = [cleanPhone1, cleanPhone2].filter((value): value is string =>
+        Boolean(value),
       );
 
-      const phonePlaceholders = phoneValues.map(() => "?").join(", ");
+      const phonePlaceholders = phoneValues.map(() => '?').join(', ');
 
       const [phoneRows] = await pool.query(
         `
@@ -706,17 +569,10 @@ router.put(
       );
 
       if ((phoneRows as any[]).length) {
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCOUNT_PHONE_EXISTS",
-          "Phone number is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCOUNT_PHONE_EXISTS', 'Phone number is already in use');
       }
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await pool.query(
         `
@@ -749,128 +605,75 @@ router.put(
         [
           idMasterComp,
           idOffice,
-
           cleanName,
           cleanAlias,
-
           cleanEmail1,
           cleanEmail2,
-
           cleanPhone1,
           cleanPhone2,
-
           idProfilePhoto,
-
           idChair,
           idAccess,
-
           requestedAllAccess,
-
           idAdminAcct,
         ],
       );
 
-      //==================================================
-      //==== AUDIT AFTER
-      //==================================================
+      // Audit after
 
       const auditAfter = {
         id_master_comp: idMasterComp,
-
         id_office: idOffice,
-
         name: cleanName,
-
         alias: cleanAlias,
-
         email_1: cleanEmail1,
-
         email_2: cleanEmail2,
-
         phone_1: cleanPhone1,
-
         phone_2: cleanPhone2,
-
         id_profile_photo: idProfilePhoto,
-
         id_chair: idChair,
-
         id_access: idAccess,
-
         is_all_access: requestedAllAccess,
-
         admin_acct_status: Number(targetUser.admin_acct_status),
       };
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         idMasterComp: sessionCompany,
-
-        eventCode: "admin_account.updated",
-
-        category: "data_change",
-
-        module: "admin_account",
-
-        action: "update",
-
-        actorType: "admin",
-
+        eventCode: 'admin_account.updated',
+        category: 'data_change',
+        module: 'admin_account',
+        action: 'update',
+        actorType: 'admin',
         actorId: sessionAdminId,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_account",
-
+        entityType: 'admin_account',
         entityId: idAdminAcct,
-
         entityLabel: cleanName,
-
         before: auditBefore,
-
         after: auditAfter,
-
         httpStatus: 200,
       });
 
-      return sendSuccess(
-        res,
-        200,
-        "ADMIN_ACCOUNT_UPDATED",
-        "Admin account updated successfully",
-        {
-          id_admin_acct: keyhsid.idAdmin.encode(idAdminAcct),
-        },
-      );
+      return sendSuccess(res, 200, 'ADMIN_ACCOUNT_UPDATED', 'Admin account updated successfully', {
+        id_admin_acct: keyhsid.idAdmin.encode(idAdminAcct),
+      });
     } catch (error) {
-      console.error("Update admin account error:", error);
+      console.error('Update admin account error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== ADMIN ACCOUNT - UPDATE STATUS
-//==================================================
+// Admin account - update status
 
 router.patch(
-  "/api/v1/admin-acct/:id/status",
-
+  '/api/v1/admin-acct/:id/status',
   verifyToken,
-
-  requirePermission("admin_account.update"),
-
+  requirePermission('admin_account.update'),
   async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
@@ -879,53 +682,31 @@ router.patch(
 
       const sessionAdminId = req.user?.id_admin_acct;
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       if (!sessionAdminId) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
-      //==================================================
-      //==== STATUS
-      //==================================================
+      // Status
 
       const newStatus = Number(admin_acct_status);
 
       if (![0, 1].includes(newStatus)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_INVALID_STATUS",
-          "Invalid account status",
-        );
+        return sendError(res, 400, 'ADMIN_ACCOUNT_INVALID_STATUS', 'Invalid account status');
       }
 
-      //==================================================
-      //==== TARGET ID
-      //==================================================
+      // Target ID
 
       const decodedAdminAcct = keyhsid.idAdmin.decode(String(id))[0];
 
       const idAdminAcct = Number(decodedAdminAcct);
 
-      if (
-        !decodedAdminAcct ||
-        !Number.isInteger(idAdminAcct) ||
-        idAdminAcct <= 0
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_INVALID_ID",
-          "Invalid admin account identifier",
-        );
+      if (!decodedAdminAcct || !Number.isInteger(idAdminAcct) || idAdminAcct <= 0) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_INVALID_ID', 'Invalid admin account identifier');
       }
 
-      //==================================================
-      //==== GET SESSION
-      //==================================================
+      // Get session
 
       const [sessionRows] = await pool.query(
         `
@@ -948,18 +729,13 @@ router.patch(
       const sessionUsers = sessionRows as any[];
 
       if (!sessionUsers.length) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const sessionUser = sessionUsers[0];
 
       if (Number(sessionUser.admin_acct_status) !== 1) {
-        return sendError(
-          res,
-          403,
-          "AUTH_ACCOUNT_INACTIVE",
-          "Your account is not active",
-        );
+        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
       }
 
       const sessionCompany = Number(sessionUser.id_master_comp);
@@ -968,9 +744,7 @@ router.patch(
 
       const sessionAllAccess = Number(sessionUser.is_all_access);
 
-      //==================================================
-      //==== GET TARGET
-      //==================================================
+      // Get target
 
       const [targetRows] = await pool.query(
         `
@@ -999,74 +773,56 @@ router.patch(
       const targetUsers = targetRows as any[];
 
       if (!targetUsers.length) {
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCOUNT_NOT_FOUND",
-          "Admin account not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCOUNT_NOT_FOUND', 'Admin account not found');
       }
 
       const targetUser = targetUsers[0];
 
-      //==================================================
-      //==== COMPANY HARD BOUNDARY
-      //==================================================
+      // Company hard boundary
 
       if (Number(targetUser.id_master_comp) !== sessionCompany) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN",
-          "You do not have access to this company account",
+          'ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN',
+          'You do not have access to this company account',
         );
       }
 
-      //==================================================
-      //==== OFFICE SCOPE
-      //==================================================
+      // Office scope
 
-      if (
-        sessionAllAccess !== 1 &&
-        Number(targetUser.id_office) !== sessionOffice
-      ) {
+      if (sessionAllAccess !== 1 && Number(targetUser.id_office) !== sessionOffice) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN",
-          "You do not have access to this office account",
+          'ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN',
+          'You do not have access to this office account',
         );
       }
 
-      //==================================================
-      //==== SELF DEACTIVATION
-      //==================================================
+      // Self deactivation
 
       if (idAdminAcct === sessionAdminId && newStatus === 0) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_SELF_DEACTIVATION_FORBIDDEN",
-          "You cannot deactivate your own account",
+          'ADMIN_ACCOUNT_SELF_DEACTIVATION_FORBIDDEN',
+          'You cannot deactivate your own account',
         );
       }
 
-      //==================================================
-      //==== PROTECT FULL ACCESS ACCOUNT
-      //==================================================
+      // Protect full access account
 
       if (Number(targetUser.is_all_access) === 1 && sessionAllAccess !== 1) {
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_FULL_ACCESS_STATUS_FORBIDDEN",
-          "You are not allowed to change the status of a full-access account",
+          'ADMIN_ACCOUNT_FULL_ACCESS_STATUS_FORBIDDEN',
+          'You are not allowed to change the status of a full-access account',
         );
       }
 
-      //==================================================
-      //==== LAST FULL ACCESS IN COMPANY
-      //==================================================
+      // Last full access in company
 
       if (Number(targetUser.is_all_access) === 1 && newStatus === 0) {
         const [fullAccessRows] = await pool.query(
@@ -1084,45 +840,34 @@ router.patch(
           [sessionCompany, idAdminAcct],
         );
 
-        const remainingFullAccess = Number(
-          (fullAccessRows as any[])[0]?.total ?? 0,
-        );
+        const remainingFullAccess = Number((fullAccessRows as any[])[0]?.total ?? 0);
 
         if (remainingFullAccess === 0) {
           return sendError(
             res,
             409,
-            "ADMIN_ACCOUNT_LAST_FULL_ACCESS_REQUIRED",
-            "At least one active full-access account must remain in the company",
+            'ADMIN_ACCOUNT_LAST_FULL_ACCESS_REQUIRED',
+            'At least one active full-access account must remain in the company',
           );
         }
       }
 
-      //==================================================
-      //==== ALREADY SAME
-      //==================================================
+      // Already same
 
       if (Number(targetUser.admin_acct_status) === newStatus) {
         return sendSuccess(
           res,
           200,
-          newStatus === 1
-            ? "ADMIN_ACCOUNT_ALREADY_ACTIVE"
-            : "ADMIN_ACCOUNT_ALREADY_INACTIVE",
-          newStatus === 1
-            ? "Admin account is already active"
-            : "Admin account is already inactive",
+          newStatus === 1 ? 'ADMIN_ACCOUNT_ALREADY_ACTIVE' : 'ADMIN_ACCOUNT_ALREADY_INACTIVE',
+          newStatus === 1 ? 'Admin account is already active' : 'Admin account is already inactive',
           {
             id_admin_acct: keyhsid.idAdmin.encode(idAdminAcct),
-
             admin_acct_status: newStatus,
           },
         );
       }
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await pool.query(
         `
@@ -1137,74 +882,49 @@ router.patch(
         [newStatus, idAdminAcct],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         idMasterComp: sessionCompany,
-
-        eventCode: "admin_account.status_changed",
-
-        category: "data_change",
-
-        module: "admin_account",
-
-        action: "status_change",
-
-        actorType: "admin",
-
+        eventCode: 'admin_account.status_changed',
+        category: 'data_change',
+        module: 'admin_account',
+        action: 'status_change',
+        actorType: 'admin',
         actorId: sessionAdminId,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_account",
-
+        entityType: 'admin_account',
         entityId: idAdminAcct,
-
         entityLabel: targetUser.name,
-
         before: {
           admin_acct_status: Number(targetUser.admin_acct_status),
         },
-
         after: {
           admin_acct_status: newStatus,
         },
-
         metadata: {
-          transition: newStatus === 1 ? "activated" : "deactivated",
+          transition: newStatus === 1 ? 'activated' : 'deactivated',
         },
-
         httpStatus: 200,
       });
 
       return sendSuccess(
         res,
         200,
+        newStatus === 1 ? 'ADMIN_ACCOUNT_ACTIVATED' : 'ADMIN_ACCOUNT_DEACTIVATED',
         newStatus === 1
-          ? "ADMIN_ACCOUNT_ACTIVATED"
-          : "ADMIN_ACCOUNT_DEACTIVATED",
-        newStatus === 1
-          ? "Admin account activated successfully"
-          : "Admin account deactivated successfully",
+          ? 'Admin account activated successfully'
+          : 'Admin account deactivated successfully',
         {
           id_admin_acct: keyhsid.idAdmin.encode(idAdminAcct),
-
           admin_acct_status: newStatus,
         },
       );
     } catch (error) {
-      console.error("Update admin account status error:", error);
+      console.error('Update admin account status error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );

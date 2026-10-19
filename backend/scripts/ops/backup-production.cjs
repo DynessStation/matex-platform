@@ -1,8 +1,8 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const { spawn } = require("node:child_process");
-const { pipeline } = require("node:stream/promises");
-const { createGzip } = require("node:zlib");
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+const { pipeline } = require('node:stream/promises');
+const { createGzip } = require('node:zlib');
 
 const {
   createMysqlDefaultsFile,
@@ -13,7 +13,7 @@ const {
   requireCommand,
   runCommand,
   sha256File,
-} = require("./backup-common.cjs");
+} = require('./backup-common.cjs');
 
 const args = parseArgs(process.argv.slice(2));
 
@@ -36,16 +36,13 @@ Options:
 function timestamp() {
   return new Date()
     .toISOString()
-    .replace(/[-:]/g, "")
-    .replace(/\.\d{3}Z$/, "Z");
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}Z$/, 'Z');
 }
 
 function isSameOrNestedPath(candidate, parent) {
   const relative = path.relative(parent, candidate);
-  return (
-    relative === "" ||
-    (!relative.startsWith("..") && !path.isAbsolute(relative))
-  );
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function pruneExpiredBackups(outputRoot, currentBackupName, retentionDays) {
@@ -71,34 +68,32 @@ function pruneExpiredBackups(outputRoot, currentBackupName, retentionDays) {
 
 async function dumpDatabase(connection, defaultsFile, targetPath) {
   const child = spawn(
-    "mysqldump",
+    'mysqldump',
     [
       `--defaults-extra-file=${defaultsFile}`,
-      "--single-transaction",
-      "--quick",
-      "--routines",
-      "--triggers",
-      "--events",
-      "--hex-blob",
-      "--skip-lock-tables",
-      "--default-character-set=utf8mb4",
+      '--single-transaction',
+      '--quick',
+      '--routines',
+      '--triggers',
+      '--events',
+      '--hex-blob',
+      '--skip-lock-tables',
+      '--default-character-set=utf8mb4',
       connection.database,
     ],
-    { stdio: ["ignore", "pipe", "pipe"], windowsHide: true },
+    { stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true },
   );
 
-  let stderr = "";
-  child.stderr.on("data", (chunk) => {
+  let stderr = '';
+  child.stderr.on('data', (chunk) => {
     stderr += chunk.toString();
   });
 
   const closed = new Promise((resolve, reject) => {
-    child.on("error", reject);
-    child.on("close", (code) => {
+    child.on('error', reject);
+    child.on('close', (code) => {
       if (code !== 0) {
-        reject(
-          new Error(`mysqldump exited with code ${code}: ${stderr.trim()}`),
-        );
+        reject(new Error(`mysqldump exited with code ${code}: ${stderr.trim()}`));
         return;
       }
       resolve();
@@ -106,11 +101,7 @@ async function dumpDatabase(connection, defaultsFile, targetPath) {
   });
 
   await Promise.all([
-    pipeline(
-      child.stdout,
-      createGzip({ level: 9 }),
-      fs.createWriteStream(targetPath),
-    ),
+    pipeline(child.stdout, createGzip({ level: 9 }), fs.createWriteStream(targetPath)),
     closed,
   ]);
 }
@@ -121,51 +112,41 @@ async function main() {
     return;
   }
 
-  const backendRoot = path.resolve(__dirname, "..", "..");
-  const envFile = path.resolve(
-    String(args["env-file"] || path.join(backendRoot, ".env")),
-  );
+  const backendRoot = path.resolve(__dirname, '..', '..');
+  const envFile = path.resolve(String(args['env-file'] || path.join(backendRoot, '.env')));
   loadEnvironment(envFile);
 
   const connection = mysqlConnectionFromEnvironment();
-  const storageDisk = String(process.env.STORAGE_DISK ?? "local")
+  const storageDisk = String(process.env.STORAGE_DISK ?? 'local')
     .trim()
     .toLowerCase();
-  if (storageDisk !== "local") {
-    throw new Error(
-      `This backup command supports STORAGE_DISK=local; received ${storageDisk}`,
-    );
+  if (storageDisk !== 'local') {
+    throw new Error(`This backup command supports STORAGE_DISK=local; received ${storageDisk}`);
   }
 
-  const storageRoot = path.resolve(
-    String(process.env.FILE_STORAGE_ROOT ?? "").trim(),
-  );
+  const storageRoot = path.resolve(String(process.env.FILE_STORAGE_ROOT ?? '').trim());
   if (!process.env.FILE_STORAGE_ROOT || !fs.existsSync(storageRoot)) {
     throw new Error(`FILE_STORAGE_ROOT does not exist: ${storageRoot}`);
   }
 
-  const outputValue = args["output-dir"] || process.env.BACKUP_ROOT;
+  const outputValue = args['output-dir'] || process.env.BACKUP_ROOT;
   if (!outputValue) {
-    throw new Error("Provide --output-dir or BACKUP_ROOT");
+    throw new Error('Provide --output-dir or BACKUP_ROOT');
   }
   const outputRoot = path.resolve(String(outputValue));
   if (isSameOrNestedPath(outputRoot, storageRoot)) {
-    throw new Error("BACKUP_ROOT must be outside FILE_STORAGE_ROOT");
+    throw new Error('BACKUP_ROOT must be outside FILE_STORAGE_ROOT');
   }
 
-  const retentionValue =
-    args["retention-days"] || process.env.BACKUP_RETENTION_DAYS;
+  const retentionValue = args['retention-days'] || process.env.BACKUP_RETENTION_DAYS;
   const retentionDays = retentionValue ? Number(retentionValue) : null;
-  if (
-    retentionDays !== null &&
-    (!Number.isSafeInteger(retentionDays) || retentionDays < 1)
-  ) {
-    throw new Error("Retention days must be a positive whole number");
+  if (retentionDays !== null && (!Number.isSafeInteger(retentionDays) || retentionDays < 1)) {
+    throw new Error('Retention days must be a positive whole number');
   }
 
   const versions = {
-    mysqldump: requireCommand("mysqldump"),
-    tar: requireCommand("tar"),
+    mysqldump: requireCommand('mysqldump'),
+    tar: requireCommand('tar'),
   };
 
   if (args.check) {
@@ -184,23 +165,23 @@ async function main() {
   }
 
   fs.mkdirSync(temporaryDirectory, { mode: 0o700 });
-  const databaseArchive = path.join(temporaryDirectory, "database.sql.gz");
-  const filesArchive = path.join(temporaryDirectory, "files.tar.gz");
+  const databaseArchive = path.join(temporaryDirectory, 'database.sql.gz');
+  const filesArchive = path.join(temporaryDirectory, 'files.tar.gz');
   let defaultsFile;
 
   try {
     defaultsFile = createMysqlDefaultsFile(connection);
     await dumpDatabase(connection, defaultsFile, databaseArchive);
-    await runCommand("tar", ["-C", storageRoot, "-czf", filesArchive, "."]);
+    await runCommand('tar', ['-C', storageRoot, '-czf', filesArchive, '.']);
 
-    const gitResult = await runCommand("git", ["rev-parse", "HEAD"], {
-      cwd: path.resolve(backendRoot, ".."),
+    const gitResult = await runCommand('git', ['rev-parse', 'HEAD'], {
+      cwd: path.resolve(backendRoot, '..'),
     }).catch(() => ({ stdout: null }));
     const databaseStat = fs.statSync(databaseArchive);
     const filesStat = fs.statSync(filesArchive);
     const manifest = {
       format_version: 1,
-      application: "MATEX",
+      application: 'MATEX',
       created_at: new Date().toISOString(),
       git_commit: gitResult.stdout || null,
       source_database: connection.database,
@@ -222,7 +203,7 @@ async function main() {
     };
 
     fs.writeFileSync(
-      path.join(temporaryDirectory, "manifest.json"),
+      path.join(temporaryDirectory, 'manifest.json'),
       `${JSON.stringify(manifest, null, 2)}\n`,
       { mode: 0o600 },
     );
@@ -230,7 +211,7 @@ async function main() {
     const removed = pruneExpiredBackups(outputRoot, backupName, retentionDays);
     process.stdout.write(`Backup created: ${finalDirectory}\n`);
     if (removed.length > 0) {
-      process.stdout.write(`Expired backups removed: ${removed.join(", ")}\n`);
+      process.stdout.write(`Expired backups removed: ${removed.join(', ')}\n`);
     }
   } catch (error) {
     fs.rmSync(temporaryDirectory, { recursive: true, force: true });

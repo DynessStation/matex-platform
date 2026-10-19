@@ -2,48 +2,36 @@
 
 export interface OfficeOperatingHourInput {
   day_of_week: number;
-
   sequence?: number;
-
   open_time?: string | null;
-
   close_time?: string | null;
-
   is_closed?: number | boolean;
 }
 
 export interface NormalizedOfficeOperatingHour {
   day_of_week: number;
-
   sequence: number;
-
   open_time: string | null;
-
   close_time: string | null;
-
   is_closed: 0 | 1;
 }
 
 export type OperatingHourResult =
   | {
       success: true;
-
       data: NormalizedOfficeOperatingHour[];
     }
   | {
       success: false;
-
       status: number;
       code: string;
       message: string;
     };
 
-//==================================================
-//==== NULLABLE STRING
-//==================================================
+// Nullable string
 
 export const nullableString = (value: unknown): string | null => {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return null;
   }
 
@@ -52,68 +40,54 @@ export const nullableString = (value: unknown): string | null => {
   return clean || null;
 };
 
-//==================================================
-//==== BOOLEAN FLAG
-//==================================================
+// Boolean flag
 
-export const normalizeFlag = (
-  value: unknown,
-
-  fallback: 0 | 1 = 0,
-): 0 | 1 => {
-  if (value === true || value === 1 || value === "1" || value === "true") {
+export const normalizeFlag = (value: unknown, fallback: 0 | 1 = 0): 0 | 1 => {
+  if (value === true || value === 1 || value === '1' || value === 'true') {
     return 1;
   }
 
-  if (value === false || value === 0 || value === "0" || value === "false") {
+  if (value === false || value === 0 || value === '0' || value === 'false') {
     return 0;
   }
 
   return fallback;
 };
 
-//==================================================
-//==== SLUGIFY
-//==================================================
+// Slugify
 
 export const slugify = (value: string): string => {
   return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
-//==================================================
-//==== EMAIL
-//==================================================
+// Email
 
 export const isValidEmail = (value: string): boolean => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 };
 
-//==================================================
-//==== HTTP URL
-//==================================================
+// HTTP URL
 
 export const isValidHttpUrl = (value: string): boolean => {
   try {
     const url = new URL(value);
 
-    return url.protocol === "http:" || url.protocol === "https:";
+    return url.protocol === 'http:' || url.protocol === 'https:';
   } catch {
     return false;
   }
 };
 
-//==================================================
-//==== TIME
-//==================================================
+// Time
 
 export const normalizeTime = (value: unknown): string | null => {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return null;
   }
 
@@ -125,31 +99,27 @@ export const normalizeTime = (value: unknown): string | null => {
     return null;
   }
 
-  return `${match[1]}:${match[2]}:${match[3] ?? "00"}`;
+  return `${match[1]}:${match[2]}:${match[3] ?? '00'}`;
 };
 
-//==================================================
-//==== OPERATING HOURS
-//==================================================
+// Operating hours
 
 export const validateOperatingHours = (value: unknown): OperatingHourResult => {
   if (!Array.isArray(value)) {
     return {
       success: false,
-
       status: 400,
-      code: "OFFICE_OPERATING_HOURS_ARRAY_INVALID",
-      message: "Operating hours must be an array",
+      code: 'OFFICE_OPERATING_HOURS_ARRAY_INVALID',
+      message: 'Operating hours must be an array',
     };
   }
 
   if (value.length > 30) {
     return {
       success: false,
-
       status: 400,
-      code: "OFFICE_OPERATING_HOURS_AMOUNT_INVALID",
-      message: "Too many operating hour entries",
+      code: 'OFFICE_OPERATING_HOURS_AMOUNT_INVALID',
+      message: 'Too many operating hour entries',
     };
   }
 
@@ -170,31 +140,25 @@ export const validateOperatingHours = (value: unknown): OperatingHourResult => {
 
     const isClosed = normalizeFlag(item?.is_closed, 0);
 
-    //==================================================
-    //==== DAY
-    //==================================================
+    // Day
 
     if (!Number.isInteger(day) || day < 1 || day > 7) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_DAY_INVALID",
-        message: "Invalid operating day",
+        code: 'OFFICE_OPERATING_DAY_INVALID',
+        message: 'Invalid operating day',
       };
     }
 
-    //==================================================
-    //==== SEQUENCE
-    //==================================================
+    // Sequence
 
     if (!Number.isInteger(sequence) || sequence < 1 || sequence > 10) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_HOURS_SEQUENCE_INVALID",
-        message: "Invalid operating hour sequence",
+        code: 'OFFICE_OPERATING_HOURS_SEQUENCE_INVALID',
+        message: 'Invalid operating hour sequence',
       };
     }
 
@@ -203,33 +167,25 @@ export const validateOperatingHours = (value: unknown): OperatingHourResult => {
     if (uniqueKeys.has(key)) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_HOURS_DUPLICATED",
-        message: "Duplicate operating hour entry",
+        code: 'OFFICE_OPERATING_HOURS_DUPLICATED',
+        message: 'Duplicate operating hour entry',
       };
     }
 
     uniqueKeys.add(key);
 
-    entriesPerDay.set(
-      day,
+    entriesPerDay.set(day, (entriesPerDay.get(day) ?? 0) + 1);
 
-      (entriesPerDay.get(day) ?? 0) + 1,
-    );
-
-    //==================================================
-    //==== CLOSED
-    //==================================================
+    // Closed
 
     if (isClosed === 1) {
       if (sequence !== 1) {
         return {
           success: false,
-
           status: 400,
-          code: "OFFICE_OPERATING_DAY_SEQUENCE_INVALID",
-          message: "Closed day must use sequence 1",
+          code: 'OFFICE_OPERATING_DAY_SEQUENCE_INVALID',
+          message: 'Closed day must use sequence 1',
         };
       }
 
@@ -237,22 +193,16 @@ export const validateOperatingHours = (value: unknown): OperatingHourResult => {
 
       result.push({
         day_of_week: day,
-
         sequence,
-
         open_time: null,
-
         close_time: null,
-
         is_closed: 1,
       });
 
       continue;
     }
 
-    //==================================================
-    //==== OPEN / CLOSE
-    //==================================================
+    // Open / close
 
     const openTime = normalizeTime(item?.open_time);
 
@@ -261,59 +211,47 @@ export const validateOperatingHours = (value: unknown): OperatingHourResult => {
     if (!openTime || !closeTime) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_HOURS_OPEN_CLOSE_INVALID", // SUMPAH BINGUNG NAMAIN CODENYA WKWK
-        message: "Open and close time are required for operating days",
+        code: 'OFFICE_OPERATING_HOURS_OPEN_CLOSE_INVALID', // SUMPAH BINGUNG NAMAIN CODENYA WKWK
+        message: 'Open and close time are required for operating days',
       };
     }
 
     if (openTime === closeTime) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_HOURS_SAME_OPEN_CLOSE",
-        message: "Open time and close time cannot be the same",
+        code: 'OFFICE_OPERATING_HOURS_SAME_OPEN_CLOSE',
+        message: 'Open time and close time cannot be the same',
       };
     }
 
     result.push({
       day_of_week: day,
-
       sequence,
-
       open_time: openTime,
-
       close_time: closeTime,
-
       is_closed: 0,
     });
   }
 
-  //==================================================
-  //==== CLOSED DAY CANNOT HAVE ANOTHER RANGE
-  //==================================================
+  // Closed day cannot have another range
 
   for (const day of closedDays) {
     if ((entriesPerDay.get(day) ?? 0) > 1) {
       return {
         success: false,
-
         status: 400,
-        code: "OFFICE_OPERATING_HOURS_CONTAIN_ANOTHER_OPERATING_TIME",
-        message: "Closed day cannot contain another operating time",
+        code: 'OFFICE_OPERATING_HOURS_CONTAIN_ANOTHER_OPERATING_TIME',
+        message: 'Closed day cannot contain another operating time',
       };
     }
   }
 
-  result.sort(
-    (a, b) => a.day_of_week - b.day_of_week || a.sequence - b.sequence,
-  );
+  result.sort((a, b) => a.day_of_week - b.day_of_week || a.sequence - b.sequence);
 
   return {
     success: true,
-
     data: result,
   };
 };

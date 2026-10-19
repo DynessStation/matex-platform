@@ -1,90 +1,66 @@
 // Permission ids of an access profile: validation with dependencies, key lookups, and audit diffs.
-import keyhsid from "../../../hsid";
+import keyhsid from '../../../hsid';
 
 export type PermissionResolveResult =
   | {
       success: true;
-
       ids: number[];
     }
   | {
       success: false;
-
       status: number;
-
       code: string;
-
       message: string;
     };
 
-//==================================================
-//==== RESOLVE PERMISSIONS
-//==================================================
+// Resolve permissions
 
 export const resolvePermissionIds = async (
   executor: any,
-
   value: unknown,
 ): Promise<PermissionResolveResult> => {
-  //==================================================
-  //==== ARRAY REQUIRED
-  //==================================================
+  // Array required
 
   if (!Array.isArray(value)) {
     return {
       success: false,
-
       status: 400,
-
-      code: "ADMIN_ACCESS_PERMISSIONS_ARRAY_INVALID",
-
-      message: "Permissions must be an array",
+      code: 'ADMIN_ACCESS_PERMISSIONS_ARRAY_INVALID',
+      message: 'Permissions must be an array',
     };
   }
 
-  //==================================================
-  //==== EMPTY IS ALLOWED
-  //==================================================
+  // Empty is allowed
 
   if (value.length === 0) {
     return {
       success: true,
-
       ids: [],
     };
   }
 
-  //==================================================
-  //==== VALIDATE RAW VALUES
-  //==================================================
+  // Validate raw values
 
   const encodedPermissions: string[] = [];
 
   for (const item of value) {
-    if (typeof item !== "string" || !item.trim()) {
+    if (typeof item !== 'string' || !item.trim()) {
       return {
         success: false,
-
         status: 400,
-
-        code: "ADMIN_ACCESS_PERMISSION_ID_INVALID",
-
-        message: "Invalid permission identifier",
+        code: 'ADMIN_ACCESS_PERMISSION_ID_INVALID',
+        message: 'Invalid permission identifier',
       };
     }
 
     encodedPermissions.push(item.trim());
   }
 
-  //==================================================
-  //==== UNIQUE
-  //==================================================
+  // Unique
 
   const uniqueEncoded = [...new Set(encodedPermissions)];
 
-  //==================================================
-  //==== DECODE
-  //==================================================
+  // Decode
 
   const permissionIds: number[] = [];
 
@@ -96,29 +72,22 @@ export const resolvePermissionIds = async (
     if (!decoded || !Number.isInteger(idPermission) || idPermission <= 0) {
       return {
         success: false,
-
         status: 400,
-
-        code: "ADMIN_ACCESS_PERMISSION_ID_INVALID",
-
-        message: "Invalid permission identifier",
+        code: 'ADMIN_ACCESS_PERMISSION_ID_INVALID',
+        message: 'Invalid permission identifier',
       };
     }
 
     permissionIds.push(idPermission);
   }
 
-  //==================================================
-  //==== UNIQUE NUMERIC IDS
-  //==================================================
+  // Unique numeric IDS
 
   const uniqueIds = [...new Set(permissionIds)];
 
-  //==================================================
-  //==== VALIDATE ACTIVE PERMISSIONS
-  //==================================================
+  // Validate active permissions
 
-  const placeholders = uniqueIds.map(() => "?").join(", ");
+  const placeholders = uniqueIds.map(() => '?').join(', ');
 
   const [permissionRows] = await executor.query(
     `
@@ -141,27 +110,19 @@ export const resolvePermissionIds = async (
   if (permissions.length !== uniqueIds.length) {
     return {
       success: false,
-
       status: 400,
-
-      code: "ADMIN_ACCESS_PERMISSION_NOT_AVAILABLE",
-
-      message: "One or more permissions are not available",
+      code: 'ADMIN_ACCESS_PERMISSION_NOT_AVAILABLE',
+      message: 'One or more permissions are not available',
     };
   }
 
-  //==================================================
-  //==== PERMISSION DEPENDENCIES
-  //==================================================
+  // Permission dependencies
 
-  const permissionKeys = new Set(
-    permissions.map((item) => String(item.permission_key)),
-  );
+  const permissionKeys = new Set(permissions.map((item) => String(item.permission_key)));
 
   const dependencies: Record<string, string[]> = {
-    "attachment.create": ["attachment.view"],
-
-    "attachment.delete": ["attachment.view"],
+    'attachment.create': ['attachment.view'],
+    'attachment.delete': ['attachment.view'],
   };
 
   for (const [permissionKey, requiredKeys] of Object.entries(dependencies)) {
@@ -176,11 +137,8 @@ export const resolvePermissionIds = async (
 
       return {
         success: false,
-
         status: 400,
-
-        code: "ADMIN_ACCESS_PERMISSION_DEPENDENCY_REQUIRED",
-
+        code: 'ADMIN_ACCESS_PERMISSION_DEPENDENCY_REQUIRED',
         message: `${requiredKey} is required when assigning ${permissionKey}`,
       };
     }
@@ -188,25 +146,18 @@ export const resolvePermissionIds = async (
 
   return {
     success: true,
-
     ids: uniqueIds,
   };
 };
 
-//==================================================
-//==== GET PERMISSION KEYS BY IDS
-//==================================================
+// Get permission keys by IDS
 
-export const getPermissionKeysByIds = async (
-  executor: any,
-
-  ids: number[],
-): Promise<string[]> => {
+export const getPermissionKeysByIds = async (executor: any, ids: number[]): Promise<string[]> => {
   if (!ids.length) {
     return [];
   }
 
-  const placeholders = ids.map(() => "?").join(", ");
+  const placeholders = ids.map(() => '?').join(', ');
 
   const [rows] = await executor.query(
     `
@@ -228,13 +179,10 @@ export const getPermissionKeysByIds = async (
   return (rows as any[]).map((item) => String(item.permission_key));
 };
 
-//==================================================
-//==== GET ACCESS PERMISSION KEYS
-//==================================================
+// Get access permission keys
 
 export const getAccessPermissionKeys = async (
   executor: any,
-
   idAccess: number,
 ): Promise<string[]> => {
   const [rows] = await executor.query(
@@ -259,15 +207,9 @@ export const getAccessPermissionKeys = async (
   return (rows as any[]).map((item) => String(item.permission_key));
 };
 
-//==================================================
-//==== PERMISSION DIFF
-//==================================================
+// Permission diff
 
-export const getPermissionDiff = (
-  before: string[],
-
-  after: string[],
-) => {
+export const getPermissionDiff = (before: string[], after: string[]) => {
   const beforeSet = new Set(before);
 
   const afterSet = new Set(after);
@@ -278,9 +220,7 @@ export const getPermissionDiff = (
 
   return {
     added,
-
     removed,
-
     changed: added.length > 0 || removed.length > 0,
   };
 };

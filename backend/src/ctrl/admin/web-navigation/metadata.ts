@@ -1,12 +1,12 @@
 // Navigation metadata: key and field validation, settings JSON parsing.
-import { isPublicContentLocale } from "../../../config/public-content.config";
+import { isPublicContentLocale } from '../../../config/public-content.config';
 
 export const parseJsonValue = (value: unknown): unknown | null => {
-  if (value === null || value === undefined || value === "") {
+  if (value === null || value === undefined || value === '') {
     return null;
   }
 
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return value;
   }
 
@@ -33,7 +33,7 @@ export type NavigationMetadataResult =
     };
 
 export const normalizeNavigationKey = (value: unknown): string | null => {
-  const key = String(value ?? "")
+  const key = String(value ?? '')
     .trim()
     .toLowerCase();
 
@@ -45,48 +45,41 @@ export const normalizeNavigationKey = (value: unknown): string | null => {
 };
 
 export const normalizeNavigationMetadata = (body: any): NavigationMetadataResult => {
-  const name = String(body?.web_navigation_name ?? "").trim();
+  const name = String(body?.web_navigation_name ?? '').trim();
 
   if (!name || name.length > 255) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_NAME_INVALID",
-      message:
-        "Web navigation name is required and must not exceed 255 characters",
+      code: 'WEB_NAVIGATION_NAME_INVALID',
+      message: 'Web navigation name is required and must not exceed 255 characters',
     };
   }
 
-  const location = String(body?.web_navigation_location ?? "")
+  const location = String(body?.web_navigation_location ?? '')
     .trim()
     .toLowerCase();
 
-  if (
-    !location ||
-    location.length > 50 ||
-    !/^[a-z0-9][a-z0-9_-]*$/.test(location)
-  ) {
+  if (!location || location.length > 50 || !/^[a-z0-9][a-z0-9_-]*$/.test(location)) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_LOCATION_INVALID",
-      message: "Invalid web navigation location",
+      code: 'WEB_NAVIGATION_LOCATION_INVALID',
+      message: 'Invalid web navigation location',
     };
   }
 
-  const defaultLocale = String(
-    body?.web_navigation_default_locale ?? "",
-  ).trim();
+  const defaultLocale = String(body?.web_navigation_default_locale ?? '').trim();
 
   if (!isPublicContentLocale(defaultLocale)) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_LOCALE_UNSUPPORTED",
-      message: "Unsupported default locale",
+      code: 'WEB_NAVIGATION_LOCALE_UNSUPPORTED',
+      message: 'Unsupported default locale',
     };
   }
 
   const rawSettings = body?.web_navigation_settings_json ?? null;
 
-  if (rawSettings === null || rawSettings === undefined || rawSettings === "") {
+  if (rawSettings === null || rawSettings === undefined || rawSettings === '') {
     return {
       success: true,
       name,
@@ -99,27 +92,23 @@ export const normalizeNavigationMetadata = (body: any): NavigationMetadataResult
 
   let settings: unknown = rawSettings;
 
-  if (typeof rawSettings === "string") {
+  if (typeof rawSettings === 'string') {
     try {
       settings = JSON.parse(rawSettings);
     } catch {
       return {
         success: false,
-        code: "WEB_NAVIGATION_SETTINGS_INVALID",
-        message: "Web navigation settings must contain valid JSON",
+        code: 'WEB_NAVIGATION_SETTINGS_INVALID',
+        message: 'Web navigation settings must contain valid JSON',
       };
     }
   }
 
-  if (
-    typeof settings !== "object" ||
-    settings === null ||
-    Array.isArray(settings)
-  ) {
+  if (typeof settings !== 'object' || settings === null || Array.isArray(settings)) {
     return {
       success: false,
-      code: "WEB_NAVIGATION_SETTINGS_INVALID",
-      message: "Web navigation settings must be a JSON object",
+      code: 'WEB_NAVIGATION_SETTINGS_INVALID',
+      message: 'Web navigation settings must be a JSON object',
     };
   }
 

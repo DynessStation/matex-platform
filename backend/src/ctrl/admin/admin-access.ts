@@ -1,9 +1,9 @@
-import express = require("express");
+import express = require('express');
 
-import readRoutes from "./admin-access/read";
-import createRoutes from "./admin-access/create";
-import updateRoutes from "./admin-access/update";
-import deleteRoutes from "./admin-access/delete";
+import readRoutes from './admin-access/read';
+import createRoutes from './admin-access/create';
+import updateRoutes from './admin-access/update';
+import deleteRoutes from './admin-access/delete';
 
 // Access profiles and the permission matrix, under /api/v1/admin-access.
 //

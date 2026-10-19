@@ -7,26 +7,26 @@
 //   4. Write the generated credentials to a git-ignored state file for the tests.
 //
 // Database host/port/user/password come from backend/.env; only the database name differs.
-import { spawnSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
-import fs from "node:fs";
-import { createRequire } from "node:module";
-import path from "node:path";
+import { spawnSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 
-import { assertSafeStack, backendRoot, stack } from "./stack.mjs";
+import { assertSafeStack, backendRoot, stack } from './stack.mjs';
 
 assertSafeStack();
 
-const backendRequire = createRequire(path.join(backendRoot, "package.json"));
-const dotenv = backendRequire("dotenv");
-const mysql = backendRequire("mysql2/promise");
+const backendRequire = createRequire(path.join(backendRoot, 'package.json'));
+const dotenv = backendRequire('dotenv');
+const mysql = backendRequire('mysql2/promise');
 
-const env = dotenv.parse(fs.readFileSync(path.join(backendRoot, ".env")));
+const env = dotenv.parse(fs.readFileSync(path.join(backendRoot, '.env')));
 const connection = await mysql.createConnection({
   host: env.DB_HOST,
   port: Number(env.DB_PORT) || 3306,
   user: env.DB_USER,
-  password: env.DB_PASS || "",
+  password: env.DB_PASS || '',
 });
 try {
   await connection.query(`DROP DATABASE IF EXISTS \`${stack.databaseName}\``);
@@ -53,7 +53,7 @@ function run(script, args = [], input) {
     cwd: backendRoot,
     env: childEnv,
     input,
-    encoding: "utf8",
+    encoding: 'utf8',
   });
   if (result.status !== 0) {
     throw new Error(`${script} failed:\n${result.stdout}\n${result.stderr}`);
@@ -61,27 +61,27 @@ function run(script, args = [], input) {
   return result.stdout;
 }
 
-run("scripts/migrate.cjs");
+run('scripts/migrate.cjs');
 
 const admin = {
-  identity: "e2e.admin@example.invalid",
-  password: `E2e-${randomBytes(12).toString("base64url")}9`,
+  identity: 'e2e.admin@example.invalid',
+  password: `E2e-${randomBytes(12).toString('base64url')}9`,
 };
 run(
-  "scripts/create-first-admin.cjs",
+  'scripts/create-first-admin.cjs',
   [
-    "--name",
-    "Penguji Otomatis",
-    "--alias",
-    "E2EAdmin",
-    "--email",
+    '--name',
+    'Penguji Otomatis',
+    '--alias',
+    'E2EAdmin',
+    '--email',
     admin.identity,
-    "--phone",
-    "+628100000099",
-    "--company-name",
-    "MATEX E2E",
-    "--company-alias",
-    "E2E",
+    '--phone',
+    '+628100000099',
+    '--company-name',
+    'MATEX E2E',
+    '--company-alias',
+    'E2E',
   ],
   `${admin.password}\n${admin.password}\n`,
 );

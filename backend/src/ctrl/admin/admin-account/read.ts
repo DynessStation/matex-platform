@@ -1,12 +1,12 @@
 // Admin-account list and detail.
-import express = require("express");
-import keyhsid from "../../../hsid";
-import db = require("../../../db");
+import express = require('express');
+import keyhsid from '../../../hsid';
+import db = require('../../../db');
 
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { buildAttachmentUrl } from "../../../helper/attachment.helper";
-import { sendError } from "../../../helper/api-response.helper";
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { buildAttachmentUrl } from '../../../helper/attachment.helper';
+import { sendError } from '../../../helper/api-response.helper';
 
 const { pool } = db;
 
@@ -14,28 +14,24 @@ const router = express.Router();
 
 // get accounts
 router.get(
-  "/api/v1/admin-acct",
+  '/api/v1/admin-acct',
   verifyToken,
-  requirePermission("admin_account.view"),
+  requirePermission('admin_account.view'),
   async (req: AuthRequest, res) => {
     const { query } = req;
 
     let { page, search, limit, ord: order, srt: sort } = query;
 
     try {
-      // =========================================
-      // AUTH ACCOUNT
-      // =========================================
+      // Auth account
 
       const idAdminAcct = req.user?.id_admin_acct;
 
       if (!idAdminAcct) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
-      // =========================================
-      // GET ACCOUNT SCOPE
-      // =========================================
+      // Get account scope
 
       const [sessionRows] = await pool.query(
         `
@@ -56,67 +52,52 @@ router.get(
       const sessionUsers = sessionRows as any[];
 
       if (sessionUsers.length === 0) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const idMasterComp = sessionUsers[0].id_master_comp;
 
       const idOffice = sessionUsers[0].id_office;
 
-      // =========================================
-      // PAGINATION
-      // =========================================
+      // Pagination
 
-      const parsedPage =
-        typeof page === "string" && page !== "" ? Number(page) : NaN;
+      const parsedPage = typeof page === 'string' && page !== '' ? Number(page) : NaN;
 
-      const parsedLimit =
-        typeof limit === "string" && limit !== "" ? Number(limit) : 10;
+      const parsedLimit = typeof limit === 'string' && limit !== '' ? Number(limit) : 10;
 
-      const pageNumber =
-        Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+      const pageNumber = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
       const itemsPerPage =
-        Number.isFinite(parsedLimit) && parsedLimit > 0
-          ? Math.min(parsedLimit, 100)
-          : 10;
+        Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 10;
 
       const offset = (pageNumber - 1) * itemsPerPage;
 
-      // =========================================
-      // SORTING
-      // =========================================
+      // Sorting
 
       const allowedOrder: Record<string, string> = {
-        id: "aa.id_admin_acct",
-        name: "aa.name",
-        alias: "aa.alias",
-        email_1: "aa.email_1",
-        email_2: "aa.email_2",
-        phone_1: "aa.phone_1",
-        phone_2: "aa.phone_2",
-        created: "aa.created",
-        updated: "aa.updated",
+        id: 'aa.id_admin_acct',
+        name: 'aa.name',
+        alias: 'aa.alias',
+        email_1: 'aa.email_1',
+        email_2: 'aa.email_2',
+        phone_1: 'aa.phone_1',
+        phone_2: 'aa.phone_2',
+        created: 'aa.created',
+        updated: 'aa.updated',
       };
 
       const orderQuery =
-        typeof order === "string" && allowedOrder[order]
-          ? allowedOrder[order]
-          : "aa.id_admin_acct";
+        typeof order === 'string' && allowedOrder[order] ? allowedOrder[order] : 'aa.id_admin_acct';
 
-      const sortQuery = sort === "true" ? "DESC" : "ASC";
+      const sortQuery = sort === 'true' ? 'DESC' : 'ASC';
 
-      // =========================================
-      // SEARCH
-      // =========================================
+      // Search
 
-      const searchTerm = typeof search === "string" ? search.trim() : "";
+      const searchTerm = typeof search === 'string' ? search.trim() : '';
 
       const searchValue = `%${searchTerm}%`;
 
-      // =========================================
-      // COUNT TOTAL DATA
-      // =========================================
+      // Count total data
 
       const qGetTotal = `
                 SELECT
@@ -153,9 +134,7 @@ router.get(
 
       const totalData = Number((totalRows as any[])[0].total);
 
-      // =========================================
-      // GET DATA
-      // =========================================
+      // Get data
 
       const qGetData = `
                 SELECT
@@ -255,82 +234,51 @@ router.get(
         offset,
       ]);
 
-      // =========================================
-      // RESPONSE DATA
-      // =========================================
+      // Response data
 
       const data = (rows as any[]).map((item) => {
-        //==================================================
-        //==== PROFILE PHOTO
-        //==================================================
+        // Profile photo
 
         const profilePhoto = item.profile_attachment_id
           ? {
-              id_attachment: keyhsid.idAttachment.encode(
-                item.profile_attachment_id,
-              ),
-
+              id_attachment: keyhsid.idAttachment.encode(item.profile_attachment_id),
               collection_name: item.profile_collection_name,
-
               name: item.profile_name,
-
               original_name: item.profile_original_name,
-
               file_name: item.profile_file_name,
-
               mime_type: item.profile_mime_type,
-
               extension: item.profile_extension,
-
               disk: item.profile_disk,
-
               storage_path: item.profile_storage_path,
-
               file_size: Number(item.profile_file_size),
-
               width: item.profile_width,
-
               height: item.profile_height,
-
               asset_url: buildAttachmentUrl(item.profile_storage_path),
             }
           : null;
 
-        //==================================================
-        //==== RESPONSE
-        //==================================================
+        // Response
 
         return {
           ...item,
-
           id_admin_acct: keyhsid.idAdmin.encode(item.id_admin_acct),
-
           id_master_comp: keyhsid.idMasterCompany.encode(item.id_master_comp),
-
           id_office: keyhsid.idOffice.encode(item.id_office),
-
           id_chair: keyhsid.idChair.encode(item.id_chair),
-
           id_admin_access: keyhsid.idAdminAccess.encode(item.id_admin_access),
-
           id_profile_photo: profilePhoto?.id_attachment ?? null,
-
           profile_photo: profilePhoto,
-
-          status_label: item.admin_acct_status === 1 ? "Active" : "Inactive",
+          status_label: item.admin_acct_status === 1 ? 'Active' : 'Inactive',
         };
       });
 
-      // =========================================
-      // PAGINATION RESPONSE
-      // =========================================
+      // Pagination response
 
       const pagerows = Math.ceil(totalData / itemsPerPage);
 
       return res.status(200).json({
         success: true,
         data: data,
-
         pagination: {
           total: totalData,
           page: pageNumber,
@@ -340,54 +288,34 @@ router.get(
         },
       });
     } catch (error) {
-      console.error("Database query error:", error);
+      console.error('Database query error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== ADMIN ACCOUNT - GET DETAIL
-//==================================================
+// Admin account - get detail
 
 router.get(
-  "/api/v1/admin-acct/:id",
+  '/api/v1/admin-acct/:id',
   verifyToken,
-  requirePermission("admin_account.view"),
+  requirePermission('admin_account.view'),
   async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
 
-      //==================================================
-      //==== DECODE ADMIN ACCOUNT ID
-      //==================================================
+      // Decode admin account ID
 
       const decodedAdminAcct = keyhsid.idAdmin.decode(id as string)[0];
 
       const idAdminAcct = Number(decodedAdminAcct);
 
-      if (
-        !decodedAdminAcct ||
-        !Number.isInteger(idAdminAcct) ||
-        idAdminAcct <= 0
-      ) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCOUNT_INVALID_ID",
-          "Invalid admin account identifier",
-        );
+      if (!decodedAdminAcct || !Number.isInteger(idAdminAcct) || idAdminAcct <= 0) {
+        return sendError(res, 400, 'ADMIN_ACCOUNT_INVALID_ID', 'Invalid admin account identifier');
       }
 
-      //==================================================
-      //==== GET ADMIN ACCOUNT
-      //==================================================
+      // Get admin account
 
       const qGetData = `
                 SELECT
@@ -469,24 +397,17 @@ router.get(
       const dataRows = rows as any[];
 
       if (dataRows.length === 0) {
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCOUNT_NOT_FOUND",
-          "Admin account not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCOUNT_NOT_FOUND', 'Admin account not found');
       }
 
       const account = dataRows[0];
 
-      //==================================================
-      //==== SESSION SCOPE
-      //==================================================
+      // Session scope
 
       const sessionAdminId = req.user?.id_admin_acct;
 
       if (!sessionAdminId) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const [sessionRows] = await pool.query(
@@ -509,38 +430,27 @@ router.get(
       const sessionUsers = sessionRows as any[];
 
       if (!sessionUsers.length) {
-        return sendError(res, 401, "AUTH_SESSION_INVALID", "Invalid session");
+        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
       }
 
       const sessionUser = sessionUsers[0];
 
       if (Number(sessionUser.admin_acct_status) !== 1) {
+        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
+      }
+
+      // Company hard boundary
+
+      if (Number(account.id_master_comp) !== Number(sessionUser.id_master_comp)) {
         return sendError(
           res,
           403,
-          "AUTH_ACCOUNT_INACTIVE",
-          "Your account is not active",
+          'ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN',
+          'You do not have access to this company account',
         );
       }
 
-      //==================================================
-      //==== COMPANY HARD BOUNDARY
-      //==================================================
-
-      if (
-        Number(account.id_master_comp) !== Number(sessionUser.id_master_comp)
-      ) {
-        return sendError(
-          res,
-          403,
-          "ADMIN_ACCOUNT_COMPANY_SCOPE_FORBIDDEN",
-          "You do not have access to this company account",
-        );
-      }
-
-      //==================================================
-      //==== OFFICE SCOPE
-      //==================================================
+      // Office scope
 
       if (
         Number(sessionUser.is_all_access) !== 1 &&
@@ -549,117 +459,71 @@ router.get(
         return sendError(
           res,
           403,
-          "ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN",
-          "You do not have access to this office account",
+          'ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN',
+          'You do not have access to this office account',
         );
       }
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       const profilePhoto = account.profile_attachment_id
         ? {
-            id_attachment: keyhsid.idAttachment.encode(
-              account.profile_attachment_id,
-            ),
-
+            id_attachment: keyhsid.idAttachment.encode(account.profile_attachment_id),
             collection_name: account.profile_collection_name,
-
             name: account.profile_name,
-
             original_name: account.profile_original_name,
-
             file_name: account.profile_file_name,
-
             mime_type: account.profile_mime_type,
-
             extension: account.profile_extension,
-
             disk: account.profile_disk,
-
             storage_path: account.profile_storage_path,
-
             file_size: Number(account.profile_file_size),
-
             width: account.profile_width,
-
             height: account.profile_height,
-
             asset_url: buildAttachmentUrl(account.profile_storage_path),
           }
         : null;
 
       return res.status(200).json({
         success: true,
-
         data: {
           id_admin_acct: keyhsid.idAdmin.encode(account.id_admin_acct),
-
           name: account.name,
-
           alias: account.alias,
-
           email_1: account.email_1,
-
           email_2: account.email_2,
-
           phone_1: account.phone_1,
-
           phone_2: account.phone_2,
-
           id_profile_photo: profilePhoto?.id_attachment ?? null,
-
           profile_photo: profilePhoto,
-
           master_comp: {
-            id_master_comp: keyhsid.idMasterCompany.encode(
-              account.id_master_comp,
-            ),
-
+            id_master_comp: keyhsid.idMasterCompany.encode(account.id_master_comp),
             comp_name: account.comp_name,
-
             comp_alias: account.comp_alias,
           },
-
           office: {
             id_office: keyhsid.idOffice.encode(account.id_office),
-
             office_name: account.office_name,
           },
-
           chair: {
             id_chair: keyhsid.idChair.encode(account.id_chair),
-
             chair_name: account.chair_name,
-
             chair_description: account.chair_description,
           },
-
           access: {
             id_access: keyhsid.idAdminAccess.encode(account.id_access),
-
             access_name: account.access_name,
           },
-
           is_all_access: account.is_all_access,
-
           admin_acct_status: account.admin_acct_status,
-
           created: account.created,
-
           updated: account.updated,
         },
       });
     } catch (error) {
-      console.error("Get admin account detail error:", error);
+      console.error('Get admin account detail error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );

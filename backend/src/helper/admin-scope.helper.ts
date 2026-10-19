@@ -1,6 +1,6 @@
-import { Pool } from "mysql2/promise";
+import { Pool } from 'mysql2/promise';
 
-import { AuthRequest } from "../middleware/auth-jwt.middleware";
+import { AuthRequest } from '../middleware/auth-jwt.middleware';
 
 export type AdminScopeResult =
   | {
@@ -15,18 +15,15 @@ export type AdminScopeResult =
       message: string;
     };
 
-export const getAdminScope = async (
-  req: AuthRequest,
-  pool: Pool,
-): Promise<AdminScopeResult> => {
+export const getAdminScope = async (req: AuthRequest, pool: Pool): Promise<AdminScopeResult> => {
   const idAdminAcct = Number(req.user?.id_admin_acct);
 
   if (!Number.isSafeInteger(idAdminAcct) || idAdminAcct <= 0) {
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -46,8 +43,8 @@ export const getAdminScope = async (
     return {
       success: false,
       status: account ? 403 : 401,
-      code: account ? "AUTH_ACCOUNT_INACTIVE" : "AUTH_SESSION_INVALID",
-      message: account ? "Your account is not active" : "Invalid session",
+      code: account ? 'AUTH_ACCOUNT_INACTIVE' : 'AUTH_SESSION_INVALID',
+      message: account ? 'Your account is not active' : 'Invalid session',
     };
   }
 

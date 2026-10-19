@@ -1,29 +1,29 @@
-import express = require("express");
-import { Response } from "express";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import express = require('express');
+import { Response } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-import db = require("../../db");
+import db = require('../../db');
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContactChannelType,
   isPublicContentLocale,
   normalizePublicContentKey,
-} from "../../config/public-content.config";
-import { getAdminScope } from "../../helper/admin-scope.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
-import { writeAuditLog } from "../../helper/audit-log.helper";
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+} from '../../config/public-content.config';
+import { getAdminScope } from '../../helper/admin-scope.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { writeAuditLog } from '../../helper/audit-log.helper';
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 const app = express();
 const { pool } = db;
 
 const normalizeUrl = (value: unknown): string | null | undefined => {
-  const clean = String(value ?? "").trim();
+  const clean = String(value ?? '').trim();
   if (!clean) return null;
   try {
     const parsed = new URL(clean);
-    return ["http:", "https:", "mailto:", "tel:"].includes(parsed.protocol)
+    return ['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)
       ? parsed.toString()
       : undefined;
   } catch {
@@ -33,16 +33,26 @@ const normalizeUrl = (value: unknown): string | null | undefined => {
 
 const normalizeTranslations = (value: unknown) => {
   if (!Array.isArray(value)) return null;
-  const result: Array<{ locale: string; label: string; description: string | null; status: 0 | 1 }> = [];
+  const result: Array<{
+    locale: string;
+    label: string;
+    description: string | null;
+    status: 0 | 1;
+  }> = [];
   const seen = new Set<string>();
   for (const item of value) {
-    const locale = String(item?.locale ?? "").trim();
-    const label = String(item?.label ?? "").trim();
-    const description = String(item?.description ?? "").trim() || null;
+    const locale = String(item?.locale ?? '').trim();
+    const label = String(item?.label ?? '').trim();
+    const description = String(item?.description ?? '').trim() || null;
     if (!isPublicContentLocale(locale) || seen.has(locale) || !label || label.length > 255)
       return null;
     seen.add(locale);
-    result.push({ locale, label, description, status: Number(item?.status) === 0 ? 0 : 1 });
+    result.push({
+      locale,
+      label,
+      description,
+      status: Number(item?.status) === 0 ? 0 : 1,
+    });
   }
   return PUBLIC_CONTENT_LOCALES.every((locale) => seen.has(locale)) ? result : null;
 };
@@ -55,21 +65,32 @@ const normalizeChannels = (value: unknown) => {
     const item = value[index];
     const key = normalizePublicContentKey(item?.key);
     const type = item?.type;
-    const channelValue = String(item?.value ?? "").trim();
-    const url = ["whatsapp", "email", "phone"].includes(type)
-      ? null
-      : normalizeUrl(item?.url);
+    const channelValue = String(item?.value ?? '').trim();
+    const url = ['whatsapp', 'email', 'phone'].includes(type) ? null : normalizeUrl(item?.url);
     const translations = normalizeTranslations(item?.translations);
-    if (!key || key.length > 100 || seen.has(key) || !isPublicContactChannelType(type) ||
-      !channelValue || channelValue.length > 500 || url === undefined || !translations)
+    if (
+      !key ||
+      key.length > 100 ||
+      seen.has(key) ||
+      !isPublicContactChannelType(type) ||
+      !channelValue ||
+      channelValue.length > 500 ||
+      url === undefined ||
+      !translations
+    )
       return null;
-    if (type === "whatsapp" && !/^\+[1-9]\d{7,14}$/.test(channelValue)) return null;
+    if (type === 'whatsapp' && !/^\+[1-9]\d{7,14}$/.test(channelValue)) return null;
     seen.add(key);
     result.push({
-      key, type, value: channelValue, url,
+      key,
+      type,
+      value: channelValue,
+      url,
       isPrimary: Number(item?.is_primary) === 1 ? 1 : 0,
       isPublic: Number(item?.is_public) === 0 ? 0 : 1,
-      sortOrder: Number.isSafeInteger(Number(item?.sort_order)) ? Math.max(0, Number(item.sort_order)) : index,
+      sortOrder: Number.isSafeInteger(Number(item?.sort_order))
+        ? Math.max(0, Number(item.sort_order))
+        : index,
       translations,
     });
   }
@@ -83,16 +104,25 @@ const normalizeTopics = (value: unknown) => {
   for (let index = 0; index < value.length; index += 1) {
     const item = value[index];
     const key = normalizePublicContentKey(item?.key);
-    const email = String(item?.recipient_email ?? "").trim() || null;
+    const email = String(item?.recipient_email ?? '').trim() || null;
     const status = Number(item?.status) === 0 ? 0 : 1;
     const translations = normalizeTranslations(item?.translations);
-    if (!key || key.length > 100 || seen.has(key) || (status === 1 && email === null) ||
-      (email !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || !translations)
+    if (
+      !key ||
+      key.length > 100 ||
+      seen.has(key) ||
+      (status === 1 && email === null) ||
+      (email !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
+      !translations
+    )
       return null;
     seen.add(key);
     result.push({
-      key, email,
-      sortOrder: Number.isSafeInteger(Number(item?.sort_order)) ? Math.max(0, Number(item.sort_order)) : index,
+      key,
+      email,
+      sortOrder: Number.isSafeInteger(Number(item?.sort_order))
+        ? Math.max(0, Number(item.sort_order))
+        : index,
       status,
       translations,
     });
@@ -146,17 +176,24 @@ const loadSettings = async (idMasterComp: number) => {
     for (const row of rows) {
       const id = Number(row[key]);
       const values = map.get(id) ?? [];
-      values.push({ locale: row.locale, label: row.label, description: row.description, status: Number(row.status) });
+      values.push({
+        locale: row.locale,
+        label: row.label,
+        description: row.description,
+        status: Number(row.status),
+      });
       map.set(id, values);
     }
     return map;
   };
-  const channelI18n = group(channelTranslations, "id_public_contact_channel");
-  const topicI18n = group(topicTranslations, "id_contact_inquiry_topic");
+  const channelI18n = group(channelTranslations, 'id_public_contact_channel');
+  const topicI18n = group(topicTranslations, 'id_contact_inquiry_topic');
   return {
     channels: channelRows.map((row) => ({
-      key: row.public_contact_channel_key, type: row.public_contact_channel_type,
-      value: row.public_contact_channel_value, url: row.public_contact_channel_url,
+      key: row.public_contact_channel_key,
+      type: row.public_contact_channel_type,
+      value: row.public_contact_channel_value,
+      url: row.public_contact_channel_url,
       is_primary: Number(row.public_contact_channel_is_primary),
       is_public: Number(row.public_contact_channel_is_public),
       sort_order: Number(row.public_contact_channel_sort_order),
@@ -173,32 +210,43 @@ const loadSettings = async (idMasterComp: number) => {
 };
 
 app.get(
-  "/api/v1/public-contact",
+  '/api/v1/public-contact',
   verifyToken,
-  requirePermission("public_contact.view"),
+  requirePermission('public_contact.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     try {
-      return sendSuccess(res, 200, "PUBLIC_CONTACT_FOUND", "Contact settings loaded", await loadSettings(scope.idMasterComp));
+      return sendSuccess(
+        res,
+        200,
+        'PUBLIC_CONTACT_FOUND',
+        'Contact settings loaded',
+        await loadSettings(scope.idMasterComp),
+      );
     } catch (error) {
-      console.error("[Public Contact] Failed to load settings", error);
-      return sendError(res, 500, "PUBLIC_CONTACT_LOAD_FAILED", "Unable to load contact settings");
+      console.error('[Public Contact] Failed to load settings', error);
+      return sendError(res, 500, 'PUBLIC_CONTACT_LOAD_FAILED', 'Unable to load contact settings');
     }
   },
 );
 
 app.put(
-  "/api/v1/public-contact",
+  '/api/v1/public-contact',
   verifyToken,
-  requirePermission("public_contact.update"),
+  requirePermission('public_contact.update'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const channels = normalizeChannels(req.body?.channels);
     const topics = normalizeTopics(req.body?.topics);
     if (!channels || !topics)
-      return sendError(res, 400, "PUBLIC_CONTACT_PAYLOAD_INVALID", "Contact settings are incomplete or invalid");
+      return sendError(
+        res,
+        400,
+        'PUBLIC_CONTACT_PAYLOAD_INVALID',
+        'Contact settings are incomplete or invalid',
+      );
 
     const connection = await pool.getConnection();
     try {
@@ -210,7 +258,7 @@ app.put(
           `UPDATE public_contact_channel SET public_contact_channel_deleted_at = NOW(),
             public_contact_channel_is_public = 0, id_updated_by = ?, updated = NOW()
            WHERE id_master_comp = ? AND public_contact_channel_deleted_at IS NULL
-            AND public_contact_channel_key NOT IN (${channelKeys.map(() => "?").join(",")})`,
+            AND public_contact_channel_key NOT IN (${channelKeys.map(() => '?').join(',')})`,
           [scope.idAdminAcct, scope.idMasterComp, ...channelKeys],
         );
       } else {
@@ -236,8 +284,18 @@ app.put(
             public_contact_channel_sort_order = VALUES(public_contact_channel_sort_order),
             id_updated_by = VALUES(id_updated_by), public_contact_channel_deleted_at = NULL,
             updated = NOW()`,
-          [scope.idMasterComp, item.key, item.type, item.value, item.url, item.isPrimary,
-            item.isPublic, item.sortOrder, scope.idAdminAcct, scope.idAdminAcct],
+          [
+            scope.idMasterComp,
+            item.key,
+            item.type,
+            item.value,
+            item.url,
+            item.isPrimary,
+            item.isPublic,
+            item.sortOrder,
+            scope.idAdminAcct,
+            scope.idAdminAcct,
+          ],
         );
         const [idRows] = await connection.query<RowDataPacket[]>(
           `SELECT id_public_contact_channel FROM public_contact_channel
@@ -254,8 +312,14 @@ app.put(
               public_contact_channel_description = VALUES(public_contact_channel_description),
               public_contact_channel_i18n_status = VALUES(public_contact_channel_i18n_status),
               updated = NOW()`,
-            [idRows[0].id_public_contact_channel, scope.idMasterComp, translation.locale,
-              translation.label, translation.description, translation.status],
+            [
+              idRows[0].id_public_contact_channel,
+              scope.idMasterComp,
+              translation.locale,
+              translation.label,
+              translation.description,
+              translation.status,
+            ],
           );
         }
       }
@@ -264,7 +328,7 @@ app.put(
         await connection.query(
           `UPDATE contact_inquiry_topic SET contact_inquiry_topic_status = 0,
             id_updated_by = ?, updated = NOW() WHERE id_master_comp = ?
-            AND contact_inquiry_topic_key NOT IN (${topicKeys.map(() => "?").join(",")})`,
+            AND contact_inquiry_topic_key NOT IN (${topicKeys.map(() => '?').join(',')})`,
           [scope.idAdminAcct, scope.idMasterComp, ...topicKeys],
         );
       } else {
@@ -284,8 +348,15 @@ app.put(
             contact_inquiry_topic_sort_order = VALUES(contact_inquiry_topic_sort_order),
             contact_inquiry_topic_status = VALUES(contact_inquiry_topic_status),
             id_updated_by = VALUES(id_updated_by), updated = NOW()`,
-          [scope.idMasterComp, item.key, item.email, item.sortOrder, item.status,
-            scope.idAdminAcct, scope.idAdminAcct],
+          [
+            scope.idMasterComp,
+            item.key,
+            item.email,
+            item.sortOrder,
+            item.status,
+            scope.idAdminAcct,
+            scope.idAdminAcct,
+          ],
         );
         const [idRows] = await connection.query<RowDataPacket[]>(
           `SELECT id_contact_inquiry_topic FROM contact_inquiry_topic
@@ -299,26 +370,52 @@ app.put(
               contact_inquiry_topic_i18n_status) VALUES (?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE contact_inquiry_topic_label = VALUES(contact_inquiry_topic_label),
               contact_inquiry_topic_i18n_status = VALUES(contact_inquiry_topic_i18n_status), updated = NOW()`,
-            [idRows[0].id_contact_inquiry_topic, scope.idMasterComp, translation.locale,
-              translation.label, translation.status],
+            [
+              idRows[0].id_contact_inquiry_topic,
+              scope.idMasterComp,
+              translation.locale,
+              translation.label,
+              translation.status,
+            ],
           );
         }
       }
       await writeAuditLog({
-        req, connection, writeMode: "strict", idMasterComp: scope.idMasterComp,
-        eventCode: "public_contact.updated", category: "data_change",
-        module: "public_contact", action: "update", actorType: "admin",
-        actorId: scope.idAdminAcct, actorLabel: req.user?.alias ?? null,
-        entityType: "public_contact", entityId: scope.idMasterComp,
-        entityLabel: "Public contact settings", before,
-        after: { channels, topics }, httpStatus: 200,
+        req,
+        connection,
+        writeMode: 'strict',
+        idMasterComp: scope.idMasterComp,
+        eventCode: 'public_contact.updated',
+        category: 'data_change',
+        module: 'public_contact',
+        action: 'update',
+        actorType: 'admin',
+        actorId: scope.idAdminAcct,
+        actorLabel: req.user?.alias ?? null,
+        entityType: 'public_contact',
+        entityId: scope.idMasterComp,
+        entityLabel: 'Public contact settings',
+        before,
+        after: { channels, topics },
+        httpStatus: 200,
       });
       await connection.commit();
-      return sendSuccess(res, 200, "PUBLIC_CONTACT_UPDATED", "Contact settings updated successfully", await loadSettings(scope.idMasterComp));
+      return sendSuccess(
+        res,
+        200,
+        'PUBLIC_CONTACT_UPDATED',
+        'Contact settings updated successfully',
+        await loadSettings(scope.idMasterComp),
+      );
     } catch (error) {
       await connection.rollback();
-      console.error("[Public Contact] Failed to update settings", error);
-      return sendError(res, 500, "PUBLIC_CONTACT_UPDATE_FAILED", "Unable to update contact settings");
+      console.error('[Public Contact] Failed to update settings', error);
+      return sendError(
+        res,
+        500,
+        'PUBLIC_CONTACT_UPDATE_FAILED',
+        'Unable to update contact settings',
+      );
     } finally {
       connection.release();
     }

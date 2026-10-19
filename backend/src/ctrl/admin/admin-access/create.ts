@@ -1,49 +1,32 @@
 // Create an access profile.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope } from "./scope";
-import { resolvePermissionIds, getPermissionKeysByIds } from "./permissions";
+import { getSessionScope } from './scope';
+import { resolvePermissionIds, getPermissionKeysByIds } from './permissions';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== ADMIN ACCESS - CREATE
-//==================================================
+// Admin access - create
 
 router.post(
-  "/api/v1/admin-access",
-
+  '/api/v1/admin-access',
   verifyToken,
-
-  requirePermission("admin_access.create"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_access.create'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
-      const {
-        access_name,
+      const { access_name, access_description, permissions } = req.body;
 
-        access_description,
-
-        permissions,
-      } = req.body;
-
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -51,60 +34,41 @@ router.post(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== NORMALIZE
-      //==================================================
+      // Normalize
 
-      const cleanName =
-        typeof access_name === "string" ? access_name.trim() : "";
+      const cleanName = typeof access_name === 'string' ? access_name.trim() : '';
 
       const cleanDescription =
-        typeof access_description === "string" && access_description.trim()
+        typeof access_description === 'string' && access_description.trim()
           ? access_description.trim()
           : null;
 
-      //==================================================
-      //==== VALIDATE NAME
-      //==================================================
+      // Validate name
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_NAME_REQUIRED",
-          "Access name is required",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_NAME_REQUIRED', 'Access name is required');
       }
 
       if (cleanName.length > 255) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_NAME_TOO_LONG",
-          "Access name is too long",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_NAME_TOO_LONG', 'Access name is too long');
       }
 
       if (cleanDescription && cleanDescription.length > 500) {
         return sendError(
           res,
           400,
-          "ADMIN_ACCESS_DESCRIPTION_TOO_LONG",
-          "Access description is too long",
+          'ADMIN_ACCESS_DESCRIPTION_TOO_LONG',
+          'Access description is too long',
         );
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== DUPLICATE NAME
-      //==================================================
+      // Duplicate name
 
       const [duplicateRows] = await connection.query(
         `
@@ -126,23 +90,12 @@ router.post(
       if ((duplicateRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          409,
-          "ADMIN_ACCESS_NAME_EXISTS",
-          "Access name is already in use",
-        );
+        return sendError(res, 409, 'ADMIN_ACCESS_NAME_EXISTS', 'Access name is already in use');
       }
 
-      //==================================================
-      //==== RESOLVE PERMISSIONS
-      //==================================================
+      // Resolve permissions
 
-      const permissionResult = await resolvePermissionIds(
-        connection,
-
-        permissions,
-      );
+      const permissionResult = await resolvePermissionIds(connection, permissions);
 
       if (!permissionResult.success) {
         await connection.rollback();
@@ -155,9 +108,7 @@ router.post(
         );
       }
 
-      //==================================================
-      //==== INSERT ACCESS
-      //==================================================
+      // Insert access
 
       const [insertResult] = await connection.query(
         `
@@ -199,18 +150,12 @@ router.post(
 
       const idAccess = Number((insertResult as any).insertId);
 
-      //==================================================
-      //==== INSERT PERMISSION MAPPING
-      //==================================================
+      // Insert permission mapping
 
       if (permissionResult.ids.length) {
-        const valuesSql = permissionResult.ids.map(() => "(?, ?)").join(", ");
+        const valuesSql = permissionResult.ids.map(() => '(?, ?)').join(', ');
 
-        const values = permissionResult.ids.flatMap((idPermission) => [
-          idAccess,
-
-          idPermission,
-        ]);
+        const values = permissionResult.ids.flatMap((idPermission) => [idAccess, idPermission]);
 
         await connection.query(
           `
@@ -227,77 +172,43 @@ router.post(
         );
       }
 
-      //==================================================
-      //==== AUDIT PERMISSIONS
-      //==================================================
+      // Audit permissions
 
-      const permissionKeys = await getPermissionKeysByIds(
-        connection,
+      const permissionKeys = await getPermissionKeysByIds(connection, permissionResult.ids);
 
-        permissionResult.ids,
-      );
-
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "admin_access.created",
-
-        category: "access_control",
-
-        module: "admin_access",
-
-        action: "create",
-
-        actorType: "admin",
-
+        eventCode: 'admin_access.created',
+        category: 'access_control',
+        module: 'admin_access',
+        action: 'create',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_access",
-
+        entityType: 'admin_access',
         entityId: idAccess,
-
         entityLabel: cleanName,
-
         after: {
           access_name: cleanName,
-
           access_description: cleanDescription,
-
           permissions: permissionKeys,
-
           admin_access_status: 1,
         },
-
         httpStatus: 201,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        201,
-        "ADMIN_ACCESS_CREATED",
-        "Admin access created successfully",
-        {
-          id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
-        },
-      );
+      return sendSuccess(res, 201, 'ADMIN_ACCESS_CREATED', 'Admin access created successfully', {
+        id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -305,14 +216,9 @@ router.post(
         } catch {}
       }
 
-      console.error("Create admin access error:", error);
+      console.error('Create admin access error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

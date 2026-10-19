@@ -1,52 +1,41 @@
 // Validates the profile photo chosen for an admin account (create and update).
-import keyhsid from "../../../hsid";
-import db = require("../../../db");
+import keyhsid from '../../../hsid';
+import db = require('../../../db');
 
 const { pool } = db;
 
-//==================================================
-//==== ADMIN PROFILE PHOTO VALIDATION
-//==================================================
+// Admin profile photo validation
 
 type ProfilePhotoValidationResult =
   | {
       success: true;
-
       idAttachment: number | null;
     }
   | {
       success: false;
-
       status: number;
-
       code: string;
-
       message: string;
     };
 
 export const resolveAdminProfilePhoto = async (
   value: unknown,
-
   scope: {
     idMasterComp: number;
     idOffice: number;
     isAllAccess: number;
   },
 ): Promise<ProfilePhotoValidationResult> => {
-  //==================================================
-  //==== EMPTY
-  //==================================================
+  // Empty
 
-  if (value === undefined || value === null || String(value).trim() === "") {
+  if (value === undefined || value === null || String(value).trim() === '') {
     return {
       success: true,
       idAttachment: null,
     };
   }
 
-  //==================================================
-  //==== DECODE
-  //==================================================
+  // Decode
 
   const encodedAttachment = String(value).trim();
 
@@ -54,25 +43,16 @@ export const resolveAdminProfilePhoto = async (
 
   const idAttachment = Number(decodedAttachment);
 
-  if (
-    !decodedAttachment ||
-    !Number.isInteger(idAttachment) ||
-    idAttachment <= 0
-  ) {
+  if (!decodedAttachment || !Number.isInteger(idAttachment) || idAttachment <= 0) {
     return {
       success: false,
-
       status: 400,
-
-      code: "ADMIN_ACCOUNT_PROFILE_PHOTO_INVALID_ID",
-
-      message: "Invalid profile photo identifier",
+      code: 'ADMIN_ACCOUNT_PROFILE_PHOTO_INVALID_ID',
+      message: 'Invalid profile photo identifier',
     };
   }
 
-  //==================================================
-  //==== GET ATTACHMENT
-  //==================================================
+  // Get attachment
 
   const [attachmentRows] = await pool.query(
     `
@@ -98,55 +78,37 @@ export const resolveAdminProfilePhoto = async (
   if (!attachments.length) {
     return {
       success: false,
-
       status: 400,
-
-      code: "ADMIN_ACCOUNT_PROFILE_PHOTO_NOT_AVAILABLE",
-
-      message: "Profile photo is not available",
+      code: 'ADMIN_ACCOUNT_PROFILE_PHOTO_NOT_AVAILABLE',
+      message: 'Profile photo is not available',
     };
   }
 
   const attachment = attachments[0];
 
-  //==================================================
-  //==== COMPANY SCOPE
-  //==================================================
+  // Company scope
 
   if (Number(attachment.id_master_comp) !== scope.idMasterComp) {
     return {
       success: false,
-
       status: 403,
-
-      code: "ADMIN_ACCOUNT_PROFILE_PHOTO_COMPANY_SCOPE_FORBIDDEN",
-
-      message: "Profile photo is outside the company scope",
+      code: 'ADMIN_ACCOUNT_PROFILE_PHOTO_COMPANY_SCOPE_FORBIDDEN',
+      message: 'Profile photo is outside the company scope',
     };
   }
 
-  //==================================================
-  //==== OFFICE SCOPE
-  //==================================================
+  // Office scope
 
-  if (
-    scope.isAllAccess !== 1 &&
-    Number(attachment.id_office) !== scope.idOffice
-  ) {
+  if (scope.isAllAccess !== 1 && Number(attachment.id_office) !== scope.idOffice) {
     return {
       success: false,
-
       status: 403,
-
-      code: "ADMIN_ACCOUNT_PROFILE_PHOTO_OFFICE_SCOPE_FORBIDDEN",
-
-      message: "Profile photo is outside the office scope",
+      code: 'ADMIN_ACCOUNT_PROFILE_PHOTO_OFFICE_SCOPE_FORBIDDEN',
+      message: 'Profile photo is outside the office scope',
     };
   }
 
-  //==================================================
-  //==== RESULT
-  //==================================================
+  // Result
 
   return {
     success: true,

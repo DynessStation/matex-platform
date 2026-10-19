@@ -1,58 +1,40 @@
 // Delete (soft delete) an access profile.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, decodeAdminAccessId } from "./scope";
-import { getAccessPermissionKeys } from "./permissions";
+import { getSessionScope, decodeAdminAccessId } from './scope';
+import { getAccessPermissionKeys } from './permissions';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== ADMIN ACCESS - DELETE
-//==================================================
+// Admin access - delete
 
 router.delete(
-  "/api/v1/admin-access/:id",
-
+  '/api/v1/admin-access/:id',
   verifyToken,
-
-  requirePermission("admin_access.delete"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_access.delete'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const { id } = req.params;
 
-      //==================================================
-      //==== ACCESS ID
-      //==================================================
+      // Access ID
 
       const idAccess = decodeAdminAccessId(id);
 
       if (!idAccess) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_ACCESS_INVALID_ID",
-          "Invalid admin access identifier",
-        );
+        return sendError(res, 400, 'ADMIN_ACCESS_INVALID_ID', 'Invalid admin access identifier');
       }
 
-      //==================================================
-      //==== SESSION
-      //==================================================
+      // Session
 
       const scope = await getSessionScope(req);
 
@@ -60,17 +42,13 @@ router.delete(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [accessRows] = await connection.query(
         `
@@ -101,19 +79,12 @@ router.delete(
       if (!accesses.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_ACCESS_NOT_FOUND",
-          "Admin access not found",
-        );
+        return sendError(res, 404, 'ADMIN_ACCESS_NOT_FOUND', 'Admin access not found');
       }
 
       const access = accesses[0];
 
-      //==================================================
-      //==== MUST BE INACTIVE
-      //==================================================
+      // Must be inactive
 
       if (Number(access.admin_access_status) !== 0) {
         await connection.rollback();
@@ -121,14 +92,12 @@ router.delete(
         return sendError(
           res,
           409,
-          "ADMIN_ACCESS_MUST_BE_INACTIVE",
-          "Deactivate the admin access before deleting it",
+          'ADMIN_ACCESS_MUST_BE_INACTIVE',
+          'Deactivate the admin access before deleting it',
         );
       }
 
-      //==================================================
-      //==== ACCOUNT REFERENCES
-      //==================================================
+      // Account references
 
       const [referenceRows] = await connection.query(
         `
@@ -152,41 +121,28 @@ router.delete(
         return sendError(
           res,
           409,
-          "ADMIN_ACCESS_HAS_ADMIN_REFERENCES",
-          "Admin access is still assigned to one or more admin accounts",
+          'ADMIN_ACCESS_HAS_ADMIN_REFERENCES',
+          'Admin access is still assigned to one or more admin accounts',
           {
             assigned_accounts: references,
           },
         );
       }
 
-      //==================================================
-      //==== AUDIT BEFORE PERMISSIONS
-      //==================================================
+      // Audit before permissions
 
-      const permissionKeys = await getAccessPermissionKeys(
-        connection,
+      const permissionKeys = await getAccessPermissionKeys(connection, idAccess);
 
-        idAccess,
-      );
-
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         access_name: access.access_name,
-
         access_description: access.access_description ?? null,
-
         permissions: permissionKeys,
-
         admin_access_status: Number(access.admin_access_status),
       };
 
-      //==================================================
-      //==== DELETE PERMISSION MAPPING
-      //==================================================
+      // Delete permission mapping
 
       await connection.query(
         `
@@ -197,9 +153,7 @@ router.delete(
         [idAccess],
       );
 
-      //==================================================
-      //==== SOFT DELETE ACCESS
-      //==================================================
+      // Soft delete access
 
       await connection.query(
         `
@@ -216,73 +170,43 @@ router.delete(
         [idAccess, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "admin_access.deleted",
-
-        category: "access_control",
-
-        module: "admin_access",
-
-        action: "delete",
-
-        actorType: "admin",
-
+        eventCode: 'admin_access.deleted',
+        category: 'access_control',
+        module: 'admin_access',
+        action: 'delete',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_access",
-
+        entityType: 'admin_access',
         entityId: idAccess,
-
         entityLabel: access.access_name,
-
         before: auditBefore,
-
         after: {
           ...auditBefore,
-
           permissions: [],
-
           admin_access_status: 99,
         },
-
         metadata: {
-          delete_type: "soft_delete",
-
+          delete_type: 'soft_delete',
           removed_permissions: permissionKeys,
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        200,
-        "ADMIN_ACCESS_DELETED",
-        "Admin access deleted successfully",
-        {
-          id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
-        },
-      );
+      return sendSuccess(res, 200, 'ADMIN_ACCESS_DELETED', 'Admin access deleted successfully', {
+        id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -290,14 +214,9 @@ router.delete(
         } catch {}
       }
 
-      console.error("Delete admin access error:", error);
+      console.error('Delete admin access error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

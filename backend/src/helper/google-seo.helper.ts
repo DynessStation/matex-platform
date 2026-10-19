@@ -1,7 +1,7 @@
-import { JWT } from "google-auth-library";
+import { JWT } from 'google-auth-library';
 
-const searchConsoleScope = "https://www.googleapis.com/auth/webmasters.readonly";
-const allowedPageSpeedStrategies = new Set(["mobile", "desktop"]);
+const searchConsoleScope = 'https://www.googleapis.com/auth/webmasters.readonly';
+const allowedPageSpeedStrategies = new Set(['mobile', 'desktop']);
 const safePublicPathPattern = /^\/[a-zA-Z0-9/_-]*$/;
 
 export interface GoogleSeoConfiguration {
@@ -30,11 +30,8 @@ export const googleSeoConfiguration = (
   env: NodeJS.ProcessEnv = process.env,
 ): GoogleSeoConfiguration => {
   const siteUrl = env.GOOGLE_SEARCH_CONSOLE_SITE_URL?.trim() || null;
-  const serviceAccountEmail =
-    env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim() || null;
-  const privateKey =
-    env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n").trim() ||
-    null;
+  const serviceAccountEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim() || null;
+  const privateKey = env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n').trim() || null;
   const pageSpeedKey = env.GOOGLE_PAGESPEED_API_KEY?.trim() || null;
   const publicSiteUrl = env.PUBLIC_SITE_URL?.trim() || null;
 
@@ -77,13 +74,10 @@ export const pageSpeedTarget = (
   siteUrl: string,
   pathValue: unknown,
   strategyValue: unknown,
-): { url: string; strategy: "mobile" | "desktop" } | null => {
-  const path = String(pathValue ?? "/").trim() || "/";
-  const strategy = String(strategyValue ?? "mobile").toLowerCase();
-  if (
-    !safePublicPathPattern.test(path) ||
-    !allowedPageSpeedStrategies.has(strategy)
-  ) {
+): { url: string; strategy: 'mobile' | 'desktop' } | null => {
+  const path = String(pathValue ?? '/').trim() || '/';
+  const strategy = String(strategyValue ?? 'mobile').toLowerCase();
+  if (!safePublicPathPattern.test(path) || !allowedPageSpeedStrategies.has(strategy)) {
     return null;
   }
 
@@ -91,7 +85,10 @@ export const pageSpeedTarget = (
     const base = new URL(siteUrl);
     const target = new URL(path, base);
     if (target.origin !== base.origin) return null;
-    return { url: target.toString(), strategy: strategy as "mobile" | "desktop" };
+    return {
+      url: target.toString(),
+      strategy: strategy as 'mobile' | 'desktop',
+    };
   } catch {
     return null;
   }
@@ -99,11 +96,7 @@ export const pageSpeedTarget = (
 
 export const searchConsoleClient = (configuration: GoogleSeoConfiguration) => {
   const settings = configuration.searchConsole;
-  if (
-    !settings.configured ||
-    !settings.serviceAccountEmail ||
-    !settings.privateKey
-  ) {
+  if (!settings.configured || !settings.serviceAccountEmail || !settings.privateKey) {
     return null;
   }
 
@@ -116,13 +109,9 @@ export const searchConsoleClient = (configuration: GoogleSeoConfiguration) => {
 
 export const searchConsoleTotals = (rows: SearchConsoleRow[]) => {
   const clicks = rows.reduce((total, row) => total + Number(row.clicks ?? 0), 0);
-  const impressions = rows.reduce(
-    (total, row) => total + Number(row.impressions ?? 0),
-    0,
-  );
+  const impressions = rows.reduce((total, row) => total + Number(row.impressions ?? 0), 0);
   const weightedPosition = rows.reduce(
-    (total, row) =>
-      total + Number(row.position ?? 0) * Number(row.impressions ?? 0),
+    (total, row) => total + Number(row.position ?? 0) * Number(row.impressions ?? 0),
     0,
   );
 

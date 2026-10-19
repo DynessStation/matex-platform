@@ -1,34 +1,29 @@
 // Navigation menu items: create, update, and delete a branch.
-import express = require("express");
-import { Response } from "express";
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import { Response } from 'express';
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 import {
   decodeWebNavigationItemId,
   normalizeNavigationItemInput,
-} from "../../../helper/web-navigation.helper";
+} from '../../../helper/web-navigation.helper';
 
-import { getSessionScope, decodeNavigationId } from "./scope";
+import { getSessionScope, decodeNavigationId } from './scope';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== WEB NAVIGATION ITEM - CREATE
-//==================================================
+// Web navigation item - create
 
 router.post(
-  "/api/v1/web-navigation/:id/items",
-
+  '/api/v1/web-navigation/:id/items',
   verifyToken,
-
-  requirePermission("web_navigation.create"),
-
+  requirePermission('web_navigation.create'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -39,8 +34,8 @@ router.post(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -81,12 +76,7 @@ router.post(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
@@ -155,8 +145,8 @@ router.post(
         return sendError(
           res,
           409,
-          "WEB_NAVIGATION_ITEM_KEY_EXISTS",
-          "Navigation item key is already in use",
+          'WEB_NAVIGATION_ITEM_KEY_EXISTS',
+          'Navigation item key is already in use',
         );
       }
 
@@ -240,21 +230,20 @@ router.post(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "web_navigation_item.created",
-        category: "data_change",
-        module: "web_navigation",
-        action: "create",
-        actorType: "admin",
+        eventCode: 'web_navigation_item.created',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: 'create',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation_item",
+        entityType: 'web_navigation_item',
         entityId: idItem,
         entityLabel:
           item.translations.find(
-            (translation) =>
-              translation.locale === navigation.web_navigation_default_locale,
+            (translation) => translation.locale === navigation.web_navigation_default_locale,
           )?.label ?? item.key,
         after: {
           id_web_navigation: idNavigation,
@@ -274,8 +263,8 @@ router.post(
       return sendSuccess(
         res,
         201,
-        "WEB_NAVIGATION_ITEM_CREATED",
-        "Navigation item created successfully",
+        'WEB_NAVIGATION_ITEM_CREATED',
+        'Navigation item created successfully',
         {
           id_web_navigation_item: keyhsid.idWebNavigationItem.encode(idItem),
         },
@@ -287,22 +276,22 @@ router.post(
         } catch {}
       }
 
-      if ((error as any)?.code === "ER_DUP_ENTRY") {
+      if ((error as any)?.code === 'ER_DUP_ENTRY') {
         return sendError(
           res,
           409,
-          "WEB_NAVIGATION_ITEM_ALREADY_EXISTS",
-          "Navigation item key or translation is already in use",
+          'WEB_NAVIGATION_ITEM_ALREADY_EXISTS',
+          'Navigation item key or translation is already in use',
         );
       }
 
-      console.error("[Web Navigation] Failed to create navigation item", error);
+      console.error('[Web Navigation] Failed to create navigation item', error);
 
       return sendError(
         res,
         500,
-        "WEB_NAVIGATION_ITEM_CREATE_FAILED",
-        "Unable to create navigation item",
+        'WEB_NAVIGATION_ITEM_CREATE_FAILED',
+        'Unable to create navigation item',
       );
     } finally {
       connection?.release();
@@ -310,17 +299,12 @@ router.post(
   },
 );
 
-//==================================================
-//==== WEB NAVIGATION ITEM - UPDATE
-//==================================================
+// Web navigation item - update
 
 router.put(
-  "/api/v1/web-navigation/:id/items/:itemId",
-
+  '/api/v1/web-navigation/:id/items/:itemId',
   verifyToken,
-
-  requirePermission("web_navigation.update"),
-
+  requirePermission('web_navigation.update'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -333,8 +317,8 @@ router.put(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -342,8 +326,8 @@ router.put(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_ITEM_INVALID_ID",
-          "Invalid navigation item identifier",
+          'WEB_NAVIGATION_ITEM_INVALID_ID',
+          'Invalid navigation item identifier',
         );
       }
 
@@ -357,9 +341,7 @@ router.put(
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== NAVIGATION
-      //==================================================
+      // Navigation
 
       const [navigationRows] = await connection.query(
         `
@@ -388,19 +370,12 @@ router.put(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
 
-      //==================================================
-      //==== LOCK ALL ITEMS FOR UPDATE VALIDATION
-      //==================================================
+      // Lock all items for update validation
 
       const [itemRows] = await connection.query(
         `
@@ -436,17 +411,10 @@ router.put(
       if (!currentItem) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_ITEM_NOT_FOUND",
-          "Navigation item not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_ITEM_NOT_FOUND', 'Navigation item not found');
       }
 
-      //==================================================
-      //==== INPUT
-      //==================================================
+      // Input
 
       const normalized = normalizeNavigationItemInput(
         req.body,
@@ -487,9 +455,7 @@ router.put(
         [idNavigation, scope.idMasterComp, item.key],
       );
 
-      //==================================================
-      //==== UNIQUE KEY
-      //==================================================
+      // Unique key
 
       const duplicateKey = navigationItems.some(
         (candidate) =>
@@ -503,14 +469,12 @@ router.put(
         return sendError(
           res,
           409,
-          "WEB_NAVIGATION_ITEM_KEY_EXISTS",
-          "Navigation item key is already in use",
+          'WEB_NAVIGATION_ITEM_KEY_EXISTS',
+          'Navigation item key is already in use',
         );
       }
 
-      //==================================================
-      //==== BEFORE TRANSLATIONS
-      //==================================================
+      // Before translations
 
       const [beforeTranslationRows] = await connection.query(
         `
@@ -536,23 +500,15 @@ router.put(
         [idItem, scope.idMasterComp],
       );
 
-      const beforeTranslations = (beforeTranslationRows as any[]).map(
-        (translation) => ({
-          locale: translation.web_navigation_item_locale,
+      const beforeTranslations = (beforeTranslationRows as any[]).map((translation) => ({
+        locale: translation.web_navigation_item_locale,
+        label: translation.web_navigation_item_label,
+        path: translation.web_navigation_item_path,
+        url: translation.web_navigation_item_url,
+        status: Number(translation.web_navigation_item_i18n_status),
+      }));
 
-          label: translation.web_navigation_item_label,
-
-          path: translation.web_navigation_item_path,
-
-          url: translation.web_navigation_item_url,
-
-          status: Number(translation.web_navigation_item_i18n_status),
-        }),
-      );
-
-      //==================================================
-      //==== UPDATE ITEM
-      //==================================================
+      // Update item
 
       await connection.query(
         `
@@ -589,9 +545,7 @@ router.put(
         ],
       );
 
-      //==================================================
-      //==== REPLACE TRANSLATIONS
-      //==================================================
+      // Replace translations
 
       await connection.query(
         `
@@ -641,35 +595,31 @@ router.put(
         );
       }
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       const defaultTranslation = item.translations.find(
-        (translation) =>
-          translation.locale === navigation.web_navigation_default_locale,
+        (translation) => translation.locale === navigation.web_navigation_default_locale,
       );
 
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "web_navigation_item.updated",
-        category: "data_change",
-        module: "web_navigation",
-        action: "update",
-        actorType: "admin",
+        eventCode: 'web_navigation_item.updated',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: 'update',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation_item",
+        entityType: 'web_navigation_item',
         entityId: idItem,
         entityLabel: defaultTranslation?.label ?? item.key,
         before: {
           id_web_navigation: idNavigation,
           key: currentItem.web_navigation_item_key,
           sort_order: Number(currentItem.web_navigation_item_sort_order),
-
           status: Number(currentItem.web_navigation_item_status),
           translations: beforeTranslations,
         },
@@ -677,9 +627,7 @@ router.put(
           id_web_navigation: idNavigation,
           key: item.key,
           sort_order: item.sortOrder,
-
           status: item.status,
-
           translations: item.translations,
         },
         metadata: {
@@ -693,8 +641,8 @@ router.put(
       return sendSuccess(
         res,
         200,
-        "WEB_NAVIGATION_ITEM_UPDATED",
-        "Navigation item updated successfully",
+        'WEB_NAVIGATION_ITEM_UPDATED',
+        'Navigation item updated successfully',
         {
           id_web_navigation_item: keyhsid.idWebNavigationItem.encode(idItem),
         },
@@ -706,22 +654,22 @@ router.put(
         } catch {}
       }
 
-      if ((error as any)?.code === "ER_DUP_ENTRY") {
+      if ((error as any)?.code === 'ER_DUP_ENTRY') {
         return sendError(
           res,
           409,
-          "WEB_NAVIGATION_ITEM_ALREADY_EXISTS",
-          "Navigation item key or translation is already in use",
+          'WEB_NAVIGATION_ITEM_ALREADY_EXISTS',
+          'Navigation item key or translation is already in use',
         );
       }
 
-      console.error("[Web Navigation] Failed to update navigation item", error);
+      console.error('[Web Navigation] Failed to update navigation item', error);
 
       return sendError(
         res,
         500,
-        "WEB_NAVIGATION_ITEM_UPDATE_FAILED",
-        "Unable to update navigation item",
+        'WEB_NAVIGATION_ITEM_UPDATE_FAILED',
+        'Unable to update navigation item',
       );
     } finally {
       connection?.release();
@@ -729,17 +677,12 @@ router.put(
   },
 );
 
-//==================================================
-//==== WEB NAVIGATION ITEM - DELETE BRANCH
-//==================================================
+// Web navigation item - delete branch
 
 router.delete(
-  "/api/v1/web-navigation/:id/items/:itemId",
-
+  '/api/v1/web-navigation/:id/items/:itemId',
   verifyToken,
-
-  requirePermission("web_navigation.delete"),
-
+  requirePermission('web_navigation.delete'),
   async (req: AuthRequest, res: Response) => {
     let connection: any = null;
 
@@ -752,8 +695,8 @@ router.delete(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_INVALID_ID",
-          "Invalid web navigation identifier",
+          'WEB_NAVIGATION_INVALID_ID',
+          'Invalid web navigation identifier',
         );
       }
 
@@ -761,8 +704,8 @@ router.delete(
         return sendError(
           res,
           400,
-          "WEB_NAVIGATION_ITEM_INVALID_ID",
-          "Invalid navigation item identifier",
+          'WEB_NAVIGATION_ITEM_INVALID_ID',
+          'Invalid navigation item identifier',
         );
       }
 
@@ -801,12 +744,7 @@ router.delete(
       if (!navigations.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_NOT_FOUND",
-          "Web navigation not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
 
       const navigation = navigations[0];
@@ -836,19 +774,12 @@ router.delete(
 
       const navigationItems = itemRows as any[];
 
-      const target = navigationItems.find(
-        (item) => Number(item.id_web_navigation_item) === idItem,
-      );
+      const target = navigationItems.find((item) => Number(item.id_web_navigation_item) === idItem);
 
       if (!target) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "WEB_NAVIGATION_ITEM_NOT_FOUND",
-          "Navigation item not found",
-        );
+        return sendError(res, 404, 'WEB_NAVIGATION_ITEM_NOT_FOUND', 'Navigation item not found');
       }
 
       const deletedIds = [idItem];
@@ -862,7 +793,7 @@ router.delete(
         },
       ];
 
-      const placeholders = deletedIds.map(() => "?").join(", ");
+      const placeholders = deletedIds.map(() => '?').join(', ');
 
       await connection.query(
         `
@@ -893,16 +824,16 @@ router.delete(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "web_navigation_item.deleted",
-        category: "data_change",
-        module: "web_navigation",
-        action: "delete",
-        actorType: "admin",
+        eventCode: 'web_navigation_item.deleted',
+        category: 'data_change',
+        module: 'web_navigation',
+        action: 'delete',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "web_navigation_item",
+        entityType: 'web_navigation_item',
         entityId: idItem,
         entityLabel: target.web_navigation_item_key,
         before: {
@@ -912,14 +843,12 @@ router.delete(
           items: deletedItems.map((item) => ({
             ...item,
             status: 0,
-            deleted_at: "set",
+            deleted_at: 'set',
           })),
         },
         metadata: {
           navigation_name: navigation.web_navigation_name,
-
           deleted_item_count: deletedIds.length,
-
         },
         httpStatus: 200,
       });
@@ -929,8 +858,8 @@ router.delete(
       return sendSuccess(
         res,
         200,
-        "WEB_NAVIGATION_ITEM_DELETED",
-        "Navigation item deleted successfully",
+        'WEB_NAVIGATION_ITEM_DELETED',
+        'Navigation item deleted successfully',
         {
           deleted_item_count: deletedIds.length,
         },
@@ -942,13 +871,13 @@ router.delete(
         } catch {}
       }
 
-      console.error("[Web Navigation] Failed to delete navigation item", error);
+      console.error('[Web Navigation] Failed to delete navigation item', error);
 
       return sendError(
         res,
         500,
-        "WEB_NAVIGATION_ITEM_DELETE_FAILED",
-        "Unable to delete navigation item",
+        'WEB_NAVIGATION_ITEM_DELETE_FAILED',
+        'Unable to delete navigation item',
       );
     } finally {
       connection?.release();

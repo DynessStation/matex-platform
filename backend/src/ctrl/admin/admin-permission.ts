@@ -1,31 +1,27 @@
-import express = require("express");
+import express = require('express');
 
-import db = require("../../db");
+import db = require('../../db');
 
-import keyhsid from "../../hsid";
+import keyhsid from '../../hsid';
 
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-import { writeAuditLog } from "../../helper/audit-log.helper";
+import { writeAuditLog } from '../../helper/audit-log.helper';
 
-//==================================================
-//==== APP
-//==================================================
+// App
 
 const app = express();
 
 const { pool } = db;
 
-//==================================================
-//==== HELPERS
-//==================================================
+// Helpers
 
 const decodePermissionId = (value: unknown): number | null => {
-  const encodedId = String(value ?? "").trim();
+  const encodedId = String(value ?? '').trim();
 
   if (!encodedId) {
     return null;
@@ -42,100 +38,67 @@ const decodePermissionId = (value: unknown): number | null => {
   return idPermission;
 };
 
-//==================================================
-//==== NORMALIZE PERMISSION KEY
-//==================================================
+// Normalize permission key
 
 const normalizePermissionKey = (value: unknown): string => {
-  return String(value ?? "")
+  return String(value ?? '')
     .trim()
     .toLowerCase();
 };
 
-//==================================================
-//==== VALID PERMISSION KEY
-//==================================================
+// Valid permission key
 
 const isValidPermissionKey = (value: string): boolean => {
   return /^[a-z0-9_]+(?:\.[a-z0-9_]+)+$/.test(value);
 };
 
-//==================================================
-//==== ADMIN PERMISSION - GET LIST
-//==================================================
+// Admin permission - get list
 
 app.get(
-  "/api/v1/admin-permission",
-
+  '/api/v1/admin-permission',
   verifyToken,
-
-  requirePermission("admin_permission.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.view'),
+  async (req: AuthRequest, res) => {
     try {
-      //==================================================
-      //==== PAGINATION
-      //==================================================
+      // Pagination
 
       const parsedPage = Number(req.query.page);
 
       const parsedLimit = Number(req.query.paginate ?? req.query.limit);
 
-      const page =
-        Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+      const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
       const limit =
-        Number.isFinite(parsedLimit) && parsedLimit > 0
-          ? Math.min(parsedLimit, 100)
-          : 15;
+        Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 15;
 
       const offset = (page - 1) * limit;
 
-      //==================================================
-      //==== SEARCH
-      //==================================================
+      // Search
 
-      const search =
-        typeof req.query.search === "string" ? req.query.search.trim() : "";
+      const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
 
       const searchValue = `%${search}%`;
 
-      //==================================================
-      //==== SORT
-      //==================================================
+      // Sort
 
-      const requestedField =
-        typeof req.query.field === "string" ? req.query.field : "";
+      const requestedField = typeof req.query.field === 'string' ? req.query.field : '';
 
       const requestedSort =
-        typeof req.query.sort === "string"
-          ? req.query.sort.toLowerCase()
-          : "asc";
+        typeof req.query.sort === 'string' ? req.query.sort.toLowerCase() : 'asc';
 
       const allowedSortFields: Record<string, string> = {
-        permission_key: "ap.permission_key",
-
-        permission_name: "ap.permission_name",
-
-        permission_group: "ap.permission_group",
-
-        created: "ap.created",
-
-        updated: "ap.updated",
+        permission_key: 'ap.permission_key',
+        permission_name: 'ap.permission_name',
+        permission_group: 'ap.permission_group',
+        created: 'ap.created',
+        updated: 'ap.updated',
       };
 
-      const orderField =
-        allowedSortFields[requestedField] ?? "ap.permission_group";
+      const orderField = allowedSortFields[requestedField] ?? 'ap.permission_group';
 
-      const orderDirection = requestedSort === "desc" ? "DESC" : "ASC";
+      const orderDirection = requestedSort === 'desc' ? 'DESC' : 'ASC';
 
-      //==================================================
-      //==== COUNT
-      //==================================================
+      // Count
 
       const [totalRows] = await pool.query(
         `
@@ -158,9 +121,7 @@ app.get(
 
       const total = Number((totalRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -210,162 +171,98 @@ app.get(
         [searchValue, searchValue, searchValue, searchValue, limit, offset],
       );
 
-      //==================================================
-      //==== RESPONSE DATA
-      //==================================================
+      // Response data
 
       const data = (rows as any[]).map((item) => ({
-        id_admin_permission: keyhsid.idAdminPermission.encode(
-          item.id_admin_permission,
-        ),
-
+        id_admin_permission: keyhsid.idAdminPermission.encode(item.id_admin_permission),
         permission_key: item.permission_key,
-
         permission_name: item.permission_name,
-
         permission_group: item.permission_group,
-
         permission_description: item.permission_description,
-
         permission_status: Number(item.permission_status),
-
-        status_label:
-          Number(item.permission_status) === 1 ? "Active" : "Inactive",
-
+        status_label: Number(item.permission_status) === 1 ? 'Active' : 'Inactive',
         access_count: Number(item.access_count ?? 0),
-
         created: item.created,
-
         updated: item.updated,
       }));
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return res.status(200).json({
         success: true,
-
         data,
-
         pagination: {
           total,
-
           page,
-
           limit,
-
           length: data.length,
-
           pagerows: Math.ceil(total / limit),
         },
       });
     } catch (error) {
-      console.error("Get admin permission error:", error);
+      console.error('Get admin permission error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== ADMIN PERMISSION - CREATE
-//==================================================
+// Admin permission - create
 
 app.post(
-  "/api/v1/admin-permission",
-
+  '/api/v1/admin-permission',
   verifyToken,
-
-  requirePermission("admin_permission.create"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.create'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
-      const {
-        permission_key,
-        permission_name,
-        permission_group,
-        permission_description,
-      } = req.body;
+      const { permission_key, permission_name, permission_group, permission_description } =
+        req.body;
 
-      //==================================================
-      //==== CLEAN DATA
-      //==================================================
+      // Clean data
 
       const cleanKey = normalizePermissionKey(permission_key);
 
-      const cleanName = String(permission_name ?? "").trim();
+      const cleanName = String(permission_name ?? '').trim();
 
-      const cleanGroup = String(permission_group ?? "").trim();
+      const cleanGroup = String(permission_group ?? '').trim();
 
-      const cleanDescription = String(permission_description ?? "").trim();
+      const cleanDescription = String(permission_description ?? '').trim();
 
-      //==================================================
-      //==== VALIDATION
-      //==================================================
+      // Validation
 
       if (!cleanKey) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_KEY_REQUIRED",
-          "Permission key is required",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_KEY_REQUIRED', 'Permission key is required');
       }
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_NAME_REQUIRED",
-          "Permission name is required",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_NAME_REQUIRED', 'Permission name is required');
       }
 
       if (!isValidPermissionKey(cleanKey)) {
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_KEY_INVALID",
-          "Permission key format is invalid",
+          'ADMIN_PERMISSION_KEY_INVALID',
+          'Permission key format is invalid',
         );
       }
 
       if (cleanKey.length > 100) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_KEY_TOO_LONG",
-          "Permission key is too long",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_KEY_TOO_LONG', 'Permission key is too long');
       }
 
       if (cleanName.length > 150) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_NAME_TOO_LONG",
-          "Permission name is too long",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_NAME_TOO_LONG', 'Permission name is too long');
       }
 
       if (cleanGroup.length > 100) {
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_GROUP_TOO_LONG",
-          "Permission group is too long",
+          'ADMIN_PERMISSION_GROUP_TOO_LONG',
+          'Permission group is too long',
         );
       }
 
@@ -373,22 +270,18 @@ app.post(
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_DESCRIPTION_TOO_LONG",
-          "Permission description is too long",
+          'ADMIN_PERMISSION_DESCRIPTION_TOO_LONG',
+          'Permission description is too long',
         );
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== DUPLICATE KEY
-      //==================================================
+      // Duplicate key
 
       const [duplicateRows] = await connection.query(
         `
@@ -407,17 +300,10 @@ app.post(
       if ((duplicateRows as any[]).length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          409,
-          "ADMIN_PERMISSION_KEY_EXISTS",
-          "Permission key already exists",
-        );
+        return sendError(res, 409, 'ADMIN_PERMISSION_KEY_EXISTS', 'Permission key already exists');
       }
 
-      //==================================================
-      //==== INSERT
-      //==================================================
+      // Insert
 
       const [result] = await connection.query(
         `
@@ -451,67 +337,43 @@ app.post(
 
       const insertId = Number((result as any).insertId);
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
-        eventCode: "admin_permission.created",
-
-        category: "access_control",
-
-        module: "admin_permission",
-
-        action: "create",
-
-        actorType: "admin",
-
+        writeMode: 'strict',
+        eventCode: 'admin_permission.created',
+        category: 'access_control',
+        module: 'admin_permission',
+        action: 'create',
+        actorType: 'admin',
         actorId: req.user?.id_admin_acct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_permission",
-
+        entityType: 'admin_permission',
         entityId: insertId,
-
         entityLabel: cleanKey,
-
         after: {
           permission_key: cleanKey,
-
           permission_name: cleanName,
-
           permission_group: cleanGroup || null,
-
           permission_description: cleanDescription || null,
-
           permission_status: 1,
         },
-
         httpStatus: 201,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         201,
-        "ADMIN_PERMISSION_CREATED",
-        "Admin permission created successfully",
+        'ADMIN_PERMISSION_CREATED',
+        'Admin permission created successfully',
         {
           id_admin_permission: keyhsid.idAdminPermission.encode(insertId),
         },
@@ -523,14 +385,9 @@ app.post(
         } catch {}
       }
 
-      console.error("Create admin permission error:", error);
+      console.error('Create admin permission error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -539,22 +396,13 @@ app.post(
   },
 );
 
-//==================================================
-//==== ADMIN PERMISSION - GET DETAIL
-//==================================================
+// Admin permission - get detail
 
 app.get(
-  "/api/v1/admin-permission/:id",
-
+  '/api/v1/admin-permission/:id',
   verifyToken,
-
-  requirePermission("admin_permission.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.view'),
+  async (req: AuthRequest, res) => {
     try {
       const idPermission = decodePermissionId(req.params.id);
 
@@ -562,8 +410,8 @@ app.get(
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_INVALID_ID",
-          "Invalid admin permission identifier",
+          'ADMIN_PERMISSION_INVALID_ID',
+          'Invalid admin permission identifier',
         );
       }
 
@@ -606,70 +454,40 @@ app.get(
       const permissions = rows as any[];
 
       if (!permissions.length) {
-        return sendError(
-          res,
-          404,
-          "ADMIN_PERMISSION_NOT_FOUND",
-          "Admin permission not found",
-        );
+        return sendError(res, 404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
       }
 
       const item = permissions[0];
 
       return res.status(200).json({
         success: true,
-
         data: {
-          id_admin_permission: keyhsid.idAdminPermission.encode(
-            item.id_admin_permission,
-          ),
-
+          id_admin_permission: keyhsid.idAdminPermission.encode(item.id_admin_permission),
           permission_key: item.permission_key,
-
           permission_name: item.permission_name,
-
           permission_group: item.permission_group,
-
           permission_description: item.permission_description,
-
           permission_status: Number(item.permission_status),
-
           access_count: Number(item.access_count ?? 0),
-
           created: item.created,
-
           updated: item.updated,
         },
       });
     } catch (error) {
-      console.error("Get admin permission detail error:", error);
+      console.error('Get admin permission detail error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== ADMIN PERMISSION - UPDATE
-//==================================================
+// Admin permission - update
 
 app.put(
-  "/api/v1/admin-permission/:id",
-
+  '/api/v1/admin-permission/:id',
   verifyToken,
-
-  requirePermission("admin_permission.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
@@ -679,53 +497,38 @@ app.put(
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_INVALID_ID",
-          "Invalid admin permission identifier",
+          'ADMIN_PERMISSION_INVALID_ID',
+          'Invalid admin permission identifier',
         );
       }
 
-      const { permission_name, permission_group, permission_description } =
-        req.body;
+      const { permission_name, permission_group, permission_description } = req.body;
 
-      //==================================================
-      //==== IMPORTANT
+      // Important
       //==== PERMISSION KEY IS IMMUTABLE
-      //==================================================
 
-      const cleanName = String(permission_name ?? "").trim();
+      const cleanName = String(permission_name ?? '').trim();
 
-      const cleanGroup = String(permission_group ?? "").trim();
+      const cleanGroup = String(permission_group ?? '').trim();
 
-      const cleanDescription = String(permission_description ?? "").trim();
+      const cleanDescription = String(permission_description ?? '').trim();
 
-      //==================================================
-      //==== VALIDATION
-      //==================================================
+      // Validation
 
       if (!cleanName) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_NAME_REQUIRED",
-          "Permission name is required",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_NAME_REQUIRED', 'Permission name is required');
       }
 
       if (cleanName.length > 150) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_NAME_TOO_LONG",
-          "Permission name is too long",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_NAME_TOO_LONG', 'Permission name is too long');
       }
 
       if (cleanGroup.length > 100) {
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_GROUP_TOO_LONG",
-          "Permission group is too long",
+          'ADMIN_PERMISSION_GROUP_TOO_LONG',
+          'Permission group is too long',
         );
       }
 
@@ -733,22 +536,18 @@ app.put(
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_DESCRIPTION_TOO_LONG",
-          "Permission description is too long",
+          'ADMIN_PERMISSION_DESCRIPTION_TOO_LONG',
+          'Permission description is too long',
         );
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [existingRows] = await connection.query(
         `
@@ -779,51 +578,32 @@ app.put(
       if (!permissions.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_PERMISSION_NOT_FOUND",
-          "Admin permission not found",
-        );
+        return sendError(res, 404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
       }
 
       const permission = permissions[0];
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         permission_key: permission.permission_key,
-
         permission_name: permission.permission_name,
-
         permission_group: permission.permission_group ?? null,
-
         permission_description: permission.permission_description ?? null,
-
         permission_status: Number(permission.permission_status),
       };
 
-      //==================================================
-      //==== AUDIT AFTER
-      //==================================================
+      // Audit after
 
       const auditAfter = {
         permission_key: permission.permission_key,
-
         permission_name: cleanName,
-
         permission_group: cleanGroup || null,
-
         permission_description: cleanDescription || null,
-
         permission_status: Number(permission.permission_status),
       };
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await connection.query(
         `
@@ -841,71 +621,47 @@ app.put(
         [cleanName, cleanGroup || null, cleanDescription || null, idPermission],
       );
 
-      //==================================================
-      //==== CHANGE CHECK
-      //==================================================
+      // Change check
 
       const changed =
         auditBefore.permission_name !== auditAfter.permission_name ||
         auditBefore.permission_group !== auditAfter.permission_group ||
-        auditBefore.permission_description !==
-          auditAfter.permission_description;
+        auditBefore.permission_description !== auditAfter.permission_description;
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       if (changed) {
         await writeAuditLog({
           req,
-
           connection,
-
-          writeMode: "strict",
-
-          eventCode: "admin_permission.updated",
-
-          category: "access_control",
-
-          module: "admin_permission",
-
-          action: "update",
-
-          actorType: "admin",
-
+          writeMode: 'strict',
+          eventCode: 'admin_permission.updated',
+          category: 'access_control',
+          module: 'admin_permission',
+          action: 'update',
+          actorType: 'admin',
           actorId: req.user?.id_admin_acct,
-
           actorLabel: req.user?.alias ?? null,
-
-          entityType: "admin_permission",
-
+          entityType: 'admin_permission',
           entityId: idPermission,
-
           entityLabel: permission.permission_key,
-
           before: auditBefore,
-
           after: auditAfter,
-
           httpStatus: 200,
         });
       }
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         200,
-        "ADMIN_PERMISSION_UPDATED",
-        "Admin permission updated successfully",
+        'ADMIN_PERMISSION_UPDATED',
+        'Admin permission updated successfully',
         {
           id_admin_permission: keyhsid.idAdminPermission.encode(idPermission),
         },
@@ -917,14 +673,9 @@ app.put(
         } catch {}
       }
 
-      console.error("Update admin permission error:", error);
+      console.error('Update admin permission error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -933,66 +684,44 @@ app.put(
   },
 );
 
-//==================================================
-//==== ADMIN PERMISSION - UPDATE STATUS
-//==================================================
+// Admin permission - update status
 
 app.patch(
-  "/api/v1/admin-permission/:id/status",
-
+  '/api/v1/admin-permission/:id/status',
   verifyToken,
-
-  requirePermission("admin_permission.update"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.update'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const idPermission = decodePermissionId(req.params.id);
 
-      //==================================================
-      //==== ID
-      //==================================================
+      // ID
 
       if (!idPermission) {
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_INVALID_ID",
-          "Invalid admin permission identifier",
+          'ADMIN_PERMISSION_INVALID_ID',
+          'Invalid admin permission identifier',
         );
       }
 
-      //==================================================
-      //==== STATUS
-      //==================================================
+      // Status
 
       const newStatus = Number(req.body?.permission_status);
 
       if (![0, 1].includes(newStatus)) {
-        return sendError(
-          res,
-          400,
-          "ADMIN_PERMISSION_INVALID_STATUS",
-          "Invalid permission status",
-        );
+        return sendError(res, 400, 'ADMIN_PERMISSION_INVALID_STATUS', 'Invalid permission status');
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [rows] = await connection.query(
         `
@@ -1021,19 +750,12 @@ app.patch(
       if (!permissions.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_PERMISSION_NOT_FOUND",
-          "Admin permission not found",
-        );
+        return sendError(res, 404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
       }
 
       const permission = permissions[0];
 
-      //==================================================
-      //==== SAME STATUS
-      //==================================================
+      // Same status
 
       if (Number(permission.permission_status) === newStatus) {
         await connection.rollback();
@@ -1041,23 +763,18 @@ app.patch(
         return sendSuccess(
           res,
           200,
+          newStatus === 1 ? 'ADMIN_PERMISSION_ALREADY_ACTIVE' : 'ADMIN_PERMISSION_ALREADY_INACTIVE',
           newStatus === 1
-            ? "ADMIN_PERMISSION_ALREADY_ACTIVE"
-            : "ADMIN_PERMISSION_ALREADY_INACTIVE",
-          newStatus === 1
-            ? "Admin permission is already active"
-            : "Admin permission is already inactive",
+            ? 'Admin permission is already active'
+            : 'Admin permission is already inactive',
           {
             id_admin_permission: keyhsid.idAdminPermission.encode(idPermission),
-
             permission_status: newStatus,
           },
         );
       }
 
-      //==================================================
-      //==== AFFECTED ACTIVE ACCESS ROLES
-      //==================================================
+      // Affected active access roles
 
       const [referenceRows] = await connection.query(
         `
@@ -1078,13 +795,9 @@ app.patch(
         [idPermission],
       );
 
-      const affectedAccessRoles = Number(
-        (referenceRows as any[])[0]?.total ?? 0,
-      );
+      const affectedAccessRoles = Number((referenceRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== UPDATE
-      //==================================================
+      // Update
 
       await connection.query(
         `
@@ -1100,76 +813,50 @@ app.patch(
         [newStatus, idPermission],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
-        eventCode: "admin_permission.status_changed",
-
-        category: "access_control",
-
-        module: "admin_permission",
-
-        action: "status_change",
-
-        actorType: "admin",
-
+        writeMode: 'strict',
+        eventCode: 'admin_permission.status_changed',
+        category: 'access_control',
+        module: 'admin_permission',
+        action: 'status_change',
+        actorType: 'admin',
         actorId: req.user?.id_admin_acct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_permission",
-
+        entityType: 'admin_permission',
         entityId: idPermission,
-
         entityLabel: permission.permission_key,
-
         before: {
           permission_status: Number(permission.permission_status),
         },
-
         after: {
           permission_status: newStatus,
         },
-
         metadata: {
-          transition: newStatus === 1 ? "activated" : "deactivated",
-
+          transition: newStatus === 1 ? 'activated' : 'deactivated',
           affected_access_roles: affectedAccessRoles,
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         200,
+        newStatus === 1 ? 'ADMIN_PERMISSION_ACTIVATED' : 'ADMIN_PERMISSION_DEACTIVATED',
         newStatus === 1
-          ? "ADMIN_PERMISSION_ACTIVATED"
-          : "ADMIN_PERMISSION_DEACTIVATED",
-        newStatus === 1
-          ? "Admin permission activated successfully"
-          : "Admin permission deactivated successfully",
+          ? 'Admin permission activated successfully'
+          : 'Admin permission deactivated successfully',
         {
           id_admin_permission: keyhsid.idAdminPermission.encode(idPermission),
-
           permission_status: newStatus,
         },
       );
@@ -1180,14 +867,9 @@ app.patch(
         } catch {}
       }
 
-      console.error("Update admin permission status error:", error);
+      console.error('Update admin permission status error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();
@@ -1196,22 +878,13 @@ app.patch(
   },
 );
 
-//==================================================
-//==== ADMIN PERMISSION - DELETE
-//==================================================
+// Admin permission - delete
 
 app.delete(
-  "/api/v1/admin-permission/:id",
-
+  '/api/v1/admin-permission/:id',
   verifyToken,
-
-  requirePermission("admin_permission.delete"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('admin_permission.delete'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
@@ -1221,22 +894,18 @@ app.delete(
         return sendError(
           res,
           400,
-          "ADMIN_PERMISSION_INVALID_ID",
-          "Invalid admin permission identifier",
+          'ADMIN_PERMISSION_INVALID_ID',
+          'Invalid admin permission identifier',
         );
       }
 
-      //==================================================
-      //==== TRANSACTION
-      //==================================================
+      // Transaction
 
       connection = await pool.getConnection();
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== GET PERMISSION
-      //==================================================
+      // Get permission
 
       const [permissionRows] = await connection.query(
         `
@@ -1267,19 +936,12 @@ app.delete(
       if (!permissions.length) {
         await connection.rollback();
 
-        return sendError(
-          res,
-          404,
-          "ADMIN_PERMISSION_NOT_FOUND",
-          "Admin permission not found",
-        );
+        return sendError(res, 404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
       }
 
       const permission = permissions[0];
 
-      //==================================================
-      //==== MUST DEACTIVATE FIRST
-      //==================================================
+      // Must deactivate first
 
       if (Number(permission.permission_status) !== 0) {
         await connection.rollback();
@@ -1287,14 +949,12 @@ app.delete(
         return sendError(
           res,
           409,
-          "ADMIN_PERMISSION_MUST_BE_INACTIVE",
-          "Deactivate the admin permission before deleting it",
+          'ADMIN_PERMISSION_MUST_BE_INACTIVE',
+          'Deactivate the admin permission before deleting it',
         );
       }
 
-      //==================================================
-      //==== CHECK ACCESS REFERENCES
-      //==================================================
+      // Check access references
 
       const [referenceRows] = await connection.query(
         `
@@ -1316,33 +976,25 @@ app.delete(
         return sendError(
           res,
           409,
-          "ADMIN_PERMISSION_HAS_ACCESS_REFERENCES",
-          "Admin permission is still assigned to one or more access roles",
+          'ADMIN_PERMISSION_HAS_ACCESS_REFERENCES',
+          'Admin permission is still assigned to one or more access roles',
           {
             access_roles: referenceCount,
           },
         );
       }
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         permission_key: permission.permission_key,
-
         permission_name: permission.permission_name,
-
         permission_group: permission.permission_group ?? null,
-
         permission_description: permission.permission_description ?? null,
-
         permission_status: Number(permission.permission_status),
       };
 
-      //==================================================
-      //==== SOFT DELETE
-      //==================================================
+      // Soft delete
 
       await connection.query(
         `
@@ -1358,67 +1010,44 @@ app.delete(
         [idPermission],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
-        eventCode: "admin_permission.deleted",
-
-        category: "access_control",
-
-        module: "admin_permission",
-
-        action: "delete",
-
-        actorType: "admin",
-
+        writeMode: 'strict',
+        eventCode: 'admin_permission.deleted',
+        category: 'access_control',
+        module: 'admin_permission',
+        action: 'delete',
+        actorType: 'admin',
         actorId: req.user?.id_admin_acct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "admin_permission",
-
+        entityType: 'admin_permission',
         entityId: idPermission,
-
         entityLabel: permission.permission_key,
-
         before: auditBefore,
-
         after: {
           ...auditBefore,
-
           permission_status: 99,
         },
-
         metadata: {
-          delete_type: "soft_delete",
+          delete_type: 'soft_delete',
         },
-
         httpStatus: 200,
       });
 
-      //==================================================
-      //==== COMMIT
-      //==================================================
+      // Commit
 
       await connection.commit();
 
-      //==================================================
-      //==== RESPONSE
-      //==================================================
+      // Response
 
       return sendSuccess(
         res,
         200,
-        "ADMIN_PERMISSION_DELETED",
-        "Admin permission deleted successfully",
+        'ADMIN_PERMISSION_DELETED',
+        'Admin permission deleted successfully',
         {
           id_admin_permission: keyhsid.idAdminPermission.encode(idPermission),
         },
@@ -1430,14 +1059,9 @@ app.delete(
         } catch {}
       }
 
-      console.error("Delete admin permission error:", error);
+      console.error('Delete admin permission error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

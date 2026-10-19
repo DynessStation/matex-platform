@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { RowDataPacket } from "mysql2";
-import { isPublicContentLocale } from "../../config/public-content.config";
-import { pool } from "../../db";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
+import { Router } from 'express';
+import { RowDataPacket } from 'mysql2';
+import { isPublicContentLocale } from '../../config/public-content.config';
+import { pool } from '../../db';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 
 const router = Router();
 const publicScope = (locale: unknown) => {
@@ -17,7 +17,7 @@ const image = (row: any, prefix: string) =>
     ? {
         asset_url: buildAttachmentUrl(row[`${prefix}_path`]),
         original_url: buildAttachmentUrl(row[`${prefix}_path`]),
-        name: row[`${prefix}_name`] ?? "",
+        name: row[`${prefix}_name`] ?? '',
         width: row[`${prefix}_width`] == null ? null : Number(row[`${prefix}_width`]),
         height: row[`${prefix}_height`] == null ? null : Number(row[`${prefix}_height`]),
       }
@@ -42,26 +42,32 @@ const dto = (row: any) => ({
   name: row.product_category_name,
   slug: row.product_category_slug,
   localized_slugs: row.localized_slugs ?? {},
-  description: row.product_category_description ?? "",
-  type: "product",
+  description: row.product_category_description ?? '',
+  type: 'product',
   status: true,
   is_featured: Boolean(row.product_category_is_featured),
   sort_order: Number(row.product_category_sort_order ?? 0),
   meta_title: row.product_category_meta_title ?? row.product_category_name,
-  meta_description: row.product_category_meta_description ?? row.product_category_description ?? "",
-  canonical_url: row.product_category_canonical_url ?? "",
-  og_title: row.product_category_og_title ?? row.product_category_meta_title ?? row.product_category_name,
-  og_description: row.product_category_og_description ?? row.product_category_meta_description ?? row.product_category_description ?? "",
-  category_image: image(row, "image"),
-  category_icon: image(row, "icon"),
-  category_meta_image: image(row, "og") ?? image(row, "image"),
+  meta_description: row.product_category_meta_description ?? row.product_category_description ?? '',
+  canonical_url: row.product_category_canonical_url ?? '',
+  og_title:
+    row.product_category_og_title ?? row.product_category_meta_title ?? row.product_category_name,
+  og_description:
+    row.product_category_og_description ??
+    row.product_category_meta_description ??
+    row.product_category_description ??
+    '',
+  category_image: image(row, 'image'),
+  category_icon: image(row, 'icon'),
+  category_meta_image: image(row, 'og') ?? image(row, 'image'),
   subcategories: [] as any[],
 });
 const tree = (items: any[]) => {
   const byId = new Map(items.map((item) => [item.id, item]));
   const roots: any[] = [];
   for (const item of items) {
-    if (item.parent_id && byId.has(item.parent_id)) byId.get(item.parent_id).subcategories.push(item);
+    if (item.parent_id && byId.has(item.parent_id))
+      byId.get(item.parent_id).subcategories.push(item);
     else roots.push(item);
   }
   return roots;
@@ -69,7 +75,7 @@ const tree = (items: any[]) => {
 const withLocalizedSlugs = async (rows: RowDataPacket[], company: number) => {
   if (!rows.length) return [];
   const ids = rows.map((row) => Number(row.id_product_category));
-  const marks = ids.map(() => "?").join(",");
+  const marks = ids.map(() => '?').join(',');
   const [translations] = await pool.query<RowDataPacket[]>(
     `SELECT id_product_category,product_category_locale,product_category_slug FROM product_category_i18n WHERE id_product_category IN (${marks}) AND id_master_comp=? AND product_category_i18n_status=1`,
     [...ids, company],
@@ -79,45 +85,62 @@ const withLocalizedSlugs = async (rows: RowDataPacket[], company: number) => {
       ...row,
       localized_slugs: Object.fromEntries(
         translations
-          .filter((translation) => Number(translation.id_product_category) === Number(row.id_product_category))
-          .map((translation) => [translation.product_category_locale, translation.product_category_slug]),
+          .filter(
+            (translation) =>
+              Number(translation.id_product_category) === Number(row.id_product_category),
+          )
+          .map((translation) => [
+            translation.product_category_locale,
+            translation.product_category_slug,
+          ]),
       ),
     }),
   );
 };
 
-router.get("/api/public/product-categories/:locale", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/product-categories/:locale', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const scope = publicScope(req.params.locale);
-  if (!scope) return sendError(res, 404, "PRODUCT_CATEGORIES_NOT_FOUND", "Product categories not found");
+  if (!scope)
+    return sendError(res, 404, 'PRODUCT_CATEGORIES_NOT_FOUND', 'Product categories not found');
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
       `${select} WHERE ${where} ORDER BY c.product_category_sort_order,i.product_category_name`,
       [scope.company, scope.locale],
     );
     const data = await withLocalizedSlugs(rows, scope.company);
-    return sendSuccess(res, 200, "PRODUCT_CATEGORIES_FOUND", "Product categories loaded", { data: tree(data), total: data.length });
+    return sendSuccess(res, 200, 'PRODUCT_CATEGORIES_FOUND', 'Product categories loaded', {
+      data: tree(data),
+      total: data.length,
+    });
   } catch (error) {
-    console.error("[Public product category] list failed", error);
-    return sendError(res, 500, "PRODUCT_CATEGORIES_UNAVAILABLE", "Unable to load product categories");
+    console.error('[Public product category] list failed', error);
+    return sendError(
+      res,
+      500,
+      'PRODUCT_CATEGORIES_UNAVAILABLE',
+      'Unable to load product categories',
+    );
   }
 });
 
-router.get("/api/public/product-categories/:locale/:slug", async (req, res) => {
-  res.setHeader("Cache-Control", "no-store");
+router.get('/api/public/product-categories/:locale/:slug', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   const scope = publicScope(req.params.locale);
-  if (!scope) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
+  if (!scope)
+    return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
       `${select} WHERE ${where} AND i.product_category_slug=? LIMIT 1`,
       [scope.company, scope.locale, req.params.slug],
     );
-    if (!rows.length) return sendError(res, 404, "PRODUCT_CATEGORY_NOT_FOUND", "Product category not found");
+    if (!rows.length)
+      return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
     const [category] = await withLocalizedSlugs(rows, scope.company);
-    return sendSuccess(res, 200, "PRODUCT_CATEGORY_FOUND", "Product category loaded", category);
+    return sendSuccess(res, 200, 'PRODUCT_CATEGORY_FOUND', 'Product category loaded', category);
   } catch (error) {
-    console.error("[Public product category] detail failed", error);
-    return sendError(res, 500, "PRODUCT_CATEGORY_UNAVAILABLE", "Unable to load product category");
+    console.error('[Public product category] detail failed', error);
+    return sendError(res, 500, 'PRODUCT_CATEGORY_UNAVAILABLE', 'Unable to load product category');
   }
 });
 

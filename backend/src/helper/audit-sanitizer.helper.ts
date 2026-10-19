@@ -1,6 +1,4 @@
-//==================================================
-//==== LIMITS
-//==================================================
+// Limits
 
 const MAX_DEPTH = 8;
 
@@ -10,70 +8,55 @@ const MAX_OBJECT_KEYS = 200;
 
 const MAX_STRING_LENGTH = 4000;
 
-//==================================================
-//==== REDACTED VALUE
-//==================================================
+// Redacted value
 
-const REDACTED = "[REDACTED]";
+const REDACTED = '[REDACTED]';
 
-const TRUNCATED = "[TRUNCATED]";
+const TRUNCATED = '[TRUNCATED]';
 
-//==================================================
-//==== SENSITIVE KEYS
-//==================================================
+// Sensitive keys
 
 const sensitiveKeys = new Set([
-  "password",
-  "password_hash",
-  "passwordhash",
-  "confirm_password",
-  "password_confirmation",
-
-  "token",
-  "access_token",
-  "refresh_token",
-  "reset_token",
-  "verification_token",
-  "bearer_token",
-
-  "otp",
-  "otp_code",
-
-  "authorization",
-  "cookie",
-  "set_cookie",
-  "set-cookie",
-
-  "secret",
-  "client_secret",
-
-  "api_key",
-  "apikey",
-  "api_secret",
-
-  "private_key",
-
-  "card_number",
-  "cardnumber",
-  "cvv",
-  "cvc",
-  "pin",
+  'password',
+  'password_hash',
+  'passwordhash',
+  'confirm_password',
+  'password_confirmation',
+  'token',
+  'access_token',
+  'refresh_token',
+  'reset_token',
+  'verification_token',
+  'bearer_token',
+  'otp',
+  'otp_code',
+  'authorization',
+  'cookie',
+  'set_cookie',
+  'set-cookie',
+  'secret',
+  'client_secret',
+  'api_key',
+  'apikey',
+  'api_secret',
+  'private_key',
+  'card_number',
+  'cardnumber',
+  'cvv',
+  'cvc',
+  'pin',
 ]);
 
-//==================================================
-//==== NORMALIZE KEY
-//==================================================
+// Normalize key
 
 const normalizeKey = (key: string): string => {
   return key
     .trim()
     .toLowerCase()
-    .replace(/[\s-]+/g, "_");
+    .replace(/[\s-]+/g, '_');
 };
 
-//==================================================
-//==== SENSITIVE KEY
-//==================================================
+// Sensitive key
 
 const isSensitiveKey = (key: string): boolean => {
   const normalized = normalizeKey(key);
@@ -88,18 +71,16 @@ const isSensitiveKey = (key: string): boolean => {
    * customer_password_hash, dll.
    */
   return (
-    normalized.includes("password") ||
-    normalized.includes("access_token") ||
-    normalized.includes("refresh_token") ||
-    normalized.includes("client_secret") ||
-    normalized.includes("api_secret") ||
-    normalized.includes("private_key")
+    normalized.includes('password') ||
+    normalized.includes('access_token') ||
+    normalized.includes('refresh_token') ||
+    normalized.includes('client_secret') ||
+    normalized.includes('api_secret') ||
+    normalized.includes('private_key')
   );
 };
 
-//==================================================
-//==== SANITIZE STRING
-//==================================================
+// Sanitize string
 
 const sanitizeString = (value: string): string => {
   if (value.length <= MAX_STRING_LENGTH) {
@@ -109,9 +90,7 @@ const sanitizeString = (value: string): string => {
   return value.slice(0, MAX_STRING_LENGTH) + TRUNCATED;
 };
 
-//==================================================
-//==== SANITIZE VALUE
-//==================================================
+// Sanitize value
 
 const sanitizeValue = (value: unknown, depth: number): unknown => {
   if (depth > MAX_DEPTH) {
@@ -122,15 +101,15 @@ const sanitizeValue = (value: unknown, depth: number): unknown => {
     return value ?? null;
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return sanitizeString(value);
   }
 
-  if (typeof value === "number" || typeof value === "boolean") {
+  if (typeof value === 'number' || typeof value === 'boolean') {
     return value;
   }
 
-  if (typeof value === "bigint") {
+  if (typeof value === 'bigint') {
     return value.toString();
   }
 
@@ -139,7 +118,7 @@ const sanitizeValue = (value: unknown, depth: number): unknown => {
   }
 
   if (Buffer.isBuffer(value)) {
-    return "[BINARY]";
+    return '[BINARY]';
   }
 
   if (Array.isArray(value)) {
@@ -154,7 +133,7 @@ const sanitizeValue = (value: unknown, depth: number): unknown => {
     return sanitized;
   }
 
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     const source = value as Record<string, unknown>;
 
     const entries = Object.entries(source);
@@ -181,9 +160,7 @@ const sanitizeValue = (value: unknown, depth: number): unknown => {
   return String(value);
 };
 
-//==================================================
-//==== SANITIZE AUDIT DATA
-//==================================================
+// Sanitize audit data
 
 export const sanitizeAuditData = (value: unknown): unknown => {
   return sanitizeValue(value, 0);

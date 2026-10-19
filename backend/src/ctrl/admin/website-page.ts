@@ -1,74 +1,58 @@
-import { Router, Response } from "express";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { pool } from "../../db";
-import keyhsid from "../../hsid";
-import { buildAttachmentUrl } from "../../helper/attachment.helper";
-import { sendError, sendSuccess } from "../../helper/api-response.helper";
-import { writeAuditLog } from "../../helper/audit-log.helper";
-import { validateWebsiteHomeMedia } from "../../config/website-home.config";
-import { AuthRequest, verifyToken } from "../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../middleware/auth-permission.middleware";
+import { Router, Response } from 'express';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { pool } from '../../db';
+import keyhsid from '../../hsid';
+import { buildAttachmentUrl } from '../../helper/attachment.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { writeAuditLog } from '../../helper/audit-log.helper';
+import { validateWebsiteHomeMedia } from '../../config/website-home.config';
+import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 const router = Router();
-const FIXED_PAGE_KEYS = new Set([
-  "home",
-  "about",
-  "contact",
-  "faq",
-  "terms",
-  "career",
-]);
-const SUPPORTED_LOCALES = ["id-ID", "en-US"] as const;
-const DEFAULT_LOCALE = "id-ID" as const;
-const FIXED_PATHS: Record<
-  string,
-  Record<(typeof SUPPORTED_LOCALES)[number], string>
-> = {
-  home: { "id-ID": "home", "en-US": "home" },
-  about: { "id-ID": "tentang-matex", "en-US": "about-matex" },
-  contact: { "id-ID": "kontak", "en-US": "contact-us" },
-  faq: { "id-ID": "faq", "en-US": "faq" },
-  terms: { "id-ID": "syarat-ketentuan", "en-US": "terms-and-conditions" },
-  career: { "id-ID": "karir", "en-US": "careers" },
+const FIXED_PAGE_KEYS = new Set(['home', 'about', 'contact', 'faq', 'terms', 'career']);
+const SUPPORTED_LOCALES = ['id-ID', 'en-US'] as const;
+const DEFAULT_LOCALE = 'id-ID' as const;
+const FIXED_PATHS: Record<string, Record<(typeof SUPPORTED_LOCALES)[number], string>> = {
+  home: { 'id-ID': 'home', 'en-US': 'home' },
+  about: { 'id-ID': 'tentang-matex', 'en-US': 'about-matex' },
+  contact: { 'id-ID': 'kontak', 'en-US': 'contact-us' },
+  faq: { 'id-ID': 'faq', 'en-US': 'faq' },
+  terms: { 'id-ID': 'syarat-ketentuan', 'en-US': 'terms-and-conditions' },
+  career: { 'id-ID': 'karir', 'en-US': 'careers' },
 };
 const HOME_MEDIA_SLOTS = [
-  "home_main",
-  "home_side_1",
-  "home_side_2",
-  "home_tile_1",
-  "home_tile_2",
-  "home_tile_3",
-  "home_tile_4",
-  "home_advertisement",
+  'home_main',
+  'home_side_1',
+  'home_side_2',
+  'home_tile_1',
+  'home_tile_2',
+  'home_tile_3',
+  'home_tile_4',
+  'home_advertisement',
 ] as const;
 const HOME_CONTENT_SECTION_KEYS = [
-  "latex_features",
-  "categories",
-  "products",
-  "articles",
-  "tags",
-  "newsletter",
-  "advertisement",
+  'latex_features',
+  'categories',
+  'products',
+  'articles',
+  'tags',
+  'newsletter',
+  'advertisement',
 ] as const;
 const ABOUT_CONTRACT_VERSION = 1;
 const ABOUT_HIGHLIGHT_LIMIT = 3;
 const ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH = 160;
 const ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH = 1000;
 const PAGE_MEDIA_SLOTS: Record<string, Set<string>> = {
-  home: new Set([...HOME_MEDIA_SLOTS, "og"]),
-  about: new Set(["about_content", "og"]),
-  contact: new Set(["og"]),
-  faq: new Set(["og"]),
-  terms: new Set(["og"]),
-  career: new Set(["og"]),
+  home: new Set([...HOME_MEDIA_SLOTS, 'og']),
+  about: new Set(['about_content', 'og']),
+  contact: new Set(['og']),
+  faq: new Set(['og']),
+  terms: new Set(['og']),
+  career: new Set(['og']),
 };
-const CLICK_ACTIONS = new Set([
-  "none",
-  "internal",
-  "external",
-  "product",
-  "category",
-]);
+const CLICK_ACTIONS = new Set(['none', 'internal', 'external', 'product', 'category']);
 
 type SessionScope =
   | { success: true; idAdminAcct: number; idMasterComp: number }
@@ -80,8 +64,8 @@ const getSessionScope = async (req: AuthRequest): Promise<SessionScope> => {
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
 
@@ -100,16 +84,16 @@ const getSessionScope = async (req: AuthRequest): Promise<SessionScope> => {
     return {
       success: false,
       status: 401,
-      code: "AUTH_SESSION_INVALID",
-      message: "Invalid session",
+      code: 'AUTH_SESSION_INVALID',
+      message: 'Invalid session',
     };
   }
   if (Number(account.admin_acct_status) !== 1) {
     return {
       success: false,
       status: 403,
-      code: "AUTH_ACCOUNT_INACTIVE",
-      message: "Your account is not active",
+      code: 'AUTH_ACCOUNT_INACTIVE',
+      message: 'Your account is not active',
     };
   }
 
@@ -122,7 +106,7 @@ const getSessionScope = async (req: AuthRequest): Promise<SessionScope> => {
 
 const parseJsonValue = (value: unknown): unknown | null => {
   if (value === null || value === undefined) return null;
-  if (typeof value !== "string") return value;
+  if (typeof value !== 'string') return value;
   try {
     return JSON.parse(value);
   } catch {
@@ -134,12 +118,12 @@ const getEffectiveStatus = (
   isPublished: number,
   publishAt: string | Date | null,
   unpublishAt: string | Date | null,
-): "draft" | "scheduled" | "published" | "expired" => {
-  if (isPublished !== 1) return "draft";
+): 'draft' | 'scheduled' | 'published' | 'expired' => {
+  if (isPublished !== 1) return 'draft';
   const now = Date.now();
-  if (publishAt && new Date(publishAt).getTime() > now) return "scheduled";
-  if (unpublishAt && new Date(unpublishAt).getTime() <= now) return "expired";
-  return "published";
+  if (publishAt && new Date(publishAt).getTime() > now) return 'scheduled';
+  if (unpublishAt && new Date(unpublishAt).getTime() <= now) return 'expired';
+  return 'published';
 };
 
 class PayloadError extends Error {
@@ -151,52 +135,37 @@ class PayloadError extends Error {
   }
 }
 
-const optionalString = (
-  value: unknown,
-  field: string,
-  maximum: number,
-): string | null => {
-  if (value === null || value === undefined || value === "") return null;
-  if (typeof value !== "string" || value.length > maximum) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      `${field} is invalid or too long`,
-    );
+const optionalString = (value: unknown, field: string, maximum: number): string | null => {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value !== 'string' || value.length > maximum) {
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', `${field} is invalid or too long`);
   }
   return value;
 };
 
 const jsonValue = (value: unknown, field: string): unknown | null => {
   if (value === null || value === undefined) return null;
-  if (typeof value !== "object" || Array.isArray(value)) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      `${field} must be an object`,
-    );
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', `${field} must be an object`);
   }
   try {
     JSON.stringify(value);
     return value;
   } catch {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      `${field} must be valid JSON data`,
-    );
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', `${field} must be valid JSON data`);
   }
 };
 
 const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
   if (
-    typeof value !== "object" ||
+    typeof value !== 'object' ||
     value === null ||
     Array.isArray(value) ||
-    ![2, 3].includes(
-      Number((value as Record<string, unknown>)["home_contract_version"]),
-    )
+    ![2, 3].includes(Number((value as Record<string, unknown>)['home_contract_version']))
   ) {
     throw new PayloadError(
-      "WEBSITE_HOME_CONTENT_INVALID",
-      "Home content settings use an unsupported format",
+      'WEBSITE_HOME_CONTENT_INVALID',
+      'Home content settings use an unsupported format',
     );
   }
 
@@ -206,13 +175,13 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
   for (const key of HOME_CONTENT_SECTION_KEYS) {
     const section = source[key];
     if (
-      typeof section !== "object" ||
+      typeof section !== 'object' ||
       section === null ||
       Array.isArray(section) ||
-      typeof (section as Record<string, unknown>)["status"] !== "boolean"
+      typeof (section as Record<string, unknown>)['status'] !== 'boolean'
     ) {
       throw new PayloadError(
-        "WEBSITE_HOME_CONTENT_INVALID",
+        'WEBSITE_HOME_CONTENT_INVALID',
         `Home section ${key} requires a visibility setting`,
       );
     }
@@ -224,41 +193,37 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
 
 const normalizeAboutContent = (value: unknown): Record<string, unknown> => {
   if (
-    typeof value !== "object" ||
+    typeof value !== 'object' ||
     value === null ||
     Array.isArray(value) ||
-    (value as Record<string, unknown>)["about_contract_version"] !==
-      ABOUT_CONTRACT_VERSION
+    (value as Record<string, unknown>)['about_contract_version'] !== ABOUT_CONTRACT_VERSION
   ) {
     throw new PayloadError(
-      "WEBSITE_ABOUT_CONTENT_INVALID",
-      "About MATEX content settings use an unsupported format",
+      'WEBSITE_ABOUT_CONTENT_INVALID',
+      'About MATEX content settings use an unsupported format',
     );
   }
 
-  const highlights = (value as Record<string, unknown>)["highlights"];
+  const highlights = (value as Record<string, unknown>)['highlights'];
   if (!Array.isArray(highlights) || highlights.length > ABOUT_HIGHLIGHT_LIMIT) {
     throw new PayloadError(
-      "WEBSITE_ABOUT_CONTENT_INVALID",
+      'WEBSITE_ABOUT_CONTENT_INVALID',
       `About MATEX supports up to ${ABOUT_HIGHLIGHT_LIMIT} highlights`,
     );
   }
 
   const normalizedHighlights = highlights.map((item) => {
-    if (typeof item !== "object" || item === null || Array.isArray(item)) {
+    if (typeof item !== 'object' || item === null || Array.isArray(item)) {
       throw new PayloadError(
-        "WEBSITE_ABOUT_CONTENT_INVALID",
-        "Each About MATEX highlight needs a title and description",
+        'WEBSITE_ABOUT_CONTENT_INVALID',
+        'Each About MATEX highlight needs a title and description',
       );
     }
 
     const source = item as Record<string, unknown>;
-    const title =
-      typeof source["title"] === "string" ? source["title"].trim() : "";
+    const title = typeof source['title'] === 'string' ? source['title'].trim() : '';
     const description =
-      typeof source["description"] === "string"
-        ? source["description"].trim()
-        : "";
+      typeof source['description'] === 'string' ? source['description'].trim() : '';
 
     if (
       !title ||
@@ -267,8 +232,8 @@ const normalizeAboutContent = (value: unknown): Record<string, unknown> => {
       description.length > ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH
     ) {
       throw new PayloadError(
-        "WEBSITE_ABOUT_CONTENT_INVALID",
-        "Each About MATEX highlight needs a valid title and description",
+        'WEBSITE_ABOUT_CONTENT_INVALID',
+        'Each About MATEX highlight needs a valid title and description',
       );
     }
 
@@ -282,166 +247,131 @@ const normalizeAboutContent = (value: unknown): Record<string, unknown> => {
 };
 
 const dateValue = (value: unknown, field: string): Date | null => {
-  if (value === null || value === undefined || value === "") return null;
-  if (typeof value !== "string") {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      `${field} is invalid`,
-    );
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value !== 'string') {
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', `${field} is invalid`);
   }
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      `${field} is invalid`,
-    );
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', `${field} is invalid`);
   }
   return date;
 };
 
 const validateClickAction = (action: string, target: string | null): void => {
   if (!CLICK_ACTIONS.has(action)) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-      "Banner click action is invalid",
-    );
+    throw new PayloadError('WEBSITE_PAGE_MEDIA_ACTION_INVALID', 'Banner click action is invalid');
   }
-  if (action === "none") {
+  if (action === 'none') {
     if (target) {
       throw new PayloadError(
-        "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-        "A banner without a click action cannot have a destination",
+        'WEBSITE_PAGE_MEDIA_ACTION_INVALID',
+        'A banner without a click action cannot have a destination',
       );
     }
     return;
   }
   if (!target) {
+    throw new PayloadError('WEBSITE_PAGE_MEDIA_ACTION_INVALID', 'Banner destination is required');
+  }
+  if (action === 'external' && !/^https:\/\/[^\s]+$/i.test(target)) {
     throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-      "Banner destination is required",
+      'WEBSITE_PAGE_MEDIA_ACTION_INVALID',
+      'External banner destinations must use HTTPS',
     );
   }
-  if (action === "external" && !/^https:\/\/[^\s]+$/i.test(target)) {
+  if (action === 'internal' && (!/^\/(?!\/)[^\s]*$/.test(target) || target.includes('..'))) {
     throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-      "External banner destinations must use HTTPS",
-    );
-  }
-  if (
-    action === "internal" &&
-    (!/^\/(?!\/)[^\s]*$/.test(target) || target.includes(".."))
-  ) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-      "Internal banner destinations must use a safe website path",
+      'WEBSITE_PAGE_MEDIA_ACTION_INVALID',
+      'Internal banner destinations must use a safe website path',
     );
   }
   if (
-    (action === "product" || action === "category") &&
+    (action === 'product' || action === 'category') &&
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(target)
   ) {
     throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_ACTION_INVALID",
-      "Product and category destinations must use a valid address",
+      'WEBSITE_PAGE_MEDIA_ACTION_INVALID',
+      'Product and category destinations must use a valid address',
     );
   }
 };
 
 const parseSavePayload = (pageKey: string, body: any) => {
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      "Website page data is incomplete",
-    );
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', 'Website page data is incomplete');
   }
-  if (typeof body.is_published !== "boolean") {
-    throw new PayloadError(
-      "WEBSITE_PAGE_PAYLOAD_INVALID",
-      "Publication status is required",
-    );
+  if (typeof body.is_published !== 'boolean') {
+    throw new PayloadError('WEBSITE_PAGE_PAYLOAD_INVALID', 'Publication status is required');
   }
 
-  const publishAt = dateValue(body.publish_at, "Publication start");
-  const unpublishAt = dateValue(body.unpublish_at, "Publication end");
+  const publishAt = dateValue(body.publish_at, 'Publication start');
+  const unpublishAt = dateValue(body.unpublish_at, 'Publication end');
   if (publishAt && unpublishAt && unpublishAt <= publishAt) {
     throw new PayloadError(
-      "WEBSITE_PAGE_PUBLICATION_WINDOW_INVALID",
-      "Publication end must be later than its start",
+      'WEBSITE_PAGE_PUBLICATION_WINDOW_INVALID',
+      'Publication end must be later than its start',
     );
   }
 
   if (!Array.isArray(body.translations) || body.translations.length !== 2) {
     throw new PayloadError(
-      "WEBSITE_PAGE_TRANSLATIONS_REQUIRED",
-      "Indonesian and English content are required",
+      'WEBSITE_PAGE_TRANSLATIONS_REQUIRED',
+      'Indonesian and English content are required',
     );
   }
   const seenLocales = new Set<string>();
   const translations = body.translations.map((item: any) => {
-    const locale = String(item?.locale ?? "");
+    const locale = String(item?.locale ?? '');
     if (
-      !SUPPORTED_LOCALES.includes(
-        locale as (typeof SUPPORTED_LOCALES)[number],
-      ) ||
+      !SUPPORTED_LOCALES.includes(locale as (typeof SUPPORTED_LOCALES)[number]) ||
       seenLocales.has(locale)
     ) {
       throw new PayloadError(
-        "WEBSITE_PAGE_TRANSLATIONS_INVALID",
-        "Each supported language must appear exactly once",
+        'WEBSITE_PAGE_TRANSLATIONS_INVALID',
+        'Each supported language must appear exactly once',
       );
     }
     seenLocales.add(locale);
-    const title = typeof item?.title === "string" ? item.title.trim() : "";
-    if (
-      !title ||
-      title.length > 255 ||
-      typeof item?.is_published !== "boolean"
-    ) {
+    const title = typeof item?.title === 'string' ? item.title.trim() : '';
+    if (!title || title.length > 255 || typeof item?.is_published !== 'boolean') {
       throw new PayloadError(
-        "WEBSITE_PAGE_TRANSLATIONS_INVALID",
-        "Each language needs a valid title and publication status",
+        'WEBSITE_PAGE_TRANSLATIONS_INVALID',
+        'Each language needs a valid title and publication status',
       );
     }
     const seo = item?.seo ?? {};
-    const canonicalUrl = optionalString(
-      seo.canonical_url,
-      "Canonical URL",
-      500,
-    );
+    const canonicalUrl = optionalString(seo.canonical_url, 'Canonical URL', 500);
     if (canonicalUrl && !/^https?:\/\/[^\s]+$/i.test(canonicalUrl)) {
       throw new PayloadError(
-        "WEBSITE_PAGE_TRANSLATIONS_INVALID",
-        "Canonical URL must be an absolute HTTP or HTTPS URL",
+        'WEBSITE_PAGE_TRANSLATIONS_INVALID',
+        'Canonical URL must be an absolute HTTP or HTTPS URL',
       );
     }
-    const content = jsonValue(item.content, "Structured page content");
+    const content = jsonValue(item.content, 'Structured page content');
     return {
       locale: locale as (typeof SUPPORTED_LOCALES)[number],
       path: FIXED_PATHS[pageKey][locale as (typeof SUPPORTED_LOCALES)[number]],
       title,
-      summary: optionalString(item.summary, "Summary", 65535),
+      summary: optionalString(item.summary, 'Summary', 65535),
       bodyHtml:
-        pageKey === "home" || pageKey === "about"
+        pageKey === 'home' || pageKey === 'about'
           ? null
-          : optionalString(item.body_html, "Page content", 2_000_000),
+          : optionalString(item.body_html, 'Page content', 2_000_000),
       content:
-        pageKey === "home"
+        pageKey === 'home'
           ? normalizeHomeContent(content)
-          : pageKey === "about"
+          : pageKey === 'about'
             ? normalizeAboutContent(content)
             : content,
-      seoTitle: optionalString(seo.title, "SEO title", 255),
-      seoDescription: optionalString(seo.description, "SEO description", 500),
-      seoKeywords: optionalString(seo.keywords, "SEO keywords", 500),
-      seoRobots: optionalString(seo.robots, "Search engine instruction", 100),
+      seoTitle: optionalString(seo.title, 'SEO title', 255),
+      seoDescription: optionalString(seo.description, 'SEO description', 500),
+      seoKeywords: optionalString(seo.keywords, 'SEO keywords', 500),
+      seoRobots: optionalString(seo.robots, 'Search engine instruction', 100),
       canonicalUrl,
-      socialTitle: optionalString(seo.social_title, "Social title", 255),
-      socialDescription: optionalString(
-        seo.social_description,
-        "Social description",
-        500,
-      ),
-      schema: jsonValue(seo.schema, "Structured SEO data"),
+      socialTitle: optionalString(seo.social_title, 'Social title', 255),
+      socialDescription: optionalString(seo.social_description, 'Social description', 500),
+      schema: jsonValue(seo.schema, 'Structured SEO data'),
       isPublished: item.is_published ? 1 : 0,
     };
   });
@@ -449,79 +379,64 @@ const parseSavePayload = (pageKey: string, body: any) => {
   if (
     body.is_published &&
     translations.find(
-      (item: { locale: string; isPublished: number }) =>
-        item.locale === DEFAULT_LOCALE,
+      (item: { locale: string; isPublished: number }) => item.locale === DEFAULT_LOCALE,
     )?.isPublished !== 1
   ) {
     throw new PayloadError(
-      "WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED",
-      "Published pages require published Indonesian content",
+      'WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED',
+      'Published pages require published Indonesian content',
     );
   }
 
   if (!Array.isArray(body.media) || body.media.length > 10) {
-    throw new PayloadError(
-      "WEBSITE_PAGE_MEDIA_INVALID",
-      "Page media selection is invalid",
-    );
+    throw new PayloadError('WEBSITE_PAGE_MEDIA_INVALID', 'Page media selection is invalid');
   }
   const seenSlots = new Set<string>();
   const seenAttachments = new Set<number>();
   const media = body.media.map((item: any, index: number) => {
-    const decoded = keyhsid.idAttachment.decode(
-      String(item?.id_attachment ?? ""),
-    );
+    const decoded = keyhsid.idAttachment.decode(String(item?.id_attachment ?? ''));
     const idAttachment = Number(decoded[0]);
-    const slot = String(item?.slot ?? "");
+    const slot = String(item?.slot ?? '');
     if (
       !Number.isSafeInteger(idAttachment) ||
       idAttachment <= 0 ||
       !PAGE_MEDIA_SLOTS[pageKey].has(slot) ||
       seenSlots.has(slot) ||
       seenAttachments.has(idAttachment) ||
-      typeof item?.is_visible !== "boolean"
+      typeof item?.is_visible !== 'boolean'
     ) {
       throw new PayloadError(
-        "WEBSITE_PAGE_MEDIA_INVALID",
-        "Page media contains an invalid or duplicate assignment",
+        'WEBSITE_PAGE_MEDIA_INVALID',
+        'Page media contains an invalid or duplicate assignment',
       );
     }
     seenSlots.add(slot);
     seenAttachments.add(idAttachment);
-    const clickAction = String(item.click_action ?? "none");
-    const clickTarget = optionalString(
-      item.click_target,
-      "Banner destination",
-      1000,
-    );
+    const clickAction = String(item.click_action ?? 'none');
+    const clickTarget = optionalString(item.click_target, 'Banner destination', 1000);
     validateClickAction(clickAction, clickTarget);
 
     const texts = item.translations ?? [];
     if (!Array.isArray(texts) || texts.length > 2) {
-      throw new PayloadError(
-        "WEBSITE_PAGE_MEDIA_INVALID",
-        "Media text is invalid",
-      );
+      throw new PayloadError('WEBSITE_PAGE_MEDIA_INVALID', 'Media text is invalid');
     }
     const textLocales = new Set<string>();
     const translations = texts.map((text: any) => {
-      const locale = String(text?.locale ?? "");
+      const locale = String(text?.locale ?? '');
       if (
-        !SUPPORTED_LOCALES.includes(
-          locale as (typeof SUPPORTED_LOCALES)[number],
-        ) ||
+        !SUPPORTED_LOCALES.includes(locale as (typeof SUPPORTED_LOCALES)[number]) ||
         textLocales.has(locale)
       ) {
         throw new PayloadError(
-          "WEBSITE_PAGE_MEDIA_INVALID",
-          "Media languages must be unique and supported",
+          'WEBSITE_PAGE_MEDIA_INVALID',
+          'Media languages must be unique and supported',
         );
       }
       textLocales.add(locale);
       return {
         locale,
-        caption: optionalString(text.caption, "Media caption", 500),
-        altText: optionalString(text.alt_text, "Alternative image text", 500),
+        caption: optionalString(text.caption, 'Media caption', 500),
+        altText: optionalString(text.alt_text, 'Alternative image text', 500),
       };
     });
     return {
@@ -537,42 +452,34 @@ const parseSavePayload = (pageKey: string, body: any) => {
 
   if (body.is_published) {
     const visibleSlots = new Set(
-      media
-        .filter((item: any) => item.isVisible === 1)
-        .map((item: any) => item.slot),
+      media.filter((item: any) => item.isVisible === 1).map((item: any) => item.slot),
     );
     const requiredSlots =
-      pageKey === "home"
-        ? HOME_MEDIA_SLOTS
-        : pageKey === "about"
-          ? ["about_content"]
-          : [];
+      pageKey === 'home' ? HOME_MEDIA_SLOTS : pageKey === 'about' ? ['about_content'] : [];
     const missing = requiredSlots.filter((slot) => !visibleSlots.has(slot));
     if (missing.length) {
       throw new PayloadError(
-        "WEBSITE_PAGE_MEDIA_REQUIRED",
-        `Complete required page images: ${missing.join(", ")}`,
+        'WEBSITE_PAGE_MEDIA_REQUIRED',
+        `Complete required page images: ${missing.join(', ')}`,
       );
     }
 
-    if (pageKey === "about") {
+    if (pageKey === 'about') {
       const contentImage = media.find(
-        (item: any) => item.slot === "about_content" && item.isVisible === 1,
+        (item: any) => item.slot === 'about_content' && item.isVisible === 1,
       );
       const publishedLocales = translations
         .filter((item: any) => item.isPublished === 1)
         .map((item: any) => item.locale);
       const missingAltLocales = publishedLocales.filter((locale: string) => {
-        const text = contentImage?.translations.find(
-          (item: any) => item.locale === locale,
-        );
+        const text = contentImage?.translations.find((item: any) => item.locale === locale);
         return !text?.altText;
       });
 
       if (missingAltLocales.length) {
         throw new PayloadError(
-          "WEBSITE_ABOUT_MEDIA_ALT_REQUIRED",
-          `About MATEX image alternative text is required for: ${missingAltLocales.join(", ")}`,
+          'WEBSITE_ABOUT_MEDIA_ALT_REQUIRED',
+          `About MATEX image alternative text is required for: ${missingAltLocales.join(', ')}`,
         );
       }
     }
@@ -588,18 +495,13 @@ const parseSavePayload = (pageKey: string, body: any) => {
 };
 
 router.get(
-  "/api/v1/website-page/:key",
+  '/api/v1/website-page/:key',
   verifyToken,
-  requirePermission("website_page.view"),
+  requirePermission('website_page.view'),
   async (req: AuthRequest, res: Response) => {
     const pageKey = String(req.params.key).trim().toLowerCase();
     if (!FIXED_PAGE_KEYS.has(pageKey)) {
-      return sendError(
-        res,
-        404,
-        "WEBSITE_PAGE_NOT_FOUND",
-        "Fixed website page not found",
-      );
+      return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Fixed website page not found');
     }
 
     try {
@@ -634,12 +536,7 @@ router.get(
       );
       const page = pageRows[0];
       if (!page) {
-        return sendError(
-          res,
-          404,
-          "WEBSITE_PAGE_NOT_FOUND",
-          "Fixed website page not found",
-        );
+        return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Fixed website page not found');
       }
 
       const [translationRows] = await pool.query<RowDataPacket[]>(
@@ -718,9 +615,7 @@ router.get(
         let media = mediaByRelation.get(relationId);
         if (!media) {
           media = {
-            id_attachment: keyhsid.idAttachment.encode(
-              Number(row.id_attachment),
-            ),
+            id_attachment: keyhsid.idAttachment.encode(Number(row.id_attachment)),
             slot: String(row.website_page_media_slot),
             sort_order: Number(row.website_page_media_sort_order),
             is_visible: Number(row.website_page_media_is_visible) === 1,
@@ -753,77 +648,59 @@ router.get(
       }
 
       const isPublished = Number(page.website_page_is_published);
-      return sendSuccess(
-        res,
-        200,
-        "WEBSITE_PAGE_DETAIL_FETCHED",
-        "Fixed website page loaded",
-        {
-          key: String(page.website_page_key),
-          default_locale: String(page.website_page_default_locale),
-          is_published: isPublished === 1,
-          effective_status: getEffectiveStatus(
-            isPublished,
-            page.website_page_publish_at,
-            page.website_page_unpublish_at,
-          ),
-          publish_at: page.website_page_publish_at ?? null,
-          unpublish_at: page.website_page_unpublish_at ?? null,
-          translations: translationRows.map((translation) => ({
-            locale: String(translation.website_page_locale),
-            path: String(translation.website_page_path),
-            title: String(translation.website_page_title),
-            summary: translation.website_page_summary ?? null,
-            body_html: translation.website_page_body_html ?? null,
-            content: parseJsonValue(translation.website_page_content_json),
-            seo: {
-              title: translation.website_page_seo_title ?? null,
-              description: translation.website_page_seo_description ?? null,
-              keywords: translation.website_page_seo_keywords ?? null,
-              robots: translation.website_page_seo_robots ?? null,
-              canonical_url: translation.website_page_canonical_url ?? null,
-              social_title: translation.website_page_social_title ?? null,
-              social_description:
-                translation.website_page_social_description ?? null,
-              schema: parseJsonValue(translation.website_page_schema_json),
-            },
-            is_published:
-              Number(translation.website_page_translation_is_published) === 1,
-            created: translation.created,
-            updated: translation.updated,
-          })),
-          media: [...mediaByRelation.values()],
-          created_by: page.created_by_alias ?? null,
-          updated_by: page.updated_by_alias ?? null,
-          created: page.created,
-          updated: page.updated,
-        },
-      );
+      return sendSuccess(res, 200, 'WEBSITE_PAGE_DETAIL_FETCHED', 'Fixed website page loaded', {
+        key: String(page.website_page_key),
+        default_locale: String(page.website_page_default_locale),
+        is_published: isPublished === 1,
+        effective_status: getEffectiveStatus(
+          isPublished,
+          page.website_page_publish_at,
+          page.website_page_unpublish_at,
+        ),
+        publish_at: page.website_page_publish_at ?? null,
+        unpublish_at: page.website_page_unpublish_at ?? null,
+        translations: translationRows.map((translation) => ({
+          locale: String(translation.website_page_locale),
+          path: String(translation.website_page_path),
+          title: String(translation.website_page_title),
+          summary: translation.website_page_summary ?? null,
+          body_html: translation.website_page_body_html ?? null,
+          content: parseJsonValue(translation.website_page_content_json),
+          seo: {
+            title: translation.website_page_seo_title ?? null,
+            description: translation.website_page_seo_description ?? null,
+            keywords: translation.website_page_seo_keywords ?? null,
+            robots: translation.website_page_seo_robots ?? null,
+            canonical_url: translation.website_page_canonical_url ?? null,
+            social_title: translation.website_page_social_title ?? null,
+            social_description: translation.website_page_social_description ?? null,
+            schema: parseJsonValue(translation.website_page_schema_json),
+          },
+          is_published: Number(translation.website_page_translation_is_published) === 1,
+          created: translation.created,
+          updated: translation.updated,
+        })),
+        media: [...mediaByRelation.values()],
+        created_by: page.created_by_alias ?? null,
+        updated_by: page.updated_by_alias ?? null,
+        created: page.created,
+        updated: page.updated,
+      });
     } catch (error) {
-      console.error("[Admin Website] Failed to load fixed page", error);
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      console.error('[Admin Website] Failed to load fixed page', error);
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
 router.put(
-  "/api/v1/website-page/:key",
+  '/api/v1/website-page/:key',
   verifyToken,
-  requirePermission("website_page.update"),
+  requirePermission('website_page.update'),
   async (req: AuthRequest, res: Response) => {
     const pageKey = String(req.params.key).trim().toLowerCase();
     if (!FIXED_PAGE_KEYS.has(pageKey)) {
-      return sendError(
-        res,
-        404,
-        "WEBSITE_PAGE_NOT_FOUND",
-        "Fixed website page not found",
-      );
+      return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Fixed website page not found');
     }
 
     const scope = await getSessionScope(req);
@@ -838,12 +715,7 @@ router.put(
       if (error instanceof PayloadError) {
         return sendError(res, 400, error.code, error.message);
       }
-      return sendError(
-        res,
-        400,
-        "WEBSITE_PAGE_PAYLOAD_INVALID",
-        "Website page data is invalid",
-      );
+      return sendError(res, 400, 'WEBSITE_PAGE_PAYLOAD_INVALID', 'Website page data is invalid');
     }
 
     const connection = await pool.getConnection();
@@ -864,12 +736,7 @@ router.put(
       const page = pageRows[0];
       if (!page) {
         await connection.rollback();
-        return sendError(
-          res,
-          404,
-          "WEBSITE_PAGE_NOT_FOUND",
-          "Fixed website page not found",
-        );
+        return sendError(res, 404, 'WEBSITE_PAGE_NOT_FOUND', 'Fixed website page not found');
       }
 
       const attachmentIds = payload.media.map(
@@ -877,7 +744,7 @@ router.put(
       );
       const attachmentById = new Map<number, RowDataPacket>();
       if (attachmentIds.length) {
-        const placeholders = attachmentIds.map(() => "?").join(", ");
+        const placeholders = attachmentIds.map(() => '?').join(', ');
         const [attachmentRows] = await connection.query<RowDataPacket[]>(
           `
             SELECT id_attachment, mime_type, width, height
@@ -900,32 +767,27 @@ router.put(
         return sendError(
           res,
           400,
-          "WEBSITE_PAGE_MEDIA_UNAVAILABLE",
-          "One or more selected images are unavailable",
+          'WEBSITE_PAGE_MEDIA_UNAVAILABLE',
+          'One or more selected images are unavailable',
         );
       }
 
       for (const item of payload.media) {
         const attachment = attachmentById.get(item.idAttachment)!;
-        if (
-          !["image/jpeg", "image/png", "image/webp"].includes(
-            String(attachment.mime_type),
-          )
-        ) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(String(attachment.mime_type))) {
           await connection.rollback();
           return sendError(
             res,
             400,
-            "WEBSITE_PAGE_MEDIA_TYPE_INVALID",
-            "Page images must use JPEG, PNG, or WebP",
+            'WEBSITE_PAGE_MEDIA_TYPE_INVALID',
+            'Page images must use JPEG, PNG, or WebP',
           );
         }
-        if (pageKey === "home" && item.slot !== "og") {
+        if (pageKey === 'home' && item.slot !== 'og') {
           const issue = validateWebsiteHomeMedia(item.slot, {
             mimeType: String(attachment.mime_type),
             width: attachment.width === null ? null : Number(attachment.width),
-            height:
-              attachment.height === null ? null : Number(attachment.height),
+            height: attachment.height === null ? null : Number(attachment.height),
           });
           if (issue) {
             await connection.rollback();
@@ -1008,9 +870,7 @@ router.put(
             translation.title,
             translation.summary,
             translation.bodyHtml,
-            translation.content === null
-              ? null
-              : JSON.stringify(translation.content),
+            translation.content === null ? null : JSON.stringify(translation.content),
             translation.seoTitle,
             translation.seoDescription,
             translation.seoKeywords,
@@ -1018,18 +878,15 @@ router.put(
             translation.canonicalUrl,
             translation.socialTitle,
             translation.socialDescription,
-            translation.schema === null
-              ? null
-              : JSON.stringify(translation.schema),
+            translation.schema === null ? null : JSON.stringify(translation.schema),
             translation.isPublished,
           ],
         );
       }
 
-      await connection.query(
-        "DELETE FROM website_page_media WHERE id_website_page = ?",
-        [page.id_website_page],
-      );
+      await connection.query('DELETE FROM website_page_media WHERE id_website_page = ?', [
+        page.id_website_page,
+      ]);
       for (const item of payload.media) {
         const [result] = await connection.query<ResultSetHeader>(
           `
@@ -1067,12 +924,7 @@ router.put(
               )
               VALUES (?, ?, ?, ?)
             `,
-            [
-              result.insertId,
-              translation.locale,
-              translation.caption,
-              translation.altText,
-            ],
+            [result.insertId, translation.locale, translation.caption, translation.altText],
           );
         }
       }
@@ -1080,16 +932,16 @@ router.put(
       await writeAuditLog({
         req,
         connection,
-        writeMode: "strict",
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-        eventCode: "website_page.updated",
-        category: "data_change",
-        module: "website_page",
-        action: "update",
-        actorType: "admin",
+        eventCode: 'website_page.updated',
+        category: 'data_change',
+        module: 'website_page',
+        action: 'update',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
         actorLabel: req.user?.alias ?? null,
-        entityType: "website_page",
+        entityType: 'website_page',
         entityId: Number(page.id_website_page),
         entityLabel: pageKey,
         before: {
@@ -1109,30 +961,21 @@ router.put(
       });
 
       await connection.commit();
-      return sendSuccess(
-        res,
-        200,
-        "WEBSITE_PAGE_UPDATED",
-        "Fixed website page saved",
-        { key: pageKey },
-      );
+      return sendSuccess(res, 200, 'WEBSITE_PAGE_UPDATED', 'Fixed website page saved', {
+        key: pageKey,
+      });
     } catch (error: any) {
       await connection.rollback();
-      console.error("[Admin Website] Failed to save fixed page", error);
-      if (error?.code === "ER_DUP_ENTRY") {
+      console.error('[Admin Website] Failed to save fixed page', error);
+      if (error?.code === 'ER_DUP_ENTRY') {
         return sendError(
           res,
           409,
-          "WEBSITE_PAGE_CONFLICT",
-          "A localized website address is already in use",
+          'WEBSITE_PAGE_CONFLICT',
+          'A localized website address is already in use',
         );
       }
-      return sendError(
-        res,
-        500,
-        "WEBSITE_PAGE_SAVE_FAILED",
-        "Unable to save fixed website page",
-      );
+      return sendError(res, 500, 'WEBSITE_PAGE_SAVE_FAILED', 'Unable to save fixed website page');
     } finally {
       connection.release();
     }

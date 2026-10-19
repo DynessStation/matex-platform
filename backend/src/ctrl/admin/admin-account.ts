@@ -1,11 +1,11 @@
-import express = require("express");
+import express = require('express');
 
-import sessionRoutes from "./admin-account/session";
-import selectRoutes from "./admin-account/select";
-import readRoutes from "./admin-account/read";
-import createRoutes from "./admin-account/create";
-import updateRoutes from "./admin-account/update";
-import deleteRoutes from "./admin-account/delete";
+import sessionRoutes from './admin-account/session';
+import selectRoutes from './admin-account/select';
+import readRoutes from './admin-account/read';
+import createRoutes from './admin-account/create';
+import updateRoutes from './admin-account/update';
+import deleteRoutes from './admin-account/delete';
 
 // Admin session (login, logout, /me) and admin-account management, under /api/v1/admin-acct.
 //

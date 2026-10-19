@@ -1,21 +1,19 @@
 // Office list and detail.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { buildAttachmentUrl } from "../../../helper/attachment.helper";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError } from "../../../helper/api-response.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { buildAttachmentUrl } from '../../../helper/attachment.helper';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError } from '../../../helper/api-response.helper';
 
-import { getSessionScope, decodeOfficeId } from "./scope";
+import { getSessionScope, decodeOfficeId } from './scope';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== GET LIST QUERY
-//==================================================
+// Get list query
 
 const getListQuery = (query: any) => {
   const parsedPage = Number(query.page);
@@ -24,42 +22,27 @@ const getListQuery = (query: any) => {
 
   const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const limit =
-    Number.isFinite(parsedLimit) && parsedLimit > 0
-      ? Math.min(parsedLimit, 100)
-      : 15;
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 15;
 
   const offset = (page - 1) * limit;
 
-  const search = typeof query.search === "string" ? query.search.trim() : "";
+  const search = typeof query.search === 'string' ? query.search.trim() : '';
 
   return {
     page,
-
     limit,
-
     offset,
-
     searchValue: `%${search}%`,
   };
 };
 
-//==================================================
-//==== OFFICE - GET LIST
-//==================================================
+// Office - get list
 
 router.get(
-  "/api/v1/office",
-
+  '/api/v1/office',
   verifyToken,
-
-  requirePermission("office.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.view'),
+  async (req: AuthRequest, res) => {
     try {
       const scope = await getSessionScope(req);
 
@@ -69,41 +52,29 @@ router.get(
 
       const { page, limit, offset, searchValue } = getListQuery(req.query);
 
-      //==================================================
-      //==== SORT
-      //==================================================
+      // Sort
 
-      const order = typeof req.query.ord === "string" ? req.query.ord : "";
+      const order = typeof req.query.ord === 'string' ? req.query.ord : '';
 
       const sort = req.query.srt;
 
       const allowedOrder: Record<string, string> = {
-        id: "o.id_office",
-
-        office_code: "o.office_code",
-
-        office_name: "o.office_name",
-
-        city: "o.city",
-
-        admin_count: "admin_count",
-
-        media_count: "media_count",
-
-        created: "o.created",
-
-        updated: "o.updated",
-
-        public_sort_order: "o.public_sort_order",
+        id: 'o.id_office',
+        office_code: 'o.office_code',
+        office_name: 'o.office_name',
+        city: 'o.city',
+        admin_count: 'admin_count',
+        media_count: 'media_count',
+        created: 'o.created',
+        updated: 'o.updated',
+        public_sort_order: 'o.public_sort_order',
       };
 
-      const orderQuery = allowedOrder[order] ?? "o.id_office";
+      const orderQuery = allowedOrder[order] ?? 'o.id_office';
 
-      const sortQuery = sort === "desc" || sort === "true" ? "DESC" : "ASC";
+      const sortQuery = sort === 'desc' || sort === 'true' ? 'DESC' : 'ASC';
 
-      //==================================================
-      //==== COUNT
-      //==================================================
+      // Count
 
       const [totalRows] = await pool.query(
         `
@@ -140,26 +111,12 @@ router.get(
                 ) LIKE ?
               )
           `,
-        [
-          scope.idMasterComp,
-
-          searchValue,
-
-          searchValue,
-
-          searchValue,
-
-          searchValue,
-
-          searchValue,
-        ],
+        [scope.idMasterComp, searchValue, searchValue, searchValue, searchValue, searchValue],
       );
 
       const total = Number((totalRows as any[])[0]?.total ?? 0);
 
-      //==================================================
-      //==== DATA
-      //==================================================
+      // Data
 
       const [rows] = await pool.query(
         `
@@ -296,144 +253,81 @@ router.get(
           `,
         [
           scope.idMasterComp,
-
           searchValue,
-
           searchValue,
-
           searchValue,
-
           searchValue,
-
           searchValue,
-
           limit,
-
           offset,
         ],
       );
 
       const data = (rows as any[]).map((item) => ({
         id_office: keyhsid.idOffice.encode(item.id_office),
-
         office_code: item.office_code,
-
         office_name: item.office_name,
-
         office_description: item.office_description,
-
         address: item.address,
-
         city: item.city,
-
         province: item.province,
-
         postal_code: item.postal_code,
-
         email: item.email,
-
         phone: item.phone,
-
         lat: item.lat === null ? null : Number(item.lat),
-
         lng: item.lng === null ? null : Number(item.lng),
-
         attendance_enabled: Number(item.attendance_enabled),
-
         attendance_radius_meter:
-          item.attendance_radius_meter === null
-            ? null
-            : Number(item.attendance_radius_meter),
-
+          item.attendance_radius_meter === null ? null : Number(item.attendance_radius_meter),
         website_url: item.website_url,
-
         is_public: Number(item.is_public),
-
         public_slug: item.public_slug,
-
         public_sort_order: Number(item.public_sort_order ?? 0),
-
         google_place_id: item.google_place_id,
-
         google_maps_url: item.google_maps_url,
-
         google_business_url: item.google_business_url,
-
         admin_count: Number(item.admin_count ?? 0),
-
         media_count: Number(item.media_count ?? 0),
-
         status: Number(item.status),
-
-        status_label: Number(item.status) === 1 ? "Active" : "Inactive",
-
-        visibility_label: Number(item.is_public) === 1 ? "Public" : "Internal",
-
+        status_label: Number(item.status) === 1 ? 'Active' : 'Inactive',
+        visibility_label: Number(item.is_public) === 1 ? 'Public' : 'Internal',
         created: item.created,
-
         updated: item.updated,
       }));
 
       return res.status(200).json({
         success: true,
-
         data,
-
         pagination: {
           page,
-
           limit,
-
           total,
-
           length: data.length,
-
           pagerows: Math.ceil(total / limit),
-
           total_pages: Math.ceil(total / limit),
-
           has_more: offset + data.length < total,
         },
       });
     } catch (error) {
-      console.error("Get office list error:", error);
+      console.error('Get office list error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );
 
-//==================================================
-//==== OFFICE - GET DETAIL
-//==================================================
+// Office - get detail
 
 router.get(
-  "/api/v1/office/:id",
-
+  '/api/v1/office/:id',
   verifyToken,
-
-  requirePermission("office.view"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.view'),
+  async (req: AuthRequest, res) => {
     try {
       const idOffice = decodeOfficeId(req.params.id);
 
       if (!idOffice) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_INVALID_ID",
-          "Invalid office identifier",
-        );
+        return sendError(res, 400, 'OFFICE_INVALID_ID', 'Invalid office identifier');
       }
 
       const scope = await getSessionScope(req);
@@ -442,9 +336,7 @@ router.get(
         return sendError(res, scope.status, scope.code, scope.message);
       }
 
-      //==================================================
-      //==== OFFICE
-      //==================================================
+      // Office
 
       const [officeRows] = await pool.query(
         `
@@ -480,14 +372,12 @@ router.get(
       const offices = officeRows as any[];
 
       if (!offices.length) {
-        return sendError(res, 404, "OFFICE_NOT_FOUND", "Office not found");
+        return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
       }
 
       const office = offices[0];
 
-      //==================================================
-      //==== OPERATING HOURS
-      //==================================================
+      // Operating hours
 
       const [hourRows] = await pool.query(
         `
@@ -518,21 +408,14 @@ router.get(
 
       const operatingHours = (hourRows as any[]).map((item) => ({
         id_office_operating_hour: item.id_office_operating_hour,
-
         day_of_week: Number(item.day_of_week),
-
         sequence: Number(item.sequence),
-
         open_time: item.open_time,
-
         close_time: item.close_time,
-
         is_closed: Number(item.is_closed),
       }));
 
-      //==================================================
-      //==== ATTACHMENTS
-      //==================================================
+      // Attachments
 
       const [attachmentRows] = await pool.query(
         `
@@ -600,115 +483,63 @@ router.get(
 
       const attachments = (attachmentRows as any[]).map((item) => ({
         id_office_attachment: item.id_office_attachment,
-
         attachment_role: item.attachment_role,
-
         caption: item.caption,
-
         sort_order: Number(item.sort_order ?? 0),
-
         is_public: Number(item.is_public),
-
         id_attachment: keyhsid.idAttachment.encode(item.id_attachment),
-
         collection_name: item.collection_name,
-
         name: item.name,
-
         original_name: item.original_name,
-
         file_name: item.file_name,
-
         mime_type: item.mime_type,
-
         extension: item.extension,
-
         disk: item.disk,
-
         storage_path: item.storage_path,
-
         file_size: Number(item.file_size),
-
         width: item.width,
-
         height: item.height,
-
         asset_url: buildAttachmentUrl(item.storage_path),
       }));
 
       return res.status(200).json({
         success: true,
-
         data: {
           id_office: keyhsid.idOffice.encode(office.id_office),
-
           office_code: office.office_code,
-
           office_name: office.office_name,
-
           office_description: office.office_description,
-
           address: office.address,
-
           city: office.city,
-
           province: office.province,
-
           postal_code: office.postal_code,
-
           email: office.email,
-
           phone: office.phone,
-
           lat: office.lat === null ? null : Number(office.lat),
-
           lng: office.lng === null ? null : Number(office.lng),
-
           attendance_enabled: Number(office.attendance_enabled),
-
           attendance_radius_meter:
-            office.attendance_radius_meter === null
-              ? null
-              : Number(office.attendance_radius_meter),
-
+            office.attendance_radius_meter === null ? null : Number(office.attendance_radius_meter),
           website_url: office.website_url,
-
           is_public: Number(office.is_public),
-
           public_slug: office.public_slug,
-
           public_sort_order: Number(office.public_sort_order ?? 0),
-
           google_place_id: office.google_place_id,
-
           google_maps_url: office.google_maps_url,
-
           google_business_url: office.google_business_url,
-
           status: Number(office.status),
-
-          status_label: Number(office.status) === 1 ? "Active" : "Inactive",
-
+          status_label: Number(office.status) === 1 ? 'Active' : 'Inactive',
           admin_count: Number(office.admin_count ?? 0),
-
           operating_hours: operatingHours,
-
           attachments,
-
           created: office.created,
-
           updated: office.updated,
         },
       });
     } catch (error) {
-      console.error("Get office detail error:", error);
+      console.error('Get office detail error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     }
   },
 );

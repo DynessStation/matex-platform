@@ -1,9 +1,9 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const { spawn } = require("node:child_process");
-const { Writable } = require("node:stream");
-const { pipeline } = require("node:stream/promises");
-const { createGunzip } = require("node:zlib");
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+const { Writable } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
+const { createGunzip } = require('node:zlib');
 
 const {
   createMysqlDefaultsFile,
@@ -14,7 +14,7 @@ const {
   requireCommand,
   runCommand,
   sha256File,
-} = require("./backup-common.cjs");
+} = require('./backup-common.cjs');
 
 const args = parseArgs(process.argv.slice(2));
 
@@ -43,34 +43,25 @@ Options:
 }
 
 function readManifest(backupDirectory) {
-  const manifestPath = path.join(backupDirectory, "manifest.json");
+  const manifestPath = path.join(backupDirectory, 'manifest.json');
   if (!fs.existsSync(manifestPath)) {
     throw new Error(`Backup manifest was not found: ${manifestPath}`);
   }
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  if (manifest.format_version !== 1 || manifest.application !== "MATEX") {
-    throw new Error("Unsupported or invalid MATEX backup manifest");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (manifest.format_version !== 1 || manifest.application !== 'MATEX') {
+    throw new Error('Unsupported or invalid MATEX backup manifest');
   }
   return manifest;
 }
 
-function ensureSafeTargetDirectory(
-  targetPath,
-  liveStorageRoot,
-  allowLiveTarget,
-) {
+function ensureSafeTargetDirectory(targetPath, liveStorageRoot, allowLiveTarget) {
   const resolvedTarget = path.resolve(targetPath);
   const resolvedLive = path.resolve(liveStorageRoot);
   if (resolvedTarget === resolvedLive && !allowLiveTarget) {
-    throw new Error(
-      "Refusing to restore over FILE_STORAGE_ROOT without --allow-live-target",
-    );
+    throw new Error('Refusing to restore over FILE_STORAGE_ROOT without --allow-live-target');
   }
 
-  if (
-    fs.existsSync(resolvedTarget) &&
-    fs.readdirSync(resolvedTarget).length > 0
-  ) {
+  if (fs.existsSync(resolvedTarget) && fs.readdirSync(resolvedTarget).length > 0) {
     throw new Error(`Target files directory must be empty: ${resolvedTarget}`);
   }
   fs.mkdirSync(resolvedTarget, { recursive: true, mode: 0o700 });
@@ -90,7 +81,7 @@ async function verifyBackup(backupDirectory, manifest) {
   const entries = [manifest.files?.database, manifest.files?.storage];
   for (const entry of entries) {
     if (!entry?.name || !entry.sha256) {
-      throw new Error("Backup manifest is missing an archive entry");
+      throw new Error('Backup manifest is missing an archive entry');
     }
     const filePath = path.join(backupDirectory, entry.name);
     if (!fs.existsSync(filePath)) {
@@ -103,36 +94,24 @@ async function verifyBackup(backupDirectory, manifest) {
   }
 
   await verifyGzip(path.join(backupDirectory, manifest.files.database.name));
-  requireCommand("tar");
-  await runCommand("tar", [
-    "-tzf",
-    path.join(backupDirectory, manifest.files.storage.name),
-  ]);
+  requireCommand('tar');
+  await runCommand('tar', ['-tzf', path.join(backupDirectory, manifest.files.storage.name)]);
 }
 
-async function restoreDatabase(
-  connection,
-  defaultsFile,
-  archivePath,
-  targetDatabase,
-) {
+async function restoreDatabase(connection, defaultsFile, archivePath, targetDatabase) {
   const child = spawn(
-    "mysql",
-    [
-      `--defaults-extra-file=${defaultsFile}`,
-      "--default-character-set=utf8mb4",
-      targetDatabase,
-    ],
-    { stdio: ["pipe", "ignore", "pipe"], windowsHide: true },
+    'mysql',
+    [`--defaults-extra-file=${defaultsFile}`, '--default-character-set=utf8mb4', targetDatabase],
+    { stdio: ['pipe', 'ignore', 'pipe'], windowsHide: true },
   );
 
-  let stderr = "";
-  child.stderr.on("data", (chunk) => {
+  let stderr = '';
+  child.stderr.on('data', (chunk) => {
     stderr += chunk.toString();
   });
   const closed = new Promise((resolve, reject) => {
-    child.on("error", reject);
-    child.on("close", (code) => {
+    child.on('error', reject);
+    child.on('close', (code) => {
       if (code !== 0) {
         reject(new Error(`mysql exited with code ${code}: ${stderr.trim()}`));
         return;
@@ -154,7 +133,7 @@ async function main() {
   }
 
   if (!args.backup) {
-    throw new Error("Provide --backup <directory>");
+    throw new Error('Provide --backup <directory>');
   }
   const backupDirectory = path.resolve(String(args.backup));
   const manifest = readManifest(backupDirectory);
@@ -165,30 +144,25 @@ async function main() {
     return;
   }
 
-  const backendRoot = path.resolve(__dirname, "..", "..");
-  const envFile = path.resolve(
-    String(args["env-file"] || path.join(backendRoot, ".env")),
-  );
+  const backendRoot = path.resolve(__dirname, '..', '..');
+  const envFile = path.resolve(String(args['env-file'] || path.join(backendRoot, '.env')));
   loadEnvironment(envFile);
   const connection = mysqlConnectionFromEnvironment();
-  const targetDatabase = String(args["target-db"] ?? "").trim();
-  const targetFilesValue = String(args["target-files"] ?? "").trim();
+  const targetDatabase = String(args['target-db'] ?? '').trim();
+  const targetFilesValue = String(args['target-files'] ?? '').trim();
   if (!targetDatabase || !targetFilesValue) {
-    throw new Error("--execute requires --target-db and --target-files");
+    throw new Error('--execute requires --target-db and --target-files');
   }
 
-  const allowLiveTarget = Boolean(args["allow-live-target"]);
+  const allowLiveTarget = Boolean(args['allow-live-target']);
   const targetsLiveDatabase = targetDatabase === connection.database;
-  const liveStorageRoot = String(process.env.FILE_STORAGE_ROOT ?? "").trim();
+  const liveStorageRoot = String(process.env.FILE_STORAGE_ROOT ?? '').trim();
   if (!liveStorageRoot) {
-    throw new Error("Missing required environment variable: FILE_STORAGE_ROOT");
+    throw new Error('Missing required environment variable: FILE_STORAGE_ROOT');
   }
-  const targetsLiveFiles =
-    path.resolve(targetFilesValue) === path.resolve(liveStorageRoot);
+  const targetsLiveFiles = path.resolve(targetFilesValue) === path.resolve(liveStorageRoot);
   if ((targetsLiveDatabase || targetsLiveFiles) && !allowLiveTarget) {
-    throw new Error(
-      "Refusing to restore over live targets without --allow-live-target",
-    );
+    throw new Error('Refusing to restore over live targets without --allow-live-target');
   }
 
   const expectedConfirmation =
@@ -199,12 +173,8 @@ async function main() {
     throw new Error(`Confirmation must be exactly ${expectedConfirmation}`);
   }
 
-  requireCommand("mysql");
-  const targetFiles = ensureSafeTargetDirectory(
-    targetFilesValue,
-    liveStorageRoot,
-    allowLiveTarget,
-  );
+  requireCommand('mysql');
+  const targetFiles = ensureSafeTargetDirectory(targetFilesValue, liveStorageRoot, allowLiveTarget);
   let defaultsFile;
   try {
     defaultsFile = createMysqlDefaultsFile(connection);
@@ -214,10 +184,10 @@ async function main() {
       path.join(backupDirectory, manifest.files.database.name),
       targetDatabase,
     );
-    await runCommand("tar", [
-      "-C",
+    await runCommand('tar', [
+      '-C',
       targetFiles,
-      "-xzf",
+      '-xzf',
       path.join(backupDirectory, manifest.files.storage.name),
     ]);
   } finally {

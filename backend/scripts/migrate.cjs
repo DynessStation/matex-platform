@@ -68,11 +68,7 @@ const requiredAdoptionColumns = {
     'contact_inquiry_notification_status',
     'contact_inquiry_recipient_email',
   ],
-  product_catalog: [
-    'product_kind',
-    'product_origin_city',
-    'product_origin_province',
-  ],
+  product_catalog: ['product_kind', 'product_origin_city', 'product_origin_province'],
 };
 
 function requireEnvironment(name) {
@@ -175,7 +171,9 @@ async function validateAdoptionTarget(connection) {
     ]
       .filter(Boolean)
       .join('; ');
-    throw new Error(`Existing database cannot be adopted because its schema is incomplete (${details})`);
+    throw new Error(
+      `Existing database cannot be adopted because its schema is incomplete (${details})`,
+    );
   }
 }
 
@@ -256,9 +254,8 @@ async function run() {
       await ensureHistoryTable(connection);
     }
 
-    let applied = hasHistoryTable || !showStatusOnly
-      ? await getAppliedMigrations(connection)
-      : new Map();
+    let applied =
+      hasHistoryTable || !showStatusOnly ? await getAppliedMigrations(connection) : new Map();
     verifyChecksums(migrations, applied);
 
     if (showStatusOnly) {
@@ -308,13 +305,17 @@ async function run() {
         );
         executed += 1;
       } catch (error) {
-        throw new Error(`Migration failed: ${migration.fileName}`, { cause: error });
+        throw new Error(`Migration failed: ${migration.fileName}`, {
+          cause: error,
+        });
       }
     }
 
     applied = await getAppliedMigrations(connection);
     verifyChecksums(migrations, applied);
-    console.log(`Migration complete. Executed ${executed}; applied ${applied.size}/${migrations.length}.`);
+    console.log(
+      `Migration complete. Executed ${executed}; applied ${applied.size}/${migrations.length}.`,
+    );
   } finally {
     if (lockAcquired) {
       await connection.query('SELECT RELEASE_LOCK(?)', [lockName]).catch(() => undefined);

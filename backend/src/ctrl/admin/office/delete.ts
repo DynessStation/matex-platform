@@ -1,47 +1,33 @@
 // Delete (soft delete) an office.
-import express = require("express");
-import db = require("../../../db");
-import keyhsid from "../../../hsid";
-import { AuthRequest, verifyToken } from "../../../middleware/auth-jwt.middleware";
-import { requirePermission } from "../../../middleware/auth-permission.middleware";
-import { sendError, sendSuccess } from "../../../helper/api-response.helper";
-import { writeAuditLog } from "../../../helper/audit-log.helper";
+import express = require('express');
+import db = require('../../../db');
+import keyhsid from '../../../hsid';
+import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
+import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { writeAuditLog } from '../../../helper/audit-log.helper';
 
-import { getSessionScope, decodeOfficeId } from "./scope";
-import { toAuditOperatingHours, toAuditOfficeAttachments } from "./relations";
+import { getSessionScope, decodeOfficeId } from './scope';
+import { toAuditOperatingHours, toAuditOfficeAttachments } from './relations';
 
 const { pool } = db;
 
 const router = express.Router();
 
-//==================================================
-//==== OFFICE - DELETE
-//==================================================
+// Office - delete
 
 router.delete(
-  "/api/v1/office/:id",
-
+  '/api/v1/office/:id',
   verifyToken,
-
-  requirePermission("office.delete"),
-
-  async (
-    req: AuthRequest,
-
-    res,
-  ) => {
+  requirePermission('office.delete'),
+  async (req: AuthRequest, res) => {
     let connection: any = null;
 
     try {
       const idOffice = decodeOfficeId(req.params.id);
 
       if (!idOffice) {
-        return sendError(
-          res,
-          400,
-          "OFFICE_INVALID_ID",
-          "Invalid office identifier",
-        );
+        return sendError(res, 400, 'OFFICE_INVALID_ID', 'Invalid office identifier');
       }
 
       const scope = await getSessionScope(req);
@@ -54,9 +40,7 @@ router.delete(
 
       await connection.beginTransaction();
 
-      //==================================================
-      //==== TARGET
-      //==================================================
+      // Target
 
       const [officeRows] = await connection.query(
         `
@@ -113,28 +97,24 @@ router.delete(
       if (!offices.length) {
         await connection.rollback();
 
-        return sendError(res, 404, "OFFICE_NOT_FOUND", "Office not found");
+        return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
       }
 
       const office = offices[0];
 
-      //==================================================
-      //==== MUST BE INACTIVE
-      //==================================================
+      // Must be inactive
 
       if (Number(office.status) !== 0) {
         await connection.rollback();
         return sendError(
           res,
           409,
-          "OFFICE_MUST_BE_INACTIVE",
-          "Deactivate the office before deleting it",
+          'OFFICE_MUST_BE_INACTIVE',
+          'Deactivate the office before deleting it',
         );
       }
 
-      //==================================================
-      //==== ADMIN REFERENCES
-      //==================================================
+      // Admin references
 
       const [accountRows] = await connection.query(
         `
@@ -161,17 +141,15 @@ router.delete(
         return sendError(
           res,
           409,
-          "OFFICE_HAS_ADMIN_REFERENCES",
-          "Office is still assigned to one or more admin accounts",
+          'OFFICE_HAS_ADMIN_REFERENCES',
+          'Office is still assigned to one or more admin accounts',
           {
             assigned_accounts: references,
           },
         );
       }
 
-      //==================================================
-      //==== OPERATING HOURS BEFORE DELETE
-      //==================================================
+      // Operating hours before delete
 
       const [hourRows] = await connection.query(
         `
@@ -197,9 +175,7 @@ router.delete(
         [idOffice],
       );
 
-      //==================================================
-      //==== ATTACHMENTS BEFORE DELETE
-      //==================================================
+      // Attachments before delete
 
       const [attachmentRows] = await connection.query(
         `
@@ -235,68 +211,38 @@ router.delete(
 
       const auditHours = toAuditOperatingHours(hourRows as any[]);
 
-      const auditAttachments = toAuditOfficeAttachments(
-        attachmentRows as any[],
-      );
+      const auditAttachments = toAuditOfficeAttachments(attachmentRows as any[]);
 
-      //==================================================
-      //==== AUDIT BEFORE
-      //==================================================
+      // Audit before
 
       const auditBefore = {
         office_code: office.office_code,
-
         office_name: office.office_name,
-
         office_description: office.office_description ?? null,
-
         address: office.address ?? null,
-
         city: office.city ?? null,
-
         province: office.province ?? null,
-
         postal_code: office.postal_code ?? null,
-
         email: office.email ?? null,
-
         phone: office.phone ?? null,
-
         lat: office.lat === null ? null : Number(office.lat),
-
         lng: office.lng === null ? null : Number(office.lng),
-
         attendance_enabled: Number(office.attendance_enabled),
-
         attendance_radius_meter:
-          office.attendance_radius_meter === null
-            ? null
-            : Number(office.attendance_radius_meter),
-
+          office.attendance_radius_meter === null ? null : Number(office.attendance_radius_meter),
         website_url: office.website_url ?? null,
-
         is_public: Number(office.is_public),
-
         public_slug: office.public_slug ?? null,
-
         public_sort_order: Number(office.public_sort_order ?? 0),
-
         google_place_id: office.google_place_id ?? null,
-
         google_maps_url: office.google_maps_url ?? null,
-
         google_business_url: office.google_business_url ?? null,
-
         operating_hours: auditHours,
-
         attachments: auditAttachments,
-
         status: Number(office.status),
       };
 
-      //==================================================
-      //==== DETACH MEDIA
-      //==================================================
+      // Detach media
 
       await connection.query(
         `
@@ -307,9 +253,7 @@ router.delete(
         [idOffice],
       );
 
-      //==================================================
-      //==== DELETE OPERATING HOURS
-      //==================================================
+      // Delete operating hours
 
       await connection.query(
         `
@@ -320,9 +264,7 @@ router.delete(
         [idOffice],
       );
 
-      //==================================================
-      //==== SOFT DELETE OFFICE
-      //==================================================
+      // Soft delete office
 
       await connection.query(
         `
@@ -340,75 +282,43 @@ router.delete(
         [idOffice, scope.idMasterComp],
       );
 
-      //==================================================
-      //==== AUDIT
-      //==================================================
+      // Audit
 
       await writeAuditLog({
         req,
-
         connection,
-
-        writeMode: "strict",
-
+        writeMode: 'strict',
         idMasterComp: scope.idMasterComp,
-
-        eventCode: "office.deleted",
-
-        category: "data_change",
-
-        module: "office",
-
-        action: "delete",
-
-        actorType: "admin",
-
+        eventCode: 'office.deleted',
+        category: 'data_change',
+        module: 'office',
+        action: 'delete',
+        actorType: 'admin',
         actorId: scope.idAdminAcct,
-
         actorLabel: req.user?.alias ?? null,
-
-        entityType: "office",
-
+        entityType: 'office',
         entityId: idOffice,
-
         entityLabel: office.office_name,
-
         before: auditBefore,
-
         after: {
           ...auditBefore,
-
           operating_hours: [],
-
           attachments: [],
-
           status: 99,
         },
-
         metadata: {
-          delete_type: "soft_delete",
-
+          delete_type: 'soft_delete',
           removed_operating_hours: auditHours.length,
-
-          removed_attachment_ids: auditAttachments.map(
-            (item) => item.id_attachment,
-          ),
+          removed_attachment_ids: auditAttachments.map((item) => item.id_attachment),
         },
-
         httpStatus: 200,
       });
 
       await connection.commit();
 
-      return sendSuccess(
-        res,
-        200,
-        "OFFICE_DELETED",
-        "Office deleted successfully",
-        {
-          id_office: keyhsid.idOffice.encode(idOffice),
-        },
-      );
+      return sendSuccess(res, 200, 'OFFICE_DELETED', 'Office deleted successfully', {
+        id_office: keyhsid.idOffice.encode(idOffice),
+      });
     } catch (error) {
       if (connection) {
         try {
@@ -416,14 +326,9 @@ router.delete(
         } catch {}
       }
 
-      console.error("Delete office error:", error);
+      console.error('Delete office error:', error);
 
-      return sendError(
-        res,
-        500,
-        "INTERNAL_SERVER_ERROR",
-        "Internal Server Error",
-      );
+      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
     } finally {
       if (connection) {
         connection.release();

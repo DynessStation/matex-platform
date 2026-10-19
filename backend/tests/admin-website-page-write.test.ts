@@ -1,25 +1,25 @@
-import assert from "node:assert/strict";
-import { after, before, test } from "node:test";
-import cookieParser from "cookie-parser";
-import express from "express";
-import jwt from "jsonwebtoken";
-import { AddressInfo } from "node:net";
-import { pool } from "../src/db";
-import keyhsid from "../src/hsid";
+import assert from 'node:assert/strict';
+import { after, before, test } from 'node:test';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { AddressInfo } from 'node:net';
+import { pool } from '../src/db';
+import keyhsid from '../src/hsid';
 
 process.env.FILE_STORAGE_ROOT ||= process.cwd();
-process.env.FILE_BASE_URL ||= "http://localhost/files";
-process.env.JWT_SECRET = "website-page-write-test-secret";
+process.env.FILE_BASE_URL ||= 'http://localhost/files';
+process.env.JWT_SECRET = 'website-page-write-test-secret';
 
-const router = require("../src/ctrl/admin/website-page").default;
+const router = require('../src/ctrl/admin/website-page').default;
 const originalQuery = pool.query;
 const originalGetConnection = pool.getConnection;
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(router);
-const server = app.listen(0, "127.0.0.1");
-let base = "";
+const server = app.listen(0, '127.0.0.1');
+let base = '';
 let poolRows: any[][] = [];
 let poolCalls: { sql: string; params: unknown[] }[] = [];
 let connectionCalls: { sql: string; params: unknown[] }[] = [];
@@ -29,10 +29,7 @@ let rolledBack = 0;
 let released = 0;
 let connectionRequested = 0;
 
-const token = jwt.sign(
-  { id_admin_acct: 9, alias: "Tester" },
-  process.env.JWT_SECRET,
-);
+const token = jwt.sign({ id_admin_acct: 9, alias: 'Tester' }, process.env.JWT_SECRET);
 
 const connection = {
   beginTransaction: async () => {
@@ -49,15 +46,15 @@ const connection = {
   },
   query: async (sql: string, params: unknown[] = []) => {
     connectionCalls.push({ sql, params });
-    if (sql.includes("FROM website_page") && sql.includes("FOR UPDATE")) {
+    if (sql.includes('FROM website_page') && sql.includes('FOR UPDATE')) {
       return [[{ id_website_page: 42, website_page_is_published: 1 }], []];
     }
-    if (sql.includes("FROM attachment")) {
+    if (sql.includes('FROM attachment')) {
       return [
         [
           {
             id_attachment: 27,
-            mime_type: "image/webp",
+            mime_type: 'image/webp',
             width: 1600,
             height: 900,
           },
@@ -65,10 +62,10 @@ const connection = {
         [],
       ];
     }
-    if (sql.includes("INSERT INTO website_page_media\n")) {
+    if (sql.includes('INSERT INTO website_page_media\n')) {
       return [{ insertId: 88, affectedRows: 1 }, []];
     }
-    if (sql.includes("INSERT INTO audit_log")) {
+    if (sql.includes('INSERT INTO audit_log')) {
       return [{ insertId: 99, affectedRows: 1 }, []];
     }
     return [{ affectedRows: 1 }, []];
@@ -77,7 +74,7 @@ const connection = {
 
 before(async () => {
   if (!server.listening) {
-    await new Promise<void>((resolve) => server.once("listening", resolve));
+    await new Promise<void>((resolve) => server.once('listening', resolve));
   }
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/v1/website-page`;
   pool.query = (async (sql: string, params: unknown[]) => {
@@ -111,7 +108,7 @@ function reset() {
     [
       {
         id_admin_acct: 9,
-        alias: "Tester",
+        alias: 'Tester',
         id_master_comp: 7,
         id_access: 3,
         is_all_access: 1,
@@ -126,89 +123,82 @@ function reset() {
 
 const request = (key: string, body: unknown) =>
   fetch(`${base}/${key}`, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
       cookie: `access_token=${token}`,
-      "content-type": "application/json",
+      'content-type': 'application/json',
     },
     body: JSON.stringify(body),
   });
 
 const translations = [
   {
-    locale: "id-ID",
-    path: "this-input-is-ignored",
-    title: "Tentang MATEX",
-    summary: "Ringkasan",
-    body_html: "<p>Isi</p>",
+    locale: 'id-ID',
+    path: 'this-input-is-ignored',
+    title: 'Tentang MATEX',
+    summary: 'Ringkasan',
+    body_html: '<p>Isi</p>',
     content: { about_contract_version: 1, highlights: [] },
-    seo: { title: "Tentang MATEX", schema: { "@type": "AboutPage" } },
+    seo: { title: 'Tentang MATEX', schema: { '@type': 'AboutPage' } },
     is_published: true,
   },
   {
-    locale: "en-US",
-    path: "also-ignored",
-    title: "About MATEX",
-    summary: "Summary",
-    body_html: "<p>Content</p>",
+    locale: 'en-US',
+    path: 'also-ignored',
+    title: 'About MATEX',
+    summary: 'Summary',
+    body_html: '<p>Content</p>',
     content: { about_contract_version: 1, highlights: [] },
-    seo: { title: "About MATEX" },
+    seo: { title: 'About MATEX' },
     is_published: true,
   },
 ];
 
-test("page updates require the dedicated website page permission", async () => {
+test('page updates require the dedicated website page permission', async () => {
   reset();
   poolRows[0][0].is_all_access = 0;
   poolRows[1] = [{ id_admin_permission: 82 }];
 
-  const response = await request("custom-page", {});
+  const response = await request('custom-page', {});
 
   assert.equal(response.status, 404);
-  assert.deepEqual(poolCalls[1].params, [3, "website_page.update"]);
+  assert.deepEqual(poolCalls[1].params, [3, 'website_page.update']);
   assert.equal(connectionRequested, 0);
 });
 
-test("invalid payloads are rejected before a transaction begins", async () => {
+test('invalid payloads are rejected before a transaction begins', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: true,
     translations: [translations[0]],
     media: [],
   });
   assert.equal(response.status, 400);
-  assert.equal(
-    (await response.json()).code,
-    "WEBSITE_PAGE_TRANSLATIONS_REQUIRED",
-  );
+  assert.equal((await response.json()).code, 'WEBSITE_PAGE_TRANSLATIONS_REQUIRED');
   assert.equal(connectionRequested, 0);
   assert.equal(began, 0);
 });
 
-test("published pages require the Indonesian translation to be published", async () => {
+test('published pages require the Indonesian translation to be published', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: true,
     translations: translations.map((translation) => ({
       ...translation,
-      is_published:
-        translation.locale === "id-ID" ? false : translation.is_published,
+      is_published: translation.locale === 'id-ID' ? false : translation.is_published,
     })),
     media: [],
   });
 
   assert.equal(response.status, 400);
-  assert.equal(
-    (await response.json()).code,
-    "WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED",
-  );
+  assert.equal((await response.json()).code, 'WEBSITE_PAGE_DEFAULT_TRANSLATION_REQUIRED');
   assert.equal(connectionRequested, 0);
   assert.equal(began, 0);
 });
 
-test("home rejects incomplete section settings before a transaction begins", async () => {
+test('home rejects incomplete section settings before a transaction begins', async () => {
   reset();
-  const response = await request("home", {
+  const response = await request('home', {
     is_published: false,
     translations: translations.map((translation) => ({
       ...translation,
@@ -218,42 +208,42 @@ test("home rejects incomplete section settings before a transaction begins", asy
   });
 
   assert.equal(response.status, 400);
-  assert.equal((await response.json()).code, "WEBSITE_HOME_CONTENT_INVALID");
+  assert.equal((await response.json()).code, 'WEBSITE_HOME_CONTENT_INVALID');
   assert.equal(connectionRequested, 0);
   assert.equal(began, 0);
 });
 
-test("home saves only its current section contract and clears unused HTML", async () => {
+test('home saves only its current section contract and clears unused HTML', async () => {
   reset();
   const content = {
     home_contract_version: 3,
     latex_features: {
       status: true,
-      eyebrow: "MATEX EXCELLENCE",
-      title: "Why natural latex",
-      description: "Natural material benefits",
-      items: [{ title: "Elastic", description: "Responsive support" }],
+      eyebrow: 'MATEX EXCELLENCE',
+      title: 'Why natural latex',
+      description: 'Natural material benefits',
+      items: [{ title: 'Elastic', description: 'Responsive support' }],
     },
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
-    tags: { status: false, title: "Popular tags" },
+    tags: { status: false, title: 'Popular tags' },
     newsletter: { status: false },
     advertisement: {
       status: true,
-      label: "Promotion",
-      title: "Talk to MATEX",
-      description: "Product information",
-      cta_label: "Contact us",
-      cta_url: "/contact",
+      label: 'Promotion',
+      title: 'Talk to MATEX',
+      description: 'Product information',
+      cta_label: 'Contact us',
+      cta_url: '/contact',
     },
     sale_product: { status: true },
   };
-  const response = await request("home", {
+  const response = await request('home', {
     is_published: false,
     translations: translations.map((translation) => ({
       ...translation,
-      body_html: "<p>Unused legacy home copy</p>",
+      body_html: '<p>Unused legacy home copy</p>',
       content,
     })),
     media: [],
@@ -261,7 +251,7 @@ test("home saves only its current section contract and clears unused HTML", asyn
 
   assert.equal(response.status, 200);
   const writes = connectionCalls.filter((call) =>
-    call.sql.includes("INSERT INTO website_page_i18n"),
+    call.sql.includes('INSERT INTO website_page_i18n'),
   );
   assert.equal(writes.length, 2);
   assert.equal(writes[0].params[6], null);
@@ -269,30 +259,30 @@ test("home saves only its current section contract and clears unused HTML", asyn
     home_contract_version: 3,
     latex_features: {
       status: true,
-      eyebrow: "MATEX EXCELLENCE",
-      title: "Why natural latex",
-      description: "Natural material benefits",
-      items: [{ title: "Elastic", description: "Responsive support" }],
+      eyebrow: 'MATEX EXCELLENCE',
+      title: 'Why natural latex',
+      description: 'Natural material benefits',
+      items: [{ title: 'Elastic', description: 'Responsive support' }],
     },
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
-    tags: { status: false, title: "Popular tags" },
+    tags: { status: false, title: 'Popular tags' },
     newsletter: { status: false },
     advertisement: {
       status: true,
-      label: "Promotion",
-      title: "Talk to MATEX",
-      description: "Product information",
-      cta_label: "Contact us",
-      cta_url: "/contact",
+      label: 'Promotion',
+      title: 'Talk to MATEX',
+      description: 'Product information',
+      cta_label: 'Contact us',
+      cta_url: '/contact',
     },
   });
 });
 
-test("about rejects legacy or incomplete content before a transaction begins", async () => {
+test('about rejects legacy or incomplete content before a transaction begins', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: false,
     translations: translations.map((translation) => ({
       ...translation,
@@ -302,20 +292,20 @@ test("about rejects legacy or incomplete content before a transaction begins", a
   });
 
   assert.equal(response.status, 400);
-  assert.equal((await response.json()).code, "WEBSITE_ABOUT_CONTENT_INVALID");
+  assert.equal((await response.json()).code, 'WEBSITE_ABOUT_CONTENT_INVALID');
   assert.equal(connectionRequested, 0);
 });
 
-test("about saves only its current highlight contract and clears unused HTML", async () => {
+test('about saves only its current highlight contract and clears unused HTML', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: false,
     translations: translations.map((translation) => ({
       ...translation,
-      body_html: "<p>Unused legacy About copy</p>",
+      body_html: '<p>Unused legacy About copy</p>',
       content: {
         about_contract_version: 1,
-        highlights: [{ title: "Natural latex", description: "Description" }],
+        highlights: [{ title: 'Natural latex', description: 'Description' }],
       },
     })),
     media: [],
@@ -323,44 +313,41 @@ test("about saves only its current highlight contract and clears unused HTML", a
 
   assert.equal(response.status, 200);
   const writes = connectionCalls.filter((call) =>
-    call.sql.includes("INSERT INTO website_page_i18n"),
+    call.sql.includes('INSERT INTO website_page_i18n'),
   );
   assert.equal(writes.length, 2);
   assert.equal(writes[0].params[6], null);
   assert.deepEqual(JSON.parse(String(writes[0].params[7])), {
     about_contract_version: 1,
-    highlights: [{ title: "Natural latex", description: "Description" }],
+    highlights: [{ title: 'Natural latex', description: 'Description' }],
   });
 });
 
-test("published about requires alternative text for every published language", async () => {
+test('published about requires alternative text for every published language', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: true,
     translations,
     media: [
       {
         id_attachment: keyhsid.idAttachment.encode(27),
-        slot: "about_content",
+        slot: 'about_content',
         is_visible: true,
-        click_action: "none",
+        click_action: 'none',
         click_target: null,
-        translations: [{ locale: "id-ID", alt_text: "MATEX", caption: null }],
+        translations: [{ locale: 'id-ID', alt_text: 'MATEX', caption: null }],
       },
     ],
   });
 
   assert.equal(response.status, 400);
-  assert.equal(
-    (await response.json()).code,
-    "WEBSITE_ABOUT_MEDIA_ALT_REQUIRED",
-  );
+  assert.equal((await response.json()).code, 'WEBSITE_ABOUT_MEDIA_ALT_REQUIRED');
   assert.equal(connectionRequested, 0);
 });
 
-test("fixed paths and all related page data are saved in one transaction", async () => {
+test('fixed paths and all related page data are saved in one transaction', async () => {
   reset();
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: true,
     publish_at: null,
     unpublish_at: null,
@@ -368,52 +355,44 @@ test("fixed paths and all related page data are saved in one transaction", async
     media: [
       {
         id_attachment: keyhsid.idAttachment.encode(27),
-        slot: "about_content",
+        slot: 'about_content',
         is_visible: true,
-        click_action: "external",
-        click_target: "https://example.com/company",
+        click_action: 'external',
+        click_target: 'https://example.com/company',
         translations: [
-          { locale: "id-ID", alt_text: "Pabrik MATEX", caption: null },
-          { locale: "en-US", alt_text: "MATEX factory", caption: null },
+          { locale: 'id-ID', alt_text: 'Pabrik MATEX', caption: null },
+          { locale: 'en-US', alt_text: 'MATEX factory', caption: null },
         ],
       },
     ],
   });
 
   assert.equal(response.status, 200);
-  assert.equal((await response.json()).code, "WEBSITE_PAGE_UPDATED");
+  assert.equal((await response.json()).code, 'WEBSITE_PAGE_UPDATED');
   assert.equal(began, 1);
   assert.equal(committed, 1);
   assert.equal(rolledBack, 0);
   assert.equal(released, 1);
 
   const translationWrites = connectionCalls.filter((call) =>
-    call.sql.includes("INSERT INTO website_page_i18n"),
+    call.sql.includes('INSERT INTO website_page_i18n'),
   );
   assert.equal(translationWrites.length, 2);
-  assert.equal(translationWrites[0].params[3], "tentang-matex");
-  assert.equal(translationWrites[1].params[3], "about-matex");
+  assert.equal(translationWrites[0].params[3], 'tentang-matex');
+  assert.equal(translationWrites[1].params[3], 'about-matex');
 
+  assert.ok(connectionCalls.some((call) => call.sql.includes('DELETE FROM website_page_media')));
   assert.ok(
-    connectionCalls.some((call) =>
-      call.sql.includes("DELETE FROM website_page_media"),
-    ),
+    connectionCalls.some((call) => call.sql.includes('INSERT INTO website_page_media_i18n')),
   );
-  assert.ok(
-    connectionCalls.some((call) =>
-      call.sql.includes("INSERT INTO website_page_media_i18n"),
-    ),
-  );
-  assert.ok(
-    connectionCalls.some((call) => call.sql.includes("INSERT INTO audit_log")),
-  );
+  assert.ok(connectionCalls.some((call) => call.sql.includes('INSERT INTO audit_log')));
 });
 
-test("fixed metadata pages keep their localized paths", async () => {
+test('fixed metadata pages keep their localized paths', async () => {
   const cases = [
-    { key: "contact", paths: ["kontak", "contact-us"] },
-    { key: "faq", paths: ["faq", "faq"] },
-    { key: "career", paths: ["karir", "careers"] },
+    { key: 'contact', paths: ['kontak', 'contact-us'] },
+    { key: 'faq', paths: ['faq', 'faq'] },
+    { key: 'career', paths: ['karir', 'careers'] },
   ];
 
   for (const item of cases) {
@@ -428,7 +407,7 @@ test("fixed metadata pages keep their localized paths", async () => {
 
     assert.equal(response.status, 200);
     const writes = connectionCalls.filter((call) =>
-      call.sql.includes("INSERT INTO website_page_i18n"),
+      call.sql.includes('INSERT INTO website_page_i18n'),
     );
     assert.deepEqual(
       writes.map((call) => call.params[3]),
@@ -437,44 +416,42 @@ test("fixed metadata pages keep their localized paths", async () => {
   }
 });
 
-test("unavailable media rolls back before existing relations are replaced", async () => {
+test('unavailable media rolls back before existing relations are replaced', async () => {
   reset();
   connection.query = (async (sql: string, params: unknown[] = []) => {
     connectionCalls.push({ sql, params });
-    if (sql.includes("FROM website_page") && sql.includes("FOR UPDATE")) {
+    if (sql.includes('FROM website_page') && sql.includes('FOR UPDATE')) {
       return [[{ id_website_page: 42, website_page_is_published: 1 }], []];
     }
-    if (sql.includes("FROM attachment")) return [[], []];
+    if (sql.includes('FROM attachment')) return [[], []];
     return [{ affectedRows: 1 }, []];
   }) as any;
 
-  const response = await request("about", {
+  const response = await request('about', {
     is_published: true,
     translations,
     media: [
       {
         id_attachment: keyhsid.idAttachment.encode(27),
-        slot: "about_content",
+        slot: 'about_content',
         is_visible: true,
-        click_action: "none",
+        click_action: 'none',
         click_target: null,
         translations: [
-          { locale: "id-ID", alt_text: "MATEX", caption: null },
-          { locale: "en-US", alt_text: "MATEX", caption: null },
+          { locale: 'id-ID', alt_text: 'MATEX', caption: null },
+          { locale: 'en-US', alt_text: 'MATEX', caption: null },
         ],
       },
     ],
   });
 
   assert.equal(response.status, 400);
-  assert.equal((await response.json()).code, "WEBSITE_PAGE_MEDIA_UNAVAILABLE");
+  assert.equal((await response.json()).code, 'WEBSITE_PAGE_MEDIA_UNAVAILABLE');
   assert.equal(committed, 0);
   assert.equal(rolledBack, 1);
   assert.equal(released, 1);
   assert.equal(
-    connectionCalls.some((call) =>
-      call.sql.includes("DELETE FROM website_page_media"),
-    ),
+    connectionCalls.some((call) => call.sql.includes('DELETE FROM website_page_media')),
     false,
   );
 });

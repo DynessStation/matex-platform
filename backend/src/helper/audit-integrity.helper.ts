@@ -1,8 +1,6 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual } from 'crypto';
 
-//==================================================
-//==== CANONICALIZE
-//==================================================
+// Canonicalize
 
 const canonicalizeValue = (value: unknown): unknown => {
   if (value === null || value === undefined) {
@@ -13,7 +11,7 @@ const canonicalizeValue = (value: unknown): unknown => {
     return value.map(canonicalizeValue);
   }
 
-  if (typeof value === "object") {
+  if (typeof value === 'object') {
     const source = value as Record<string, unknown>;
 
     const result: Record<string, unknown> = {};
@@ -30,17 +28,13 @@ const canonicalizeValue = (value: unknown): unknown => {
   return value;
 };
 
-//==================================================
-//==== CANONICAL JSON
-//==================================================
+// Canonical JSON
 
 export const canonicalAuditJson = (value: unknown): string => {
   return JSON.stringify(canonicalizeValue(value));
 };
 
-//==================================================
-//==== CREATE HASH
-//==================================================
+// Create hash
 
 export const createAuditIntegrityHash = (payload: unknown): string | null => {
   const secret = process.env.AUDIT_INTEGRITY_SECRET;
@@ -49,14 +43,10 @@ export const createAuditIntegrityHash = (payload: unknown): string | null => {
     return null;
   }
 
-  return createHmac("sha256", secret)
-    .update(canonicalAuditJson(payload))
-    .digest("hex");
+  return createHmac('sha256', secret).update(canonicalAuditJson(payload)).digest('hex');
 };
 
-//==================================================
-//==== VERIFY HASH
-//==================================================
+// Verify hash
 
 export const verifyAuditIntegrityHash = (
   payload: unknown,
@@ -72,9 +62,9 @@ export const verifyAuditIntegrityHash = (
     return false;
   }
 
-  const expectedBuffer = Buffer.from(expectedHash, "hex");
+  const expectedBuffer = Buffer.from(expectedHash, 'hex');
 
-  const currentBuffer = Buffer.from(currentHash, "hex");
+  const currentBuffer = Buffer.from(currentHash, 'hex');
 
   if (expectedBuffer.length !== currentBuffer.length) {
     return false;

@@ -1,11 +1,11 @@
-import express = require("express");
+import express = require('express');
 
-import readRoutes from "./web-navigation/read";
-import createRoutes from "./web-navigation/create";
-import updateRoutes from "./web-navigation/update";
-import deleteRoutes from "./web-navigation/delete";
-import itemsRoutes from "./web-navigation/items";
-import reorderRoutes from "./web-navigation/reorder";
+import readRoutes from './web-navigation/read';
+import createRoutes from './web-navigation/create';
+import updateRoutes from './web-navigation/update';
+import deleteRoutes from './web-navigation/delete';
+import itemsRoutes from './web-navigation/items';
+import reorderRoutes from './web-navigation/reorder';
 
 // Website navigation and its menu items, under /api/v1/web-navigation.
 //
