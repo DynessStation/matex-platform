@@ -56,7 +56,7 @@ export class TagState {
   getTags(ctx: StateContext<TagStateModel>, action: GetTagsAction) {
     return this.tagService.getTags(action.payload).pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             tag: {
               data: result.data,
@@ -64,7 +64,7 @@ export class TagState {
             },
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -80,15 +80,15 @@ export class TagState {
   edit(ctx: StateContext<TagStateModel>, { id }: EditTagAction) {
     return this.tagService.getTags().pipe(
       tap({
-        next: results => {
+        next: (results) => {
           const state = ctx.getState();
-          const result = results.data.find(tag => tag.id == id);
+          const result = results.data.find((tag) => tag.id == id);
           ctx.patchState({
             ...state,
             selectedTag: result,
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -96,7 +96,10 @@ export class TagState {
   }
 
   @Action(UpdateTagAction)
-  update(_ctx: StateContext<TagStateModel>, { payload: _payload, id: _id }: UpdateTagAction) {
+  update(
+    _ctx: StateContext<TagStateModel>,
+    { payload: _payload, id: _id }: UpdateTagAction,
+  ) {
     // Update Tag Logic Here
   }
 
@@ -114,7 +117,10 @@ export class TagState {
   }
 
   @Action(DeleteAllTagAction)
-  deleteAll(_ctx: StateContext<TagStateModel>, { ids: _ids }: DeleteAllTagAction) {
+  deleteAll(
+    _ctx: StateContext<TagStateModel>,
+    { ids: _ids }: DeleteAllTagAction,
+  ) {
     // Delete All Tag Logic Here
   }
 

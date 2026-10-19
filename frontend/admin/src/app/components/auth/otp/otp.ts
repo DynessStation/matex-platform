@@ -23,7 +23,14 @@ import { VerifyEmailOtpAction } from '../../../shared/store/action/auth.action';
 
 @Component({
   selector: 'app-otp',
-  imports: [TranslateModule, FormsModule, ReactiveFormsModule, Alert, Button, AsyncPipe],
+  imports: [
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    Alert,
+    Button,
+    AsyncPipe,
+  ],
   templateUrl: './otp.html',
   styleUrl: './otp.scss',
 })
@@ -32,14 +39,16 @@ export class Otp {
   store = inject(Store);
   formBuilder = inject(FormBuilder);
 
-  setting$: Observable<IValues> = inject(Store).select(SettingState.setting) as Observable<IValues>;
+  setting$: Observable<IValues> = inject(Store).select(
+    SettingState.setting,
+  ) as Observable<IValues>;
 
   public form: FormGroup;
   public email: string;
   public loading: boolean;
 
   constructor() {
-    this.email = this.store.selectSnapshot(state => state.auth.email);
+    this.email = this.store.selectSnapshot((state) => state.auth.email);
     if (!this.email) void this.router.navigateByUrl('/auth/login');
     this.form = this.formBuilder.group({
       otp: new FormControl('', [Validators.required, Validators.minLength(5)]),

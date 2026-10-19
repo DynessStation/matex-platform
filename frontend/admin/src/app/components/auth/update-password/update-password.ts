@@ -40,7 +40,9 @@ export class UpdatePassword {
   private formBuilder = inject(FormBuilder);
   router = inject(Router);
 
-  setting$: Observable<IValues> = inject(Store).select(SettingState.setting) as Observable<IValues>;
+  setting$: Observable<IValues> = inject(Store).select(
+    SettingState.setting,
+  ) as Observable<IValues>;
 
   public form: FormGroup;
   public email: string;
@@ -48,9 +50,10 @@ export class UpdatePassword {
   public show: boolean = false;
 
   constructor() {
-    this.email = this.store.selectSnapshot(state => state.auth.email);
-    this.token = this.store.selectSnapshot(state => state.auth.token);
-    if (!this.email && !this.token) void this.router.navigateByUrl('/auth/login');
+    this.email = this.store.selectSnapshot((state) => state.auth.email);
+    this.token = this.store.selectSnapshot((state) => state.auth.token);
+    if (!this.email && !this.token)
+      void this.router.navigateByUrl('/auth/login');
     this.form = this.formBuilder.group({
       newPassword: new FormControl('', [Validators.required]),
       confirmPassword: new FormControl('', [Validators.required]),

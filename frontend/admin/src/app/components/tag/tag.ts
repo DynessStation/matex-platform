@@ -9,7 +9,10 @@ import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { ImportCsvModal } from '../../shared/components/ui/modal/import-csv-modal/import-csv-modal';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
-import { ITableClickedAction, ITableConfig } from '../../shared/interface/table.interface';
+import {
+  ITableClickedAction,
+  ITableConfig,
+} from '../../shared/interface/table.interface';
 import { ITag, ITagModel } from '../../shared/interface/tag.interface';
 import {
   DeleteAllTagAction,
@@ -45,7 +48,12 @@ export class Tag {
 
   public tableConfig: ITableConfig = {
     columns: [
-      { title: 'name', dataField: 'name', sortable: true, sort_direction: 'desc' },
+      {
+        title: 'name',
+        dataField: 'name',
+        sortable: true,
+        sort_direction: 'desc',
+      },
       {
         title: 'created_at',
         dataField: 'created_at',
@@ -56,7 +64,12 @@ export class Tag {
       { title: 'status', dataField: 'status', type: 'switch' },
     ],
     rowActions: [
-      { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'tag.edit' },
+      {
+        label: 'Edit',
+        actionToPerform: 'edit',
+        icon: 'ri-pencil-line',
+        permission: 'tag.edit',
+      },
       {
         label: 'Delete',
         actionToPerform: 'delete',
@@ -69,7 +82,7 @@ export class Tag {
   };
 
   ngOnInit() {
-    this.tag$.subscribe(tag => {
+    this.tag$.subscribe((tag) => {
       this.tableConfig.data = tag ? tag?.data : [];
       this.tableConfig.total = tag ? tag?.total : 0;
     });
@@ -88,7 +101,8 @@ export class Tag {
   }
 
   edit(data: ITag) {
-    if (this.tagType() == 'post') void this.router.navigateByUrl(`/blog/tag/edit/${data.id}`);
+    if (this.tagType() == 'post')
+      void this.router.navigateByUrl(`/blog/tag/edit/${data.id}`);
     else void this.router.navigateByUrl(`/tag/edit/${data.id}`);
   }
 

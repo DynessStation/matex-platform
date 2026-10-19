@@ -6,7 +6,8 @@ export const errorRoutes: Routes = [
     children: [
       {
         path: '403',
-        loadComponent: () => import('./error403/error403').then(m => m.Error403),
+        loadComponent: () =>
+          import('./error403/error403').then((m) => m.Error403),
       },
     ],
   },

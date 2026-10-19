@@ -35,12 +35,16 @@ export class StateState {
     return (country_id?: number | null) => {
       if (country_id)
         return state.state.data
-          .filter(element => element.country_id == country_id)
-          .map(st => {
-            return { label: st?.name, value: st?.id, country_id: st?.country_id };
+          .filter((element) => element.country_id == country_id)
+          .map((st) => {
+            return {
+              label: st?.name,
+              value: st?.id,
+              country_id: st?.country_id,
+            };
           });
       else
-        return state.state.data.map(st => {
+        return state.state.data.map((st) => {
           return { label: st?.name, value: st?.id, country_id: st?.country_id };
         });
     };
@@ -56,14 +60,14 @@ export class StateState {
     }
     return this.stateService.getStates().pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             state: {
               data: result,
             },
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),

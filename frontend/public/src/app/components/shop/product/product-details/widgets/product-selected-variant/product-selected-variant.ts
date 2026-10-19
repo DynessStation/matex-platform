@@ -21,5 +21,7 @@ export class ProductSelectedVariant {
     return obj !== null && 'variation_image' in obj;
   }
 
-  get isEnglish() { return this.router.url === '/en' || this.router.url.startsWith('/en/'); }
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
 }

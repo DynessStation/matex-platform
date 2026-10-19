@@ -1,5 +1,13 @@
 import { isPlatformBrowser, DatePipe, NgClass, AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  DOCUMENT,
+  Inject,
+  inject,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
@@ -93,8 +101,7 @@ export class Blog {
   public totalItems$: Observable<number> = this.blog$.pipe(map((blog) => blog?.total || 0));
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    const locale: 'id-ID' | 'en-US' =
-      this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
+    const locale: 'id-ID' | 'en-US' = this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
     this.seo.apply({
       locale,
       title: locale === 'en-US' ? 'Articles | MATEX' : 'Artikel | MATEX',

@@ -9,7 +9,13 @@ import { ICategory } from '../../../shared/interface/category.interface';
 
 @Component({
   selector: 'app-tree',
-  imports: [TranslateModule, FormsModule, ReactiveFormsModule, TreeNode, NoData],
+  imports: [
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TreeNode,
+    NoData,
+  ],
   templateUrl: './tree.html',
   styleUrl: './tree.scss',
 })
@@ -24,10 +30,10 @@ export class Tree {
   public dataToShow: ICategory[] = [];
 
   constructor() {
-    this.treeSearch.valueChanges.subscribe(data => {
+    this.treeSearch.valueChanges.subscribe((data) => {
       if (data) {
         this.dataToShow = [];
-        (this.data() ?? []).forEach(item => {
+        (this.data() ?? []).forEach((item) => {
           this.hasValue(item) && this.dataToShow.push(item);
         });
       } else {
@@ -42,7 +48,11 @@ export class Tree {
 
   hasValue(item: ICategory) {
     let valueToReturn = false;
-    if (item[this.displayKey()].toLowerCase().includes(this.treeSearch?.value?.toLowerCase())) {
+    if (
+      item[this.displayKey()]
+        .toLowerCase()
+        .includes(this.treeSearch?.value?.toLowerCase())
+    ) {
       valueToReturn = true;
     }
     item[this.recursionKey()]?.length &&

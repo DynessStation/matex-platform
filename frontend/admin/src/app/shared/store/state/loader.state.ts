@@ -43,7 +43,10 @@ export class LoaderState {
   }
 
   @Action(ShowLoaderAction)
-  public showLoaderAction(ctx: StateContext<LoaderStateModel>, action: ShowLoaderAction) {
+  public showLoaderAction(
+    ctx: StateContext<LoaderStateModel>,
+    action: ShowLoaderAction,
+  ) {
     const state = ctx.getState();
     const count = state?.loadingCount ? state?.loadingCount : 0;
     ctx.patchState({ status: action?.loading, loadingCount: count + 1 });

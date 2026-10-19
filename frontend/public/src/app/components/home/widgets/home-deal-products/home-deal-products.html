@@ -15,7 +15,10 @@
                 }
               </div>
             </div>
-            <div class="swiper product-thumbnail-slider thumbnail-image-box" #productGalleryThumbSwiper>
+            <div
+              class="swiper product-thumbnail-slider thumbnail-image-box"
+              #productGalleryThumbSwiper
+            >
               <div class="swiper-wrapper">
                 @for (gallery of product.product_galleries || []; track gallery) {
                   <div class="swiper-slide">
@@ -33,7 +36,8 @@
             <h6 class="name text-capitalize">{{ product.name }}</h6>
           </a>
           <h5 class="price">
-            {{ product.sale_price | currencySymbol }} <del>{{ product.price | currencySymbol }}</del>
+            {{ product.sale_price | currencySymbol }}
+            <del>{{ product.price | currencySymbol }}</del>
           </h5>
         </div>
       </div>
@@ -186,7 +190,7 @@
                 </div>
                 <h6>
                   <span>
-                    {{ product.orders_count }}/{{ (product.orders_count + product.quantity) }}
+                    {{ product.orders_count }}/{{ product.orders_count + product.quantity }}
                   </span>
                   <span>Sold</span>
                 </h6>
@@ -207,7 +211,10 @@
                       @if (deal.product_galleries?.length) {
                         @for (image of deal.product_galleries || []; track image) {
                           <div class="swiper-slide">
-                            <a [routerLink]="['/product/' + (deal.slug || product.slug)]" class="main-image-box">
+                            <a
+                              [routerLink]="['/product/' + (deal.slug || product.slug)]"
+                              class="main-image-box"
+                            >
                               <img [src]="image.asset_url" class="img-fluid" alt="image" />
                             </a>
                           </div>
@@ -255,7 +262,9 @@
                   <div class="progress">
                     <div
                       class="progress-bar"
-                      [style.width.%]="(deal.orders_count / (deal.orders_count + deal.quantity)) * 100"
+                      [style.width.%]="
+                        (deal.orders_count / (deal.orders_count + deal.quantity)) * 100
+                      "
                     ></div>
                   </div>
                   <h5>

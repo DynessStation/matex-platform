@@ -14,6 +14,8 @@ export class TagService {
   private http = inject(HttpClient);
 
   getTags(payload?: Params): Observable<ITagModel> {
-    return this.http.get<ITagModel>(`${environment.URL}/tag.json`, { params: payload });
+    return this.http.get<ITagModel>(`${environment.URL}/tag.json`, {
+      params: payload,
+    });
   }
 }

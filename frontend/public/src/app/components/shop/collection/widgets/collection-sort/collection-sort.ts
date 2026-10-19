@@ -118,7 +118,8 @@ export class CollectionSort {
       { value: 'high-low', label: this.isEnglish ? 'Highest price' : 'Harga tertinggi' },
     ];
     this.sortingItem = [10, 25, 50, 100].map((value) => ({
-      value: String(value), label: `${value} ${this.isEnglish ? 'products' : 'produk'}`,
+      value: String(value),
+      label: `${value} ${this.isEnglish ? 'products' : 'produk'}`,
     }));
   }
 

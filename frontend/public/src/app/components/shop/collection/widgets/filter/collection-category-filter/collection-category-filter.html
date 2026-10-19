@@ -8,7 +8,9 @@
 }
 @if (((filteredCategories$ | async) || []).length) {
   <ul class="category-list custom-padding custom-height">
-    <div *ngTemplateOutlet="recursiveCategories; context: { $implicit: (filteredCategories$ | async) }"></div>
+    <div
+      *ngTemplateOutlet="recursiveCategories; context: { $implicit: (filteredCategories$ | async) }"
+    ></div>
     <ng-template #recursiveCategories let-categories>
       @for (category of categories | filter: searchText : 'subcategories'; track category) {
         <li>
@@ -39,7 +41,7 @@
       }
     </ng-template>
   </ul>
-  @if (((filteredCategories$ | async) || [] | filter : searchText : 'subcategories').length === 0) {
+  @if (((filteredCategories$ | async) || [] | filter: searchText : 'subcategories').length === 0) {
     <div class="search-not-found-box">
       <h5>No Category Found</h5>
     </div>

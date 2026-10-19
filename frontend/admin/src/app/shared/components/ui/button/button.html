@@ -2,12 +2,17 @@
   [class]="class()"
   [id]="id()"
   [type]="type()"
-  [class.disabled]="disabled() || ((spinnerStatus$ | async) && spinner() && buttonId === id())"
+  [class.disabled]="
+    disabled() || ((spinnerStatus$ | async) && spinner() && buttonId === id())
+  "
   [disabled]="disabled() || ((spinnerStatus$ | async) && buttonId === id())"
   (click)="onClick(id())"
 >
   <div
-    [ngClass]="{ 'position-relative spinning' : spinner() && (spinnerStatus$ | async) && buttonId && buttonId === id() }"
+    [ngClass]="{
+      'position-relative spinning':
+        spinner() && (spinnerStatus$ | async) && buttonId && buttonId === id(),
+    }"
   >
     <ng-content />
   </div>

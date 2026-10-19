@@ -48,7 +48,7 @@ export class StoreState {
 
   @Selector()
   static stores(state: StoreStateModel) {
-    return state.store.data.map(store => {
+    return state.store.data.map((store) => {
       return { label: store?.store_name, value: store?.id };
     });
   }
@@ -62,7 +62,7 @@ export class StoreState {
   getStores(ctx: StateContext<StoreStateModel>, action: GetStoresAction) {
     return this.storeService.getStores(action.payload).pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             store: {
               data: result.data,
@@ -70,7 +70,7 @@ export class StoreState {
             },
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -86,15 +86,15 @@ export class StoreState {
   edit(ctx: StateContext<StoreStateModel>, { id }: EditStoreAction) {
     return this.storeService.getStores().pipe(
       tap({
-        next: results => {
+        next: (results) => {
           const state = ctx.getState();
-          const result = results.data.find(store => store.id == id);
+          const result = results.data.find((store) => store.id == id);
           ctx.patchState({
             ...state,
             selectedStore: result,
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -102,7 +102,10 @@ export class StoreState {
   }
 
   @Action(UpdateStoreAction)
-  update(_ctx: StateContext<StoreStateModel>, { payload: _payload, id: _id }: UpdateStoreAction) {
+  update(
+    _ctx: StateContext<StoreStateModel>,
+    { payload: _payload, id: _id }: UpdateStoreAction,
+  ) {
     // Update Store Logic Here
   }
 
@@ -128,7 +131,10 @@ export class StoreState {
   }
 
   @Action(DeleteAllStoreAction)
-  deleteAll(_ctx: StateContext<StoreStateModel>, { ids: _ids }: DeleteAllStoreAction) {
+  deleteAll(
+    _ctx: StateContext<StoreStateModel>,
+    { ids: _ids }: DeleteAllStoreAction,
+  ) {
     // Delete All Store Status Logic Here
   }
 }

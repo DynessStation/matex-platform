@@ -1,7 +1,8 @@
 <div [class]="class()">
   <label [attr.for]="for()" [class]="labelClass()">
-    {{ label() | translate }} @if(required()){
-    <span class="theme-color ms-2 required-dot">*</span>
+    {{ label() | translate }}
+    @if (required()) {
+      <span class="theme-color ms-2 required-dot">*</span>
     }
   </label>
   <div [class]="gridClass()">

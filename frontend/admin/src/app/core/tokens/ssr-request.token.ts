@@ -6,5 +6,4 @@ export interface SsrRequest {
   };
 }
 
-export const SSR_REQUEST =
-  new InjectionToken<SsrRequest>('SSR_REQUEST');
+export const SSR_REQUEST = new InjectionToken<SsrRequest>('SSR_REQUEST');

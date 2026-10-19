@@ -1,6 +1,16 @@
-import { Component, TemplateRef, inject, viewChild, input } from '@angular/core';
+import {
+  Component,
+  TemplateRef,
+  inject,
+  viewChild,
+  input,
+} from '@angular/core';
 
-import { ModalDismissReasons, NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  ModalDismissReasons,
+  NgbModal,
+  NgbModule,
+} from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { NgxDropzoneChangeEvent, NgxDropzoneModule } from 'ngx-dropzone';
@@ -42,11 +52,11 @@ export class ImportCsvModal {
         windowClass: 'theme-modal modal-xl media-modal',
       })
       .result.then(
-        result => {
+        (result) => {
           `Result ${result}`;
           this.closeResult = `Closed with: ${result}`;
         },
-        reason => {
+        (reason) => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         },
       );

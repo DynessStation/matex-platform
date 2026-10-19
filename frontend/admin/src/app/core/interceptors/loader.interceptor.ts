@@ -3,22 +3,22 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-} from "@angular/common/http";
+} from '@angular/common/http';
 
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject } from '@angular/core';
 
-import { Store } from "@ngxs/store";
+import { Store } from '@ngxs/store';
 
-import { Observable, finalize } from "rxjs";
+import { Observable, finalize } from 'rxjs';
 
 import {
   HideButtonSpinnerAction,
   HideLoaderAction,
   ShowButtonSpinnerAction,
   ShowLoaderAction,
-} from "../../shared/store/action/loader.action";
+} from '../../shared/store/action/loader.action';
 
-import { SKIP_GLOBAL_LOADER } from "./loader-context";
+import { SKIP_GLOBAL_LOADER } from './loader-context';
 
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {
@@ -36,7 +36,7 @@ export class LoaderInterceptor implements HttpInterceptor {
     req: HttpRequest<T>,
     next: HttpHandler,
   ): Observable<HttpEvent<T>> {
-    const isGet = req.method === "GET";
+    const isGet = req.method === 'GET';
 
     const skipGlobalLoader = req.context.get(SKIP_GLOBAL_LOADER);
 

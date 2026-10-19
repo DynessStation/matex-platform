@@ -25,7 +25,13 @@ import { TagState } from '../../../shared/store/state/tag.state';
 
 @Component({
   selector: 'app-form-tag',
-  imports: [TranslateModule, FormsModule, ReactiveFormsModule, FormFields, Button],
+  imports: [
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FormFields,
+    Button,
+  ],
   templateUrl: './form-tag.html',
   styleUrl: './form-tag.scss',
 })
@@ -59,7 +65,7 @@ export class FormTag {
   ngOnInit() {
     this.route.params
       .pipe(
-        switchMap(params => {
+        switchMap((params) => {
           if (!params['id']) return of();
           return this.store
             .dispatch(new EditTagAction(params['id']))
@@ -67,7 +73,7 @@ export class FormTag {
         }),
         takeUntil(this.destroy$),
       )
-      .subscribe(tag => {
+      .subscribe((tag) => {
         this.tag = tag;
         this.form.patchValue({
           name: this.tag?.name,
@@ -88,7 +94,8 @@ export class FormTag {
     if (this.form.valid) {
       this.store.dispatch(action).subscribe({
         complete: () => {
-          if (this.tagType() == 'post') void this.router.navigateByUrl('/blog/tag');
+          if (this.tagType() == 'post')
+            void this.router.navigateByUrl('/blog/tag');
           else void this.router.navigateByUrl('/tag');
         },
       });

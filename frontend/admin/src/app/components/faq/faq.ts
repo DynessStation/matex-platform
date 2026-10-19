@@ -10,7 +10,10 @@ import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';
 import { IFaq, IFaqModel } from '../../shared/interface/faq.interface';
-import { ITableClickedAction, ITableConfig } from '../../shared/interface/table.interface';
+import {
+  ITableClickedAction,
+  ITableConfig,
+} from '../../shared/interface/table.interface';
 import {
   DeleteAllFaqAction,
   DeleteFaqAction,
@@ -21,7 +24,13 @@ import { FaqState } from '../../shared/store/state/faq.state';
 
 @Component({
   selector: 'app-faq',
-  imports: [TranslateModule, RouterModule, HasPermissionDirective, PageWrapper, Table],
+  imports: [
+    TranslateModule,
+    RouterModule,
+    HasPermissionDirective,
+    PageWrapper,
+    Table,
+  ],
   templateUrl: './faq.html',
   styleUrl: './faq.scss',
 })
@@ -40,10 +49,25 @@ export class Faq {
 
   public tableConfig: ITableConfig = {
     columns: [
-      { title: 'faq_admin.question', dataField: 'question', sortable: true, sort_direction: 'asc' },
-      { title: 'faq_admin.key', dataField: 'key', sortable: true, sort_direction: 'asc' },
+      {
+        title: 'faq_admin.question',
+        dataField: 'question',
+        sortable: true,
+        sort_direction: 'asc',
+      },
+      {
+        title: 'faq_admin.key',
+        dataField: 'key',
+        sortable: true,
+        sort_direction: 'asc',
+      },
       { title: 'faq_admin.translations', dataField: 'translation_label' },
-      { title: 'Urutan', dataField: 'sort_order', sortable: true, sort_direction: 'asc' },
+      {
+        title: 'Urutan',
+        dataField: 'sort_order',
+        sortable: true,
+        sort_direction: 'asc',
+      },
       {
         title: 'created_at',
         dataField: 'created',
@@ -60,7 +84,12 @@ export class Faq {
       },
     ],
     rowActions: [
-      { label: 'Edit', actionToPerform: 'edit', icon: 'ri-pencil-line', permission: 'faq.update' },
+      {
+        label: 'Edit',
+        actionToPerform: 'edit',
+        icon: 'ri-pencil-line',
+        permission: 'faq.update',
+      },
       {
         label: 'Delete',
         actionToPerform: 'delete',
@@ -73,10 +102,12 @@ export class Faq {
   };
 
   ngOnInit() {
-    this.faq$.subscribe(faq => {
-      this.tableConfig.data = (faq?.data ?? []).map(item => ({
+    this.faq$.subscribe((faq) => {
+      this.tableConfig.data = (faq?.data ?? []).map((item) => ({
         ...item,
-        translation_label: item.translation_complete ? 'Indonesia + English' : 'Belum lengkap',
+        translation_label: item.translation_complete
+          ? 'Indonesia + English'
+          : 'Belum lengkap',
       }));
       this.tableConfig.total = faq?.pagination.total ?? 0;
     });

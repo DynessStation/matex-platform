@@ -15,16 +15,24 @@ export class ProductInformation {
   product = input<Product | null>(null);
   private router = inject(Router);
 
-  get isEnglish() { return this.router.url === '/en' || this.router.url.startsWith('/en/'); }
+  get isEnglish() {
+    return this.router.url === '/en' || this.router.url.startsWith('/en/');
+  }
   originLabel() {
-    return [this.product()?.origin_city, this.product()?.origin_province, this.product()?.country_origin]
+    return [
+      this.product()?.origin_city,
+      this.product()?.origin_province,
+      this.product()?.country_origin,
+    ]
       .filter(Boolean)
       .join(', ');
   }
   stockLabel(status?: string) {
     const labels: Record<string, [string, string]> = {
-      in_stock: ['Tersedia', 'Available'], out_of_stock: ['Habis', 'Out of stock'],
-      preorder: ['Pre-order', 'Pre-order'], made_to_order: ['Dibuat sesuai pesanan', 'Made to order'],
+      in_stock: ['Tersedia', 'Available'],
+      out_of_stock: ['Habis', 'Out of stock'],
+      preorder: ['Pre-order', 'Pre-order'],
+      made_to_order: ['Dibuat sesuai pesanan', 'Made to order'],
     };
     const label = labels[status ?? ''];
     return label ? label[this.isEnglish ? 1 : 0] : status;

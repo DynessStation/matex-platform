@@ -95,12 +95,17 @@ export class CategoryState {
       );
   }
   @Action(ReorderCategoriesAction)
-  reorder(_: StateContext<CategoryStateModel>, action: ReorderCategoriesAction) {
-    return this.service.reorder(action.items).pipe(
-      tap((result) =>
-        this.notes.showSuccess(this.messages.resolveResponse(result)),
-      ),
-    );
+  reorder(
+    _: StateContext<CategoryStateModel>,
+    action: ReorderCategoriesAction,
+  ) {
+    return this.service
+      .reorder(action.items)
+      .pipe(
+        tap((result) =>
+          this.notes.showSuccess(this.messages.resolveResponse(result)),
+        ),
+      );
   }
   @Action(DeleteCategoryAction)
   delete(_: StateContext<CategoryStateModel>, action: DeleteCategoryAction) {

@@ -37,8 +37,10 @@ export class HomeNewsletter {
   }
 
   whatsapp(channels: PublicContactChannel[]): PublicContactChannel | null {
-    return channels.find((channel) => channel.type === 'whatsapp' && channel.is_primary)
-      ?? channels.find((channel) => channel.type === 'whatsapp')
-      ?? null;
+    return (
+      channels.find((channel) => channel.type === 'whatsapp' && channel.is_primary) ??
+      channels.find((channel) => channel.type === 'whatsapp') ??
+      null
+    );
   }
 }

@@ -1,24 +1,24 @@
-import { Injectable, PLATFORM_ID, inject } from "@angular/core";
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 
-import { isPlatformBrowser } from "@angular/common";
+import { isPlatformBrowser } from '@angular/common';
 
 import {
   CanActivate,
   CanActivateChild,
   Router,
   UrlTree,
-} from "@angular/router";
+} from '@angular/router';
 
-import { Store } from "@ngxs/store";
+import { Store } from '@ngxs/store';
 
-import { Observable, catchError, map, of, take } from "rxjs";
+import { Observable, catchError, map, of, take } from 'rxjs';
 
-import { CheckAuthAction } from "../../shared/store/action/auth.action";
+import { CheckAuthAction } from '../../shared/store/action/auth.action';
 
-import { AuthState } from "../../shared/store/state/auth.state";
+import { AuthState } from '../../shared/store/state/auth.state';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
   private store = inject(Store);
@@ -82,10 +82,10 @@ export class AuthGuard implements CanActivate, CanActivateChild {
           return true;
         }
 
-        return this.router.createUrlTree(["/auth/login"]);
+        return this.router.createUrlTree(['/auth/login']);
       }),
 
-      catchError(() => of(this.router.createUrlTree(["/auth/login"]))),
+      catchError(() => of(this.router.createUrlTree(['/auth/login']))),
     );
   }
 }

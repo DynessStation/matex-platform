@@ -13,8 +13,18 @@ export class Timer implements OnInit, OnDestroy {
   readonly type = input<string>('timer-one');
   readonly class = input<string>('product-timer');
 
-  private timeSubject = new BehaviorSubject<{ days: number; hours: number; minutes: number; seconds: number } | null>(null);
-  public time$: Observable<{ days: number; hours: number; minutes: number; seconds: number } | null> = this.timeSubject.asObservable();
+  private timeSubject = new BehaviorSubject<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null>(null);
+  public time$: Observable<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null> = this.timeSubject.asObservable();
 
   public interval?: ReturnType<typeof setInterval>;
 
@@ -22,7 +32,7 @@ export class Timer implements OnInit, OnDestroy {
   public formattedHours = '00:00:00';
   public formattedTime = '00:00';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit(): void {
     this.updateTimer();

@@ -55,7 +55,7 @@ export class MenuState {
   getMenu(ctx: StateContext<MenuStateModel>, action: GetMenuAction) {
     return this.menuService.getMenu(action.payload).pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             menu: {
               data: result.data,
@@ -63,7 +63,7 @@ export class MenuState {
             },
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -79,15 +79,15 @@ export class MenuState {
   edit(ctx: StateContext<MenuStateModel>, { id }: EditMenuAction) {
     return this.menuService.getMenu().pipe(
       tap({
-        next: results => {
+        next: (results) => {
           const state = ctx.getState();
-          const result = results.data.find(menu => menu.id == id);
+          const result = results.data.find((menu) => menu.id == id);
           ctx.patchState({
             ...state,
             selectedMenu: result,
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),
@@ -95,12 +95,18 @@ export class MenuState {
   }
 
   @Action(UpdateMenuAction)
-  update(_ctx: StateContext<MenuStateModel>, { payload: _payload, id: _id }: UpdateMenuAction) {
+  update(
+    _ctx: StateContext<MenuStateModel>,
+    { payload: _payload, id: _id }: UpdateMenuAction,
+  ) {
     // Update Menu Logic Here
   }
 
   @Action(UpdateSortMenuAction)
-  updateShort(_ctx: StateContext<MenuStateModel>, _action: UpdateSortMenuAction) {
+  updateShort(
+    _ctx: StateContext<MenuStateModel>,
+    _action: UpdateSortMenuAction,
+  ) {
     // Update Short Logic Here
   }
 

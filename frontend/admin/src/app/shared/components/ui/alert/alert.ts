@@ -19,7 +19,7 @@ export class Alert {
   public alert: Alert;
 
   constructor() {
-    this.notificationService.alertSubject.subscribe(alert => {
+    this.notificationService.alertSubject.subscribe((alert) => {
       this.alert = <Alert>alert;
     });
   }

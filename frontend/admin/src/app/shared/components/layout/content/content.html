@@ -3,7 +3,10 @@
     <app-header />
   </div>
   <div class="page-body-wrapper">
-    <div class="sidebar-wrapper" [class.close_icon]="navServices.collapseSidebar">
+    <div
+      class="sidebar-wrapper"
+      [class.close_icon]="navServices.collapseSidebar"
+    >
       <app-sidebar-menu-skeleton [loading]="navServices.sidebarLoading" />
       <app-sidebar />
     </div>

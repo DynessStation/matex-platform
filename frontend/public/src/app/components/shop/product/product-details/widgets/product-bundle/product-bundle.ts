@@ -1,4 +1,10 @@
-import { Component, inject, input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -99,9 +105,9 @@ export class ProductBundle {
           const params: CartAddOrUpdate = {
             id:
               this.cartItem &&
-                product.selected_variant &&
-                this.cartItem?.variation &&
-                product.selected_variant?.id == this.cartItem?.variation?.id
+              product.selected_variant &&
+              this.cartItem?.variation &&
+              product.selected_variant?.id == this.cartItem?.variation?.id
                 ? this.cartItem.id
                 : null,
             product_id: product?.id,

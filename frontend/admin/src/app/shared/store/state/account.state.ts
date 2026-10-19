@@ -55,14 +55,14 @@ export class AccountState {
   getUserDetails(ctx: StateContext<AccountStateModel>) {
     return this.accountService.getUserDetails().pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             user: result,
             permissions: result.permission,
             roleName: result.role.name,
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),

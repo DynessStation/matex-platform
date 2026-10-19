@@ -32,13 +32,16 @@ export class CountryState {
 
   @Selector()
   static countries(state: CountryStateModel) {
-    return state?.country?.data?.map(cn => {
+    return state?.country?.data?.map((cn) => {
       return { label: cn?.name, value: cn?.id };
     });
   }
 
   @Action(GetCountriesAction)
-  getCountries(ctx: StateContext<CountryStateModel>, _action: GetCountriesAction) {
+  getCountries(
+    ctx: StateContext<CountryStateModel>,
+    _action: GetCountriesAction,
+  ) {
     const state = ctx.getState();
     if (state?.country?.data?.length) {
       // If the country has been already loaded
@@ -47,14 +50,14 @@ export class CountryState {
     }
     return this.countryService.getCountries().pipe(
       tap({
-        next: result => {
+        next: (result) => {
           ctx.patchState({
             country: {
               data: result,
             },
           });
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),

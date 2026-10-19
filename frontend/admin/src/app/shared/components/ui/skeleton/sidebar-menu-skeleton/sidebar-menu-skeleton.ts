@@ -16,7 +16,9 @@ import { SettingState } from '../../../../store/state/setting.state';
 export class SidebarMenuSkeleton {
   readonly loading = input<boolean>(false);
 
-  setting$: Observable<IValues> = inject(Store).select(SettingState.setting) as Observable<IValues>;
+  setting$: Observable<IValues> = inject(Store).select(
+    SettingState.setting,
+  ) as Observable<IValues>;
 
   public skeletonItems = Array.from({ length: 20 }, (_, index) => index);
 }

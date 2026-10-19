@@ -1,7 +1,7 @@
-import { IAttachment } from "./attachment.interface";
-import { IRole, IPermission } from "./role.interface";
-import { IStores } from "./store.interface";
-import { IWallet } from "./wallet.interface";
+import { IAttachment } from './attachment.interface';
+import { IRole, IPermission } from './role.interface';
+import { IStores } from './store.interface';
+import { IWallet } from './wallet.interface';
 
 export interface IAccountUser {
   id: number;

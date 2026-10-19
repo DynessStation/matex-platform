@@ -21,7 +21,14 @@ import { SettingState } from '../../../shared/store/state/setting.state';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [TranslateModule, FormsModule, ReactiveFormsModule, Alert, Button, AsyncPipe],
+  imports: [
+    TranslateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    Alert,
+    Button,
+    AsyncPipe,
+  ],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss',
 })
@@ -32,7 +39,9 @@ export class ForgotPassword {
 
   public form: FormGroup;
 
-  setting$: Observable<IValues> = inject(Store).select(SettingState.setting) as Observable<IValues>;
+  setting$: Observable<IValues> = inject(Store).select(
+    SettingState.setting,
+  ) as Observable<IValues>;
 
   constructor() {
     this.form = this.formBuilder.group({

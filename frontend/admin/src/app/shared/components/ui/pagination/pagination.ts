@@ -26,7 +26,9 @@ export class Pagination {
     this.currentPage = changes['currentPage']
       ? changes['currentPage'].currentValue
       : this.currentPage;
-    this.pageSize = changes['pageSize'] ? changes['pageSize'].currentValue : this.pageSize;
+    this.pageSize = changes['pageSize']
+      ? changes['pageSize'].currentValue
+      : this.pageSize;
     this.paginate = this.getPager(this.total, this.currentPage, this.pageSize);
   }
 
@@ -55,7 +57,9 @@ export class Pagination {
       // Less than or equal to the paginateRange
       startPage = 1;
       endPage = Number(totalPages);
-    } else if (Number(currentPage) <= Number(Math.floor(Number(paginateRange) / 2))) {
+    } else if (
+      Number(currentPage) <= Number(Math.floor(Number(paginateRange) / 2))
+    ) {
       // Near the beginning
       startPage = 1;
       endPage = Number(paginateRange);
@@ -68,18 +72,23 @@ export class Pagination {
       endPage = Number(totalPages);
     } else {
       // In the middle
-      startPage = Number(currentPage) - Number(Math.floor(Number(paginateRange) / 2));
-      endPage = Number(currentPage) + Number(Math.floor(Number(paginateRange) / 2));
+      startPage =
+        Number(currentPage) - Number(Math.floor(Number(paginateRange) / 2));
+      endPage =
+        Number(currentPage) + Number(Math.floor(Number(paginateRange) / 2));
     }
 
     // calculate start and end item indexes
     let startIndex = (Number(currentPage) - 1) * Number(pageSize);
-    let endIndex = Math.min(Number(startIndex) + Number(pageSize) - 1, Number(totalItems) - 1);
+    let endIndex = Math.min(
+      Number(startIndex) + Number(pageSize) - 1,
+      Number(totalItems) - 1,
+    );
 
     // create an array of pages to ng-repeat in the pager control
-    let pages = Array.from(Array(Number(endPage) + 1 - Number(startPage)).keys()).map(
-      i => Number(startPage) + Number(i),
-    );
+    let pages = Array.from(
+      Array(Number(endPage) + 1 - Number(startPage)).keys(),
+    ).map((i) => Number(startPage) + Number(i));
 
     // return object with all pager properties required by the view
     return {

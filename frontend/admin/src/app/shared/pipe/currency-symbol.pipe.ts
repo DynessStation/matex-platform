@@ -24,7 +24,8 @@ export class CurrencySymbolPipe implements PipeTransform {
     const setting = this.store.selectSnapshot(SettingState.setting);
     const exchangeRate = setting?.general?.default_currency?.exchange_rate ?? 1;
     const symbol = setting?.general?.default_currency?.symbol ?? '$';
-    const symbolPosition = setting?.general?.default_currency?.symbol_position ?? position;
+    const symbolPosition =
+      setting?.general?.default_currency?.symbol_position ?? position;
 
     // Adjust value by exchange rate
     value = value * exchangeRate;

@@ -1,9 +1,4 @@
-import {
-  DOCUMENT,
-  Injectable,
-  OnDestroy,
-  inject,
-} from '@angular/core';
+import { DOCUMENT, Injectable, OnDestroy, inject } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import {
@@ -29,11 +24,9 @@ export class SessionService implements OnDestroy {
   private resumeSubscription?: Subscription;
   private countdownSubscription?: Subscription;
 
-  private remainingTimeSubject =
-    new BehaviorSubject<number>(0);
+  private remainingTimeSubject = new BehaviorSubject<number>(0);
 
-  remainingTime$ =
-    this.remainingTimeSubject.asObservable();
+  remainingTime$ = this.remainingTimeSubject.asObservable();
 
   constructor() {
     this.initializeResumeWatcher();
@@ -59,9 +52,7 @@ export class SessionService implements OnDestroy {
 
     this.remainingTimeSubject.next(remaining);
 
-    this.expirySubscription = timer(
-      remaining,
-    ).subscribe(() => {
+    this.expirySubscription = timer(remaining).subscribe(() => {
       this.logout();
     });
 
@@ -76,9 +67,7 @@ export class SessionService implements OnDestroy {
   }
 
   private startCountdown(): void {
-    this.countdownSubscription = interval(
-      1000,
-    ).subscribe(() => {
+    this.countdownSubscription = interval(1000).subscribe(() => {
       const expiresAt = this.getExpiresAt();
 
       if (!expiresAt) {
@@ -86,10 +75,7 @@ export class SessionService implements OnDestroy {
         return;
       }
 
-      const remaining = Math.max(
-        0,
-        expiresAt - Date.now(),
-      );
+      const remaining = Math.max(0, expiresAt - Date.now());
 
       this.remainingTimeSubject.next(remaining);
     });
@@ -103,10 +89,7 @@ export class SessionService implements OnDestroy {
     const window = this.document.defaultView;
 
     this.resumeSubscription = merge(
-      fromEvent(
-        this.document,
-        'visibilitychange',
-      ),
+      fromEvent(this.document, 'visibilitychange'),
       fromEvent(window, 'focus'),
     ).subscribe(() => {
       if (this.document.hidden) {
@@ -118,10 +101,7 @@ export class SessionService implements OnDestroy {
   }
 
   private checkSession(): void {
-    const authenticated =
-      this.store.selectSnapshot(
-        AuthState.isAuthenticated,
-      );
+    const authenticated = this.store.selectSnapshot(AuthState.isAuthenticated);
 
     if (!authenticated) {
       return;
@@ -142,10 +122,7 @@ export class SessionService implements OnDestroy {
   }
 
   private getExpiresAt(): number | null {
-    const session =
-      this.store.selectSnapshot(
-        AuthState.session,
-      );
+    const session = this.store.selectSnapshot(AuthState.session);
 
     return session?.expires_at ?? null;
   }
@@ -156,9 +133,7 @@ export class SessionService implements OnDestroy {
 
     this.remainingTimeSubject.next(0);
 
-    this.store.dispatch(
-      new LogoutAction(),
-    );
+    this.store.dispatch(new LogoutAction());
   }
 
   private stopExpiryTimer(): void {

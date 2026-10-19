@@ -67,5 +67,7 @@ export class ExportProductAction {
 
 export class DownloadAction {
   static readonly type = '[Product] Download';
-  constructor(public payload: { product_id: number; variation_id?: number | null }) {}
+  constructor(
+    public payload: { product_id: number; variation_id?: number | null },
+  ) {}
 }

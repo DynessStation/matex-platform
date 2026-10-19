@@ -1,9 +1,37 @@
 <div class="mobile-menu d-sm-none">
   <ul>
-    <li><a [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }" [routerLink]="path('home')"><i class="ri-home-2-line"></i><span>{{ navigation.locale() === 'en-US' ? 'Home' : 'Beranda' }}</span></a></li>
-    <li><a [routerLinkActive]="['active']" [routerLink]="path('catalog')"><i class="ri-layout-grid-line"></i><span>{{ navigation.locale() === 'en-US' ? 'Catalog' : 'Katalog' }}</span></a></li>
-    <li><a [routerLinkActive]="['active']" [routerLink]="path('search')"><i class="ri-search-line"></i><span>{{ navigation.locale() === 'en-US' ? 'Search' : 'Cari' }}</span></a></li>
-    <li><a [routerLinkActive]="['active']" [routerLink]="path('articles')"><i class="ri-article-line"></i><span>{{ navigation.locale() === 'en-US' ? 'Articles' : 'Artikel' }}</span></a></li>
-    <li><a [routerLinkActive]="['active']" [routerLink]="path('contact')"><i class="ri-contacts-line"></i><span>{{ navigation.locale() === 'en-US' ? 'Contact' : 'Kontak' }}</span></a></li>
+    <li>
+      <a
+        [routerLinkActive]="['active']"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [routerLink]="path('home')"
+        ><i class="ri-home-2-line"></i
+        ><span>{{ navigation.locale() === 'en-US' ? 'Home' : 'Beranda' }}</span></a
+      >
+    </li>
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="path('catalog')"
+        ><i class="ri-layout-grid-line"></i
+        ><span>{{ navigation.locale() === 'en-US' ? 'Catalog' : 'Katalog' }}</span></a
+      >
+    </li>
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="path('search')"
+        ><i class="ri-search-line"></i
+        ><span>{{ navigation.locale() === 'en-US' ? 'Search' : 'Cari' }}</span></a
+      >
+    </li>
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="path('articles')"
+        ><i class="ri-article-line"></i
+        ><span>{{ navigation.locale() === 'en-US' ? 'Articles' : 'Artikel' }}</span></a
+      >
+    </li>
+    <li>
+      <a [routerLinkActive]="['active']" [routerLink]="path('contact')"
+        ><i class="ri-contacts-line"></i
+        ><span>{{ navigation.locale() === 'en-US' ? 'Contact' : 'Kontak' }}</span></a
+      >
+    </li>
   </ul>
 </div>

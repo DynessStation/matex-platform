@@ -27,7 +27,7 @@ export class UpdatePasswordAction {
 
 export class LogoutAction {
   static readonly type = '[Auth] Logout';
-} 
+}
 
 export class AuthClearAction {
   static readonly type = '[Auth] Clear';

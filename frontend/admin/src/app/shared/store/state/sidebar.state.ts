@@ -43,7 +43,11 @@ export class SidebarState {
     return state.badges;
   }
 
-  private updateBadgeValueRecursive(menuItems: ISidebar[], path: string, badgeValue: number) {
+  private updateBadgeValueRecursive(
+    menuItems: ISidebar[],
+    path: string,
+    badgeValue: number,
+  ) {
     for (const item of menuItems) {
       if (item.path && item.path.toString() == path.toString()) {
         item.badgeValue = badgeValue;
@@ -68,20 +72,29 @@ export class SidebarState {
   getBadges(ctx: StateContext<SidebarStateModel>, action: GetBadgesAction) {
     return this.navService.getBadges(action.payload).pipe(
       tap({
-        next: result => {
+        next: (result) => {
           const state = ctx.getState();
           ctx.patchState({
             ...state,
             badges: result,
           });
           this.store.dispatch(
-            new UpdateBadgeValueAction('/product', result?.product?.total_in_approved_products),
+            new UpdateBadgeValueAction(
+              '/product',
+              result?.product?.total_in_approved_products,
+            ),
           );
           this.store.dispatch(
-            new UpdateBadgeValueAction('/store', result?.store?.total_in_approved_stores),
+            new UpdateBadgeValueAction(
+              '/store',
+              result?.store?.total_in_approved_stores,
+            ),
           );
           this.store.dispatch(
-            new UpdateBadgeValueAction('/refund', result?.refund?.total_pending_refunds),
+            new UpdateBadgeValueAction(
+              '/refund',
+              result?.refund?.total_pending_refunds,
+            ),
           );
           this.store.dispatch(
             new UpdateBadgeValueAction(
@@ -90,7 +103,7 @@ export class SidebarState {
             ),
           );
         },
-        error: err => {
+        error: (err) => {
           throw new Error(err?.error?.message);
         },
       }),

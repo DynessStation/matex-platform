@@ -89,8 +89,7 @@ export class Collection {
   private recentProductIds = '';
 
   constructor(private route: ActivatedRoute) {
-    const locale: 'id-ID' | 'en-US' =
-      this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
+    const locale: 'id-ID' | 'en-US' = this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
     this.seo.apply({
       locale,
       title: locale === 'en-US' ? 'Product Catalog | MATEX' : 'Katalog Produk | MATEX',

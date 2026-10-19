@@ -1,5 +1,8 @@
 import { IStores } from '../../interface/store.interface';
-import { IAccountUser, IAccountUserUpdatePassword } from './../../interface/account.interface';
+import {
+  IAccountUser,
+  IAccountUserUpdatePassword,
+} from './../../interface/account.interface';
 
 export class GetUserDetailsAction {
   static readonly type = '[Account] User Get';

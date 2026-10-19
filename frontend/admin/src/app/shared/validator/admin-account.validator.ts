@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export class AdminAccountValidator {
   /**
@@ -13,7 +13,7 @@ export class AdminAccountValidator {
    */
   static nameValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = String(control.value ?? "").trim();
+      const value = String(control.value ?? '').trim();
 
       if (!value) {
         return null;
@@ -36,7 +36,7 @@ export class AdminAccountValidator {
    */
   static alias(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = String(control.value ?? "");
+      const value = String(control.value ?? '');
 
       if (!value) {
         return null;
@@ -57,7 +57,7 @@ export class AdminAccountValidator {
    */
   static phone(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = String(control.value ?? "");
+      const value = String(control.value ?? '');
 
       if (!value) {
         return null;
@@ -69,7 +69,7 @@ export class AdminAccountValidator {
         };
       }
 
-      if (value.startsWith("0")) {
+      if (value.startsWith('0')) {
         return {
           phoneStartsWithZero: true,
         };
@@ -88,7 +88,7 @@ export class AdminAccountValidator {
    */
   static password(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = String(control.value ?? "");
+      const value = String(control.value ?? '');
 
       if (!value) {
         return null;
@@ -111,8 +111,8 @@ export class AdminAccountValidator {
   }
 
   static passwordMatch(
-    passwordField = "password",
-    confirmField = "confirm_password",
+    passwordField = 'password',
+    confirmField = 'confirm_password',
   ): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const password = control.get(passwordField)?.value;

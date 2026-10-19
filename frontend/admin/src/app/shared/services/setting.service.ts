@@ -4,7 +4,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { IAppSetting, IGoogleReCaptcha, ISetting } from '../interface/setting.interface';
+import {
+  IAppSetting,
+  IGoogleReCaptcha,
+  ISetting,
+} from '../interface/setting.interface';
 
 @Injectable({
   providedIn: 'root',

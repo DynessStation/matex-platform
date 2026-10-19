@@ -5,7 +5,12 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { Params } from '../interface/core.interface';
-import { IFaqDetailResponse, IFaqModel, IFaqMutationResponse, IFaqPayload } from '../interface/faq.interface';
+import {
+  IFaqDetailResponse,
+  IFaqModel,
+  IFaqMutationResponse,
+  IFaqPayload,
+} from '../interface/faq.interface';
 import { IApiResponse } from '../interface/api-response.interface';
 
 @Injectable({
@@ -17,14 +22,25 @@ export class FaqService {
 
   getFaqs(payload?: Params): Observable<IFaqModel> {
     let params = new HttpParams();
-    if (payload?.['page'] !== undefined) params = params.set('page', String(payload['page'] || 1));
-    if (payload?.['paginate'] !== undefined) params = params.set('limit', String(payload['paginate']));
-    if (payload?.['limit'] !== undefined) params = params.set('limit', String(payload['limit']));
-    if (payload?.['search']) params = params.set('search', String(payload['search']));
-    if (payload?.['field']) params = params.set('field', String(payload['field']));
+    if (payload?.['page'] !== undefined)
+      params = params.set('page', String(payload['page'] || 1));
+    if (payload?.['paginate'] !== undefined)
+      params = params.set('limit', String(payload['paginate']));
+    if (payload?.['limit'] !== undefined)
+      params = params.set('limit', String(payload['limit']));
+    if (payload?.['search'])
+      params = params.set('search', String(payload['search']));
+    if (payload?.['field'])
+      params = params.set('field', String(payload['field']));
     if (payload?.['sort']) params = params.set('sort', String(payload['sort']));
     return this.http.get<IApiResponse<IFaqModel>>(this.apiUrl, { params }).pipe(
-      map(response => response.data ?? { data: [], pagination: { current_page: 1, per_page: 15, total: 0 } }),
+      map(
+        (response) =>
+          response.data ?? {
+            data: [],
+            pagination: { current_page: 1, per_page: 15, total: 0 },
+          },
+      ),
     );
   }
 
@@ -36,12 +52,18 @@ export class FaqService {
     return this.http.post<IFaqMutationResponse>(this.apiUrl, payload);
   }
 
-  updateFaq(id: string, payload: IFaqPayload): Observable<IFaqMutationResponse> {
+  updateFaq(
+    id: string,
+    payload: IFaqPayload,
+  ): Observable<IFaqMutationResponse> {
     return this.http.put<IFaqMutationResponse>(`${this.apiUrl}/${id}`, payload);
   }
 
   updateFaqStatus(id: string, status: 0 | 1): Observable<IFaqMutationResponse> {
-    return this.http.patch<IFaqMutationResponse>(`${this.apiUrl}/${id}/status`, { status });
+    return this.http.patch<IFaqMutationResponse>(
+      `${this.apiUrl}/${id}/status`,
+      { status },
+    );
   }
 
   deleteFaq(id: string): Observable<IFaqMutationResponse> {

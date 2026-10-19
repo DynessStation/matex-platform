@@ -53,7 +53,8 @@ export class TreeNode {
   }
 
   startDrag(event: DragEvent) {
-    if (!event.dataTransfer || this.savingOrder || this.reorderDisabled()) return;
+    if (!event.dataTransfer || this.savingOrder || this.reorderDisabled())
+      return;
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/category-id', String(this.node().id));
   }
