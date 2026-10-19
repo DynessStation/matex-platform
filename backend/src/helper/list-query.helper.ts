@@ -31,6 +31,16 @@ export const parseListQuery = (
   };
 };
 
+/**
+ * The SQL expression for a requested sort key, or `fallback` for unknown keys. Only own keys of
+ * `columns` count, so built-in object keys such as `toString` never reach the SQL.
+ */
+export const sortColumn = (
+  columns: Record<string, string>,
+  key: unknown,
+  fallback: string,
+): string => (typeof key === 'string' && Object.hasOwn(columns, key) ? columns[key] : fallback);
+
 /** 'desc' or 'true' -> DESC, 'asc' or 'false' -> ASC, anything else -> `fallback`. */
 export const sortDirection = (value: unknown, fallback: 'ASC' | 'DESC'): 'ASC' | 'DESC' => {
   if (value === 'desc' || value === 'true') return 'DESC';

@@ -7,6 +7,7 @@ import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middlewar
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { sendError } from '../../../helper/api-response.helper';
+import { sortColumn } from '../../../helper/list-query.helper';
 
 const { pool } = db;
 
@@ -86,8 +87,7 @@ router.get(
         updated: 'aa.updated',
       };
 
-      const orderQuery =
-        typeof order === 'string' && allowedOrder[order] ? allowedOrder[order] : 'aa.id_admin_acct';
+      const orderQuery = sortColumn(allowedOrder, order, 'aa.id_admin_acct');
 
       const sortQuery = sort === 'true' ? 'DESC' : 'ASC';
 

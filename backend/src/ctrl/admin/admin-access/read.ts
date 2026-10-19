@@ -7,6 +7,7 @@ import { requirePermission } from '../../../middleware/auth-permission.middlewar
 import { sendError } from '../../../helper/api-response.helper';
 
 import { getSessionScope, decodeAdminAccessId } from './scope';
+import { sortColumn } from '../../../helper/list-query.helper';
 
 const { pool } = db;
 
@@ -74,7 +75,7 @@ router.get(
         updated: 'aa.updated',
       };
 
-      const orderQuery = allowedOrder[order] ?? 'aa.id_admin_access';
+      const orderQuery = sortColumn(allowedOrder, order, 'aa.id_admin_access');
 
       const sortQuery = sort === 'desc' || sort === 'true' ? 'DESC' : 'ASC';
 

@@ -14,6 +14,7 @@ import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { parseJsonValue } from '../../helper/json.helper';
+import { sortColumn } from '../../helper/list-query.helper';
 
 // App
 
@@ -490,7 +491,7 @@ app.get(
         created: 'al.created',
       };
 
-      const orderQuery = allowedOrder[order] ?? 'al.id_audit_log';
+      const orderQuery = sortColumn(allowedOrder, order, 'al.id_audit_log');
 
       const sortQuery = sort === 'asc' || sort === 'false' ? 'ASC' : 'DESC';
 

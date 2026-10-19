@@ -11,6 +11,7 @@ import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
 import { writeAuditLog } from '../../helper/audit-log.helper';
+import { sortColumn } from '../../helper/list-query.helper';
 
 // App
 
@@ -94,7 +95,7 @@ app.get(
         updated: 'ap.updated',
       };
 
-      const orderField = allowedSortFields[requestedField] ?? 'ap.permission_group';
+      const orderField = sortColumn(allowedSortFields, requestedField, 'ap.permission_group');
 
       const orderDirection = requestedSort === 'desc' ? 'DESC' : 'ASC';
 

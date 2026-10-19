@@ -164,6 +164,26 @@ test('update renames and replaces permissions', async () => {
   expect(detail.data.permission_ids).toHaveLength(4);
 });
 
+test('update refuses a name used by another profile; list paging and sorting', async () => {
+  const list = await expectCode(await owner.get(base), 200);
+  const other = list.data.find((profile: any) => profile.id_admin_access !== accessId);
+  expect(other).toBeTruthy();
+  await expectCode(
+    await owner.put(`${base}/${accessId}`, {
+      data: { access_name: other.access_name.toUpperCase(), permissions: [] },
+    }),
+    409,
+    'ADMIN_ACCESS_NAME_EXISTS',
+  );
+
+  const page = await expectCode(
+    await owner.get(base, { params: { ord: 'access_name', srt: 'true', limit: '1', page: '2' } }),
+    200,
+  );
+  expect(page.pagination).toMatchObject({ page: 2, limit: 1, length: 1 });
+  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
+});
+
 test('granted permissions take effect for an account with the profile', async () => {
   member = await createAdminAccount(
     owner,

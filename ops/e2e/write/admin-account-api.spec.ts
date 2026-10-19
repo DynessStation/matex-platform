@@ -148,6 +148,8 @@ test('create, then list and read the new account', async () => {
     200,
   );
   expect(list.pagination).toMatchObject({ total: 1, page: 1, length: 1 });
+  // Built-in object keys are not sort columns (audit BE-007).
+  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   expect(list.data[0]).toMatchObject({
     id_admin_acct: createdId,
     alias: newAccount.alias,

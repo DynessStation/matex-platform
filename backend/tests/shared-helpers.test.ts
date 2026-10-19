@@ -18,7 +18,7 @@ import {
   trimTo,
 } from '../src/helper/input.helper';
 import { parseJsonValue } from '../src/helper/json.helper';
-import { parseListQuery, sortDirection } from '../src/helper/list-query.helper';
+import { parseListQuery, sortColumn, sortDirection } from '../src/helper/list-query.helper';
 import { withTransaction } from '../src/helper/transaction.helper';
 import { errorHandler } from '../src/middleware/error-handler.middleware';
 
@@ -84,6 +84,16 @@ test('list query: paging and search', () => {
   assert.equal(parseListQuery({ limit: '500' }, { maxLimit: 50 }).limit, 50);
   assert.equal(parseListQuery({ limit: 'x', page: '-2' }, { defaultLimit: 20 }).limit, 20);
   assert.equal(parseListQuery({ page: ['2', '3'] }).page, 1);
+});
+
+test('list query: sort column (audit BE-007)', () => {
+  const columns = { name: 'o.office_name' };
+  assert.equal(sortColumn(columns, 'name', 'o.id'), 'o.office_name');
+  assert.equal(sortColumn(columns, 'unknown', 'o.id'), 'o.id');
+  assert.equal(sortColumn(columns, undefined, 'o.id'), 'o.id');
+  for (const key of ['toString', 'constructor', '__proto__', 'hasOwnProperty']) {
+    assert.equal(sortColumn(columns, key, 'o.id'), 'o.id');
+  }
 });
 
 test('list query: sort direction', () => {

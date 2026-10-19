@@ -8,7 +8,7 @@ import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError } from '../../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { decodeId } from '../../../helper/id.helper';
-import { parseListQuery, sortDirection } from '../../../helper/list-query.helper';
+import { parseListQuery, sortColumn, sortDirection } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
@@ -43,8 +43,7 @@ router.get(
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
     const { page, limit, offset, searchValue } = parseListQuery(req.query);
-    const ord = typeof req.query.ord === 'string' ? req.query.ord : '';
-    const orderBy = Object.hasOwn(SORTABLE, ord) ? SORTABLE[ord] : 'o.id_office';
+    const orderBy = sortColumn(SORTABLE, req.query.ord, 'o.id_office');
     const direction = sortDirection(req.query.srt, 'ASC');
     const searchParams = Array(5).fill(searchValue);
 
