@@ -15,7 +15,7 @@ import { requirePermission } from '../../../middleware/auth-permission.middlewar
 import { onFailure } from '../../../middleware/error-handler.middleware';
 
 import { readNavigationMetadata } from './input';
-import { lockNavigation } from './records';
+import { assertNotPrimary, lockNavigation } from './records';
 
 const { pool } = db;
 
@@ -133,6 +133,7 @@ router.patch(
         scope.idMasterComp,
         'web_navigation_key, web_navigation_name, web_navigation_status',
       );
+      if (status === 0) assertNotPrimary(navigation.web_navigation_key, 'deactivate');
 
       await connection.query(
         `UPDATE web_navigation SET web_navigation_status = ?, id_updated_by = ?, updated = NOW()

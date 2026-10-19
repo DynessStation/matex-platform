@@ -5,6 +5,19 @@ import { HttpError } from '../../../helper/http-error.helper';
 
 import { NavigationItemTranslation } from './input';
 
+// The site header navigation: it cannot be deactivated or deleted (owner decision, D-3).
+export const PRIMARY_NAVIGATION_KEY = 'primary';
+
+export const assertNotPrimary = (key: unknown, change: 'deactivate' | 'delete') => {
+  if (key === PRIMARY_NAVIGATION_KEY) {
+    throw new HttpError(
+      409,
+      'WEB_NAVIGATION_PRIMARY_PROTECTED',
+      `The primary navigation is the site header and cannot be ${change}d`,
+    );
+  }
+};
+
 /** Locks the navigation row (not deleted) and returns the requested columns, or throws 404. */
 export const lockNavigation = async (
   connection: PoolConnection,

@@ -14,6 +14,8 @@ import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middlewar
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 import { onFailure } from '../../../middleware/error-handler.middleware';
 
+import { assertNotPrimary } from './records';
+
 const { pool } = db;
 
 const router = express.Router();
@@ -54,6 +56,7 @@ router.delete(
       if (!navigation) {
         throw new HttpError(404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }
+      assertNotPrimary(navigation.web_navigation_key, 'delete');
 
       await connection.query(
         `UPDATE web_navigation_item

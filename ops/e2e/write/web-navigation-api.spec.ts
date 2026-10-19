@@ -232,7 +232,7 @@ test('reorder requires every item exactly once', async () => {
   expect(text.indexOf('"key":"home"')).toBeLessThan(text.indexOf('"key":"about"'));
 });
 
-test('status changes, and only the primary navigation is public', async () => {
+test('status changes, and the protected primary navigation', async () => {
   await expectCode(
     await owner.patch(`${base}/${navigationId}/status`, { data: { web_navigation_status: 3 } }),
     400,
@@ -253,7 +253,7 @@ test('status changes, and only the primary navigation is public', async () => {
     200,
   );
 
-  // Deactivating the seeded primary navigation hides it from the public site; restore it after.
+  // The seeded primary navigation is the site header: it cannot be deactivated or deleted.
   const list = await expectCode(await owner.get(base), 200);
   const primary = list.data.navigations.find((navigation: any) => navigation.key === 'primary');
   expect(primary).toBeTruthy();
@@ -263,11 +263,15 @@ test('status changes, and only the primary navigation is public', async () => {
     200,
   );
   expect(JSON.stringify(published.data)).toContain('/en/contact-us');
-  await expectCode(await owner.patch(primaryStatus, { data: { web_navigation_status: 0 } }), 200);
   await expectCode(
-    await anonymous.get('/api/public/navigation/primary/en-US'),
-    404,
-    'NAVIGATION_NOT_FOUND',
+    await owner.patch(primaryStatus, { data: { web_navigation_status: 0 } }),
+    409,
+    'WEB_NAVIGATION_PRIMARY_PROTECTED',
+  );
+  await expectCode(
+    await owner.delete(`${base}/${primary.id_web_navigation}`),
+    409,
+    'WEB_NAVIGATION_PRIMARY_PROTECTED',
   );
   await expectCode(await owner.patch(primaryStatus, { data: { web_navigation_status: 1 } }), 200);
   await expectCode(await anonymous.get('/api/public/navigation/primary/en-US'), 200);
