@@ -6,8 +6,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 
 ## Posisi sekarang
 
-- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `7bf1314` (deploy 20 Oktober 2026, backup sebelum deploy `matex-20261019T170910Z`). Fase 5A sampai 5C lanjutan sudah live.
-- **Belum di-deploy:** 5D (D-1 sampai D-6: aturan kategori dan navigasi primary, jumlah produk per kategori, `total_all` di list, pemakaian media, filter produk per kategori), tanpa migration.
+- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `fb9837f` (deploy 20 Oktober 2026, backup sebelum deploy `matex-20261019T184838Z`). Fase 5A sampai 5D sudah live.
 - **Kondisi:** fondasi operasional aman (backup terenkripsi di luar VPS, restore sudah dilatih, SSH root hanya dengan kunci, log dirotasi). Semua modul admin generasi lama sudah satu pola dan dijaga test kontrak.
 - **Test:** backend 84 unit test; e2e 120 test (115 kontrak API + 5 browser). Semuanya lulus.
 
