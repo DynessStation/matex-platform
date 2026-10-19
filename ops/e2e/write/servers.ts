@@ -20,7 +20,9 @@ const apiEnvironment: Record<string, string> = {
   CORS_ORIGINS: `${stack.adminOrigin},${stack.publicOrigin}`,
   PUBLIC_COMPANY_ID: '1',
   PUBLIC_SITE_URL: stack.publicOrigin,
-  PUBLIC_ANALYTICS_ENABLED: 'false',
+  // On, so the analytics beacon is covered; the secret is a test value for this stack only.
+  PUBLIC_ANALYTICS_ENABLED: 'true',
+  ANALYTICS_HASH_SECRET: 'e2e-only-analytics-hash-secret-0123456789',
   LOGIN_RATE_LIMIT_MAX: '1000',
   // Empty values stop dotenv from loading real third-party keys from backend/.env.
   OPENAI_API_KEY: '',
