@@ -14,6 +14,7 @@ import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middlewar
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
 import {
+  assertOfficeUnique,
   OFFICE_COLUMNS,
   officeColumnValues,
   officeCoreAudit,
@@ -27,7 +28,6 @@ import {
   toAuditOfficeAttachments,
   toAuditOperatingHours,
 } from './relations';
-import { assertOfficeUnique } from './unique';
 
 const { pool } = db;
 
