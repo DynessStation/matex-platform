@@ -19,7 +19,7 @@ import {
   readOfficeHours,
   toAuditOfficeAttachments,
   toAuditOperatingHours,
-} from './relations';
+} from './records';
 
 const { pool } = db;
 

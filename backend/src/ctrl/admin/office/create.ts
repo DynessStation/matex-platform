@@ -27,7 +27,7 @@ import {
   resolveOfficeAttachments,
   toAuditOfficeAttachments,
   toAuditOperatingHours,
-} from './relations';
+} from './records';
 
 const { pool } = db;
 

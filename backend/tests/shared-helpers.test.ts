@@ -20,7 +20,7 @@ import {
 import { parseJsonValue } from '../src/helper/json.helper';
 import { parseListQuery, sortColumn, sortDirection } from '../src/helper/list-query.helper';
 import { withTransaction } from '../src/helper/transaction.helper';
-import { errorHandler } from '../src/middleware/error-handler.middleware';
+import { errorHandler, onFailure } from '../src/middleware/error-handler.middleware';
 
 test('input: strings', () => {
   assert.equal(nullableString('  a b  '), 'a b');
@@ -143,6 +143,50 @@ test('transaction: rolls back and rethrows on error', async () => {
     (error: unknown) => error instanceof HttpError && error.code === 'THING_EXISTS',
   );
   assert.deepEqual(calls, ['begin', 'rollback', 'release']);
+});
+
+test('error handler: onFailure sets the route failure code and the duplicate-key answer', async () => {
+  const router = express.Router();
+  router.get('/fails', onFailure('THING_LOAD_FAILED', 'Unable to load thing'), async () => {
+    throw new Error('database down');
+  });
+  router.get(
+    '/duplicate',
+    onFailure('THING_CREATE_FAILED', 'Unable to create thing', {
+      duplicate: { code: 'THING_EXISTS', message: 'Thing already exists' },
+    }),
+    async () => {
+      throw Object.assign(new Error('Duplicate entry'), { code: 'ER_DUP_ENTRY' });
+    },
+  );
+  const app = express();
+  app.use(router);
+  app.use(errorHandler);
+
+  const originalError = console.error;
+  console.error = () => {};
+  const server = app.listen(0, '127.0.0.1');
+  try {
+    await new Promise<void>((resolve) => server.once('listening', resolve));
+    const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    const fails = await fetch(`${base}/fails`);
+    assert.equal(fails.status, 500);
+    assert.deepEqual(await fails.json(), {
+      success: false,
+      code: 'THING_LOAD_FAILED',
+      message: 'Unable to load thing',
+    });
+    const duplicate = await fetch(`${base}/duplicate`);
+    assert.equal(duplicate.status, 409);
+    assert.deepEqual(await duplicate.json(), {
+      success: false,
+      code: 'THING_EXISTS',
+      message: 'Thing already exists',
+    });
+  } finally {
+    console.error = originalError;
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });
 
 test('error handler: HttpError from a mounted router becomes its response; others become 500', async () => {

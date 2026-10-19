@@ -1,4 +1,4 @@
-// Office photos and operating hours: validation against the database, reads, writes, and audit views.
+// Office photos and operating hours: shared database reads and writes, validation, and audit views.
 import { Pool, PoolConnection } from 'mysql2/promise';
 
 import keyhsid from '../../../hsid';
