@@ -6,8 +6,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 
 ## Posisi sekarang
 
-- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `e46d5fa`. Lokal, GitHub, dan VPS sama persis.
-- **Belum di-deploy:** 35 commit lokal (Fase 5A sampai 5C), termasuk migration 025 (SEC-003). Deploy butuh backup, migration, lalu deploy, atas izin pemilik.
+- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `2fb590a` (deploy 19 Oktober 2026, dengan backup `matex-20261019T155243Z` dan migration 025). Lokal, GitHub, dan VPS sama.
 - **Kondisi:** fondasi operasional aman (backup terenkripsi di luar VPS, restore sudah dilatih, SSH root hanya dengan kunci, log dirotasi). Semua modul admin generasi lama sudah satu pola dan dijaga test kontrak.
 - **Test:** backend 84 unit test; e2e 79 test (74 kontrak API + 5 browser). Semuanya lulus.
 
@@ -79,7 +78,7 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 
 | ID | Ringkas | Rencana |
 | --- | --- | --- |
-| BE-009 (sisa) | Mungkin ada produk/kategori di production yang gambarnya terlanjur terhapus dari Media | Cek baca-saja di production setelah deploy |
+| SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | Fase 6, bersama perapian frontend |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
 | DB-003 | Beberapa relasi belum dikunci foreign key | Bersama migration 5D |
 | DB-004 | Daftar izin global, belum per perusahaan | Diputuskan saat multi-perusahaan benar-benar dipakai |

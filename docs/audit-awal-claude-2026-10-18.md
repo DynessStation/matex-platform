@@ -116,7 +116,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 **SEC-007 — API memberi tahu bahwa servernya Express** · Info · **Selesai (Fase 5C, 19 Oktober 2026)**
 - `app.ts` mematikan header `X-Powered-By`, tapi setiap modul route yang dibuat sebagai sub-app `express()` memasangnya lagi, dan sub-app pertama yang di-load melewati semua request. Production menjawab semua API dengan `X-Powered-By: Express` (dicek 19 Oktober). Hanya membocorkan teknologi server, tidak membuka akses apa pun.
-- Perbaikan: semua modul route memakai `express.Router()`. Setiap respons di test kontrak dicek tidak membawa header itu.
+- Perbaikan: semua modul route memakai `express.Router()`. Setiap respons di test kontrak dicek tidak membawa header itu. Sisa: server SSR Angular (public dan admin) masih mengirim header ini; dikerjakan di Fase 6.
 
 ### Database
 
@@ -199,7 +199,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 **BE-009 — Gambar yang dipakai produk bisa dihapus dari Media** · P2 · **Selesai (Fase 5C)**
 - Sebelum menghapus file, modul attachment mengecek apakah file itu masih dipakai, tapi daftar pengecekannya belum mencakup media produk dan gambar/ikon kategori produk. Akibatnya gambar yang sedang tampil di website bisa dihapus dari Media, termasuk file fisiknya.
 - Perbaikan: semua tabel yang menunjuk attachment dicek (satu daftar di `ctrl/admin/attachment.ts`). Ada test kontrak dan unit test.
-- Catatan: belum dicek apakah di production sudah ada produk atau kategori yang gambarnya terlanjur terhapus.
+- Dicek di production setelah deploy 19 Oktober: 0 dari 21 relasi media produk dan kategori menunjuk file yang sudah terhapus.
 
 **BE-010 — Upload tipe file yang salah menghasilkan error 500** · P3 · **Selesai (Fase 5C)**
 - Pesan error dari fungsi penyimpan file tidak lagi sama dengan yang dicari route upload, sehingga misalnya file .txt ke Media dijawab 500, bukan 400 `ATTACHMENT_FILE_TYPE_NOT_ALLOWED`.
