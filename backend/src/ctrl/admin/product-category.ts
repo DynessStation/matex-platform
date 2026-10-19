@@ -129,7 +129,10 @@ const LIST_SELECT = `SELECT c.id_product_category, c.id_parent_product_category,
     img.id_attachment image_id, img.storage_path image_path, img.name image_name,
     img.width image_width, img.height image_height, img.mime_type image_mime,
     ico.id_attachment icon_id, ico.storage_path icon_path, ico.name icon_name,
-    ico.width icon_width, ico.height icon_height, ico.mime_type icon_mime
+    ico.width icon_width, ico.height icon_height, ico.mime_type icon_mime,
+    (SELECT COUNT(DISTINCT pc.id_product) FROM product_catalog_category pc
+     JOIN product_catalog p ON p.id_product = pc.id_product AND p.product_deleted_at IS NULL
+     WHERE pc.id_product_category = c.id_product_category) product_count
   FROM product_category c
   LEFT JOIN product_category_i18n i ON i.id_product_category = c.id_product_category
     AND i.product_category_locale = ?
@@ -155,6 +158,7 @@ const listDto = (row: any) => ({
   status: row.product_category_status,
   is_featured: Boolean(row.product_category_is_featured),
   sort_order: Number(row.product_category_sort_order ?? 0),
+  product_count: Number(row.product_count ?? 0),
   category_image: prefixedMedia(row, 'image'),
   category_icon: prefixedMedia(row, 'icon'),
   created_at: row.created,
@@ -202,6 +206,31 @@ const lockCategory = async (connection: PoolConnection, id: number, idMasterComp
     [id, idMasterComp],
   );
   return rows[0] ?? null;
+};
+
+/** Products (not deleted) that use the category. */
+const countProducts = async (connection: PoolConnection, id: number, idMasterComp: number) => {
+  const [rows] = await connection.query<RowDataPacket[]>(
+    `SELECT COUNT(DISTINCT pc.id_product) total
+     FROM product_catalog_category pc
+     JOIN product_catalog p ON p.id_product = pc.id_product AND p.product_deleted_at IS NULL
+     WHERE pc.id_product_category = ? AND pc.id_master_comp = ?`,
+    [id, idMasterComp],
+  );
+  return Number(rows[0]?.total ?? 0);
+};
+
+// Only a category without products can be switched off or deleted (owner decision, D-1).
+const assertNoProducts = async (connection: PoolConnection, id: number, idMasterComp: number) => {
+  const products = await countProducts(connection, id, idMasterComp);
+  if (products > 0) {
+    throw new HttpError(
+      409,
+      'PRODUCT_CATEGORY_HAS_PRODUCTS',
+      'Move the products of this category to another category first',
+      { products },
+    );
+  }
 };
 
 /** The parent must be a live category and, on update, not the category or one of its children. */
@@ -347,8 +376,12 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     }
     let savedId: number;
     if (id) {
-      if (!(await lockCategory(connection, id, scope.idMasterComp))) {
+      const current = await lockCategory(connection, id, scope.idMasterComp);
+      if (!current) {
         throw new HttpError(404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
+      }
+      if (current.product_category_status === 'published' && payload.status !== 'published') {
+        await assertNoProducts(connection, id, scope.idMasterComp);
       }
       await connection.query(
         `UPDATE product_category SET id_parent_product_category = ?, product_category_key = ?,
@@ -584,7 +617,7 @@ router.put(
   },
 );
 
-// Soft delete; a category with live child categories cannot be deleted.
+// Soft delete; a category with live child categories or products cannot be deleted.
 router.delete(
   '/api/v1/product-categories/:id',
   verifyToken,
@@ -613,6 +646,12 @@ router.delete(
     const found = await withTransaction(pool, async (connection) => {
       const category = await lockCategory(connection, id, scope.idMasterComp);
       if (!category) return false;
+      await assertNoProducts(connection, id, scope.idMasterComp);
+      // Release its media, so the files can be deleted from the media library.
+      await connection.query(
+        `DELETE FROM product_category_attachment WHERE id_product_category = ?`,
+        [id],
+      );
       await connection.query(
         `UPDATE product_category SET product_category_deleted_at = NOW(), id_updated_by = ?
          WHERE id_product_category = ? AND id_master_comp = ?`,

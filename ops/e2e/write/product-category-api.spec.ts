@@ -245,6 +245,64 @@ test('reorder', async () => {
   expect(detail.data.sort_order).toBe(4);
 });
 
+test('categories that hold products', async () => {
+  const childBody = {
+    key: `${key}-anak`,
+    status: 'published',
+    parent_id: parentId,
+    translations: translations(`${key}-anak`, 'Anak'),
+  };
+  const product = await expectCode(
+    await owner.post('/api/v1/products', {
+      data: {
+        key: `produk-kategori-${runId}`,
+        sku: `SKU-KAT-${runId}`.toUpperCase(),
+        status: 'draft',
+        category_ids: [childId],
+        translations: [
+          { locale: 'id-ID', slug: `produk-kategori-${runId}`, name: 'Produk Kategori' },
+          { locale: 'en-US', slug: `category-product-${runId}`, name: 'Category Product' },
+        ],
+      },
+    }),
+    201,
+  );
+
+  // The list shows how many products each category holds (D-2).
+  const list = await expectCode(await owner.get(base, { params: { search: key } }), 200);
+  expect(list.data.data[0]).toMatchObject({
+    id: parentId,
+    product_count: 0,
+    subcategories: [{ id: childId, product_count: 1 }],
+  });
+
+  // A category with products cannot be switched off or deleted (D-1).
+  for (const status of ['draft', 'archived']) {
+    const refused = await expectCode(
+      await owner.put(`${base}/${childId}`, { data: { ...childBody, status } }),
+      409,
+      'PRODUCT_CATEGORY_HAS_PRODUCTS',
+    );
+    expect(refused.data).toEqual({ products: 1 });
+  }
+  await expectCode(await owner.delete(`${base}/${childId}`), 409, 'PRODUCT_CATEGORY_HAS_PRODUCTS');
+  // Other changes stay possible.
+  await expectCode(
+    await owner.put(`${base}/${childId}`, { data: { ...childBody, image_id: image } }),
+    200,
+  );
+
+  // Deleted products do not count.
+  await expectCode(await owner.delete(`/api/v1/products/${product.data.id}`), 200);
+  await expectCode(
+    await owner.put(`${base}/${childId}`, {
+      data: { ...childBody, image_id: image, status: 'draft' },
+    }),
+    200,
+    'PRODUCT_CATEGORY_UPDATED',
+  );
+});
+
 test('an account without category rights is refused', async () => {
   const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Kategori', []);
   const account = await createAdminAccount(
@@ -270,6 +328,8 @@ test('delete', async () => {
   // A deleted category can no longer be deleted again (BE-012).
   await expectCode(await owner.delete(`${base}/${childId}`), 404, 'PRODUCT_CATEGORY_NOT_FOUND');
   await expectCode(await owner.delete(`${base}/${parentId}`), 200, 'PRODUCT_CATEGORY_DELETED');
+  // A deleted category no longer holds its media, so the image can be deleted.
+  await expectCode(await owner.delete(`/api/v1/attachment/${image}`), 200, 'ATTACHMENT_DELETED');
   const list = await expectCode(await owner.get(base, { params: { search: key } }), 200);
   expect(list.data.total).toBe(0);
   const audit = await expectCode(
