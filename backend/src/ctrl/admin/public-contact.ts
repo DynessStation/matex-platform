@@ -1,6 +1,10 @@
+// Contact settings of the public site (channels and inquiry topics), under /api/v1/public-contact.
+// Both lists are saved as a whole. The public page and form are ctrl/public/contact.ts.
+// Contract: ops/e2e/write/public-contact-api.spec.ts.
 import express = require('express');
 import { Response } from 'express';
 import { RowDataPacket } from 'mysql2';
+import { PoolConnection } from 'mysql2/promise';
 
 import db = require('../../db');
 import {
@@ -12,12 +16,22 @@ import {
 import { getAdminScope } from '../../helper/admin-scope.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
+import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = express.Router();
 const { pool } = db;
 
+type Translation = { locale: string; label: string; description: string | null; status: 0 | 1 };
+type Channels = NonNullable<ReturnType<typeof normalizeChannels>>;
+type Topics = NonNullable<ReturnType<typeof normalizeTopics>>;
+
+// Channel types whose link is built from the value, so a configured URL is ignored.
+const VALUE_LINKED_TYPES = ['whatsapp', 'email', 'phone'];
+
+/** null for empty, undefined for anything that is not an http(s), mailto, or tel URL. */
 const normalizeUrl = (value: unknown): string | null | undefined => {
   const clean = String(value ?? '').trim();
   if (!clean) return null;
@@ -31,42 +45,36 @@ const normalizeUrl = (value: unknown): string | null | undefined => {
   }
 };
 
-const normalizeTranslations = (value: unknown) => {
+// Every supported language exactly once, each with a label.
+const normalizeTranslations = (value: unknown): Translation[] | null => {
   if (!Array.isArray(value)) return null;
-  const result: Array<{
-    locale: string;
-    label: string;
-    description: string | null;
-    status: 0 | 1;
-  }> = [];
+  const result: Translation[] = [];
   const seen = new Set<string>();
   for (const item of value) {
     const locale = String(item?.locale ?? '').trim();
     const label = String(item?.label ?? '').trim();
     const description = String(item?.description ?? '').trim() || null;
-    if (!isPublicContentLocale(locale) || seen.has(locale) || !label || label.length > 255)
+    if (!isPublicContentLocale(locale) || seen.has(locale) || !label || label.length > 255) {
       return null;
+    }
     seen.add(locale);
-    result.push({
-      locale,
-      label,
-      description,
-      status: Number(item?.status) === 0 ? 0 : 1,
-    });
+    result.push({ locale, label, description, status: Number(item?.status) === 0 ? 0 : 1 });
   }
   return PUBLIC_CONTENT_LOCALES.every((locale) => seen.has(locale)) ? result : null;
 };
 
+const sortOrder = (value: unknown, index: number) =>
+  Number.isSafeInteger(Number(value)) ? Math.max(0, Number(value)) : index;
+
 const normalizeChannels = (value: unknown) => {
   if (!Array.isArray(value) || value.length > 30) return null;
-  const result: any[] = [];
+  const result = [];
   const seen = new Set<string>();
-  for (let index = 0; index < value.length; index += 1) {
-    const item = value[index];
+  for (const [index, item] of value.entries()) {
     const key = normalizePublicContentKey(item?.key);
     const type = item?.type;
     const channelValue = String(item?.value ?? '').trim();
-    const url = ['whatsapp', 'email', 'phone'].includes(type) ? null : normalizeUrl(item?.url);
+    const url = VALUE_LINKED_TYPES.includes(type) ? null : normalizeUrl(item?.url);
     const translations = normalizeTranslations(item?.translations);
     if (
       !key ||
@@ -77,8 +85,9 @@ const normalizeChannels = (value: unknown) => {
       channelValue.length > 500 ||
       url === undefined ||
       !translations
-    )
+    ) {
       return null;
+    }
     if (type === 'whatsapp' && !/^\+[1-9]\d{7,14}$/.test(channelValue)) return null;
     seen.add(key);
     result.push({
@@ -88,21 +97,19 @@ const normalizeChannels = (value: unknown) => {
       url,
       isPrimary: Number(item?.is_primary) === 1 ? 1 : 0,
       isPublic: Number(item?.is_public) === 0 ? 0 : 1,
-      sortOrder: Number.isSafeInteger(Number(item?.sort_order))
-        ? Math.max(0, Number(item.sort_order))
-        : index,
+      sortOrder: sortOrder(item?.sort_order, index),
       translations,
     });
   }
   return result;
 };
 
+// An active topic needs a recipient address.
 const normalizeTopics = (value: unknown) => {
   if (!Array.isArray(value) || value.length > 30) return null;
-  const result: any[] = [];
+  const result = [];
   const seen = new Set<string>();
-  for (let index = 0; index < value.length; index += 1) {
-    const item = value[index];
+  for (const [index, item] of value.entries()) {
     const key = normalizePublicContentKey(item?.key);
     const email = String(item?.recipient_email ?? '').trim() || null;
     const status = Number(item?.status) === 0 ? 0 : 1;
@@ -114,20 +121,35 @@ const normalizeTopics = (value: unknown) => {
       (status === 1 && email === null) ||
       (email !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
       !translations
-    )
+    ) {
       return null;
+    }
     seen.add(key);
     result.push({
       key,
       email,
-      sortOrder: Number.isSafeInteger(Number(item?.sort_order))
-        ? Math.max(0, Number(item.sort_order))
-        : index,
+      sortOrder: sortOrder(item?.sort_order, index),
       status,
       translations,
     });
   }
   return result;
+};
+
+const groupTranslations = (rows: RowDataPacket[], idColumn: string) => {
+  const map = new Map<number, any[]>();
+  for (const row of rows) {
+    const id = Number(row[idColumn]);
+    const values = map.get(id) ?? [];
+    values.push({
+      locale: row.locale,
+      label: row.label,
+      description: row.description,
+      status: Number(row.status),
+    });
+    map.set(id, values);
+  }
+  return map;
 };
 
 const loadSettings = async (idMasterComp: number) => {
@@ -171,23 +193,8 @@ const loadSettings = async (idMasterComp: number) => {
      WHERE t.id_master_comp = ? ORDER BY t.contact_inquiry_topic_locale`,
     [idMasterComp],
   );
-  const group = (rows: RowDataPacket[], key: string) => {
-    const map = new Map<number, any[]>();
-    for (const row of rows) {
-      const id = Number(row[key]);
-      const values = map.get(id) ?? [];
-      values.push({
-        locale: row.locale,
-        label: row.label,
-        description: row.description,
-        status: Number(row.status),
-      });
-      map.set(id, values);
-    }
-    return map;
-  };
-  const channelI18n = group(channelTranslations, 'id_public_contact_channel');
-  const topicI18n = group(topicTranslations, 'id_contact_inquiry_topic');
+  const channelI18n = groupTranslations(channelTranslations, 'id_public_contact_channel');
+  const topicI18n = groupTranslations(topicTranslations, 'id_contact_inquiry_topic');
   return {
     channels: channelRows.map((row) => ({
       key: row.public_contact_channel_key,
@@ -209,25 +216,147 @@ const loadSettings = async (idMasterComp: number) => {
   };
 };
 
+/** `AND <column> NOT IN (...)` for the kept keys, or nothing when none are kept. */
+const notIn = (column: string, keys: string[]) =>
+  keys.length ? `AND ${column} NOT IN (${keys.map(() => '?').join(',')})` : '';
+
+// Channels left out are soft-deleted (and hidden); the rest are upserted by key.
+const saveChannels = async (
+  connection: PoolConnection,
+  idMasterComp: number,
+  idAdminAcct: number,
+  channels: Channels,
+) => {
+  const keys = channels.map((item) => item.key);
+  await connection.query(
+    `UPDATE public_contact_channel SET public_contact_channel_deleted_at = NOW(),
+      public_contact_channel_is_public = 0, id_updated_by = ?, updated = NOW()
+     WHERE id_master_comp = ? AND public_contact_channel_deleted_at IS NULL
+      ${notIn('public_contact_channel_key', keys)}`,
+    [idAdminAcct, idMasterComp, ...keys],
+  );
+  for (const item of channels) {
+    await connection.query(
+      `INSERT INTO public_contact_channel (id_master_comp, public_contact_channel_key,
+        public_contact_channel_type, public_contact_channel_value, public_contact_channel_url,
+        public_contact_channel_is_primary, public_contact_channel_is_public,
+        public_contact_channel_sort_order, id_created_by, id_updated_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE public_contact_channel_type = VALUES(public_contact_channel_type),
+        public_contact_channel_value = VALUES(public_contact_channel_value),
+        public_contact_channel_url = VALUES(public_contact_channel_url),
+        public_contact_channel_is_primary = VALUES(public_contact_channel_is_primary),
+        public_contact_channel_is_public = VALUES(public_contact_channel_is_public),
+        public_contact_channel_sort_order = VALUES(public_contact_channel_sort_order),
+        id_updated_by = VALUES(id_updated_by), public_contact_channel_deleted_at = NULL,
+        updated = NOW()`,
+      [
+        idMasterComp,
+        item.key,
+        item.type,
+        item.value,
+        item.url,
+        item.isPrimary,
+        item.isPublic,
+        item.sortOrder,
+        idAdminAcct,
+        idAdminAcct,
+      ],
+    );
+    const [idRows] = await connection.query<RowDataPacket[]>(
+      `SELECT id_public_contact_channel FROM public_contact_channel
+       WHERE id_master_comp = ? AND public_contact_channel_key = ? LIMIT 1`,
+      [idMasterComp, item.key],
+    );
+    for (const translation of item.translations) {
+      await connection.query(
+        `INSERT INTO public_contact_channel_i18n (id_public_contact_channel,
+          id_master_comp, public_contact_channel_locale, public_contact_channel_label,
+          public_contact_channel_description, public_contact_channel_i18n_status)
+         VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE
+          public_contact_channel_label = VALUES(public_contact_channel_label),
+          public_contact_channel_description = VALUES(public_contact_channel_description),
+          public_contact_channel_i18n_status = VALUES(public_contact_channel_i18n_status),
+          updated = NOW()`,
+        [
+          idRows[0].id_public_contact_channel,
+          idMasterComp,
+          translation.locale,
+          translation.label,
+          translation.description,
+          translation.status,
+        ],
+      );
+    }
+  }
+};
+
+// Topics left out are switched off (inquiries keep pointing at them); the rest are upserted.
+const saveTopics = async (
+  connection: PoolConnection,
+  idMasterComp: number,
+  idAdminAcct: number,
+  topics: Topics,
+) => {
+  const keys = topics.map((item) => item.key);
+  await connection.query(
+    `UPDATE contact_inquiry_topic SET contact_inquiry_topic_status = 0,
+      id_updated_by = ?, updated = NOW() WHERE id_master_comp = ?
+      ${notIn('contact_inquiry_topic_key', keys)}`,
+    [idAdminAcct, idMasterComp, ...keys],
+  );
+  for (const item of topics) {
+    await connection.query(
+      `INSERT INTO contact_inquiry_topic (id_master_comp, contact_inquiry_topic_key,
+        contact_inquiry_topic_recipient_email, contact_inquiry_topic_sort_order,
+        contact_inquiry_topic_status, id_created_by, id_updated_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE
+        contact_inquiry_topic_recipient_email = VALUES(contact_inquiry_topic_recipient_email),
+        contact_inquiry_topic_sort_order = VALUES(contact_inquiry_topic_sort_order),
+        contact_inquiry_topic_status = VALUES(contact_inquiry_topic_status),
+        id_updated_by = VALUES(id_updated_by), updated = NOW()`,
+      [idMasterComp, item.key, item.email, item.sortOrder, item.status, idAdminAcct, idAdminAcct],
+    );
+    const [idRows] = await connection.query<RowDataPacket[]>(
+      `SELECT id_contact_inquiry_topic FROM contact_inquiry_topic
+       WHERE id_master_comp = ? AND contact_inquiry_topic_key = ? LIMIT 1`,
+      [idMasterComp, item.key],
+    );
+    for (const translation of item.translations) {
+      await connection.query(
+        `INSERT INTO contact_inquiry_topic_i18n (id_contact_inquiry_topic,
+          id_master_comp, contact_inquiry_topic_locale, contact_inquiry_topic_label,
+          contact_inquiry_topic_i18n_status) VALUES (?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE contact_inquiry_topic_label = VALUES(contact_inquiry_topic_label),
+          contact_inquiry_topic_i18n_status = VALUES(contact_inquiry_topic_i18n_status),
+          updated = NOW()`,
+        [
+          idRows[0].id_contact_inquiry_topic,
+          idMasterComp,
+          translation.locale,
+          translation.label,
+          translation.status,
+        ],
+      );
+    }
+  }
+};
+
 router.get(
   '/api/v1/public-contact',
   verifyToken,
   requirePermission('public_contact.view'),
+  onFailure('PUBLIC_CONTACT_LOAD_FAILED', 'Unable to load contact settings'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    try {
-      return sendSuccess(
-        res,
-        200,
-        'PUBLIC_CONTACT_FOUND',
-        'Contact settings loaded',
-        await loadSettings(scope.idMasterComp),
-      );
-    } catch (error) {
-      console.error('[Public Contact] Failed to load settings', error);
-      return sendError(res, 500, 'PUBLIC_CONTACT_LOAD_FAILED', 'Unable to load contact settings');
-    }
+    return sendSuccess(
+      res,
+      200,
+      'PUBLIC_CONTACT_FOUND',
+      'Contact settings loaded',
+      await loadSettings(scope.idMasterComp),
+    );
   },
 );
 
@@ -235,151 +364,25 @@ router.put(
   '/api/v1/public-contact',
   verifyToken,
   requirePermission('public_contact.update'),
+  onFailure('PUBLIC_CONTACT_UPDATE_FAILED', 'Unable to update contact settings'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
     const channels = normalizeChannels(req.body?.channels);
     const topics = normalizeTopics(req.body?.topics);
-    if (!channels || !topics)
+    if (!channels || !topics) {
       return sendError(
         res,
         400,
         'PUBLIC_CONTACT_PAYLOAD_INVALID',
         'Contact settings are incomplete or invalid',
       );
+    }
 
-    const connection = await pool.getConnection();
-    try {
-      await connection.beginTransaction();
+    await withTransaction(pool, async (connection) => {
       const before = await loadSettings(scope.idMasterComp);
-      const channelKeys = channels.map((item) => item.key);
-      if (channelKeys.length) {
-        await connection.query(
-          `UPDATE public_contact_channel SET public_contact_channel_deleted_at = NOW(),
-            public_contact_channel_is_public = 0, id_updated_by = ?, updated = NOW()
-           WHERE id_master_comp = ? AND public_contact_channel_deleted_at IS NULL
-            AND public_contact_channel_key NOT IN (${channelKeys.map(() => '?').join(',')})`,
-          [scope.idAdminAcct, scope.idMasterComp, ...channelKeys],
-        );
-      } else {
-        await connection.query(
-          `UPDATE public_contact_channel SET public_contact_channel_deleted_at = NOW(),
-            public_contact_channel_is_public = 0, id_updated_by = ?, updated = NOW()
-           WHERE id_master_comp = ? AND public_contact_channel_deleted_at IS NULL`,
-          [scope.idAdminAcct, scope.idMasterComp],
-        );
-      }
-      for (const item of channels) {
-        await connection.query(
-          `INSERT INTO public_contact_channel (id_master_comp, public_contact_channel_key,
-            public_contact_channel_type, public_contact_channel_value, public_contact_channel_url,
-            public_contact_channel_is_primary, public_contact_channel_is_public,
-            public_contact_channel_sort_order, id_created_by, id_updated_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE public_contact_channel_type = VALUES(public_contact_channel_type),
-            public_contact_channel_value = VALUES(public_contact_channel_value),
-            public_contact_channel_url = VALUES(public_contact_channel_url),
-            public_contact_channel_is_primary = VALUES(public_contact_channel_is_primary),
-            public_contact_channel_is_public = VALUES(public_contact_channel_is_public),
-            public_contact_channel_sort_order = VALUES(public_contact_channel_sort_order),
-            id_updated_by = VALUES(id_updated_by), public_contact_channel_deleted_at = NULL,
-            updated = NOW()`,
-          [
-            scope.idMasterComp,
-            item.key,
-            item.type,
-            item.value,
-            item.url,
-            item.isPrimary,
-            item.isPublic,
-            item.sortOrder,
-            scope.idAdminAcct,
-            scope.idAdminAcct,
-          ],
-        );
-        const [idRows] = await connection.query<RowDataPacket[]>(
-          `SELECT id_public_contact_channel FROM public_contact_channel
-           WHERE id_master_comp = ? AND public_contact_channel_key = ? LIMIT 1`,
-          [scope.idMasterComp, item.key],
-        );
-        for (const translation of item.translations) {
-          await connection.query(
-            `INSERT INTO public_contact_channel_i18n (id_public_contact_channel,
-              id_master_comp, public_contact_channel_locale, public_contact_channel_label,
-              public_contact_channel_description, public_contact_channel_i18n_status)
-             VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE
-              public_contact_channel_label = VALUES(public_contact_channel_label),
-              public_contact_channel_description = VALUES(public_contact_channel_description),
-              public_contact_channel_i18n_status = VALUES(public_contact_channel_i18n_status),
-              updated = NOW()`,
-            [
-              idRows[0].id_public_contact_channel,
-              scope.idMasterComp,
-              translation.locale,
-              translation.label,
-              translation.description,
-              translation.status,
-            ],
-          );
-        }
-      }
-      const topicKeys = topics.map((item) => item.key);
-      if (topicKeys.length) {
-        await connection.query(
-          `UPDATE contact_inquiry_topic SET contact_inquiry_topic_status = 0,
-            id_updated_by = ?, updated = NOW() WHERE id_master_comp = ?
-            AND contact_inquiry_topic_key NOT IN (${topicKeys.map(() => '?').join(',')})`,
-          [scope.idAdminAcct, scope.idMasterComp, ...topicKeys],
-        );
-      } else {
-        await connection.query(
-          `UPDATE contact_inquiry_topic SET contact_inquiry_topic_status = 0,
-            id_updated_by = ?, updated = NOW() WHERE id_master_comp = ?`,
-          [scope.idAdminAcct, scope.idMasterComp],
-        );
-      }
-      for (const item of topics) {
-        await connection.query(
-          `INSERT INTO contact_inquiry_topic (id_master_comp, contact_inquiry_topic_key,
-            contact_inquiry_topic_recipient_email, contact_inquiry_topic_sort_order,
-            contact_inquiry_topic_status, id_created_by, id_updated_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE
-            contact_inquiry_topic_recipient_email = VALUES(contact_inquiry_topic_recipient_email),
-            contact_inquiry_topic_sort_order = VALUES(contact_inquiry_topic_sort_order),
-            contact_inquiry_topic_status = VALUES(contact_inquiry_topic_status),
-            id_updated_by = VALUES(id_updated_by), updated = NOW()`,
-          [
-            scope.idMasterComp,
-            item.key,
-            item.email,
-            item.sortOrder,
-            item.status,
-            scope.idAdminAcct,
-            scope.idAdminAcct,
-          ],
-        );
-        const [idRows] = await connection.query<RowDataPacket[]>(
-          `SELECT id_contact_inquiry_topic FROM contact_inquiry_topic
-           WHERE id_master_comp = ? AND contact_inquiry_topic_key = ? LIMIT 1`,
-          [scope.idMasterComp, item.key],
-        );
-        for (const translation of item.translations) {
-          await connection.query(
-            `INSERT INTO contact_inquiry_topic_i18n (id_contact_inquiry_topic,
-              id_master_comp, contact_inquiry_topic_locale, contact_inquiry_topic_label,
-              contact_inquiry_topic_i18n_status) VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE contact_inquiry_topic_label = VALUES(contact_inquiry_topic_label),
-              contact_inquiry_topic_i18n_status = VALUES(contact_inquiry_topic_i18n_status), updated = NOW()`,
-            [
-              idRows[0].id_contact_inquiry_topic,
-              scope.idMasterComp,
-              translation.locale,
-              translation.label,
-              translation.status,
-            ],
-          );
-        }
-      }
+      await saveChannels(connection, scope.idMasterComp, scope.idAdminAcct, channels);
+      await saveTopics(connection, scope.idMasterComp, scope.idAdminAcct, topics);
       await writeAuditLog({
         req,
         connection,
@@ -399,26 +402,15 @@ router.put(
         after: { channels, topics },
         httpStatus: 200,
       });
-      await connection.commit();
-      return sendSuccess(
-        res,
-        200,
-        'PUBLIC_CONTACT_UPDATED',
-        'Contact settings updated successfully',
-        await loadSettings(scope.idMasterComp),
-      );
-    } catch (error) {
-      await connection.rollback();
-      console.error('[Public Contact] Failed to update settings', error);
-      return sendError(
-        res,
-        500,
-        'PUBLIC_CONTACT_UPDATE_FAILED',
-        'Unable to update contact settings',
-      );
-    } finally {
-      connection.release();
-    }
+    });
+
+    return sendSuccess(
+      res,
+      200,
+      'PUBLIC_CONTACT_UPDATED',
+      'Contact settings updated successfully',
+      await loadSettings(scope.idMasterComp),
+    );
   },
 );
 
