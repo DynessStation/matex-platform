@@ -165,7 +165,8 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Dampak: sulit dibaca, rawan efek samping saat diubah, dan sulit dites.
 - Saran: pecah bertahap saat fitur terkait akan diubah, bukan sekaligus.
 - `auth.ts` sudah dipecah ke `ctrl/admin/admin-account/`: `session.ts` (login, logout, `/me`), `select.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`, dan `profile-photo.ts`. Isi handler dipindah apa adanya. `auth.ts` kini hanya mengatur urutan route, karena `/me` dan `/select/*` harus terdaftar sebelum `/:id`, dan folder itu sengaja tidak di-load otomatis. Bukti: rekaman 76 request (seluruh respons JSON beserta isi tabel `admin_acct` dan `audit_log` sesudahnya) identik sebelum dan sesudah pemecahan. Test kontrak gagal bila urutan route dibalik.
-- Sisa: `office.ts`, `web-navigation.ts`, `admin-access.ts`, dipecah saat fiturnya akan diubah, dengan test kontrak lebih dulu.
+- Fase 4E: `office.ts` dipecah ke `ctrl/admin/office/` (`scope.ts`, `input.ts`, `relations.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`), didahului test kontrak `office-api.spec.ts`. Rekaman respons dan isi tabel identik sebelum dan sesudahnya. Tidak ada bug baru.
+- Sisa: `admin-access.ts` dan `web-navigation.ts` (Fase 4F dan 4G), dengan cara yang sama.
 
 **BE-004 — ID dengan karakter tidak valid membuat server error 500** · P3 · **Selesai (Fase 4C)**
 - Library `hashids` versi 2 melempar error bila ID berisi karakter di luar alfabetnya (misalnya URL yang diketik manual atau diubah), sementara semua kode mengharapkan hasil kosong untuk ID tidak valid. Contoh: `GET /api/v1/admin-acct/select/office?id_master_comp=abc-def` menjawab 500, bukan 400.

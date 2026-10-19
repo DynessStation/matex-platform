@@ -51,9 +51,9 @@ Patokan kapan sebuah controller dipecah: lebih dari sekitar 1.000 baris, atau is
 | 4A | Buang kode Kartify yang tidak terpakai (arsip di tag `kartify-reference-v1`) | Selesai |
 | 4B | Format frontend dengan Prettier, build CSS admin deterministik | Selesai |
 | 4C | Test kontrak akun admin, pecah `auth.ts` | Selesai |
-| 4D | Struktur backend: `middleware/` keluar dari `ctrl/`, buang `helpers.ts` yang mati, perkakas test kontrak (`test:api`, rekaman) | Berjalan |
-| 4E | `office.ts` (4.076 baris) | Berikutnya |
-| 4F | `admin-access.ts` (2.316 baris) | |
+| 4D | Struktur backend: `middleware/` keluar dari `ctrl/`, buang `helpers.ts` yang mati, perkakas test kontrak (`test:api`, rekaman) | Selesai |
+| 4E | `office.ts` (4.076 baris) | Selesai |
+| 4F | `admin-access.ts` (2.316 baris) | Berikutnya |
 | 4G | `web-navigation.ts` (2.622 baris) | |
 | 4H | Controller 1.000–1.850 baris: `attachment.ts`, `chair.ts`, `admin-permission.ts`, `website-page.ts`, `audit-log.ts`. Dipecah saat fiturnya diubah, atau lebih awal bila test kontraknya sudah ada | Nanti |
 | 5 | Frontend (lihat di bawah) | Nanti |
