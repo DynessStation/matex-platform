@@ -1,0 +1,56 @@
+# Rencana Perapian UI/UX Admin
+
+Turunan dari dokumen pemilik "PERAPIHAN UI-UX INTERNAL MATEX V1, TEMUAN 20 OKTOBER 2026" (PDF di luar repo, 11 halaman) dan dua keputusan pemilik di hari yang sama. Dokumen ini menjadi daftar kerja Fase 5D (aturan data) dan Fase 6D (UI/UX admin) di `peta-jalan.md`. Status tiap butir diperbarui di sini.
+
+_Dibuat: 20 Oktober 2026._
+
+## Prinsip
+
+1. **Global dulu, per halaman belakangan.** Gaya ditulis sekali di style global (turunan template Kartify di `frontend/admin/public/assets/scss` dan `src/styles.scss`). SCSS di folder modul hanya untuk hal yang memang khas halaman itu. Kalau Kartify sudah punya gayanya, pakai atau ubah; kalau belum, tambahkan di global.
+2. **Satu komponen untuk satu pola.** Tabel, kotak bantuan, tombol perbarui dengan jeda, dan tombol kembali masing-masing satu komponen bersama, dipakai semua halaman.
+3. **Desain PDF adalah arah, bukan ukuran pasti.** Warna, ukuran, dan bentuk mengikuti token yang sudah ada di template.
+4. **Backend dulu bila data belum tersedia.** Butir yang butuh data baru (jumlah produk per kategori, total tanpa filter, jumlah pemakaian media) dimulai dari API dan test kontraknya.
+5. **Mengikuti alur kerja yang sudah ada.** Perubahan backend memakai test kontrak dan rekaman. Perubahan frontend memakai test browser untuk halaman yang disentuh.
+
+## Fase 5D: aturan data (backend, sebelum UI)
+
+| ID | Butir | Rencana | Status |
+| --- | --- | --- | --- |
+| D-1 | Kategori yang punya produk tidak boleh dinonaktifkan atau dihapus (keputusan pemilik) | Kategori yang masih dipakai produk (produk yang belum dihapus) ditolak saat diubah ke status selain `published` atau saat dihapus: 409 dengan jumlah produknya. Hapus juga melepas media kategori, supaya gambarnya bisa dihapus dari Media. Foreign key `RESTRICT` sudah ada, tapi tidak pernah terpicu karena hapus kategori hanya soft delete | Belum |
+| D-2 | Jumlah produk per kategori | List kategori admin membawa `product_count` (untuk tampilan di halaman kategori dan filter produk) | Belum |
+| D-3 | Navigasi "primary" tidak boleh dihapus (keputusan pemilik) | Navigasi `primary` ditolak saat dihapus, dinonaktifkan, atau diganti kuncinya: 409. Alur rapinya ada di U-9 | Belum |
+| D-4 | Format list seragam (5D lama) | Satu bentuk pagination untuk semua list: data, `total` (sesuai filter), `total_all` (tanpa filter, untuk teks "Menampilkan x dari y"), `page`, `limit`. Dikerjakan bersama tabel baru (U-3), modul per modul | Belum |
+| D-5 | Jumlah pemakaian media | List media membawa jumlah pemakaian per tempat (beranda, produk, artikel, dan seterusnya), dari daftar `REFERENCES` yang sudah ada | Belum |
+| D-6 | Filter produk per kategori | List produk admin menerima `category` | Belum |
+
+## Fase 6D: UI/UX admin
+
+### Global (dikerjakan pertama, dipakai semua halaman)
+
+| ID | Butir | Rencana | Status |
+| --- | --- | --- | --- |
+| U-1 | Huruf di area isi sedikit lebih kecil (permintaan khusus pemilik) | Turunkan ukuran dasar area isi dari 14px ke 13px lewat variabel template, tanpa menyentuh sidebar dan header; cek ulang tabel, form, dan tombol | Belum |
+| U-2 | Warna input dan select seragam | Satu set status untuk semua kontrol form: normal (isi putih), fokus (garis warna tema, bawaan Kartify), readonly/disabled (abu), error | Belum |
+| U-3 | Tabel versi baru | Di komponen `app-table` bersama: (a) baris alat di samping tombol tambah: muat ulang dengan query yang sama, muat ulang dari awal (reset), impor dan unduh (tombol nonaktif dulu), ikon dengan tooltip, jeda 3 detik setelah dipakai; (b) teks "Menampilkan x dari y data, t detik"; (c) kotak cari dan jumlah per halaman yang ringkas tanpa label; (d) judul kolom paling banyak 2 baris, tombol urut berupa tombol kecil di header, bukan klik judul; (e) kolom aksi tanpa label, ikon roda gigi berisi pengaturan tabel: teks penuh, sembunyikan tombol urut, warna baris selang-seling (tersimpan per pengguna di browser); (f) aksi baris selalu menu titik tiga, tidak ada aksi dengan klik baris; (g) isi sel paling banyak 2 baris dengan "..." kecuali teks penuh aktif | Belum |
+| U-4 | Kotak bantuan "?" | Komponen ikon "?" dengan kotak info singkat: muncul saat hover (hilang saat kursor menjauh) atau klik (hilang saat klik di luar), tidak menutupi isi, responsif; tautan "Selengkapnya" membuka drawer kanan | Belum |
+| U-5 | Drawer bantuan | Drawer kanan berisi panduan admin per halaman dengan penanda (#), melompat ke bagian yang diklik. Isinya diambil dari panduan admin yang sudah ada (`docs/PANDUAN PENGGUNAAN ... 1.0.10`), disimpan sebagai file teks di frontend supaya mudah diperbarui | Belum |
+| U-6 | Tombol perbarui dengan jeda | Satu komponen: indikator memuat saat ditekan, lalu hitung mundur di dalam tombol (nonaktif) selama jeda. Dasbor 2 menit, Analitik Publik dan SEO 5 menit (SEO memanggil Google, kuotanya terbatas) | Belum |
+| U-7 | Tombol kembali di form | Satu komponen tombol "Kembali" di kepala form, menuju list asalnya (dengan query terakhir) | Belum |
+
+### Per halaman
+
+| ID | Halaman | Butir | Status |
+| --- | --- | --- | --- |
+| U-8 | Dasbor, Analitik Publik, SEO | Ikon "?" di kartu dan bagian yang perlu penjelasan; tombol perbarui berjeda (U-6) | Belum |
+| U-9 | Navigasi Header Website | Navigasi `primary` diperlakukan sebagai navigasi bawaan: tidak ada tombol hapus atau nonaktif, kuncinya terkunci, dan menu sidebar langsung membuka pengelola item `primary` (navigasi lain tetap tersedia dari sana). Rincian alur dikonfirmasi ke pemilik sebelum dikerjakan | Belum |
+| U-10 | Akun Admin dan form serupa | Bug input telepon: klik kotak nomor malah membuka pilihan kode negara (lapisan select menutupi input) | Belum |
+| U-11 | Halaman website (Syarat, Karir, dan lainnya) | Tombol "Simpan Perubahan" di menu kiri ikut tergulung saat isi di kanan digulung; buat menunya tetap di tempat (sticky) dengan benar | Belum |
+| U-12 | Kategori Produk | Tata letak kategori disamakan dengan halaman lain; tab form (Umum, Konten & Bahasa, SEO, Media) pindah ke atas supaya form tidak sempit; jumlah produk di tiap kategori (D-2); cek dan perbaiki bug di halaman ini satu per satu | Belum |
+| U-13 | Produk | Panel kategori sebagai filter list (Semua dan tiap kategori, dengan pencarian kategori) (D-6) | Belum |
+| U-14 | Media | Penanda "Dipakai: n" di tiap kartu, dengan rincian per tempat saat diarahkan (D-5) | Belum |
+
+### Catatan
+
+- Tombol impor dan unduh di U-3 sengaja nonaktif sampai fiturnya dibuat (sesuai permintaan pemilik). Fiturnya sendiri belum dijadwalkan.
+- Bila di tengah pengerjaan ada butir yang ternyata tidak efisien, butir itu dicatat di sini dengan alasannya, lalu ditinggalkan.
+- Temuan baru selama pengerjaan ditambahkan ke tabel di atas dengan ID berikutnya.

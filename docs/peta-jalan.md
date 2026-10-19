@@ -46,7 +46,7 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 | 5B Fondasi bersama ✅ | Scope sesi diambil sekali oleh middleware lalu dibaca dari `req`; helper input, ID, list query, JSON, transaksi, `HttpError`, dan penanganan error pusat, semua dengan unit test; salinan kembar langsung diganti | **Selesai 19 Okt:** modul generasi baru menjalankan 1 query akun per request (sebelumnya 2); rekaman identik |
 | 5C Pindah ke pola ✅ | Modul dipindah satu per satu, test kontrak dulu, mengikuti checklist di `standar-kode.md` | **Selesai 19 Okt:** `office` (3.115 → 1.327 baris), `admin-access` (1.742 → ±830), `web-navigation` (2.654 → ±1.250), `admin-account` (3.912 → 1.574), `chair` (1.150 → 420), `admin-permission` (1.074 → 431), `audit-log` (838 → 296), `attachment` (1.386 → 528), `website-page` (976 → 787, jadi folder). Tidak ada lagi salinan `getSessionScope`; rekaman tiap modul identik. Bug yang ditemukan di jalan: BE-006 sampai BE-010, SEC-003, SEC-004, SEC-007 |
 | 5C lanjutan ✅ | Modul generasi baru yang punya kode gagal sendiri diberi test kontrak dulu, lalu `try/catch` diganti `onFailure` | **Selesai 20 Okt:** `faq`, `public-contact`, `article`, `product-category`, `product` (jadi folder), `analytics`, dan semua route publik; rekaman identik. Tersisa hanya `try/catch` yang memetakan layanan luar ke 502/503 (`seo-console`, `content-assistant`, beacon analytics, sitemap). Bug di jalan: BE-011, BE-012, BE-013 |
-| 5D Keputusan seragam | Satu format pagination dan satu cara soft delete. Ini mengubah perilaku, jadi dikerjakan bersama frontend di Fase 6 dan, bila perlu, dengan migration | Satu format di seluruh API |
+| 5D Aturan data (berikutnya) | Keputusan pemilik 20 Okt dan data yang dibutuhkan UI baru, daftar lengkap di `rencana-ui-admin.md` (D-1 sampai D-6): kategori yang masih punya produk tidak bisa dinonaktifkan atau dihapus; navigasi `primary` tidak bisa dihapus; jumlah produk per kategori, jumlah pemakaian media, filter produk per kategori; satu format list (`total` dan `total_all`) dikerjakan bersama tabel baru di 6D | Semua butir D berstatus selesai, dengan test kontrak |
 
 ### Fase 6: Frontend satu pola
 
@@ -55,7 +55,8 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 | 6A Survei dan standar | Survei mendalam admin dan public; lengkapi standar frontend | `standar-kode.md` bagian 4 lengkap |
 | 6B Website publik | Buang sisa fitur toko v2 yang masih terpasang (cart, wishlist, compare, coupon, order, wallet, refund, point, currency, review, Q&A, pembayaran: belasan store NGXS) dan file demo Kartify yang diunduh setiap kunjungan (`theme.json`, `currency.json`). Tetap tersimpan di tag arsip | Tidak ada request demo saat halaman dibuka; test browser lulus |
 | 6C Admin | Pecah komponen raksasa (form halaman website 3.233 baris, form akun admin 1.515, form kantor 952, form produk 813); satukan `directive/` dan `directives/`; buang tipe tema Kartify yang tidak dipakai | Tidak ada komponen di atas sekitar 800 baris |
-| 6D Lint dan test | Peringatan lint 0 (urutan import, tipe `any`); test browser untuk halaman yang disentuh; jalankan keputusan 5D | Lint admin dan public 0 peringatan |
+| 6D UI/UX admin | Temuan pemilik 20 Okt, daftar lengkap di `rencana-ui-admin.md`: global dulu (huruf area isi sedikit lebih kecil, warna kontrol form seragam, tabel versi baru, kotak bantuan "?" dan drawer panduan, tombol perbarui berjeda, tombol kembali), lalu per halaman (dasbor/analitik/SEO, navigasi `primary`, bug input telepon, tombol simpan halaman website, kategori, filter produk, penanda pemakaian media). SCSS ditulis sekali di global; SCSS modul hanya untuk yang khas halaman | Semua butir U selesai atau ditinggalkan dengan alasan; SCSS modul berkurang |
+| 6E Lint dan test | Peringatan lint 0 (urutan import, tipe `any`); test browser untuk halaman yang disentuh | Lint admin dan public 0 peringatan |
 
 ## Ujung sementara: "MATEX v1.1, Fondasi Rapi"
 
@@ -64,6 +65,7 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 - [ ] Semua modul backend memakai satu pola dan punya test kontrak API.
 - [ ] Backend: format dan lint seragam, tanpa peringatan; tidak ada fungsi bantu kembar.
 - [ ] Website publik tanpa sisa fitur toko v2; admin tanpa komponen raksasa.
+- [ ] Temuan UI/UX admin 20 Oktober (`rencana-ui-admin.md`) selesai.
 - [ ] Lint frontend 0 peringatan.
 - [ ] Satu format pagination dan satu cara soft delete di seluruh API.
 - [ ] Semua test (unit, kontrak API, browser) lulus, dan semuanya sudah di production.
@@ -80,7 +82,7 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 | ID | Ringkas | Rencana |
 | --- | --- | --- |
 | SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | Fase 6, bersama perapian frontend |
-| Catatan produk | Kategori yang dihapus tetap terhubung ke produknya dan tetap "memakai" gambarnya (gambar tidak bisa dihapus dari Media); menghapus navigasi "primary" tidak dicegah | Diputuskan pemilik, lalu dikerjakan di 5D |
+| Catatan produk | Kategori yang dihapus tetap terhubung ke produknya dan tetap "memakai" gambarnya; navigasi "primary" bisa dihapus | Diputuskan pemilik 20 Okt: dikerjakan di 5D (D-1, D-3) |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
 | DB-003 | Beberapa relasi belum dikunci foreign key | Bersama migration 5D |
 | DB-004 | Daftar izin global, belum per perusahaan | Diputuskan saat multi-perusahaan benar-benar dipakai |
