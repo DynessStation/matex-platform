@@ -27,6 +27,10 @@ const SORTABLE: Record<string, string> = {
 
 const SEARCH = `(? = '' OR p.product_key LIKE ? OR p.product_sku LIKE ? OR i.product_name LIKE ?)`;
 
+// Optional category filter (D-6): products in that category, matched exactly.
+const IN_CATEGORY = `(? IS NULL OR EXISTS (SELECT 1 FROM product_catalog_category pc
+  WHERE pc.id_product = p.id_product AND pc.id_product_category = ?))`;
+
 router.get(
   '/api/v1/products',
   verifyToken,
@@ -41,6 +45,11 @@ router.get(
     const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
     const paginate = Math.min(100, Math.max(1, Math.floor(Number(req.query.paginate) || 15)));
     const offset = (page - 1) * paginate;
+    const categoryParam = typeof req.query.category === 'string' ? req.query.category.trim() : '';
+    const idCategory = categoryParam ? decodeId(categoryParam, keyhsid.idProductCategory) : null;
+    if (categoryParam && !idCategory) {
+      return sendError(res, 400, 'PRODUCT_LIST_CATEGORY_INVALID', 'Invalid category filter');
+    }
     const sortField = sortColumn(SORTABLE, req.query.field, '');
     const direction = req.query.sort === 'desc' ? 'DESC' : 'ASC';
     const orderBy = sortField
@@ -51,15 +60,26 @@ router.get(
       `SELECT COUNT(DISTINCT p.id_product) AS total
        FROM product_catalog p
        LEFT JOIN product_catalog_i18n i ON i.id_product = p.id_product AND i.product_locale = ?
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH}`,
-      [locale, scope.idMasterComp, search, like, like, like],
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY}`,
+      [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory],
     );
     const [rows] = await pool.query<RowDataPacket[]>(
       `${BASE_SELECT}
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH}
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY}
        ORDER BY ${orderBy}
        LIMIT ? OFFSET ?`,
-      [locale, scope.idMasterComp, search, like, like, like, paginate, offset],
+      [
+        locale,
+        scope.idMasterComp,
+        search,
+        like,
+        like,
+        like,
+        idCategory,
+        idCategory,
+        paginate,
+        offset,
+      ],
     );
 
     return sendSuccess(res, 200, 'PRODUCTS_LISTED', 'Products loaded', {
