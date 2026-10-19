@@ -4,6 +4,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 import db = require('../../db');
 import keyhsid from '../../hsid';
+import { decodeId } from '../../helper/id.helper';
 import {
   PUBLIC_CONTENT_LOCALES,
   isPublicContentLocale,
@@ -15,7 +16,7 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 
 type TranslationInput = {
@@ -23,12 +24,6 @@ type TranslationInput = {
   question: string;
   answer: string;
   status: 0 | 1;
-};
-
-const decodeFaqId = (value: unknown): number | null => {
-  const decoded = keyhsid.idFaq.decode(String(value ?? ''));
-  const id = Number(decoded[0]);
-  return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
 const normalizeTranslations = (value: unknown): TranslationInput[] | null => {
@@ -80,7 +75,7 @@ const getPayload = (body: any) => {
   return { key, sortOrder, status, translations };
 };
 
-app.get(
+router.get(
   '/api/v1/faq',
   verifyToken,
   requirePermission('faq.view'),
@@ -168,14 +163,14 @@ app.get(
   },
 );
 
-app.get(
+router.get(
   '/api/v1/faq/:id',
   verifyToken,
   requirePermission('faq.view'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const idFaq = decodeFaqId(req.params.id);
+    const idFaq = decodeId(req.params.id, keyhsid.idFaq);
     if (!idFaq) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
 
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -207,7 +202,7 @@ app.get(
   },
 );
 
-app.post(
+router.post(
   '/api/v1/faq',
   verifyToken,
   requirePermission('faq.create'),
@@ -280,14 +275,14 @@ app.post(
   },
 );
 
-app.put(
+router.put(
   '/api/v1/faq/:id',
   verifyToken,
   requirePermission('faq.update'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const idFaq = decodeFaqId(req.params.id);
+    const idFaq = decodeId(req.params.id, keyhsid.idFaq);
     const payload = getPayload(req.body);
     if (!idFaq) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
     if (!payload) return sendError(res, 400, 'FAQ_PAYLOAD_INVALID', 'Complete both FAQ languages');
@@ -361,14 +356,14 @@ app.put(
   },
 );
 
-app.patch(
+router.patch(
   '/api/v1/faq/:id/status',
   verifyToken,
   requirePermission('faq.update'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const idFaq = decodeFaqId(req.params.id);
+    const idFaq = decodeId(req.params.id, keyhsid.idFaq);
     const status = Number(req.body?.status);
     if (!idFaq) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
     if (![0, 1].includes(status))
@@ -422,14 +417,14 @@ app.patch(
   },
 );
 
-app.delete(
+router.delete(
   '/api/v1/faq/:id',
   verifyToken,
   requirePermission('faq.delete'),
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const idFaq = decodeFaqId(req.params.id);
+    const idFaq = decodeId(req.params.id, keyhsid.idFaq);
     if (!idFaq) return sendError(res, 404, 'FAQ_NOT_FOUND', 'FAQ not found');
     const connection = await pool.getConnection();
     try {
@@ -479,4 +474,4 @@ app.delete(
   },
 );
 
-export default app;
+export default router;
