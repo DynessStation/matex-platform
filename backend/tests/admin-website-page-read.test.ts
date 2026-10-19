@@ -5,6 +5,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { AddressInfo } from 'node:net';
 import { pool } from '../src/db';
+import { errorHandler } from '../src/middleware/error-handler.middleware';
 
 process.env.FILE_STORAGE_ROOT ||= process.cwd();
 process.env.FILE_BASE_URL ||= 'http://localhost/files';
@@ -15,6 +16,7 @@ const originalQuery = pool.query;
 const app = express();
 app.use(cookieParser());
 app.use(router);
+app.use(errorHandler);
 const server = app.listen(0, '127.0.0.1');
 let base = '';
 let calls: { sql: string; params: unknown[] }[] = [];
@@ -85,34 +87,19 @@ test('page lookup requires the dedicated website page permission', async () => {
 
 test('page lookup is restricted to the signed-in admin company', async () => {
   reset();
-  rows.push(
-    [
-      {
-        id_admin_acct: 9,
-        id_master_comp: 7,
-        admin_acct_status: 1,
-      },
-    ],
-    [],
-  );
+  rows.push([]);
 
   const response = await request('about');
   assert.equal(response.status, 404);
-  assert.deepEqual(calls[1].params, [9]);
-  assert.deepEqual(calls[2].params, [7, 'about']);
-  assert.ok(calls[2].sql.includes('page.id_master_comp = ?'));
+  // The session account comes from verifyToken: no second account query.
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[1].params, [7, 'about']);
+  assert.ok(calls[1].sql.includes('page.id_master_comp = ?'));
 });
 
 test('detail returns only fixed-page fields and groups media translations', async () => {
   reset();
   rows.push(
-    [
-      {
-        id_admin_acct: 9,
-        id_master_comp: 7,
-        admin_acct_status: 1,
-      },
-    ],
     [
       {
         id_website_page: 42,
@@ -205,8 +192,8 @@ test('detail returns only fixed-page fields and groups media translations', asyn
   assert.equal(data.media[0].translations.length, 2);
   assert.equal(data.created_by, 'Admin');
 
-  assert.deepEqual(calls[2].params, [7, 'about']);
+  assert.deepEqual(calls[1].params, [7, 'about']);
+  assert.deepEqual(calls[2].params, [42, 7]);
   assert.deepEqual(calls[3].params, [42, 7]);
-  assert.deepEqual(calls[4].params, [42, 7]);
-  assert.ok(calls[4].sql.includes('attachment.id_master_comp = ?'));
+  assert.ok(calls[3].sql.includes('attachment.id_master_comp = ?'));
 });

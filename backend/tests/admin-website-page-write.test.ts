@@ -5,6 +5,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { AddressInfo } from 'node:net';
 import { pool } from '../src/db';
+import { errorHandler } from '../src/middleware/error-handler.middleware';
 import keyhsid from '../src/hsid';
 
 process.env.FILE_STORAGE_ROOT ||= process.cwd();
@@ -18,6 +19,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(router);
+app.use(errorHandler);
 const server = app.listen(0, '127.0.0.1');
 let base = '';
 let poolRows: any[][] = [];
@@ -62,7 +64,7 @@ const connection = {
         [],
       ];
     }
-    if (sql.includes('INSERT INTO website_page_media\n')) {
+    if (sql.includes('INSERT INTO website_page_media (')) {
       return [{ insertId: 88, affectedRows: 1 }, []];
     }
     if (sql.includes('INSERT INTO audit_log')) {
@@ -117,7 +119,6 @@ function reset() {
         admin_access_status: 1,
       },
     ],
-    [{ id_admin_acct: 9, id_master_comp: 7, admin_acct_status: 1 }],
   ];
 }
 
