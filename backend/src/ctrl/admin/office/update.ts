@@ -98,8 +98,16 @@ router.put(
         );
       }
 
+      if (cleanCode.length > 50) {
+        return sendError(res, 400, 'OFFICE_CODE_TOO_LONG', 'Office code is too long');
+      }
+
       if (!cleanName) {
         return sendError(res, 400, 'OFFICE_NAME_REQUIRED', 'Office name is required');
+      }
+
+      if (cleanName.length > 255) {
+        return sendError(res, 400, 'OFFICE_NAME_TOO_LONG', 'Office name is too long');
       }
 
       const cleanDescription = nullableString(office_description);
@@ -193,6 +201,15 @@ router.put(
       const rawSlug = nullableString(public_slug);
 
       const cleanSlug = isPublic === 1 ? slugFromText(rawSlug ?? cleanName) : null;
+
+      if (isPublic === 1 && !cleanSlug) {
+        return sendError(
+          res,
+          400,
+          'OFFICE_PUBLIC_SLUG_REQUIRED',
+          'Public slug is required for public office',
+        );
+      }
 
       const sortOrderRaw = Number(public_sort_order ?? 0);
 

@@ -262,7 +262,7 @@ test('update replaces fields, hours, and photos', async () => {
   expect(detail.data.attachments).toHaveLength(1);
 });
 
-test.fixme('update validates like create (audit BE-006)', async () => {
+test('update validates like create (audit BE-006)', async () => {
   const data = {
     ...newOffice(),
     attachments: [{ id_attachment: coverId, attachment_role: 'cover' }],
