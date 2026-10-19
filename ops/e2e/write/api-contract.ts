@@ -41,7 +41,9 @@ function mask(value: unknown, key = ""): unknown {
   if (value && typeof value === "object") {
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, mask(v, k)]));
   }
-  return volatileKey.test(key) && value !== null && value !== "" ? "<masked>" : value;
+  if (volatileKey.test(key) && value !== null && value !== "") return "<masked>";
+  // Uploaded files get random 32-hex names (also inside storage paths and URLs).
+  return typeof value === "string" ? value.replace(/[0-9a-f]{32}/g, "<random>") : value;
 }
 
 const recorded: unknown[] = [];
@@ -71,6 +73,73 @@ export async function login(identity: string, password: string): Promise<APIRequ
   );
   expect(body.data.id_admin_acct).toBeTruthy();
   return context;
+}
+
+export type AdminReferences = {
+  id_master_comp: string;
+  id_office: string;
+  id_chair: string;
+  id_access: string;
+};
+
+/** The first company, office, chair, and access profile offered by the admin-account selects. */
+export async function adminReferences(
+  context: APIRequestContext,
+  office?: string,
+): Promise<AdminReferences> {
+  const select = async (kind: string, params: Record<string, string> = {}) => {
+    const body = await expectCode(await context.get(`/api/v1/admin-acct/select/${kind}`, { params }), 200);
+    return body.data[0].value as string;
+  };
+  const company = await select("company");
+  return {
+    id_master_comp: company,
+    id_office: office ?? (await select("office", { id_master_comp: company })),
+    id_chair: await select("chair", { id_master_comp: company }),
+    id_access: await select("access", { id_master_comp: company }),
+  };
+}
+
+let accountCount = 0;
+
+/**
+ * Creates an admin account without full access (so it holds no permissions) and returns its
+ * id and credentials. `key` must be unique within the run (letters and digits only).
+ */
+export async function createAdminAccount(
+  context: APIRequestContext,
+  key: string,
+  references: AdminReferences,
+): Promise<{ id: string; identity: string; password: string }> {
+  const account = {
+    name: "Akun Uji Kontrak",
+    alias: `${key}${runId}`.slice(0, 15),
+    email_1: `${key.toLowerCase()}.${runId}@example.invalid`,
+    phone_1: `+6281${String(runNumber).padStart(7, "0")}${(accountCount += 1)}`,
+    password: `Uji-${key}-${runId}-9`,
+  };
+  const body = await expectCode(
+    await context.post("/api/v1/admin-acct", { data: { ...account, ...references, is_all_access: 0 } }),
+    201,
+    "ADMIN_ACCOUNT_CREATED",
+  );
+  return { id: body.data.id_admin_acct, identity: account.email_1, password: account.password };
+}
+
+/** Uploads write/fixtures/sample.png into an attachment collection and returns its id. */
+export async function uploadSample(context: APIRequestContext, collection: string): Promise<string> {
+  const file = path.join(path.dirname(stack.stateFile), "write", "fixtures", "sample.png");
+  const body = await expectCode(
+    await context.post("/api/v1/attachment", {
+      multipart: {
+        collection,
+        files: { name: "sample.png", mimeType: "image/png", buffer: fs.readFileSync(file) },
+      },
+    }),
+    201,
+    "ATTACHMENT_UPLOADED",
+  );
+  return body.data[0].id_attachment as string;
 }
 
 /** Writes the recording for this spec, including the current rows of `tables`. No-op unless recording. */
