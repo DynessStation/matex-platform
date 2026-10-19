@@ -58,14 +58,28 @@ File pendaftar memakai satu templat komentar: apa modulnya, path API-nya, apakah
 
 ### 2.3 Bentuk sebuah handler
 
-Target pola (Fase 5; modul generasi baru seperti `faq.ts` dan `product.ts` sudah mendekati):
+Pola standar (modul generasi baru seperti `faq.ts` sudah memakainya; modul lama dipindahkan di Fase 5C):
 
-1. Middleware: `verifyToken`, lalu `requirePermission("<modul>.<aksi>")`.
-2. Scope sesi (perusahaan, kantor, akses) diambil dari helper bersama, bukan query sendiri. Target akhirnya: dibaca dari `req`, yang sudah diisi middleware izin, sehingga tidak ada query akun yang diulang.
-3. Input dibaca dan divalidasi dengan helper bersama (`helper/input.helper.ts`, rencana Fase 5), dan menolak dengan kode yang jelas.
-4. Perubahan data memakai transaksi (helper `withTransaction`, rencana) dan menulis audit log (`writeAuditLog`).
-5. Respons memakai `sendSuccess` dan `sendError` (`helper/api-response.helper.ts`), bukan `res.json` langsung.
-6. Error tak terduga diteruskan ke penanganan error pusat di `app.ts` (Express 5 sudah meneruskan error dari fungsi async), kecuali kalau handler perlu rollback.
+1. Middleware: `verifyToken`, lalu `requirePermission('<modul>.<aksi>')`.
+2. Scope sesi lewat `getAdminScope(req)`. Di belakang `requirePermission`, scope sudah dititipkan di `req.adminScope`, jadi tidak ada query akun yang diulang. Jangan menulis query sesi sendiri.
+3. Input dibaca dan divalidasi dengan helper bersama, dan ditolak dengan kode yang jelas.
+4. Perubahan data memakai `withTransaction` dan menulis audit log (`writeAuditLog`).
+5. Respons memakai `sendSuccess` dan `sendError`, bukan `res.json` langsung.
+6. Kegagalan yang diharapkan boleh `throw new HttpError(status, kode, pesan)` dari mana saja: penanganan error pusat (`middleware/error-handler.middleware.ts`) menjawabnya, dan `withTransaction` melakukan rollback dulu. Error tak terduga dijawab 500 oleh penanganan yang sama.
+
+Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi bantu):
+
+| Helper | Isi |
+| --- | --- |
+| `admin-scope.helper.ts` | `getAdminScope`: admin, perusahaan, kantor, profil akses, full-access |
+| `input.helper.ts` | `nullableString`, `trimTo`, `toFlag` / `parseFlag`, `slugFromText`, `contentSlug`, `isValidEmail`, `isValidHttpUrl` |
+| `id.helper.ts` | `decodeId(value, codec)` untuk ID hashids |
+| `list-query.helper.ts` | `parseListQuery` (page, limit, search) dan `sortDirection` |
+| `json.helper.ts` | `parseJsonValue` untuk kolom JSON |
+| `transaction.helper.ts` | `withTransaction` |
+| `http-error.helper.ts` | `HttpError` |
+| `api-response.helper.ts` | `sendSuccess`, `sendError` |
+| `audit-log.helper.ts` | `writeAuditLog` |
 
 ### 2.4 Konvensi API dan database
 

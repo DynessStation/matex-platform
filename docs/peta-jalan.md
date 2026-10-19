@@ -8,7 +8,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 
 - **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `e46d5fa`. Lokal, GitHub, dan VPS sama persis.
 - **Kondisi:** fondasi operasional aman (backup terenkripsi di luar VPS, restore sudah dilatih, SSH root hanya dengan kunci, log dirotasi). Kode backend sedang diseragamkan; empat controller terbesar sudah dipecah dan dijaga test kontrak.
-- **Test:** backend 61 unit test; e2e 40 test (35 kontrak API + 5 browser). Semuanya lulus.
+- **Test:** backend 77 unit test; e2e 40 test (35 kontrak API + 5 browser). Semuanya lulus.
 
 ## Yang sudah selesai
 
@@ -30,6 +30,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 | 19 Okt | 4E–4G | `office.ts`, `admin-access.ts`, `web-navigation.ts` dipecah, masing-masing dengan test kontrak; rekaman identik |
 | 19 Okt | Audit lanjutan | Penamaan modul diseragamkan; semua di atas di-deploy ke production (`e46d5fa`) |
 | 19 Okt | 5A | Format dan lint backend seragam (Prettier root config, Oxlint); 0 error lint |
+| 19 Okt | 5B | Fondasi bersama: scope sesi sekali per request, helper input/ID/list/JSON/transaksi, `HttpError`; salinan kembar diganti |
 
 ## Ke mana selanjutnya
 
@@ -40,7 +41,7 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 | Langkah | Isi | Selesai bila |
 | --- | --- | --- |
 | 5A Gaya ✅ | Satu config Prettier di root; Oxlint untuk backend (TypeScript 7 belum didukung ESLint); satu commit format murni; 1.397 baris komentar pembatas dan 2.215 celah kosong dirapatkan | **Selesai 19 Okt:** lint backend 0 error (309 warning = daftar utang 5C); syntax tree 122 file identik |
-| 5B Fondasi bersama | Scope sesi diambil sekali oleh middleware lalu dibaca dari `req`; helper input, ID, list query, JSON, dan transaksi, masing-masing dengan unit test | Helper siap dipakai; satu request tidak lagi mengulang query akun |
+| 5B Fondasi bersama ✅ | Scope sesi diambil sekali oleh middleware lalu dibaca dari `req`; helper input, ID, list query, JSON, transaksi, `HttpError`, dan penanganan error pusat, semua dengan unit test; salinan kembar langsung diganti | **Selesai 19 Okt:** modul generasi baru menjalankan 1 query akun per request (sebelumnya 2); rekaman identik |
 | 5C Pindah ke pola | Modul dipindah satu per satu, test kontrak dulu. Belum punya test: `chair`, `audit-log`, `admin-permission`, `attachment`, `website-page`. Sudah punya: `office`, `admin-access`, `web-navigation`, `admin-account`. Lalu penyesuaian kecil di modul generasi baru | Tidak ada salinan `getSessionScope` atau fungsi bantu kembar; rekaman tiap modul identik |
 | 5D Keputusan seragam | Satu format pagination dan satu cara soft delete. Ini mengubah perilaku, jadi dikerjakan bersama frontend di Fase 6 dan, bila perlu, dengan migration | Satu format di seluruh API |
 
