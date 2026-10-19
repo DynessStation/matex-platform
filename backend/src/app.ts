@@ -3,7 +3,7 @@ import 'dotenv/config';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import fs from 'fs';
 import helmet from 'helmet';
@@ -12,6 +12,7 @@ import path from 'path';
 
 import { validateRuntimeConfig } from './config/runtime.config';
 import storageConfig from './config/storage.config';
+import { errorHandler } from './middleware/error-handler.middleware';
 import { requestContextMiddleware } from './middleware/request-context.middleware';
 import { pool } from './db';
 
@@ -192,19 +193,7 @@ app.use((req, res) => {
   });
 });
 
-app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('[API] Unhandled request error', error);
-
-  if (res.headersSent) {
-    return;
-  }
-
-  res.status(500).json({
-    success: false,
-    code: 'INTERNAL_SERVER_ERROR',
-    message: 'Internal Server Error',
-  });
-});
+app.use(errorHandler);
 
 const port = positiveInteger(process.env.PORT, 3000);
 let server: Server | null = null;
