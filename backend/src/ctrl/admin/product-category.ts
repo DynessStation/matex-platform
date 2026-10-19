@@ -17,7 +17,7 @@ import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug, trimTo } from '../../helper/input.helper';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 const statuses = new Set(['draft', 'published', 'archived']);
 
@@ -131,7 +131,7 @@ const makeTree = (items: any[]) => {
   return roots;
 };
 
-app.get(
+router.get(
   '/api/v1/product-categories',
   verifyToken,
   requirePermission('product_category.view'),
@@ -165,7 +165,7 @@ app.get(
   },
 );
 
-app.patch(
+router.patch(
   '/api/v1/product-categories/reorder',
   verifyToken,
   requirePermission('product_category.update'),
@@ -255,7 +255,7 @@ app.patch(
   },
 );
 
-app.get(
+router.get(
   '/api/v1/product-categories/:id',
   verifyToken,
   requirePermission('product_category.view'),
@@ -509,13 +509,13 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   }
 };
 
-app.post(
+router.post(
   '/api/v1/product-categories',
   verifyToken,
   requirePermission('product_category.create'),
   (req, res) => save(req, res, null),
 );
-app.put(
+router.put(
   '/api/v1/product-categories/:id',
   verifyToken,
   requirePermission('product_category.update'),
@@ -526,7 +526,7 @@ app.put(
       : sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
   },
 );
-app.delete(
+router.delete(
   '/api/v1/product-categories/:id',
   verifyToken,
   requirePermission('product_category.delete'),
@@ -560,4 +560,4 @@ app.delete(
   },
 );
 
-export default app;
+export default router;

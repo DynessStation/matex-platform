@@ -7,7 +7,7 @@ import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 
 type AssistMode = 'translate' | 'generate';
@@ -130,7 +130,7 @@ const extractOutputText = (response: any) => {
   return '';
 };
 
-app.post(
+router.post(
   '/api/v1/content-assistant',
   verifyToken,
   requirePermission('content_assistant.use'),
@@ -279,4 +279,4 @@ app.post(
   },
 );
 
-export default app;
+export default router;

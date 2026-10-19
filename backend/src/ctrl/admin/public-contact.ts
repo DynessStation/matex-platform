@@ -15,7 +15,7 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 
 const normalizeUrl = (value: unknown): string | null | undefined => {
@@ -209,7 +209,7 @@ const loadSettings = async (idMasterComp: number) => {
   };
 };
 
-app.get(
+router.get(
   '/api/v1/public-contact',
   verifyToken,
   requirePermission('public_contact.view'),
@@ -231,7 +231,7 @@ app.get(
   },
 );
 
-app.put(
+router.put(
   '/api/v1/public-contact',
   verifyToken,
   requirePermission('public_contact.update'),
@@ -422,4 +422,4 @@ app.put(
   },
 );
 
-export default app;
+export default router;

@@ -18,7 +18,7 @@ import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { trimTo } from '../../helper/input.helper';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 const statuses = new Set(['draft', 'published', 'archived']);
 const types = new Set(['physical', 'service', 'digital']);
@@ -346,7 +346,7 @@ const baseSelect = `SELECT p.*,i.product_slug,i.product_name,i.product_short_des
  i.product_og_title,i.product_og_description FROM product_catalog p
  LEFT JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.product_locale=?`;
 
-app.get(
+router.get(
   '/api/v1/products',
   verifyToken,
   requirePermission('product.view'),
@@ -397,7 +397,7 @@ app.get(
   },
 );
 
-app.get(
+router.get(
   '/api/v1/products/:id',
   verifyToken,
   requirePermission('product.view'),
@@ -720,13 +720,13 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   }
 };
 
-app.post(
+router.post(
   '/api/v1/products',
   verifyToken,
   requirePermission('product.create'),
   (req: AuthRequest, res: Response) => save(req, res, null),
 );
-app.put(
+router.put(
   '/api/v1/products/:id',
   verifyToken,
   requirePermission('product.update'),
@@ -735,7 +735,7 @@ app.put(
     return id ? save(req, res, id) : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
-app.patch(
+router.patch(
   '/api/v1/products/:id/status',
   verifyToken,
   requirePermission('product.update'),
@@ -755,7 +755,7 @@ app.patch(
       : sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
   },
 );
-app.delete(
+router.delete(
   '/api/v1/products/:id',
   verifyToken,
   requirePermission('product.delete'),
@@ -774,4 +774,4 @@ app.delete(
   },
 );
 
-export default app;
+export default router;

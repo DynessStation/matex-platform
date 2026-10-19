@@ -63,6 +63,8 @@ export async function expectCode(
     status,
     code: code ?? body.code,
   });
+  // app.ts turns this header off; no route may bring it back (SEC-007).
+  expect(response.headers()['x-powered-by']).toBeUndefined();
   return body;
 }
 

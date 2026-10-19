@@ -11,11 +11,11 @@ import deleteRoutes from './admin-access/delete';
 // so this file registers them. Order matters inside read: /permission-matrix must come before
 // /:id, because Express matches routes in registration order.
 // Contract: ops/e2e/write/admin-access-api.spec.ts.
-const app = express();
+const router = express.Router();
 
-app.use(readRoutes);
-app.use(createRoutes);
-app.use(updateRoutes);
-app.use(deleteRoutes);
+router.use(readRoutes);
+router.use(createRoutes);
+router.use(updateRoutes);
+router.use(deleteRoutes);
 
-export default app;
+export default router;

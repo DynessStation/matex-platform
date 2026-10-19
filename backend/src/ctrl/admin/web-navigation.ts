@@ -12,13 +12,13 @@ import reorderRoutes from './web-navigation/reorder';
 // The route modules live in ./web-navigation, which the auto-loader in app.ts does not scan,
 // so this file registers them. Order does not matter: their paths do not overlap.
 // Contract: ops/e2e/write/web-navigation-api.spec.ts.
-const app = express();
+const router = express.Router();
 
-app.use(readRoutes);
-app.use(createRoutes);
-app.use(updateRoutes);
-app.use(deleteRoutes);
-app.use(itemsRoutes);
-app.use(reorderRoutes);
+router.use(readRoutes);
+router.use(createRoutes);
+router.use(updateRoutes);
+router.use(deleteRoutes);
+router.use(itemsRoutes);
+router.use(reorderRoutes);
 
-export default app;
+export default router;

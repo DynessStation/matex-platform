@@ -13,13 +13,13 @@ import deleteRoutes from './admin-account/delete';
 // so this file registers them. Order matters: session and select register /me and /select/*,
 // which must come before /:id in read, because Express matches routes in registration order.
 // Contract: ops/e2e/write/admin-account-api.spec.ts.
-const app = express();
+const router = express.Router();
 
-app.use(sessionRoutes);
-app.use(selectRoutes);
-app.use(readRoutes);
-app.use(createRoutes);
-app.use(updateRoutes);
-app.use(deleteRoutes);
+router.use(sessionRoutes);
+router.use(selectRoutes);
+router.use(readRoutes);
+router.use(createRoutes);
+router.use(updateRoutes);
+router.use(deleteRoutes);
 
-export default app;
+export default router;

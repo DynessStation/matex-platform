@@ -7,9 +7,9 @@ import updateRoutes from './website-page/update';
 //
 // The route modules live in ./website-page, which the auto-loader in app.ts does not scan,
 // so this file registers them. Contract: ops/e2e/write/website-page-api.spec.ts.
-const app = express();
+const router = express.Router();
 
-app.use(readRoutes);
-app.use(updateRoutes);
+router.use(readRoutes);
+router.use(updateRoutes);
 
-export default app;
+export default router;

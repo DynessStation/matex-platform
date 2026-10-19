@@ -17,7 +17,7 @@ import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug } from '../../helper/input.helper';
 
-const app = express();
+const router = express.Router();
 const { pool } = db;
 const statuses = new Set(['draft', 'published', 'scheduled', 'archived']);
 
@@ -116,7 +116,7 @@ const attachmentDto = (row: any, prefix: string) =>
       }
     : null;
 
-app.get(
+router.get(
   '/api/v1/articles',
   verifyToken,
   requirePermission('article.view'),
@@ -179,7 +179,7 @@ app.get(
   },
 );
 
-app.get(
+router.get(
   '/api/v1/articles/:id',
   verifyToken,
   requirePermission('article.view'),
@@ -393,14 +393,14 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     cx.release();
   }
 };
-app.post('/api/v1/articles', verifyToken, requirePermission('article.create'), (req, res) =>
+router.post('/api/v1/articles', verifyToken, requirePermission('article.create'), (req, res) =>
   save(req, res, null),
 );
-app.put('/api/v1/articles/:id', verifyToken, requirePermission('article.update'), (req, res) => {
+router.put('/api/v1/articles/:id', verifyToken, requirePermission('article.update'), (req, res) => {
   const id = decodeId(req.params.id, keyhsid.idArticle);
   return id ? save(req, res, id) : sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
 });
-app.patch(
+router.patch(
   '/api/v1/articles/:id/status',
   verifyToken,
   requirePermission('article.update'),
@@ -418,7 +418,7 @@ app.patch(
     return sendSuccess(res, 200, 'ARTICLE_STATUS_UPDATED', 'Article status updated', null);
   },
 );
-app.delete(
+router.delete(
   '/api/v1/articles/:id',
   verifyToken,
   requirePermission('article.delete'),
@@ -435,4 +435,4 @@ app.delete(
   },
 );
 
-export default app;
+export default router;
