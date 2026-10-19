@@ -77,8 +77,9 @@ Target pola (Fase 5; modul generasi baru seperti `faq.ts` dan `product.ts` sudah
 
 ### 2.5 Gaya penulisan
 
-- Satu formatter untuk semua file backend (Prettier, rencana Fase 5A), dan ESLint dengan aturan yang sama di setiap modul.
-- Komentar menjelaskan **kenapa**, bukan mengulang kode. Komentar pembatas `//====` dan baris kosong berlebihan dari generasi kode lama dibuang saat modul dirapikan.
+- **Format:** satu config Prettier di root repo (`.prettierrc.json`: lebar 100, petik tunggal). Backend dan `ops` sudah memakainya; frontend masih memakai config lokalnya (admin lebar 80, public 100) dan disamakan di Fase 6. Perintah: `npm run format` dan `npm run format:check` di `backend` dan `ops/e2e`.
+- **Lint backend:** Oxlint (`npm run lint` di `backend`, config `backend/.oxlintrc.json`). Dipilih karena backend memakai TypeScript 7, yang belum didukung typescript-eslint. Aturan: kategori *correctness* dan variabel tak terpakai adalah **error** (harus 0); tipe `any`, `==`, dan file di atas 800 baris adalah **warning**, yaitu daftar utang yang dicicil di Fase 5C. Frontend tetap memakai ESLint karena butuh aturan template Angular.
+- Komentar menjelaskan **kenapa**, bukan mengulang kode. Komentar pembatas `//====` dari generasi kode lama sudah diringkas menjadi satu baris komentar biasa (Fase 5A). Tidak menulis pembatas baru.
 - Tipe nyata, bukan `any`, untuk data yang keluar-masuk fungsi.
 
 ## 3. Test dan bukti

@@ -3,3 +3,6 @@
 
 # style(frontend): format admin and public src with Prettier (FE-002)
 7a19f9c59276d48ac9c8b13af2fd65fbbce87735
+
+# style: format the backend and ops with the shared Prettier config (Phase 5A)
+3d0d92c7d6cefdef7188efa9f89518f7a57f796e

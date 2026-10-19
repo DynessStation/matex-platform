@@ -182,6 +182,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
 - Struktur folder juga tidak konsisten: middleware Express ada di `src/ctrl/middleware/` dengan nama camelCase (`authJwt.ts`), dan `src/helpers.ts` sudah tidak dipakai.
 - Fase 4D (19 Oktober 2026): middleware dipindah ke `src/middleware/` (`auth-jwt.middleware.ts`, `auth-permission.middleware.ts`, `request-context.middleware.ts`) dan `src/helpers.ts` dihapus. Rekaman test kontrak identik sebelum dan sesudahnya. Struktur target dan konvensi nama ada di `docs/standar-kode.md`. Penyeragaman gaya penulisan di dalam file dilakukan saat file itu dipecah atau diubah.
+- Fase 5A (19 Oktober 2026): satu config Prettier di root dan Oxlint untuk backend. Komentar pembatas dan baris kosong berlebihan dirapatkan dalam satu commit format murni (syntax tree 122 file identik, tercatat di `.git-blame-ignore-revs`). Lint backend 0 error. Sisa BE-002 (dua generasi pola kode) dikerjakan di Fase 5B–5C.
 
 **BE-003 — Hal yang sudah benar di backend** · Info
 - Semua query database memakai parameter (aman dari SQL injection), perubahan data dibungkus transaksi, data dicek kepemilikannya per perusahaan sebelum diubah, dan ada rate limit untuk login dan API.
