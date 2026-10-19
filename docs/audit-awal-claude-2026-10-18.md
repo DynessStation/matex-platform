@@ -173,9 +173,16 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 ### Frontend
 
-**FE-001 — Banyak modul sisa template Kartify yang tidak dipakai** · P2 · Terbukti
+**FE-001 — Banyak modul sisa template Kartify yang tidak dipakai** · P2 · **Selesai (Fase 4A, 19 Oktober 2026)**
 - Admin punya sekitar 27 folder modul (order, wallet, coupon, store, dan lain-lain) yang tidak lagi punya halaman. Sudah dikeluarkan dari build, tapi file-nya masih ada.
-- Sesuai keputusan sebelumnya, ini sengaja disimpan untuk referensi v2. Perlu dirapikan bertahap.
+- Pengukuran lewat graf import TypeScript (termasuk import type): 269 dari 546 file `.ts` admin (40.461 dari 80.219 baris) dan 70 dari 366 file `.ts` public tidak terjangkau dari titik masuk aplikasi.
+- Perbaikan: semua kode itu diarsipkan di tag Git `kartify-reference-v1`, lalu dihapus dari kode aktif beserta template/style-nya (admin 541 file, public 186 file). Bukti tanpa perubahan perilaku: hasil build production public identik byte demi byte (1.100 file). Admin identik kecuali CSS global, yang juga berbeda di antara dua build dari sumber yang sama karena SCSS Kartify memakai `math.random()` (lihat FE-010). Lint, build, dan test e2e 5/5 lulus.
+- Aturan ke depan: sebelum membuat modul baru, cek desain Kartify yang cocok di tag itu (lihat README, bagian Kartify Design Reference).
+
+**FE-010 — Build CSS admin tidak deterministik** · P3 · Terbukti
+- `frontend/admin/public/assets/scss/themes/_dark-sidebar.scss` memakai `math.random()` untuk warna ikon layout sidebar `iconcolor-sidebar`, sehingga setiap build menghasilkan CSS (dan nama file) berbeda walaupun kodenya sama.
+- Dampak: cache CSS di browser pengguna selalu dianggap baru setiap deploy, dan perbandingan build tidak bisa dipakai sebagai bukti identik.
+- Saran: ganti pilihan acak dengan urutan warna tetap.
 
 **FE-002 — Ribuan peringatan lint di admin** · P3 · Terbukti
 - Admin: 17.114 peringatan, sekitar 97% hanya soal format (spasi, akhir baris). Public: 133 peringatan. Error: 0.
@@ -283,7 +290,7 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
-| Maintainability | BE-001, BE-002, FE-001, FE-002 |
+| Maintainability | BE-001, BE-002, FE-002, FE-010 (FE-001 selesai) |
 | Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
 | Kekurangan test | TEST-001 (sebagian selesai) |
 | Kekurangan dokumentasi | DOC-001 |
@@ -315,7 +322,8 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 **Fase 4 — Kerapian bertahap**
 - BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah.
 - FE-002: satu commit khusus format.
-- FE-001: rapikan modul sisa Kartify per kelompok.
+- FE-001: rapikan modul sisa Kartify per kelompok. **Selesai (4A).**
+- FE-010: buat build CSS admin deterministik.
 
 **Fase 5 — Lanjut fitur**
 Fitur baru v1, lalu persiapan v2 (commerce), aplikasi mobile, dan keputusan semi-open-source.

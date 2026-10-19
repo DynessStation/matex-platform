@@ -42,6 +42,20 @@ During server-side rendering, both frontends reach the API and their own assets 
 
 Production builds without these variables fall back to the production loopback ports.
 
+## Kartify Design Reference
+
+Both frontends started from the purchased Kartify template. Kartify modules that MATEX v1 does not use (orders, cart, coupons, shipping, wallet, stores, themes, and so on) were removed from the code to keep it maintainable, and are archived in the git tag `kartify-reference-v1`.
+
+**Before building a new module, check that tag for a Kartify design or component that fits, and adapt it instead of starting from scratch.** For example:
+
+```bash
+git ls-tree -r --name-only kartify-reference-v1 -- frontend/admin/src/app/components
+git show kartify-reference-v1:frontend/admin/src/app/components/order/order.html
+git checkout kartify-reference-v1 -- frontend/admin/src/app/components/coupon
+```
+
+Kartify is a visual reference; its demo data and fixtures are not MATEX business logic.
+
 ## Browser Tests
 
 `ops/e2e` has two Playwright suites:
