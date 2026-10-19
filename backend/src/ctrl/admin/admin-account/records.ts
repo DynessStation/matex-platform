@@ -122,7 +122,7 @@ export const profilePhotoDto = (row: any) =>
 export const SESSION_ACCOUNT_SELECT = `SELECT aa.id_admin_acct, aa.id_master_comp, aa.id_office,
     aa.password, aa.name, aa.alias, aa.email_1, aa.email_2, aa.phone_1, aa.phone_2,
     aa.id_profile_photo, ${PROFILE_PHOTO_COLUMNS}, aa.id_chair, aa.id_access, aa.is_all_access,
-    aa.admin_acct_status, mc.comp_name, mc.comp_alias, o.office_name, o.address, ch.chair_name,
+    aa.admin_acct_status, aa.token_version, mc.comp_name, mc.comp_alias, o.office_name, o.address, ch.chair_name,
     ch.chair_description, ac.access_name, ac.id_master_comp AS access_master_comp,
     ac.admin_access_status
   FROM admin_acct aa

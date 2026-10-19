@@ -122,7 +122,12 @@ router.post('/api/v1/admin-acct/login', multer().none(), async (req: Request, re
   const secretKey = process.env.JWT_SECRET;
   if (!secretKey) throw new Error('JWT_SECRET is not configured');
   const token = jwt.sign(
-    { id_admin_acct: user.id_admin_acct, alias: user.alias, id_access: user.id_access },
+    {
+      id_admin_acct: user.id_admin_acct,
+      alias: user.alias,
+      id_access: user.id_access,
+      tv: Number(user.token_version ?? 0),
+    },
     secretKey,
     {
       expiresIn: (process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']) || '24h',
@@ -155,7 +160,8 @@ router.post('/api/v1/admin-acct/login', multer().none(), async (req: Request, re
   });
 });
 
-// Logout always succeeds and clears the cookie; a valid token only adds the audit entry.
+// Logout always succeeds and clears the cookie. A valid token also revokes every token of the
+// account (audit SEC-003) and adds the audit entry.
 router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res: Response) => {
   const token = req.cookies?.access_token;
   let logoutUser: jwt.JwtPayload | null = null;
@@ -172,6 +178,11 @@ router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res: Response)
   const idAdminAcct = Number(logoutUser?.id_admin_acct);
   if (Number.isInteger(idAdminAcct) && idAdminAcct > 0) {
     try {
+      // A token that was already revoked matches no row, so it cannot end newer sessions.
+      await pool.query(
+        'UPDATE admin_acct SET token_version = token_version + 1 WHERE id_admin_acct = ? AND token_version = ?',
+        [idAdminAcct, Number(logoutUser?.tv ?? 0)],
+      );
       const [rows] = await pool.query(
         'SELECT id_admin_acct, id_master_comp, alias FROM admin_acct WHERE id_admin_acct = ? LIMIT 1',
         [idAdminAcct],

@@ -8,7 +8,7 @@ import { writeAuditLog } from '../helper/audit-log.helper';
 
 import type { AdminScope } from '../helper/admin-scope.helper';
 
-import { AuthRequest } from './auth-jwt.middleware';
+import { ACCOUNT_ACCESS_QUERY, AuthRequest } from './auth-jwt.middleware';
 
 // Database
 
@@ -53,42 +53,14 @@ export const requirePermission =
         return;
       }
 
-      // Current account + access
+      // Current account + access, already loaded by verifyToken() on normal routes.
 
-      const [accountRows] = await pool.query(
-        `
-            SELECT
-              aa.id_admin_acct,
-
-              aa.alias,
-
-              aa.id_master_comp,
-              aa.id_office,
-              aa.id_access,
-
-              aa.is_all_access,
-              aa.admin_acct_status,
-
-              ac.id_master_comp
-                AS access_master_comp,
-
-              ac.access_name,
-              ac.admin_access_status
-
-            FROM admin_acct aa
-
-            INNER JOIN admin_access ac
-              ON aa.id_access =
-                ac.id_admin_access
-
-            WHERE aa.id_admin_acct = ?
-
-            LIMIT 1
-          `,
-        [idAdminAcct],
-      );
-
-      const accounts = accountRows as any[];
+      const accounts =
+        req.adminAccount !== undefined
+          ? req.adminAccount
+            ? [req.adminAccount]
+            : []
+          : ((await pool.query(ACCOUNT_ACCESS_QUERY, [idAdminAcct]))[0] as any[]);
 
       // Account not found
 

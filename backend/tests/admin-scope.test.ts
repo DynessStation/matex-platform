@@ -2,8 +2,11 @@ import assert from 'node:assert/strict';
 import { after } from 'node:test';
 import test from 'node:test';
 
+import jwt from 'jsonwebtoken';
+
 import { pool } from '../src/db';
 import { adminHasPermission, getAdminScope } from '../src/helper/admin-scope.helper';
+import { verifyToken } from '../src/middleware/auth-jwt.middleware';
 import { requirePermission } from '../src/middleware/auth-permission.middleware';
 
 // requirePermission() stores the admin scope on req, and getAdminScope() reuses it, so a request
@@ -148,4 +151,45 @@ test('requirePermission leaves no scope when it refuses', async () => {
   assert.equal(res.statusCode, 403);
   assert.equal(res.body.code, 'AUTH_PERMISSION_DENIED');
   assert.equal(req.adminScope, undefined);
+});
+
+const SECRET = 'admin-scope-test-secret';
+const signed = (payload: Record<string, unknown>) => jwt.sign(payload, SECRET);
+const runVerify = async (token: string) => {
+  const req: any = { cookies: { access_token: token }, headers: {}, get: () => undefined };
+  const res = fakeRes();
+  let nextCalled = false;
+  await verifyToken(req, res, () => {
+    nextCalled = true;
+  });
+  return { req, res, nextCalled };
+};
+
+test('verifyToken: a token from before the last logout is revoked (audit SEC-003)', async () => {
+  process.env.JWT_SECRET = SECRET;
+  stubPool({ ...accountRow, token_version: 2 });
+
+  const current = await runVerify(signed({ id_admin_acct: 11, tv: 2 }));
+  assert.equal(current.nextCalled, true);
+  assert.equal(current.req.adminAccount.id_admin_acct, 11);
+
+  const revoked = await runVerify(signed({ id_admin_acct: 11, tv: 1 }));
+  assert.equal(revoked.nextCalled, false);
+  assert.equal(revoked.res.statusCode, 401);
+  assert.equal(revoked.res.body.code, 'AUTH_TOKEN_INVALID_OR_EXPIRED');
+
+  // Tokens issued before token versions existed count as version 0.
+  stubPool({ ...accountRow, token_version: 0 });
+  assert.equal((await runVerify(signed({ id_admin_acct: 11 }))).nextCalled, true);
+});
+
+test('requirePermission reuses the account loaded by verifyToken', async () => {
+  const queries = stubPool(accountRow);
+  const req: any = { ...fakeReq(), adminAccount: { ...accountRow } };
+  let nextCalled = false;
+  await requirePermission('faq.view')(req, fakeRes(), () => {
+    nextCalled = true;
+  });
+  assert.equal(nextCalled, true);
+  assert.equal(queries.filter((sql) => sql.includes('FROM admin_acct')).length, 0);
 });

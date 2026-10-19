@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import { expect, request, test, type APIRequestContext } from '@playwright/test';
 
 import {
   admin,
@@ -12,6 +12,7 @@ import {
   saveRecording,
   uploadSample,
 } from './api-contract';
+import { stack } from './stack.mjs';
 
 // API contract for the admin session and admin-account endpoints
 // (backend/src/ctrl/admin/admin-account.ts and its ./admin-account folder). It pins status codes,
@@ -427,4 +428,39 @@ test('office-scoped admins stay within their office and cannot touch full-access
 test('logout ends the session', async () => {
   await expectCode(await owner.post(`${base}/logout`), 200, 'AUTH_LOGOUT_SUCCESS');
   await expectCode(await owner.get(`${base}/me`), 401, 'AUTH_TOKEN_REQUIRED');
+});
+
+test('logout revokes every session of the account, including copied tokens (audit SEC-003)', async () => {
+  const loginOnce = async () => {
+    const context = await request.newContext({ baseURL: stack.apiOrigin });
+    const response = await context.post(`${base}/login`, {
+      data: { identity: admin.identity, password: admin.password },
+    });
+    await expectCode(response, 200, 'AUTH_LOGIN_SUCCESS');
+    const token = /access_token=([^;]+)/.exec(response.headers()['set-cookie'] ?? '')?.[1];
+    expect(token).toBeTruthy();
+    return { context, token: token as string };
+  };
+  const first = await loginOnce();
+  const second = await loginOnce();
+  const copied = await request.newContext({
+    baseURL: stack.apiOrigin,
+    extraHTTPHeaders: { cookie: `access_token=${first.token}` },
+  });
+  try {
+    await expectCode(await copied.get(`${base}/me`), 200, 'AUTH_AUTHENTICATED');
+    await expectCode(await first.context.post(`${base}/logout`), 200, 'AUTH_LOGOUT_SUCCESS');
+
+    await expectCode(await copied.get(`${base}/me`), 401, 'AUTH_TOKEN_INVALID_OR_EXPIRED');
+    await expectCode(await second.context.get(`${base}/me`), 401, 'AUTH_TOKEN_INVALID_OR_EXPIRED');
+    await expectCode(await copied.get(base), 401, 'AUTH_TOKEN_INVALID_OR_EXPIRED');
+
+    // Logging in again works, and a revoked token cannot log the new session out.
+    const third = await loginOnce();
+    await expectCode(await copied.post(`${base}/logout`), 200, 'AUTH_LOGOUT_SUCCESS');
+    await expectCode(await third.context.get(`${base}/me`), 200, 'AUTH_AUTHENTICATED');
+    await third.context.dispose();
+  } finally {
+    await Promise.all([first.context.dispose(), second.context.dispose(), copied.dispose()]);
+  }
 });

@@ -55,6 +55,27 @@ export const getAdminScope = async (
     return { success: true, ...req.adminScope };
   }
 
+  // verifyToken() already loaded the account on routes without requirePermission().
+  if (req.adminAccount !== undefined) {
+    const account = req.adminAccount;
+    if (!account || Number(account.admin_acct_status) !== 1) {
+      return {
+        success: false,
+        status: account ? 403 : 401,
+        code: account ? 'AUTH_ACCOUNT_INACTIVE' : 'AUTH_SESSION_INVALID',
+        message: account ? 'Your account is not active' : 'Invalid session',
+      };
+    }
+    req.adminScope = {
+      idAdminAcct: Number(account.id_admin_acct),
+      idMasterComp: Number(account.id_master_comp),
+      idOffice: Number(account.id_office),
+      idAccess: Number(account.id_access),
+      isAllAccess: Number(account.is_all_access),
+    };
+    return { success: true, ...req.adminScope };
+  }
+
   const idAdminAcct = Number(req.user?.id_admin_acct);
 
   if (!Number.isSafeInteger(idAdminAcct) || idAdminAcct <= 0) {
