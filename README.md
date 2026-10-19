@@ -73,6 +73,8 @@ One-time local setup for the write suite: the database user in `backend/.env` ne
 
 While writing tests, start the stack once and rerun against it with `MATEX_E2E_REUSE=1 npx playwright test -c playwright.write.config.ts`.
 
+`npm run test:api` runs only the API contract specs (`write/*-api.spec.ts`) against the e2e API, without building the frontends, so it finishes in seconds. With `MATEX_E2E_RECORD=recordings/<name>` it also writes every checked response and the rows of the tables each spec names to `recordings/<name>/<spec>.json` (git-ignored), with timestamps, uuids, and tokens masked. Record before and after a refactor and compare the files to prove the API behaves the same. The full workflow is in `docs/konsep-kerapian-kode.md`.
+
 ## Current Baseline
 
 Phase 4.8 stabilization complete.
