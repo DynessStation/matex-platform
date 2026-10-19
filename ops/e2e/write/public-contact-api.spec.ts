@@ -54,6 +54,7 @@ test.afterAll(async () => {
     'contact_inquiry_topic',
     'contact_inquiry_topic_i18n',
     'contact_inquiry',
+    'audit_log',
   ]);
   await anonymous?.dispose();
   await owner?.dispose();
