@@ -220,8 +220,11 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
 - Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, dan akun admin.
 
-**OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · Dugaan (berdasarkan dokumen sendiri)
+**OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · **Selesai**
 - `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
+- Salinan di luar VPS: lihat V-2 (Google Drive terenkripsi, harian).
+- Latihan restore 19 Oktober 2026: backup otomatis `matex-20261018T191501Z` diunduh dari VPS, checksum-nya diverifikasi, lalu dipulihkan dengan `backup:restore` ke database terpisah `mia_restore_drill` di MySQL 8.4 lokal (versi sama dengan production) dalam 40 detik. Hasil: migration `current` 25/25, 47 dari 48 tabel identik dengan production (selisih 1 baris analitik yang tercatat setelah jam backup), 91 dari 91 file lampiran ada, dan API yang membaca data hasil restore melayani halaman, menu, 53 produk, artikel, FAQ, kontak, sitemap, dan gambar. Database dan file drill dihapus setelahnya.
+- Catatan untuk restore di Windows: `tar` bawaan Git Bash membaca `D:\...` sebagai alamat server remote. Jalankan dengan `C:\Windows\System32` (tar bawaan Windows) dan folder `bin` MySQL di urutan pertama PATH.
 
 **DOC-001 — README dan memori lama sudah ketinggalan** · P3 · Terbukti
 - README masih menyebut "Phase 4.8". Catatan Codex menyebut `product.ts` masih kosong, padahal sekarang sudah 899 baris.
@@ -304,9 +307,10 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Hasil: `npm run test:write`, 4 skenario. Selama membangunnya ditemukan FE-005 sampai FE-008 dan DB-008.
 - Lanjutan: skenario kantor, jabatan, dan akun admin. (FE-007 dan DB-008 selesai.)
 
-**Fase 3 — Operasional**
+**Fase 3 — Operasional** · **Selesai 18–19 Oktober 2026**
 - OPS-001: salinan backup di luar VPS + satu kali latihan restore.
 - DB-005: cek dan bersihkan izin percobaan di production lewat migration.
+- Saran rutin: ulangi latihan restore setiap 3 bulan, dan setiap sebelum migration besar.
 
 **Fase 4 — Kerapian bertahap**
 - BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah.
