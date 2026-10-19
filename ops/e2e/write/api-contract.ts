@@ -113,7 +113,12 @@ export async function adminReferences(
   };
 }
 
-let accountCount = 0;
+// Three digits derived from an account key.
+const keyNumber = (key: string) =>
+  String([...key].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) % 1000, 7)).padStart(
+    3,
+    '0',
+  );
 
 /**
  * Creates an admin account without full access (so it holds no permissions) and returns its
@@ -128,7 +133,8 @@ export async function createAdminAccount(
     name: 'Akun Uji Kontrak',
     alias: `${key}${runId}`.slice(0, 15),
     email_1: `${key.toLowerCase()}.${runId}@example.invalid`,
-    phone_1: `+6281${String(runNumber).padStart(7, '0')}${(accountCount += 1)}`,
+    // Derived from the key: specs load this module separately, so a counter would repeat.
+    phone_1: `+6281${String(runNumber).padStart(7, '0')}${keyNumber(key)}`,
     password: `Uji-${key}-${runId}-9`,
   };
   const body = await expectCode(

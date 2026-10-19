@@ -214,7 +214,7 @@ test('delete refuses files in use and removes the rest', async () => {
   // A profile photo in use.
   const photo = await uploadSample(owner, 'admin_profile');
   const references = await adminReferences(owner);
-  await createAdminAccount(owner, 'Foto', {
+  await createAdminAccount(owner, 'LampiranFoto', {
     ...references,
     id_profile_photo: photo,
   } as typeof references);
