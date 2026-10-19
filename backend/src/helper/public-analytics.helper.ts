@@ -33,6 +33,8 @@ const webVitalNames = new Set(['LCP', 'INP', 'CLS']);
 
 const text = (value: unknown, maxLength: number): string | null => {
   const clean = String(value ?? '')
+    // Strip control characters from visitor-supplied text before storing it.
+    // oxlint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f]/g, '')
     .trim();
   return clean ? clean.slice(0, maxLength) : null;

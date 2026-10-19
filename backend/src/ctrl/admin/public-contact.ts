@@ -1,6 +1,6 @@
 import express = require('express');
 import { Response } from 'express';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
 
 import db = require('../../db');
 import {
