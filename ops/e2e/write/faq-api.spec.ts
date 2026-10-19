@@ -39,7 +39,7 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  await saveRecording('faq-api', ['faq', 'faq_i18n']);
+  await saveRecording('faq-api', ['faq', 'faq_i18n', 'audit_log']);
   await anonymous?.dispose();
   await owner?.dispose();
 });
