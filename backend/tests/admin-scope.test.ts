@@ -3,7 +3,7 @@ import { after } from 'node:test';
 import test from 'node:test';
 
 import { pool } from '../src/db';
-import { getAdminScope } from '../src/helper/admin-scope.helper';
+import { adminHasPermission, getAdminScope } from '../src/helper/admin-scope.helper';
 import { requirePermission } from '../src/middleware/auth-permission.middleware';
 
 // requirePermission() stores the admin scope on req, and getAdminScope() reuses it, so a request
@@ -119,6 +119,21 @@ test('requirePermission stores the scope for full-access accounts too', async ()
   const req: any = fakeReq();
   await requirePermission('faq.view')(req, fakeRes(), () => {});
   assert.equal(req.adminScope.isAllAccess, 1);
+});
+
+test('adminHasPermission: full access passes, others need the permission row', async () => {
+  const scope = { idAdminAcct: 11, idMasterComp: 7, idOffice: 3, idAccess: 5, isAllAccess: 0 };
+  stubPool(accountRow, true);
+  assert.equal(await adminHasPermission(scope, 'attachment.view', pool), true);
+  stubPool(accountRow, false);
+  assert.equal(await adminHasPermission(scope, 'attachment.view', pool), false);
+  const queries = stubPool(accountRow, false);
+  assert.equal(
+    await adminHasPermission({ ...scope, isAllAccess: 1 }, 'attachment.view', pool),
+    true,
+  );
+  assert.equal(await adminHasPermission({ ...scope, idAccess: 0 }, 'attachment.view', pool), false);
+  assert.equal(queries.length, 0);
 });
 
 test('requirePermission leaves no scope when it refuses', async () => {

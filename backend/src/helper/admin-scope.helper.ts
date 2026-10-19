@@ -24,6 +24,29 @@ export type AdminScopeResult =
       message: string;
     };
 
+/**
+ * Whether the admin's access profile grants `permissionKey` (full-access admins always pass).
+ * Pass the transaction connection as `executor` inside a transaction.
+ */
+export const adminHasPermission = async (
+  scope: AdminScope,
+  permissionKey: string,
+  executor: Pick<Pool, 'query'> = db.pool,
+): Promise<boolean> => {
+  if (scope.isAllAccess === 1) return true;
+  if (!Number.isInteger(scope.idAccess) || scope.idAccess <= 0) return false;
+
+  const [rows] = await executor.query(
+    `SELECT 1
+     FROM admin_access_permission aap
+     INNER JOIN admin_permission ap ON ap.id_admin_permission = aap.id_admin_permission
+     WHERE aap.id_admin_access = ? AND ap.permission_key = ? AND ap.permission_status = 1
+     LIMIT 1`,
+    [scope.idAccess, permissionKey],
+  );
+  return (rows as unknown[]).length > 0;
+};
+
 export const getAdminScope = async (
   req: AuthRequest,
   pool: Pool = db.pool,

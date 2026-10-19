@@ -301,6 +301,8 @@ test('list paging and sorting', async () => {
   );
   expect(second.pagination).toMatchObject({ page: 2, limit: 1 });
   expect(second.data[0].office_name < first.data[0].office_name).toBe(true);
+  // Only known columns sort; built-in object keys such as toString fall back to the default.
+  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   await expectCode(await owner.get(base, { params: { ord: 'unknown', limit: '500' } }), 200).then(
     (body) => expect(body.pagination).toMatchObject({ limit: 100 }),
   );

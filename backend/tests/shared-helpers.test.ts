@@ -62,6 +62,7 @@ test('id: decodeId', () => {
   assert.equal(decodeId('not-a-hash', keyhsid.idOffice), null);
   assert.equal(decodeId(undefined, keyhsid.idOffice), null);
   assert.equal(decodeId(keyhsid.idOffice.encode(0), keyhsid.idOffice), null);
+  assert.equal(decodeId(` ${keyhsid.idOffice.encode(7)} `, keyhsid.idOffice), 7);
 });
 
 test('list query: paging and search', () => {
