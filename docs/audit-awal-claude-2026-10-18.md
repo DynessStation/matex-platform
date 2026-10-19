@@ -160,14 +160,15 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 ### Backend
 
-**BE-001 — Beberapa file controller sangat besar** · P2 · **Sebagian selesai (Fase 4C, 19 Oktober 2026)**
+**BE-001 — Beberapa file controller sangat besar** · P2 · **Selesai untuk 4 file terbesar (Fase 4C–4G, 19 Oktober 2026)**
 - `auth.ts` 5.099 baris (isinya login sekaligus kelola akun admin), `office.ts` 4.076, `web-navigation.ts` 2.622, `admin-access.ts` 2.316.
 - Dampak: sulit dibaca, rawan efek samping saat diubah, dan sulit dites.
 - Saran: pecah bertahap saat fitur terkait akan diubah, bukan sekaligus.
 - `auth.ts` sudah dipecah ke `ctrl/admin/admin-account/`: `session.ts` (login, logout, `/me`), `select.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`, dan `profile-photo.ts`. Isi handler dipindah apa adanya. `auth.ts` kini hanya mengatur urutan route, karena `/me` dan `/select/*` harus terdaftar sebelum `/:id`, dan folder itu sengaja tidak di-load otomatis. Bukti: rekaman 76 request (seluruh respons JSON beserta isi tabel `admin_acct` dan `audit_log` sesudahnya) identik sebelum dan sesudah pemecahan. Test kontrak gagal bila urutan route dibalik.
 - Fase 4E: `office.ts` dipecah ke `ctrl/admin/office/` (`scope.ts`, `input.ts`, `relations.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`), didahului test kontrak `office-api.spec.ts`. Rekaman respons dan isi tabel identik sebelum dan sesudahnya. Tidak ada bug baru.
 - Fase 4F: `admin-access.ts` dipecah ke `ctrl/admin/admin-access/` (`scope.ts`, `permissions.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`), didahului test kontrak `admin-access-api.spec.ts`. Test itu juga membuktikan izin yang diberikan ke profil akses benar-benar berlaku. Rekaman identik. Tidak ada bug baru.
-- Sisa: `web-navigation.ts` (Fase 4G).
+- Fase 4G: `web-navigation.ts` dipecah ke `ctrl/admin/web-navigation/` (`scope.ts`, `metadata.ts`, `read.ts`, `create.ts`, `update.ts`, `delete.ts`, `items.ts`, `reorder.ts`), didahului test kontrak `web-navigation-api.spec.ts`. Rekaman identik. Tidak ada bug baru.
+- Kini tidak ada controller backend di atas 1.850 baris. Controller 1.000–1.850 baris (`attachment.ts`, `chair.ts`, `admin-permission.ts`, `website-page.ts`, `audit-log.ts`) dipecah dengan cara yang sama saat fiturnya diubah (Fase 4H di `docs/konsep-kerapian-kode.md`).
 
 **BE-004 — ID dengan karakter tidak valid membuat server error 500** · P3 · **Selesai (Fase 4C)**
 - Library `hashids` versi 2 melempar error bila ID berisi karakter di luar alfabetnya (misalnya URL yang diketik manual atau diubah), sementara semua kode mengharapkan hasil kosong untuk ID tidak valid. Contoh: `GET /api/v1/admin-acct/select/office?id_master_comp=abc-def` menjawab 500, bukan 400.
@@ -242,7 +243,8 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Public 1 file test, admin 0. Backend punya 56 test kontrak, dan ada 3 file test browser (Playwright).
 - Alur admin yang mengubah data (simpan produk, upload media, publish artikel) belum diuji otomatis.
 - Perbaikan (Fase 2): `npm run test:write` di `ops/e2e` menguji login, upload media, serta publish produk dan artikel sampai tampil di website publik, pada lingkungan lokal terpisah (`matex_e2e`, port 3100/4300/4301) dengan build ala production. Belum dicakup: kantor, jabatan, dan akun admin.
-- Fase 4C: `write/admin-account-api.spec.ts` menguji kontrak API sesi admin dan akun admin (13 endpoint: kode status, kode respons, field utama, aturan keamanan seperti tidak boleh menonaktifkan atau menghapus diri sendiri, dan urutan route) ke MySQL asli. Suite kini 15 skenario. Belum dicakup: kantor dan jabatan.
+- Fase 4C: `write/admin-account-api.spec.ts` menguji kontrak API sesi admin dan akun admin (13 endpoint: kode status, kode respons, field utama, aturan keamanan seperti tidak boleh menonaktifkan atau menghapus diri sendiri, dan urutan route) ke MySQL asli. Suite kini 15 skenario.
+- Fase 4D–4G: `npm run test:api` (hanya API, tanpa build frontend) dan mode rekam `MATEX_E2E_RECORD`. Test kontrak kini mencakup akun admin, kantor (`office-api`), profil akses dan matriks izin (`admin-access-api`), serta navigasi website (`web-navigation-api`): 35 test API, ditambah 5 test browser, total 40. Belum dicakup: jabatan, lampiran, produk, artikel, halaman website, dan log audit; test kontraknya ditulis saat modul itu akan diubah.
 
 **OPS-001 — Backup di luar VPS dan latihan restore belum terbukti** · P2 · **Selesai**
 - `production-v1-readiness-audit.md` mencatat salinan backup di luar VPS dan latihan restore sebagai pekerjaan yang tersisa.
@@ -307,7 +309,7 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
-| Maintainability | BE-001 (sebagian), BE-002 (FE-001, FE-002, dan FE-010 selesai) |
+| Maintainability | BE-001 (4 file terbesar selesai), BE-002 (struktur folder selesai; FE-001, FE-002, dan FE-010 selesai) |
 | Performa | Belum ada temuan terbukti. Cache API publik masih `no-store` (catatan dari audit lama). |
 | Kekurangan test | TEST-001 (sebagian selesai) |
 | Kekurangan dokumentasi | DOC-001 |
@@ -337,7 +339,7 @@ DB lokal MySQL 8.4 setara production, `.env` lokal dipindah, fix SSR dev, dan RE
 - Saran rutin: ulangi latihan restore setiap 3 bulan, dan setiap sebelum migration besar.
 
 **Fase 4 — Kerapian bertahap**
-- BE-001: pecah `auth.ts` dan `office.ts` saat fiturnya akan diubah. **`auth.ts` selesai (4C)**, didahului test kontrak API; `office.ts` menyusul.
+- BE-001: pecah controller besar, masing-masing didahului test kontrak API. **`auth.ts` (4C), `office.ts` (4E), `admin-access.ts` (4F), `web-navigation.ts` (4G) selesai.** Struktur backend dirapikan di 4D. Rencana lanjutan ada di `docs/konsep-kerapian-kode.md`.
 - FE-002: satu commit khusus format. **Selesai (4B).**
 - FE-001: rapikan modul sisa Kartify per kelompok. **Selesai (4A).**
 - FE-010: buat build CSS admin deterministik. **Selesai (4B).**

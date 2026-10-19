@@ -67,7 +67,7 @@ The one-time formatting commit is listed in `.git-blame-ignore-revs`. GitHub ski
 `ops/e2e` has two Playwright suites:
 
 - `npm test`: read-only release checks against a deployed stack (defaults to the production loopback ports).
-- `npm run test:write`: admin write flows (login, media upload, publishing a product and an article and checking them on the public site) plus the API contract of the admin session and admin-account endpoints (`write/admin-account-api.spec.ts`), on an isolated local stack. It rebuilds the `matex_e2e` database from migrations, starts the API on 3100 and production-style SSR builds of admin (4300) and public (4301), runs the tests, then removes the temporary uploads. Your dev database, storage, and dev servers are not touched, and it refuses to run against a non-local address or a database whose name does not end in `_e2e`.
+- `npm run test:write`: admin write flows (login, media upload, publishing a product and an article and checking them on the public site) plus the API contracts in `write/*-api.spec.ts` (admin session and accounts, offices, access profiles, website navigation), on an isolated local stack. It rebuilds the `matex_e2e` database from migrations, starts the API on 3100 and production-style SSR builds of admin (4300) and public (4301), runs the tests, then removes the temporary uploads. Your dev database, storage, and dev servers are not touched, and it refuses to run against a non-local address or a database whose name does not end in `_e2e`.
 
 One-time local setup for the write suite: the database user in `backend/.env` needs `ALL PRIVILEGES ON matex_e2e.*`.
 
