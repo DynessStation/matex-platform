@@ -42,7 +42,9 @@ Nama file dan folder memakai huruf kecil dengan tanda hubung (`web-navigation.ts
 Satu modul adalah satu urusan bisnis (kantor, profil akses, navigasi, dan seterusnya). Bentuknya salah satu dari dua ini:
 
 - **Modul kecil** (sampai sekitar 500 baris): satu file `ctrl/admin/<modul>.ts`.
-- **Modul besar**: `ctrl/admin/<modul>.ts` hanya mendaftarkan router, dan isinya ada di folder `ctrl/admin/<modul>/`. Folder ini sengaja tidak di-load otomatis, jadi file pendaftar itulah yang menentukan urutan route. Contohnya `office`, `admin-access`, `web-navigation`, dan `admin-account`.
+- **Modul besar**: `ctrl/admin/<modul>.ts` hanya mendaftarkan router, dan isinya ada di folder `ctrl/admin/<modul>/`. Folder ini sengaja tidak di-load otomatis, jadi file pendaftar itulah yang menentukan urutan route. Contohnya `office`, `admin-access`, `web-navigation`, `admin-account`, dan `website-page`.
+
+Setiap file route, termasuk file pendaftar, mengekspor `express.Router()`. Jangan `express()`: sub-app memasang lagi header `X-Powered-By` yang dimatikan `app.ts` (SEC-007).
 
 Nama file di dalam folder modul:
 
@@ -60,7 +62,7 @@ File pendaftar memakai satu templat komentar: apa modulnya, path API-nya, apakah
 
 ### 2.3 Bentuk sebuah handler
 
-Pola standar (modul generasi baru seperti `faq.ts` sudah memakainya; modul lama dipindahkan di Fase 5C):
+Pola standar (semua modul generasi lama sudah dipindah di Fase 5C; contoh ringkas: `chair.ts`, `audit-log.ts`):
 
 1. Middleware: `verifyToken`, lalu `requirePermission('<modul>.<aksi>')`.
 2. Scope sesi lewat `getAdminScope(req)`. Di belakang `requirePermission`, scope sudah dititipkan di `req.adminScope`, jadi tidak ada query akun yang diulang. Jangan menulis query sesi sendiri.
@@ -83,6 +85,9 @@ Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi
 | `middleware/error-handler.middleware.ts` | `onFailure(kode, pesan, { duplicate })`: kode 500/409 milik route, untuk modul yang API-nya punya kode gagal sendiri |
 | `api-response.helper.ts` | `sendSuccess`, `sendError` |
 | `audit-log.helper.ts` | `writeAuditLog` |
+| `attachment.helper.ts` | `storeAttachment` (validasi per koleksi, gambar jadi WebP, cek isi video), `buildAttachmentUrl`, `deleteStoredAttachment` |
+
+Aturan lintas modul: tabel baru yang menunjuk `attachment` wajib ditambahkan ke daftar `REFERENCES` di `ctrl/admin/attachment.ts`, supaya file yang masih dipakai tidak bisa dihapus (BE-009).
 
 ### Checklist memindahkan modul lama ke pola standar (Fase 5C)
 

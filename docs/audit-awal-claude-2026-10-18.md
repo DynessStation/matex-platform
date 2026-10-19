@@ -101,10 +101,11 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Saran: cukup dicatat dulu. Tidak mendesak untuk skala sekarang.
 - Perbaikan: kolom `admin_acct.token_version` (migration 025). Token membawa versi itu; `verifyToken` menolak token yang versinya sudah lewat, dan logout menaikkan versi sehingga semua sesi akun itu (termasuk token salinan) berakhir. Token lama tanpa versi dianggap versi 0, jadi deploy tidak mengeluarkan siapa pun. Ada test kontrak dan unit test.
 
-**SEC-004 — Upload file menampung semua file di memori** · P3 · Terbukti
+**SEC-004 — Upload file menampung semua file di memori** · P3 · **Selesai (Fase 5C, 19 Oktober 2026)**
 - Satu upload bisa membawa 10 file × 50 MB yang ditampung di RAM server. Tipe video dipercaya dari keterangan browser.
 - Yang sudah aman: gambar selalu diproses ulang (dikompres dan dibersihkan), sehingga file gambar berbahaya ikut "dicuci". Fitur ini hanya untuk admin yang login.
 - Saran: turunkan batas atau simpan sementara ke disk kalau upload video jadi sering.
+- Perbaikan: upload ditulis ke file sementara (`<tmp>/matex-upload`), bukan RAM, dan dihapus lagi setelah request selesai. Isi video dicek dari tanda tangan filenya (mp4, webm, ogg), tidak lagi hanya dari keterangan browser. Ada test kontraknya.
 
 **SEC-005 — Isi artikel (HTML) tidak dibersihkan di server** · Info
 - Saat ini aman, karena Angular otomatis membuang script berbahaya saat menampilkan.
@@ -112,6 +113,10 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 **SEC-006 — Ada dump database di folder `tmp/`** · Info
 - `tmp/canonical-import-*/database.sql` tidak ikut Git (aman), tapi kemungkinan berisi data akun. Jangan disalin ke Google Drive atau flashdisk bersama.
+
+**SEC-007 — API memberi tahu bahwa servernya Express** · Info · **Selesai (Fase 5C, 19 Oktober 2026)**
+- `app.ts` mematikan header `X-Powered-By`, tapi setiap modul route yang dibuat sebagai sub-app `express()` memasangnya lagi, dan sub-app pertama yang di-load melewati semua request. Production menjawab semua API dengan `X-Powered-By: Express` (dicek 19 Oktober). Hanya membocorkan teknologi server, tidak membuka akses apa pun.
+- Perbaikan: semua modul route memakai `express.Router()`. Setiap respons di test kontrak dicek tidak membawa header itu.
 
 ### Database
 
@@ -191,12 +196,22 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Daftar akun admin selalu menyaring ke kantor admin yang login, termasuk admin full-access. Padahal dropdown kantor menawarkan semua kantor ke admin full-access, dan detail/ubah/hapus mengizinkannya. Akibatnya akun yang dibuat di kantor lain tidak pernah muncul di daftar.
 - Perbaikan: saringan kantor hanya untuk admin tanpa full-access. Ada test kontraknya.
 
+**BE-009 — Gambar yang dipakai produk bisa dihapus dari Media** · P2 · **Selesai (Fase 5C)**
+- Sebelum menghapus file, modul attachment mengecek apakah file itu masih dipakai, tapi daftar pengecekannya belum mencakup media produk dan gambar/ikon kategori produk. Akibatnya gambar yang sedang tampil di website bisa dihapus dari Media, termasuk file fisiknya.
+- Perbaikan: semua tabel yang menunjuk attachment dicek (satu daftar di `ctrl/admin/attachment.ts`). Ada test kontrak dan unit test.
+- Catatan: belum dicek apakah di production sudah ada produk atau kategori yang gambarnya terlanjur terhapus.
+
+**BE-010 — Upload tipe file yang salah menghasilkan error 500** · P3 · **Selesai (Fase 5C)**
+- Pesan error dari fungsi penyimpan file tidak lagi sama dengan yang dicari route upload, sehingga misalnya file .txt ke Media dijawab 500, bukan 400 `ATTACHMENT_FILE_TYPE_NOT_ALLOWED`.
+- Perbaikan: fungsi penyimpan file langsung menolak dengan kode yang tepat (`HttpError`). Ada test kontraknya.
+
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
 - Struktur folder juga tidak konsisten: middleware Express ada di `src/ctrl/middleware/` dengan nama camelCase (`authJwt.ts`), dan `src/helpers.ts` sudah tidak dipakai.
 - Fase 4D (19 Oktober 2026): middleware dipindah ke `src/middleware/` (`auth-jwt.middleware.ts`, `auth-permission.middleware.ts`, `request-context.middleware.ts`) dan `src/helpers.ts` dihapus. Rekaman test kontrak identik sebelum dan sesudahnya. Struktur target dan konvensi nama ada di `docs/standar-kode.md`. Penyeragaman gaya penulisan di dalam file dilakukan saat file itu dipecah atau diubah.
 - Fase 5A (19 Oktober 2026): satu config Prettier di root dan Oxlint untuk backend. Komentar pembatas dan baris kosong berlebihan dirapatkan dalam satu commit format murni (syntax tree 122 file identik, tercatat di `.git-blame-ignore-revs`). Lint backend 0 error. Sisa BE-002 (dua generasi pola kode) dikerjakan di Fase 5B–5C.
 - Fase 5B (19 Oktober 2026): helper bersama (`helper/input`, `id`, `list-query`, `json`, `transaction`, `http-error`) dan penanganan error pusat; scope sesi dimuat sekali per request oleh `requirePermission`. Salinan fungsi yang identik di office, web-navigation, article, product, product-category, website-page, audit-log, dan admin-account diganti. Sisa: salinan `getSessionScope` dan pola lama per modul (Fase 5C).
+- Fase 5C (19 Oktober 2026): semua 9 modul generasi lama dipindah ke pola standar dengan test kontrak; tidak ada lagi salinan `getSessionScope`, dan semua modul route memakai `express.Router()`. Sisa: modul generasi baru yang masih menulis `try/catch` sendiri (lihat peta jalan, 5C lanjutan).
 
 **BE-003 — Hal yang sudah benar di backend** · Info
 - Semua query database memakai parameter (aman dari SQL injection), perubahan data dibungkus transaksi, data dicek kepemilikannya per perusahaan sebelum diubah, dan ada rate limit untuk login dan API.
@@ -319,8 +334,8 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004 sampai BE-008, dan SEC-003 sudah diperbaiki. |
-| Risiko keamanan | SEC-004 (SEC-001, SEC-002, dan SEC-003 selesai) |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004 sampai BE-010, SEC-003, SEC-004, dan SEC-007 sudah diperbaiki. |
+| Risiko keamanan | Tidak ada yang terbuka (SEC-001 sampai SEC-004 dan SEC-007 selesai; SEC-005 dan SEC-006 hanya catatan) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |
 | Arsitektur | DB-004 (izin global vs multi-perusahaan) |
