@@ -1,192 +1,107 @@
+// Attachments (uploaded files, the media library), under /api/v1/attachment.
+// Contract: ops/e2e/write/attachment-api.spec.ts.
 import express = require('express');
-
 import { NextFunction, Response } from 'express';
-
-import multer from 'multer';
-
 import fs from 'fs/promises';
-
+import multer from 'multer';
+import { ResultSetHeader } from 'mysql2';
+import { PoolConnection } from 'mysql2/promise';
 import os from 'os';
-
 import path from 'path';
 
 import db = require('../../db');
-
 import keyhsid from '../../hsid';
-
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
-
-import { writeAuditLog } from '../../helper/audit-log.helper';
-
 import {
   AttachmentCollection,
   getAttachmentCollectionConfig,
 } from '../../config/attachment.config';
-
+import { AdminScope, getAdminScope } from '../../helper/admin-scope.helper';
+import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import {
   StoredAttachment,
   buildAttachmentUrl,
   deleteStoredAttachment,
   storeAttachment,
 } from '../../helper/attachment.helper';
-
+import { writeAuditLog } from '../../helper/audit-log.helper';
+import { HttpError } from '../../helper/http-error.helper';
+import { decodeId } from '../../helper/id.helper';
+import { parseListQuery, sortColumn } from '../../helper/list-query.helper';
+import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
-
 import { requirePermission } from '../../middleware/auth-permission.middleware';
-
-// App
-
-const app = express();
 
 const { pool } = db;
 
-// Decode attachment ID
+const router = express.Router();
 
-const decodeAttachmentId = (value: unknown): number | null => {
-  const encodedId = String(value ?? '').trim();
-
-  if (!encodedId) {
-    return null;
-  }
-
-  const decoded = keyhsid.idAttachment.decode(encodedId)[0];
-
-  const idAttachment = Number(decoded);
-
-  if (!decoded || !Number.isInteger(idAttachment) || idAttachment <= 0) {
-    return null;
-  }
-
-  return idAttachment;
+const SORTS: Record<string, string> = {
+  newest: 'a.id_attachment DESC',
+  oldest: 'a.id_attachment ASC',
+  smallest: 'a.file_size ASC, a.id_attachment DESC',
+  largest: 'a.file_size DESC, a.id_attachment DESC',
 };
 
-// Attachment references
+// Every table that points at attachment, with the name reported for it. An attachment any of
+// them still uses cannot be deleted.
+const REFERENCES: [table: string, column: string, source: string][] = [
+  ['admin_acct', 'id_profile_photo', 'admin_account.profile_photo'],
+  ['office_attachment', 'id_attachment', 'office.attachment'],
+  ['website_page_media', 'id_attachment', 'website_page.media'],
+  ['article_attachment', 'id_attachment', 'article.attachment'],
+  ['product_catalog_attachment', 'id_attachment', 'product.attachment'],
+  ['product_category_attachment', 'id_attachment', 'product_category.attachment'],
+];
 
-interface AttachmentReference {
-  idAttachment: number;
-  source: string;
-  total: number;
-}
+const ATTACHMENT_COLUMNS = `id_attachment, collection_name, name, original_name, file_name,
+  mime_type, extension, disk, storage_path, file_size, width, height, id_master_comp, id_office,
+  created_by_id, attachment_status`;
 
-export const getAttachmentReferences = async (
-  ids: number[],
-  executor: any = pool,
-): Promise<AttachmentReference[]> => {
-  if (!ids.length) {
-    return [];
-  }
+const MAX_FILES = 10;
+const MAX_BULK = 100;
 
+// Uploads go to temporary files, not memory (SEC-004); the upload route removes them. The size
+// ceiling only has to allow the largest collection (50 MB product videos): each collection's
+// own limits are checked by storeAttachment.
+const upload = multer({
+  dest: path.join(os.tmpdir(), 'matex-upload'),
+  limits: { fileSize: 50 * 1024 * 1024, files: MAX_FILES },
+});
+
+const uploadAttachmentFiles = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  upload.array('files', MAX_FILES)(req, res, (error: unknown) => {
+    if (!error) return next();
+    if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+      sendError(
+        res,
+        400,
+        'ATTACHMENT_SERVER_FILE_SIZE_LIMIT',
+        'Uploaded file exceeds the server file size limit',
+      );
+    } else if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_COUNT') {
+      sendError(res, 400, 'ATTACHMENT_UPLOAD_LIMIT_EXCEEDED', 'Too many files were uploaded');
+    } else {
+      const message = error instanceof multer.MulterError ? error.message : '';
+      sendError(
+        res,
+        400,
+        'ATTACHMENT_UPLOAD_PROCESS_FAILED',
+        message || 'Unable to process uploaded files',
+      );
+    }
+  });
+};
+
+type QueryExecutor = { query: (sql: string, values: unknown[]) => Promise<any> };
+
+/** Which of `ids` are still referenced, and where. */
+export const getAttachmentReferences = async (ids: number[], executor: QueryExecutor = pool) => {
+  const references: { idAttachment: number; source: string; total: number }[] = [];
   const placeholders = ids.map(() => '?').join(',');
-
-  const references: AttachmentReference[] = [];
-
-  // Admin profile photo
-
-  const [adminRows] = await executor.query(
-    `
-          SELECT
-            id_profile_photo AS id_attachment,
-            COUNT(*) AS total
-
-          FROM admin_acct
-
-          WHERE id_profile_photo IN (
-            ${placeholders}
-          )
-
-          GROUP BY
-            id_profile_photo
-        `,
-    ids,
-  );
-
-  for (const row of adminRows as any[]) {
-    references.push({
-      idAttachment: Number(row.id_attachment),
-      source: 'admin_account.profile_photo',
-      total: Number(row.total),
-    });
-  }
-
-  // Office attachment
-
-  const [officeRows] = await executor.query(
-    `
-      SELECT
-        id_attachment,
-
-        COUNT(*) AS total
-
-      FROM office_attachment
-
-      WHERE id_attachment IN (
-        ${placeholders}
-      )
-
-      GROUP BY
-        id_attachment
-    `,
-    ids,
-  );
-
-  for (const row of officeRows as any[]) {
-    references.push({
-      idAttachment: Number(row.id_attachment),
-      source: 'office.attachment',
-      total: Number(row.total),
-    });
-  }
-
-  // Fixed website page media
-
-  const [websitePageRows] = await executor.query(
-    `
-      SELECT
-        id_attachment,
-
-        COUNT(*) AS total
-
-      FROM website_page_media
-
-      WHERE id_attachment IN (
-        ${placeholders}
-      )
-
-      GROUP BY
-        id_attachment
-    `,
-    ids,
-  );
-
-  for (const row of websitePageRows as any[]) {
-    references.push({
-      idAttachment: Number(row.id_attachment),
-      source: 'website_page.media',
-      total: Number(row.total),
-    });
-  }
-
-  const [articleRows] = await executor.query(
-    `SELECT id_attachment, COUNT(*) AS total FROM article_attachment
-     WHERE id_attachment IN (${placeholders}) GROUP BY id_attachment`,
-    ids,
-  );
-  for (const row of articleRows as any[]) {
-    references.push({
-      idAttachment: Number(row.id_attachment),
-      source: 'article.attachment',
-      total: Number(row.total),
-    });
-  }
-
-  // Product media and product category image, icon, and share image.
-  for (const [table, source] of [
-    ['product_catalog_attachment', 'product.attachment'],
-    ['product_category_attachment', 'product_category.attachment'],
-  ]) {
+  for (const [table, column, source] of REFERENCES) {
     const [rows] = await executor.query(
-      `SELECT id_attachment, COUNT(*) AS total FROM ${table}
-       WHERE id_attachment IN (${placeholders}) GROUP BY id_attachment`,
+      `SELECT ${column} AS id_attachment, COUNT(*) AS total FROM ${table}
+       WHERE ${column} IN (${placeholders}) GROUP BY ${column}`,
       ids,
     );
     for (const row of rows as any[]) {
@@ -197,343 +112,208 @@ export const getAttachmentReferences = async (
       });
     }
   }
-
-  // Every table with a foreign key to attachment must be checked here.
-
   return references;
 };
 
-// Multer
-
-const upload = multer({
-  // Uploads go to temporary files, not memory (SEC-004); the route removes them afterwards.
-  dest: path.join(os.tmpdir(), 'matex-upload'),
-  limits: {
-    // Hard global limit
-    // Collection-specific validation still applies after Multer. This ceiling
-    // only prevents Multer from rejecting the 50 MB product-video allowance.
-    fileSize: 50 * 1024 * 1024,
-    files: 10,
-  },
-});
-
-// Upload middleware
-
-const uploadAttachmentFiles = (req: AuthRequest, res: Response, next: NextFunction): void => {
-  upload.array('files', 10)(req, res, (error: any) => {
-    if (!error) {
-      next();
-
-      return;
-    }
-
-    // Multer error
-
-    if (error instanceof multer.MulterError) {
-      if (error.code === 'LIMIT_FILE_SIZE') {
-        sendError(
-          res,
-          400,
-          'ATTACHMENT_SERVER_FILE_SIZE_LIMIT',
-          'Uploaded file exceeds the server file size limit',
-        );
-
-        return;
-      }
-
-      if (error.code === 'LIMIT_FILE_COUNT') {
-        sendError(res, 400, 'ATTACHMENT_UPLOAD_LIMIT_EXCEEDED', 'Too many files were uploaded');
-
-        return;
-      }
-
-      sendError(
-        res,
-        400,
-        'ATTACHMENT_UPLOAD_PROCESS_FAILED',
-        error.message || 'Unable to process uploaded files',
-      );
-
-      return;
-    }
-
-    // Unknown upload error
-
-    sendError(res, 400, 'ATTACHMENT_UPLOAD_PROCESS_FAILED', 'Unable to process uploaded files');
-  });
+/** Locks the live attachments among `ids` the admin may manage (own office unless full access). */
+const lockAttachments = async (connection: PoolConnection, ids: number[], scope: AdminScope) => {
+  const officeOnly = scope.isAllAccess !== 1;
+  const [rows] = await connection.query(
+    `SELECT ${ATTACHMENT_COLUMNS} FROM attachment
+     WHERE id_attachment IN (${ids.map(() => '?').join(',')}) AND id_master_comp = ?
+       AND attachment_status = 1 AND deleted_at IS NULL ${officeOnly ? 'AND id_office = ?' : ''}
+     FOR UPDATE`,
+    officeOnly ? [...ids, scope.idMasterComp, scope.idOffice] : [...ids, scope.idMasterComp],
+  );
+  return rows as any[];
 };
 
-// Attachment - get list
+const attachmentAudit = (row: any) => ({
+  collection_name: row.collection_name,
+  name: row.name,
+  original_name: row.original_name,
+  file_name: row.file_name,
+  mime_type: row.mime_type,
+  extension: row.extension,
+  disk: row.disk,
+  storage_path: row.storage_path,
+  file_size: Number(row.file_size),
+  width: row.width === null ? null : Number(row.width),
+  height: row.height === null ? null : Number(row.height),
+  id_master_comp: Number(row.id_master_comp),
+  id_office: Number(row.id_office),
+  created_by_id: Number(row.created_by_id),
+  attachment_status: Number(row.attachment_status),
+});
 
-app.get(
+const auditBase = (req: AuthRequest, connection: PoolConnection, scope: AdminScope) => ({
+  req,
+  connection,
+  writeMode: 'strict' as const,
+  idMasterComp: scope.idMasterComp,
+  category: 'file' as const,
+  module: 'attachment',
+  actorType: 'admin' as const,
+  actorId: scope.idAdminAcct,
+  actorLabel: req.user?.alias ?? null,
+  entityType: 'attachment',
+});
+
+/** Soft-deletes locked attachments with an audit entry each, inside the transaction. */
+const softDelete = async (
+  req: AuthRequest,
+  connection: PoolConnection,
+  scope: AdminScope,
+  attachments: any[],
+  metadata: Record<string, unknown>,
+) => {
+  const ids = attachments.map((item) => Number(item.id_attachment));
+  await connection.query(
+    `UPDATE attachment SET attachment_status = 99, deleted_at = NOW(), updated = NOW()
+     WHERE id_attachment IN (${ids.map(() => '?').join(',')})
+       AND attachment_status = 1 AND deleted_at IS NULL`,
+    ids,
+  );
+  for (const attachment of attachments) {
+    const before = attachmentAudit(attachment);
+    await writeAuditLog({
+      ...auditBase(req, connection, scope),
+      eventCode: 'attachment.deleted',
+      action: 'delete',
+      entityId: Number(attachment.id_attachment),
+      entityLabel: attachment.original_name,
+      before,
+      after: { ...before, attachment_status: 99 },
+      metadata: {
+        delete_type: 'soft_delete',
+        ...metadata,
+        physical_cleanup_requested: attachment.disk === 'local',
+      },
+      httpStatus: 200,
+    });
+  }
+};
+
+// Called after commit: the rows are already deleted, so a failed file removal is only logged
+// (the file can be cleaned up later).
+const removeFiles = async (attachments: any[]) => {
+  const results = await Promise.allSettled(
+    attachments
+      .filter((item) => item.disk === 'local')
+      .map((item) => deleteStoredAttachment(item.storage_path)),
+  );
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error('Delete attachment physical file error:', result.reason);
+    }
+  }
+};
+
+router.get(
   '/api/v1/attachment',
   verifyToken,
   requirePermission('attachment.view'),
   async (req: AuthRequest, res: Response) => {
-    try {
-      // Session
+    const scope = await getAdminScope(req);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-      const idAdminAcct = req.user?.id_admin_acct;
+    const { page, limit, offset, search, searchValue } = parseListQuery(req.query, {
+      defaultLimit: 20,
+      maxLimit: 50,
+    });
 
-      if (!idAdminAcct) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      // Query params
-
-      const parsedPage = Number(req.query.page);
-
-      const parsedLimit = Number(req.query.limit);
-
-      const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-
-      const limit =
-        Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 50) : 20;
-
-      const offset = (page - 1) * limit;
-
-      const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
-
-      const collection =
-        typeof req.query.collection === 'string' ? req.query.collection.trim() : '';
-
-      const mimeType = typeof req.query.mime_type === 'string' ? req.query.mime_type.trim() : '';
-
-      const searchValue = `%${search}%`;
-
-      // Get session scope
-
-      const [accountRows] = await pool.query(
-        `
-            SELECT
-              id_master_comp,
-              id_office,
-              is_all_access,
-              admin_acct_status
-
-            FROM admin_acct
-
-            WHERE id_admin_acct = ?
-
-            LIMIT 1
-          `,
-        [idAdminAcct],
-      );
-
-      const accounts = accountRows as any[];
-
-      if (accounts.length === 0) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      const account = accounts[0];
-
-      if (account.admin_acct_status !== 1) {
-        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-      }
-
-      // Where
-
-      const where: string[] = [
-        'a.attachment_status = 1',
-        'a.deleted_at IS NULL',
-        'a.id_master_comp = ?',
-      ];
-
-      const params: any[] = [account.id_master_comp];
-
-      // Office scope
-
-      if (Number(account.is_all_access) !== 1) {
-        where.push('a.id_office = ?');
-
-        params.push(account.id_office);
-      }
-
-      // Search
-
-      if (search) {
-        where.push(`
-          (
-            a.name LIKE ?
-            OR a.original_name LIKE ?
-            OR a.file_name LIKE ?
-          )
-        `);
-
-        params.push(searchValue, searchValue, searchValue);
-      }
-
-      // Collection filter
-
-      if (collection) {
-        where.push('a.collection_name = ?');
-
-        params.push(collection);
-      }
-
-      // Mime filter
-
-      if (mimeType) {
-        where.push('a.mime_type LIKE ?');
-
-        params.push(`${mimeType}%`);
-      }
-
-      const whereQuery = where.join(' AND ');
-
-      // Sort
-
-      const sort = typeof req.query.sort === 'string' ? req.query.sort.trim().toLowerCase() : '';
-
-      let orderQuery = 'a.id_attachment DESC';
-
-      switch (sort) {
-        case 'oldest':
-          orderQuery = 'a.id_attachment ASC';
-          break;
-
-        case 'smallest':
-          orderQuery = 'a.file_size ASC, a.id_attachment DESC';
-          break;
-
-        case 'largest':
-          orderQuery = 'a.file_size DESC, a.id_attachment DESC';
-          break;
-
-        case 'newest':
-        default:
-          orderQuery = 'a.id_attachment DESC';
-          break;
-      }
-
-      // Count
-
-      const [totalRows] = await pool.query(
-        `
-            SELECT
-              COUNT(*) AS total
-
-            FROM attachment a
-
-            WHERE ${whereQuery}
-          `,
-        params,
-      );
-
-      const total = Number((totalRows as any[])[0]?.total ?? 0);
-
-      // Get data
-
-      const [rows] = await pool.query(
-        `
-            SELECT
-              a.id_attachment,
-              a.collection_name,
-              a.name,
-              a.original_name,
-              a.file_name,
-              a.mime_type,
-              a.extension,
-              a.disk,
-              a.storage_path,
-              a.file_size,
-              a.width,
-              a.height,
-              a.created,
-              a.updated
-
-            FROM attachment a
-
-            WHERE ${whereQuery}
-
-            ORDER BY
-              ${orderQuery}
-
-            LIMIT ?
-            OFFSET ?
-          `,
-        [...params, limit, offset],
-      );
-
-      // Response data
-
-      const data = (rows as any[]).map((item) => ({
-        id_attachment: keyhsid.idAttachment.encode(item.id_attachment),
-        collection_name: item.collection_name,
-        name: item.name,
-        original_name: item.original_name,
-        file_name: item.file_name,
-        mime_type: item.mime_type,
-        extension: item.extension,
-        disk: item.disk,
-        storage_path: item.storage_path,
-        file_size: Number(item.file_size),
-        width: item.width,
-        height: item.height,
-        asset_url: buildAttachmentUrl(item.storage_path),
-        created: item.created,
-        updated: item.updated,
-      }));
-
-      // Pagination
-
-      const totalPages = Math.ceil(total / limit);
-
-      // Response
-
-      return res.status(200).json({
-        success: true,
-        data,
-        pagination: {
-          page,
-          limit,
-          total,
-          length: data.length,
-          total_pages: totalPages,
-          has_more: offset + data.length < total,
-        },
-      });
-    } catch (error) {
-      console.error('Get attachment error:', error);
-
-      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
+    const where = ['a.attachment_status = 1', 'a.deleted_at IS NULL', 'a.id_master_comp = ?'];
+    const params: unknown[] = [scope.idMasterComp];
+    if (scope.isAllAccess !== 1) {
+      where.push('a.id_office = ?');
+      params.push(scope.idOffice);
     }
+    if (search) {
+      where.push('(a.name LIKE ? OR a.original_name LIKE ? OR a.file_name LIKE ?)');
+      params.push(searchValue, searchValue, searchValue);
+    }
+    const collection = typeof req.query.collection === 'string' ? req.query.collection.trim() : '';
+    if (collection) {
+      where.push('a.collection_name = ?');
+      params.push(collection);
+    }
+    const mimeType = typeof req.query.mime_type === 'string' ? req.query.mime_type.trim() : '';
+    if (mimeType) {
+      where.push('a.mime_type LIKE ?');
+      params.push(`${mimeType}%`);
+    }
+    const whereSql = where.join(' AND ');
+    const sort = typeof req.query.sort === 'string' ? req.query.sort.trim().toLowerCase() : '';
+    const orderBy = sortColumn(SORTS, sort, SORTS.newest);
+
+    const [totalRows] = await pool.query(
+      `SELECT COUNT(*) AS total FROM attachment a WHERE ${whereSql}`,
+      params,
+    );
+    const total = Number((totalRows as any[])[0]?.total ?? 0);
+
+    const [rows] = await pool.query(
+      `SELECT a.id_attachment, a.collection_name, a.name, a.original_name, a.file_name,
+         a.mime_type, a.extension, a.disk, a.storage_path, a.file_size, a.width, a.height,
+         a.created, a.updated
+       FROM attachment a
+       WHERE ${whereSql}
+       ORDER BY ${orderBy}
+       LIMIT ? OFFSET ?`,
+      [...params, limit, offset],
+    );
+
+    const data = (rows as any[]).map((item) => ({
+      id_attachment: keyhsid.idAttachment.encode(item.id_attachment),
+      collection_name: item.collection_name,
+      name: item.name,
+      original_name: item.original_name,
+      file_name: item.file_name,
+      mime_type: item.mime_type,
+      extension: item.extension,
+      disk: item.disk,
+      storage_path: item.storage_path,
+      file_size: Number(item.file_size),
+      width: item.width,
+      height: item.height,
+      asset_url: buildAttachmentUrl(item.storage_path),
+      created: item.created,
+      updated: item.updated,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        length: data.length,
+        total_pages: Math.ceil(total / limit),
+        has_more: offset + data.length < total,
+      },
+    });
   },
 );
 
-// Attachment - create
-
-app.post(
+// Stores the files first, then inserts the rows in one transaction; when anything fails, the
+// stored files are removed again. The temporary upload files are always removed.
+router.post(
   '/api/v1/attachment',
   verifyToken,
   requirePermission('attachment.create'),
   uploadAttachmentFiles,
   async (req: AuthRequest, res: Response) => {
-    // Stored file tracker
-
-    const storedFiles: StoredAttachment[] = [];
-
-    const createdAttachments: any[] = [];
-
-    let connection: any = null;
+    const uploads = Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : [];
+    const stored: StoredAttachment[] = [];
 
     try {
-      // Session
-
-      const idAdminAcct = req.user?.id_admin_acct;
-
-      if (!idAdminAcct) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      // Collection
+      const scope = await getAdminScope(req);
+      if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
       const collection = String(req.body?.collection ?? '').trim();
-
-      const collectionConfig = getAttachmentCollectionConfig(collection);
-
-      if (!collectionConfig) {
+      const config = getAttachmentCollectionConfig(collection);
+      if (!config) {
         return sendError(
           res,
           400,
@@ -541,870 +321,208 @@ app.post(
           'Invalid attachment collection',
         );
       }
-
-      // Files
-
-      const files = Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : [];
-
-      if (files.length === 0) {
+      if (!uploads.length) {
         return sendError(res, 400, 'ATTACHMENT_FILE_REQUIRED', 'At least one file is required');
       }
-
-      // Collection file limit
-
-      if (files.length > collectionConfig.maxFiles) {
+      if (uploads.length > config.maxFiles) {
         return sendError(
           res,
           400,
           'ATTACHMENT_COLLECTION_FILE_LIMIT_EXCEEDED',
-          `A maximum of ${collectionConfig.maxFiles} file(s) is allowed for this collection`,
-          {
-            max_files: collectionConfig.maxFiles,
-          },
+          `A maximum of ${config.maxFiles} file(s) is allowed for this collection`,
+          { max_files: config.maxFiles },
         );
       }
 
-      // Get session account scope
+      const ids = await withTransaction(pool, async (connection) => {
+        const created: number[] = [];
+        for (const input of uploads) {
+          const file = await storeAttachment(input, collection as AttachmentCollection);
+          stored.push(file);
+          const [insert] = await connection.query<ResultSetHeader>(
+            `INSERT INTO attachment (collection_name, name, original_name, file_name, mime_type,
+               extension, disk, storage_path, file_size, width, height, id_master_comp, id_office,
+               created_by_id, created, updated, attachment_status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), 1)`,
+            [
+              file.collection_name,
+              file.name,
+              file.original_name,
+              file.file_name,
+              file.mime_type,
+              file.extension,
+              file.disk,
+              file.storage_path,
+              file.file_size,
+              file.width,
+              file.height,
+              scope.idMasterComp,
+              scope.idOffice,
+              scope.idAdminAcct,
+            ],
+          );
+          created.push(Number(insert.insertId));
+        }
 
-      const [accountRows] = await pool.query(
-        `
-            SELECT
-              id_admin_acct,
-              id_master_comp,
-              id_office,
-              admin_acct_status
+        for (const [index, id] of created.entries()) {
+          const file = stored[index];
+          await writeAuditLog({
+            ...auditBase(req, connection, scope),
+            eventCode: 'attachment.uploaded',
+            action: 'upload',
+            entityId: id,
+            entityLabel: file.original_name,
+            after: {
+              id_attachment: id,
+              collection_name: file.collection_name,
+              name: file.name,
+              original_name: file.original_name,
+              file_name: file.file_name,
+              mime_type: file.mime_type,
+              extension: file.extension,
+              disk: file.disk,
+              storage_path: file.storage_path,
+              file_size: file.file_size,
+              width: file.width,
+              height: file.height,
+              id_master_comp: scope.idMasterComp,
+              id_office: scope.idOffice,
+              created_by_id: scope.idAdminAcct,
+              attachment_status: 1,
+            },
+            metadata: { collection: file.collection_name, upload_batch_size: created.length },
+            httpStatus: 201,
+          });
+        }
+        return created;
+      });
 
-            FROM admin_acct
-
-            WHERE id_admin_acct = ?
-
-            LIMIT 1
-          `,
-        [idAdminAcct],
-      );
-
-      const accounts = accountRows as any[];
-
-      if (accounts.length === 0) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      const account = accounts[0];
-
-      if (account.admin_acct_status !== 1) {
-        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-      }
-
-      // Database transaction
-
-      connection = await pool.getConnection();
-
-      await connection.beginTransaction();
-
-      const resultData: any[] = [];
-
-      // Process files
-
-      for (const file of files) {
-        // Store physical file
-
-        const stored = await storeAttachment(file, collection as AttachmentCollection);
-
-        storedFiles.push(stored);
-
-        // Insert attachment
-
-        const [insertResult] = await connection.query(
-          `
-              INSERT INTO attachment (
-                collection_name,
-                name,
-                original_name,
-                file_name,
-                mime_type,
-                extension,
-                disk,
-                storage_path,
-                file_size,
-                width,
-                height,
-                id_master_comp,
-                id_office,
-                created_by_id,
-                created,
-                updated,
-                attachment_status
-              )
-              VALUES (
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                NOW(),
-                NOW(),
-                1
-              )
-            `,
-          [
-            stored.collection_name,
-            stored.name,
-            stored.original_name,
-            stored.file_name,
-            stored.mime_type,
-            stored.extension,
-            stored.disk,
-            stored.storage_path,
-            stored.file_size,
-            stored.width,
-            stored.height,
-            account.id_master_comp,
-            account.id_office,
-            idAdminAcct,
-          ],
-        );
-
-        const idAttachment = Number((insertResult as any).insertId);
-
-        // Audit snapshot
-
-        createdAttachments.push({
-          id_attachment: idAttachment,
-          collection_name: stored.collection_name,
-          name: stored.name,
-          original_name: stored.original_name,
-          file_name: stored.file_name,
-          mime_type: stored.mime_type,
-          extension: stored.extension,
-          disk: stored.disk,
-          storage_path: stored.storage_path,
-          file_size: stored.file_size,
-          width: stored.width,
-          height: stored.height,
-          id_master_comp: Number(account.id_master_comp),
-          id_office: Number(account.id_office),
-          created_by_id: Number(idAdminAcct),
-          attachment_status: 1,
-        });
-
-        // Response item
-
-        resultData.push({
-          id_attachment: keyhsid.idAttachment.encode(idAttachment),
-          collection_name: stored.collection_name,
-          name: stored.name,
-          original_name: stored.original_name,
-          file_name: stored.file_name,
-          mime_type: stored.mime_type,
-          extension: stored.extension,
-          disk: stored.disk,
-          storage_path: stored.storage_path,
-          file_size: stored.file_size,
-          width: stored.width,
-          height: stored.height,
-          asset_url: stored.asset_url,
-        });
-      }
-
-      // Audit
-
-      for (const attachment of createdAttachments) {
-        await writeAuditLog({
-          req,
-          connection,
-          writeMode: 'strict',
-          idMasterComp: Number(account.id_master_comp),
-          eventCode: 'attachment.uploaded',
-          category: 'file',
-          module: 'attachment',
-          action: 'upload',
-          actorType: 'admin',
-          actorId: idAdminAcct,
-          actorLabel: req.user?.alias ?? null,
-          entityType: 'attachment',
-          entityId: attachment.id_attachment,
-          entityLabel: attachment.original_name,
-          after: attachment,
-          metadata: {
-            collection: attachment.collection_name,
-            upload_batch_size: createdAttachments.length,
-          },
-          httpStatus: 201,
-        });
-      }
-
-      // Commit
-
-      await connection.commit();
-
-      // Response
-
+      const data = stored.map((file, index) => ({
+        id_attachment: keyhsid.idAttachment.encode(ids[index]),
+        collection_name: file.collection_name,
+        name: file.name,
+        original_name: file.original_name,
+        file_name: file.file_name,
+        mime_type: file.mime_type,
+        extension: file.extension,
+        disk: file.disk,
+        storage_path: file.storage_path,
+        file_size: file.file_size,
+        width: file.width,
+        height: file.height,
+        asset_url: file.asset_url,
+      }));
+      const several = data.length > 1;
       return sendSuccess(
         res,
         201,
-        resultData.length > 1 ? 'ATTACHMENTS_UPLOADED' : 'ATTACHMENT_UPLOADED',
-        resultData.length > 1
-          ? 'Attachments uploaded successfully'
-          : 'Attachment uploaded successfully',
-        resultData,
+        several ? 'ATTACHMENTS_UPLOADED' : 'ATTACHMENT_UPLOADED',
+        several ? 'Attachments uploaded successfully' : 'Attachment uploaded successfully',
+        data,
       );
-    } catch (error: any) {
-      // Rollback database
-
-      if (connection) {
-        try {
-          await connection.rollback();
-        } catch (rollbackError) {
-          console.error('Attachment rollback error:', rollbackError);
-        }
-      }
-
-      // Remove stored files
-
-      await Promise.allSettled(
-        storedFiles.map((item) => deleteStoredAttachment(item.storage_path)),
-      );
-
-      console.error('Create attachment error:', error);
-
-      // Known validation errors
-
-      const validationErrorMap: Record<
-        string,
-        {
-          code: string;
-          message: string;
-        }
-      > = {
-        'Invalid attachment collection': {
-          code: 'ATTACHMENT_COLLECTION_INVALID',
-          message: 'Invalid attachment collection',
-        },
-        // Messages thrown by storeAttachment (helper/attachment.helper.ts).
-        'Attachment collection does not support this file type': {
-          code: 'ATTACHMENT_IMAGE_PROCESSING_UNSUPPORTED',
-          message: 'Attachment collection does not support this file type',
-        },
-        'Unsupported attachment type': {
-          code: 'ATTACHMENT_FILE_TYPE_NOT_ALLOWED',
-          message: 'Unsupported attachment type',
-        },
-        'File size exceeds the allowed limit': {
-          code: 'ATTACHMENT_FILE_TOO_LARGE',
-          message: 'File size exceeds the allowed limit',
-        },
-      };
-
-      const validationError = validationErrorMap[String(error?.message ?? '')];
-
-      if (validationError) {
-        return sendError(res, 400, validationError.code, validationError.message);
-      }
-
-      // Invalid image content
-
-      if (
-        error?.name === 'Error' &&
-        String(error?.message ?? '')
-          .toLowerCase()
-          .includes('image')
-      ) {
-        return sendError(
-          res,
-          400,
-          'ATTACHMENT_IMAGE_PROCESS_FAILED',
-          'The uploaded image could not be processed',
-        );
-      }
-
-      // Server error
-
-      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
+    } catch (error) {
+      await Promise.allSettled(stored.map((file) => deleteStoredAttachment(file.storage_path)));
+      throw error;
     } finally {
-      // Release connection
-
-      if (connection) {
-        connection.release();
-      }
-
-      // Remove temporary upload files
-
-      const uploaded = Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : [];
-
-      await Promise.allSettled(uploaded.map((item) => fs.unlink(item.path)));
+      await Promise.allSettled(uploads.map((input) => fs.unlink(input.path)));
     }
   },
 );
 
-// Attachment - delete
-
-app.delete(
+router.delete(
   '/api/v1/attachment/:id',
   verifyToken,
   requirePermission('attachment.delete'),
   async (req: AuthRequest, res: Response) => {
-    let connection: any = null;
-
-    try {
-      // Session
-
-      const idAdminAcct = req.user?.id_admin_acct;
-
-      if (!idAdminAcct) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      // Decode
-
-      const idAttachment = decodeAttachmentId(req.params.id);
-
-      if (!idAttachment) {
-        return sendError(res, 400, 'ATTACHMENT_INVALID_ID', 'Invalid attachment identifier');
-      }
-
-      // Session scope
-
-      const [accountRows] = await pool.query(
-        `
-            SELECT
-              id_master_comp,
-              id_office,
-              admin_acct_status,
-              is_all_access
-
-            FROM admin_acct
-
-            WHERE id_admin_acct = ?
-
-            LIMIT 1
-          `,
-        [idAdminAcct],
-      );
-
-      const accounts = accountRows as any[];
-
-      if (!accounts.length) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      const account = accounts[0];
-
-      if (account.admin_acct_status !== 1) {
-        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-      }
-
-      // Transaction
-
-      connection = await pool.getConnection();
-
-      await connection.beginTransaction();
-
-      // Get attachment
-
-      const attachmentWhere: string[] = [
-        'id_attachment = ?',
-        'id_master_comp = ?',
-        'attachment_status = 1',
-        'deleted_at IS NULL',
-      ];
-
-      const attachmentParams: any[] = [idAttachment, account.id_master_comp];
-
-      if (Number(account.is_all_access) !== 1) {
-        attachmentWhere.push('id_office = ?');
-
-        attachmentParams.push(account.id_office);
-      }
-
-      const [attachmentRows] = await connection.query(
-        `
-            SELECT
-              id_attachment,
-
-              collection_name,
-
-              name,
-
-              original_name,
-
-              file_name,
-
-              mime_type,
-
-              extension,
-
-              disk,
-
-              storage_path,
-
-              file_size,
-
-              width,
-
-              height,
-
-              id_master_comp,
-
-              id_office,
-
-              created_by_id,
-
-              attachment_status
-
-            FROM attachment
-
-            WHERE
-              ${attachmentWhere.join(' AND ')}
-
-            LIMIT 1
-
-            FOR UPDATE
-          `,
-        attachmentParams,
-      );
-
-      const attachments = attachmentRows as any[];
-
-      if (!attachments.length) {
-        await connection.rollback();
-
-        return sendError(res, 404, 'ATTACHMENT_NOT_FOUND', 'Attachment not found');
-      }
-
-      const attachment = attachments[0];
-
-      // Reference check
-
-      const references = await getAttachmentReferences([idAttachment], connection);
-
-      if (references.length) {
-        await connection.rollback();
-
-        return sendError(res, 409, 'ATTACHMENT_IN_USE', 'Attachment is currently in use');
-      }
-
-      // Soft delete
-
-      await connection.query(
-        `
-          UPDATE attachment
-
-          SET
-            attachment_status = 99,
-            deleted_at = NOW(),
-            updated = NOW()
-
-          WHERE id_attachment = ?
-            AND attachment_status = 1
-            AND deleted_at IS NULL
-        `,
-        [idAttachment],
-      );
-
-      // Audit before
-
-      const auditBefore = {
-        collection_name: attachment.collection_name,
-        name: attachment.name,
-        original_name: attachment.original_name,
-        file_name: attachment.file_name,
-        mime_type: attachment.mime_type,
-        extension: attachment.extension,
-        disk: attachment.disk,
-        storage_path: attachment.storage_path,
-        file_size: Number(attachment.file_size),
-        width: attachment.width === null ? null : Number(attachment.width),
-        height: attachment.height === null ? null : Number(attachment.height),
-        id_master_comp: Number(attachment.id_master_comp),
-        id_office: Number(attachment.id_office),
-        created_by_id: Number(attachment.created_by_id),
-        attachment_status: Number(attachment.attachment_status),
-      };
-
-      // Audit
-
-      await writeAuditLog({
-        req,
-        connection,
-        writeMode: 'strict',
-        idMasterComp: Number(account.id_master_comp),
-        eventCode: 'attachment.deleted',
-        category: 'file',
-        module: 'attachment',
-        action: 'delete',
-        actorType: 'admin',
-        actorId: idAdminAcct,
-        actorLabel: req.user?.alias ?? null,
-        entityType: 'attachment',
-        entityId: idAttachment,
-        entityLabel: attachment.original_name,
-        before: auditBefore,
-        after: {
-          ...auditBefore,
-          attachment_status: 99,
-        },
-        metadata: {
-          delete_type: 'soft_delete',
-          physical_cleanup_requested: attachment.disk === 'local',
-        },
-        httpStatus: 200,
-      });
-
-      await connection.commit();
-
-      // Delete physical file
-
-      if (attachment.disk === 'local') {
-        try {
-          await deleteStoredAttachment(attachment.storage_path);
-        } catch (fileError) {
-          // DB is already deleted
-          //==== PHYSICAL CLEANUP CAN BE RETRIED LATER
-
-          console.error('Delete attachment physical file error:', fileError);
-        }
-      }
-
-      // Response
-
-      return sendSuccess(res, 200, 'ATTACHMENT_DELETED', 'Attachment deleted successfully', {
-        id_attachment: keyhsid.idAttachment.encode(idAttachment),
-      });
-    } catch (error) {
-      // Rollback
-
-      if (connection) {
-        try {
-          await connection.rollback();
-        } catch {}
-      }
-
-      console.error('Delete attachment error:', error);
-
-      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
-    } finally {
-      if (connection) {
-        connection.release();
-      }
+    const idAttachment = decodeId(req.params.id, keyhsid.idAttachment);
+    if (!idAttachment) {
+      return sendError(res, 400, 'ATTACHMENT_INVALID_ID', 'Invalid attachment identifier');
     }
+
+    const scope = await getAdminScope(req);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
+
+    const attachments = await withTransaction(pool, async (connection) => {
+      const rows = await lockAttachments(connection, [idAttachment], scope);
+      if (!rows.length) throw new HttpError(404, 'ATTACHMENT_NOT_FOUND', 'Attachment not found');
+      if ((await getAttachmentReferences([idAttachment], connection)).length) {
+        throw new HttpError(409, 'ATTACHMENT_IN_USE', 'Attachment is currently in use');
+      }
+      await softDelete(req, connection, scope, rows, {});
+      return rows;
+    });
+    await removeFiles(attachments);
+
+    return sendSuccess(res, 200, 'ATTACHMENT_DELETED', 'Attachment deleted successfully', {
+      id_attachment: keyhsid.idAttachment.encode(idAttachment),
+    });
   },
 );
 
-// Attachment - bulk delete
-
-app.post(
+// All or nothing: every attachment must exist in the admin's scope and be unused.
+router.post(
   '/api/v1/attachment/bulk-delete',
   verifyToken,
   requirePermission('attachment.delete'),
   async (req: AuthRequest, res: Response) => {
-    let connection: any = null;
-
-    try {
-      // Session
-
-      const idAdminAcct = req.user?.id_admin_acct;
-
-      if (!idAdminAcct) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      // IDS
-
-      const encodedIds = Array.isArray(req.body?.ids) ? req.body.ids : [];
-
-      if (!encodedIds.length) {
-        return sendError(
-          res,
-          400,
-          'ATTACHMENT_BULK_REQUIRED',
-          'At least one attachment is required',
-        );
-      }
-
-      if (encodedIds.length > 100) {
-        return sendError(
-          res,
-          400,
-          'ATTACHMENT_BULK_LIMIT_EXCEEDED',
-          'A maximum of 100 attachments can be deleted at once',
-          {
-            max_items: 100,
-          },
-        );
-      }
-
-      const decodedIds = encodedIds.map((value: unknown) => decodeAttachmentId(value));
-
-      if (decodedIds.some((value: any) => !value)) {
-        return sendError(
-          res,
-          400,
-          'ATTACHMENT_BULK_INVALID_ID',
-          'One or more attachment identifiers are invalid',
-        );
-      }
-
-      const ids = Array.from(new Set(decodedIds as number[]));
-
-      // Session scope
-
-      const [accountRows] = await pool.query(
-        `
-            SELECT
-              id_master_comp,
-              id_office,
-              admin_acct_status,
-              is_all_access
-
-            FROM admin_acct
-
-            WHERE id_admin_acct = ?
-
-            LIMIT 1
-          `,
-        [idAdminAcct],
+    const encodedIds: unknown[] = Array.isArray(req.body?.ids) ? req.body.ids : [];
+    if (!encodedIds.length) {
+      return sendError(res, 400, 'ATTACHMENT_BULK_REQUIRED', 'At least one attachment is required');
+    }
+    if (encodedIds.length > MAX_BULK) {
+      return sendError(
+        res,
+        400,
+        'ATTACHMENT_BULK_LIMIT_EXCEEDED',
+        `A maximum of ${MAX_BULK} attachments can be deleted at once`,
+        { max_items: MAX_BULK },
       );
-
-      const accounts = accountRows as any[];
-
-      if (!accounts.length) {
-        return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');
-      }
-
-      const account = accounts[0];
-
-      if (account.admin_acct_status !== 1) {
-        return sendError(res, 403, 'AUTH_ACCOUNT_INACTIVE', 'Your account is not active');
-      }
-
-      // Transaction
-
-      connection = await pool.getConnection();
-
-      await connection.beginTransaction();
-
-      // Get attachments
-
-      const placeholders = ids.map(() => '?').join(',');
-
-      // Attachment scope
-
-      const attachmentWhere: string[] = [
-        `
-      id_attachment IN (
-        ${placeholders}
-      )
-    `,
-        'id_master_comp = ?',
-        'attachment_status = 1',
-        'deleted_at IS NULL',
-      ];
-
-      const attachmentParams: any[] = [...ids, account.id_master_comp];
-
-      if (Number(account.is_all_access) !== 1) {
-        attachmentWhere.push('id_office = ?');
-
-        attachmentParams.push(account.id_office);
-      }
-
-      const [attachmentRows] = await connection.query(
-        `
-          SELECT
-            id_attachment,
-
-            collection_name,
-
-            name,
-
-            original_name,
-
-            file_name,
-
-            mime_type,
-
-            extension,
-
-            disk,
-
-            storage_path,
-
-            file_size,
-
-            width,
-
-            height,
-
-            id_master_comp,
-
-            id_office,
-
-            created_by_id,
-
-            attachment_status
-
-          FROM attachment
-
-          WHERE
-            ${attachmentWhere.join(' AND ')}
-
-          FOR UPDATE
-        `,
-        attachmentParams,
+    }
+    const decodedIds = encodedIds.map((value) => decodeId(value, keyhsid.idAttachment));
+    if (decodedIds.some((id) => !id)) {
+      return sendError(
+        res,
+        400,
+        'ATTACHMENT_BULK_INVALID_ID',
+        'One or more attachment identifiers are invalid',
       );
+    }
+    const ids = Array.from(new Set(decodedIds as number[]));
 
-      const attachments = attachmentRows as any[];
+    const scope = await getAdminScope(req);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-      // All must exist in current scope
-
-      if (attachments.length !== ids.length) {
-        await connection.rollback();
-
-        return sendError(
-          res,
+    const attachments = await withTransaction(pool, async (connection) => {
+      const rows = await lockAttachments(connection, ids, scope);
+      if (rows.length !== ids.length) {
+        throw new HttpError(
           404,
           'ATTACHMENT_BULK_NOT_FOUND',
           'One or more attachments were not found',
         );
       }
-
-      // Reference check
-
       const references = await getAttachmentReferences(ids, connection);
-
       if (references.length) {
-        await connection.rollback();
-
-        const blockedIds = Array.from(new Set(references.map((item) => item.idAttachment))).map(
-          (id) => keyhsid.idAttachment.encode(id),
-        );
-
-        return sendError(
-          res,
+        const blocked = new Set(references.map((item) => item.idAttachment));
+        throw new HttpError(
           409,
           'ATTACHMENT_BULK_IN_USE',
           'One or more attachments are currently in use',
-          {
-            blocked_ids: blockedIds,
-          },
+          { blocked_ids: [...blocked].map((id) => keyhsid.idAttachment.encode(id)) },
         );
       }
-
-      // Soft delete
-
-      await connection.query(
-        `
-          UPDATE attachment
-
-          SET
-            attachment_status = 99,
-            deleted_at = NOW(),
-            updated = NOW()
-
-          WHERE id_attachment IN (
-            ${placeholders}
-          )
-        `,
-        ids,
-      );
-
-      // Audit
-
-      for (const attachment of attachments) {
-        const auditBefore = {
-          collection_name: attachment.collection_name,
-          name: attachment.name,
-          original_name: attachment.original_name,
-          file_name: attachment.file_name,
-          mime_type: attachment.mime_type,
-          extension: attachment.extension,
-          disk: attachment.disk,
-          storage_path: attachment.storage_path,
-          file_size: Number(attachment.file_size),
-          width: attachment.width === null ? null : Number(attachment.width),
-          height: attachment.height === null ? null : Number(attachment.height),
-          id_master_comp: Number(attachment.id_master_comp),
-          id_office: Number(attachment.id_office),
-          created_by_id: Number(attachment.created_by_id),
-          attachment_status: Number(attachment.attachment_status),
-        };
-
-        await writeAuditLog({
-          req,
-          connection,
-          writeMode: 'strict',
-          idMasterComp: Number(account.id_master_comp),
-          eventCode: 'attachment.deleted',
-          category: 'file',
-          module: 'attachment',
-          action: 'delete',
-          actorType: 'admin',
-          actorId: idAdminAcct,
-          actorLabel: req.user?.alias ?? null,
-          entityType: 'attachment',
-          entityId: Number(attachment.id_attachment),
-          entityLabel: attachment.original_name,
-          before: auditBefore,
-          after: {
-            ...auditBefore,
-            attachment_status: 99,
-          },
-          metadata: {
-            delete_type: 'soft_delete',
-            bulk_delete: true,
-            bulk_size: attachments.length,
-            physical_cleanup_requested: attachment.disk === 'local',
-          },
-          httpStatus: 200,
-        });
-      }
-
-      await connection.commit();
-
-      // Delete physical files
-
-      const physicalDeleteResults = await Promise.allSettled(
-        attachments
-          .filter((item) => item.disk === 'local')
-          .map((item) => deleteStoredAttachment(item.storage_path)),
-      );
-
-      physicalDeleteResults.forEach((result) => {
-        if (result.status === 'rejected') {
-          console.error('Bulk delete physical file error:', result.reason);
-        }
+      await softDelete(req, connection, scope, rows, {
+        bulk_delete: true,
+        bulk_size: rows.length,
       });
+      return rows;
+    });
+    await removeFiles(attachments);
 
-      // Response
-
-      return sendSuccess(res, 200, 'ATTACHMENTS_DELETED', 'Attachments deleted successfully', {
-        deleted: ids.length,
-      });
-    } catch (error) {
-      if (connection) {
-        try {
-          await connection.rollback();
-        } catch {}
-      }
-
-      console.error('Bulk delete attachment error:', error);
-
-      return sendError(res, 500, 'INTERNAL_SERVER_ERROR', 'Internal Server Error');
-    } finally {
-      if (connection) {
-        connection.release();
-      }
-    }
+    return sendSuccess(res, 200, 'ATTACHMENTS_DELETED', 'Attachments deleted successfully', {
+      deleted: ids.length,
+    });
   },
 );
 
-export default app;
+export default router;

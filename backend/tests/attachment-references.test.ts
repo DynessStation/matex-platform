@@ -28,3 +28,20 @@ test('website page media prevents a referenced attachment from being deleted', a
     },
   ]);
 });
+
+test('product and product category media prevent deletion (BE-009)', async () => {
+  const executor = {
+    query: async (sql: string) => {
+      if (sql.includes('FROM product_catalog_attachment'))
+        return [[{ id_attachment: 5, total: 1 }], []];
+      if (sql.includes('FROM product_category_attachment'))
+        return [[{ id_attachment: 6, total: 3 }], []];
+      return [[], []];
+    },
+  };
+
+  assert.deepEqual(await getAttachmentReferences([5, 6], executor), [
+    { idAttachment: 5, source: 'product.attachment', total: 1 },
+    { idAttachment: 6, source: 'product_category.attachment', total: 3 },
+  ]);
+});
