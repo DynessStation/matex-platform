@@ -178,6 +178,10 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Hapus akun admin adalah soft delete (status 99). List, ubah, ubah status, dan hapus sudah menyaring status 0/1, tapi `GET /api/v1/admin-acct/:id` tidak, sehingga akun terhapus masih tampil lewat URL detail. Login akun itu tetap ditolak.
 - Perbaikan: query detail ikut menyaring status 0/1, sehingga akun terhapus menjawab 404.
 
+**BE-006 — Update kantor melewati tiga pengecekan yang ada di create** · P3 · **Selesai (Fase 5C)**
+- Create kantor menolak kode di atas 50 karakter, nama di atas 255 karakter, dan kantor publik tanpa slug yang valid; update tidak. Kode yang kepanjangan sampai ke MySQL dan berakhir error 500, dan kantor publik bisa tersimpan tanpa slug.
+- Ditemukan saat menyiapkan pemindahan modul `office` ke pola standar. Perbaikan: update menjalankan pengecekan yang sama (lalu keduanya memakai satu `readOfficeInput`). Ada test kontraknya.
+
 **BE-002 — Gaya penulisan kode tidak seragam** · P3 · Terbukti
 - Sebagian file (misalnya `article.ts`) ditulis sangat padat satu baris panjang, sementara file lain sangat renggang dengan banyak komentar pembatas. Ini menyulitkan review.
 - Struktur folder juga tidak konsisten: middleware Express ada di `src/ctrl/middleware/` dengan nama camelCase (`authJwt.ts`), dan `src/helpers.ts` sudah tidak dipakai.
@@ -306,7 +310,7 @@ Kondisi yang sudah sehat: kode server sama dengan GitHub, skema database product
 
 | Jenis | Item |
 |---|---|
-| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004, dan BE-005 sudah diperbaiki. |
+| Bug aktual | DB-002 (migration 013 di MariaDB). FE-003, FE-005, FE-006, FE-007, FE-008, FE-009, DB-007, BE-004, BE-005, dan BE-006 sudah diperbaiki. |
 | Risiko keamanan | SEC-003, SEC-004 (SEC-001 dan SEC-002 selesai) |
 | Integritas data | DB-003 (DB-001, DB-005, dan DB-008 selesai) |
 | Konten bisnis | (CONTENT-001 selesai) |

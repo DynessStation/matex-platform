@@ -81,6 +81,20 @@ Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi
 | `api-response.helper.ts` | `sendSuccess`, `sendError` |
 | `audit-log.helper.ts` | `writeAuditLog` |
 
+### Checklist memindahkan modul lama ke pola standar (Fase 5C)
+
+Contoh lengkapnya modul `office` (3.115 → 1.327 baris, rekaman identik).
+
+1. **Scope dan izin:** hapus salinan `getSessionScope` dan query sesi sendiri; pakai `getAdminScope`. Cek izin tambahan dengan `adminHasPermission(scope, kunci, connection)`.
+2. **ID:** `decodeId(req.params.id, keyhsid.idX)`, bukan fungsi decode per modul.
+3. **Input:** satu fungsi `read<Modul>Input(body)` dipakai create **dan** update, melempar `HttpError` dengan kode dan pesan yang sama seperti sebelumnya. Kalau create dan update ternyata berbeda aturan, catat sebagai temuan dulu (contoh: BE-006).
+4. **Transaksi:** `withTransaction`; jalan keluar yang diharapkan melempar `HttpError` (rollback otomatis). Tidak ada lagi `connection.rollback()` manual, variabel `connection: any`, atau `try/catch` yang hanya menjawab 500.
+5. **Query yang kembar** (pengecekan duplikat, pembacaan relasi) jadi satu fungsi di folder modul.
+6. **SQL ringkas:** tanpa baris kosong di dalam query; daftar kolom panjang memakai konstanta (contoh `OFFICE_COLUMNS`).
+7. **Komentar:** hanya yang menjelaskan *kenapa*. Label yang mengulang kode (`// Commit`, `// Response`, `// Session`) dibuang.
+8. **Bentuk respons tetap sama**, termasuk pagination lama; penyeragaman format menunggu 5D.
+9. **Bukti:** rekaman sebelum/sesudah identik, test unit dan e2e lulus. Perluas test kontrak dulu untuk jalur yang akan berubah dan belum tercakup.
+
 ### 2.4 Konvensi API dan database
 
 - **Kode respons** HURUF_BESAR dengan awalan modul: `OFFICE_NOT_FOUND`, `ADMIN_ACCESS_NAME_EXISTS`. Status HTTP: 400 input salah, 401 belum login, 403 tidak berizin atau di luar scope, 404 tidak ada, 409 bentrok dengan data lain.
