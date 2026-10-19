@@ -1,4 +1,17 @@
-import hashids from "hashids";
+import Hashids from "hashids";
+
+// hashids 2 throws when an id contains characters outside its alphabet (for example a
+// tampered URL). Every caller treats an empty result as an invalid id and answers 400/404,
+// so return [] instead of letting the request fail with a 500.
+class hashids extends Hashids {
+  override decode(id: string): ReturnType<Hashids["decode"]> {
+    try {
+      return super.decode(id);
+    } catch {
+      return [];
+    }
+  }
+}
 
 const idAttachment = new hashids("key_attachment123", 8);
 

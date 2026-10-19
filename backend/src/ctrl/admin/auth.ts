@@ -3368,6 +3368,7 @@ app.get(
                     AND pa.deleted_at IS NULL
 
                 WHERE aa.id_admin_acct = ?
+                    AND aa.admin_acct_status IN (0, 1)
 
                 LIMIT 1
             `;
