@@ -3,11 +3,14 @@ import { expect, test, type APIRequestContext } from '@playwright/test';
 import {
   admin,
   apiContext,
+  createAccessProfile,
+  createAdminAccount,
   expectCode,
   login,
   runId,
   runNumber,
   saveRecording,
+  uploadSample,
 } from './api-contract';
 
 // API contract for the admin session and admin-account endpoints
@@ -246,6 +249,179 @@ test('status and delete enforce their safety rules', async () => {
     200,
   );
   expect(list.pagination).toMatchObject({ total: 0 });
+});
+
+let otherOfficeId = '';
+let otherOfficeAccount: { id: string; identity: string; password: string };
+
+const accountData = (key: string, references: Record<string, string>) => ({
+  name: 'Akun Uji Kontrak',
+  alias: `${key}${runId}`.slice(0, 15),
+  email_1: `${key.toLowerCase()}.${runId}@example.invalid`,
+  phone_1: `+6282${String(runNumber).padStart(7, '0')}${key.length}`,
+  password: `Uji-${key}-${runId}-9`,
+  ...references,
+  is_all_access: 0,
+});
+
+test('references, profile photos, and duplicates are checked', async () => {
+  const photoId = await uploadSample(owner, 'admin_profile');
+  const mediaId = await uploadSample(owner, 'media_library');
+  const data = accountData('Foto', reference);
+
+  await expectCode(
+    await owner.post(base, { data: { ...data, id_profile_photo: mediaId } }),
+    400,
+    'ADMIN_ACCOUNT_PROFILE_PHOTO_NOT_AVAILABLE',
+  );
+  const created = await expectCode(
+    await owner.post(base, { data: { ...data, id_profile_photo: photoId } }),
+    201,
+    'ADMIN_ACCOUNT_CREATED',
+  );
+  const id = created.data.id_admin_acct;
+  const withPhoto = await expectCode(await owner.get(`${base}/${id}`), 200);
+  expect(withPhoto.data.id_profile_photo).toBe(photoId);
+
+  // Without the field the photo is kept; null removes it.
+  await expectCode(await owner.put(`${base}/${id}`, { data }), 200, 'ADMIN_ACCOUNT_UPDATED');
+  expect((await expectCode(await owner.get(`${base}/${id}`), 200)).data.id_profile_photo).toBe(
+    photoId,
+  );
+  await expectCode(
+    await owner.put(`${base}/${id}`, { data: { ...data, id_profile_photo: null } }),
+    200,
+  );
+  expect(
+    (await expectCode(await owner.get(`${base}/${id}`), 200)).data.id_profile_photo,
+  ).toBeNull();
+
+  await expectCode(
+    await owner.put(`${base}/${id}`, { data: { ...data, email_1: admin.identity } }),
+    409,
+    'ADMIN_ACCOUNT_EMAIL_EXISTS',
+  );
+  await expectCode(
+    await owner.put(`${base}/${id}`, { data: { ...data, phone_1: '+628100000099' } }),
+    409,
+    'ADMIN_ACCOUNT_PHONE_EXISTS',
+  );
+
+  const inactiveAccess = await createAccessProfile(owner, 'Profil Nonaktif', []);
+  await expectCode(
+    await owner.patch(`/api/v1/admin-access/${inactiveAccess}/status`, {
+      data: { admin_access_status: 0 },
+    }),
+    200,
+  );
+  await expectCode(
+    await owner.post(base, {
+      data: { ...accountData('Nonaktif', reference), id_access: inactiveAccess },
+    }),
+    400,
+    'ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE',
+  );
+
+  const offices = await expectCode(
+    await owner.get(`${base}/select/office`, {
+      params: { id_master_comp: reference.id_master_comp, limit: '500' },
+    }),
+    200,
+  );
+  expect(offices.pagination).toMatchObject({ limit: 50 });
+});
+
+test.fixme('a full-access admin sees accounts of every office (audit BE-008)', async () => {
+  const office = await expectCode(
+    await owner.post('/api/v1/office', {
+      data: {
+        office_code: `AK-${runId}`.toUpperCase(),
+        office_name: 'Kantor Uji Akun',
+        operating_hours: [],
+        attachments: [],
+      },
+    }),
+    201,
+    'OFFICE_CREATED',
+  );
+  otherOfficeId = office.data.id_office;
+  otherOfficeAccount = await createAdminAccount(owner, 'Cabang', {
+    ...reference,
+    id_office: otherOfficeId,
+  });
+
+  const list = await expectCode(
+    await owner.get(base, { params: { search: `Cabang${runId}`.slice(0, 15) } }),
+    200,
+  );
+  expect(list.pagination).toMatchObject({ total: 1 });
+  await expectCode(await owner.get(`${base}/${otherOfficeAccount.id}`), 200);
+});
+
+test('office-scoped admins stay within their office and cannot touch full-access accounts', async () => {
+  const managerAccess = await createAccessProfile(owner, 'Pengelola Akun', [
+    'admin_account.view',
+    'admin_account.create',
+    'admin_account.update',
+    'admin_account.delete',
+  ]);
+  const manager = await createAdminAccount(owner, 'Pengelola', {
+    ...reference,
+    id_access: managerAccess,
+  });
+  const session = await login(manager.identity, manager.password);
+  try {
+    const list = await expectCode(await session.get(base), 200);
+    expect(list.data.every((account: any) => account.id_office === reference.id_office)).toBe(true);
+
+    if (otherOfficeAccount) {
+      await expectCode(
+        await session.get(`${base}/${otherOfficeAccount.id}`),
+        403,
+        'ADMIN_ACCOUNT_OFFICE_SCOPE_FORBIDDEN',
+      );
+      await expectCode(
+        await session.post(base, {
+          data: accountData('Luar', { ...reference, id_office: otherOfficeId }),
+        }),
+        403,
+        'ADMIN_ACCOUNT_CREATE_OFFICE_SCOPE_FORBIDDEN',
+      );
+    }
+    await expectCode(
+      await session.post(base, {
+        data: { ...accountData('Penuh', reference), is_all_access: 1 },
+      }),
+      403,
+      'ADMIN_ACCOUNT_FULL_ACCESS_GRANT_FORBIDDEN',
+    );
+
+    const ownerData = {
+      name: 'Penguji Otomatis',
+      alias: 'E2EAdmin',
+      email_1: admin.identity,
+      phone_1: '+628100000099',
+      ...reference,
+      is_all_access: 1,
+    };
+    await expectCode(
+      await session.put(`${base}/${ownerId}`, { data: ownerData }),
+      403,
+      'ADMIN_ACCOUNT_FULL_ACCESS_UPDATE_FORBIDDEN',
+    );
+    await expectCode(
+      await session.patch(`${base}/${ownerId}/status`, { data: { admin_acct_status: 0 } }),
+      403,
+      'ADMIN_ACCOUNT_FULL_ACCESS_STATUS_FORBIDDEN',
+    );
+    await expectCode(
+      await session.delete(`${base}/${ownerId}`),
+      403,
+      'ADMIN_ACCOUNT_FULL_ACCESS_DELETE_FORBIDDEN',
+    );
+  } finally {
+    await session.dispose();
+  }
 });
 
 test('logout ends the session', async () => {
