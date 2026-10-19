@@ -331,7 +331,7 @@ test('references, profile photos, and duplicates are checked', async () => {
   expect(offices.pagination).toMatchObject({ limit: 50 });
 });
 
-test.fixme('a full-access admin sees accounts of every office (audit BE-008)', async () => {
+test('a full-access admin sees accounts of every office (audit BE-008)', async () => {
   const office = await expectCode(
     await owner.post('/api/v1/office', {
       data: {

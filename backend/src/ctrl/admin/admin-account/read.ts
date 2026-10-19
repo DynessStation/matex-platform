@@ -38,7 +38,8 @@ router.get(
         `
         SELECT
             id_master_comp,
-            id_office
+            id_office,
+            is_all_access
 
         FROM admin_acct
 
@@ -59,6 +60,9 @@ router.get(
       const idMasterComp = sessionUsers[0].id_master_comp;
 
       const idOffice = sessionUsers[0].id_office;
+
+      // Full-access admins see every office of the company; others only their own office.
+      const isAllAccess = Number(sessionUsers[0].is_all_access);
 
       // Pagination
 
@@ -116,7 +120,7 @@ router.get(
                 )
 
                 AND aa.id_master_comp = ?
-                AND aa.id_office = ?
+                AND (? = 1 OR aa.id_office = ?)
                 AND aa.admin_acct_status IN (0, 1)
             `;
 
@@ -129,6 +133,7 @@ router.get(
         searchValue,
         searchValue,
         idMasterComp,
+        isAllAccess,
         idOffice,
       ]);
 
@@ -212,7 +217,7 @@ router.get(
                 )
 
                 AND aa.id_master_comp = ?
-                AND aa.id_office = ?
+                AND (? = 1 OR aa.id_office = ?)
                 AND aa.admin_acct_status IN (0, 1)
 
                 ORDER BY ${orderQuery} ${sortQuery}
@@ -229,6 +234,7 @@ router.get(
         searchValue,
         searchValue,
         idMasterComp,
+        isAllAccess,
         idOffice,
         itemsPerPage,
         offset,
