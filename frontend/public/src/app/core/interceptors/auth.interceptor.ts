@@ -1,18 +1,16 @@
-import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { inject, Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { Values } from '../../shared/interface/setting.interface';
-import { AuthService } from '../../shared/services/auth.service';
-import { NotificationService } from '../../shared/services/notification.service';
-import { AuthClear } from '../../shared/store/action/auth.action';
 import { SettingState } from '../../shared/store/state/setting.state';
 import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 
+// Sends visitors to the maintenance page while maintenance mode is on. The public site has no
+// sign-in, so the Kartify token and 401 handling were removed in 6B.
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private store = inject(Store);
@@ -23,8 +21,6 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
     private ngZone: NgZone,
-    private notificationService: NotificationService,
-    public authService: AuthService,
   ) {
     this.setting$.subscribe((setting) => {
       this.isMaintenanceModeOn = setting?.maintenance?.maintenance_mode!;
@@ -44,24 +40,6 @@ export class AuthInterceptor implements HttpInterceptor {
       // End the interceptor chain if in maintenance mode
     }
 
-    const token = this.store.selectSnapshot((state) => state.auth.access_token);
-    if (token) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    }
-
-    return next.handle(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          this.notificationService.notification = false;
-          this.store.dispatch(new AuthClear());
-          this.authService.isLogin = true;
-        }
-        return throwError(() => error);
-      }),
-    );
+    return next.handle(req);
   }
 }
