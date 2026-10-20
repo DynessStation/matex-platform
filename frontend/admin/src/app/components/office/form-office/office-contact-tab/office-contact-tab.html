@@ -1,0 +1,49 @@
+<div class="row g-4">
+  <div class="col-md-6">
+    <label class="form-label"> {{ 'office.email' | translate }} </label>
+
+    <input
+      type="email"
+      class="form-control"
+      formControlName="email"
+      [class.is-invalid]="
+        form.controls.email.touched && form.controls.email.invalid
+      "
+    />
+    @if (form.controls.email.touched && form.controls.email.errors?.['email']) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.email_invalid' | translate }}
+      </div>
+    }
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label"> {{ 'office.phone' | translate }} </label>
+
+    <input class="form-control" formControlName="phone" />
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.website_url' | translate }}
+    </label>
+
+    <input
+      class="form-control"
+      formControlName="website_url"
+      placeholder="https://..."
+    />
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.google_business_url' | translate }}
+    </label>
+
+    <input
+      class="form-control"
+      formControlName="google_business_url"
+      placeholder="https://..."
+    />
+  </div>
+</div>

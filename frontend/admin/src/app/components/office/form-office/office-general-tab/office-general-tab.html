@@ -1,0 +1,84 @@
+<div class="row g-4">
+  <div class="col-md-4">
+    <label class="form-label"> {{ 'office.code' | translate }} * </label>
+
+    <input
+      class="form-control"
+      formControlName="office_code"
+      placeholder="HO-BGR"
+      [class.is-invalid]="
+        form.controls.office_code.touched && form.controls.office_code.invalid
+      "
+    />
+    @if (
+      form.controls.office_code.touched &&
+      form.controls.office_code.errors?.['required']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.code_required' | translate }}
+      </div>
+    }
+
+    @if (
+      form.controls.office_code.touched &&
+      form.controls.office_code.errors?.['pattern']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.code_pattern' | translate }}
+      </div>
+    }
+
+    @if (
+      form.controls.office_code.touched &&
+      form.controls.office_code.errors?.['maxlength']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.code_max_length' | translate }}
+      </div>
+    }
+  </div>
+
+  <div class="col-md-8">
+    <label class="form-label"> {{ 'office.name' | translate }} *</label>
+
+    <input
+      class="form-control"
+      formControlName="office_name"
+      [placeholder]="'office.name_placeholder' | translate"
+      [class.is-invalid]="
+        form.controls.office_name.touched && form.controls.office_name.invalid
+      "
+    />
+
+    @if (
+      form.controls.office_name.touched &&
+      form.controls.office_name.errors?.['required']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.name_required' | translate }}
+      </div>
+    }
+
+    @if (
+      form.controls.office_name.touched &&
+      form.controls.office_name.errors?.['maxlength']
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.name_max_length' | translate }}
+      </div>
+    }
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.description' | translate }}
+    </label>
+
+    <textarea
+      rows="5"
+      class="form-control"
+      formControlName="office_description"
+      [placeholder]="'office.description_placeholder' | translate"
+    ></textarea>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<app-location-picker
+  [value]="office.locationValue"
+  (locationChange)="office.locationChanged($event)"
+/>
+
+<div class="row g-3 mt-2">
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.address' | translate }}
+    </label>
+
+    <input class="form-control" formControlName="address" readonly />
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label"> {{ 'office.city' | translate }} </label>
+
+    <input class="form-control" formControlName="city" readonly />
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">
+      {{ 'office.province' | translate }}
+    </label>
+
+    <input class="form-control" formControlName="province" readonly />
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label">
+      {{ 'office.postal_code' | translate }}
+    </label>
+
+    <input class="form-control" formControlName="postal_code" readonly />
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">
+      {{ 'office.latitude' | translate }}
+    </label>
+
+    <input
+      class="form-control"
+      [value]="form.controls.lat.value ?? ''"
+      readonly
+    />
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">
+      {{ 'office.longitude' | translate }}
+    </label>
+
+    <input
+      class="form-control"
+      [value]="form.controls.lng.value ?? ''"
+      readonly
+    />
+  </div>
+</div>
+
+<hr class="my-4" />
+
+<div class="office-switch-row mb-3">
+  <label class="switch">
+    <input
+      id="attendance_enabled"
+      type="checkbox"
+      formControlName="attendance_enabled"
+    />
+
+    <span class="switch-state"></span>
+  </label>
+
+  <label class="office-switch-label" for="attendance_enabled">
+    {{ 'office.enable_attendance_geofence' | translate }}
+  </label>
+</div>
+
+@if (form.controls.attendance_enabled.value) {
+  <div class="col-md-4">
+    <label class="form-label">
+      {{ 'office.attendance_radius' | translate }}
+    </label>
+
+    <div class="input-group">
+      <input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="attendance_radius_meter"
+        [class.is-invalid]="
+          form.controls.attendance_radius_meter.touched &&
+          form.controls.attendance_enabled.value &&
+          (form.controls.attendance_radius_meter.value === null ||
+            form.controls.attendance_radius_meter.value <= 0)
+        "
+      />
+
+      <span class="input-group-text">
+        {{ 'office.meter' | translate }}
+      </span>
+    </div>
+    @if (
+      form.controls.attendance_radius_meter.touched &&
+      form.controls.attendance_enabled.value &&
+      (form.controls.attendance_radius_meter.value === null ||
+        form.controls.attendance_radius_meter.value <= 0)
+    ) {
+      <div class="text-danger form-error">
+        {{ 'office.validation.attendance_radius_positive' | translate }}
+      </div>
+    }
+  </div>
+}

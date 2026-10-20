@@ -1,0 +1,126 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-1">{{ 'office.gallery' | translate }}</h5>
+
+    <small class="text-muted">
+      {{ 'office.gallery_help' | translate }}
+    </small>
+  </div>
+
+  <button type="button" class="btn btn-theme" (click)="openMedia()">
+    <i class="ri-image-add-line"></i>
+
+    {{ 'office.select_media' | translate }}
+  </button>
+</div>
+
+@if (office.officeMedia.length) {
+  <div class="office-media-list">
+    @for (
+      media of office.officeMedia;
+      track media.attachment.id_attachment;
+      let index = $index
+    ) {
+      <div class="office-media-item">
+        <img
+          [src]="media.attachment.asset_url"
+          [alt]="'office.media_alt' | translate"
+        />
+
+        <div class="office-media-content">
+          <div class="d-flex justify-content-between gap-3">
+            <div>
+              <strong>
+                {{ media.attachment.original_name }}
+              </strong>
+
+              @if (media.attachment_role === 'cover') {
+                <span class="badge bg-warning ms-2">
+                  {{ 'office.cover' | translate }}
+                </span>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-light-bg office-media-action office-media-delete"
+              [title]="'office.remove_media' | translate"
+              (click)="removeMedia(index)"
+            >
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+
+          <input
+            class="form-control mt-3"
+            [placeholder]="'office.caption' | translate"
+            [value]="media.caption"
+            (input)="updateCaption(index, $any($event.target).value)"
+          />
+
+          <div class="d-flex flex-wrap gap-3 align-items-center mt-3">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-theme"
+              [disabled]="media.attachment_role === 'cover'"
+              (click)="setCover(index)"
+            >
+              {{ 'office.set_cover' | translate }}
+            </button>
+
+            <div class="office-switch-row">
+              <label class="switch switch-sm">
+                <input
+                  type="checkbox"
+                  [checked]="media.is_public"
+                  (change)="
+                    updateMediaPublic(index, $any($event.target).checked)
+                  "
+                />
+
+                <span class="switch-state"></span>
+              </label>
+
+              <span class="office-switch-label">
+                {{ 'office.public' | translate }}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-light-bg office-media-action"
+              [disabled]="index === 0"
+              (click)="moveMedia(index, -1)"
+            >
+              <i class="ri-arrow-up-line"></i>
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-light-bg office-media-action"
+              [disabled]="index === office.officeMedia.length - 1"
+              (click)="moveMedia(index, 1)"
+            >
+              <i class="ri-arrow-down-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="office-media-empty">
+    {{ 'office.no_media_selected' | translate }}
+  </div>
+}
+
+<app-media-modal
+  #mediaModal
+  [selectMedia]="true"
+  [multipleImage]="true"
+  [url]="false"
+  [accept]="mediaAccept"
+  [collection]="'office_media'"
+  [selectedImagesIds]="selectedMedia"
+  (selectImage)="selectMedia($event)"
+/>

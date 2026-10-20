@@ -1,0 +1,61 @@
+<div class="office-switch-row mb-4">
+  <label class="switch">
+    <input id="is_public" type="checkbox" formControlName="is_public" />
+
+    <span class="switch-state"></span>
+  </label>
+
+  <label class="office-switch-label" for="is_public">
+    {{ 'office.show_publicly' | translate }}
+  </label>
+</div>
+
+@if (form.controls.is_public.value) {
+  <div class="row g-4">
+    <div class="col-md-8">
+      <label class="form-label">
+        {{ 'office.public_slug' | translate }}
+      </label>
+
+      <input
+        class="form-control"
+        formControlName="public_slug"
+        placeholder="kantor-pusat-bogor"
+      />
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">
+        {{ 'office.sort_order' | translate }}
+      </label>
+
+      <input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="public_sort_order"
+      />
+    </div>
+  </div>
+}
+
+<hr class="my-4" />
+
+<div class="row g-4">
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.google_place_id' | translate }}
+    </label>
+
+    <input class="form-control" formControlName="google_place_id" readonly />
+  </div>
+
+  <div class="col-12">
+    <label class="form-label">
+      {{ 'office.google_maps_url' | translate }}
+    </label>
+
+    <input class="form-control" formControlName="google_maps_url" readonly />
+  </div>
+</div>

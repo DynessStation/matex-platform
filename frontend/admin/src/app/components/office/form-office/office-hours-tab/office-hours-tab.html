@@ -1,0 +1,104 @@
+@if (office.scheduleError) {
+  <div class="alert alert-danger">
+    {{ office.scheduleError }}
+  </div>
+}
+
+<div class="operating-hours">
+  @for (day of office.operatingDays; track day.day_of_week) {
+    <div class="operating-day">
+      <!-- DAY -->
+
+      <div class="operating-day-name">
+        <strong>
+          {{ office.weekdayLabel(day.day_of_week) }}
+        </strong>
+
+        <div class="office-switch-row">
+          <label class="switch switch-sm">
+            <input
+              type="checkbox"
+              [checked]="!day.is_closed"
+              (change)="toggleDay(day)"
+            />
+
+            <span class="switch-state"></span>
+          </label>
+
+          <span class="office-switch-label">
+            {{ (day.is_closed ? 'office.closed' : 'office.open') | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- TIME RANGES -->
+
+      <div class="operating-ranges">
+        @if (!day.is_closed) {
+          @for (range of day.ranges; track $index) {
+            <div class="operating-range">
+              <!-- OPEN -->
+
+              <div class="operating-time">
+                <ngb-timepicker
+                  [(ngModel)]="range.open_time"
+                  [ngModelOptions]="{
+                    standalone: true,
+                  }"
+                  [meridian]="office.localization.useMeridian()"
+                  [seconds]="false"
+                  [spinners]="true"
+                  [hourStep]="1"
+                  [minuteStep]="5"
+                />
+              </div>
+
+              <!-- SEPARATOR -->
+
+              <span class="operating-time-separator"> - </span>
+
+              <!-- CLOSE -->
+
+              <div class="operating-time">
+                <ngb-timepicker
+                  [(ngModel)]="range.close_time"
+                  [ngModelOptions]="{
+                    standalone: true,
+                  }"
+                  [meridian]="office.localization.useMeridian()"
+                  [seconds]="false"
+                  [spinners]="true"
+                  [hourStep]="1"
+                  [minuteStep]="5"
+                />
+              </div>
+
+              <!-- DELETE -->
+
+              <button
+                type="button"
+                class="btn btn-sm btn-light-bg operating-range-delete"
+                [title]="'office.remove_time_range' | translate"
+                (click)="removeRange(day, $index)"
+              >
+                <i class="ri-delete-bin-line"></i>
+              </button>
+            </div>
+          }
+
+          <!-- ADD RANGE -->
+
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-theme operating-range-add"
+            (click)="addRange(day)"
+          >
+            <i class="ri-add-line"></i>
+
+            {{ 'office.add_time_range' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>
