@@ -34,6 +34,8 @@ import {
   UpdateStoreDetailsAction,
 } from '../../shared/store/action/account.action';
 import { AccountState } from '../../shared/store/state/account.state';
+import { GetCountriesAction } from '../../shared/store/action/country.action';
+import { GetStatesAction } from '../../shared/store/action/state.action';
 import { CountryState } from '../../shared/store/state/country.state';
 import { StateState } from '../../shared/store/state/state.state';
 import { StoreState } from '../../shared/store/state/store.state';
@@ -152,6 +154,8 @@ export class Account {
   }
 
   ngOnInit() {
+    // Only this page uses the country and state lists (loaded here, not on every admin visit).
+    this.store.dispatch([new GetCountriesAction(), new GetStatesAction()]);
     this.states$ = this.store
       .select(StateState.states)
       .pipe(map((filterFn) => filterFn(null)));

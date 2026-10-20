@@ -19,7 +19,6 @@ import {
   VerifyEmailOtpAction,
 } from '../action/auth.action';
 import { GetSettingOptionAction } from '../action/setting.action';
-import { GetBadgesAction } from '../action/sidebar.action';
 
 //==================================================
 //==== STATE MODEL
@@ -162,11 +161,7 @@ export class AuthState {
         //==== APPLICATION DATA
         //==================================================
 
-        this.store.dispatch([
-          new GetBadgesAction(),
-
-          new GetSettingOptionAction(),
-        ]);
+        this.store.dispatch(new GetSettingOptionAction());
       }),
 
       //==================================================

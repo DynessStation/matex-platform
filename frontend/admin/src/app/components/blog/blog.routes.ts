@@ -29,21 +29,4 @@ export const blogRoutes: Routes = [
         (m) => m.EditBlogCategory,
       ),
   },
-  {
-    path: 'tag',
-    loadComponent: () =>
-      import('./tag/blog-tag/blog-tag').then((m) => m.BlogTag),
-  },
-  {
-    path: 'tag/create',
-    loadComponent: () =>
-      import('./tag/create-blog-tag/create-blog-tag').then(
-        (m) => m.CreateBlogTag,
-      ),
-  },
-  {
-    path: 'tag/edit/:id',
-    loadComponent: () =>
-      import('./tag/edit-blog-tag/edit-blog-tag').then((m) => m.EditBlogTag),
-  },
 ];

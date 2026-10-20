@@ -11,9 +11,7 @@ import { DevEnvironmentBadge } from './shared/components/dev-environment-badge/d
 import { IValues } from './shared/interface/setting.interface';
 import { AdminThemeModeService } from './shared/services/admin-theme-mode.service';
 import { LogoutAction } from './shared/store/action/auth.action';
-import { GetCountriesAction } from './shared/store/action/country.action';
 import { GetSettingOptionAction } from './shared/store/action/setting.action';
-import { GetStatesAction } from './shared/store/action/state.action';
 import { SettingState } from './shared/store/state/setting.state';
 
 @Component({
@@ -39,8 +37,6 @@ export class App {
     const config = inject(NgbNavConfig);
     const document = inject<Document>(DOCUMENT);
 
-    this.store.dispatch(new GetCountriesAction());
-    this.store.dispatch(new GetStatesAction());
     this.store.dispatch(new GetSettingOptionAction());
     this.setting$.subscribe((setting) => {
       if (setting?.general) {

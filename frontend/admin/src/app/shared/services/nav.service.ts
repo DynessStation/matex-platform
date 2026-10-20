@@ -19,8 +19,4 @@ export class NavService {
   public collapseSidebar: boolean = false;
   public sidebarLoading: boolean = false;
   public fullScreen: boolean = false;
-
-  getBadges(payload?: Params): Observable<IBadges> {
-    return this.http.get<IBadges>(`${environment.URL}/badge.json`, payload);
-  }
 }

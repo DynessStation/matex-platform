@@ -1,13 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Store, Action, Selector, State, StateContext } from '@ngxs/store';
-import { tap } from 'rxjs';
 
 import * as data from '../../data/menu';
 import { ISidebar, IBadges } from '../../interface/sidebar.interface';
-import { NavService } from '../../services/nav.service';
 import {
-  GetBadgesAction,
   GetSidebarAction,
   UpdateBadgeValueAction,
 } from '../action/sidebar.action';
@@ -31,7 +28,6 @@ export class SidebarStateModel {
 @Injectable()
 export class SidebarState {
   private store = inject(Store);
-  private navService = inject(NavService);
 
   @Selector()
   static menu(state: SidebarStateModel) {
@@ -66,48 +62,6 @@ export class SidebarState {
         data: data.menu,
       },
     });
-  }
-
-  @Action(GetBadgesAction)
-  getBadges(ctx: StateContext<SidebarStateModel>, action: GetBadgesAction) {
-    return this.navService.getBadges(action.payload).pipe(
-      tap({
-        next: (result) => {
-          const state = ctx.getState();
-          ctx.patchState({
-            ...state,
-            badges: result,
-          });
-          this.store.dispatch(
-            new UpdateBadgeValueAction(
-              '/product',
-              result?.product?.total_in_approved_products,
-            ),
-          );
-          this.store.dispatch(
-            new UpdateBadgeValueAction(
-              '/store',
-              result?.store?.total_in_approved_stores,
-            ),
-          );
-          this.store.dispatch(
-            new UpdateBadgeValueAction(
-              '/refund',
-              result?.refund?.total_pending_refunds,
-            ),
-          );
-          this.store.dispatch(
-            new UpdateBadgeValueAction(
-              '/withdrawal',
-              result?.withdraw_request?.total_pending_withdraw_requests,
-            ),
-          );
-        },
-        error: (err) => {
-          throw new Error(err?.error?.message);
-        },
-      }),
-    );
   }
 
   @Action(UpdateBadgeValueAction)

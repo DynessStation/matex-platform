@@ -52,11 +52,6 @@ export class Header {
       code: 'en',
       icon: 'us',
     },
-    {
-      language: 'Français',
-      code: 'fr',
-      icon: 'fr',
-    },
   ];
 
   public selectedLanguage: ILanguage = {

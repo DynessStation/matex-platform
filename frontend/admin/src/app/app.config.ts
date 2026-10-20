@@ -45,14 +45,12 @@ import { ChairState } from './shared/store/state/chair.state';
 import { CountryState } from './shared/store/state/country.state';
 import { FaqState } from './shared/store/state/faq.state';
 import { LoaderState } from './shared/store/state/loader.state';
-import { MenuState } from './shared/store/state/menu.state';
 import { OfficeState } from './shared/store/state/office.state';
 import { ProductState } from './shared/store/state/product.state';
 import { SettingState } from './shared/store/state/setting.state';
 import { SidebarState } from './shared/store/state/sidebar.state';
 import { StateState } from './shared/store/state/state.state';
 import { StoreState } from './shared/store/state/store.state';
-import { TagState } from './shared/store/state/tag.state';
 import { WebNavigationState } from './shared/store/state/web-navigation.state';
 
 //==================================================
@@ -137,13 +135,11 @@ export const appConfig: ApplicationConfig = {
         CountryState,
         FaqState,
         LoaderState,
-        MenuState,
         ProductState,
         SettingState,
         SidebarState,
         StateState,
         StoreState,
-        TagState,
       ]),
 
       NgxsModule.forFeature([AuthState]),
