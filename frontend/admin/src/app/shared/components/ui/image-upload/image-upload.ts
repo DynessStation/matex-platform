@@ -15,7 +15,7 @@ import { MediaModal } from '../modal/media-modal/media-modal';
 
 import { MediaSelection } from '../media-box/media-box';
 
-import { HasPermissionDirective } from '../../../directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 //==================================================
 //==== COMPONENT

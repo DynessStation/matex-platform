@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { HasPermissionDirective } from '../../../../directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../../directives/has-permission.directive';
 
 @Component({
   selector: 'app-quick-view',

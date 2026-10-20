@@ -20,7 +20,7 @@ import { Store } from '@ngxs/store';
 import { NgxDropzoneChangeEvent, NgxDropzoneModule } from 'ngx-dropzone';
 
 import * as media from '../../../../../shared/data/media-config';
-import { HasPermissionDirective } from '../../../../directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../../directives/has-permission.directive';
 import { IAttachment } from '../../../../interface/attachment.interface';
 import { NotificationService } from '../../../../services/notification.service';
 import { CreateAttachmentAction } from '../../../../store/action/attachment.action';

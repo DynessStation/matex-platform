@@ -11,7 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { Button } from '../../../shared/components/ui/button/button';
 import { NoData } from '../../../shared/components/ui/no-data/no-data';
-import { HasPermissionDirective } from '../../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import {
   IWebNavigationReorderItem,
   IWebNavigationTreeItem,

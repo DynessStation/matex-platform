@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { HasPermissionDirective } from '../../../directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 
 // Hidden for admins without content_assistant.use; the API enforces the same permission.
 @Component({

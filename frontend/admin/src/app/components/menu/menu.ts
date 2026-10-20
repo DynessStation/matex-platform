@@ -9,7 +9,7 @@ import { FixedMenuForm } from './fixed-menu-form/fixed-menu-form';
 import { MenuTree } from './menu-tree/menu-tree';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import {
   IWebNavigationDetail,
   IWebNavigationItem,

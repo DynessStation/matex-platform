@@ -15,7 +15,7 @@ import { DeleteModal } from '../../shared/components/ui/modal/delete-modal/delet
 
 import { MediaModal } from '../../shared/components/ui/modal/media-modal/media-modal';
 
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 import { IAttachment } from '../../shared/interface/attachment.interface';
 

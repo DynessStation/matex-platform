@@ -17,7 +17,7 @@ import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
 import { AiFieldAction } from '../../shared/components/ui/ai-field-action/ai-field-action';
 import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { ContentAssistantService } from '../../shared/services/content-assistant.service';

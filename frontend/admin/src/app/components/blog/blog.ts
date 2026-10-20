@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Table } from '../../shared/components/ui/table/table';
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
 import { IValues } from '../../shared/interface/setting.interface';
 import {

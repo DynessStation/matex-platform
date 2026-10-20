@@ -18,7 +18,7 @@ import { ConfirmationModal } from '../../shared/components/ui/modal/confirmation
 
 import { Table } from '../../shared/components/ui/table/table';
 
-import { HasPermissionDirective } from '../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 
 import {
   IAdminAccount,

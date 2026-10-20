@@ -12,7 +12,7 @@ import { Store } from '@ngxs/store';
 
 import { Button } from '../../../shared/components/ui/button/button';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
-import { HasPermissionDirective } from '../../../shared/directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import {
   IWebNavigationDetail,
   IWebNavigationItem,

@@ -16,7 +16,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
-import { HasPermissionDirective } from '../../../directive/has-permission.directive';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
 import {
   IAttachment,
   IAttachmentModel,
