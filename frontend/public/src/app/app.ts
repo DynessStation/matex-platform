@@ -14,7 +14,6 @@ import { SeoService } from './shared/services/seo.service';
 import { PublicAnalyticsService } from './shared/services/public-analytics.service';
 import { GetCurrencies } from './shared/store/action/currency.action';
 import { GetSettingOption } from './shared/store/action/setting.action';
-import { GetThemes } from './shared/store/action/theme.action';
 import { SettingState } from './shared/store/state/setting.state';
 import { ThemeOptionState } from './shared/store/state/theme-option.state';
 
@@ -43,7 +42,6 @@ export class App {
 
   constructor() {
     this.firstPartyAnalytics.start();
-    this.store.dispatch(new GetThemes());
     this.store.dispatch(new GetCurrencies({ status: 1 }));
     this.store.dispatch(new GetSettingOption());
 

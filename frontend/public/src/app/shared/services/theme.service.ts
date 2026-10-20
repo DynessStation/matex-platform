@@ -5,7 +5,7 @@ import { map, Observable, switchMap } from 'rxjs';
 
 import { WebsitePageService } from './website-page.service';
 import { environment } from '../../../environments/environment';
-import { BannerLink, GadgetTheme, ThemesModel } from '../interface/theme.interface';
+import { BannerLink, GadgetTheme } from '../interface/theme.interface';
 import { IPublicWebsitePage } from '../interface/website-page.interface';
 
 @Injectable({
@@ -27,10 +27,6 @@ export class ThemeService {
     private http: HttpClient,
     private websitePageService: WebsitePageService,
   ) {}
-
-  getThemes(): Observable<ThemesModel> {
-    return this.http.get<ThemesModel>(`${environment.URL}/theme.json`);
-  }
 
   getHomePage(slug?: string, locale: 'id-ID' | 'en-US' = 'id-ID'): Observable<any> {
     const template$ = this.http.get(`${environment.URL}/home/${slug}.json`);

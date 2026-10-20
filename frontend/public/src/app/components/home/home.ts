@@ -5,34 +5,20 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import {
-  catchError,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  of,
-  startWith,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { catchError, finalize, map, of, startWith, switchMap, tap } from 'rxjs';
 
-import { BabyShop } from './baby-shop/baby-shop';
-import { Electro } from './electro/electro';
 import { Gadget } from './gadget/gadget';
-import { MegaMart } from './mega-mart/mega-mart';
-import { OrganicStore } from './organic-store/organic-store';
-import { StyleTech } from './style-tech/style-tech';
 import { LayoutService } from '../../shared/services/layout.service';
 import { ThemeOptionService } from '../../shared/services/theme-option.service';
 import { WebsitePageSeoService } from '../../shared/services/website-page-seo.service';
 import { GetHomePage } from '../../shared/store/action/theme.action';
 import { ThemeState } from '../../shared/store/state/theme.state';
 
+const HOME_THEME = 'gadget-store';
+
 @Component({
   selector: 'app-home',
-  imports: [AsyncPipe, Gadget, MegaMart, OrganicStore, BabyShop, StyleTech, Electro],
+  imports: [AsyncPipe, Gadget],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -49,13 +35,9 @@ export class Home {
   readonly locale: 'id-ID' | 'en-US' =
     this.route.snapshot.routeConfig?.path === 'en' ? 'en-US' : 'id-ID';
 
-  readonly view$ = combineLatest([
-    this.route.queryParamMap.pipe(map((params) => params.get('theme') || '')),
-    this.store.select(ThemeState.activeTheme),
-  ]).pipe(
-    map(([queryTheme, activeTheme]) => queryTheme || activeTheme),
-    filter((theme): theme is string => Boolean(theme)),
-    distinctUntilChanged(),
+  // The MATEX home page: the gadget-store layout filled with the published home page content.
+  // The other Kartify demo home themes (selectable with ?theme=) were removed in 6B (FE-011).
+  readonly view$ = of(HOME_THEME).pipe(
     tap(() => {
       this.state.set('loading');
       this.themeOptionService.preloader.set(true);
