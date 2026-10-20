@@ -187,6 +187,7 @@ Aturan:
 - Blok yang sama di dua modul atau lebih (misalnya `.metric-grid`, `.refresh-button`, `.panel-footer` di dasbor dan analitik) dipindah ke global.
 - Warna, ukuran huruf, dan jarak memakai variabel template atau CSS variable (`var(--theme-color)`), bukan angka lepas.
 - `::ng-deep` hanya untuk menyentuh library pihak ketiga, dengan komentar alasannya.
+- Memindah SCSS komponen ke global: bungkus semuanya dengan satu class di elemen akar komponen (contoh `.website-page-form` di `pages/_website-page.scss`). Satu class setara bobot atribut enkapsulasi Angular, jadi urutan menang-kalah dengan Kartify tetap sama; `:host-context(body.dark-only)` menjadi `body.dark-only &`. Awas aturan dengan bobot sama di `src/styles.scss`: file itu dimuat belakangan, jadi menang (contoh: tombol hapus media perlu `.btn` tambahan).
 
 ### 4.4 Komponen bersama
 
@@ -205,7 +206,9 @@ Ditambah di 6D (lihat `rencana-ui-admin.md`): kotak bantuan "?" dan drawer pandu
 
 ### 4.5 Ukuran
 
-- Komponen (TypeScript) paling banyak sekitar 800 baris, template sekitar 600 baris. Form besar dipecah per tab atau per bagian menjadi komponen anak, dengan state form tetap di induknya.
+- Komponen (TypeScript) paling banyak sekitar 800 baris, template sekitar 600 baris. Form besar dipecah per tab atau per bagian menjadi komponen anak.
+- Pola form bertab (contoh: `website-page-form`): state dan logika bersama di service yang disediakan form itu sendiri (`providers: [XService]`, satu instance per form yang terbuka); tiap tab adalah komponen anak yang meng-inject service itu dan memegang template serta handler miliknya sendiri. Input dan output tetap di form induk dan diserahkan ke service lewat `connect()`. Tab yang memakai `formControlName` memasang `viewProviders` `ControlContainer` agar terikat ke `[formGroup]` induk. Helper tanpa state ke `*.util.ts`, tipe dan konstanta ke `*.model.ts`.
+- Saat memindah template ke komponen lain, cek `imports` untuk directive atribut tanpa binding (misalnya `appLocalizedNumber`): yang lupa di-import tidak membuat build gagal, directive-nya diam-diam tidak jalan.
 - Data besar yang statis (misalnya daftar kode negara) boleh lebih panjang, dan letaknya di `shared/data/`.
 
 ### 4.6 Teks dan bahasa
@@ -227,4 +230,5 @@ Ditambah di 6D (lihat `rencana-ui-admin.md`): kotak bantuan "?" dan drawer pandu
 ### 4.9 Bukti perapian
 
 - Perapian murni (pindah gaya, pecah komponen): CSS hasil build identik atau hanya berbeda di bagian yang memang diubah, tampilan halaman yang disentuh dicek di browser (desktop dan lebar ponsel), dan test browser lulus.
+- Cara yang dipakai di 6C untuk form besar: test browser dulu (semua tab terbuka, handler tiap tab, simpan), simpan tanpa perubahan direkam (`MATEX_E2E_RECORD`) lalu dibandingkan sebelum dan sesudah, dan screenshot penuh setiap tab (terang dan gelap) dibandingkan per piksel.
 - Perubahan tampilan: sebelum dan sesudahnya dicek di browser, lalu dilaporkan ke pemilik.
