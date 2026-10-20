@@ -1,15 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { admin } from './api-contract';
+import { admin, runId, saveRecording } from './api-contract';
 import { stack } from './stack.mjs';
 
 // Browser contract for the fixed website page form
 // (frontend/admin/src/app/components/website-page/website-page-form): every tab renders for
 // a plain page (terms), the home page, and the about page, and a saved title reaches the
-// public site. Guards the split of this form into one component per tab (6C).
+// public site. Saving home and about unchanged is recorded (MATEX_E2E_RECORD, see
+// api-contract.ts) so the stored rows can be compared before and after a refactor.
+// Guards the split of this form into one component per tab (6C).
 test.describe.configure({ mode: 'serial' });
 
-const run = Date.now().toString(36);
 const TABS = ['Umum', 'Konten & Bahasa', 'SEO', 'Media', 'Publikasi', 'Pratinjau'];
 
 async function login(page: Page): Promise<void> {
@@ -27,6 +28,15 @@ async function openPage(page: Page, key: string): Promise<void> {
 
 async function openTab(page: Page, name: string): Promise<void> {
   await page.locator('.vertical-tabs .nav-link', { hasText: name }).first().click();
+}
+
+/** Clicks "Simpan Perubahan" and expects the page update to succeed. */
+async function saveForm(page: Page, key: string): Promise<void> {
+  const response = page.waitForResponse(
+    (r) => r.url().includes(`/api/v1/website-page/${key}`) && r.request().method() === 'PUT',
+  );
+  await page.locator('button', { hasText: 'Simpan Perubahan' }).first().click();
+  expect((await response).status()).toBe(200);
 }
 
 /** Opens a tab and waits for its panel heading. */
@@ -81,15 +91,9 @@ test('a saved title reaches the public site', async ({ page }) => {
   await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
   const title = page.locator('input[formcontrolname=title]:visible').first();
   const original = await title.inputValue();
-  const changed = `Syarat & Ketentuan Uji ${run}`;
+  const changed = `Syarat & Ketentuan Uji ${runId}`;
 
-  const save = async () => {
-    const response = page.waitForResponse(
-      (r) => r.url().includes('/api/v1/website-page/terms') && r.request().method() === 'PUT',
-    );
-    await page.locator('button', { hasText: 'Simpan Perubahan' }).first().click();
-    expect((await response).status()).toBe(200);
-  };
+  const save = () => saveForm(page, 'terms');
 
   await title.fill(changed);
   await save();
@@ -103,4 +107,19 @@ test('a saved title reaches the public site', async ({ page }) => {
   await expect(page.locator('input[formcontrolname=title]:visible').first()).toHaveValue(changed);
   await page.locator('input[formcontrolname=title]:visible').first().fill(original);
   await save();
+});
+
+test('saving home and about unchanged keeps their content', async ({ page }) => {
+  await login(page);
+  for (const key of ['home', 'about']) {
+    await openPage(page, key);
+    await expectTab(page, 'Umum', 'Informasi Dasar');
+    await saveForm(page, key);
+  }
+  await saveRecording('website-page-form', [
+    'website_page',
+    'website_page_i18n',
+    'website_page_media',
+    'website_page_media_i18n',
+  ]);
 });
