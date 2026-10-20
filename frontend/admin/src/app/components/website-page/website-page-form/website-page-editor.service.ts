@@ -59,8 +59,6 @@ import {
   gadgetHomeMediaActionIssue,
   toAttachmentArray,
   toPreviewIso,
-  previewLanguageLabelKey,
-  previewVisibilityKey,
   toLocalDateTimeInput,
   publicationDateValue,
   composePublicationDateTime,
@@ -314,8 +312,6 @@ export class WebsitePageEditorService {
   readonly gadgetHomeMediaRequirement = gadgetHomeMediaRequirement;
   readonly gadgetHomeMediaIssue = gadgetHomeMediaIssue;
   readonly gadgetHomeMediaActionIssue = gadgetHomeMediaActionIssue;
-  readonly previewLanguageLabelKey = previewLanguageLabelKey;
-  readonly previewVisibilityKey = previewVisibilityKey;
   readonly publicationDateValue = publicationDateValue;
   readonly gadgetHomeMediaRule = getGadgetHomeMediaRule;
 
@@ -1850,68 +1846,6 @@ export class WebsitePageEditorService {
   //==================================================
   //==== PREVIEW SUMMARY
   //==================================================
-
-  get previewDefaultTranslation(): IWebsitePageEditorTranslation | null {
-    if (!this.previewPage) {
-      return null;
-    }
-
-    return (
-      this.previewPage.translations.find(
-        (item) =>
-          item.website_page_locale ===
-          this.previewPage?.website_page_default_locale,
-      ) ??
-      this.previewPage.translations[0] ??
-      null
-    );
-  }
-
-  get previewDraftTranslations(): IWebsitePageEditorTranslation[] {
-    if (!this.previewPage || !this.publicationRequiresPublishedTranslation) {
-      return [];
-    }
-
-    return this.previewPage.translations.filter(
-      (item) =>
-        item.website_page_locale !==
-          this.previewPage?.website_page_default_locale &&
-        item.website_page_i18n_status === 0,
-    );
-  }
-
-  get previewHeroMediaName(): string {
-    return (
-      this.previewPage?.attachments.find(
-        (item) =>
-          item.website_page_attachment_role ===
-          (this.isGadgetHomeTemplate ? 'home_main' : 'hero'),
-      )?.original_name ?? '-'
-    );
-  }
-
-  previewPublicationChoiceKey(): string {
-    switch (this.publicationChoice) {
-      case 'publish_now':
-        return 'website_page.publication_publish_now';
-
-      case 'schedule':
-        return 'website_page.publication_schedule';
-
-      case 'archive':
-        return 'website_page.publication_archive';
-
-      case 'draft':
-        return 'website_page.publication_draft';
-
-      default:
-        return 'website_page.publication_keep_current';
-    }
-  }
-
-  previewResultStatusKey(): string {
-    return `website_page.status_${this.previewPage?.effective_status ?? 'draft'}`;
-  }
 
   //==================================================
   //==== SAVE
