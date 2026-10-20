@@ -3,13 +3,18 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 
 // General tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
   selector: 'app-website-page-general-tab',
 
-  imports: [ReactiveFormsModule, TranslateModule],
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    LocalizedNumberInputDirective,
+  ],
 
   templateUrl: './website-page-general-tab.html',
 

@@ -130,8 +130,17 @@ test('tab handlers work without saving', async ({ page }) => {
   await login(page);
   const panel = page.locator('.vertical-tabs .tab-content');
 
-  // Terms: switch the content language, then step to SEO with the tab button.
+  // Terms: the sort order field formats digits (hidden on fixed pages, so typed via an event).
   await openPage(page, 'terms');
+  const sortOrder = page.locator('input[formcontrolname=website_page_sort_order]');
+  const shown = await sortOrder.evaluate((input: HTMLInputElement) => {
+    input.value = '12345';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    return input.value;
+  });
+  expect(shown).toBe('12.345');
+
+  // Terms: switch the content language, then step to SEO with the tab button.
   await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
   const english = panel.locator('button', { hasText: 'English' }).first();
   await english.click();
