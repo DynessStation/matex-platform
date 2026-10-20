@@ -6,6 +6,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { NgxEditorModule } from 'ngx-editor';
 
+import { WebsitePageContentTab } from './website-page-content-tab/website-page-content-tab';
 import { WebsitePageEditorService } from './website-page-editor.service';
 import { WebsitePageGeneralTab } from './website-page-general-tab/website-page-general-tab';
 import { WebsitePagePreviewTab } from './website-page-preview-tab/website-page-preview-tab';
@@ -38,6 +39,7 @@ import { WebsitePagePreview } from '../website-page-preview/website-page-preview
     WebsitePageSeoTab,
     WebsitePagePreviewTab,
     WebsitePagePublicationTab,
+    WebsitePageContentTab,
   ],
 
   templateUrl: './website-page-form.html',

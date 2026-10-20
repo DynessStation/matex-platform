@@ -1,5 +1,4 @@
 import {
-  afterNextRender,
   DestroyRef,
   effect,
   inject,
@@ -18,15 +17,12 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { Editor, Toolbar } from 'ngx-editor';
 import { finalize } from 'rxjs';
 
 import {
   WebsitePageEditorLocale,
   WebsitePageEditorPublicationChoice,
-  HomeSectionKey,
   HomeSectionVisibility,
-  HomeLatexFeatureDraft,
   HomeLatexContentDraft,
   HomeAdvertisementDraft,
   AboutFeatureDraft,
@@ -101,8 +97,8 @@ export class WebsitePageEditorService {
   private store = inject(Store);
   public readonly localization = inject(LocalizationService);
   private readonly translate = inject(TranslateService);
-  private readonly contentAssistant = inject(ContentAssistantService);
-  private readonly notification = inject(NotificationService);
+  readonly contentAssistant = inject(ContentAssistantService);
+  readonly notification = inject(NotificationService);
   private readonly formIssues = inject(FormIssueNavigatorService);
 
   //==================================================
@@ -141,8 +137,6 @@ export class WebsitePageEditorService {
 
   public activeLocale: WebsitePageEditorLocale = 'id-ID';
   public assistingPageField: string | null = null;
-  public assistingOrganizerField: string | null = null;
-
   //==================================================
   //==== PREVIEW
   //==================================================
@@ -188,24 +182,6 @@ export class WebsitePageEditorService {
   //==== CONTENT EDITOR
   //==================================================
 
-  public readonly contentEditor = signal<Editor | null>(null);
-
-  public readonly contentEditorToolbar: Toolbar = [
-    ['bold', 'italic', 'underline', 'strike'],
-
-    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
-
-    ['ordered_list', 'bullet_list'],
-
-    ['blockquote', 'horizontal_rule'],
-
-    ['link'],
-
-    ['align_left', 'align_center', 'align_right', 'align_justify'],
-
-    ['format_clear'],
-  ];
-
   public readonly supportedLanguages: {
     locale: WebsitePageEditorLocale;
     labelKey: string;
@@ -224,56 +200,6 @@ export class WebsitePageEditorService {
   ];
 
   public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
-
-  public readonly homeSectionOptions: readonly {
-    key: HomeSectionKey;
-    labelKey: string;
-    descriptionKey: string;
-    requiresVerifiedData: boolean;
-  }[] = [
-    {
-      key: 'latex_features',
-      labelKey: 'website_page.home_section_latex_features',
-      descriptionKey: 'website_page.home_section_latex_features_help',
-      requiresVerifiedData: false,
-    },
-    {
-      key: 'categories',
-      labelKey: 'website_page.home_section_categories',
-      descriptionKey: 'website_page.home_section_categories_help',
-      requiresVerifiedData: false,
-    },
-    {
-      key: 'products',
-      labelKey: 'website_page.home_section_products',
-      descriptionKey: 'website_page.home_section_products_help',
-      requiresVerifiedData: false,
-    },
-    {
-      key: 'articles',
-      labelKey: 'website_page.home_section_articles',
-      descriptionKey: 'website_page.home_section_articles_help',
-      requiresVerifiedData: false,
-    },
-    {
-      key: 'tags',
-      labelKey: 'website_page.home_section_tags',
-      descriptionKey: 'website_page.home_section_tags_help',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'newsletter',
-      labelKey: 'website_page.home_section_newsletter',
-      descriptionKey: 'website_page.home_section_newsletter_help',
-      requiresVerifiedData: true,
-    },
-    {
-      key: 'advertisement',
-      labelKey: 'website_page.home_section_advertisement',
-      descriptionKey: 'website_page.home_section_advertisement_help',
-      requiresVerifiedData: false,
-    },
-  ];
 
   public homeSectionVisibility: Record<
     WebsitePageEditorLocale,
@@ -404,14 +330,6 @@ export class WebsitePageEditorService {
   //==================================================
 
   constructor() {
-    afterNextRender(() => {
-      this.contentEditor.set(new Editor());
-    });
-
-    this.destroyRef.onDestroy(() => {
-      this.contentEditor()?.destroy();
-    });
-
     // English belum otomatis dibuat pada page baru.
     this.translationForm('en-US').disable({
       emitEvent: false,
@@ -664,19 +582,6 @@ export class WebsitePageEditorService {
     );
   }
 
-  get isOperationalDataPage(): boolean {
-    return (
-      this.isSystemPage &&
-      ['contact', 'faq'].includes(this.form.controls.website_page_key.value)
-    );
-  }
-
-  get operationalDataHelpKey(): string {
-    return this.form.controls.website_page_key.value === 'contact'
-      ? 'website_page.operational_contact_help'
-      : 'website_page.operational_faq_help';
-  }
-
   get mediaRoleOptions(): { value: string; label: string }[] {
     if (this.isGadgetHomeTemplate) return this.gadgetHomeMediaRoles;
 
@@ -696,20 +601,6 @@ export class WebsitePageEditorService {
       { value: 'gallery', label: 'Gallery' },
       { value: 'og', label: 'Open Graph / share image' },
     ];
-  }
-
-  updateHomeLatexItem(
-    locale: WebsitePageEditorLocale,
-    index: number,
-    field: keyof HomeLatexFeatureDraft,
-    value: string,
-  ): void {
-    const items = [...this.homeLatexContent[locale].items];
-    items[index] = { ...items[index], [field]: value };
-    this.homeLatexContent = {
-      ...this.homeLatexContent,
-      [locale]: { ...this.homeLatexContent[locale], items },
-    };
   }
 
   aboutHighlightIssue(
@@ -750,19 +641,6 @@ export class WebsitePageEditorService {
     }
 
     return null;
-  }
-
-  updateAboutFeature(
-    locale: WebsitePageEditorLocale,
-    index: number,
-    field: keyof AboutFeatureDraft,
-    value: string,
-  ): void {
-    this.aboutFeatures[locale][index] = {
-      ...this.aboutFeatures[locale][index],
-      [field]: value,
-    };
-    this.aboutFeatures = { ...this.aboutFeatures };
   }
 
   //==================================================
@@ -832,74 +710,7 @@ export class WebsitePageEditorService {
       });
   }
 
-  assistOrganizerDescription(
-    kind: 'latex' | 'latex_item' | 'advertisement' | 'about_item',
-    index = 0,
-  ): void {
-    if (this.assistingOrganizerField) return;
-    const locale = this.activeLocale;
-    const sourceLocale: WebsitePageEditorLocale = 'id-ID';
-    const translateFromIndonesia = locale === 'en-US';
-    const taskKey = `${kind}-${index}`;
-    let current = '';
-    let source = '';
-    let userWrittenTitle = '';
-
-    if (kind === 'latex') {
-      current = this.homeLatexContent[locale].description;
-      source = this.homeLatexContent[sourceLocale].description;
-      userWrittenTitle = this.homeLatexContent[locale].title;
-    } else if (kind === 'latex_item') {
-      current = this.homeLatexContent[locale].items[index]?.description || '';
-      source =
-        this.homeLatexContent[sourceLocale].items[index]?.description || '';
-      userWrittenTitle =
-        this.homeLatexContent[locale].items[index]?.title || '';
-    } else if (kind === 'advertisement') {
-      current = this.homeAdvertisementContent[locale].description;
-      source = this.homeAdvertisementContent[sourceLocale].description;
-      userWrittenTitle = this.homeAdvertisementContent[locale].title;
-    } else {
-      current = this.aboutFeatures[locale][index]?.description || '';
-      source = this.aboutFeatures[sourceLocale][index]?.description || '';
-      userWrittenTitle = this.aboutFeatures[locale][index]?.title || '';
-    }
-
-    this.assistingOrganizerField = taskKey;
-    this.contentAssistant
-      .assist({
-        mode: translateFromIndonesia ? 'translate' : 'generate',
-        content_type: `website-${kind}`,
-        source_locale: translateFromIndonesia ? sourceLocale : undefined,
-        target_locale: locale,
-        context: JSON.stringify({ user_written_title: userWrittenTitle }),
-        fields: { description: translateFromIndonesia ? source : current },
-        field_types: { description: 'multiline_text' },
-      })
-      .pipe(finalize(() => (this.assistingOrganizerField = null)))
-      .subscribe({
-        next: (fields) => {
-          const description = fields['description'] || '';
-          if (kind === 'latex') {
-            this.homeLatexContent[locale].description = description;
-          } else if (kind === 'latex_item') {
-            this.updateHomeLatexItem(locale, index, 'description', description);
-          } else if (kind === 'advertisement') {
-            this.homeAdvertisementContent[locale].description = description;
-          } else {
-            this.updateAboutFeature(locale, index, 'description', description);
-          }
-          this.notification.showSuccess(
-            translateFromIndonesia
-              ? 'Deskripsi English sudah diterjemahkan. Judul tetap Anda isi sendiri.'
-              : 'Draf deskripsi sudah diisi. Periksa kembali sebelum menyimpan.',
-          );
-        },
-        error: (error) => this.showContentAssistantError(error),
-      });
-  }
-
-  private showContentAssistantError(error: any): void {
+  showContentAssistantError(error: any): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
@@ -913,33 +724,7 @@ export class WebsitePageEditorService {
     });
   }
 
-  addLanguage(locale: WebsitePageEditorLocale): void {
-    this.enableLanguage(locale);
-
-    this.activeLocale = locale;
-  }
-
-  removeLanguage(locale: WebsitePageEditorLocale): void {
-    if (this.isDefaultLocale(locale)) {
-      return;
-    }
-
-    this.resetTranslationForm(locale);
-
-    this.translationForm(locale).disable({
-      emitEvent: false,
-    });
-
-    if (this.activeLocale === locale) {
-      const defaultLocale =
-        parseLocale(this.form.controls.website_page_default_locale.value) ??
-        'id-ID';
-
-      this.activeLocale = defaultLocale;
-    }
-  }
-
-  private resetTranslationForm(locale: WebsitePageEditorLocale): void {
+  resetTranslationForm(locale: WebsitePageEditorLocale): void {
     this.translationForm(locale).reset(
       {
         locale,
@@ -978,60 +763,9 @@ export class WebsitePageEditorService {
   //==== TRANSLATION SLUG
   //==================================================
 
-  generateTranslationSlug(locale: WebsitePageEditorLocale): void {
-    const group = this.translationForm(locale);
-
-    if (group.controls.slug.value.trim()) {
-      return;
-    }
-
-    group.controls.slug.setValue(slugify(group.controls.title.value));
-  }
-
-  normalizeTranslationSlug(locale: WebsitePageEditorLocale): void {
-    const control = this.translationForm(locale).controls.slug;
-
-    control.setValue(slugify(control.value));
-  }
-
   //==================================================
   //==== NEXT SEO
   //==================================================
-
-  goToSeo(): void {
-    const invalidAboutLocale = this.firstInvalidAboutLocale();
-    if (invalidAboutLocale) {
-      this.activeLocale = invalidAboutLocale;
-      this.activeTab = 'content';
-      return;
-    }
-
-    let invalidLocale: WebsitePageEditorLocale | null = null;
-
-    this.supportedLanguages.forEach((language) => {
-      const group = this.translationForm(language.locale);
-
-      if (group.disabled) {
-        return;
-      }
-
-      group.markAllAsTouched();
-
-      if (group.invalid && !invalidLocale) {
-        invalidLocale = language.locale;
-      }
-    });
-
-    if (invalidLocale) {
-      this.activeLocale = invalidLocale;
-
-      this.activeTab = 'content';
-
-      return;
-    }
-
-    this.activeTab = 'seo';
-  }
 
   //==================================================
   //==== SEO PREVIEW
