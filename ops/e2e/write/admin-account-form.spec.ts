@@ -68,9 +68,13 @@ async function chooseLookup(page: Page, name: string, option?: string): Promise<
   const options = control(page, name).locator('.select2-results__option:not(.loading-results)');
   const choice = option ? options.filter({ hasText: option }).first() : options.first();
   await expect(choice).toBeVisible();
-  const label = (await choice.innerText()).trim();
+  // textContent: the option list may restyle the text (innerText follows text-transform).
+  const label = ((await choice.textContent()) ?? '').trim();
   await choice.click();
-  await expect(control(page, name).locator('.select2-selection__rendered')).toContainText(label);
+  await expect(control(page, name).locator('.select2-selection__rendered')).toHaveAttribute(
+    'title',
+    label,
+  );
   return label;
 }
 
