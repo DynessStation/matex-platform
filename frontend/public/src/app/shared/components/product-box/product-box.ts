@@ -3,11 +3,7 @@ import { RouterModule } from '@angular/router';
 
 import { NgbRatingConfig, NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { ProductBoxFive } from './product-box-five/product-box-five';
-import { ProductBoxFour } from './product-box-four/product-box-four';
 import { ProductBoxOne } from './product-box-one/product-box-one';
-import { ProductBoxThree } from './product-box-three/product-box-three';
-import { ProductBoxTwo } from './product-box-two/product-box-two';
 import { Product } from '../../interface/product.interface';
 import { Wishlist } from './widgets/wishlist/wishlist';
 import { ProductPricePipe } from '../../pipe/product-price.pipe';
@@ -20,10 +16,7 @@ import { ProductCartButton } from './widgets/product-cart-button/product-cart-bu
     RouterModule,
     ProductBoxOne,
     Wishlist,
-    ProductBoxTwo,
-    ProductBoxFour,
-    ProductBoxThree,
-    ProductBoxFive,
+
     ProductPricePipe,
     ProductCartButton,
     RouterModule,

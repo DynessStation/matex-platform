@@ -30,17 +30,11 @@ import { LoaderInterceptor } from './core/interceptors/loader.interceptor';
 import { ssrApiOriginInterceptor } from './core/interceptors/ssr-api-origin.interceptor';
 import { SeoService } from './shared/services/seo.service';
 import { BlogState } from './shared/store/state/blog.state';
-import { BrandState } from './shared/store/state/brand.state';
 import { CartState } from './shared/store/state/cart.state';
 import { CategoryState } from './shared/store/state/category.state';
-import { CompareState } from './shared/store/state/compare.state';
 import { CurrencyState } from './shared/store/state/currency.state';
 import { LoaderState } from './shared/store/state/loader.state';
-import { PageState } from './shared/store/state/page.state';
 import { ProductState } from './shared/store/state/product.state';
-import { QuestionAnswersState } from './shared/store/state/questions-answers.state';
-import { RefundState } from './shared/store/state/refund.state';
-import { ServiceState } from './shared/store/state/service.state';
 import { SettingState } from './shared/store/state/setting.state';
 import { TagState } from './shared/store/state/tag.state';
 import { ThemeOptionState } from './shared/store/state/theme-option.state';
@@ -113,13 +107,7 @@ export const appConfig: ApplicationConfig = {
         CartState,
         BlogState,
         WishlistState,
-        CompareState,
-        BrandState,
-        ServiceState,
-        RefundState,
-        PageState,
         CurrencyState,
-        QuestionAnswersState,
       ]),
       NgxsStoragePluginModule.forRoot({
         keys: ['theme_option', 'theme', 'setting', 'cart', 'wishlist', 'compare'],

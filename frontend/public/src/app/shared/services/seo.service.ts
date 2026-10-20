@@ -7,16 +7,12 @@ import { Store } from '@ngxs/store';
 import { filter, Observable } from 'rxjs';
 
 import { IBlog } from '../interface/blog.interface';
-import { IBrand } from '../interface/brand.interface';
 import { ICategory } from '../interface/category.interface';
-import { Page } from '../interface/page.interface';
 import { Product } from '../interface/product.interface';
 import { Values } from '../interface/setting.interface';
 import { Option } from '../interface/theme-option.interface';
 import { BlogState } from '../store/state/blog.state';
-import { BrandState } from '../store/state/brand.state';
 import { CategoryState } from '../store/state/category.state';
-import { PageState } from '../store/state/page.state';
 import { ProductState } from '../store/state/product.state';
 import { SettingState } from '../store/state/setting.state';
 import { ThemeOptionState } from '../store/state/theme-option.state';
@@ -39,8 +35,6 @@ export class SeoService {
     ProductState.selectedProduct,
   ) as Observable<Product>;
   blog$: Observable<IBlog> = inject(Store).select(BlogState.selectedBlog) as Observable<IBlog>;
-  brand$: Observable<IBrand> = inject(Store).select(BrandState.selectedBrand) as Observable<IBrand>;
-  page$: Observable<Page> = inject(Store).select(PageState.selectedPage) as Observable<Page>;
   category$: Observable<ICategory> = inject(Store).select(
     CategoryState.selectedCategory,
   ) as Observable<ICategory>;
@@ -54,8 +48,6 @@ export class SeoService {
   public isTabInFocus = true;
   public product: Product;
   public blog: IBlog;
-  public page: Page;
-  public brand: IBrand;
   public category: ICategory;
   public themeOption: Option;
   public scoContent: any = {};
@@ -87,8 +79,6 @@ export class SeoService {
     this.setting$.subscribe((val) => (this.setting = val));
     this.product$.subscribe((product) => (this.product = product));
     this.blog$.subscribe((blog) => (this.blog = blog));
-    this.page$.subscribe((page) => (this.page = page));
-    this.brand$.subscribe((brand) => (this.brand = brand));
     this.category$.subscribe((blog) => (this.category = blog));
     this.themeOption$.subscribe((option) => {
       this.themeOption = option;
@@ -143,34 +133,6 @@ export class SeoService {
         og_description: this.themeOption?.seo?.meta_description,
         og_image: this.themeOption?.seo?.og_image?.original_url,
       };
-      this.customSCO();
-    } else if (path.includes('page')) {
-      if (this.page) {
-        this.scoContent = {
-          ...this.scoContent,
-          og_type: 'website',
-          url: window.location.href,
-          og_title: this.page?.meta_title || this.themeOption?.seo?.meta_title,
-          og_description: this.page?.meta_description || this.themeOption?.seo?.meta_description,
-          og_image:
-            this.page?.page_meta_image?.original_url ||
-            this.themeOption?.seo?.og_image?.original_url,
-        };
-      }
-      this.customSCO();
-    } else if (path.includes('brand')) {
-      if (this.brand) {
-        this.scoContent = {
-          ...this.scoContent,
-          og_type: 'website',
-          url: window.location.href,
-          og_title: this.brand?.meta_title || this.themeOption?.seo?.meta_title,
-          og_description: this.brand?.meta_description || this.themeOption?.seo?.meta_description,
-          og_image:
-            this.brand?.brand_meta_image?.original_url ||
-            this.themeOption?.seo?.og_image?.original_url,
-        };
-      }
       this.customSCO();
     } else if (path.includes('category') || path.includes('kategori')) {
       if (this.category) {

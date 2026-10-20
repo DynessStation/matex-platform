@@ -1,56 +1,5 @@
-@if (productBoxStyle() === 'minimal') {
-  <div class="latest-product-box">
-    <a [routerLink]="['/product', product()?.slug]">
-      <img
-        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
-        class="img-fluid"
-        [alt]="product()?.name"
-      />
-    </a>
-    <h5>{{ product()?.name }}</h5>
-  </div>
-} @else if (productBoxStyle() === 'product-slider') {
-  <a [routerLink]="['/product/' + product()?.slug]" class="recent-product-box">
-    <img
-      [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
-      class="img-fluid"
-      [alt]="product()?.name"
-    />
-  </a>
-} @else if (productBoxStyle() === 'horizontal') {
-  <div class="vertical-product-box">
-    <a [routerLink]="['/product', product()?.slug]" class="product-image">
-      <img
-        [src]="product()?.product_thumbnail?.asset_url || 'assets/images/placeholder/product.png'"
-        class="img-fluid"
-        [alt]="product()?.name"
-      />
-    </a>
-    <div class="product-content">
-      <a [routerLink]="['/product', product()?.slug]">
-        <h5 class="name title-color">{{ product()?.name }}</h5>
-      </a>
-      <ngb-rating [rate]="product()?.rating_count!" class="rating">
-        <ng-template let-fill="fill" let-index="index">
-          <i class="ri-star-fill" [class.filled]="fill === 100"></i>
-        </ng-template>
-      </ngb-rating>
-      <h6 class="price">
-        {{ product() | productPrice }}
-        <del>{{ product() | productPrice: 'compare' }}</del>
-      </h6>
-    </div>
-  </div>
-} @else if (productBoxStyle() === 'product_box_one') {
+@if (productBoxStyle() === 'product_box_one') {
   <app-product-box-one [product]="product()"></app-product-box-one>
-} @else if (productBoxStyle() === 'product_box_two') {
-  <app-product-box-two [product]="product()"></app-product-box-two>
-} @else if (productBoxStyle() === 'product_box_three') {
-  <app-product-box-three [product]="product()"></app-product-box-three>
-} @else if (productBoxStyle() === 'product_box_four') {
-  <app-product-box-four [product]="product()"></app-product-box-four>
-} @else if (productBoxStyle() === 'product_box_five') {
-  <app-product-box-five [product]="product()"></app-product-box-five>
 } @else {
   <div class="product-box productMain">
     <a [routerLink]="['/product', product()?.slug]" class="product-image">

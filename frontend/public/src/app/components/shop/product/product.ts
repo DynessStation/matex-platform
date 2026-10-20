@@ -4,15 +4,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { combineLatest, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import { ProductFullWidth } from './product-details/product-full-width/product-full-width';
-import { ProductImage } from './product-details/product-image/product-image';
-import { ProductLightBoxImage } from './product-details/product-light-box-image/product-light-box-image';
-import { ProductSlider } from './product-details/product-slider/product-slider';
-import { ProductSticky } from './product-details/product-sticky/product-sticky';
 import { ProductThumbnail } from './product-details/product-thumbnail/product-thumbnail';
-import { ProductZoom } from './product-details/product-zoom/product-zoom';
 import { RelatedProduct } from './product-details/widgets/related-product/related-product';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
@@ -25,18 +19,7 @@ import { ThemeOptionState } from '../../../shared/store/state/theme-option.state
 
 @Component({
   selector: 'app-product',
-  imports: [
-    AsyncPipe,
-    ProductThumbnail,
-    RelatedProduct,
-    ProductImage,
-    ProductSlider,
-    ProductSticky,
-    ProductFullWidth,
-    ProductLightBoxImage,
-    Breadcrumb,
-    ProductZoom,
-  ],
+  imports: [AsyncPipe, ProductThumbnail, RelatedProduct, Breadcrumb],
   templateUrl: './product.html',
   styleUrl: './product.scss',
 })
@@ -80,16 +63,12 @@ export class Product {
       this.applySeo(product);
     });
 
-    // For Demo Purpose only
-    combineLatest([this.route.queryParams, this.themeOptions$])
+    // One product layout; the Kartify demo layouts (switched with ?layout=) were removed in 6B.
+    this.themeOptions$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([params, option]) => {
-        if (params['layout']) {
-          this.layout = params['layout'];
-        } else {
-          this.layout = option?.product?.product_layout || 'product_thumbnail';
-        }
-      });
+      .subscribe(
+        (option) => (this.layout = option?.product?.product_layout || 'product_thumbnail'),
+      );
   }
 
   get isEnglish() {

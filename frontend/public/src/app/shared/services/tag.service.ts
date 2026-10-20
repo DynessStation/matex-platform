@@ -1,9 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import { Params } from '../interface/core.interface';
 import { TagModel } from '../interface/tag.interface';
 
@@ -11,9 +9,9 @@ import { TagModel } from '../interface/tag.interface';
   providedIn: 'root',
 })
 export class TagService {
-  constructor(private http: HttpClient) {}
-
-  getTags(payload?: Params): Observable<TagModel> {
-    return this.http.get<TagModel>(`${environment.URL}/tag.json`, { params: payload });
+  // The home page tags section waits for a backend source (owner plan). Until then there are
+  // no tags; the Kartify demo tags (tag.json: Nokia, Samsung, ...) were removed in 6B.
+  getTags(_payload?: Params): Observable<TagModel> {
+    return of({ data: [], total: 0 } as unknown as TagModel);
   }
 }

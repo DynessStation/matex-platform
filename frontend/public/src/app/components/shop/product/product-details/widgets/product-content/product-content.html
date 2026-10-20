@@ -64,19 +64,11 @@
         </button>
       </li>
     }
-    <li>
-      <button type="button" class="btn" (click)="openModal('question', product()!)">
-        <i class="ri-questionnaire-line"></i>
-        <span>Ask a question</span>
-      </button>
-    </li>
   </ul>
 }
 @if (product()?.is_wishlist) {
   <div class="buy-box compare-box">
     <app-wishlist [product]="product()!" />
-
-    <app-compare [product]="product()!" />
   </div>
 }
 

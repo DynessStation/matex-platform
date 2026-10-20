@@ -1,14 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import { AlertPayload } from '../components/widgets/alert/alert';
-import { Params } from '../interface/core.interface';
-import { NotificationModel } from '../interface/notification.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +16,6 @@ export class NotificationService {
 
   constructor(
     private zone: NgZone,
-    private http: HttpClient,
     private modalService: NgbModal,
     private toastr: ToastrService,
   ) {}
@@ -42,19 +37,5 @@ export class NotificationService {
         this.toastr.error(message);
       }
     });
-  }
-
-  getNotifications(payload?: Params): Observable<NotificationModel> {
-    return this.http.get<NotificationModel>(`${environment.URL}/notifications.json`, {
-      params: payload,
-    });
-  }
-
-  markAsReadNotification(): Observable<NotificationModel> {
-    return this.http.put<NotificationModel>(`${environment.URL}/notifications/markAsRead`, {});
-  }
-
-  deleteNotification(id: string): Observable<number> {
-    return this.http.delete<number>(`${environment.URL}/notifications/${id}`);
   }
 }

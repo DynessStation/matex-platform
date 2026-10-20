@@ -8,9 +8,7 @@ import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { DeliveryReturnModal } from '../../../../../../shared/components/modal/delivery-return-modal/delivery-return-modal';
-import { QuestionModal } from '../../../../../../shared/components/modal/question-modal/question-modal';
 import { SizeChartModal } from '../../../../../../shared/components/modal/size-chart-modal/size-chart-modal';
-import { Compare } from '../../../../../../shared/components/product-box/widgets/compare/compare';
 import { Wishlist } from '../../../../../../shared/components/product-box/widgets/wishlist/wishlist';
 import { VariantAttributes } from '../../../../../../shared/components/variant-attributes/variant-attributes';
 import { Timer } from '../../../../../../shared/components/widgets/timer/timer';
@@ -35,7 +33,6 @@ import { ProductWholesales } from '../product-wholesales/product-wholesales';
     CurrencySymbolPipe,
     Timer,
     Wishlist,
-    Compare,
     TranslateModule,
     ProductBuyButton,
   ],
@@ -185,12 +182,6 @@ export class ProductContent {
         windowClass: 'theme-modal delivery-return-modal',
       });
       deliveryModal.componentInstance.policy = value;
-    } else if (type == 'question') {
-      const questionModal = this.modal.open(QuestionModal, {
-        centered: true,
-        windowClass: 'theme-modal ask-question-modal',
-      });
-      questionModal.componentInstance.product = value;
     }
   }
 }
