@@ -1,0 +1,467 @@
+<div class="border rounded p-4">
+  <div class="mb-4">
+    <h5 class="mb-1">
+      {{ 'website_page.publication_title' | translate }}
+    </h5>
+
+    <p class="text-muted mb-0">
+      {{ 'website_page.publication_help' | translate }}
+    </p>
+  </div>
+
+  <!--==================================================-->
+  <!--==== CURRENT STATUS ===============================-->
+  <!--==================================================-->
+
+  @if (editor.mode() === 'edit' && editor.editData(); as page) {
+    <div class="cms-publication-current mb-4">
+      <div>
+        <small class="text-muted d-block mb-1">
+          {{ 'website_page.current_status' | translate }}
+        </small>
+
+        <strong>
+          {{ 'website_page.status_' + page.effective_status | translate }}
+        </strong>
+      </div>
+
+      @if (page.website_page_publish_at) {
+        <div>
+          <small class="text-muted d-block mb-1">
+            {{ 'website_page.publish_at' | translate }}
+          </small>
+
+          <strong>
+            {{
+              page.website_page_publish_at
+                | date
+                  : editor.localization.dateTimeFormat()
+                  : undefined
+                  : editor.localization.locale()
+            }}
+          </strong>
+        </div>
+      }
+
+      @if (page.website_page_unpublish_at) {
+        <div>
+          <small class="text-muted d-block mb-1">
+            {{ 'website_page.unpublish_at' | translate }}
+          </small>
+
+          <strong>
+            {{
+              page.website_page_unpublish_at
+                | date
+                  : editor.localization.dateTimeFormat()
+                  : undefined
+                  : editor.localization.locale()
+            }}
+          </strong>
+        </div>
+      }
+    </div>
+  }
+
+  <!--==================================================-->
+  <!--==== CHOICES ======================================-->
+  <!--==================================================-->
+
+  <div class="cms-publication-options">
+    @if (editor.mode() === 'edit') {
+      <label
+        class="cms-publication-option"
+        [class.active]="editor.publicationChoice === 'current'"
+      >
+        <input
+          type="radio"
+          name="publicationChoice"
+          value="current"
+          [checked]="editor.publicationChoice === 'current'"
+          (change)="selectPublicationChoice('current')"
+        />
+
+        <div>
+          <strong>
+            {{ 'website_page.publication_keep_current' | translate }}
+          </strong>
+
+          <small>
+            {{ 'website_page.publication_keep_current_help' | translate }}
+          </small>
+        </div>
+      </label>
+    }
+
+    <label
+      class="cms-publication-option"
+      [class.active]="editor.publicationChoice === 'draft'"
+    >
+      <input
+        type="radio"
+        name="publicationChoice"
+        value="draft"
+        [checked]="editor.publicationChoice === 'draft'"
+        (change)="selectPublicationChoice('draft')"
+      />
+
+      <div>
+        <strong>
+          {{ 'website_page.publication_draft' | translate }}
+        </strong>
+
+        <small>
+          {{ 'website_page.publication_draft_help' | translate }}
+        </small>
+      </div>
+    </label>
+
+    <label
+      class="cms-publication-option"
+      [class.active]="editor.publicationChoice === 'publish_now'"
+    >
+      <input
+        type="radio"
+        name="publicationChoice"
+        value="publish_now"
+        [checked]="editor.publicationChoice === 'publish_now'"
+        (change)="selectPublicationChoice('publish_now')"
+      />
+
+      <div>
+        <strong>
+          {{ 'website_page.publication_publish_now' | translate }}
+        </strong>
+
+        <small>
+          {{ 'website_page.publication_publish_now_help' | translate }}
+        </small>
+      </div>
+    </label>
+
+    <label
+      class="cms-publication-option"
+      [class.active]="editor.publicationChoice === 'schedule'"
+    >
+      <input
+        type="radio"
+        name="publicationChoice"
+        value="schedule"
+        [checked]="editor.publicationChoice === 'schedule'"
+        (change)="selectPublicationChoice('schedule')"
+      />
+
+      <div>
+        <strong>
+          {{ 'website_page.publication_schedule' | translate }}
+        </strong>
+
+        <small>
+          {{ 'website_page.publication_schedule_help' | translate }}
+        </small>
+      </div>
+    </label>
+
+    @if (editor.mode() === 'edit' && !editor.isSystemPage) {
+      <label
+        class="cms-publication-option cms-publication-option-danger"
+        [class.active]="editor.publicationChoice === 'archive'"
+      >
+        <input
+          type="radio"
+          name="publicationChoice"
+          value="archive"
+          [checked]="editor.publicationChoice === 'archive'"
+          (change)="selectPublicationChoice('archive')"
+        />
+
+        <div>
+          <strong>
+            {{ 'website_page.publication_archive' | translate }}
+          </strong>
+
+          <small>
+            {{ 'website_page.publication_archive_help' | translate }}
+          </small>
+        </div>
+      </label>
+    }
+  </div>
+
+  <!--==================================================-->
+  <!--==== SCHEDULE =====================================-->
+  <!--==================================================-->
+
+  @if (editor.publicationChoice === 'schedule') {
+    <div class="border rounded p-3 mt-4">
+      <label class="form-label">
+        {{ 'website_page.schedule_publish_at' | translate }}
+        *
+      </label>
+
+      <div class="row g-3">
+        <!-- DATE -->
+
+        <div class="col-lg-7">
+          <label class="form-label small text-muted">
+            {{ 'website_page.date_label' | translate }}
+          </label>
+
+          <div
+            ngbDropdown
+            #publishDateDropdown="ngbDropdown"
+            class="cms-publication-date-dropdown custom-dp-dropdown"
+            [autoClose]="'outside'"
+          >
+            <button
+              type="button"
+              ngbDropdownToggle
+              class="cms-publication-date-toggle"
+              [class.is-invalid]="
+                editor.publicationValidationAttempted &&
+                editor.publicationScheduleInvalid
+              "
+            >
+              <span>
+                @if (editor.publicationPublishDate; as selectedDate) {
+                  {{
+                    publicationDateValue(selectedDate)
+                      | date
+                        : editor.localization.dateFormat()
+                        : undefined
+                        : editor.localization.locale()
+                  }}
+                } @else {
+                  {{ 'website_page.select_date' | translate }}
+                }
+              </span>
+
+              <i class="ri-calendar-line"></i>
+            </button>
+
+            <div ngbDropdownMenu class="cms-publication-calendar">
+              <ngb-datepicker
+                [(ngModel)]="editor.publicationPublishDate"
+                [ngModelOptions]="{ standalone: true }"
+                [minDate]="publicationMinDate"
+                [startDate]="
+                  editor.publicationPublishDate ?? publicationMinDate
+                "
+                [outsideDays]="'hidden'"
+                (ngModelChange)="syncPublicationPublishDateTime()"
+                (dateSelect)="publishDateDropdown.close()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- TIME -->
+
+        <div class="col-lg-5">
+          <label class="form-label small text-muted">
+            {{ 'website_page.time_label' | translate }}
+          </label>
+
+          <div
+            class="cms-publication-timepicker"
+            [class.is-invalid]="
+              editor.publicationValidationAttempted &&
+              editor.publicationScheduleInvalid
+            "
+          >
+            <ngb-timepicker
+              [(ngModel)]="editor.publicationPublishTime"
+              [ngModelOptions]="{ standalone: true }"
+              [meridian]="editor.localization.useMeridian()"
+              [seconds]="false"
+              [spinners]="true"
+              [hourStep]="1"
+              [minuteStep]="5"
+              (ngModelChange)="syncPublicationPublishDateTime()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <small class="text-muted d-block mt-1">
+        {{ 'website_page.schedule_publish_at_help' | translate }}
+      </small>
+
+      @if (
+        editor.publicationValidationAttempted &&
+        editor.publicationScheduleInvalid
+      ) {
+        <div class="text-danger form-error">
+          {{ 'website_page.validation.schedule_future_required' | translate }}
+        </div>
+      }
+    </div>
+  }
+
+  <!--==================================================-->
+  <!--==== AUTO UNPUBLISH ===============================-->
+  <!--==================================================-->
+
+  @if (
+    editor.publicationChoice === 'publish_now' ||
+    editor.publicationChoice === 'schedule'
+  ) {
+    <div class="border rounded p-3 mt-3">
+      <label class="form-label">
+        {{ 'website_page.auto_unpublish_at' | translate }}
+      </label>
+
+      <div class="row g-3">
+        <!-- DATE -->
+
+        <div class="col-lg-7">
+          <label class="form-label small text-muted">
+            {{ 'website_page.date_label' | translate }}
+          </label>
+
+          <div
+            ngbDropdown
+            #unpublishDateDropdown="ngbDropdown"
+            class="cms-publication-date-dropdown custom-dp-dropdown"
+            [autoClose]="'outside'"
+          >
+            <button
+              type="button"
+              ngbDropdownToggle
+              class="cms-publication-date-toggle"
+              [class.is-invalid]="
+                editor.publicationValidationAttempted &&
+                editor.publicationEndInvalid
+              "
+            >
+              <span>
+                @if (editor.publicationUnpublishDate; as selectedDate) {
+                  {{
+                    publicationDateValue(selectedDate)
+                      | date
+                        : editor.localization.dateFormat()
+                        : undefined
+                        : editor.localization.locale()
+                  }}
+                } @else {
+                  {{ 'website_page.select_date' | translate }}
+                }
+              </span>
+
+              <i class="ri-calendar-line"></i>
+            </button>
+
+            <div ngbDropdownMenu class="cms-publication-calendar">
+              <ngb-datepicker
+                [(ngModel)]="editor.publicationUnpublishDate"
+                [ngModelOptions]="{ standalone: true }"
+                [minDate]="publicationMinDate"
+                [startDate]="
+                  editor.publicationUnpublishDate ?? publicationMinDate
+                "
+                [outsideDays]="'hidden'"
+                (ngModelChange)="syncPublicationUnpublishDateTime()"
+                (dateSelect)="unpublishDateDropdown.close()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- TIME -->
+
+        <div class="col-lg-5">
+          <label class="form-label small text-muted">
+            {{ 'website_page.time_label' | translate }}
+          </label>
+
+          <div
+            class="cms-publication-timepicker"
+            [class.is-invalid]="
+              editor.publicationValidationAttempted &&
+              editor.publicationEndInvalid
+            "
+          >
+            <ngb-timepicker
+              [(ngModel)]="editor.publicationUnpublishTime"
+              [ngModelOptions]="{ standalone: true }"
+              [meridian]="editor.localization.useMeridian()"
+              [seconds]="false"
+              [spinners]="true"
+              [hourStep]="1"
+              [minuteStep]="5"
+              (ngModelChange)="syncPublicationUnpublishDateTime()"
+            />
+          </div>
+        </div>
+      </div>
+
+      @if (editor.publicationUnpublishDate || editor.publicationUnpublishTime) {
+        <button
+          type="button"
+          class="btn btn-sm btn-light-bg mt-2"
+          (click)="clearPublicationUnpublish()"
+        >
+          <i class="ri-close-line me-1"></i>
+
+          {{ 'website_page.clear_datetime' | translate }}
+        </button>
+      }
+
+      <small class="text-muted d-block mt-1">
+        {{ 'website_page.auto_unpublish_at_help' | translate }}
+      </small>
+
+      @if (
+        editor.publicationValidationAttempted && editor.publicationEndInvalid
+      ) {
+        <div class="text-danger form-error">
+          {{ 'website_page.validation.unpublish_after_publish' | translate }}
+        </div>
+      }
+    </div>
+  }
+
+  <!--==================================================-->
+  <!--==== DEFAULT TRANSLATION BLOCKER ==================-->
+  <!--==================================================-->
+
+  @if (
+    editor.publicationRequiresPublishedTranslation &&
+    !editor.defaultTranslationPublished
+  ) {
+    <div class="alert alert-warning mt-4 mb-0">
+      <i class="ri-information-line me-1"></i>
+
+      {{ 'website_page.default_translation_publish_required' | translate }}
+    </div>
+  }
+
+  <!--==================================================-->
+  <!--==== NAVIGATION ===================================-->
+  <!--==================================================-->
+
+  <div
+    class="d-flex justify-content-between align-items-center border-top mt-4 pt-4"
+  >
+    <button
+      type="button"
+      class="btn btn-light-bg"
+      (click)="backFromPublication()"
+    >
+      <i class="ri-arrow-left-line me-1"></i>
+
+      {{
+        (editor.canViewAttachments
+          ? 'website_page.back_media'
+          : 'website_page.back_seo'
+        ) | translate
+      }}
+    </button>
+
+    <button type="button" class="btn btn-theme" (click)="goToPreview()">
+      {{ 'website_page.next_preview' | translate }}
+
+      <i class="ri-arrow-right-line ms-1"></i>
+    </button>
+  </div>
+</div>

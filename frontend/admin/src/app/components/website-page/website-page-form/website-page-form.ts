@@ -9,6 +9,7 @@ import { NgxEditorModule } from 'ngx-editor';
 import { WebsitePageEditorService } from './website-page-editor.service';
 import { WebsitePageGeneralTab } from './website-page-general-tab/website-page-general-tab';
 import { WebsitePagePreviewTab } from './website-page-preview-tab/website-page-preview-tab';
+import { WebsitePagePublicationTab } from './website-page-publication-tab/website-page-publication-tab';
 import { WebsitePageSeoTab } from './website-page-seo-tab/website-page-seo-tab';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
@@ -36,6 +37,7 @@ import { WebsitePagePreview } from '../website-page-preview/website-page-preview
     WebsitePageGeneralTab,
     WebsitePageSeoTab,
     WebsitePagePreviewTab,
+    WebsitePagePublicationTab,
   ],
 
   templateUrl: './website-page-form.html',

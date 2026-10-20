@@ -60,8 +60,6 @@ import {
   toAttachmentArray,
   toPreviewIso,
   toLocalDateTimeInput,
-  publicationDateValue,
-  composePublicationDateTime,
   dateToNgbDate,
 } from './website-page-form.util';
 import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
@@ -312,7 +310,6 @@ export class WebsitePageEditorService {
   readonly gadgetHomeMediaRequirement = gadgetHomeMediaRequirement;
   readonly gadgetHomeMediaIssue = gadgetHomeMediaIssue;
   readonly gadgetHomeMediaActionIssue = gadgetHomeMediaActionIssue;
-  readonly publicationDateValue = publicationDateValue;
   readonly gadgetHomeMediaRule = getGadgetHomeMediaRule;
 
   //==================================================
@@ -738,7 +735,7 @@ export class WebsitePageEditorService {
     return null;
   }
 
-  private firstInvalidAboutLocale(): WebsitePageEditorLocale | null {
+  firstInvalidAboutLocale(): WebsitePageEditorLocale | null {
     if (!this.isAboutTemplate) return null;
 
     for (const language of this.supportedLanguages) {
@@ -1401,26 +1398,6 @@ export class WebsitePageEditorService {
   //==== PUBLICATION
   //==================================================
 
-  selectPublicationChoice(choice: WebsitePageEditorPublicationChoice): void {
-    this.publicationChoice = choice;
-
-    this.publicationValidationAttempted = false;
-
-    if (choice === 'schedule') {
-      if (!this.publicationPublishAt) {
-        this.initializePublicationSchedule();
-      }
-    } else {
-      this.publicationPublishAt = '';
-      this.publicationPublishDate = null;
-      this.publicationPublishTime = null;
-    }
-
-    if (choice === 'draft' || choice === 'archive') {
-      this.clearPublicationUnpublish();
-    }
-  }
-
   get defaultTranslationPublished(): boolean {
     const locale =
       parseLocale(this.form.controls.website_page_default_locale.value) ??
@@ -1497,46 +1474,6 @@ export class WebsitePageEditorService {
     return unpublishAt.getTime() <= startAt.getTime();
   }
 
-  goToPreview(): void {
-    this.publicationValidationAttempted = true;
-    this.mediaValidationAttempted = true;
-
-    const invalidAboutLocale = this.firstInvalidAboutLocale();
-    if (invalidAboutLocale) {
-      this.activeLocale = invalidAboutLocale;
-      this.activeTab = 'content';
-      return;
-    }
-
-    if (this.aboutMediaBlocksSave || this.gadgetHomeMediaBlocksSave) {
-      this.activeTab = 'media';
-      return;
-    }
-
-    if (
-      this.publicationRequiresPublishedTranslation &&
-      !this.defaultTranslationPublished
-    ) {
-      return;
-    }
-
-    if (this.publicationScheduleInvalid) {
-      return;
-    }
-
-    if (this.publicationEndInvalid) {
-      return;
-    }
-
-    this.refreshPreviewPage();
-
-    this.activeTab = 'preview';
-  }
-
-  backFromPublication(): void {
-    this.activeTab = this.canViewAttachments ? 'media' : 'seo';
-  }
-
   //==================================================
   //==== PREVIEW NAVIGATION
   //==================================================
@@ -1589,7 +1526,7 @@ export class WebsitePageEditorService {
   //==== PREVIEW PAGE
   //==================================================
 
-  private refreshPreviewPage(): void {
+  refreshPreviewPage(): void {
     this.previewPage = this.buildPreviewPage();
   }
 
@@ -2180,58 +2117,6 @@ export class WebsitePageEditorService {
   //==================================================
   //==== DATETIME INPUT
   //==================================================
-
-  get publicationMinDate(): NgbDateStruct {
-    const now = new Date();
-
-    return {
-      year: now.getFullYear(),
-      month: now.getMonth() + 1,
-      day: now.getDate(),
-    };
-  }
-
-  syncPublicationPublishDateTime(): void {
-    this.publicationPublishAt = composePublicationDateTime(
-      this.publicationPublishDate,
-      this.publicationPublishTime,
-    );
-  }
-
-  syncPublicationUnpublishDateTime(): void {
-    this.publicationUnpublishAt = composePublicationDateTime(
-      this.publicationUnpublishDate,
-      this.publicationUnpublishTime,
-    );
-  }
-
-  clearPublicationUnpublish(): void {
-    this.publicationUnpublishDate = null;
-    this.publicationUnpublishTime = null;
-    this.publicationUnpublishAt = '';
-  }
-
-  private initializePublicationSchedule(): void {
-    const date = new Date();
-
-    date.setSeconds(0, 0);
-
-    const currentMinute = date.getMinutes();
-
-    const nextMinute = Math.floor(currentMinute / 5) * 5 + 5;
-
-    date.setMinutes(nextMinute);
-
-    this.publicationPublishDate = dateToNgbDate(date);
-
-    this.publicationPublishTime = {
-      hour: date.getHours(),
-      minute: date.getMinutes(),
-      second: 0,
-    };
-
-    this.syncPublicationPublishDateTime();
-  }
 
   private patchPublicationDateTime(
     type: 'publish' | 'unpublish',
