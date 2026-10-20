@@ -146,12 +146,85 @@ Setiap modul backend yang disentuh harus punya test kontrak dulu. Helper di `ops
 
 ## 4. Frontend
 
-Standar frontend dilengkapi di Fase 6, setelah survei lengkap. Yang sudah berlaku:
+Berlaku untuk `frontend/admin` (panel internal) dan `frontend/public` (website), keduanya Angular 21 dengan SSR dan NGXS. Dasarnya survei Fase 6A (21 Oktober 2026, hasilnya di peta jalan).
 
-- **Struktur:** `components/<fitur>/` untuk halaman, `shared/` untuk komponen, layanan, store (NGXS), dan tipe bersama, serta `core/` untuk guard, interceptor, dan utilitas inti.
-- **Nama file:** komponen tanpa akhiran (`office.ts`, `form-office.ts`), selain komponen memakai akhiran (`*.service.ts`, `*.state.ts`, `*.action.ts`, `*.interface.ts`, `*.routes.ts`).
+### 4.1 Struktur folder
+
+```
+src/app/
+  components/<fitur>/        halaman: list <fitur>.ts, form-<fitur>/, detail-<fitur>/
+  shared/components/ui/      komponen bersama (tabel, form field, media, modal, dan seterusnya)
+  shared/services/           satu service per modul API (*.service.ts)
+  shared/store/              NGXS: action/ dan state/ per modul
+  shared/interface/          tipe bersama (*.interface.ts)
+  shared/directives/         directive (satu folder; tidak ada directive/ dan directives/ berdampingan)
+  core/                      guard, interceptor, utilitas inti
+public/assets/scss/          template Kartify (gaya dasar)
+src/styles.scss              lapisan gaya global MATEX
+```
+
+Nama file dan folder huruf kecil dengan tanda hubung. Komponen tanpa akhiran (`office.ts`, `form-office.ts`); selain komponen memakai akhiran (`*.service.ts`, `*.state.ts`, `*.action.ts`, `*.interface.ts`, `*.routes.ts`, `*.directive.ts`, `*.pipe.ts`).
+
+### 4.2 Aliran data
+
+- Komponen tidak memanggil `HttpClient` langsung. Jalurnya: komponen → action NGXS → state → service → API. (Survei: sudah dipatuhi, 0 komponen memakai `HttpClient`.)
+- Satu service per modul API, memakai `environment.API_URL`. Tidak ada request ke `assets/data/*.json` (data demo Kartify) untuk data apa pun.
+- Langganan observable di komponen dibersihkan (`takeUntilDestroyed`), atau dipakai lewat `async` pipe.
+- Kode baru memakai gaya Angular sekarang: `input()`, `output()`, `signal()`, dan kontrol alur `@if`/`@for`. Kode lama dengan `@Input()` disesuaikan saat komponennya disentuh.
+
+### 4.3 Gaya (SCSS)
+
+Urutan lapisan, dari dasar ke paling khusus:
+
+1. **Template Kartify** (`public/assets/scss`): variabel (ukuran huruf, warna, jarak) dan komponen dasar (form, tabel, tombol, kartu, modal). Ubah variabelnya di sini bila perubahannya berlaku untuk seluruh aplikasi.
+2. **Lapisan global MATEX** (`src/styles.scss`, nanti dipecah ke `src/styles/_*.scss` per urusan): pola yang dipakai lebih dari satu halaman, misalnya status kontrol form, tabel, kotak bantuan, kartu metrik, tombol perbarui.
+3. **SCSS modul**: hanya tata letak yang benar-benar khas halaman itu.
+
+Aturan:
+
+- Sebelum menulis gaya, cek apakah Kartify atau lapisan global sudah punya. Kalau sudah, pakai atau ubah; kalau belum dan polanya dipakai di lebih dari satu tempat, tambahkan di global.
+- SCSS modul tidak boleh menimpa elemen dasar (`.form-control`, `.form-label`, `.input-group-text`, `.btn`, `table`). Survei menemukan timpaan seperti itu di 6 modul; semuanya dipindah ke global di 6D.
+- Blok yang sama di dua modul atau lebih (misalnya `.metric-grid`, `.refresh-button`, `.panel-footer` di dasbor dan analitik) dipindah ke global.
+- Warna, ukuran huruf, dan jarak memakai variabel template atau CSS variable (`var(--theme-color)`), bukan angka lepas.
+- `::ng-deep` hanya untuk menyentuh library pihak ketiga, dengan komentar alasannya.
+
+### 4.4 Komponen bersama
+
+Pola yang sudah punya komponen wajib memakainya, tidak dibuat ulang per halaman:
+
+| Pola | Komponen |
+| --- | --- |
+| Tabel list | `app-table` (`shared/components/ui/table`) |
+| Field form | `form-fields` |
+| Pilih atau unggah media | `media-box`, `image-upload`, modal media |
+| Konfirmasi dan hapus | `confirmation-modal`, `delete-modal` |
+| Kosong, error, memuat | `no-data`, `detail-error-state`, `skeleton` |
+| Halaman | `pagination` |
+
+Ditambah di 6D (lihat `rencana-ui-admin.md`): kotak bantuan "?" dan drawer panduan, tombol perbarui berjeda, tombol kembali, dan pratinjau gambar (lightbox).
+
+### 4.5 Ukuran
+
+- Komponen (TypeScript) paling banyak sekitar 800 baris, template sekitar 600 baris. Form besar dipecah per tab atau per bagian menjadi komponen anak, dengan state form tetap di induknya.
+- Data besar yang statis (misalnya daftar kode negara) boleh lebih panjang, dan letaknya di `shared/data/`.
+
+### 4.6 Teks dan bahasa
+
+- Teks yang tampil ke pengguna lewat ngx-translate (`public/assets/i18n/<bahasa>.json`). Bahasa yang dipakai: Indonesia (utama) dan Inggris. Berkas bahasa lain dari template (`fr.json`) dibuang.
+- Pesan error dari API ditampilkan dengan terjemahan kode error bila ada, lalu pesan API sebagai cadangan.
+
+### 4.7 Format, lint, dan test
+
 - **Format:** Prettier pada `src` (`npm run format`). Perubahan format saja dikerjakan di commit tersendiri.
-- **Desain:** sebelum membuat atau merombak tampilan, cek desain Kartify yang cocok di tag `kartify-reference-v1`. Kartify adalah acuan tampilan; data demo dan logika tokonya bukan logika bisnis MATEX.
-- **Bukti perapian:** CSS hasil build identik, dan JavaScript hanya berbeda di bagian yang memang diubah. Ditambah test browser untuk halaman yang disentuh.
+- **Lint:** ESLint (`npm run lint`), target 0 peringatan. Perbaikan otomatis (urutan import) dikerjakan di commit tersendiri, terpisah dari perubahan perilaku.
+- **Test:** test browser Playwright di `ops/e2e` untuk alur yang disentuh. Halaman yang dirombak di 6D mendapat test browser untuk alur utamanya.
 
-Target Fase 6 (rinciannya di peta jalan): satu folder per jenis (tidak ada kembar seperti `directive/` dan `directives/`), tidak ada komponen di atas sekitar 800 baris, tidak ada sisa fitur toko v2 di website publik, dan lint tanpa peringatan.
+### 4.8 Desain
+
+- Acuan tampilan adalah Kartify (tag `kartify-reference-v1`). Data demo dan logika tokonya bukan logika bisnis MATEX.
+- Mockup dari pemilik adalah arah, bukan ukuran pasti: warna, ukuran, dan bentuk mengikuti token yang sudah ada.
+
+### 4.9 Bukti perapian
+
+- Perapian murni (pindah gaya, pecah komponen): CSS hasil build identik atau hanya berbeda di bagian yang memang diubah, tampilan halaman yang disentuh dicek di browser (desktop dan lebar ponsel), dan test browser lulus.
+- Perubahan tampilan: sebelum dan sesudahnya dicek di browser, lalu dilaporkan ke pemilik.

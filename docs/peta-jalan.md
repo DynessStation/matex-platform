@@ -50,11 +50,23 @@ Hasil survei 19 Oktober: backend punya dua generasi kode. Generasi lama (8 modul
 
 ### Fase 6: Frontend satu pola
 
+Hasil survei 6A (21 Oktober), dasar standar `standar-kode.md` bagian 4:
+
+| Bagian | Admin | Website publik |
+| --- | --- | --- |
+| Ukuran | 270 file TypeScript (±39.800 baris), 25 file SCSS modul (±5.400 baris) | ±20.100 baris TypeScript, ±2.600 baris SCSS |
+| Komponen terbesar | form halaman website 3.233 baris (template 3.179), form akun admin 1.515, form kantor 952, pratinjau halaman 942, form produk 813 (template 1.299), komponen tabel 814 | Tidak ada di atas 450 baris |
+| Sisa template Kartify | `settings.json` demo diunduh setiap admin dibuka; store `store`, `state`, `country` (dipakai halaman akun), `tag` dan `menu` (tidak dipakai, halaman tag tidak punya route); 9 tipe tema/toko tanpa pemakai; `fr.json` | 31 store NGXS, lebih dari 20 service yang mengambil data demo `assets/data/*.json` (keranjang, wishlist, kupon, order, dan seterusnya) |
+| Gaya ganda | `.form-control`/`.form-label`/`.input-group-text` ditimpa di 6 modul; blok kartu metrik dan tombol perbarui tersalin di dasbor dan analitik | Belum disurvei mendalam (dikerjakan di 6B) |
+| Lint | 0 error, 554 peringatan (435 urutan import, 114 tipe `any`) | 0 error, 90 peringatan |
+| Aliran data | Komponen tidak memanggil `HttpClient` langsung (sudah benar) | Sama |
+| Test | Belum ada test unit frontend; 5 test browser di `ops/e2e` | Sama |
+
 | Langkah | Isi | Selesai bila |
 | --- | --- | --- |
-| 6A Survei dan standar | Survei mendalam admin dan public; lengkapi standar frontend | `standar-kode.md` bagian 4 lengkap |
+| 6A Survei dan standar ✅ | Survei mendalam admin dan public; lengkapi standar frontend | **Selesai 21 Okt:** `standar-kode.md` bagian 4 lengkap (struktur, aliran data, lapisan gaya, komponen bersama, ukuran, bahasa, lint, bukti) |
 | 6B Website publik | Buang sisa fitur toko v2 yang masih terpasang (cart, wishlist, compare, coupon, order, wallet, refund, point, currency, review, Q&A, pembayaran: belasan store NGXS) dan file demo Kartify yang diunduh setiap kunjungan (`theme.json`, `currency.json`). Tetap tersimpan di tag arsip | Tidak ada request demo saat halaman dibuka; test browser lulus |
-| 6C Admin | Pecah komponen raksasa (form halaman website 3.233 baris, form akun admin 1.515, form kantor 952, form produk 813); satukan `directive/` dan `directives/`; buang tipe tema Kartify yang tidak dipakai | Tidak ada komponen di atas sekitar 800 baris |
+| 6C Admin | Pecah komponen raksasa (form halaman website 3.233 baris, form akun admin 1.515, form kantor 952, form produk 813); satukan `directive/` dan `directives/`; buang sisa Kartify di admin (`settings.json` demo, store `store`/`state`/`country`/`tag`/`menu` dan halaman tag tanpa route, tipe tema/toko tanpa pemakai, `fr.json`) | Tidak ada komponen di atas sekitar 800 baris |
 | 6D UI/UX admin | Temuan pemilik 20 Okt, daftar lengkap di `rencana-ui-admin.md`: global dulu (huruf area isi sedikit lebih kecil, warna kontrol form seragam, tabel versi baru, kotak bantuan "?" dan drawer panduan, tombol perbarui berjeda, tombol kembali), lalu per halaman (dasbor/analitik/SEO, navigasi `primary`, bug input telepon, tombol simpan halaman website, kategori, filter produk, penanda pemakaian media). SCSS ditulis sekali di global; SCSS modul hanya untuk yang khas halaman | Semua butir U selesai atau ditinggalkan dengan alasan; SCSS modul berkurang |
 | 6E Lint dan test | Peringatan lint 0 (urutan import, tipe `any`); test browser untuk halaman yang disentuh | Lint admin dan public 0 peringatan |
 
