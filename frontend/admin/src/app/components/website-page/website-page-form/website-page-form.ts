@@ -34,7 +34,6 @@ import { WebsitePagePreview } from '../website-page-preview/website-page-preview
 
   templateUrl: './website-page-form.html',
 
-  styleUrl: './website-page-form.scss',
 
   providers: [WebsitePageEditorService],
 })
