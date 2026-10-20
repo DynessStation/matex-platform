@@ -1,4 +1,4 @@
-<form class="theme-form theme-form-2 mega-form" [formGroup]="form">
+<form class="theme-form theme-form-2 mega-form" [formGroup]="editor.form">
   <div class="vertical-tabs">
     <div class="row g-4">
       <!--==================================================-->
@@ -9,10 +9,10 @@
         <ul
           ngbNav
           #nav="ngbNav"
-          [(activeId)]="activeTab"
+          [(activeId)]="editor.activeTab"
           class="nav-pills"
           orientation="vertical"
-          (navChange)="onNavChange($event)"
+          (navChange)="editor.onNavChange($event)"
         >
           <!-- GENERAL -->
 
@@ -39,7 +39,7 @@
                   </p>
                 </div>
 
-                @if (isSystemPage) {
+                @if (editor.isSystemPage) {
                   <div class="alert alert-warning">
                     <i class="ri-information-line me-1"></i>
 
@@ -47,7 +47,7 @@
                   </div>
                 }
 
-                <div class="row g-4" [class.d-none]="isSystemPage">
+                <div class="row g-4" [class.d-none]="editor.isSystemPage">
                   <!-- PAGE KEY -->
 
                   <div class="col-md-6">
@@ -61,12 +61,12 @@
                       class="form-control"
                       formControlName="website_page_key"
                       placeholder="about"
-                      [readonly]="isSystemPage"
+                      [readonly]="editor.isSystemPage"
                       [class.is-invalid]="
-                        form.controls.website_page_key.touched &&
-                        form.controls.website_page_key.invalid
+                        editor.form.controls.website_page_key.touched &&
+                        editor.form.controls.website_page_key.invalid
                       "
-                      (blur)="normalizePageKey()"
+                      (blur)="editor.normalizePageKey()"
                     />
 
                     <small class="text-muted d-block mt-1">
@@ -74,8 +74,8 @@
                     </small>
 
                     @if (
-                      form.controls.website_page_key.touched &&
-                      form.controls.website_page_key.errors?.['required']
+                      editor.form.controls.website_page_key.touched &&
+                      editor.form.controls.website_page_key.errors?.['required']
                     ) {
                       <div class="text-danger form-error">
                         {{ 'website_page.validation.key_required' | translate }}
@@ -83,8 +83,8 @@
                     }
 
                     @if (
-                      form.controls.website_page_key.touched &&
-                      form.controls.website_page_key.errors?.['pattern']
+                      editor.form.controls.website_page_key.touched &&
+                      editor.form.controls.website_page_key.errors?.['pattern']
                     ) {
                       <div class="text-danger form-error">
                         {{ 'website_page.validation.key_pattern' | translate }}
@@ -92,8 +92,10 @@
                     }
 
                     @if (
-                      form.controls.website_page_key.touched &&
-                      form.controls.website_page_key.errors?.['maxlength']
+                      editor.form.controls.website_page_key.touched &&
+                      editor.form.controls.website_page_key.errors?.[
+                        'maxlength'
+                      ]
                     ) {
                       <div class="text-danger form-error">
                         {{
@@ -168,8 +170,8 @@
                       class="form-control"
                       formControlName="website_page_sort_order"
                       [class.is-invalid]="
-                        form.controls.website_page_sort_order.touched &&
-                        form.controls.website_page_sort_order.invalid
+                        editor.form.controls.website_page_sort_order.touched &&
+                        editor.form.controls.website_page_sort_order.invalid
                       "
                     />
 
@@ -235,8 +237,8 @@
                             formControlName="website_page_type"
                             placeholder="standard"
                             [class.is-invalid]="
-                              form.controls.website_page_type.touched &&
-                              form.controls.website_page_type.invalid
+                              editor.form.controls.website_page_type.touched &&
+                              editor.form.controls.website_page_type.invalid
                             "
                           />
                         </div>
@@ -252,13 +254,14 @@
                             class="form-control"
                             formControlName="website_page_template"
                             [class.is-invalid]="
-                              form.controls.website_page_template.touched &&
-                              form.controls.website_page_template.invalid
+                              editor.form.controls.website_page_template
+                                .touched &&
+                              editor.form.controls.website_page_template.invalid
                             "
                           >
                             <option value="">Default / generic</option>
                             @for (
-                              template of templateOptions;
+                              template of editor.templateOptions;
                               track template.value
                             ) {
                               <option [value]="template.value">
@@ -280,7 +283,7 @@
                   <button
                     type="button"
                     class="btn btn-theme"
-                    (click)="goToContent()"
+                    (click)="editor.goToContent()"
                   >
                     {{ 'website_page.next_content' | translate }}
 
@@ -317,13 +320,20 @@
                 <!--==================================================-->
 
                 <div class="d-flex flex-wrap gap-2 mb-4">
-                  @for (language of supportedLanguages; track language.locale) {
+                  @for (
+                    language of editor.supportedLanguages;
+                    track language.locale
+                  ) {
                     <button
                       type="button"
                       class="btn d-flex align-items-center gap-2"
-                      [class.btn-theme]="activeLocale === language.locale"
-                      [class.btn-light-bg]="activeLocale !== language.locale"
-                      (click)="selectLanguage(language.locale)"
+                      [class.btn-theme]="
+                        editor.activeLocale === language.locale
+                      "
+                      [class.btn-light-bg]="
+                        editor.activeLocale !== language.locale
+                      "
+                      (click)="editor.selectLanguage(language.locale)"
                     >
                       <span class="fw-semibold">
                         {{ language.shortLabel }}
@@ -333,7 +343,7 @@
                         {{ language.labelKey | translate }}
                       </span>
 
-                      @if (isDefaultLocale(language.locale)) {
+                      @if (editor.isDefaultLocale(language.locale)) {
                         <span class="badge bg-primary">
                           {{
                             'website_page.default_language_badge' | translate
@@ -341,7 +351,7 @@
                         </span>
                       }
 
-                      @if (!isLanguageEnabled(language.locale)) {
+                      @if (!editor.isLanguageEnabled(language.locale)) {
                         <span class="badge bg-light text-dark">
                           {{ 'website_page.not_added' | translate }}
                         </span>
@@ -354,7 +364,7 @@
                 <!--==== LANGUAGE NOT ENABLED ========================-->
                 <!--==================================================-->
 
-                @if (!isLanguageEnabled(activeLocale)) {
+                @if (!editor.isLanguageEnabled(editor.activeLocale)) {
                   <div class="border rounded p-4 text-center">
                     <i class="ri-translate-2 fs-1 text-muted"></i>
 
@@ -373,7 +383,7 @@
                     <button
                       type="button"
                       class="btn btn-theme"
-                      (click)="addLanguage(activeLocale)"
+                      (click)="editor.addLanguage(editor.activeLocale)"
                     >
                       <i class="ri-add-line me-1"></i>
 
@@ -385,30 +395,35 @@
                   <!--==== TRANSLATION FORM ============================-->
                   <!--==================================================-->
 
-                  <div [formGroup]="translationForm(activeLocale)">
+                  <div
+                    [formGroup]="editor.translationForm(editor.activeLocale)"
+                  >
                     <div
                       class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"
                     >
                       <div>
                         <h6 class="mb-1">
                           {{
-                            activeLocale === 'id-ID'
+                            editor.activeLocale === 'id-ID'
                               ? ('website_page.language_indonesian' | translate)
                               : ('website_page.language_english' | translate)
                           }}
                         </h6>
 
                         <small class="text-muted">
-                          {{ activeLocale }}
+                          {{ editor.activeLocale }}
                         </small>
                       </div>
 
                       <div class="d-flex align-items-center gap-2">
-                        @if (!isDefaultLocale(activeLocale) && !isSystemPage) {
+                        @if (
+                          !editor.isDefaultLocale(editor.activeLocale) &&
+                          !editor.isSystemPage
+                        ) {
                           <button
                             type="button"
                             class="btn btn-light-danger"
-                            (click)="removeLanguage(activeLocale)"
+                            (click)="editor.removeLanguage(editor.activeLocale)"
                           >
                             <i class="ri-delete-bin-line me-1"></i>
 
@@ -436,19 +451,21 @@
                               | translate
                           "
                           [class.is-invalid]="
-                            translationForm(activeLocale).controls.title
-                              .touched &&
-                            translationForm(activeLocale).controls.title.invalid
+                            editor.translationForm(editor.activeLocale).controls
+                              .title.touched &&
+                            editor.translationForm(editor.activeLocale).controls
+                              .title.invalid
                           "
-                          (blur)="generateTranslationSlug(activeLocale)"
+                          (blur)="
+                            editor.generateTranslationSlug(editor.activeLocale)
+                          "
                         />
 
                         @if (
-                          translationForm(activeLocale).controls.title
-                            .touched &&
-                          translationForm(activeLocale).controls.title.errors?.[
-                            'required'
-                          ]
+                          editor.translationForm(editor.activeLocale).controls
+                            .title.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .title.errors?.['required']
                         ) {
                           <div class="text-danger form-error">
                             {{
@@ -459,11 +476,10 @@
                         }
 
                         @if (
-                          translationForm(activeLocale).controls.title
-                            .touched &&
-                          translationForm(activeLocale).controls.title.errors?.[
-                            'maxlength'
-                          ]
+                          editor.translationForm(editor.activeLocale).controls
+                            .title.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .title.errors?.['maxlength']
                         ) {
                           <div class="text-danger form-error">
                             {{
@@ -513,14 +529,18 @@
                             class="form-control"
                             formControlName="slug"
                             placeholder="tentang-kami"
-                            [readonly]="isSystemPage"
+                            [readonly]="editor.isSystemPage"
                             [class.is-invalid]="
-                              translationForm(activeLocale).controls.slug
-                                .touched &&
-                              translationForm(activeLocale).controls.slug
-                                .invalid
+                              editor.translationForm(editor.activeLocale)
+                                .controls.slug.touched &&
+                              editor.translationForm(editor.activeLocale)
+                                .controls.slug.invalid
                             "
-                            (blur)="normalizeTranslationSlug(activeLocale)"
+                            (blur)="
+                              editor.normalizeTranslationSlug(
+                                editor.activeLocale
+                              )
+                            "
                           />
                         </div>
 
@@ -529,10 +549,10 @@
                         </small>
 
                         @if (
-                          translationForm(activeLocale).controls.slug.touched &&
-                          translationForm(activeLocale).controls.slug.errors?.[
-                            'pattern'
-                          ]
+                          editor.translationForm(editor.activeLocale).controls
+                            .slug.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .slug.errors?.['pattern']
                         ) {
                           <div class="text-danger form-error">
                             {{
@@ -542,10 +562,10 @@
                         }
 
                         @if (
-                          translationForm(activeLocale).controls.slug.touched &&
-                          translationForm(activeLocale).controls.slug.errors?.[
-                            'maxlength'
-                          ]
+                          editor.translationForm(editor.activeLocale).controls
+                            .slug.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .slug.errors?.['maxlength']
                         ) {
                           <div class="text-danger form-error">
                             {{
@@ -556,7 +576,7 @@
                         }
                       </div>
 
-                      @if (isGadgetHomeTemplate) {
+                      @if (editor.isGadgetHomeTemplate) {
                         <div class="col-12">
                           <div class="cms-home-section-contract">
                             <div class="mb-3">
@@ -574,7 +594,7 @@
 
                             <div class="cms-home-section-grid">
                               @for (
-                                section of homeSectionOptions;
+                                section of editor.homeSectionOptions;
                                 track section.key
                               ) {
                                 <div class="cms-home-section-option">
@@ -597,9 +617,9 @@
                                         class="form-check-input"
                                         role="switch"
                                         [(ngModel)]="
-                                          homeSectionVisibility[activeLocale][
-                                            section.key
-                                          ]
+                                          editor.homeSectionVisibility[
+                                            editor.activeLocale
+                                          ][section.key]
                                         "
                                         [ngModelOptions]="{ standalone: true }"
                                       />
@@ -628,8 +648,9 @@
                                             class="form-control"
                                             maxlength="80"
                                             [(ngModel)]="
-                                              homeLatexContent[activeLocale]
-                                                .eyebrow
+                                              editor.homeLatexContent[
+                                                editor.activeLocale
+                                              ].eyebrow
                                             "
                                             [ngModelOptions]="{
                                               standalone: true,
@@ -646,8 +667,9 @@
                                             class="form-control"
                                             maxlength="180"
                                             [(ngModel)]="
-                                              homeLatexContent[activeLocale]
-                                                .title
+                                              editor.homeLatexContent[
+                                                editor.activeLocale
+                                              ].title
                                             "
                                             [ngModelOptions]="{
                                               standalone: true,
@@ -662,24 +684,25 @@
                                             }}</label>
                                             <app-ai-field-action
                                               [label]="
-                                                activeLocale === 'en-US'
+                                                editor.activeLocale === 'en-US'
                                                   ? 'Translate from Indonesian'
                                                   : 'Isi ini otomatis'
                                               "
                                               [icon]="
-                                                activeLocale === 'en-US'
+                                                editor.activeLocale === 'en-US'
                                                   ? 'ri-translate-2'
                                                   : 'ri-edit-2-line'
                                               "
                                               [loading]="
-                                                assistingOrganizerField ===
+                                                editor.assistingOrganizerField ===
                                                 'latex-0'
                                               "
                                               [disabled]="
-                                                assistingOrganizerField !== null
+                                                editor.assistingOrganizerField !==
+                                                null
                                               "
                                               (requested)="
-                                                assistOrganizerDescription(
+                                                editor.assistOrganizerDescription(
                                                   'latex'
                                                 )
                                               "
@@ -690,8 +713,9 @@
                                             rows="3"
                                             maxlength="700"
                                             [(ngModel)]="
-                                              homeLatexContent[activeLocale]
-                                                .description
+                                              editor.homeLatexContent[
+                                                editor.activeLocale
+                                              ].description
                                             "
                                             [ngModelOptions]="{
                                               standalone: true,
@@ -702,8 +726,8 @@
 
                                       <div class="cms-home-feature-grid mt-3">
                                         @for (
-                                          feature of homeLatexContent[
-                                            activeLocale
+                                          feature of editor.homeLatexContent[
+                                            editor.activeLocale
                                           ].items;
                                           track $index;
                                           let featureIndex = $index
@@ -726,8 +750,8 @@
                                                 (featureIndex + 1)
                                               "
                                               (input)="
-                                                updateHomeLatexItem(
-                                                  activeLocale,
+                                                editor.updateHomeLatexItem(
+                                                  editor.activeLocale,
                                                   featureIndex,
                                                   'title',
                                                   $any($event.target).value
@@ -737,25 +761,27 @@
                                             <div class="cms-feature-action">
                                               <app-ai-field-action
                                                 [label]="
-                                                  activeLocale === 'en-US'
+                                                  editor.activeLocale ===
+                                                  'en-US'
                                                     ? 'Translate description'
                                                     : 'Isi deskripsi otomatis'
                                                 "
                                                 [icon]="
-                                                  activeLocale === 'en-US'
+                                                  editor.activeLocale ===
+                                                  'en-US'
                                                     ? 'ri-translate-2'
                                                     : 'ri-edit-2-line'
                                                 "
                                                 [loading]="
-                                                  assistingOrganizerField ===
+                                                  editor.assistingOrganizerField ===
                                                   'latex_item-' + featureIndex
                                                 "
                                                 [disabled]="
-                                                  assistingOrganizerField !==
+                                                  editor.assistingOrganizerField !==
                                                   null
                                                 "
                                                 (requested)="
-                                                  assistOrganizerDescription(
+                                                  editor.assistOrganizerDescription(
                                                     'latex_item',
                                                     featureIndex
                                                   )
@@ -774,8 +800,8 @@
                                                 (featureIndex + 1)
                                               "
                                               (input)="
-                                                updateHomeLatexItem(
-                                                  activeLocale,
+                                                editor.updateHomeLatexItem(
+                                                  editor.activeLocale,
                                                   featureIndex,
                                                   'description',
                                                   $any($event.target).value
@@ -801,8 +827,8 @@
                                             class="form-control"
                                             maxlength="80"
                                             [(ngModel)]="
-                                              homeAdvertisementContent[
-                                                activeLocale
+                                              editor.homeAdvertisementContent[
+                                                editor.activeLocale
                                               ].label
                                             "
                                             [ngModelOptions]="{
@@ -820,8 +846,8 @@
                                             class="form-control"
                                             maxlength="180"
                                             [(ngModel)]="
-                                              homeAdvertisementContent[
-                                                activeLocale
+                                              editor.homeAdvertisementContent[
+                                                editor.activeLocale
                                               ].title
                                             "
                                             [ngModelOptions]="{
@@ -837,24 +863,25 @@
                                             }}</label>
                                             <app-ai-field-action
                                               [label]="
-                                                activeLocale === 'en-US'
+                                                editor.activeLocale === 'en-US'
                                                   ? 'Translate from Indonesian'
                                                   : 'Isi ini otomatis'
                                               "
                                               [icon]="
-                                                activeLocale === 'en-US'
+                                                editor.activeLocale === 'en-US'
                                                   ? 'ri-translate-2'
                                                   : 'ri-edit-2-line'
                                               "
                                               [loading]="
-                                                assistingOrganizerField ===
+                                                editor.assistingOrganizerField ===
                                                 'advertisement-0'
                                               "
                                               [disabled]="
-                                                assistingOrganizerField !== null
+                                                editor.assistingOrganizerField !==
+                                                null
                                               "
                                               (requested)="
-                                                assistOrganizerDescription(
+                                                editor.assistOrganizerDescription(
                                                   'advertisement'
                                                 )
                                               "
@@ -865,8 +892,8 @@
                                             rows="3"
                                             maxlength="700"
                                             [(ngModel)]="
-                                              homeAdvertisementContent[
-                                                activeLocale
+                                              editor.homeAdvertisementContent[
+                                                editor.activeLocale
                                               ].description
                                             "
                                             [ngModelOptions]="{
@@ -884,8 +911,8 @@
                                             class="form-control"
                                             maxlength="80"
                                             [(ngModel)]="
-                                              homeAdvertisementContent[
-                                                activeLocale
+                                              editor.homeAdvertisementContent[
+                                                editor.activeLocale
                                               ].cta_label
                                             "
                                             [ngModelOptions]="{
@@ -903,8 +930,8 @@
                                             class="form-control"
                                             maxlength="500"
                                             [(ngModel)]="
-                                              homeAdvertisementContent[
-                                                activeLocale
+                                              editor.homeAdvertisementContent[
+                                                editor.activeLocale
                                               ].cta_url
                                             "
                                             [ngModelOptions]="{
@@ -938,18 +965,18 @@
                           </label>
                           <app-ai-field-action
                             [label]="
-                              activeLocale === 'en-US'
+                              editor.activeLocale === 'en-US'
                                 ? 'Translate from Indonesian'
                                 : 'Isi ini otomatis'
                             "
                             [icon]="
-                              activeLocale === 'en-US'
+                              editor.activeLocale === 'en-US'
                                 ? 'ri-translate-2'
                                 : 'ri-edit-2-line'
                             "
-                            [loading]="assistingPageField === 'excerpt'"
-                            [disabled]="assistingPageField !== null"
-                            (requested)="assistPageField('excerpt')"
+                            [loading]="editor.assistingPageField === 'excerpt'"
+                            [disabled]="editor.assistingPageField !== null"
+                            (requested)="editor.assistPageField('excerpt')"
                           />
                         </div>
 
@@ -964,7 +991,7 @@
 
                         <small class="text-muted d-block mt-1">
                           {{
-                            (isGadgetHomeTemplate
+                            (editor.isGadgetHomeTemplate
                               ? 'website_page.home_summary_help'
                               : 'website_page.excerpt_help'
                             ) | translate
@@ -972,7 +999,7 @@
                         </small>
                       </div>
 
-                      @if (isAboutTemplate) {
+                      @if (editor.isAboutTemplate) {
                         <div class="col-12">
                           <div class="border rounded p-3">
                             <h6 class="mb-1">
@@ -984,7 +1011,9 @@
 
                             <div class="row g-3">
                               @for (
-                                feature of aboutFeatures[activeLocale];
+                                feature of editor.aboutFeatures[
+                                  editor.activeLocale
+                                ];
                                 track $index;
                                 let featureIndex = $index
                               ) {
@@ -998,16 +1027,16 @@
                                       type="text"
                                       class="form-control mb-3"
                                       [class.is-invalid]="
-                                        aboutHighlightIssue(
-                                          activeLocale,
+                                        editor.aboutHighlightIssue(
+                                          editor.activeLocale,
                                           featureIndex
                                         )
                                       "
                                       maxlength="160"
                                       [value]="feature.title"
                                       (input)="
-                                        updateAboutFeature(
-                                          activeLocale,
+                                        editor.updateAboutFeature(
+                                          editor.activeLocale,
                                           featureIndex,
                                           'title',
                                           $any($event.target).value
@@ -1024,24 +1053,25 @@
                                       </label>
                                       <app-ai-field-action
                                         [label]="
-                                          activeLocale === 'en-US'
+                                          editor.activeLocale === 'en-US'
                                             ? 'Translate description'
                                             : 'Isi deskripsi otomatis'
                                         "
                                         [icon]="
-                                          activeLocale === 'en-US'
+                                          editor.activeLocale === 'en-US'
                                             ? 'ri-translate-2'
                                             : 'ri-edit-2-line'
                                         "
                                         [loading]="
-                                          assistingOrganizerField ===
+                                          editor.assistingOrganizerField ===
                                           'about_item-' + featureIndex
                                         "
                                         [disabled]="
-                                          assistingOrganizerField !== null
+                                          editor.assistingOrganizerField !==
+                                          null
                                         "
                                         (requested)="
-                                          assistOrganizerDescription(
+                                          editor.assistOrganizerDescription(
                                             'about_item',
                                             featureIndex
                                           )
@@ -1051,8 +1081,8 @@
                                     <textarea
                                       class="form-control"
                                       [class.is-invalid]="
-                                        aboutHighlightIssue(
-                                          activeLocale,
+                                        editor.aboutHighlightIssue(
+                                          editor.activeLocale,
                                           featureIndex
                                         )
                                       "
@@ -1060,8 +1090,8 @@
                                       rows="4"
                                       [value]="feature.description"
                                       (input)="
-                                        updateAboutFeature(
-                                          activeLocale,
+                                        editor.updateAboutFeature(
+                                          editor.activeLocale,
                                           featureIndex,
                                           'description',
                                           $any($event.target).value
@@ -1070,8 +1100,8 @@
                                     ></textarea>
 
                                     @if (
-                                      aboutHighlightIssue(
-                                        activeLocale,
+                                      editor.aboutHighlightIssue(
+                                        editor.activeLocale,
                                         featureIndex
                                       );
                                       as issue
@@ -1090,13 +1120,15 @@
 
                       <!-- CONTENT -->
 
-                      @if (isOperationalDataPage) {
+                      @if (editor.isOperationalDataPage) {
                         <div class="col-12">
                           <div class="alert alert-info mb-0" role="note">
-                            {{ operationalDataHelpKey | translate }}
+                            {{ editor.operationalDataHelpKey | translate }}
                           </div>
                         </div>
-                      } @else if (!isAboutTemplate && !isGadgetHomeTemplate) {
+                      } @else if (
+                        !editor.isAboutTemplate && !editor.isGadgetHomeTemplate
+                      ) {
                         <div class="col-12">
                           <div class="cms-field-heading">
                             <label class="form-label">
@@ -1104,31 +1136,33 @@
                             </label>
                             <app-ai-field-action
                               [label]="
-                                activeLocale === 'en-US'
+                                editor.activeLocale === 'en-US'
                                   ? 'Translate from Indonesian'
                                   : 'Isi ini otomatis'
                               "
                               [icon]="
-                                activeLocale === 'en-US'
+                                editor.activeLocale === 'en-US'
                                   ? 'ri-translate-2'
                                   : 'ri-edit-2-line'
                               "
-                              [loading]="assistingPageField === 'content'"
-                              [disabled]="assistingPageField !== null"
-                              (requested)="assistPageField('content')"
+                              [loading]="
+                                editor.assistingPageField === 'content'
+                              "
+                              [disabled]="editor.assistingPageField !== null"
+                              (requested)="editor.assistPageField('content')"
                             />
                           </div>
 
-                          @if (contentEditor(); as editor) {
+                          @if (editor.contentEditor(); as richEditor) {
                             <div class="cms-rich-editor">
                               <div class="NgxEditor__Wrapper">
                                 <ngx-editor-menu
-                                  [editor]="editor"
-                                  [toolbar]="contentEditorToolbar"
+                                  [editor]="richEditor"
+                                  [toolbar]="editor.contentEditorToolbar"
                                 ></ngx-editor-menu>
 
                                 <ngx-editor
-                                  [editor]="editor"
+                                  [editor]="richEditor"
                                   formControlName="content"
                                   [placeholder]="
                                     'website_page.content_placeholder'
@@ -1161,7 +1195,7 @@
                       <button
                         type="button"
                         class="btn btn-light-bg"
-                        (click)="activeTab = 'general'"
+                        (click)="editor.activeTab = 'general'"
                       >
                         <i class="ri-arrow-left-line me-1"></i>
 
@@ -1171,7 +1205,7 @@
                       <button
                         type="button"
                         class="btn btn-theme"
-                        (click)="goToSeo()"
+                        (click)="editor.goToSeo()"
                       >
                         {{ 'website_page.next_seo' | translate }}
 
@@ -1208,14 +1242,21 @@
                 <!-- LANGUAGE -->
 
                 <div class="d-flex flex-wrap gap-2 mb-4">
-                  @for (language of supportedLanguages; track language.locale) {
-                    @if (isLanguageEnabled(language.locale)) {
+                  @for (
+                    language of editor.supportedLanguages;
+                    track language.locale
+                  ) {
+                    @if (editor.isLanguageEnabled(language.locale)) {
                       <button
                         type="button"
                         class="btn d-flex align-items-center gap-2"
-                        [class.btn-theme]="activeLocale === language.locale"
-                        [class.btn-light-bg]="activeLocale !== language.locale"
-                        (click)="selectLanguage(language.locale)"
+                        [class.btn-theme]="
+                          editor.activeLocale === language.locale
+                        "
+                        [class.btn-light-bg]="
+                          editor.activeLocale !== language.locale
+                        "
+                        (click)="editor.selectLanguage(language.locale)"
                       >
                         <span class="fw-semibold">
                           {{ language.shortLabel }}
@@ -1225,7 +1266,7 @@
                           {{ language.labelKey | translate }}
                         </span>
 
-                        @if (isDefaultLocale(language.locale)) {
+                        @if (editor.isDefaultLocale(language.locale)) {
                           <span class="badge bg-primary">
                             {{
                               'website_page.default_language_badge' | translate
@@ -1237,7 +1278,7 @@
                   }
                 </div>
 
-                <div [formGroup]="translationForm(activeLocale)">
+                <div [formGroup]="editor.translationForm(editor.activeLocale)">
                   <!-- SEARCH PREVIEW -->
 
                   <div class="border rounded p-3 mb-4">
@@ -1246,15 +1287,15 @@
                     </small>
 
                     <div class="text-primary fw-semibold fs-5">
-                      {{ seoPreviewTitle() }}
+                      {{ editor.seoPreviewTitle() }}
                     </div>
 
                     <div class="text-success small mb-1">
-                      {{ seoPreviewSlug() }}
+                      {{ editor.seoPreviewSlug() }}
                     </div>
 
                     <div class="text-muted">
-                      {{ seoPreviewDescription() }}
+                      {{ editor.seoPreviewDescription() }}
                     </div>
                   </div>
 
@@ -1274,10 +1315,10 @@
                           'website_page.meta_title_placeholder' | translate
                         "
                         [class.is-invalid]="
-                          translationForm(activeLocale).controls.meta_title
-                            .touched &&
-                          translationForm(activeLocale).controls.meta_title
-                            .invalid
+                          editor.translationForm(editor.activeLocale).controls
+                            .meta_title.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .meta_title.invalid
                         "
                       />
 
@@ -1288,8 +1329,8 @@
 
                         <small class="text-muted">
                           {{
-                            translationForm(activeLocale).controls.meta_title
-                              .value.length
+                            editor.translationForm(editor.activeLocale).controls
+                              .meta_title.value.length
                           }}/255
                         </small>
                       </div>
@@ -1304,18 +1345,22 @@
                         </label>
                         <app-ai-field-action
                           [label]="
-                            activeLocale === 'en-US'
+                            editor.activeLocale === 'en-US'
                               ? 'Translate from Indonesian'
                               : 'Isi ini otomatis'
                           "
                           [icon]="
-                            activeLocale === 'en-US'
+                            editor.activeLocale === 'en-US'
                               ? 'ri-translate-2'
                               : 'ri-edit-2-line'
                           "
-                          [loading]="assistingPageField === 'meta_description'"
-                          [disabled]="assistingPageField !== null"
-                          (requested)="assistPageField('meta_description')"
+                          [loading]="
+                            editor.assistingPageField === 'meta_description'
+                          "
+                          [disabled]="editor.assistingPageField !== null"
+                          (requested)="
+                            editor.assistPageField('meta_description')
+                          "
                         />
                       </div>
 
@@ -1328,9 +1373,9 @@
                             | translate
                         "
                         [class.is-invalid]="
-                          translationForm(activeLocale).controls
+                          editor.translationForm(editor.activeLocale).controls
                             .meta_description.touched &&
-                          translationForm(activeLocale).controls
+                          editor.translationForm(editor.activeLocale).controls
                             .meta_description.invalid
                         "
                       ></textarea>
@@ -1342,7 +1387,7 @@
 
                         <small class="text-muted">
                           {{
-                            translationForm(activeLocale).controls
+                            editor.translationForm(editor.activeLocale).controls
                               .meta_description.value.length
                           }}/500
                         </small>
@@ -1362,10 +1407,10 @@
                         formControlName="canonical_url"
                         placeholder="https://matex.co.id/tentang-kami"
                         [class.is-invalid]="
-                          translationForm(activeLocale).controls.canonical_url
-                            .touched &&
-                          translationForm(activeLocale).controls.canonical_url
-                            .invalid
+                          editor.translationForm(editor.activeLocale).controls
+                            .canonical_url.touched &&
+                          editor.translationForm(editor.activeLocale).controls
+                            .canonical_url.invalid
                         "
                       />
 
@@ -1374,10 +1419,10 @@
                       </small>
 
                       @if (
-                        translationForm(activeLocale).controls.canonical_url
-                          .touched &&
-                        translationForm(activeLocale).controls.canonical_url
-                          .errors?.['pattern']
+                        editor.translationForm(editor.activeLocale).controls
+                          .canonical_url.touched &&
+                        editor.translationForm(editor.activeLocale).controls
+                          .canonical_url.errors?.['pattern']
                       ) {
                         <div class="text-danger form-error">
                           {{
@@ -1468,20 +1513,22 @@
                               </label>
                               <app-ai-field-action
                                 [label]="
-                                  activeLocale === 'en-US'
+                                  editor.activeLocale === 'en-US'
                                     ? 'Translate from Indonesian'
                                     : 'Isi ini otomatis'
                                 "
                                 [icon]="
-                                  activeLocale === 'en-US'
+                                  editor.activeLocale === 'en-US'
                                     ? 'ri-translate-2'
                                     : 'ri-edit-2-line'
                                 "
                                 [loading]="
-                                  assistingPageField === 'og_description'
+                                  editor.assistingPageField === 'og_description'
                                 "
-                                [disabled]="assistingPageField !== null"
-                                (requested)="assistPageField('og_description')"
+                                [disabled]="editor.assistingPageField !== null"
+                                (requested)="
+                                  editor.assistPageField('og_description')
+                                "
                               />
                             </div>
 
@@ -1502,7 +1549,7 @@
                     <button
                       type="button"
                       class="btn btn-light-bg"
-                      (click)="activeTab = 'content'"
+                      (click)="editor.activeTab = 'content'"
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
@@ -1512,7 +1559,7 @@
                     <button
                       type="button"
                       class="btn btn-theme"
-                      (click)="goToMedia()"
+                      (click)="editor.goToMedia()"
                     >
                       {{ 'website_page.next_media' | translate }}
 
@@ -1526,7 +1573,7 @@
 
           <!-- MEDIA -->
 
-          @if (canViewAttachments) {
+          @if (editor.canViewAttachments) {
             <li [ngbNavItem]="'media'">
               <button ngbNavLink type="button">
                 <i class="ri-image-line"></i>
@@ -1553,11 +1600,11 @@
                       </p>
                     </div>
 
-                    @if (!isGadgetHomeTemplate) {
+                    @if (!editor.isGadgetHomeTemplate) {
                       <button
                         type="button"
                         class="btn btn-theme"
-                        (click)="openMedia()"
+                        (click)="editor.openMedia()"
                       >
                         <i class="ri-image-add-line me-1"></i>
 
@@ -1566,7 +1613,7 @@
                     }
                   </div>
 
-                  @if (isGadgetHomeTemplate) {
+                  @if (editor.isGadgetHomeTemplate) {
                     <div class="cms-home-media-contract mb-4">
                       <div class="d-flex align-items-start gap-2 mb-3">
                         <i class="ri-layout-grid-line fs-5 text-theme"></i>
@@ -1581,35 +1628,38 @@
                       </div>
 
                       <div class="cms-home-media-rule-grid">
-                        @for (rule of gadgetHomeMediaRules; track rule.value) {
+                        @for (
+                          rule of editor.gadgetHomeMediaRules;
+                          track rule.value
+                        ) {
                           <div
                             class="cms-home-media-rule"
                             [class.is-assigned]="
-                              gadgetHomeMediaAssigned(rule.value)
+                              editor.gadgetHomeMediaAssigned(rule.value)
                             "
                           >
                             <div class="cms-home-media-rule-header">
                               <div>
                                 <strong>{{ rule.label }}</strong>
                                 <span>
-                                  {{ gadgetHomeMediaRequirement(rule) }}
+                                  {{ editor.gadgetHomeMediaRequirement(rule) }}
                                 </span>
                               </div>
 
                               <span
                                 class="badge"
                                 [class.bg-success]="
-                                  gadgetHomeMediaAssigned(rule.value)
+                                  editor.gadgetHomeMediaAssigned(rule.value)
                                 "
                                 [class.bg-light]="
-                                  !gadgetHomeMediaAssigned(rule.value)
+                                  !editor.gadgetHomeMediaAssigned(rule.value)
                                 "
                                 [class.text-dark]="
-                                  !gadgetHomeMediaAssigned(rule.value)
+                                  !editor.gadgetHomeMediaAssigned(rule.value)
                                 "
                               >
                                 {{
-                                  gadgetHomeMediaAssigned(rule.value)
+                                  editor.gadgetHomeMediaAssigned(rule.value)
                                     ? ('website_page.home_media_assigned'
                                       | translate)
                                     : ('website_page.home_media_empty'
@@ -1619,7 +1669,7 @@
                             </div>
 
                             @if (
-                              gadgetHomeMediaForRole(rule.value);
+                              editor.gadgetHomeMediaForRole(rule.value);
                               as assignedMedia
                             ) {
                               <div class="cms-home-media-rule-preview">
@@ -1652,11 +1702,11 @@
                             <button
                               type="button"
                               class="btn btn-sm btn-outline-theme align-self-start"
-                              (click)="openHomeMedia(rule)"
+                              (click)="editor.openHomeMedia(rule)"
                             >
                               <i class="ri-image-line me-1"></i>
                               {{
-                                (gadgetHomeMediaAssigned(rule.value)
+                                (editor.gadgetHomeMediaAssigned(rule.value)
                                   ? 'website_page.home_media_replace'
                                   : 'website_page.home_media_choose'
                                 ) | translate
@@ -1667,7 +1717,9 @@
 
                         <div
                           class="cms-home-media-rule"
-                          [class.is-assigned]="gadgetHomeMediaAssigned('og')"
+                          [class.is-assigned]="
+                            editor.gadgetHomeMediaAssigned('og')
+                          "
                         >
                           <div class="cms-home-media-rule-header">
                             <div>
@@ -1686,12 +1738,18 @@
 
                             <span
                               class="badge"
-                              [class.bg-success]="gadgetHomeMediaAssigned('og')"
-                              [class.bg-light]="!gadgetHomeMediaAssigned('og')"
-                              [class.text-dark]="!gadgetHomeMediaAssigned('og')"
+                              [class.bg-success]="
+                                editor.gadgetHomeMediaAssigned('og')
+                              "
+                              [class.bg-light]="
+                                !editor.gadgetHomeMediaAssigned('og')
+                              "
+                              [class.text-dark]="
+                                !editor.gadgetHomeMediaAssigned('og')
+                              "
                             >
                               {{
-                                gadgetHomeMediaAssigned('og')
+                                editor.gadgetHomeMediaAssigned('og')
                                   ? ('website_page.home_media_assigned'
                                     | translate)
                                   : ('website_page.home_media_empty'
@@ -1700,7 +1758,10 @@
                             </span>
                           </div>
 
-                          @if (gadgetHomeMediaForRole('og'); as assignedMedia) {
+                          @if (
+                            editor.gadgetHomeMediaForRole('og');
+                            as assignedMedia
+                          ) {
                             <div class="cms-home-media-rule-preview">
                               <img
                                 [src]="assignedMedia.attachment.asset_url"
@@ -1730,11 +1791,11 @@
                           <button
                             type="button"
                             class="btn btn-sm btn-outline-theme align-self-start"
-                            (click)="openHomeOgMedia()"
+                            (click)="editor.openHomeOgMedia()"
                           >
                             <i class="ri-image-line me-1"></i>
                             {{
-                              (gadgetHomeMediaAssigned('og')
+                              (editor.gadgetHomeMediaAssigned('og')
                                 ? 'website_page.home_media_replace'
                                 : 'website_page.home_media_choose'
                               ) | translate
@@ -1743,27 +1804,27 @@
                         </div>
                       </div>
 
-                      @if (gadgetHomeMissingMediaRules.length) {
+                      @if (editor.gadgetHomeMissingMediaRules.length) {
                         <div
                           class="alert mb-0 mt-3"
                           [class.alert-danger]="
-                            mediaValidationAttempted &&
-                            gadgetHomeRequiresCompleteMedia
+                            editor.mediaValidationAttempted &&
+                            editor.gadgetHomeRequiresCompleteMedia
                           "
                           [class.alert-warning]="
-                            !mediaValidationAttempted ||
-                            !gadgetHomeRequiresCompleteMedia
+                            !editor.mediaValidationAttempted ||
+                            !editor.gadgetHomeRequiresCompleteMedia
                           "
                         >
                           <strong>Slot yang belum diisi:</strong>
                           @for (
-                            rule of gadgetHomeMissingMediaRules;
+                            rule of editor.gadgetHomeMissingMediaRules;
                             track rule.value;
                             let last = $last
                           ) {
                             {{ rule.label }}{{ last ? '' : ', ' }}
                           }
-                          @if (!gadgetHomeRequiresCompleteMedia) {
+                          @if (!editor.gadgetHomeRequiresCompleteMedia) {
                             <span>
                               — boleh disimpan sebagai draft, tetapi harus
                               lengkap sebelum dipublikasikan.
@@ -1774,14 +1835,16 @@
                     </div>
                   }
 
-                  @if (isAboutTemplate) {
+                  @if (editor.isAboutTemplate) {
                     <div
                       class="alert mb-4"
                       [class.alert-danger]="
-                        mediaValidationAttempted && aboutMediaBlocksSave
+                        editor.mediaValidationAttempted &&
+                        editor.aboutMediaBlocksSave
                       "
                       [class.alert-info]="
-                        !mediaValidationAttempted || !aboutMediaBlocksSave
+                        !editor.mediaValidationAttempted ||
+                        !editor.aboutMediaBlocksSave
                       "
                       role="note"
                     >
@@ -1791,11 +1854,14 @@
                       <div>
                         {{ 'website_page.about_media_requirement' | translate }}
                       </div>
-                      @if (aboutRequiresCompleteMedia && !aboutContentMedia) {
+                      @if (
+                        editor.aboutRequiresCompleteMedia &&
+                        !editor.aboutContentMedia
+                      ) {
                         <div class="mt-1">
                           {{ 'website_page.about_media_missing' | translate }}
                         </div>
-                      } @else if (aboutContentMediaFileInvalid) {
+                      } @else if (editor.aboutContentMediaFileInvalid) {
                         <div class="mt-1">
                           {{
                             'website_page.about_media_format_invalid'
@@ -1806,7 +1872,7 @@
                     </div>
                   }
 
-                  @if (pageMedia.length) {
+                  @if (editor.pageMedia.length) {
                     <!--==================================================-->
                     <!--==== LANGUAGE =====================================-->
                     <!--==================================================-->
@@ -1818,20 +1884,20 @@
 
                       <div class="d-flex flex-wrap gap-2">
                         @for (
-                          language of supportedLanguages;
+                          language of editor.supportedLanguages;
                           track language.locale
                         ) {
-                          @if (isLanguageEnabled(language.locale)) {
+                          @if (editor.isLanguageEnabled(language.locale)) {
                             <button
                               type="button"
                               class="btn d-flex align-items-center gap-2"
                               [class.btn-theme]="
-                                activeLocale === language.locale
+                                editor.activeLocale === language.locale
                               "
                               [class.btn-light-bg]="
-                                activeLocale !== language.locale
+                                editor.activeLocale !== language.locale
                               "
-                              (click)="selectLanguage(language.locale)"
+                              (click)="editor.selectLanguage(language.locale)"
                             >
                               <span class="fw-semibold">
                                 {{ language.shortLabel }}
@@ -1841,7 +1907,7 @@
                                 {{ language.labelKey | translate }}
                               </span>
 
-                              @if (isDefaultLocale(language.locale)) {
+                              @if (editor.isDefaultLocale(language.locale)) {
                                 <span class="badge bg-primary">
                                   {{
                                     'website_page.default_language_badge'
@@ -1861,7 +1927,7 @@
 
                     <div class="website-page-media-list">
                       @for (
-                        media of pageMedia;
+                        media of editor.pageMedia;
                         track media.attachment.id_attachment;
                         let index = $index
                       ) {
@@ -1870,8 +1936,8 @@
                             <img
                               [src]="media.attachment.asset_url"
                               [alt]="
-                                media.translations[activeLocale].alt_text ||
-                                media.attachment.original_name
+                                media.translations[editor.activeLocale]
+                                  .alt_text || media.attachment.original_name
                               "
                             />
 
@@ -1879,7 +1945,7 @@
                               <span
                                 class="badge bg-warning website-page-media-badge"
                               >
-                                {{ mediaRoleLabel(media.role) }}
+                                {{ editor.mediaRoleLabel(media.role) }}
                               </span>
                             }
                           </div>
@@ -1903,18 +1969,28 @@
                                   }}
                                 </div>
 
-                                @if (gadgetHomeMediaRule(media.role); as rule) {
+                                @if (
+                                  editor.gadgetHomeMediaRule(media.role);
+                                  as rule
+                                ) {
                                   <div class="text-muted small mt-1">
-                                    {{ gadgetHomeMediaRequirement(rule) }}
+                                    {{
+                                      editor.gadgetHomeMediaRequirement(rule)
+                                    }}
                                   </div>
                                 }
 
-                                @if (gadgetHomeMediaIssue(media); as issue) {
+                                @if (
+                                  editor.gadgetHomeMediaIssue(media);
+                                  as issue
+                                ) {
                                   <div class="text-danger small mt-1">
                                     <i class="ri-error-warning-line me-1"></i>
                                     {{ issue }}
                                   </div>
-                                } @else if (gadgetHomeMediaRule(media.role)) {
+                                } @else if (
+                                  editor.gadgetHomeMediaRule(media.role)
+                                ) {
                                   <div class="text-success small mt-1">
                                     <i class="ri-checkbox-circle-line me-1"></i>
                                     Ukuran dan rasio sesuai slot.
@@ -1928,7 +2004,7 @@
                                 [title]="
                                   'website_page.remove_media' | translate
                                 "
-                                (click)="removeMedia(index)"
+                                (click)="editor.removeMedia(index)"
                               >
                                 <i class="ri-delete-bin-line"></i>
                               </button>
@@ -1944,16 +2020,17 @@
                                   type="text"
                                   class="form-control"
                                   [value]="
-                                    media.translations[activeLocale].caption
+                                    media.translations[editor.activeLocale]
+                                      .caption
                                   "
                                   [placeholder]="
                                     'website_page.media_caption_placeholder'
                                       | translate
                                   "
                                   (input)="
-                                    updateMediaTranslation(
+                                    editor.updateMediaTranslation(
                                       index,
-                                      activeLocale,
+                                      editor.activeLocale,
                                       'caption',
                                       $any($event.target).value
                                     )
@@ -1973,21 +2050,24 @@
                                   class="form-control"
                                   [class.is-invalid]="
                                     media.role === 'about_content' &&
-                                    mediaValidationAttempted &&
-                                    aboutRequiresCompleteMedia &&
-                                    aboutContentMediaAltMissing(activeLocale)
+                                    editor.mediaValidationAttempted &&
+                                    editor.aboutRequiresCompleteMedia &&
+                                    editor.aboutContentMediaAltMissing(
+                                      editor.activeLocale
+                                    )
                                   "
                                   [value]="
-                                    media.translations[activeLocale].alt_text
+                                    media.translations[editor.activeLocale]
+                                      .alt_text
                                   "
                                   [placeholder]="
                                     'website_page.media_alt_text_placeholder'
                                       | translate
                                   "
                                   (input)="
-                                    updateMediaTranslation(
+                                    editor.updateMediaTranslation(
                                       index,
-                                      activeLocale,
+                                      editor.activeLocale,
                                       'alt_text',
                                       $any($event.target).value
                                     )
@@ -2003,9 +2083,11 @@
 
                                 @if (
                                   media.role === 'about_content' &&
-                                  mediaValidationAttempted &&
-                                  aboutRequiresCompleteMedia &&
-                                  aboutContentMediaAltMissing(activeLocale)
+                                  editor.mediaValidationAttempted &&
+                                  editor.aboutRequiresCompleteMedia &&
+                                  editor.aboutContentMediaAltMissing(
+                                    editor.activeLocale
+                                  )
                                 ) {
                                   <div class="invalid-feedback d-block">
                                     {{
@@ -2020,7 +2102,7 @@
                             <div
                               class="d-flex flex-wrap align-items-center gap-3 mt-3"
                             >
-                              @if (isGadgetHomeTemplate) {
+                              @if (editor.isGadgetHomeTemplate) {
                                 <div class="cms-home-fixed-slot">
                                   <span class="text-muted small">
                                     {{
@@ -2028,10 +2110,10 @@
                                     }}
                                   </span>
                                   <strong>{{
-                                    mediaRoleLabel(media.role)
+                                    editor.mediaRoleLabel(media.role)
                                   }}</strong>
                                 </div>
-                              } @else if (isAboutTemplate) {
+                              } @else if (editor.isAboutTemplate) {
                                 <div class="d-flex align-items-center gap-2">
                                   <label class="small text-muted mb-0"
                                     >Slot desain</label
@@ -2040,14 +2122,14 @@
                                     class="form-select form-select-sm"
                                     [value]="media.role"
                                     (change)="
-                                      updateMediaRole(
+                                      editor.updateMediaRole(
                                         index,
                                         $any($event.target).value
                                       )
                                     "
                                   >
                                     @for (
-                                      option of mediaRoleOptions;
+                                      option of editor.mediaRoleOptions;
                                       track option.value
                                     ) {
                                       <option [value]="option.value">
@@ -2061,7 +2143,7 @@
                                   type="button"
                                   class="btn btn-sm btn-outline-theme"
                                   [disabled]="media.role === 'hero'"
-                                  (click)="setHero(index)"
+                                  (click)="editor.setHero(index)"
                                 >
                                   <i class="ri-image-line me-1"></i>
 
@@ -2075,7 +2157,7 @@
                                     type="checkbox"
                                     [checked]="media.is_public"
                                     (change)="
-                                      updateMediaPublic(
+                                      editor.updateMediaPublic(
                                         index,
                                         $any($event.target).checked
                                       )
@@ -2091,16 +2173,16 @@
                               </div>
 
                               @if (
-                                !isGadgetHomeTemplate &&
+                                !editor.isGadgetHomeTemplate &&
                                 media.role === 'gallery' &&
-                                pageMedia.length > 1
+                                editor.pageMedia.length > 1
                               ) {
                                 <div class="ms-auto d-flex gap-2">
                                   <button
                                     type="button"
                                     class="btn btn-sm btn-light-bg"
                                     [disabled]="index === 0"
-                                    (click)="moveMedia(index, -1)"
+                                    (click)="editor.moveMedia(index, -1)"
                                   >
                                     <i class="ri-arrow-up-line"></i>
                                   </button>
@@ -2108,8 +2190,10 @@
                                   <button
                                     type="button"
                                     class="btn btn-sm btn-light-bg"
-                                    [disabled]="index === pageMedia.length - 1"
-                                    (click)="moveMedia(index, 1)"
+                                    [disabled]="
+                                      index === editor.pageMedia.length - 1
+                                    "
+                                    (click)="editor.moveMedia(index, 1)"
                                   >
                                     <i class="ri-arrow-down-line"></i>
                                   </button>
@@ -2117,7 +2201,7 @@
                               }
                             </div>
 
-                            @if (isGadgetHomeTemplate) {
+                            @if (editor.isGadgetHomeTemplate) {
                               <div class="row g-3 mt-1">
                                 <div class="col-md-4">
                                   <label class="form-label">
@@ -2127,7 +2211,7 @@
                                     class="form-select"
                                     [value]="media.action_type"
                                     (change)="
-                                      updateMediaActionType(
+                                      editor.updateMediaActionType(
                                         index,
                                         $any($event.target).value
                                       )
@@ -2161,7 +2245,7 @@
                                     type="text"
                                     class="form-control"
                                     [class.is-invalid]="
-                                      gadgetHomeMediaActionIssue(media)
+                                      editor.gadgetHomeMediaActionIssue(media)
                                     "
                                     [disabled]="media.action_type === 'none'"
                                     [value]="media.action_value"
@@ -2175,7 +2259,7 @@
                                             : '/tentang-matex'
                                     "
                                     (input)="
-                                      updateMediaActionValue(
+                                      editor.updateMediaActionValue(
                                         index,
                                         $any($event.target).value
                                       )
@@ -2188,7 +2272,7 @@
                                   </small>
 
                                   @if (
-                                    gadgetHomeMediaActionIssue(media);
+                                    editor.gadgetHomeMediaActionIssue(media);
                                     as actionIssue
                                   ) {
                                     <div class="text-danger form-error">
@@ -2222,7 +2306,7 @@
                     <button
                       type="button"
                       class="btn btn-light-bg"
-                      (click)="activeTab = 'seo'"
+                      (click)="editor.activeTab = 'seo'"
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
@@ -2232,7 +2316,7 @@
                     <button
                       type="button"
                       class="btn btn-theme"
-                      (click)="goToPublication()"
+                      (click)="editor.goToPublication()"
                     >
                       {{ 'website_page.next_publication' | translate }}
 
@@ -2269,7 +2353,7 @@
                 <!--==== CURRENT STATUS ===============================-->
                 <!--==================================================-->
 
-                @if (mode() === 'edit' && editData(); as page) {
+                @if (editor.mode() === 'edit' && editor.editData(); as page) {
                   <div class="cms-publication-current mb-4">
                     <div>
                       <small class="text-muted d-block mb-1">
@@ -2294,9 +2378,9 @@
                           {{
                             page.website_page_publish_at
                               | date
-                                : localization.dateTimeFormat()
+                                : editor.localization.dateTimeFormat()
                                 : undefined
-                                : localization.locale()
+                                : editor.localization.locale()
                           }}
                         </strong>
                       </div>
@@ -2312,9 +2396,9 @@
                           {{
                             page.website_page_unpublish_at
                               | date
-                                : localization.dateTimeFormat()
+                                : editor.localization.dateTimeFormat()
                                 : undefined
-                                : localization.locale()
+                                : editor.localization.locale()
                           }}
                         </strong>
                       </div>
@@ -2327,17 +2411,17 @@
                 <!--==================================================-->
 
                 <div class="cms-publication-options">
-                  @if (mode() === 'edit') {
+                  @if (editor.mode() === 'edit') {
                     <label
                       class="cms-publication-option"
-                      [class.active]="publicationChoice === 'current'"
+                      [class.active]="editor.publicationChoice === 'current'"
                     >
                       <input
                         type="radio"
                         name="publicationChoice"
                         value="current"
-                        [checked]="publicationChoice === 'current'"
-                        (change)="selectPublicationChoice('current')"
+                        [checked]="editor.publicationChoice === 'current'"
+                        (change)="editor.selectPublicationChoice('current')"
                       />
 
                       <div>
@@ -2359,14 +2443,14 @@
 
                   <label
                     class="cms-publication-option"
-                    [class.active]="publicationChoice === 'draft'"
+                    [class.active]="editor.publicationChoice === 'draft'"
                   >
                     <input
                       type="radio"
                       name="publicationChoice"
                       value="draft"
-                      [checked]="publicationChoice === 'draft'"
-                      (change)="selectPublicationChoice('draft')"
+                      [checked]="editor.publicationChoice === 'draft'"
+                      (change)="editor.selectPublicationChoice('draft')"
                     />
 
                     <div>
@@ -2382,14 +2466,14 @@
 
                   <label
                     class="cms-publication-option"
-                    [class.active]="publicationChoice === 'publish_now'"
+                    [class.active]="editor.publicationChoice === 'publish_now'"
                   >
                     <input
                       type="radio"
                       name="publicationChoice"
                       value="publish_now"
-                      [checked]="publicationChoice === 'publish_now'"
-                      (change)="selectPublicationChoice('publish_now')"
+                      [checked]="editor.publicationChoice === 'publish_now'"
+                      (change)="editor.selectPublicationChoice('publish_now')"
                     />
 
                     <div>
@@ -2408,14 +2492,14 @@
 
                   <label
                     class="cms-publication-option"
-                    [class.active]="publicationChoice === 'schedule'"
+                    [class.active]="editor.publicationChoice === 'schedule'"
                   >
                     <input
                       type="radio"
                       name="publicationChoice"
                       value="schedule"
-                      [checked]="publicationChoice === 'schedule'"
-                      (change)="selectPublicationChoice('schedule')"
+                      [checked]="editor.publicationChoice === 'schedule'"
+                      (change)="editor.selectPublicationChoice('schedule')"
                     />
 
                     <div>
@@ -2431,17 +2515,17 @@
                     </div>
                   </label>
 
-                  @if (mode() === 'edit' && !isSystemPage) {
+                  @if (editor.mode() === 'edit' && !editor.isSystemPage) {
                     <label
                       class="cms-publication-option cms-publication-option-danger"
-                      [class.active]="publicationChoice === 'archive'"
+                      [class.active]="editor.publicationChoice === 'archive'"
                     >
                       <input
                         type="radio"
                         name="publicationChoice"
                         value="archive"
-                        [checked]="publicationChoice === 'archive'"
-                        (change)="selectPublicationChoice('archive')"
+                        [checked]="editor.publicationChoice === 'archive'"
+                        (change)="editor.selectPublicationChoice('archive')"
                       />
 
                       <div>
@@ -2463,7 +2547,7 @@
                 <!--==== SCHEDULE =====================================-->
                 <!--==================================================-->
 
-                @if (publicationChoice === 'schedule') {
+                @if (editor.publicationChoice === 'schedule') {
                   <div class="border rounded p-3 mt-4">
                     <label class="form-label">
                       {{ 'website_page.schedule_publish_at' | translate }}
@@ -2489,18 +2573,21 @@
                             ngbDropdownToggle
                             class="cms-publication-date-toggle"
                             [class.is-invalid]="
-                              publicationValidationAttempted &&
-                              publicationScheduleInvalid
+                              editor.publicationValidationAttempted &&
+                              editor.publicationScheduleInvalid
                             "
                           >
                             <span>
-                              @if (publicationPublishDate; as selectedDate) {
+                              @if (
+                                editor.publicationPublishDate;
+                                as selectedDate
+                              ) {
                                 {{
-                                  publicationDateValue(selectedDate)
+                                  editor.publicationDateValue(selectedDate)
                                     | date
-                                      : localization.dateFormat()
+                                      : editor.localization.dateFormat()
                                       : undefined
-                                      : localization.locale()
+                                      : editor.localization.locale()
                                 }}
                               } @else {
                                 {{ 'website_page.select_date' | translate }}
@@ -2512,14 +2599,17 @@
 
                           <div ngbDropdownMenu class="cms-publication-calendar">
                             <ngb-datepicker
-                              [(ngModel)]="publicationPublishDate"
+                              [(ngModel)]="editor.publicationPublishDate"
                               [ngModelOptions]="{ standalone: true }"
-                              [minDate]="publicationMinDate"
+                              [minDate]="editor.publicationMinDate"
                               [startDate]="
-                                publicationPublishDate ?? publicationMinDate
+                                editor.publicationPublishDate ??
+                                editor.publicationMinDate
                               "
                               [outsideDays]="'hidden'"
-                              (ngModelChange)="syncPublicationPublishDateTime()"
+                              (ngModelChange)="
+                                editor.syncPublicationPublishDateTime()
+                              "
                               (dateSelect)="publishDateDropdown.close()"
                             />
                           </div>
@@ -2536,19 +2626,21 @@
                         <div
                           class="cms-publication-timepicker"
                           [class.is-invalid]="
-                            publicationValidationAttempted &&
-                            publicationScheduleInvalid
+                            editor.publicationValidationAttempted &&
+                            editor.publicationScheduleInvalid
                           "
                         >
                           <ngb-timepicker
-                            [(ngModel)]="publicationPublishTime"
+                            [(ngModel)]="editor.publicationPublishTime"
                             [ngModelOptions]="{ standalone: true }"
-                            [meridian]="localization.useMeridian()"
+                            [meridian]="editor.localization.useMeridian()"
                             [seconds]="false"
                             [spinners]="true"
                             [hourStep]="1"
                             [minuteStep]="5"
-                            (ngModelChange)="syncPublicationPublishDateTime()"
+                            (ngModelChange)="
+                              editor.syncPublicationPublishDateTime()
+                            "
                           />
                         </div>
                       </div>
@@ -2559,8 +2651,8 @@
                     </small>
 
                     @if (
-                      publicationValidationAttempted &&
-                      publicationScheduleInvalid
+                      editor.publicationValidationAttempted &&
+                      editor.publicationScheduleInvalid
                     ) {
                       <div class="text-danger form-error">
                         {{
@@ -2577,8 +2669,8 @@
                 <!--==================================================-->
 
                 @if (
-                  publicationChoice === 'publish_now' ||
-                  publicationChoice === 'schedule'
+                  editor.publicationChoice === 'publish_now' ||
+                  editor.publicationChoice === 'schedule'
                 ) {
                   <div class="border rounded p-3 mt-3">
                     <label class="form-label">
@@ -2604,18 +2696,21 @@
                             ngbDropdownToggle
                             class="cms-publication-date-toggle"
                             [class.is-invalid]="
-                              publicationValidationAttempted &&
-                              publicationEndInvalid
+                              editor.publicationValidationAttempted &&
+                              editor.publicationEndInvalid
                             "
                           >
                             <span>
-                              @if (publicationUnpublishDate; as selectedDate) {
+                              @if (
+                                editor.publicationUnpublishDate;
+                                as selectedDate
+                              ) {
                                 {{
-                                  publicationDateValue(selectedDate)
+                                  editor.publicationDateValue(selectedDate)
                                     | date
-                                      : localization.dateFormat()
+                                      : editor.localization.dateFormat()
                                       : undefined
-                                      : localization.locale()
+                                      : editor.localization.locale()
                                 }}
                               } @else {
                                 {{ 'website_page.select_date' | translate }}
@@ -2627,15 +2722,16 @@
 
                           <div ngbDropdownMenu class="cms-publication-calendar">
                             <ngb-datepicker
-                              [(ngModel)]="publicationUnpublishDate"
+                              [(ngModel)]="editor.publicationUnpublishDate"
                               [ngModelOptions]="{ standalone: true }"
-                              [minDate]="publicationMinDate"
+                              [minDate]="editor.publicationMinDate"
                               [startDate]="
-                                publicationUnpublishDate ?? publicationMinDate
+                                editor.publicationUnpublishDate ??
+                                editor.publicationMinDate
                               "
                               [outsideDays]="'hidden'"
                               (ngModelChange)="
-                                syncPublicationUnpublishDateTime()
+                                editor.syncPublicationUnpublishDateTime()
                               "
                               (dateSelect)="unpublishDateDropdown.close()"
                             />
@@ -2653,29 +2749,34 @@
                         <div
                           class="cms-publication-timepicker"
                           [class.is-invalid]="
-                            publicationValidationAttempted &&
-                            publicationEndInvalid
+                            editor.publicationValidationAttempted &&
+                            editor.publicationEndInvalid
                           "
                         >
                           <ngb-timepicker
-                            [(ngModel)]="publicationUnpublishTime"
+                            [(ngModel)]="editor.publicationUnpublishTime"
                             [ngModelOptions]="{ standalone: true }"
-                            [meridian]="localization.useMeridian()"
+                            [meridian]="editor.localization.useMeridian()"
                             [seconds]="false"
                             [spinners]="true"
                             [hourStep]="1"
                             [minuteStep]="5"
-                            (ngModelChange)="syncPublicationUnpublishDateTime()"
+                            (ngModelChange)="
+                              editor.syncPublicationUnpublishDateTime()
+                            "
                           />
                         </div>
                       </div>
                     </div>
 
-                    @if (publicationUnpublishDate || publicationUnpublishTime) {
+                    @if (
+                      editor.publicationUnpublishDate ||
+                      editor.publicationUnpublishTime
+                    ) {
                       <button
                         type="button"
                         class="btn btn-sm btn-light-bg mt-2"
-                        (click)="clearPublicationUnpublish()"
+                        (click)="editor.clearPublicationUnpublish()"
                       >
                         <i class="ri-close-line me-1"></i>
 
@@ -2688,7 +2789,8 @@
                     </small>
 
                     @if (
-                      publicationValidationAttempted && publicationEndInvalid
+                      editor.publicationValidationAttempted &&
+                      editor.publicationEndInvalid
                     ) {
                       <div class="text-danger form-error">
                         {{
@@ -2705,8 +2807,8 @@
                 <!--==================================================-->
 
                 @if (
-                  publicationRequiresPublishedTranslation &&
-                  !defaultTranslationPublished
+                  editor.publicationRequiresPublishedTranslation &&
+                  !editor.defaultTranslationPublished
                 ) {
                   <div class="alert alert-warning mt-4 mb-0">
                     <i class="ri-information-line me-1"></i>
@@ -2728,12 +2830,12 @@
                   <button
                     type="button"
                     class="btn btn-light-bg"
-                    (click)="backFromPublication()"
+                    (click)="editor.backFromPublication()"
                   >
                     <i class="ri-arrow-left-line me-1"></i>
 
                     {{
-                      (canViewAttachments
+                      (editor.canViewAttachments
                         ? 'website_page.back_media'
                         : 'website_page.back_seo'
                       ) | translate
@@ -2743,7 +2845,7 @@
                   <button
                     type="button"
                     class="btn btn-theme"
-                    (click)="goToPreview()"
+                    (click)="editor.goToPreview()"
                   >
                     {{ 'website_page.next_preview' | translate }}
 
@@ -2764,7 +2866,7 @@
             </button>
 
             <ng-template ngbNavContent>
-              @if (previewPage; as page) {
+              @if (editor.previewPage; as page) {
                 <!--==================================================-->
                 <!--==== LIVE PREVIEW ================================-->
                 <!--==================================================-->
@@ -2789,7 +2891,7 @@
                   <!-- WARNINGS -->
 
                   @for (
-                    translation of previewDraftTranslations;
+                    translation of editor.previewDraftTranslations;
                     track translation.website_page_locale
                   ) {
                     <div class="alert alert-warning">
@@ -2800,7 +2902,7 @@
                           | translate
                             : {
                                 language:
-                                  (previewLanguageLabelKey(
+                                  (editor.previewLanguageLabelKey(
                                     translation.website_page_locale
                                   ) | translate),
                               }
@@ -2833,7 +2935,8 @@
 
                         <strong>
                           {{
-                            previewDefaultTranslation?.website_page_title || '-'
+                            editor.previewDefaultTranslation
+                              ?.website_page_title || '-'
                           }}
                         </strong>
                       </div>
@@ -2845,7 +2948,7 @@
 
                         <strong>
                           {{
-                            previewLanguageLabelKey(
+                            editor.previewLanguageLabelKey(
                               page.website_page_default_locale
                             ) | translate
                           }}
@@ -2861,8 +2964,9 @@
                         <strong>
                           {{
                             'website_page.visibility_' +
-                              previewVisibilityKey(page.website_page_visibility)
-                              | translate
+                              editor.previewVisibilityKey(
+                                page.website_page_visibility
+                              ) | translate
                           }}
                         </strong>
                       </div>
@@ -2895,7 +2999,7 @@
                           {{ 'website_page.media_hero' | translate }}
                         </small>
 
-                        <strong>{{ previewHeroMediaName }}</strong>
+                        <strong>{{ editor.previewHeroMediaName }}</strong>
                       </div>
 
                       <div class="col-xl-3 col-md-6">
@@ -2931,7 +3035,7 @@
                               <div>
                                 <strong>
                                   {{
-                                    previewLanguageLabelKey(
+                                    editor.previewLanguageLabelKey(
                                       translation.website_page_locale
                                     ) | translate
                                   }}
@@ -3011,7 +3115,7 @@
                     </h6>
 
                     <div class="row g-3">
-                      @if (mode() === 'edit') {
+                      @if (editor.mode() === 'edit') {
                         <div class="col-xl-3 col-md-6">
                           <small class="text-muted d-block">
                             {{ 'website_page.current_status' | translate }}
@@ -3020,7 +3124,7 @@
                           <strong>
                             {{
                               'website_page.status_' +
-                                (editData()?.effective_status ?? 'draft')
+                                (editor.editData()?.effective_status ?? 'draft')
                                 | translate
                             }}
                           </strong>
@@ -3035,7 +3139,7 @@
                         </small>
 
                         <strong>
-                          {{ previewPublicationChoiceKey() | translate }}
+                          {{ editor.previewPublicationChoiceKey() | translate }}
                         </strong>
                       </div>
 
@@ -3045,7 +3149,7 @@
                         </small>
 
                         <strong>
-                          {{ previewResultStatusKey() | translate }}
+                          {{ editor.previewResultStatusKey() | translate }}
                         </strong>
                       </div>
 
@@ -3059,9 +3163,9 @@
                             {{
                               page.website_page_publish_at
                                 | date
-                                  : localization.dateTimeFormat()
+                                  : editor.localization.dateTimeFormat()
                                   : undefined
-                                  : localization.locale()
+                                  : editor.localization.locale()
                             }}
                           </strong>
                         </div>
@@ -3077,9 +3181,9 @@
                             {{
                               page.website_page_unpublish_at
                                 | date
-                                  : localization.dateTimeFormat()
+                                  : editor.localization.dateTimeFormat()
                                   : undefined
-                                  : localization.locale()
+                                  : editor.localization.locale()
                             }}
                           </strong>
                         </div>
@@ -3095,8 +3199,8 @@
                     <button
                       type="button"
                       class="btn btn-light-bg"
-                      [disabled]="saving()"
-                      (click)="activeTab = 'publication'"
+                      [disabled]="editor.saving()"
+                      (click)="editor.activeTab = 'publication'"
                     >
                       <i class="ri-arrow-left-line me-1"></i>
 
@@ -3106,10 +3210,10 @@
                     <button
                       type="button"
                       class="btn btn-theme"
-                      [disabled]="saving()"
-                      (click)="submitForm()"
+                      [disabled]="editor.saving()"
+                      (click)="editor.submitForm()"
                     >
-                      @if (saving()) {
+                      @if (editor.saving()) {
                         <span
                           class="spinner-border spinner-border-sm me-2"
                           aria-hidden="true"
@@ -3120,7 +3224,7 @@
                         <i class="ri-save-line me-1"></i>
 
                         {{
-                          (mode() === 'create'
+                          (editor.mode() === 'create'
                             ? 'website_page.create_page'
                             : 'website_page.save_changes'
                           ) | translate
@@ -3138,10 +3242,10 @@
           <button
             type="button"
             class="btn btn-theme w-100"
-            [disabled]="saving()"
-            (click)="submitForm()"
+            [disabled]="editor.saving()"
+            (click)="editor.submitForm()"
           >
-            @if (saving()) {
+            @if (editor.saving()) {
               <span
                 class="spinner-border spinner-border-sm me-2"
                 aria-hidden="true"
@@ -3172,8 +3276,8 @@
   [selectMedia]="true"
   [multipleImage]="true"
   [url]="false"
-  [accept]="pageMediaAccept"
+  [accept]="editor.pageMediaAccept"
   [collection]="'media_library'"
-  [selectedImagesIds]="selectedMedia"
-  (selectImage)="selectMedia($event)"
+  [selectedImagesIds]="editor.selectedMedia"
+  (selectImage)="editor.selectMedia($event)"
 />
