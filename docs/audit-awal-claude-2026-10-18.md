@@ -280,6 +280,14 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - `app-image-upload` di formulir artikel tidak diberi `collection`, sehingga unggahan baru langsung ditolak di browser ("collection required").
 - Perbaikan: kedua pemilih gambar artikel memakai koleksi `media_library`, sama seperti formulir kategori.
 
+**FE-011 — Beranda demo Kartify bisa dibuka di website publik** · P2 · **Selesai (Fase 6B, 21 Oktober 2026)**
+- `matexindo.com/?theme=electro` (juga `mega-mart`, `baby-shop`, `organic-store`, `style-tech`) menampilkan beranda demo toko elektronik (Nokia, Samsung, Macbook) dengan header, logo, dan warna demo, di bawah nama MATEX. Halaman produk juga menerima `?layout=` untuk enam tata letak demo. Halaman seperti itu bisa ikut terindeks mesin pencari.
+- Perbaikan: beranda selalu memakai tata letak MATEX dan halaman produk satu tata letak; tema, header, tata letak, dan data demonya dibuang.
+
+**FE-012 — Produk, kategori, atau artikel yang tidak ada membuat error 500 di build e2e** · P3 · Terbuka
+- Resolver ketiganya memasang status 404 lalu mengalihkan ke `/404`. Build e2e (tidak dioptimasi, mode pengembangan Angular) menolak "redirect dengan status 404" dan menjawab 500. Production menjawab 404 dengan benar (dicek 21 Oktober), jadi pengunjung tidak terdampak.
+- Saran: resolver cukup menampilkan halaman 404 tanpa redirect berstatus 404. Dikerjakan di 6E.
+
 ### Build, deploy, test, dan dokumentasi
 
 **TEST-001 — Test frontend hampir tidak ada** · P2 · **Sebagian selesai**

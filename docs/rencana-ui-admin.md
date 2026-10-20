@@ -50,6 +50,13 @@ _Dibuat: 20 Oktober 2026._
 | U-13 | Produk | Panel kategori sebagai filter list (Semua dan tiap kategori, dengan pencarian kategori) (D-6) | Belum |
 | U-14 | Media | Penanda "Dipakai: n" di tiap kartu, dengan rincian per tempat saat diarahkan (D-5) | Belum |
 
+### Website publik
+
+| ID | Butir | Rencana | Status |
+| --- | --- | --- | --- |
+| P-1 | Penanda market MATEX di header (akun, favorit, keranjang) | Keputusan pemilik 21 Okt: ketiganya tetap tampil sebagai penanda ke publik bahwa MATEX akan punya market internal. UI-nya dirapikan supaya jelas "segera hadir" dan seragam (sekarang: keranjang membuka panel "pratinjau, versi 2", favorit tersimpan di perangkat, akun membuka halaman "Fitur ini sedang disiapkan"). Rancangan dikonfirmasi ke pemilik sebelum dikerjakan | Belum |
+| P-2 | Bagian tags di beranda (rencana pemilik) | Bagian tetap ada; sumber datanya dibuat di backend dan admin (sekarang kosong, sebelumnya tag demo). Toggle "tags" di admin halaman Beranda baru berguna setelah itu | Belum |
+
 ### Catatan
 
 - Tombol impor dan unduh di U-3 sengaja nonaktif sampai fiturnya dibuat (sesuai permintaan pemilik). Fiturnya sendiri belum dijadwalkan.

@@ -65,7 +65,7 @@ Hasil survei 6A (21 Oktober), dasar standar `standar-kode.md` bagian 4:
 | Langkah | Isi | Selesai bila |
 | --- | --- | --- |
 | 6A Survei dan standar ✅ | Survei mendalam admin dan public; lengkapi standar frontend | **Selesai 21 Okt:** `standar-kode.md` bagian 4 lengkap (struktur, aliran data, lapisan gaya, komponen bersama, ukuran, bahasa, lint, bukti) |
-| 6B Website publik | Buang sisa fitur toko v2 yang masih terpasang (cart, wishlist, compare, coupon, order, wallet, refund, point, currency, review, Q&A, pembayaran: belasan store NGXS) dan file demo Kartify yang diunduh setiap kunjungan (`theme.json`, `currency.json`). Tetap tersimpan di tag arsip | Tidak ada request demo saat halaman dibuka; test browser lulus |
+| 6B Website publik ✅ | Buang sisa toko v2 dan demo Kartify yang tidak dipakai; tetap tersimpan di tag arsip | **Selesai 21 Okt:** tidak ada lagi request ke `assets/data` (sebelumnya 5 file per kunjungan; dicek di 15 halaman); konfigurasi situs pindah ke `shared/data/*.ts`; 16 dari 31 store dan tema/tata letak demo dibuang (FE-011); TypeScript ±20.100 → ±14.300 baris; lint 90 → 78. Ikon akun, favorit, dan keranjang di header **dipertahankan** sebagai penanda market MATEX yang akan datang (keputusan pemilik) |
 | 6C Admin | Pecah komponen raksasa (form halaman website 3.233 baris, form akun admin 1.515, form kantor 952, form produk 813); satukan `directive/` dan `directives/`; buang sisa Kartify di admin (`settings.json` demo, store `store`/`state`/`country`/`tag`/`menu` dan halaman tag tanpa route, tipe tema/toko tanpa pemakai, `fr.json`) | Tidak ada komponen di atas sekitar 800 baris |
 | 6D UI/UX admin | Temuan pemilik 20 Okt, daftar lengkap di `rencana-ui-admin.md`: global dulu (huruf area isi sedikit lebih kecil, warna kontrol form seragam, tabel versi baru, kotak bantuan "?" dan drawer panduan, tombol perbarui berjeda, tombol kembali), lalu per halaman (dasbor/analitik/SEO, navigasi `primary`, bug input telepon, tombol simpan halaman website, kategori, filter produk, penanda pemakaian media). SCSS ditulis sekali di global; SCSS modul hanya untuk yang khas halaman | Semua butir U selesai atau ditinggalkan dengan alasan; SCSS modul berkurang |
 | 6E Lint dan test | Peringatan lint 0 (urutan import, tipe `any`); test browser untuk halaman yang disentuh | Lint admin dan public 0 peringatan |
@@ -93,6 +93,7 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 
 | ID | Ringkas | Rencana |
 | --- | --- | --- |
+| FE-012 | Halaman produk/kategori/artikel yang tidak ada menjawab 500 di build e2e (production benar 404) | 6E |
 | SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | Fase 6, bersama perapian frontend |
 | Catatan produk | Kategori yang dihapus tetap terhubung ke produknya dan tetap "memakai" gambarnya; navigasi "primary" bisa dihapus | Diputuskan pemilik 20 Okt: dikerjakan di 5D (D-1, D-3) |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
