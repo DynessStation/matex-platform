@@ -85,10 +85,7 @@ import {
   IWebsitePageEditorPublicationPayload,
   IWebsitePageEditorSaveRequest,
 } from '../../../shared/interface/website-page-editor.interface';
-import {
-  ContentAssistantFieldType,
-  ContentAssistantService,
-} from '../../../shared/services/content-assistant.service';
+import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -147,8 +144,6 @@ export class WebsitePageEditorService {
   public activeTab = 'general';
 
   public activeLocale: WebsitePageEditorLocale = 'id-ID';
-  public translatingPage = false;
-  public generatingPage = false;
   public assistingPageField: string | null = null;
   public assistingOrganizerField: string | null = null;
 
@@ -802,161 +797,6 @@ export class WebsitePageEditorService {
 
   selectLanguage(locale: WebsitePageEditorLocale): void {
     this.activeLocale = locale;
-  }
-
-  copyAndTranslatePageToEnglish(): void {
-    const source = this.translationForm('id-ID').getRawValue();
-    const fields: Record<string, string> = {
-      excerpt: source.excerpt,
-      content: source.content,
-      meta_description: source.meta_description,
-      meta_keywords: source.meta_keywords,
-      og_description: source.og_description,
-    };
-
-    if (this.isGadgetHomeTemplate) {
-      const latex = this.homeLatexContent['id-ID'];
-      fields['home_latex_description'] = latex.description;
-      latex.items.forEach((item, index) => {
-        fields[`home_latex_${index}_description`] = item.description;
-      });
-      const ad = this.homeAdvertisementContent['id-ID'];
-      fields['home_ad_description'] = ad.description;
-    }
-
-    if (this.isAboutTemplate) {
-      this.aboutFeatures['id-ID'].forEach((feature, index) => {
-        fields[`about_${index}_description`] = feature.description;
-      });
-    }
-
-    this.translatingPage = true;
-    this.contentAssistant
-      .assist({
-        mode: 'translate',
-        content_type: this.isGadgetHomeTemplate
-          ? 'home page and section organizer'
-          : 'website page',
-        source_locale: 'id-ID',
-        target_locale: 'en-US',
-        fields,
-        field_types: Object.fromEntries(
-          Object.keys(fields).map((key) => [
-            key,
-            key === 'content'
-              ? 'rich_text_html'
-              : key === 'meta_description' || key === 'og_description'
-                ? 'seo_description'
-                : key === 'meta_keywords'
-                  ? 'keyword_list'
-                  : 'multiline_text',
-          ]),
-        ) as Record<string, ContentAssistantFieldType>,
-      })
-      .pipe(finalize(() => (this.translatingPage = false)))
-      .subscribe({
-        next: (translated) => {
-          this.enableLanguage('en-US');
-          this.translationForm('en-US').patchValue({
-            excerpt: translated['excerpt'],
-            content: translated['content'],
-            meta_description: translated['meta_description'],
-            meta_keywords: translated['meta_keywords'],
-            og_description: translated['og_description'],
-            status: source.status,
-          });
-
-          if (this.isGadgetHomeTemplate) {
-            const idLatex = this.homeLatexContent['id-ID'];
-            this.homeLatexContent = {
-              ...this.homeLatexContent,
-              'en-US': {
-                ...this.homeLatexContent['en-US'],
-                description: translated['home_latex_description'] || '',
-                items: idLatex.items.map((_item, index) => ({
-                  title:
-                    this.homeLatexContent['en-US'].items[index]?.title || '',
-                  description:
-                    translated[`home_latex_${index}_description`] || '',
-                })),
-              },
-            };
-            const idAd = this.homeAdvertisementContent['id-ID'];
-            this.homeAdvertisementContent = {
-              ...this.homeAdvertisementContent,
-              'en-US': {
-                ...this.homeAdvertisementContent['en-US'],
-                description: translated['home_ad_description'] || '',
-                cta_url: idAd.cta_url,
-              },
-            };
-            this.homeSectionVisibility = {
-              ...this.homeSectionVisibility,
-              'en-US': { ...this.homeSectionVisibility['id-ID'] },
-            };
-          }
-
-          if (this.isAboutTemplate) {
-            this.aboutFeatures = {
-              ...this.aboutFeatures,
-              'en-US': this.aboutFeatures['id-ID'].map((_feature, index) => ({
-                title: this.aboutFeatures['en-US'][index]?.title || '',
-                description: translated[`about_${index}_description`] || '',
-              })),
-            };
-          }
-
-          this.activeLocale = 'en-US';
-          this.notification.showSuccess(
-            'Deskripsi English dan organizer sudah diisi. Semua judul dan label tetap Anda tentukan sendiri.',
-          );
-        },
-        error: (error) => this.showContentAssistantError(error),
-      });
-  }
-
-  generatePageDescriptions(): void {
-    const locale = this.activeLocale;
-    const group = this.translationForm(locale);
-    const value = group.getRawValue();
-    this.generatingPage = true;
-    this.contentAssistant
-      .assist({
-        mode: 'generate',
-        content_type: this.isGadgetHomeTemplate ? 'home page' : 'website page',
-        target_locale: locale,
-        context: JSON.stringify({
-          title: value.title,
-          page_key: this.form.controls.website_page_key.value,
-        }),
-        fields: {
-          excerpt: value.excerpt,
-          content: value.content,
-          meta_description: value.meta_description,
-          og_description: value.og_description,
-        },
-        field_types: {
-          excerpt: 'multiline_text',
-          content: 'rich_text_html',
-          meta_description: 'seo_description',
-          og_description: 'seo_description',
-        },
-      })
-      .pipe(finalize(() => (this.generatingPage = false)))
-      .subscribe({
-        next: (generated) => {
-          group.patchValue({
-            excerpt: generated['excerpt'],
-            content: generated['content'],
-            meta_description: generated['meta_description'],
-            og_description: generated['og_description'],
-          });
-          this.notification.showSuccess(
-            'Draf deskripsi halaman sudah diisi. Periksa kembali sebelum menyimpan.',
-          );
-        },
-        error: (error) => this.showContentAssistantError(error),
-      });
   }
 
   assistPageField(
