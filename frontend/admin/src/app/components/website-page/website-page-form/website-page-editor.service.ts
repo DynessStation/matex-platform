@@ -227,13 +227,6 @@ export class WebsitePageEditorService {
     },
   ];
 
-  public readonly templateOptions = [
-    { value: 'standard', label: 'Standard page' },
-    { value: 'home', label: 'Home utama' },
-    { value: 'company-profile', label: 'Company profile' },
-    { value: 'contact', label: 'Contact page' },
-  ];
-
   public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
 
   public readonly homeSectionOptions: readonly {
@@ -2422,41 +2415,7 @@ export class WebsitePageEditorService {
   //==== NORMALIZE KEY
   //==================================================
 
-  normalizePageKey(): void {
-    const control = this.form.controls.website_page_key;
-
-    const normalized = control.value.trim().toLowerCase().replace(/\s+/g, '-');
-
-    control.setValue(normalized);
-  }
-
   //==================================================
   //==== NEXT
   //==================================================
-
-  goToContent(): void {
-    const controls = this.form.controls;
-
-    controls.website_page_key.markAsTouched();
-    controls.website_page_type.markAsTouched();
-    controls.website_page_template.markAsTouched();
-    controls.website_page_default_locale.markAsTouched();
-    controls.website_page_visibility.markAsTouched();
-    controls.website_page_sort_order.markAsTouched();
-
-    if (
-      controls.website_page_key.invalid ||
-      controls.website_page_type.invalid ||
-      controls.website_page_template.invalid ||
-      controls.website_page_default_locale.invalid ||
-      controls.website_page_visibility.invalid ||
-      controls.website_page_sort_order.invalid
-    ) {
-      this.activeTab = 'general';
-
-      return;
-    }
-
-    this.activeTab = 'content';
-  }
 }
