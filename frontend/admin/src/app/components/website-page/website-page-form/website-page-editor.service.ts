@@ -28,10 +28,8 @@ import {
   AboutFeatureDraft,
   ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH,
   ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH,
-  WebsitePageEditorMediaTranslationDraft,
   WebsitePageEditorMediaDraft,
   PAGE_MEDIA_ACCEPT,
-  GADGET_HOME_MEDIA_ROLES,
 } from './website-page-form.model';
 import {
   createHomeSectionVisibility,
@@ -47,25 +45,16 @@ import {
   createEmptyMediaTranslations,
   parseLocale,
   slugify,
-  createMediaDraft,
-  sortGadgetHomeMedia,
-  gadgetHomeMediaRequirement,
   gadgetHomeMediaIssue,
-  gadgetHomeAttachmentIssue,
   gadgetHomeMediaActionIssue,
-  toAttachmentArray,
   toPreviewIso,
   toLocalDateTimeInput,
   dateToNgbDate,
 } from './website-page-form.util';
-import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
-import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
 import {
   GADGET_HOME_MEDIA_RULES,
   GadgetHomeMediaRule,
-  getGadgetHomeMediaRule,
 } from '../../../shared/data/gadget-home-media';
-import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   WebsitePageEditorEffectiveStatus,
   WebsitePageEditorI18nStatus,
@@ -96,7 +85,7 @@ export class WebsitePageEditorService {
   private destroyRef = inject(DestroyRef);
   private store = inject(Store);
   public readonly localization = inject(LocalizationService);
-  private readonly translate = inject(TranslateService);
+  readonly translate = inject(TranslateService);
   readonly contentAssistant = inject(ContentAssistantService);
   readonly notification = inject(NotificationService);
   private readonly formIssues = inject(FormIssueNavigatorService);
@@ -120,13 +109,11 @@ export class WebsitePageEditorService {
     editData: Signal<IWebsitePageEditorDetail | null>;
     saving: Signal<boolean>;
     submitted: OutputEmitterRef<IWebsitePageEditorSaveRequest>;
-    mediaModal: Signal<MediaModal | undefined>;
   }): void {
     this.mode = form.mode;
     this.editData = form.editData;
     this.saving = form.saving;
     this.submitted = form.submitted;
-    this.mediaModal = form.mediaModal;
   }
 
   //==================================================
@@ -147,15 +134,11 @@ export class WebsitePageEditorService {
   //==== MEDIA
   //==================================================
 
-  mediaModal: Signal<MediaModal | undefined> = signal(undefined);
-
   public pageMedia: WebsitePageEditorMediaDraft[] = [];
 
   public readonly pageMediaAccept = PAGE_MEDIA_ACCEPT;
 
   public mediaValidationAttempted = false;
-
-  public activeHomeMediaRole: string | null = null;
 
   //==================================================
   //==== PUBLICATION
@@ -199,8 +182,6 @@ export class WebsitePageEditorService {
     },
   ];
 
-  public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
-
   public homeSectionVisibility: Record<
     WebsitePageEditorLocale,
     HomeSectionVisibility
@@ -230,14 +211,7 @@ export class WebsitePageEditorService {
     'en-US': createAboutFeatures(),
   };
 
-  public readonly gadgetHomeMediaRoles = GADGET_HOME_MEDIA_ROLES;
-
   // Pure helpers the template calls.
-  readonly gadgetHomeMediaRequirement = gadgetHomeMediaRequirement;
-  readonly gadgetHomeMediaIssue = gadgetHomeMediaIssue;
-  readonly gadgetHomeMediaActionIssue = gadgetHomeMediaActionIssue;
-  readonly gadgetHomeMediaRule = getGadgetHomeMediaRule;
-
   //==================================================
   //==== TRANSLATION FORM
   //==================================================
@@ -573,36 +547,6 @@ export class WebsitePageEditorService {
     return this.form.controls.website_page_key.value === 'about';
   }
 
-  get isMetadataOnlyFixedPage(): boolean {
-    return (
-      this.isSystemPage &&
-      ['contact', 'faq', 'terms', 'career'].includes(
-        this.form.controls.website_page_key.value,
-      )
-    );
-  }
-
-  get mediaRoleOptions(): { value: string; label: string }[] {
-    if (this.isGadgetHomeTemplate) return this.gadgetHomeMediaRoles;
-
-    if (this.isAboutTemplate) {
-      return [
-        { value: 'about_content', label: 'Gambar konten Tentang MATEX' },
-        { value: 'og', label: 'Open Graph / share image' },
-      ];
-    }
-
-    if (this.isMetadataOnlyFixedPage) {
-      return [{ value: 'og', label: 'Open Graph / share image' }];
-    }
-
-    return [
-      { value: 'hero', label: 'Hero image' },
-      { value: 'gallery', label: 'Gallery' },
-      { value: 'og', label: 'Open Graph / share image' },
-    ];
-  }
-
   aboutHighlightIssue(
     locale: WebsitePageEditorLocale,
     index: number,
@@ -775,199 +719,9 @@ export class WebsitePageEditorService {
   //==== NEXT MEDIA
   //==================================================
 
-  goToPublication(): void {
-    this.activeTab = 'publication';
-  }
-
   //==================================================
   //==== MEDIA
   //==================================================
-
-  openMedia(): void {
-    this.activeHomeMediaRole = null;
-    void this.mediaModal()?.openModal();
-  }
-
-  openHomeMedia(rule: GadgetHomeMediaRule): void {
-    this.activeHomeMediaRole = rule.value;
-    const current = this.gadgetHomeMediaForRole(rule.value);
-    const disabledSelectionIds = this.pageMedia
-      .filter((media) => media.role !== rule.value)
-      .map((media) => media.attachment.id_attachment);
-
-    void this.mediaModal()?.openModal({
-      selection: current?.attachment ?? null,
-      title: `Pilih gambar · ${rule.label}`,
-      description: gadgetHomeMediaRequirement(rule),
-      multiple: false,
-      maxSelection: 1,
-      disabledSelectionIds,
-      validateSelection: (attachment) =>
-        gadgetHomeAttachmentIssue(attachment, rule),
-    });
-  }
-
-  openHomeOgMedia(): void {
-    const role = 'og';
-    this.activeHomeMediaRole = role;
-    const current = this.gadgetHomeMediaForRole(role);
-    const disabledSelectionIds = this.pageMedia
-      .filter((media) => media.role !== role)
-      .map((media) => media.attachment.id_attachment);
-
-    void this.mediaModal()?.openModal({
-      selection: current?.attachment ?? null,
-      title: this.translate.instant('website_page.home_media_og_title'),
-      description: this.translate.instant(
-        'website_page.home_media_og_requirement',
-      ),
-      multiple: false,
-      maxSelection: 1,
-      disabledSelectionIds,
-      validateSelection: (attachment) =>
-        this.pageMediaAccept.includes(attachment.mime_type)
-          ? null
-          : this.translate.instant('website_page.home_media_format_error'),
-    });
-  }
-
-  get selectedMedia(): IAttachment[] {
-    if (this.isGadgetHomeTemplate && this.activeHomeMediaRole) {
-      const current = this.gadgetHomeMediaForRole(this.activeHomeMediaRole);
-      return current ? [current.attachment] : [];
-    }
-
-    return this.pageMedia.map((item) => item.attachment);
-  }
-
-  selectMedia(selection: MediaSelection): void {
-    if (this.isGadgetHomeTemplate && this.activeHomeMediaRole) {
-      const [attachment] = toAttachmentArray(selection);
-      if (!attachment) return;
-
-      const role = this.activeHomeMediaRole;
-      const currentIndex = this.pageMedia.findIndex(
-        (media) => media.role === role,
-      );
-
-      if (currentIndex >= 0) {
-        this.pageMedia[currentIndex] = {
-          ...this.pageMedia[currentIndex],
-          attachment,
-        };
-      } else {
-        this.pageMedia.push(createMediaDraft(attachment, role));
-      }
-
-      this.pageMedia = sortGadgetHomeMedia(this.pageMedia);
-      this.activeHomeMediaRole = null;
-      return;
-    }
-
-    const selected = this.isGadgetHomeTemplate
-      ? toAttachmentArray(selection).slice(0, this.gadgetHomeMediaRoles.length)
-      : toAttachmentArray(selection);
-
-    const oldMap = new Map(
-      this.pageMedia.map((item) => [item.attachment.id_attachment, item]),
-    );
-
-    const assignedRoles = new Set(
-      selected
-        .map((attachment) => oldMap.get(attachment.id_attachment)?.role)
-        .filter((role): role is string => Boolean(role)),
-    );
-
-    this.pageMedia = selected.map((attachment) => {
-      const existing = oldMap.get(attachment.id_attachment);
-
-      if (existing) {
-        return existing;
-      }
-
-      const role = this.isGadgetHomeTemplate
-        ? (this.gadgetHomeMediaRoles.find(
-            (option) => !assignedRoles.has(option.value),
-          )?.value ?? this.gadgetHomeMediaRoles[0].value)
-        : this.isAboutTemplate
-          ? assignedRoles.has('about_content')
-            ? 'og'
-            : 'about_content'
-          : this.isMetadataOnlyFixedPage
-            ? 'og'
-            : assignedRoles.has('hero')
-              ? 'gallery'
-              : 'hero';
-
-      assignedRoles.add(role);
-
-      return createMediaDraft(attachment, role);
-    });
-  }
-
-  setHero(index: number): void {
-    this.pageMedia = this.pageMedia.map((item, currentIndex) => ({
-      ...item,
-
-      role: currentIndex === index ? 'hero' : 'gallery',
-    }));
-  }
-
-  updateMediaRole(index: number, role: string): void {
-    if (this.isGadgetHomeTemplate) {
-      if (!this.gadgetHomeMediaRoles.some((option) => option.value === role)) {
-        return;
-      }
-
-      const previousRole = this.pageMedia[index]?.role;
-
-      this.pageMedia = this.pageMedia.map((item, currentIndex) => {
-        if (currentIndex === index) return { ...item, role };
-        if (item.role === role && previousRole) {
-          return { ...item, role: previousRole };
-        }
-        return item;
-      });
-
-      return;
-    }
-
-    const uniqueRole = role !== 'gallery';
-
-    this.pageMedia = this.pageMedia.map((item, currentIndex) => {
-      if (currentIndex === index) return { ...item, role };
-      if (uniqueRole && item.role === role) return { ...item, role: 'gallery' };
-      return item;
-    });
-  }
-
-  updateMediaActionType(
-    index: number,
-    actionType: 'none' | 'internal' | 'external' | 'product' | 'category',
-  ): void {
-    this.pageMedia[index] = {
-      ...this.pageMedia[index],
-      action_type: actionType,
-      action_value:
-        actionType === 'none' ? '' : this.pageMedia[index].action_value,
-    };
-    this.pageMedia = [...this.pageMedia];
-  }
-
-  updateMediaActionValue(index: number, actionValue: string): void {
-    this.pageMedia[index] = {
-      ...this.pageMedia[index],
-      action_value: actionValue,
-    };
-    this.pageMedia = [...this.pageMedia];
-  }
-
-  mediaRoleLabel(role: string): string {
-    return (
-      this.mediaRoleOptions.find((option) => option.value === role)?.label ??
-      role
-    );
-  }
 
   get gadgetHomeMissingMediaRules(): readonly GadgetHomeMediaRule[] {
     if (!this.isGadgetHomeTemplate) return [];
@@ -981,16 +735,6 @@ export class WebsitePageEditorService {
     return GADGET_HOME_MEDIA_RULES.filter(
       (rule) => rule.required && !assignedRoles.has(rule.value),
     );
-  }
-
-  gadgetHomeMediaAssigned(role: string): boolean {
-    return this.pageMedia.some(
-      (media) => media.is_public && media.role === role,
-    );
-  }
-
-  gadgetHomeMediaForRole(role: string): WebsitePageEditorMediaDraft | null {
-    return this.pageMedia.find((media) => media.role === role) ?? null;
   }
 
   get gadgetHomeMediaHasInvalidFiles(): boolean {
@@ -1065,67 +809,6 @@ export class WebsitePageEditorService {
         this.aboutContentMediaAltMissing(language.locale),
       )
     );
-  }
-
-  removeMedia(index: number): void {
-    const wasHero = this.pageMedia[index]?.role === 'hero';
-
-    this.pageMedia.splice(index, 1);
-
-    this.pageMedia = [...this.pageMedia];
-
-    if (wasHero && this.pageMedia.length && !this.isGadgetHomeTemplate) {
-      this.setHero(0);
-    }
-  }
-
-  moveMedia(index: number, direction: -1 | 1): void {
-    const target = index + direction;
-
-    if (target < 0 || target >= this.pageMedia.length) {
-      return;
-    }
-
-    const next = [...this.pageMedia];
-
-    [next[index], next[target]] = [next[target], next[index]];
-
-    this.pageMedia = next;
-  }
-
-  updateMediaPublic(index: number, checked: boolean): void {
-    this.pageMedia[index] = {
-      ...this.pageMedia[index],
-
-      is_public: checked,
-    };
-
-    this.pageMedia = [...this.pageMedia];
-  }
-
-  updateMediaTranslation(
-    index: number,
-    locale: WebsitePageEditorLocale,
-    field: keyof WebsitePageEditorMediaTranslationDraft,
-    value: string,
-  ): void {
-    const item = this.pageMedia[index];
-
-    this.pageMedia[index] = {
-      ...item,
-
-      translations: {
-        ...item.translations,
-
-        [locale]: {
-          ...item.translations[locale],
-
-          [field]: value,
-        },
-      },
-    };
-
-    this.pageMedia = [...this.pageMedia];
   }
 
   //==================================================
