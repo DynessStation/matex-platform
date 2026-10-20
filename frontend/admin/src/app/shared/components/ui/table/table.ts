@@ -24,6 +24,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { debounceTime, distinctUntilChanged, Observable } from 'rxjs';
 
+import {
+  getNestedPropertyValue,
+  isConditionMet,
+  isPermissionGranted,
+  isSwitchActive,
+  nextSwitchValue,
+  normalizeTableState,
+  TABLE_PAGE_SIZES,
+} from './table.util';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
 import {
@@ -34,13 +43,13 @@ import {
   TableRowId,
 } from '../../../interface/table.interface';
 import { CurrencySymbolPipe } from '../../../pipe/currency-symbol.pipe';
+import { LocalizationService } from '../../../services/localization.service';
 import { AccountState } from '../../../store/state/account.state';
 import { AuthState } from '../../../store/state/auth.state';
 import { LoaderState } from '../../../store/state/loader.state';
 import { ConfirmationModal } from '../modal/confirmation-modal/confirmation-modal';
 import { DeleteModal } from '../modal/delete-modal/delete-modal';
 import { Pagination } from '../pagination/pagination';
-import { LocalizationService } from '../../../services/localization.service';
 
 @Component({
   selector: 'app-table',
@@ -153,7 +162,7 @@ export class Table {
 
   public term = new FormControl();
 
-  public rows = [15, 25, 50, 100];
+  public rows = TABLE_PAGE_SIZES;
 
   public tableData: Params = {
     search: '',
@@ -275,17 +284,7 @@ export class Table {
       return true;
     }
 
-    if (!permission) {
-      return true;
-    }
-
-    const permissions = this.getCurrentPermissions();
-
-    if (Array.isArray(permission)) {
-      return permission.some((item) => permissions.includes(item));
-    }
-
-    return permissions.includes(permission);
+    return isPermissionGranted(this.getCurrentPermissions(), permission);
   }
 
   //==================================================
@@ -355,39 +354,22 @@ export class Table {
     this.onActionClicked(action.actionToPerform, rowData);
   }
 
-  public isSwitchActive(value: unknown): boolean {
-    return value === true || value === 1 || value === '1';
-  }
+  // Pure cell helpers used by the template (see table.util.ts).
 
-  public nextSwitchValue(value: unknown): 0 | 1 {
-    return this.isSwitchActive(value) ? 0 : 1;
-  }
+  public readonly isSwitchActive = isSwitchActive;
+
+  public readonly nextSwitchValue = nextSwitchValue;
+
+  public readonly isConditionMet = isConditionMet;
+
+  public readonly getNestedPropertyValue = getNestedPropertyValue;
 
   //==================================================
   //==== SYNC EXTERNAL STATE
   //==================================================
 
   public syncState(params: Params): void {
-    const page = Number(params['page']);
-
-    const paginate = Number(params['paginate']);
-
-    this.tableData = {
-      ...this.tableData,
-
-      search: typeof params['search'] === 'string' ? params['search'] : '',
-
-      field: typeof params['field'] === 'string' ? params['field'] : '',
-
-      sort:
-        params['sort'] === 'asc' || params['sort'] === 'desc'
-          ? params['sort']
-          : '',
-
-      page: Number.isInteger(page) && page > 0 ? page : 1,
-
-      paginate: this.rows.includes(paginate) ? paginate : 15,
-    };
+    this.tableData = normalizeTableState(params, this.tableData);
 
     //==================================================
     //==== SEARCH
@@ -655,34 +637,6 @@ export class Table {
   }
 
   //==================================================
-  //==== CONDITION
-  //==================================================
-
-  isConditionMet(
-    condition: {
-      field: string;
-      condition: string;
-      value: string;
-    },
-    columnData: any,
-  ): boolean {
-    const field = Array.isArray(columnData[condition.field])
-      ? columnData[condition.field].length
-      : columnData[condition.field];
-
-    switch (condition.condition) {
-      case '==':
-        return field == condition.value;
-
-      case '!=':
-        return field != condition.value;
-
-      default:
-        return false;
-    }
-  }
-
-  //==================================================
   //==== DATE SELECTION
   //==================================================
 
@@ -762,34 +716,6 @@ export class Table {
     return parsed && this.calendar.isValid(NgbDate.from(parsed))
       ? NgbDate.from(parsed)
       : currentValue;
-  }
-
-  //==================================================
-  //==== NESTED PROPERTY
-  //==================================================
-
-  getNestedPropertyValue(
-    dataField: string | undefined,
-
-    columnData: any,
-  ): string {
-    if (!dataField) {
-      return '';
-    }
-
-    const keys = dataField.split('.');
-
-    let value = columnData;
-
-    for (const key of keys) {
-      if (value && Object.prototype.hasOwnProperty.call(value, key)) {
-        value = value[key];
-      } else {
-        return '';
-      }
-    }
-
-    return value;
   }
 
   //==================================================
