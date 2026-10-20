@@ -29,15 +29,60 @@ import { Store } from '@ngxs/store';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { finalize } from 'rxjs';
 
-import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
+import {
+  WebsitePageEditorLocale,
+  WebsitePageEditorPublicationChoice,
+  HomeSectionKey,
+  HomeSectionVisibility,
+  HomeLatexFeatureDraft,
+  HomeLatexContentDraft,
+  HomeAdvertisementDraft,
+  AboutFeatureDraft,
+  ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH,
+  ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH,
+  WebsitePageEditorMediaTranslationDraft,
+  WebsitePageEditorMediaDraft,
+  PAGE_MEDIA_ACCEPT,
+  GADGET_HOME_MEDIA_ROLES,
+} from './website-page-form.model';
+import {
+  createHomeSectionVisibility,
+  readHomeSectionVisibility,
+  buildHomeContentJson,
+  createHomeLatexContent,
+  readHomeLatexContent,
+  createHomeAdvertisementContent,
+  readHomeAdvertisementContent,
+  createAboutFeatures,
+  readAboutFeatures,
+  buildAboutContentJson,
+  createEmptyMediaTranslations,
+  parseLocale,
+  slugify,
+  createMediaDraft,
+  sortGadgetHomeMedia,
+  gadgetHomeMediaRequirement,
+  gadgetHomeMediaIssue,
+  gadgetHomeAttachmentIssue,
+  gadgetHomeMediaActionIssue,
+  toAttachmentArray,
+  toPreviewIso,
+  previewLanguageLabelKey,
+  previewVisibilityKey,
+  toLocalDateTimeInput,
+  publicationDateValue,
+  composePublicationDateTime,
+  dateToNgbDate,
+} from './website-page-form.util';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
-import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
+import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
 import { MediaModal } from '../../../shared/components/ui/modal/media-modal/media-modal';
 import {
   GADGET_HOME_MEDIA_RULES,
   GadgetHomeMediaRule,
   getGadgetHomeMediaRule,
 } from '../../../shared/data/gadget-home-media';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   WebsitePageEditorEffectiveStatus,
@@ -60,90 +105,6 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { AuthState } from '../../../shared/store/state/auth.state';
 import { hasPermissionAccess } from '../../../shared/utils/permission.util';
 import { WebsitePagePreview } from '../website-page-preview/website-page-preview';
-
-type WebsitePageEditorLocale = 'id-ID' | 'en-US';
-
-type WebsitePageEditorPublicationChoice =
-  'current' | 'draft' | 'publish_now' | 'schedule' | 'archive';
-
-const HOME_SECTION_KEYS = [
-  'latex_features',
-  'categories',
-  'products',
-  'articles',
-  'tags',
-  'newsletter',
-  'advertisement',
-] as const;
-
-type HomeSectionKey = (typeof HOME_SECTION_KEYS)[number];
-type HomeSectionVisibility = Record<HomeSectionKey, boolean>;
-
-const HOME_SECTION_DEFAULTS: HomeSectionVisibility = {
-  latex_features: true,
-  categories: true,
-  products: true,
-  articles: true,
-  tags: false,
-  newsletter: false,
-  advertisement: false,
-};
-
-interface HomeLatexFeatureDraft {
-  title: string;
-  description: string;
-}
-
-interface HomeLatexContentDraft {
-  eyebrow: string;
-  title: string;
-  description: string;
-  items: HomeLatexFeatureDraft[];
-}
-
-interface HomeAdvertisementDraft {
-  label: string;
-  title: string;
-  description: string;
-  cta_label: string;
-  cta_url: string;
-}
-
-interface AboutFeatureDraft {
-  title: string;
-  description: string;
-}
-
-const ABOUT_CONTRACT_VERSION = 1;
-const ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH = 160;
-const ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH = 1000;
-
-//==================================================
-//==== MEDIA DRAFT
-//==================================================
-
-interface WebsitePageEditorMediaTranslationDraft {
-  caption: string;
-
-  alt_text: string;
-}
-
-interface WebsitePageEditorMediaDraft {
-  attachment: IAttachment;
-
-  role: string;
-
-  is_public: boolean;
-
-  action_type: 'none' | 'internal' | 'external' | 'product' | 'category';
-
-  action_value: string;
-
-  translations: Record<
-    WebsitePageEditorLocale,
-    WebsitePageEditorMediaTranslationDraft
-  >;
-}
 
 //==================================================
 //==== COMPONENT
@@ -221,7 +182,7 @@ export class WebsitePageForm {
 
   public pageMedia: WebsitePageEditorMediaDraft[] = [];
 
-  public readonly pageMediaAccept = ['image/jpeg', 'image/png', 'image/webp'];
+  public readonly pageMediaAccept = PAGE_MEDIA_ACCEPT;
 
   public mediaValidationAttempted = false;
 
@@ -350,38 +311,41 @@ export class WebsitePageForm {
     WebsitePageEditorLocale,
     HomeSectionVisibility
   > = {
-    'id-ID': this.createHomeSectionVisibility(),
-    'en-US': this.createHomeSectionVisibility(),
+    'id-ID': createHomeSectionVisibility(),
+    'en-US': createHomeSectionVisibility(),
   };
 
   public homeLatexContent: Record<
     WebsitePageEditorLocale,
     HomeLatexContentDraft
   > = {
-    'id-ID': this.createHomeLatexContent('id-ID'),
-    'en-US': this.createHomeLatexContent('en-US'),
+    'id-ID': createHomeLatexContent('id-ID'),
+    'en-US': createHomeLatexContent('en-US'),
   };
 
   public homeAdvertisementContent: Record<
     WebsitePageEditorLocale,
     HomeAdvertisementDraft
   > = {
-    'id-ID': this.createHomeAdvertisementContent('id-ID'),
-    'en-US': this.createHomeAdvertisementContent('en-US'),
+    'id-ID': createHomeAdvertisementContent('id-ID'),
+    'en-US': createHomeAdvertisementContent('en-US'),
   };
 
   public aboutFeatures: Record<WebsitePageEditorLocale, AboutFeatureDraft[]> = {
-    'id-ID': this.createAboutFeatures(),
-    'en-US': this.createAboutFeatures(),
+    'id-ID': createAboutFeatures(),
+    'en-US': createAboutFeatures(),
   };
 
-  public readonly gadgetHomeMediaRoles = [
-    ...GADGET_HOME_MEDIA_RULES.map((rule) => ({
-      value: rule.value,
-      label: `${rule.label} (${rule.recommendedWidth} × ${rule.recommendedHeight})`,
-    })),
-    { value: 'og', label: 'Open Graph / share image' },
-  ];
+  public readonly gadgetHomeMediaRoles = GADGET_HOME_MEDIA_ROLES;
+
+  // Pure helpers the template calls.
+  readonly gadgetHomeMediaRequirement = gadgetHomeMediaRequirement;
+  readonly gadgetHomeMediaIssue = gadgetHomeMediaIssue;
+  readonly gadgetHomeMediaActionIssue = gadgetHomeMediaActionIssue;
+  readonly previewLanguageLabelKey = previewLanguageLabelKey;
+  readonly previewVisibilityKey = previewVisibilityKey;
+  readonly publicationDateValue = publicationDateValue;
+  readonly gadgetHomeMediaRule = getGadgetHomeMediaRule;
 
   //==================================================
   //==== TRANSLATION FORM
@@ -538,22 +502,22 @@ export class WebsitePageForm {
       this.resetTranslationForm('id-ID');
       this.resetTranslationForm('en-US');
       this.homeSectionVisibility = {
-        'id-ID': this.createHomeSectionVisibility(),
-        'en-US': this.createHomeSectionVisibility(),
+        'id-ID': createHomeSectionVisibility(),
+        'en-US': createHomeSectionVisibility(),
       };
 
       this.homeLatexContent = {
-        'id-ID': this.createHomeLatexContent('id-ID'),
-        'en-US': this.createHomeLatexContent('en-US'),
+        'id-ID': createHomeLatexContent('id-ID'),
+        'en-US': createHomeLatexContent('en-US'),
       };
       this.homeAdvertisementContent = {
-        'id-ID': this.createHomeAdvertisementContent('id-ID'),
-        'en-US': this.createHomeAdvertisementContent('en-US'),
+        'id-ID': createHomeAdvertisementContent('id-ID'),
+        'en-US': createHomeAdvertisementContent('en-US'),
       };
 
       this.aboutFeatures = {
-        'id-ID': this.createAboutFeatures(),
-        'en-US': this.createAboutFeatures(),
+        'id-ID': createAboutFeatures(),
+        'en-US': createAboutFeatures(),
       };
 
       this.translationForm('id-ID').disable({
@@ -569,7 +533,7 @@ export class WebsitePageForm {
       //==================================================
 
       data.translations.forEach((translation) => {
-        const locale = this.parseLocale(translation.website_page_locale);
+        const locale = parseLocale(translation.website_page_locale);
 
         if (!locale) {
           return;
@@ -614,27 +578,26 @@ export class WebsitePageForm {
           },
         );
 
-        this.homeSectionVisibility[locale] = this.readHomeSectionVisibility(
+        this.homeSectionVisibility[locale] = readHomeSectionVisibility(
           translation.website_page_content_json,
         );
 
-        this.homeLatexContent[locale] = this.readHomeLatexContent(
+        this.homeLatexContent[locale] = readHomeLatexContent(
           locale,
           translation.website_page_content_json,
         );
-        this.homeAdvertisementContent[locale] =
-          this.readHomeAdvertisementContent(
-            locale,
-            translation.website_page_content_json,
-          );
+        this.homeAdvertisementContent[locale] = readHomeAdvertisementContent(
+          locale,
+          translation.website_page_content_json,
+        );
 
-        this.aboutFeatures[locale] = this.readAboutFeatures(
+        this.aboutFeatures[locale] = readAboutFeatures(
           translation.website_page_content_json,
         );
       });
 
       const defaultLocale =
-        this.parseLocale(data.website_page_default_locale) ?? 'id-ID';
+        parseLocale(data.website_page_default_locale) ?? 'id-ID';
 
       this.enableLanguage(defaultLocale);
 
@@ -645,10 +608,10 @@ export class WebsitePageForm {
       //==================================================
 
       this.pageMedia = data.attachments.map((item) => {
-        const translations = this.createEmptyMediaTranslations();
+        const translations = createEmptyMediaTranslations();
 
         item.translations.forEach((translation) => {
-          const locale = this.parseLocale(
+          const locale = parseLocale(
             translation.website_page_attachment_locale,
           );
 
@@ -770,235 +733,6 @@ export class WebsitePageForm {
     ];
   }
 
-  private createHomeSectionVisibility(): HomeSectionVisibility {
-    return { ...HOME_SECTION_DEFAULTS };
-  }
-
-  private readHomeSectionVisibility(content: unknown): HomeSectionVisibility {
-    const visibility = this.createHomeSectionVisibility();
-    if (!this.isRecord(content)) return visibility;
-
-    const keys = [2, 3].includes(Number(content['home_contract_version']))
-      ? HOME_SECTION_KEYS
-      : (['tags', 'newsletter'] as const);
-
-    for (const key of keys) {
-      const section = content[key];
-      if (this.isRecord(section) && typeof section['status'] === 'boolean') {
-        visibility[key] = section['status'];
-      }
-    }
-
-    return visibility;
-  }
-
-  private buildHomeContentJson(
-    locale: WebsitePageEditorLocale,
-    existing: unknown,
-  ): Record<string, unknown> {
-    const source = this.isRecord(existing) ? existing : {};
-    const content: Record<string, unknown> = { home_contract_version: 3 };
-
-    for (const key of HOME_SECTION_KEYS) {
-      const current = this.isRecord(source[key]) ? source[key] : {};
-      content[key] = {
-        ...current,
-        status: this.homeSectionVisibility[locale][key],
-      };
-    }
-
-    content['latex_features'] = {
-      ...(this.isRecord(content['latex_features'])
-        ? content['latex_features']
-        : {}),
-      ...this.homeLatexContent[locale],
-      items: this.homeLatexContent[locale].items
-        .map((item) => ({
-          title: item.title.trim(),
-          description: item.description.trim(),
-        }))
-        .filter((item) => item.title && item.description),
-      status: this.homeSectionVisibility[locale].latex_features,
-    };
-    content['advertisement'] = {
-      ...(this.isRecord(content['advertisement'])
-        ? content['advertisement']
-        : {}),
-      ...this.homeAdvertisementContent[locale],
-      status: this.homeSectionVisibility[locale].advertisement,
-    };
-
-    return content;
-  }
-
-  private createHomeLatexContent(
-    locale: WebsitePageEditorLocale,
-  ): HomeLatexContentDraft {
-    const english = locale === 'en-US';
-    const items = english
-      ? [
-          [
-            'High Elasticity & Responsiveness',
-            'Natural latex features a molecular structure that is exceptionally springy and instantly responsive to pressure, offering optimal bounce-back resilience without sagging even under intensive daily use.',
-          ],
-          [
-            'Damping & Load Support',
-            'Superior weight distribution makes this material exceptional at absorbing vibrations and stabilizing load support—ideal for furniture, automotive cushioning, and custom pads.',
-          ],
-          [
-            'Hypoallergenic & Hygienic',
-            'Naturally resistant to mold, bacteria, mildew, and dust mites. Keeps products fresh, clean, and safe for babies, pets, and sensitive skin.',
-          ],
-          [
-            'Harmful Chemical Free',
-            'Crafted purely from select natural sap without hazardous synthetic mixtures or toxic gas emissions, guaranteeing total health safety for indoor environments.',
-          ],
-          [
-            'Airflow & Pinhole Structure',
-            'Equipped with an open-cell structure and specialized pinhole molds that maximize natural airflow, actively preventing heat buildup and maintaining a cool surface.',
-          ],
-          [
-            'Versatile Applications',
-            'From flexible sheet materials for industrial raw goods, creative crafts, ergonomic pillows, to pet accessories and room furnishings, MATEX latex easily adapts.',
-          ],
-          [
-            'Long-Lasting Durability',
-            'Renowned for high structural density and exceptional wear resistance. MATEX latex products maintain structural integrity and comfort over years of use.',
-          ],
-          [
-            'Eco-Friendly & Sustainable',
-            'Sourced from renewable natural rubber trees and biodegradable by nature, contributing meaningfully to plastic waste reduction and environmental preservation.',
-          ],
-        ]
-      : [
-          [
-            'Elastisitas & Respon Tinggi',
-            'Lateks alami memiliki struktur molekul yang sangat kenyal dan responsif secara instan terhadap tekanan, memberikan daya pantul optimal yang kembali ke bentuk semula tanpa mudah amblas meskipun digunakan secara intensif setiap hari.',
-          ],
-          [
-            'Peredam & Penopang Beban',
-            'Kemampuan mendistribusikan bobot secara merata menjadikan material ini unggul dalam meredam getaran serta menopang berat secara stabil—sangat ideal diaplikasikan pada furnitur, jok otomotif, hingga alas produk kesayangan Anda.',
-          ],
-          [
-            'Hipoalergenik & Higienis',
-            'Secara alami bersifat resisten terhadap pertumbuhan jamur, bakteri, lumut, dan tungau debu. Menjaga produk tetap bersih, higienis, serta aman digunakan bahkan untuk bayi, hewan peliharaan, dan pemilik kulit sensitif.',
-          ],
-          [
-            'Bebas Bahan Kimia Berbahaya',
-            'Diproduksi murni dari getah pilihan tanpa campuran bahan sintetis berbahaya atau emisi gas beracun. Menjamin keamanan total bagi kesehatan keluarga sekaligus ramah untuk berbagai fungsi penggunaan di dalam ruangan.',
-          ],
-          [
-            'Sirkulasi Udara & Pinhole',
-            'Dilengkapi struktur sel terbuka serta pori-pori cetakan (pinhole) yang memaksimalkan sirkulasi udara alami. Fitur ini secara efektif mencegah penumpukan kelembapan dan panas, sehingga material tetap sejuk saat disentuh.',
-          ],
-          [
-            'Fleksibel Berbagai Aplikasi',
-            'Mulai dari bentuk lembaran fleksibel untuk bahan baku industri, kerajinan kreatif, bantal ergonomis, hingga aksesori peliharaan dan properti ruangan, lateks MATEX mudah dibentuk dan disesuaikan dengan berbagai kebutuhan manufaktur.',
-          ],
-          [
-            'Daya Tahan Jangka Panjang',
-            'Dikenal memiliki durabilitas tingkat tinggi yang tahan terhadap keausan struktural. Produk berbahan lateks MATEX mampu mempertahankan performa, keempukan, dan bentuk aslinya hingga bertahun-tahun pemakaian.',
-          ],
-          [
-            'Ramah Lingkungan (Eco-Friendly)',
-            'Bersumber dari getah pohon karet alami yang dapat diperbarui (renewable resource) dan bersifat biodegradable. Pemilihan material ini ikut berkontribusi nyata dalam menekan limbah sintetis demi kelestarian bumi.',
-          ],
-        ];
-
-    return {
-      eyebrow: english ? 'MATEX EXCELLENCE' : 'KEUNGGULAN MATEX',
-      title: english
-        ? 'Why Choose 100% Natural Latex?'
-        : 'Kenapa Harus 100% Natural Latex?',
-      description: english
-        ? 'The ultimate high-standard universal material solution, engineered to deliver exceptional flexibility, safety, and comfort for diverse industrial, property, and lifestyle needs.'
-        : 'Solusi material universal berstandar tinggi yang dirancang untuk memberikan fleksibilitas, keamanan, dan kenyamanan terbaik bagi berbagai kebutuhan industri, properti, hingga gaya hidup.',
-      items: items.map(([title, description]) => ({ title, description })),
-    };
-  }
-
-  private readHomeLatexContent(
-    locale: WebsitePageEditorLocale,
-    content: unknown,
-  ): HomeLatexContentDraft {
-    const defaults = this.createHomeLatexContent(locale);
-    if (!this.isRecord(content) || !this.isRecord(content['latex_features']))
-      return defaults;
-    const section = content['latex_features'];
-    const items = Array.isArray(section['items'])
-      ? section['items']
-          .filter((item): item is Record<string, unknown> =>
-            this.isRecord(item),
-          )
-          .map((item) => ({
-            title: typeof item['title'] === 'string' ? item['title'] : '',
-            description:
-              typeof item['description'] === 'string'
-                ? item['description']
-                : '',
-          }))
-          .filter((item) => item.title || item.description)
-          .slice(0, 8)
-      : [];
-
-    return {
-      eyebrow:
-        typeof section['eyebrow'] === 'string'
-          ? section['eyebrow']
-          : defaults.eyebrow,
-      title:
-        typeof section['title'] === 'string'
-          ? section['title']
-          : defaults.title,
-      description:
-        typeof section['description'] === 'string'
-          ? section['description']
-          : defaults.description,
-      items: items.length ? items : defaults.items,
-    };
-  }
-
-  private createHomeAdvertisementContent(
-    locale: WebsitePageEditorLocale,
-  ): HomeAdvertisementDraft {
-    return locale === 'en-US'
-      ? {
-          label: 'MATEX PROMOTION',
-          title: 'Need a natural latex solution for your business?',
-          description:
-            'Talk with our team about product specifications, availability, and partnership opportunities.',
-          cta_label: 'Contact MATEX',
-          cta_url: '/en/contact-us',
-        }
-      : {
-          label: 'PROMOSI MATEX',
-          title: 'Butuh solusi lateks alami untuk bisnis Anda?',
-          description:
-            'Diskusikan spesifikasi produk, ketersediaan, dan peluang kerja sama bersama tim kami.',
-          cta_label: 'Hubungi MATEX',
-          cta_url: '/kontak',
-        };
-  }
-
-  private readHomeAdvertisementContent(
-    locale: WebsitePageEditorLocale,
-    content: unknown,
-  ): HomeAdvertisementDraft {
-    const defaults = this.createHomeAdvertisementContent(locale);
-    if (!this.isRecord(content) || !this.isRecord(content['advertisement']))
-      return defaults;
-    const section = content['advertisement'];
-    const field = (key: keyof HomeAdvertisementDraft): string =>
-      typeof section[key] === 'string' ? section[key] : defaults[key];
-    return {
-      label: field('label'),
-      title: field('title'),
-      description: field('description'),
-      cta_label: field('cta_label'),
-      cta_url: field('cta_url'),
-    };
-  }
-
   updateHomeLatexItem(
     locale: WebsitePageEditorLocale,
     index: number,
@@ -1010,49 +744,6 @@ export class WebsitePageForm {
     this.homeLatexContent = {
       ...this.homeLatexContent,
       [locale]: { ...this.homeLatexContent[locale], items },
-    };
-  }
-
-  private createAboutFeatures(): AboutFeatureDraft[] {
-    return Array.from({ length: 3 }, () => ({ title: '', description: '' }));
-  }
-
-  private readAboutFeatures(content: unknown): AboutFeatureDraft[] {
-    const result = this.createAboutFeatures();
-    if (!this.isRecord(content)) return result;
-
-    const highlights =
-      content['about_contract_version'] === ABOUT_CONTRACT_VERSION &&
-      Array.isArray(content['highlights'])
-        ? content['highlights']
-        : Array.isArray(content['features'])
-          ? content['features']
-          : [];
-
-    highlights.slice(0, 3).forEach((item, index) => {
-      if (!this.isRecord(item)) return;
-      result[index] = {
-        title: typeof item['title'] === 'string' ? item['title'] : '',
-        description:
-          typeof item['description'] === 'string' ? item['description'] : '',
-      };
-    });
-
-    return result;
-  }
-
-  private buildAboutContentJson(
-    locale: WebsitePageEditorLocale,
-    _existing: unknown,
-  ): Record<string, unknown> {
-    return {
-      about_contract_version: ABOUT_CONTRACT_VERSION,
-      highlights: this.aboutFeatures[locale]
-        .map((feature) => ({
-          title: feature.title.trim(),
-          description: feature.description.trim(),
-        }))
-        .filter((feature) => feature.title && feature.description),
     };
   }
 
@@ -1107,31 +798,6 @@ export class WebsitePageForm {
       [field]: value,
     };
     this.aboutFeatures = { ...this.aboutFeatures };
-  }
-
-  private isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-  }
-
-  //==================================================
-  //==== EMPTY MEDIA TRANSLATIONS
-  //==================================================
-
-  private createEmptyMediaTranslations(): Record<
-    WebsitePageEditorLocale,
-    WebsitePageEditorMediaTranslationDraft
-  > {
-    return {
-      'id-ID': {
-        caption: '',
-        alt_text: '',
-      },
-
-      'en-US': {
-        caption: '',
-        alt_text: '',
-      },
-    };
   }
 
   //==================================================
@@ -1423,16 +1089,6 @@ export class WebsitePageForm {
       });
   }
 
-  private slugifyAssistant(value: string): string {
-    return String(value || '')
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 255);
-  }
-
   private showContentAssistantError(error: any): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
@@ -1466,9 +1122,8 @@ export class WebsitePageForm {
 
     if (this.activeLocale === locale) {
       const defaultLocale =
-        this.parseLocale(
-          this.form.controls.website_page_default_locale.value,
-        ) ?? 'id-ID';
+        parseLocale(this.form.controls.website_page_default_locale.value) ??
+        'id-ID';
 
       this.activeLocale = defaultLocale;
     }
@@ -1509,14 +1164,6 @@ export class WebsitePageForm {
     );
   }
 
-  private parseLocale(value: string): WebsitePageEditorLocale | null {
-    if (value === 'id-ID' || value === 'en-US') {
-      return value;
-    }
-
-    return null;
-  }
-
   //==================================================
   //==== TRANSLATION SLUG
   //==================================================
@@ -1528,23 +1175,13 @@ export class WebsitePageForm {
       return;
     }
 
-    group.controls.slug.setValue(this.slugify(group.controls.title.value));
+    group.controls.slug.setValue(slugify(group.controls.title.value));
   }
 
   normalizeTranslationSlug(locale: WebsitePageEditorLocale): void {
     const control = this.translationForm(locale).controls.slug;
 
-    control.setValue(this.slugify(control.value));
-  }
-
-  private slugify(value: string): string {
-    return value
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    control.setValue(slugify(control.value));
   }
 
   //==================================================
@@ -1686,12 +1323,12 @@ export class WebsitePageForm {
     void this.mediaModal()?.openModal({
       selection: current?.attachment ?? null,
       title: `Pilih gambar · ${rule.label}`,
-      description: this.gadgetHomeMediaRequirement(rule),
+      description: gadgetHomeMediaRequirement(rule),
       multiple: false,
       maxSelection: 1,
       disabledSelectionIds,
       validateSelection: (attachment) =>
-        this.gadgetHomeAttachmentIssue(attachment, rule),
+        gadgetHomeAttachmentIssue(attachment, rule),
     });
   }
 
@@ -1730,7 +1367,7 @@ export class WebsitePageForm {
 
   selectMedia(selection: MediaSelection): void {
     if (this.isGadgetHomeTemplate && this.activeHomeMediaRole) {
-      const [attachment] = this.toAttachmentArray(selection);
+      const [attachment] = toAttachmentArray(selection);
       if (!attachment) return;
 
       const role = this.activeHomeMediaRole;
@@ -1744,20 +1381,17 @@ export class WebsitePageForm {
           attachment,
         };
       } else {
-        this.pageMedia.push(this.createMediaDraft(attachment, role));
+        this.pageMedia.push(createMediaDraft(attachment, role));
       }
 
-      this.pageMedia = this.sortGadgetHomeMedia(this.pageMedia);
+      this.pageMedia = sortGadgetHomeMedia(this.pageMedia);
       this.activeHomeMediaRole = null;
       return;
     }
 
     const selected = this.isGadgetHomeTemplate
-      ? this.toAttachmentArray(selection).slice(
-          0,
-          this.gadgetHomeMediaRoles.length,
-        )
-      : this.toAttachmentArray(selection);
+      ? toAttachmentArray(selection).slice(0, this.gadgetHomeMediaRoles.length)
+      : toAttachmentArray(selection);
 
     const oldMap = new Map(
       this.pageMedia.map((item) => [item.attachment.id_attachment, item]),
@@ -1792,36 +1426,8 @@ export class WebsitePageForm {
 
       assignedRoles.add(role);
 
-      return this.createMediaDraft(attachment, role);
+      return createMediaDraft(attachment, role);
     });
-  }
-
-  private createMediaDraft(
-    attachment: IAttachment,
-    role: string,
-  ): WebsitePageEditorMediaDraft {
-    return {
-      attachment,
-      role,
-      is_public: true,
-      action_type: 'none',
-      action_value: '',
-      translations: this.createEmptyMediaTranslations(),
-    };
-  }
-
-  private sortGadgetHomeMedia(
-    media: WebsitePageEditorMediaDraft[],
-  ): WebsitePageEditorMediaDraft[] {
-    const order = new Map(
-      this.gadgetHomeMediaRoles.map((option, index) => [option.value, index]),
-    );
-
-    return [...media].sort(
-      (left, right) =>
-        (order.get(left.role) ?? Number.MAX_SAFE_INTEGER) -
-        (order.get(right.role) ?? Number.MAX_SAFE_INTEGER),
-    );
   }
 
   setHero(index: number): void {
@@ -1888,96 +1494,6 @@ export class WebsitePageForm {
     );
   }
 
-  gadgetHomeMediaRule(role: string): GadgetHomeMediaRule | null {
-    return getGadgetHomeMediaRule(role);
-  }
-
-  gadgetHomeMediaRequirement(rule: GadgetHomeMediaRule): string {
-    return `Rekomendasi ${rule.recommendedWidth} × ${rule.recommendedHeight}px · minimal ${rule.minWidth} × ${rule.minHeight}px`;
-  }
-
-  gadgetHomeMediaIssue(media: WebsitePageEditorMediaDraft): string | null {
-    const rule = getGadgetHomeMediaRule(media.role);
-
-    if (!rule) {
-      return media.role === 'og'
-        ? null
-        : 'Slot gambar tidak dikenali. Pilih slot desain yang tersedia.';
-    }
-
-    return this.gadgetHomeAttachmentIssue(media.attachment, rule);
-  }
-
-  gadgetHomeAttachmentIssue(
-    attachment: IAttachment,
-    rule: GadgetHomeMediaRule,
-  ): string | null {
-    if (!this.pageMediaAccept.includes(attachment.mime_type)) {
-      return 'Format harus JPEG, PNG, atau WebP.';
-    }
-
-    const width = attachment.width;
-    const height = attachment.height;
-
-    if (!width || !height) {
-      return 'Dimensi gambar tidak terbaca. Unggah ulang gambar yang valid.';
-    }
-
-    if (width < rule.minWidth || height < rule.minHeight) {
-      return `Gambar terlalu kecil. Minimal ${rule.minWidth} × ${rule.minHeight}px.`;
-    }
-
-    const expectedRatio = rule.recommendedWidth / rule.recommendedHeight;
-    const actualRatio = width / height;
-    const ratioDifference =
-      Math.abs(actualRatio - expectedRatio) / expectedRatio;
-
-    if (ratioDifference > rule.ratioTolerance) {
-      return `Rasio gambar tidak sesuai slot. Gunakan rasio ${rule.recommendedWidth}:${rule.recommendedHeight}.`;
-    }
-
-    return null;
-  }
-
-  gadgetHomeMediaActionIssue(
-    media: WebsitePageEditorMediaDraft,
-  ): string | null {
-    const target = media.action_value;
-
-    if (media.action_type === 'none') {
-      return target
-        ? 'Banner tanpa aksi tidak boleh memiliki tujuan tautan.'
-        : null;
-    }
-
-    if (!target) {
-      return 'Tujuan tautan wajib diisi untuk aksi banner ini.';
-    }
-
-    if (
-      media.action_type === 'external' &&
-      !/^https:\/\/[^\s]+$/i.test(target)
-    ) {
-      return 'Tautan eksternal harus berupa alamat HTTPS lengkap.';
-    }
-
-    if (
-      media.action_type === 'internal' &&
-      (!/^\/(?!\/)[^\s]*$/.test(target) || target.includes('..'))
-    ) {
-      return 'Halaman website harus diawali / dan tidak boleh memuat ..';
-    }
-
-    if (
-      (media.action_type === 'product' || media.action_type === 'category') &&
-      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(target)
-    ) {
-      return 'Gunakan slug huruf kecil, angka, dan tanda hubung.';
-    }
-
-    return null;
-  }
-
   get gadgetHomeMissingMediaRules(): readonly GadgetHomeMediaRule[] {
     if (!this.isGadgetHomeTemplate) return [];
 
@@ -2005,16 +1521,14 @@ export class WebsitePageForm {
   get gadgetHomeMediaHasInvalidFiles(): boolean {
     return (
       this.isGadgetHomeTemplate &&
-      this.pageMedia.some((media) => this.gadgetHomeMediaIssue(media) !== null)
+      this.pageMedia.some((media) => gadgetHomeMediaIssue(media) !== null)
     );
   }
 
   get gadgetHomeMediaHasInvalidActions(): boolean {
     return (
       this.isGadgetHomeTemplate &&
-      this.pageMedia.some(
-        (media) => this.gadgetHomeMediaActionIssue(media) !== null,
-      )
+      this.pageMedia.some((media) => gadgetHomeMediaActionIssue(media) !== null)
     );
   }
 
@@ -2139,25 +1653,6 @@ export class WebsitePageForm {
     this.pageMedia = [...this.pageMedia];
   }
 
-  private toAttachmentArray(selection: MediaSelection): IAttachment[] {
-    if (!selection) {
-      return [];
-    }
-
-    if (Array.isArray(selection)) {
-      return selection.filter(
-        (item): item is IAttachment =>
-          typeof item === 'object' && item !== null && 'id_attachment' in item,
-      );
-    }
-
-    if (typeof selection === 'object' && 'id_attachment' in selection) {
-      return [selection as IAttachment];
-    }
-
-    return [];
-  }
-
   //==================================================
   //==== PUBLICATION
   //==================================================
@@ -2184,7 +1679,7 @@ export class WebsitePageForm {
 
   get defaultTranslationPublished(): boolean {
     const locale =
-      this.parseLocale(this.form.controls.website_page_default_locale.value) ??
+      parseLocale(this.form.controls.website_page_default_locale.value) ??
       'id-ID';
 
     return this.translationForm(locale).controls.status.value === 1;
@@ -2375,7 +1870,7 @@ export class WebsitePageForm {
 
           const title = value.title.trim();
 
-          const slug = value.slug.trim() || this.slugify(title);
+          const slug = value.slug.trim() || slugify(title);
 
           return {
             website_page_locale: language.locale,
@@ -2389,15 +1884,14 @@ export class WebsitePageForm {
             website_page_content: value.content || null,
 
             website_page_content_json: this.isGadgetHomeTemplate
-              ? this.buildHomeContentJson(
-                  language.locale,
+              ? buildHomeContentJson(
                   existing?.website_page_content_json,
+                  this.homeSectionVisibility[language.locale],
+                  this.homeLatexContent[language.locale],
+                  this.homeAdvertisementContent[language.locale],
                 )
               : this.isAboutTemplate
-                ? this.buildAboutContentJson(
-                    language.locale,
-                    existing?.website_page_content_json,
-                  )
+                ? buildAboutContentJson(this.aboutFeatures[language.locale])
                 : (existing?.website_page_content_json ?? null),
 
             website_page_meta_title: value.meta_title.trim() || null,
@@ -2576,7 +2070,7 @@ export class WebsitePageForm {
 
   private previewPublishAt(): string | null {
     if (this.publicationChoice === 'schedule') {
-      return this.toPreviewIso(this.publicationPublishAt);
+      return toPreviewIso(this.publicationPublishAt);
     }
 
     if (this.publicationChoice === 'publish_now') {
@@ -2595,7 +2089,7 @@ export class WebsitePageForm {
       this.publicationChoice === 'publish_now' ||
       this.publicationChoice === 'schedule'
     ) {
-      return this.toPreviewIso(this.publicationUnpublishAt);
+      return toPreviewIso(this.publicationUnpublishAt);
     }
 
     if (this.publicationChoice === 'current') {
@@ -2603,16 +2097,6 @@ export class WebsitePageForm {
     }
 
     return null;
-  }
-
-  private toPreviewIso(value: string): string | null {
-    if (!value) {
-      return null;
-    }
-
-    const date = new Date(value);
-
-    return Number.isNaN(date.getTime()) ? null : date.toISOString();
   }
 
   //==================================================
@@ -2656,24 +2140,6 @@ export class WebsitePageForm {
           (this.isGadgetHomeTemplate ? 'home_main' : 'hero'),
       )?.original_name ?? '-'
     );
-  }
-
-  previewLanguageLabelKey(locale: string): string {
-    return locale === 'en-US'
-      ? 'website_page.language_english'
-      : 'website_page.language_indonesian';
-  }
-
-  previewVisibilityKey(value: number): string {
-    if (value === 0) {
-      return 'private';
-    }
-
-    if (value === 2) {
-      return 'unlisted';
-    }
-
-    return 'public';
   }
 
   previewPublicationChoiceKey(): string {
@@ -2943,7 +2409,7 @@ export class WebsitePageForm {
   private buildPublicationActions(): IWebsitePageEditorPublicationPayload[] {
     const currentStatus = this.editData()?.effective_status ?? 'draft';
 
-    const unpublishAt = this.toPreviewIso(this.publicationUnpublishAt);
+    const unpublishAt = toPreviewIso(this.publicationUnpublishAt);
 
     switch (this.publicationChoice) {
       case 'current':
@@ -3012,7 +2478,7 @@ export class WebsitePageForm {
         const action: IWebsitePageEditorPublicationPayload = {
           action: 'schedule',
 
-          website_page_publish_at: this.toPreviewIso(this.publicationPublishAt),
+          website_page_publish_at: toPreviewIso(this.publicationPublishAt),
 
           website_page_unpublish_at: unpublishAt,
         };
@@ -3033,38 +2499,6 @@ export class WebsitePageForm {
   //==== DATETIME INPUT
   //==================================================
 
-  private toLocalDateTimeInput(value: string | null): string {
-    if (!value) {
-      return '';
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-
-    const year = date.getFullYear();
-
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-
-    const day = String(date.getDate()).padStart(2, '0');
-
-    const hour = String(date.getHours()).padStart(2, '0');
-
-    const minute = String(date.getMinutes()).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-  }
-
-  publicationDateValue(value: NgbDateStruct | null): Date | null {
-    if (!value) {
-      return null;
-    }
-
-    return new Date(value.year, value.month - 1, value.day, 0, 0, 0, 0);
-  }
-
   get publicationMinDate(): NgbDateStruct {
     const now = new Date();
 
@@ -3076,14 +2510,14 @@ export class WebsitePageForm {
   }
 
   syncPublicationPublishDateTime(): void {
-    this.publicationPublishAt = this.composePublicationDateTime(
+    this.publicationPublishAt = composePublicationDateTime(
       this.publicationPublishDate,
       this.publicationPublishTime,
     );
   }
 
   syncPublicationUnpublishDateTime(): void {
-    this.publicationUnpublishAt = this.composePublicationDateTime(
+    this.publicationUnpublishAt = composePublicationDateTime(
       this.publicationUnpublishDate,
       this.publicationUnpublishTime,
     );
@@ -3106,7 +2540,7 @@ export class WebsitePageForm {
 
     date.setMinutes(nextMinute);
 
-    this.publicationPublishDate = this.dateToNgbDate(date);
+    this.publicationPublishDate = dateToNgbDate(date);
 
     this.publicationPublishTime = {
       hour: date.getHours(),
@@ -3121,7 +2555,7 @@ export class WebsitePageForm {
     type: 'publish' | 'unpublish',
     value: string | null,
   ): void {
-    const localValue = this.toLocalDateTimeInput(value);
+    const localValue = toLocalDateTimeInput(value);
 
     if (!localValue) {
       if (type === 'publish') {
@@ -3139,7 +2573,7 @@ export class WebsitePageForm {
 
     const date = new Date(value!);
 
-    const dateStruct = this.dateToNgbDate(date);
+    const dateStruct = dateToNgbDate(date);
 
     const timeStruct: NgbTimeStruct = {
       hour: date.getHours(),
@@ -3158,35 +2592,6 @@ export class WebsitePageForm {
     this.publicationUnpublishAt = localValue;
     this.publicationUnpublishDate = dateStruct;
     this.publicationUnpublishTime = timeStruct;
-  }
-
-  private composePublicationDateTime(
-    date: NgbDateStruct | null,
-    time: NgbTimeStruct | null,
-  ): string {
-    if (!date || !time) {
-      return '';
-    }
-
-    const year = String(date.year);
-
-    const month = String(date.month).padStart(2, '0');
-
-    const day = String(date.day).padStart(2, '0');
-
-    const hour = String(time.hour).padStart(2, '0');
-
-    const minute = String(time.minute).padStart(2, '0');
-
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-  }
-
-  private dateToNgbDate(date: Date): NgbDateStruct {
-    return {
-      year: date.getFullYear(),
-      month: date.getMonth() + 1,
-      day: date.getDate(),
-    };
   }
 
   //==================================================
