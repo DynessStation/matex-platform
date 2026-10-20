@@ -1,0 +1,70 @@
+<section class="category-panel">
+  <div class="category-heading">
+    <h5>Media produk</h5>
+    <p>
+      Gambar utama dan gambar sosial tetap berupa gambar. Galeri dapat berisi
+      gabungan gambar dan video.
+    </p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="category-media">
+        <h6>Gambar utama</h6>
+        <small>Rekomendasi minimal 1000 × 1000px.</small
+        ><app-image-upload
+          [multipleImage]="false"
+          [accept]="editor.productImageAccept"
+          [collection]="'product_media'"
+          [image]="$any(editor.media.thumbnail)"
+          (selectedFiles)="editor.selectMedia('thumbnail', $event)"
+        />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="category-media">
+        <h6>Gambar sosial</h6>
+        <small>Rekomendasi 1200 × 630px.</small
+        ><app-image-upload
+          [multipleImage]="false"
+          [accept]="editor.productImageAccept"
+          [collection]="'product_media'"
+          [image]="$any(editor.media.og)"
+          (selectedFiles)="editor.selectMedia('og', $event)"
+        />
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="category-media">
+        <h6>Galeri produk</h6>
+        <small
+          >Pilih maksimal 10 gambar atau video (MP4, WebM, OGG). Urutan pilihan
+          menjadi urutan tampil di publik. Video potret ditampilkan maksimal
+          dalam bingkai 9:16 dan video 1:1 tetap didukung tanpa memenuhi tinggi
+          halaman.</small
+        ><app-image-upload
+          [multipleImage]="true"
+          [accept]="editor.productGalleryAccept"
+          [collection]="'product_media'"
+          [maxFiles]="10"
+          [images]="$any(editor.media.gallery)"
+          (selectedFiles)="editor.selectMedia('gallery', $event)"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="category-actions">
+    <button
+      type="button"
+      class="btn btn-outline"
+      (click)="editor.setTab('channels')"
+    >
+      <i class="ri-arrow-left-line"></i> Kembali</button
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('seo')"
+    >
+      Lanjut ke SEO <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>

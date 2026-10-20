@@ -1,0 +1,365 @@
+<section class="category-panel">
+  <div class="category-heading">
+    <h5>Harga dan kanal penjualan</h5>
+    <p>
+      Harga publik dapat ditampilkan atau disembunyikan. Marketplace tetap
+      berupa tautan resmi; commerce internal disiapkan tetapi belum diaktifkan.
+    </p>
+  </div>
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <label class="form-label">Tampilan harga publik</label>
+      @if (editor.isBrowser) {
+        <select2
+          class="custom-select d-block"
+          [data]="editor.priceVisibilityOptions"
+          formControlName="price_visibility"
+          noResultMessage="Tidak ada pilihan"
+        />
+      }
+    </div>
+    <div class="col-md-6">
+      <label class="app-check app-check-card category-check mt-4"
+        ><input type="checkbox" formControlName="internal_commerce_enabled" />
+        Aktifkan commerce internal
+        <small>(belum untuk v1)</small></label
+      >
+    </div>
+  </div>
+  <div class="repeater-heading">
+    <div>
+      <h6>Harga produk per mata uang</h6>
+      <p class="section-help">
+        Nominal Rupiah dan Dollar disimpan terpisah. Website akan memakai harga
+        konsumen sesuai mata uang yang dipilih pengunjung, tanpa menghitung kurs
+        ulang. Jika harga ditampilkan, harga konsumen IDR dan USD wajib aktif
+        dan ditandai tampil di website.
+      </p>
+      @if (editor.pricePublicationError) {
+        <div class="text-danger mt-2">
+          Lengkapi dan aktifkan satu harga konsumen Rupiah serta satu harga
+          konsumen Dollar untuk website.
+        </div>
+      }
+    </div>
+    <div class="price-add-actions">
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="editor.addCurrencyPrice('IDR')"
+      >
+        <i class="ri-add-line"></i> Harga Rupiah
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="editor.addCurrencyPrice('USD')"
+      >
+        <i class="ri-add-line"></i> Harga Dollar
+      </button>
+    </div>
+  </div>
+  <div formArrayName="prices">
+    @for (row of editor.prices.controls; track $index) {
+      <div class="repeater-card" [formGroupName]="$index">
+        <div class="price-card-heading">
+          <strong>{{ priceCardTitle($index) }}</strong>
+          <span>{{ row.get('currency')?.value }}</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label">Untuk siapa?</label>
+            @if (editor.isBrowser) {
+              <select2
+                class="custom-select d-block"
+                [data]="editor.priceTypeOptions"
+                formControlName="type"
+                [displaySearchStatus]="'hidden'"
+              />
+            }
+            <small class="field-help"
+              >Konsumen untuk harga katalog; grosir untuk data internal dan
+              transaksi berikutnya.</small
+            >
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label">Mata uang</label>
+            @if (editor.isBrowser) {
+              <select2
+                class="custom-select d-block"
+                [data]="editor.currencyOptions"
+                formControlName="currency"
+                [displaySearchStatus]="'hidden'"
+              />
+            }
+            <small class="field-help"
+              >Pilih IDR untuk Rupiah atau USD untuk Dollar AS.</small
+            >
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label">Nominal harga</label>
+            <div class="input-group">
+              <span class="input-group-text">{{ priceSymbol($index) }}</span>
+              <input
+                type="text"
+                inputmode="numeric"
+                appLocalizedNumber
+                class="form-control"
+                formControlName="amount"
+                placeholder="0"
+              />
+            </div>
+            @if (pricePreview($index)) {
+              <small class="field-help price-preview"
+                >Tampil sebagai {{ pricePreview($index) }}</small
+              >
+            }
+            @if (row.get('amount')?.touched && row.get('amount')?.invalid) {
+              <div class="text-danger mt-1">
+                Nominal wajib diisi dengan angka nol atau lebih.
+              </div>
+            }
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <label class="form-label">Nama harga</label>
+            <input
+              class="form-control"
+              formControlName="label"
+              placeholder="Contoh: Harga konsumen"
+            />
+            <small class="field-help"
+              >Nama internal agar baris harga mudah dikenali.</small
+            >
+          </div>
+          @if (row.get('type')?.value === 'wholesale') {
+            <div class="col-lg-3 col-md-6">
+              <label class="form-label">Minimum pembelian</label>
+              <input
+                type="text"
+                inputmode="numeric"
+                appLocalizedNumber
+                class="form-control"
+                formControlName="min_qty"
+                placeholder="Contoh: 10"
+              />
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <label class="form-label">Maksimum pembelian</label>
+              <input
+                type="text"
+                inputmode="numeric"
+                appLocalizedNumber
+                class="form-control"
+                formControlName="max_qty"
+                placeholder="Opsional"
+              />
+            </div>
+          } @else {
+            <div class="col-lg-3 col-md-6">
+              <label class="form-label">Harga pembanding</label>
+              <div class="input-group">
+                <span class="input-group-text">{{ priceSymbol($index) }}</span>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  appLocalizedNumber
+                  class="form-control"
+                  formControlName="compare_at"
+                  placeholder="Opsional"
+                />
+              </div>
+              <small class="field-help"
+                >Isi hanya jika ingin menampilkan harga lama yang
+                dicoret.</small
+              >
+            </div>
+          }
+          <div class="col-lg-3 col-md-6">
+            <label class="app-check app-check-card category-check price-check"
+              ><input type="checkbox" formControlName="is_active" />
+              <span
+                ><strong>Harga aktif</strong
+                ><small>Dapat dipakai oleh sistem.</small></span
+              ></label
+            >
+          </div>
+          <div class="col-lg-3 col-md-6">
+            @if (row.get('type')?.value === 'end_user') {
+              <label class="app-check app-check-card category-check price-check"
+                ><input type="checkbox" formControlName="is_public" />
+                <span
+                  ><strong>Tampilkan di website</strong
+                  ><small
+                    >Menjadi harga publik untuk mata uang ini.</small
+                  ></span
+                ></label
+              >
+            } @else {
+              <div class="price-internal-note">
+                <i class="ri-lock-line"></i>
+                Harga grosir disimpan sebagai data internal.
+              </div>
+            }
+          </div>
+        </div>
+        <button
+          type="button"
+          class="remove-row"
+          (click)="editor.remove(editor.prices, $index)"
+        >
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+    }
+  </div>
+  <div class="repeater-heading mt-5">
+    <div>
+      <h6>Kanal pembelian marketplace</h6>
+      <p class="section-help">
+        Tautan aktif ditampilkan di halaman produk sesuai urutan ini. Hanya satu
+        kanal yang dapat menjadi rekomendasi utama.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-outline"
+      (click)="editor.addMarketplace()"
+    >
+      <i class="ri-add-line"></i> Tambah kanal
+    </button>
+  </div>
+  <div formArrayName="marketplaces">
+    @if (!editor.marketplaces.length) {
+      <div class="repeater-empty">
+        <i class="ri-store-2-line"></i>
+        <div>
+          <strong>Belum ada kanal marketplace</strong
+          ><span
+            >Tambahkan tautan produk dari Shopee, Tokopedia, TikTok Shop, atau
+            kanal resmi lainnya.</span
+          >
+        </div>
+      </div>
+    }
+    @for (row of editor.marketplaces.controls; track row; let index = $index) {
+      <div class="repeater-card marketplace-card" [formGroupName]="index">
+        <div class="marketplace-card-heading">
+          <strong>Kanal {{ index + 1 }}</strong
+          ><span>{{
+            row.get('is_active')?.value ? 'Aktif di publik' : 'Disembunyikan'
+          }}</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-xl-3 col-md-5">
+            <label class="form-label">Platform *</label>
+            @if (editor.isBrowser) {
+              <select2
+                class="custom-select d-block"
+                [data]="editor.marketplaceProviderOptions"
+                formControlName="provider"
+                noResultMessage="Tidak ada pilihan"
+              />
+            }
+          </div>
+          <div class="col-xl-5 col-md-7">
+            <label class="form-label">Nama yang ditampilkan</label
+            ><input
+              class="form-control"
+              formControlName="label"
+              placeholder="Opsional, contoh: MATEX Official Store"
+            /><small class="field-help"
+              >Jika kosong, nama platform digunakan.</small
+            >
+          </div>
+          <div class="col-xl-4">
+            <div class="marketplace-flags">
+              <label class="app-check app-check-card category-check"
+                ><input
+                  type="checkbox"
+                  formControlName="is_primary"
+                  (change)="selectPrimaryMarketplace(index)"
+                />
+                Rekomendasi utama</label
+              ><label class="app-check app-check-card category-check"
+                ><input
+                  type="checkbox"
+                  formControlName="is_active"
+                  (change)="toggleMarketplaceActive(index)"
+                />
+                Tampilkan</label
+              >
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Tautan produk *</label
+            ><input
+              type="url"
+              class="form-control"
+              formControlName="url"
+              placeholder="https://..."
+            /><small class="field-help"
+              >Gunakan tautan langsung menuju produk, bukan halaman utama
+              toko.</small
+            >
+            @if (row.get('url')?.invalid && row.get('url')?.touched) {
+              <div class="field-error">
+                Masukkan tautan lengkap yang diawali http:// atau https://.
+              </div>
+            }
+          </div>
+          <div class="col-lg-5 col-md-6">
+            <label class="form-label">SKU di marketplace</label
+            ><input
+              class="form-control"
+              formControlName="sku"
+              placeholder="Opsional jika berbeda dari SKU internal"
+            />
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <label class="form-label">Harga marketplace</label
+            ><input
+              type="text"
+              inputmode="numeric"
+              appLocalizedNumber
+              class="form-control"
+              formControlName="price"
+              placeholder="Opsional"
+            />
+          </div>
+          <div class="col-lg-3 col-md-2">
+            <label class="form-label">Mata uang</label
+            ><input
+              class="form-control text-uppercase"
+              maxlength="3"
+              formControlName="currency"
+              placeholder="IDR"
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          class="remove-row"
+          (click)="removeMarketplace(index)"
+          aria-label="Hapus kanal marketplace"
+        >
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+    }
+  </div>
+  <div class="category-actions">
+    <button
+      type="button"
+      class="btn btn-outline"
+      (click)="editor.setTab('content')"
+    >
+      <i class="ri-arrow-left-line"></i> Kembali</button
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('media')"
+    >
+      Lanjut ke Media <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>

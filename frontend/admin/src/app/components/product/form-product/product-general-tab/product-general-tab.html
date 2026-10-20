@@ -1,0 +1,256 @@
+<section class="category-panel">
+  <div class="category-heading">
+    <h5>Identitas produk</h5>
+    <p>Data internal, publikasi, kategori, stok, dan ukuran fisik.</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <label class="form-label">Kunci internal *</label
+      ><input
+        class="form-control"
+        formControlName="key"
+        placeholder="contoh: topper-latex-natural"
+      />
+      <small class="field-help"
+        >Kode tetap untuk sistem. Gunakan huruf kecil dan tanda hubung;
+        sebaiknya tidak diubah setelah produk dipublikasikan.</small
+      >
+      @if (form.controls.key.errors?.['duplicate']) {
+        <div class="field-error">
+          Kunci internal ini sudah digunakan produk lain.
+        </div>
+      }
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">SKU *</label
+      ><input
+        class="form-control"
+        formControlName="sku"
+        placeholder="MTX-TOP-001"
+      />
+      <small class="field-help"
+        >Kode unik produk untuk administrasi, harga, dan kanal
+        marketplace.</small
+      >
+      @if (form.controls.sku.errors?.['duplicate']) {
+        <div class="field-error">SKU ini sudah digunakan produk lain.</div>
+      }
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Bentuk produk</label>
+      @if (editor.isBrowser) {
+        <select2
+          class="custom-select d-block"
+          [data]="editor.productTypeOptions"
+          formControlName="product_type"
+          noResultMessage="Tidak ada pilihan"
+        />
+      }
+      <small class="text-muted"
+        >Barang fisik, layanan, atau produk digital.</small
+      >
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Status</label>
+      @if (editor.isBrowser) {
+        <select2
+          class="custom-select d-block"
+          [data]="editor.productStatusOptions"
+          formControlName="status"
+          noResultMessage="Tidak ada pilihan"
+        />
+      }
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Satuan</label
+      ><input
+        class="form-control"
+        formControlName="unit"
+        placeholder="pcs, lembar, kg"
+      />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Jenis / kelompok produk</label
+      ><input
+        class="form-control"
+        formControlName="product_kind"
+        placeholder="contoh: Kasur Tipis, Bantal, Jok Motor"
+      />
+      <small class="text-muted"
+        >Kelompok produk internal MATEX; berbeda dari kategori katalog.</small
+      >
+    </div>
+    <div class="col-12">
+      <label class="form-label">Kategori</label
+      ><app-advance-dropdown
+        [selectSingle]="false"
+        [selectedOption]="editor.categoryIds"
+        [options]="(editor.categories$ | async)?.data ?? []"
+        [subArrayKey]="'subcategories'"
+        (selectedItem)="editor.selectCategories($event)"
+      />
+      @if (editor.categoryError) {
+        <small class="text-danger d-block mt-1"
+          >Pilih minimal satu kategori produk.</small
+        >
+      }
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Barcode / GTIN</label
+      ><input class="form-control" formControlName="barcode" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Kode manufaktur</label
+      ><input class="form-control" formControlName="manufacturer_code" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">HS code</label
+      ><input class="form-control" formControlName="hs_code" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Negara asal</label
+      ><input class="form-control" formControlName="country_origin" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Provinsi asal</label
+      ><input
+        class="form-control"
+        formControlName="origin_province"
+        placeholder="contoh: Jawa Barat"
+      />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Kota / kabupaten asal</label
+      ><input
+        class="form-control"
+        formControlName="origin_city"
+        placeholder="contoh: Bogor"
+      />
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <label class="form-label">Berat (gram)</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="weight_grams"
+      />
+      @if (editor.measurementHelper('weight_grams'); as converted) {
+        <small class="measurement-helper">≈ {{ converted }}</small>
+      }
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <label class="form-label">Panjang (mm)</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="length_mm"
+      />
+      @if (editor.measurementHelper('length_mm'); as converted) {
+        <small class="measurement-helper">= {{ converted }}</small>
+      }
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <label class="form-label">Lebar (mm)</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="width_mm"
+      />
+      @if (editor.measurementHelper('width_mm'); as converted) {
+        <small class="measurement-helper">= {{ converted }}</small>
+      }
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <label class="form-label">Tinggi (mm)</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="height_mm"
+      />
+      @if (editor.measurementHelper('height_mm'); as converted) {
+        <small class="measurement-helper">= {{ converted }}</small>
+      }
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Minimum pesanan</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="min_order_qty"
+      />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Lead time (hari)</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="lead_time_days"
+      />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Status stok</label>
+      @if (editor.isBrowser) {
+        <select2
+          class="custom-select d-block"
+          [data]="editor.stockStatusOptions"
+          formControlName="stock_status"
+          noResultMessage="Tidak ada pilihan"
+        />
+      }
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Jumlah stok</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="stock_quantity"
+      />
+    </div>
+    <div class="col-md-4">
+      <label class="app-check app-check-card category-check"
+        ><input type="checkbox" formControlName="manage_stock" /> Kelola
+        stok</label
+      >
+    </div>
+    <div class="col-md-4">
+      <label class="app-check app-check-card category-check"
+        ><input type="checkbox" formControlName="is_featured" /> Produk
+        unggulan</label
+      >
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Urutan</label
+      ><input
+        type="text"
+        inputmode="numeric"
+        appLocalizedNumber
+        class="form-control"
+        formControlName="sort_order"
+      />
+    </div>
+  </div>
+  <div class="category-actions">
+    <span></span
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('content')"
+    >
+      Lanjut ke Konten <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>
