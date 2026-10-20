@@ -10,6 +10,7 @@ import {
   previewLanguageLabelKey,
   previewVisibilityKey,
 } from '../website-page-form.util';
+import { WebsitePagePublicationService } from '../website-page-publication.service';
 
 // Preview tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
@@ -21,6 +22,8 @@ import {
 })
 export class WebsitePagePreviewTab {
   readonly editor = inject(WebsitePageEditorService);
+
+  readonly publication = inject(WebsitePagePublicationService);
 
   readonly previewLanguageLabelKey = previewLanguageLabelKey;
 
@@ -45,7 +48,7 @@ export class WebsitePagePreviewTab {
   get previewDraftTranslations(): IWebsitePageEditorTranslation[] {
     if (
       !this.editor.previewPage ||
-      !this.editor.publicationRequiresPublishedTranslation
+      !this.publication.publicationRequiresPublishedTranslation
     ) {
       return [];
     }
@@ -69,7 +72,7 @@ export class WebsitePagePreviewTab {
   }
 
   previewPublicationChoiceKey(): string {
-    switch (this.editor.publicationChoice) {
+    switch (this.publication.publicationChoice) {
       case 'publish_now':
         return 'website_page.publication_publish_now';
 

@@ -12,6 +12,7 @@ import {
   dateToNgbDate,
   publicationDateValue,
 } from '../website-page-form.util';
+import { WebsitePagePublicationService } from '../website-page-publication.service';
 
 // Publication tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
@@ -24,21 +25,23 @@ import {
 export class WebsitePagePublicationTab {
   readonly editor = inject(WebsitePageEditorService);
 
+  readonly publication = inject(WebsitePagePublicationService);
+
   readonly publicationDateValue = publicationDateValue;
 
   selectPublicationChoice(choice: WebsitePageEditorPublicationChoice): void {
-    this.editor.publicationChoice = choice;
+    this.publication.publicationChoice = choice;
 
-    this.editor.publicationValidationAttempted = false;
+    this.publication.publicationValidationAttempted = false;
 
     if (choice === 'schedule') {
-      if (!this.editor.publicationPublishAt) {
+      if (!this.publication.publicationPublishAt) {
         this.initializePublicationSchedule();
       }
     } else {
-      this.editor.publicationPublishAt = '';
-      this.editor.publicationPublishDate = null;
-      this.editor.publicationPublishTime = null;
+      this.publication.publicationPublishAt = '';
+      this.publication.publicationPublishDate = null;
+      this.publication.publicationPublishTime = null;
     }
 
     if (choice === 'draft' || choice === 'archive') {
@@ -47,7 +50,7 @@ export class WebsitePagePublicationTab {
   }
 
   goToPreview(): void {
-    this.editor.publicationValidationAttempted = true;
+    this.publication.publicationValidationAttempted = true;
     this.editor.mediaValidationAttempted = true;
 
     const invalidAboutLocale = this.editor.firstInvalidAboutLocale();
@@ -66,17 +69,17 @@ export class WebsitePagePublicationTab {
     }
 
     if (
-      this.editor.publicationRequiresPublishedTranslation &&
+      this.publication.publicationRequiresPublishedTranslation &&
       !this.editor.defaultTranslationPublished
     ) {
       return;
     }
 
-    if (this.editor.publicationScheduleInvalid) {
+    if (this.publication.publicationScheduleInvalid) {
       return;
     }
 
-    if (this.editor.publicationEndInvalid) {
+    if (this.publication.publicationEndInvalid) {
       return;
     }
 
@@ -100,23 +103,23 @@ export class WebsitePagePublicationTab {
   }
 
   syncPublicationPublishDateTime(): void {
-    this.editor.publicationPublishAt = composePublicationDateTime(
-      this.editor.publicationPublishDate,
-      this.editor.publicationPublishTime,
+    this.publication.publicationPublishAt = composePublicationDateTime(
+      this.publication.publicationPublishDate,
+      this.publication.publicationPublishTime,
     );
   }
 
   syncPublicationUnpublishDateTime(): void {
-    this.editor.publicationUnpublishAt = composePublicationDateTime(
-      this.editor.publicationUnpublishDate,
-      this.editor.publicationUnpublishTime,
+    this.publication.publicationUnpublishAt = composePublicationDateTime(
+      this.publication.publicationUnpublishDate,
+      this.publication.publicationUnpublishTime,
     );
   }
 
   clearPublicationUnpublish(): void {
-    this.editor.publicationUnpublishDate = null;
-    this.editor.publicationUnpublishTime = null;
-    this.editor.publicationUnpublishAt = '';
+    this.publication.publicationUnpublishDate = null;
+    this.publication.publicationUnpublishTime = null;
+    this.publication.publicationUnpublishAt = '';
   }
 
   private initializePublicationSchedule(): void {
@@ -130,9 +133,9 @@ export class WebsitePagePublicationTab {
 
     date.setMinutes(nextMinute);
 
-    this.editor.publicationPublishDate = dateToNgbDate(date);
+    this.publication.publicationPublishDate = dateToNgbDate(date);
 
-    this.editor.publicationPublishTime = {
+    this.publication.publicationPublishTime = {
       hour: date.getHours(),
       minute: date.getMinutes(),
       second: 0,

@@ -71,13 +71,13 @@
     @if (editor.mode() === 'edit') {
       <label
         class="cms-publication-option"
-        [class.active]="editor.publicationChoice === 'current'"
+        [class.active]="publication.publicationChoice === 'current'"
       >
         <input
           type="radio"
           name="publicationChoice"
           value="current"
-          [checked]="editor.publicationChoice === 'current'"
+          [checked]="publication.publicationChoice === 'current'"
           (change)="selectPublicationChoice('current')"
         />
 
@@ -95,13 +95,13 @@
 
     <label
       class="cms-publication-option"
-      [class.active]="editor.publicationChoice === 'draft'"
+      [class.active]="publication.publicationChoice === 'draft'"
     >
       <input
         type="radio"
         name="publicationChoice"
         value="draft"
-        [checked]="editor.publicationChoice === 'draft'"
+        [checked]="publication.publicationChoice === 'draft'"
         (change)="selectPublicationChoice('draft')"
       />
 
@@ -118,13 +118,13 @@
 
     <label
       class="cms-publication-option"
-      [class.active]="editor.publicationChoice === 'publish_now'"
+      [class.active]="publication.publicationChoice === 'publish_now'"
     >
       <input
         type="radio"
         name="publicationChoice"
         value="publish_now"
-        [checked]="editor.publicationChoice === 'publish_now'"
+        [checked]="publication.publicationChoice === 'publish_now'"
         (change)="selectPublicationChoice('publish_now')"
       />
 
@@ -141,13 +141,13 @@
 
     <label
       class="cms-publication-option"
-      [class.active]="editor.publicationChoice === 'schedule'"
+      [class.active]="publication.publicationChoice === 'schedule'"
     >
       <input
         type="radio"
         name="publicationChoice"
         value="schedule"
-        [checked]="editor.publicationChoice === 'schedule'"
+        [checked]="publication.publicationChoice === 'schedule'"
         (change)="selectPublicationChoice('schedule')"
       />
 
@@ -165,13 +165,13 @@
     @if (editor.mode() === 'edit' && !editor.isSystemPage) {
       <label
         class="cms-publication-option cms-publication-option-danger"
-        [class.active]="editor.publicationChoice === 'archive'"
+        [class.active]="publication.publicationChoice === 'archive'"
       >
         <input
           type="radio"
           name="publicationChoice"
           value="archive"
-          [checked]="editor.publicationChoice === 'archive'"
+          [checked]="publication.publicationChoice === 'archive'"
           (change)="selectPublicationChoice('archive')"
         />
 
@@ -192,7 +192,7 @@
   <!--==== SCHEDULE =====================================-->
   <!--==================================================-->
 
-  @if (editor.publicationChoice === 'schedule') {
+  @if (publication.publicationChoice === 'schedule') {
     <div class="border rounded p-3 mt-4">
       <label class="form-label">
         {{ 'website_page.schedule_publish_at' | translate }}
@@ -218,12 +218,12 @@
               ngbDropdownToggle
               class="cms-publication-date-toggle"
               [class.is-invalid]="
-                editor.publicationValidationAttempted &&
-                editor.publicationScheduleInvalid
+                publication.publicationValidationAttempted &&
+                publication.publicationScheduleInvalid
               "
             >
               <span>
-                @if (editor.publicationPublishDate; as selectedDate) {
+                @if (publication.publicationPublishDate; as selectedDate) {
                   {{
                     publicationDateValue(selectedDate)
                       | date
@@ -241,11 +241,11 @@
 
             <div ngbDropdownMenu class="cms-publication-calendar">
               <ngb-datepicker
-                [(ngModel)]="editor.publicationPublishDate"
+                [(ngModel)]="publication.publicationPublishDate"
                 [ngModelOptions]="{ standalone: true }"
                 [minDate]="publicationMinDate"
                 [startDate]="
-                  editor.publicationPublishDate ?? publicationMinDate
+                  publication.publicationPublishDate ?? publicationMinDate
                 "
                 [outsideDays]="'hidden'"
                 (ngModelChange)="syncPublicationPublishDateTime()"
@@ -265,12 +265,12 @@
           <div
             class="cms-publication-timepicker"
             [class.is-invalid]="
-              editor.publicationValidationAttempted &&
-              editor.publicationScheduleInvalid
+              publication.publicationValidationAttempted &&
+              publication.publicationScheduleInvalid
             "
           >
             <ngb-timepicker
-              [(ngModel)]="editor.publicationPublishTime"
+              [(ngModel)]="publication.publicationPublishTime"
               [ngModelOptions]="{ standalone: true }"
               [meridian]="editor.localization.useMeridian()"
               [seconds]="false"
@@ -288,8 +288,8 @@
       </small>
 
       @if (
-        editor.publicationValidationAttempted &&
-        editor.publicationScheduleInvalid
+        publication.publicationValidationAttempted &&
+        publication.publicationScheduleInvalid
       ) {
         <div class="text-danger form-error">
           {{ 'website_page.validation.schedule_future_required' | translate }}
@@ -303,8 +303,8 @@
   <!--==================================================-->
 
   @if (
-    editor.publicationChoice === 'publish_now' ||
-    editor.publicationChoice === 'schedule'
+    publication.publicationChoice === 'publish_now' ||
+    publication.publicationChoice === 'schedule'
   ) {
     <div class="border rounded p-3 mt-3">
       <label class="form-label">
@@ -330,12 +330,12 @@
               ngbDropdownToggle
               class="cms-publication-date-toggle"
               [class.is-invalid]="
-                editor.publicationValidationAttempted &&
-                editor.publicationEndInvalid
+                publication.publicationValidationAttempted &&
+                publication.publicationEndInvalid
               "
             >
               <span>
-                @if (editor.publicationUnpublishDate; as selectedDate) {
+                @if (publication.publicationUnpublishDate; as selectedDate) {
                   {{
                     publicationDateValue(selectedDate)
                       | date
@@ -353,11 +353,11 @@
 
             <div ngbDropdownMenu class="cms-publication-calendar">
               <ngb-datepicker
-                [(ngModel)]="editor.publicationUnpublishDate"
+                [(ngModel)]="publication.publicationUnpublishDate"
                 [ngModelOptions]="{ standalone: true }"
                 [minDate]="publicationMinDate"
                 [startDate]="
-                  editor.publicationUnpublishDate ?? publicationMinDate
+                  publication.publicationUnpublishDate ?? publicationMinDate
                 "
                 [outsideDays]="'hidden'"
                 (ngModelChange)="syncPublicationUnpublishDateTime()"
@@ -377,12 +377,12 @@
           <div
             class="cms-publication-timepicker"
             [class.is-invalid]="
-              editor.publicationValidationAttempted &&
-              editor.publicationEndInvalid
+              publication.publicationValidationAttempted &&
+              publication.publicationEndInvalid
             "
           >
             <ngb-timepicker
-              [(ngModel)]="editor.publicationUnpublishTime"
+              [(ngModel)]="publication.publicationUnpublishTime"
               [ngModelOptions]="{ standalone: true }"
               [meridian]="editor.localization.useMeridian()"
               [seconds]="false"
@@ -395,7 +395,10 @@
         </div>
       </div>
 
-      @if (editor.publicationUnpublishDate || editor.publicationUnpublishTime) {
+      @if (
+        publication.publicationUnpublishDate ||
+        publication.publicationUnpublishTime
+      ) {
         <button
           type="button"
           class="btn btn-sm btn-light-bg mt-2"
@@ -412,7 +415,8 @@
       </small>
 
       @if (
-        editor.publicationValidationAttempted && editor.publicationEndInvalid
+        publication.publicationValidationAttempted &&
+        publication.publicationEndInvalid
       ) {
         <div class="text-danger form-error">
           {{ 'website_page.validation.unpublish_after_publish' | translate }}
@@ -426,7 +430,7 @@
   <!--==================================================-->
 
   @if (
-    editor.publicationRequiresPublishedTranslation &&
+    publication.publicationRequiresPublishedTranslation &&
     !editor.defaultTranslationPublished
   ) {
     <div class="alert alert-warning mt-4 mb-0">

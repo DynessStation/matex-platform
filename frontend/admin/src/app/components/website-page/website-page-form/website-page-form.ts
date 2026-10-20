@@ -10,6 +10,7 @@ import { WebsitePageGeneralTab } from './website-page-general-tab/website-page-g
 import { WebsitePageMediaTab } from './website-page-media-tab/website-page-media-tab';
 import { WebsitePagePreviewTab } from './website-page-preview-tab/website-page-preview-tab';
 import { WebsitePagePublicationTab } from './website-page-publication-tab/website-page-publication-tab';
+import { WebsitePagePublicationService } from './website-page-publication.service';
 import { WebsitePageSeoTab } from './website-page-seo-tab/website-page-seo-tab';
 import {
   IWebsitePageEditorDetail,
@@ -33,7 +34,7 @@ import {
 
   templateUrl: './website-page-form.html',
 
-  providers: [WebsitePageEditorService],
+  providers: [WebsitePageEditorService, WebsitePagePublicationService],
 })
 export class WebsitePageForm {
   readonly editor = inject(WebsitePageEditorService);
