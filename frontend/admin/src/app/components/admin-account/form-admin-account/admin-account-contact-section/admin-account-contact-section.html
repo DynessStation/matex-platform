@@ -1,0 +1,201 @@
+<!--==================================================-->
+<!--==== COUNTRY CODE TEMPLATE =======================-->
+<!--==================================================-->
+
+<ng-template #countryTemplate let-data="data">
+  <div class="country">
+    <div class="flag-box">
+      <div class="iti-flag {{ data?.class }}"></div>
+    </div>
+
+    <span class="dial-code"> {{ data?.code }} </span>
+  </div>
+</ng-template>
+
+<!--==================================================-->
+<!--==== PRIMARY EMAIL ================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.primary_email' | translate"
+  [for]="'email_1'"
+  [required]="true"
+>
+  <input
+    type="email"
+    id="email_1"
+    class="form-control"
+    formControlName="email_1"
+    [placeholder]="'admin_account.primary_email_placeholder' | translate"
+    [class.is-invalid]="
+      form.controls.email_1.touched && form.controls.email_1.invalid
+    "
+  />
+
+  @if (
+    form.controls.email_1.touched && form.controls.email_1.errors?.['required']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.primary_email_required' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.email_1.touched && form.controls.email_1.errors?.['email']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.email_invalid' | translate }}
+    </div>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== SECONDARY EMAIL ==============================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.secondary_email' | translate"
+  [for]="'email_2'"
+>
+  <input
+    type="email"
+    id="email_2"
+    class="form-control"
+    formControlName="email_2"
+    [placeholder]="'admin_account.secondary_email_placeholder' | translate"
+    [class.is-invalid]="
+      form.controls.email_2.touched && form.controls.email_2.invalid
+    "
+  />
+
+  @if (
+    form.controls.email_2.touched && form.controls.email_2.errors?.['email']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.email_invalid' | translate }}
+    </div>
+  }
+  @if (form.controls.email_2.disabled) {
+    <small class="form-helper">
+      {{ 'admin_account.secondary_email_helper' | translate }}
+    </small>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== PRIMARY PHONE ================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.primary_phone' | translate"
+  [for]="'phone_1'"
+  [required]="true"
+>
+  <div class="phone-control-row">
+    @if (account.isBrowser) {
+      <div class="phone-code-wrapper">
+        <select2
+          class="custom-select intl-tel-input"
+          [templates]="countryTemplate"
+          [data]="account.countryCodes"
+          formControlName="phone_country_1"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+        />
+      </div>
+    }
+
+    <input
+      type="text"
+      inputmode="numeric"
+      id="phone_1"
+      class="form-control phone-number-input"
+      formControlName="phone_1"
+      placeholder="81234567890"
+      (input)="account.sanitizePhone('phone_1')"
+      [class.is-invalid]="
+        form.controls.phone_1.touched && form.controls.phone_1.invalid
+      "
+    />
+  </div>
+
+  @if (
+    form.controls.phone_1.touched && form.controls.phone_1.errors?.['required']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.primary_phone_required' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.phone_1.touched &&
+    form.controls.phone_1.errors?.['invalidPhone']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.phone_digits_only' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.phone_1.touched &&
+    form.controls.phone_1.errors?.['phoneStartsWithZero']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.phone_no_leading_zero' | translate }}
+    </div>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== SECONDARY PHONE ==============================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.secondary_phone' | translate"
+  [for]="'phone_2'"
+>
+  <div class="phone-control-row">
+    @if (account.isBrowser) {
+      <div class="phone-code-wrapper">
+        <select2
+          class="custom-select intl-tel-input"
+          [templates]="countryTemplate"
+          [data]="account.countryCodes"
+          formControlName="phone_country_2"
+          [noResultMessage]="'admin_account.no_data_found' | translate"
+        />
+      </div>
+    }
+
+    <input
+      type="text"
+      inputmode="numeric"
+      id="phone_2"
+      class="form-control phone-number-input"
+      formControlName="phone_2"
+      [placeholder]="'admin_account.secondary_phone_placeholder' | translate"
+      (input)="account.sanitizePhone('phone_2')"
+      [class.is-invalid]="
+        form.controls.phone_2.touched && form.controls.phone_2.invalid
+      "
+    />
+  </div>
+
+  @if (form.controls.phone_2.disabled) {
+    <small class="form-helper">
+      {{ 'admin_account.secondary_phone_helper' | translate }}
+    </small>
+  }
+  @if (
+    form.controls.phone_2.touched &&
+    form.controls.phone_2.errors?.['invalidPhone']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.phone_digits_only' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.phone_2.touched &&
+    form.controls.phone_2.errors?.['phoneStartsWithZero']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.phone_no_leading_zero' | translate }}
+    </div>
+  }
+</app-form-fields>

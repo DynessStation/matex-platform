@@ -1,39 +1,26 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { EMPTY, Observable, catchError, switchMap, tap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
-import { TranslateModule } from '@ngx-translate/core';
-
+import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import {
   IAdminAccountDetailResponse,
   IUpdateAdminAccount,
 } from '../../../shared/interface/admin-account.interface';
-
 import {
   EditAdminAccountAction,
   UpdateAdminAccountAction,
 } from '../../../shared/store/action/admin-account.action';
-
 import { AdminAccountState } from '../../../shared/store/state/admin-account.state';
-
-import {
-  AdminAccountFormValue,
-  FormAdminAccount,
-} from '../form-admin-account/form-admin-account';
-
-import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
-
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
+import { FormAdminAccount } from '../form-admin-account/form-admin-account';
+import { AdminAccountFormValue } from '../form-admin-account/form-admin-account.model';
 
 @Component({
   selector: 'app-edit-admin-account',

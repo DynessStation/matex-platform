@@ -1,0 +1,198 @@
+<!--==================================================-->
+<!--==== COMPANY ======================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.company' | translate"
+  [for]="'id_master_comp'"
+  [required]="true"
+>
+  <div class="select-loading-wrapper">
+    @if (account.isBrowser) {
+      <select2
+        class="custom-select"
+        [data]="lookup.companyOptions"
+        [placeholder]="'admin_account.select_company' | translate"
+        [customSearchEnabled]="true"
+        [displaySearchStatus]="'always'"
+        [infiniteScroll]="true"
+        [infiniteScrollThrottle]="150"
+        formControlName="id_master_comp"
+        [noResultMessage]="'admin_account.no_data_found' | translate"
+        (open)="lookup.onLookupOpen('company')"
+        (search)="lookup.onLookupSearch('company', $event)"
+        (scroll)="lookup.onLookupScroll('company', $event)"
+      />
+    }
+    @if (lookup.isLookupLoading('company')) {
+      <span
+        class="spinner-border spinner-border-sm select-local-loader"
+        role="status"
+      ></span>
+    }
+  </div>
+
+  @if (
+    form.controls.id_master_comp.touched &&
+    form.controls.id_master_comp.errors?.['required']
+  ) {
+    <div class="text-danger form-error">
+      {{ 'admin_account.company_required' | translate }}
+    </div>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== OFFICE =======================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.office' | translate"
+  [for]="'id_office'"
+  [required]="true"
+>
+  <div class="select-loading-wrapper">
+    @if (account.isBrowser) {
+      <select2
+        class="custom-select"
+        [data]="lookup.officeOptions"
+        [placeholder]="'admin_account.select_office' | translate"
+        [customSearchEnabled]="true"
+        [displaySearchStatus]="'always'"
+        [infiniteScroll]="true"
+        [infiniteScrollThrottle]="150"
+        formControlName="id_office"
+        [noResultMessage]="'admin_account.no_data_found' | translate"
+        (open)="lookup.onLookupOpen('office')"
+        (search)="lookup.onLookupSearch('office', $event)"
+        (scroll)="lookup.onLookupScroll('office', $event)"
+      />
+    }
+    @if (lookup.isLookupLoading('office')) {
+      <span
+        class="spinner-border spinner-border-sm select-local-loader"
+        role="status"
+      ></span>
+    }
+  </div>
+
+  @if (form.controls.id_office.disabled) {
+    <small class="form-helper">
+      {{ 'admin_account.select_company_first' | translate }}
+    </small>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== CHAIR ========================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.position' | translate"
+  [for]="'id_chair'"
+  [required]="true"
+>
+  <div class="select-loading-wrapper">
+    @if (account.isBrowser) {
+      <select2
+        class="custom-select"
+        [data]="lookup.chairOptions"
+        [placeholder]="'admin_account.select_position' | translate"
+        [customSearchEnabled]="true"
+        [displaySearchStatus]="'always'"
+        [infiniteScroll]="true"
+        [infiniteScrollThrottle]="150"
+        formControlName="id_chair"
+        [noResultMessage]="'admin_account.no_data_found' | translate"
+        (open)="lookup.onLookupOpen('chair')"
+        (search)="lookup.onLookupSearch('chair', $event)"
+        (scroll)="lookup.onLookupScroll('chair', $event)"
+      />
+    }
+    @if (lookup.isLookupLoading('chair')) {
+      <span
+        class="spinner-border spinner-border-sm select-local-loader"
+        role="status"
+      ></span>
+    }
+  </div>
+  @if (form.controls.id_chair.disabled) {
+    <small class="form-helper">
+      {{ 'admin_account.select_company_first' | translate }}
+    </small>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== ACCESS =======================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.access_profile' | translate"
+  [for]="'id_access'"
+  [required]="true"
+>
+  <div class="select-loading-wrapper">
+    @if (account.isBrowser) {
+      <select2
+        class="custom-select"
+        [data]="lookup.accessOptions"
+        [placeholder]="'admin_account.select_access_profile' | translate"
+        [customSearchEnabled]="true"
+        [displaySearchStatus]="'always'"
+        [infiniteScroll]="true"
+        [infiniteScrollThrottle]="150"
+        formControlName="id_access"
+        [noResultMessage]="'admin_account.no_data_found' | translate"
+        (open)="lookup.onLookupOpen('access')"
+        (search)="lookup.onLookupSearch('access', $event)"
+        (scroll)="lookup.onLookupScroll('access', $event)"
+      />
+    }
+    @if (lookup.isLookupLoading('access')) {
+      <span
+        class="spinner-border spinner-border-sm select-local-loader"
+        role="status"
+      ></span>
+    }
+  </div>
+  @if (form.controls.id_access.disabled) {
+    <small class="form-helper">
+      {{ 'admin_account.select_company_first' | translate }}
+    </small>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== FULL SYSTEM ACCESS ===========================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.full_system_access' | translate"
+  [for]="'is_all_access'"
+>
+  <div
+    class="all-access-card"
+    [class.active]="form.controls.is_all_access.value"
+  >
+    <div class="all-access-content">
+      <div class="fw-semibold">
+        {{ 'admin_account.grant_full_system_access' | translate }}
+      </div>
+
+      <small>
+        {{ 'admin_account.full_system_access_description' | translate }}
+      </small>
+    </div>
+
+    <label class="switch">
+      <input
+        type="checkbox"
+        id="is_all_access"
+        formControlName="is_all_access"
+      />
+
+      <span class="switch-state"></span>
+    </label>
+  </div>
+</app-form-fields>

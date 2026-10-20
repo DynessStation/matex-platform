@@ -1,19 +1,13 @@
 import { Component, inject } from '@angular/core';
-
 import { Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
 import { CreateAdminAccountAction } from '../../../shared/store/action/admin-account.action';
-
-import { TranslateModule } from '@ngx-translate/core';
-
-import {
-  AdminAccountFormValue,
-  FormAdminAccount,
-} from '../form-admin-account/form-admin-account';
+import { FormAdminAccount } from '../form-admin-account/form-admin-account';
+import { AdminAccountFormValue } from '../form-admin-account/form-admin-account.model';
 
 @Component({
   selector: 'app-create-admin-account',

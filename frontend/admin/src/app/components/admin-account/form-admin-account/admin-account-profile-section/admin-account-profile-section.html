@@ -1,0 +1,108 @@
+<!--==================================================-->
+<!--==== PROFILE PHOTO ================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.profile_photo' | translate"
+  [for]="'id_profile_photo'"
+>
+  <app-image-upload
+    [image]="account.profilePhoto"
+    [multipleImage]="false"
+    [url]="false"
+    [accept]="account.profilePhotoAccept"
+    [collection]="'admin_profile'"
+    (selectedFiles)="account.selectProfilePhoto($event)"
+  />
+
+  <small class="form-helper">
+    {{ 'admin_account.profile_photo_helper' | translate }}
+  </small>
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== NAME =========================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.name' | translate"
+  [for]="'name'"
+  [required]="true"
+>
+  <input
+    type="text"
+    id="name"
+    class="form-control"
+    maxlength="50"
+    formControlName="name"
+    [placeholder]="'admin_account.name_placeholder' | translate"
+    (input)="account.sanitizeName()"
+    (blur)="account.normalizeName()"
+    [class.is-invalid]="
+      form.controls.name.touched && form.controls.name.invalid
+    "
+  />
+
+  @if (form.controls.name.touched && form.controls.name.errors?.['required']) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.name_required' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.name.touched && form.controls.name.errors?.['invalidName']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.name_invalid' | translate }}
+    </div>
+  }
+  @if (form.controls.name.touched && form.controls.name.errors?.['maxlength']) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.name_maxlength' | translate }}
+    </div>
+  }
+</app-form-fields>
+
+<!--==================================================-->
+<!--==== ALIAS ========================================-->
+<!--==================================================-->
+
+<app-form-fields
+  [label]="'admin_account.alias' | translate"
+  [for]="'alias'"
+  [required]="true"
+>
+  <input
+    type="text"
+    id="alias"
+    class="form-control"
+    maxlength="15"
+    formControlName="alias"
+    [placeholder]="'admin_account.alias_placeholder' | translate"
+    (input)="account.sanitizeAlias()"
+    [class.is-invalid]="
+      form.controls.alias.touched && form.controls.alias.invalid
+    "
+  />
+
+  @if (
+    form.controls.alias.touched && form.controls.alias.errors?.['required']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.alias_required' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.alias.touched && form.controls.alias.errors?.['invalidAlias']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.alias_invalid' | translate }}
+    </div>
+  }
+  @if (
+    form.controls.alias.touched && form.controls.alias.errors?.['maxlength']
+  ) {
+    <div class="invalid-feedback">
+      {{ 'admin_account.alias_maxlength' | translate }}
+    </div>
+  }
+</app-form-fields>
