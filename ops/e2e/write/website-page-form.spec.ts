@@ -123,3 +123,47 @@ test('saving home and about unchanged keeps their content', async ({ page }) => 
     'website_page_media_i18n',
   ]);
 });
+
+test('tab handlers work without saving', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await login(page);
+  const panel = page.locator('.vertical-tabs .tab-content');
+
+  // Terms: switch the content language, then step to SEO with the tab button.
+  await openPage(page, 'terms');
+  await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
+  const english = panel.locator('button', { hasText: 'English' }).first();
+  await english.click();
+  await expect(english).toHaveClass(/btn-theme/);
+  await panel.locator('button', { hasText: 'Lanjut ke SEO' }).click();
+  await expect(panel.locator('h5', { hasText: 'SEO' }).first()).toBeVisible();
+
+  // Terms: choosing a schedule shows the date and time pickers.
+  await expectTab(page, 'Publikasi', 'Publikasi Halaman');
+  await panel.getByText('Jadwalkan Publikasi').click();
+  await expect(panel.locator('.cms-publication-date-toggle').first()).toBeVisible();
+  await expect(panel.locator('ngb-timepicker').first()).toBeVisible();
+
+  // Home: a section switch toggles, and a media slot opens the media library.
+  await openPage(page, 'home');
+  await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
+  const tags = page.locator('#home-section-tags');
+  const tagsOn = await tags.isChecked();
+  await tags.click();
+  await expect(tags).toBeChecked({ checked: !tagsOn });
+  await expectTab(page, 'Media', 'Media Halaman');
+  await panel.locator('button', { hasText: 'Ganti Gambar' }).first().click();
+  await expect(page.locator('#media_close_btn')).toBeVisible();
+  await page.locator('#media_close_btn').click();
+  await expect(page.locator('#media_close_btn')).toHaveCount(0);
+
+  // About: a highlight title without a description is flagged.
+  await openPage(page, 'about');
+  await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
+  await panel.locator('input[maxlength="160"]').first().fill('Judul uji');
+  await panel.locator('[maxlength="1000"]').first().fill('');
+  await expect(panel.getByText('Isi judul dan deskripsi sekaligus').first()).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
