@@ -6,7 +6,7 @@ _Terakhir diperbarui: 19 Oktober 2026._
 
 ## Posisi sekarang
 
-- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `a0ce016` (deploy 21 Oktober 2026, backup sebelum deploy `matex-20261020T025100Z`). Fase 5A sampai 5D dan 6A sampai 6B sudah live.
+- **Production:** `matexindo.com` (publik) dan `internal.matexindo.com` (admin) berjalan di commit `51b207d` (deploy 20 Oktober 2026 sore, backup sebelum deploy `matex-20261020T084031Z`). Fase 5A sampai 5D, 6A, 6B, dan bagian 6C yang sudah selesai (sisa Kartify admin, satu folder directives, pecahan form halaman website) sudah live.
 - **Kondisi:** fondasi operasional aman (backup terenkripsi di luar VPS, restore sudah dilatih, SSH root hanya dengan kunci, log dirotasi). Semua modul admin generasi lama sudah satu pola dan dijaga test kontrak.
 - **Test:** backend 84 unit test; e2e 120 test (115 kontrak API + 5 browser). Semuanya lulus.
 
