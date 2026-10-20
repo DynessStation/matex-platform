@@ -1,10 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 
 import { WebsitePageService } from './website-page.service';
-import { environment } from '../../../environments/environment';
+import { HOME_LAYOUT } from '../data/home-layout';
 import { BannerLink, GadgetTheme } from '../interface/theme.interface';
 import { IPublicWebsitePage } from '../interface/website-page.interface';
 
@@ -23,13 +22,10 @@ export class ThemeService {
     advertisement: { status: false },
   };
 
-  constructor(
-    private http: HttpClient,
-    private websitePageService: WebsitePageService,
-  ) {}
+  constructor(private websitePageService: WebsitePageService) {}
 
   getHomePage(slug?: string, locale: 'id-ID' | 'en-US' = 'id-ID'): Observable<any> {
-    const template$ = this.http.get(`${environment.URL}/home/${slug}.json`);
+    const template$ = of(structuredClone(HOME_LAYOUT) as unknown);
 
     if (slug !== 'gadget-store') return template$;
 

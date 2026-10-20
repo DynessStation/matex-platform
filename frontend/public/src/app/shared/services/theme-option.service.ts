@@ -1,15 +1,13 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { THEME_OPTIONS } from '../data/theme-options';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeOptionService {
-  // public preloader: boolean = true;
   preloader = signal(true);
 
   public theme_color: string;
@@ -19,9 +17,8 @@ export class ThemeOptionService {
   public newsletterModal: boolean = false;
   public productBox: string;
 
-  constructor(private http: HttpClient) {}
-
+  // Site options ship with the app (shared/data); a copy keeps the constant unchanged.
   getThemeOption(): Observable<any> {
-    return this.http.get<any>(`${environment.URL}/theme-options.json`);
+    return of(structuredClone(THEME_OPTIONS));
   }
 }

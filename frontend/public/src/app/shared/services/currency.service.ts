@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { CURRENCIES } from '../data/currencies';
 import { Params } from '../interface/core.interface';
 import { CurrencyModel } from '../interface/currency.interface';
 
@@ -13,9 +12,8 @@ import { CurrencyModel } from '../interface/currency.interface';
 export class CurrencyService {
   public selectedCurrency: any;
 
-  constructor(private http: HttpClient) {}
-
-  getCurrencies(payload?: Params): Observable<CurrencyModel> {
-    return this.http.get<CurrencyModel>(`${environment.URL}/currency.json`, { params: payload });
+  // The currency list ships with the app (shared/data); prices come from the API per currency.
+  getCurrencies(_payload?: Params): Observable<CurrencyModel> {
+    return of(structuredClone(CURRENCIES) as unknown as CurrencyModel);
   }
 }

@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { SITE_SETTINGS } from '../data/settings';
 import { GoogleReCaptcha, Setting } from '../interface/setting.interface';
 
 @Injectable({
@@ -12,14 +11,13 @@ import { GoogleReCaptcha, Setting } from '../interface/setting.interface';
 export class SettingService {
   reCaptchaConfig: GoogleReCaptcha;
 
-  constructor(private http: HttpClient) {}
-
+  // Site settings ship with the app (shared/data); a copy keeps the constant unchanged.
   getSettingOption(): Observable<Setting> {
-    return this.http.get<Setting>(`${environment.URL}/settings.json`);
+    return of(structuredClone(SITE_SETTINGS) as unknown as Setting);
   }
 
   async getReCaptchaConfig(): Promise<void> {
-    const config = await this.getSettingOption().toPromise();
+    const config = await firstValueFrom(this.getSettingOption());
     this.reCaptchaConfig = config?.values?.google_reCaptcha!;
   }
 }
