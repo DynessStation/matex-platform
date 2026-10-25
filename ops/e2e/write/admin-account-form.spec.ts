@@ -165,8 +165,13 @@ test('create renders every section, drives the handlers, and saves', async ({ pa
   const uploadTab = modal.locator('.nav-link', { hasText: /Unggah|Upload/ });
   if (await uploadTab.count()) await uploadTab.first().click();
   await modal.locator('input[type=file]').setInputFiles(fixture);
+  const upload = page.waitForResponse(
+    (r) => r.url().includes('/api/v1/attachment') && r.request().method() === 'POST',
+  );
   await modal.locator('#media_upload_btn').click();
-  const card = modal.locator('.library-box label').first();
+  // Pick the image just uploaded: the library may still list older ones first.
+  const uploadedId = (await (await upload).json()).data[0].id_attachment;
+  const card = modal.locator(`.library-box label[for="attachment-${uploadedId}"]`);
   await expect(card).toBeVisible();
   await card.click();
   await modal.getByRole('button', { name: /Pilih Media|Insert Media/ }).click();

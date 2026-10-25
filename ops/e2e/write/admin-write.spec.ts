@@ -39,13 +39,18 @@ async function typeInEditor(page: Page, index: number, text: string): Promise<vo
   await page.keyboard.type(text);
 }
 
-async function uploadThroughModal(page: Page): Promise<void> {
+/** Uploads the sample image in the open media modal and returns its attachment id. */
+async function uploadThroughModal(page: Page): Promise<string> {
   const modal = page.locator('.modal-content');
   await expect(modal).toBeVisible();
   const uploadTab = modal.locator('.nav-link', { hasText: /Unggah|Upload/ });
   if (await uploadTab.count()) await uploadTab.first().click();
   await modal.locator('input[type=file]').setInputFiles(fixture);
+  const upload = page.waitForResponse(
+    (r) => r.url().includes('/api/v1/attachment') && r.request().method() === 'POST',
+  );
   await modal.locator('#media_upload_btn').click();
+  return (await (await upload).json()).data[0].id_attachment;
 }
 
 test('a fresh install shows the default website content (audit DB-008)', async ({ page }) => {
@@ -163,10 +168,10 @@ test('admin can publish an article that appears on the public site', async ({ pa
   // New uploads are listed first in the picker's library tab.
   await openTab(page, 'Media');
   await page.locator('li.choosefile-input').first().click();
-  await uploadThroughModal(page);
+  const uploadedId = await uploadThroughModal(page);
   const modal = page.locator('.modal-content');
   await expect(modal.locator('.nav-link.active')).toContainText(/Pilih File|Select File/);
-  const card = modal.locator('.library-box label').first();
+  const card = modal.locator(`.library-box label[for="attachment-${uploadedId}"]`);
   await expect(card).toBeVisible();
   await card.click();
   const insert = modal.getByRole('button', { name: /Pilih Media|Insert Media/ });
