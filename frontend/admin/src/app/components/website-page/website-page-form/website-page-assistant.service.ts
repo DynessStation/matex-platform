@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { finalize } from 'rxjs';
 
 import { WebsitePageEditorService } from './website-page-editor.service';
+import { WebsitePageEditorLocale } from './website-page-form.model';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
@@ -16,6 +17,9 @@ export class WebsitePageAssistantService {
   private readonly notification = inject(NotificationService);
 
   public assistingPageField: string | null = null;
+
+  // The Home or About description being filled.
+  public assistingOrganizerField: string | null = null;
 
   assistPageField(
     field: 'excerpt' | 'content' | 'meta_description' | 'og_description',
@@ -61,6 +65,87 @@ export class WebsitePageAssistantService {
             translateFromIndonesia
               ? 'Field English sudah diterjemahkan. Judul tetap Anda isi sendiri.'
               : 'Draf field sudah diisi. Periksa kembali sebelum menyimpan.',
+          );
+        },
+        error: (error) => this.showContentAssistantError(error),
+      });
+  }
+
+  assistOrganizerDescription(
+    kind: 'latex' | 'latex_item' | 'advertisement' | 'about_item',
+    index = 0,
+  ): void {
+    if (this.assistingOrganizerField) return;
+    const locale = this.editor.activeLocale;
+    const sourceLocale: WebsitePageEditorLocale = 'id-ID';
+    const translateFromIndonesia = locale === 'en-US';
+    const taskKey = `${kind}-${index}`;
+    let current = '';
+    let source = '';
+    let userWrittenTitle = '';
+
+    if (kind === 'latex') {
+      current = this.editor.homeLatexContent[locale].description;
+      source = this.editor.homeLatexContent[sourceLocale].description;
+      userWrittenTitle = this.editor.homeLatexContent[locale].title;
+    } else if (kind === 'latex_item') {
+      current =
+        this.editor.homeLatexContent[locale].items[index]?.description || '';
+      source =
+        this.editor.homeLatexContent[sourceLocale].items[index]?.description ||
+        '';
+      userWrittenTitle =
+        this.editor.homeLatexContent[locale].items[index]?.title || '';
+    } else if (kind === 'advertisement') {
+      current = this.editor.homeAdvertisementContent[locale].description;
+      source = this.editor.homeAdvertisementContent[sourceLocale].description;
+      userWrittenTitle = this.editor.homeAdvertisementContent[locale].title;
+    } else {
+      current = this.editor.aboutFeatures[locale][index]?.description || '';
+      source =
+        this.editor.aboutFeatures[sourceLocale][index]?.description || '';
+      userWrittenTitle = this.editor.aboutFeatures[locale][index]?.title || '';
+    }
+
+    this.assistingOrganizerField = taskKey;
+    this.contentAssistant
+      .assist({
+        mode: translateFromIndonesia ? 'translate' : 'generate',
+        content_type: `website-${kind}`,
+        source_locale: translateFromIndonesia ? sourceLocale : undefined,
+        target_locale: locale,
+        context: JSON.stringify({ user_written_title: userWrittenTitle }),
+        fields: { description: translateFromIndonesia ? source : current },
+        field_types: { description: 'multiline_text' },
+      })
+      .pipe(finalize(() => (this.assistingOrganizerField = null)))
+      .subscribe({
+        next: (fields) => {
+          const description = fields['description'] || '';
+          if (kind === 'latex') {
+            this.editor.homeLatexContent[locale].description = description;
+          } else if (kind === 'latex_item') {
+            this.editor.updateHomeLatexItem(
+              locale,
+              index,
+              'description',
+              description,
+            );
+          } else if (kind === 'advertisement') {
+            this.editor.homeAdvertisementContent[locale].description =
+              description;
+          } else {
+            this.editor.updateAboutFeature(
+              locale,
+              index,
+              'description',
+              description,
+            );
+          }
+          this.notification.showSuccess(
+            translateFromIndonesia
+              ? 'Deskripsi English sudah diterjemahkan. Judul tetap Anda isi sendiri.'
+              : 'Draf deskripsi sudah diisi. Periksa kembali sebelum menyimpan.',
           );
         },
         error: (error) => this.showContentAssistantError(error),

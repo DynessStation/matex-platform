@@ -17,6 +17,7 @@ import {
   HomeSectionVisibility,
   HomeLatexContentDraft,
   HomeAdvertisementDraft,
+  HomeLatexFeatureDraft,
   AboutFeatureDraft,
   ABOUT_HIGHLIGHT_TITLE_MAX_LENGTH,
   ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH,
@@ -501,6 +502,37 @@ export class WebsitePageEditorService {
     }
 
     return null;
+  }
+
+  //==================================================
+  //==== HOME AND ABOUT DRAFTS
+  //==================================================
+
+  updateHomeLatexItem(
+    locale: WebsitePageEditorLocale,
+    index: number,
+    field: keyof HomeLatexFeatureDraft,
+    value: string,
+  ): void {
+    const items = [...this.homeLatexContent[locale].items];
+    items[index] = { ...items[index], [field]: value };
+    this.homeLatexContent = {
+      ...this.homeLatexContent,
+      [locale]: { ...this.homeLatexContent[locale], items },
+    };
+  }
+
+  updateAboutFeature(
+    locale: WebsitePageEditorLocale,
+    index: number,
+    field: keyof AboutFeatureDraft,
+    value: string,
+  ): void {
+    this.aboutFeatures[locale][index] = {
+      ...this.aboutFeatures[locale][index],
+      [field]: value,
+    };
+    this.aboutFeatures = { ...this.aboutFeatures };
   }
 
   //==================================================

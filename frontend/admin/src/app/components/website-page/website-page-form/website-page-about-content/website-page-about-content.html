@@ -1,0 +1,94 @@
+<div class="border rounded p-3">
+  <h6 class="mb-1">
+    {{ 'about_highlights' | translate }}
+  </h6>
+  <p class="text-muted small mb-3">
+    {{ 'about_highlights_help' | translate }}
+  </p>
+
+  <div class="row g-3">
+    @for (
+      feature of editor.aboutFeatures[editor.activeLocale];
+      track $index;
+      let featureIndex = $index
+    ) {
+      <div class="col-lg-4">
+        <div class="border rounded p-3 h-100">
+          <label class="form-label">
+            {{ 'about_highlight_title' | translate }}
+            {{ featureIndex + 1 }}
+          </label>
+          <input
+            type="text"
+            class="form-control mb-3"
+            [class.is-invalid]="
+              editor.aboutHighlightIssue(editor.activeLocale, featureIndex)
+            "
+            maxlength="160"
+            [value]="feature.title"
+            (input)="
+              editor.updateAboutFeature(
+                editor.activeLocale,
+                featureIndex,
+                'title',
+                $any($event.target).value
+              )
+            "
+          />
+
+          <div class="cms-field-heading">
+            <label class="form-label">
+              {{ 'about_highlight_description' | translate }}
+            </label>
+            <app-ai-field-action
+              [label]="
+                editor.activeLocale === 'en-US'
+                  ? 'Translate description'
+                  : 'Isi deskripsi otomatis'
+              "
+              [icon]="
+                editor.activeLocale === 'en-US'
+                  ? 'ri-translate-2'
+                  : 'ri-edit-2-line'
+              "
+              [loading]="
+                assistant.assistingOrganizerField ===
+                'about_item-' + featureIndex
+              "
+              [disabled]="assistant.assistingOrganizerField !== null"
+              (requested)="
+                assistant.assistOrganizerDescription('about_item', featureIndex)
+              "
+            />
+          </div>
+          <textarea
+            class="form-control"
+            [class.is-invalid]="
+              editor.aboutHighlightIssue(editor.activeLocale, featureIndex)
+            "
+            maxlength="1000"
+            rows="4"
+            [value]="feature.description"
+            (input)="
+              editor.updateAboutFeature(
+                editor.activeLocale,
+                featureIndex,
+                'description',
+                $any($event.target).value
+              )
+            "
+          ></textarea>
+
+          @if (
+            editor.aboutHighlightIssue(editor.activeLocale, featureIndex);
+            as issue
+          ) {
+            <div class="invalid-feedback d-block">
+              {{ issue | translate }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
