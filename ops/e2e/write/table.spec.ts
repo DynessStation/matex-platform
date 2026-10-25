@@ -77,6 +77,23 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
   await table.locator('.selection-box select').selectOption('25');
   expect(Object.fromEntries(await query)).toMatchObject({ limit: '25', page: '1' });
 
+  // Reload keeps the query, reset clears it; both pause for three seconds after use.
+  const reload = table.locator('.table-tool').nth(0);
+  const reset = table.locator('.table-tool').nth(1);
+  query = nextList(page, path);
+  await reload.click();
+  expect(Object.fromEntries(await query)).toMatchObject({ search: `tabel-${runId}`, limit: '25' });
+  await expect(reload).toBeDisabled();
+  await expect(reload).toBeEnabled({ timeout: 6000 });
+  query = nextList(page, path);
+  await reset.click();
+  const cleared = Object.fromEntries(await query);
+  expect(cleared).toMatchObject({ page: '1', limit: '15' });
+  expect(cleared['search']).toBeUndefined();
+  await expect(table.locator('.product-search input')).toHaveValue('');
+  await expect(table.locator('.table-tool:disabled')).toHaveCount(4);
+  await expect(reset).toBeEnabled({ timeout: 6000 });
+
   // Selection: one row shows the bulk delete, select all checks every row.
   const deleteAll = table.locator('.selection-box a', { hasText: 'Hapus' });
   await expect(deleteAll).toHaveCount(0);

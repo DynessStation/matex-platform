@@ -1,17 +1,17 @@
 @if (topbar()) {
   <div class="show-box">
     <div class="selection-box">
-      <label>{{ 'show' | translate }} :</label>
       <select
-        class="form-control"
+        class="form-control table-page-size"
         [value]="tableData['paginate']"
+        [attr.aria-label]="'items_per_page' | translate"
+        [title]="'items_per_page' | translate"
         (change)="onChangeTable($event, 'paginate')"
       >
         @for (item of rows; track item) {
           <option [value]="item">{{ item }}</option>
         }
       </select>
-      <label>{{ 'items_per_page' | translate }}</label>
       @if (deleteButtonStatus) {
         <a
           href="javascript:void(0)"
@@ -126,18 +126,62 @@
           </button>
         </ng-template>
       }
-      <div class="role-search product-search justify-content-end w-auto">
-        <label for="role-search" class="form-label"
-          >{{ 'search' | translate }} :</label
-        >
+      <div class="role-search product-search table-search w-auto">
+        <i class="ri-search-line" aria-hidden="true"></i>
         <input
           type="search"
           class="form-control"
           id="role-search"
+          [placeholder]="'search' | translate"
+          [attr.aria-label]="'search' | translate"
           [formControl]="term"
         />
       </div>
       <ng-content select="[filter]" />
+
+      <!-- Tools: reload, reset, import and export (not built yet). -->
+      <div class="table-tools">
+        <button
+          type="button"
+          class="btn btn-light-bg table-tool"
+          [disabled]="toolsCoolingDown"
+          [ngbTooltip]="'table_reload' | translate"
+          [attr.aria-label]="'table_reload' | translate"
+          (click)="reloadTable()"
+        >
+          <i class="ri-refresh-line"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-light-bg table-tool"
+          [disabled]="toolsCoolingDown"
+          [ngbTooltip]="'table_reset' | translate"
+          [attr.aria-label]="'table_reset' | translate"
+          (click)="resetTable()"
+        >
+          <i class="ri-restart-line"></i>
+        </button>
+        <span [ngbTooltip]="'table_import_soon' | translate">
+          <button
+            type="button"
+            class="btn btn-light-bg table-tool"
+            disabled
+            [attr.aria-label]="'table_import_soon' | translate"
+          >
+            <i class="ri-upload-2-line"></i>
+          </button>
+        </span>
+        <span [ngbTooltip]="'table_export_soon' | translate">
+          <button
+            type="button"
+            class="btn btn-light-bg table-tool"
+            disabled
+            [attr.aria-label]="'table_export_soon' | translate"
+          >
+            <i class="ri-download-2-line"></i>
+          </button>
+        </span>
+      </div>
     </div>
   </div>
 }

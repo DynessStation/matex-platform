@@ -194,6 +194,20 @@ export class Table {
   private requestLoading = false;
 
   //==================================================
+  //==== TOOLS (U-3)
+  //==================================================
+
+  // Reload and reset pause for a moment after use, so a list is not hammered.
+  public toolsCoolingDown = false;
+
+  public readonly toolsCooldownMs = 3000;
+
+  private toolsCooldownTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Sort direction each column starts with, restored by reset.
+  private initialSortDirections = new Map<ITableColumn, string | undefined>();
+
+  //==================================================
   //==== DATE RANGE
   //==================================================
 
@@ -231,6 +245,10 @@ export class Table {
   //==================================================
 
   ngOnInit() {
+    this.tableConfig()?.columns?.forEach((column) =>
+      this.initialSortDirections.set(column, column.sort_direction),
+    );
+
     if (this.emitInitialChange()) {
       this.startLoadTimer();
 
@@ -538,6 +556,71 @@ export class Table {
   }
 
   //==================================================
+  //==== RELOAD AND RESET
+  //==================================================
+
+  /** Loads the list again with the same query. */
+  reloadTable(): void {
+    if (this.toolsCoolingDown) {
+      return;
+    }
+
+    this.startToolsCooldown();
+
+    this.onChangeTable(null, 'reload');
+  }
+
+  /** Clears search, sort, dates, and paging, then loads page 1. */
+  resetTable(): void {
+    if (this.toolsCoolingDown) {
+      return;
+    }
+
+    this.startToolsCooldown();
+
+    this.term.setValue('', { emitEvent: false });
+
+    this.fromDate = null;
+
+    this.toDate = null;
+
+    this.tableConfig()?.columns?.forEach((column) => {
+      column.sort_direction = this.initialSortDirections.get(column);
+    });
+
+    const next: Params = { ...this.tableData };
+
+    delete next['start_date'];
+
+    delete next['end_date'];
+
+    this.tableData = {
+      ...next,
+      search: '',
+      field: '',
+      sort: '',
+      page: 1,
+      paginate: TABLE_PAGE_SIZES[0],
+    };
+
+    this.onChangeTable(null, 'reload');
+  }
+
+  private startToolsCooldown(): void {
+    this.toolsCoolingDown = true;
+
+    if (this.toolsCooldownTimer) {
+      clearTimeout(this.toolsCooldownTimer);
+    }
+
+    this.toolsCooldownTimer = setTimeout(() => {
+      this.toolsCoolingDown = false;
+
+      this.toolsCooldownTimer = null;
+    }, this.toolsCooldownMs);
+  }
+
+  //==================================================
   //==== LOAD TIMER
   //==================================================
 
@@ -783,6 +866,10 @@ export class Table {
   //==================================================
 
   ngOnDestroy() {
+    if (this.toolsCooldownTimer) {
+      clearTimeout(this.toolsCooldownTimer);
+    }
+
     this.renderer.removeClass(this.document.body, 'loader-none');
   }
 }

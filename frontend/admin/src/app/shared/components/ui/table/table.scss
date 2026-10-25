@@ -328,3 +328,45 @@ tbody {
   margin: 0;
   font-size: var(--admin-text-sm);
 }
+
+//==================================================
+//==== TOP BAR (U-3): page size, search, and tools without labels
+//==================================================
+
+.table-page-size {
+  width: auto;
+  min-width: 72px;
+}
+
+.table-search {
+  position: relative;
+
+  > i {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8b9098;
+    pointer-events: none;
+  }
+
+  .form-control {
+    padding-left: 32px;
+  }
+}
+
+.table-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .table-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--admin-control-height);
+    height: var(--admin-control-height);
+    padding: 0;
+    font-size: 16px;
+  }
+}
