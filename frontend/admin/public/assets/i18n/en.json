@@ -151,7 +151,6 @@
   "audit_source_integration": "Integration",
 
   "activity_log_detail": "Activity Log Detail",
-  "audit_back": "Back",
   "audit_overview": "Overview",
   "audit_actor_entity": "Actor & Entity",
   "audit_request_context": "Request Context",

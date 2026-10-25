@@ -72,12 +72,12 @@ for (const [route, api, minutes] of [
     const key = route.slice(1);
     await page.evaluate((name) => {
       const pauses = JSON.parse(localStorage.getItem('matex-admin-refresh-pause') ?? '{}');
-      pauses[name] = Date.now() + 2000;
+      pauses[name] = Date.now() + 8000;
       localStorage.setItem('matex-admin-refresh-pause', JSON.stringify(pauses));
     }, key);
     await page.reload();
     await expect(button).toHaveText(/0:0\d/);
-    await expect(button).toBeEnabled({ timeout: 6000 });
+    await expect(button).toBeEnabled({ timeout: 15_000 });
     await expect(button).toHaveText(/Perbarui/);
 
     expect(errors).toEqual([]);

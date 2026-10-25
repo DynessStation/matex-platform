@@ -13,6 +13,28 @@
   flex-wrap: wrap;
   gap: 10px;
 
+  // Right side: the form "Kembali" button (U-7) and the page buttons.
+  .title-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  // Same height as the page buttons beside it.
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--admin-bar-height);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
   .right-options {
     ul {
       display: flex;

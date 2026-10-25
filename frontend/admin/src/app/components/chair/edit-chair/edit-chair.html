@@ -1,4 +1,4 @@
-<app-page-wrapper [title]="'chair.edit_title' | translate">
+<app-page-wrapper back="/chair" [title]="'chair.edit_title' | translate">
   @if (detailErrorStatus !== null) {
     <app-detail-error-state
       [status]="detailErrorStatus"

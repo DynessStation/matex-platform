@@ -29,6 +29,7 @@ import {
   writeTableViewSettings,
 } from './table.util';
 import { ITableColumn, ITableConfig } from '../../../interface/table.interface';
+import { ListReturnService } from '../../../services/list-return.service';
 import { AuthState } from '../../../store/state/auth.state';
 import { LoaderState } from '../../../store/state/loader.state';
 
@@ -41,6 +42,7 @@ export class TableStateService {
   private readonly calendar = inject(NgbCalendar);
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly lists = inject(ListReturnService);
   readonly formatter = inject(NgbDateParserFormatter);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -160,11 +162,16 @@ export class TableStateService {
     }
 
     if (emitInitialChange) {
+      // Back from a form (U-7): the query the list was left with.
+      const remembered = this.lists.takeReturnQuery();
+
+      if (remembered) {
+        this.syncState(remembered);
+      }
+
       this.startLoadTimer();
 
-      this.tableChanged?.emit({
-        ...this.tableData,
-      });
+      this.emitQuery();
     }
   }
 
@@ -273,6 +280,12 @@ export class TableStateService {
     this.document.body.classList.add('loader-none');
 
     this.startLoadTimer();
+
+    this.emitQuery();
+  }
+
+  private emitQuery(): void {
+    this.lists.rememberQuery(this.tableData);
 
     this.tableChanged?.emit({
       ...this.tableData,

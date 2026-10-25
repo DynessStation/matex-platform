@@ -14,7 +14,12 @@
                 <app-help-tip />
                 <ng-content select="[option]" />
               </div>
-              <ng-content select="[button]" />
+              <div class="title-header-actions">
+                @if (back()) {
+                  <app-back-button [to]="back()" />
+                }
+                <ng-content select="[button]" />
+              </div>
             </div>
           }
           <ng-content />

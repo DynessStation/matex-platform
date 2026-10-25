@@ -4,7 +4,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -39,7 +39,6 @@ import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.uti
   imports: [
     AsyncPipe,
     DatePipe,
-    RouterModule,
     TranslateModule,
     PageWrapper,
     DetailErrorState,

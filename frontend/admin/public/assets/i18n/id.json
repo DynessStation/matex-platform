@@ -151,7 +151,6 @@
   "audit_source_integration": "Integrasi",
 
   "activity_log_detail": "Detail Log Aktivitas",
-  "audit_back": "Kembali",
   "audit_overview": "Ringkasan",
   "audit_actor_entity": "Pelaku & Entitas",
   "audit_request_context": "Konteks Request",
