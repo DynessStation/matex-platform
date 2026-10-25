@@ -4,6 +4,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { WebsitePageAssistantService } from '../website-page-assistant.service';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import { WebsitePageEditorLocale } from '../website-page-form.model';
 
@@ -25,6 +26,8 @@ import { WebsitePageEditorLocale } from '../website-page-form.model';
 })
 export class WebsitePageSeoTab {
   readonly editor = inject(WebsitePageEditorService);
+
+  readonly assistant = inject(WebsitePageAssistantService);
 
   seoPreviewTitle(): string {
     const group = this.editor.translationForm(this.editor.activeLocale);

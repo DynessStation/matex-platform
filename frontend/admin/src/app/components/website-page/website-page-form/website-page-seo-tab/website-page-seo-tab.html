@@ -113,9 +113,9 @@
                 ? 'ri-translate-2'
                 : 'ri-edit-2-line'
             "
-            [loading]="editor.assistingPageField === 'meta_description'"
-            [disabled]="editor.assistingPageField !== null"
-            (requested)="editor.assistPageField('meta_description')"
+            [loading]="assistant.assistingPageField === 'meta_description'"
+            [disabled]="assistant.assistingPageField !== null"
+            (requested)="assistant.assistPageField('meta_description')"
           />
         </div>
 
@@ -272,9 +272,9 @@
                       ? 'ri-translate-2'
                       : 'ri-edit-2-line'
                   "
-                  [loading]="editor.assistingPageField === 'og_description'"
-                  [disabled]="editor.assistingPageField !== null"
-                  (requested)="editor.assistPageField('og_description')"
+                  [loading]="assistant.assistingPageField === 'og_description'"
+                  [disabled]="assistant.assistingPageField !== null"
+                  (requested)="assistant.assistPageField('og_description')"
                 />
               </div>
 

@@ -1,4 +1,4 @@
-@if (editor.previewPage; as page) {
+@if (save.previewPage; as page) {
   <!--==================================================-->
   <!--==== LIVE PREVIEW ================================-->
   <!--==================================================-->
@@ -323,7 +323,7 @@
         type="button"
         class="btn btn-theme"
         [disabled]="editor.saving()"
-        (click)="editor.submitForm()"
+        (click)="save.submitForm()"
       >
         @if (editor.saving()) {
           <span

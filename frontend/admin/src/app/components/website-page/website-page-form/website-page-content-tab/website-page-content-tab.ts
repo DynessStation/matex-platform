@@ -16,6 +16,7 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { finalize } from 'rxjs';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { WebsitePageAssistantService } from '../website-page-assistant.service';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import {
   AboutFeatureDraft,
@@ -49,6 +50,8 @@ import { parseLocale, slugify } from '../website-page-form.util';
 })
 export class WebsitePageContentTab {
   readonly editor = inject(WebsitePageEditorService);
+
+  readonly assistant = inject(WebsitePageAssistantService);
 
   // Rich text editor for the page body; created in the browser, per visit to this tab.
   readonly contentEditor = signal<Editor | null>(null);
@@ -235,7 +238,7 @@ export class WebsitePageContentTab {
               : 'Draf deskripsi sudah diisi. Periksa kembali sebelum menyimpan.',
           );
         },
-        error: (error) => this.editor.showContentAssistantError(error),
+        error: (error) => this.assistant.showContentAssistantError(error),
       });
   }
 

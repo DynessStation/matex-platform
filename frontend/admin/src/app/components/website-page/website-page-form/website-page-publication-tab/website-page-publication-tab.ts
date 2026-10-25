@@ -13,6 +13,7 @@ import {
   publicationDateValue,
 } from '../website-page-form.util';
 import { WebsitePagePublicationService } from '../website-page-publication.service';
+import { WebsitePageSaveService } from '../website-page-save.service';
 
 // Publication tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
@@ -24,6 +25,8 @@ import { WebsitePagePublicationService } from '../website-page-publication.servi
 })
 export class WebsitePagePublicationTab {
   readonly editor = inject(WebsitePageEditorService);
+
+  readonly save = inject(WebsitePageSaveService);
 
   readonly publication = inject(WebsitePagePublicationService);
 
@@ -83,7 +86,7 @@ export class WebsitePagePublicationTab {
       return;
     }
 
-    this.editor.refreshPreviewPage();
+    this.save.refreshPreviewPage();
 
     this.editor.activeTab = 'preview';
   }

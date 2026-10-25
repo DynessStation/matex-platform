@@ -11,6 +11,7 @@ import {
   previewVisibilityKey,
 } from '../website-page-form.util';
 import { WebsitePagePublicationService } from '../website-page-publication.service';
+import { WebsitePageSaveService } from '../website-page-save.service';
 
 // Preview tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
@@ -23,6 +24,8 @@ import { WebsitePagePublicationService } from '../website-page-publication.servi
 export class WebsitePagePreviewTab {
   readonly editor = inject(WebsitePageEditorService);
 
+  readonly save = inject(WebsitePageSaveService);
+
   readonly publication = inject(WebsitePagePublicationService);
 
   readonly previewLanguageLabelKey = previewLanguageLabelKey;
@@ -30,40 +33,40 @@ export class WebsitePagePreviewTab {
   readonly previewVisibilityKey = previewVisibilityKey;
 
   get previewDefaultTranslation(): IWebsitePageEditorTranslation | null {
-    if (!this.editor.previewPage) {
+    if (!this.save.previewPage) {
       return null;
     }
 
     return (
-      this.editor.previewPage.translations.find(
+      this.save.previewPage.translations.find(
         (item) =>
           item.website_page_locale ===
-          this.editor.previewPage?.website_page_default_locale,
+          this.save.previewPage?.website_page_default_locale,
       ) ??
-      this.editor.previewPage.translations[0] ??
+      this.save.previewPage.translations[0] ??
       null
     );
   }
 
   get previewDraftTranslations(): IWebsitePageEditorTranslation[] {
     if (
-      !this.editor.previewPage ||
+      !this.save.previewPage ||
       !this.publication.publicationRequiresPublishedTranslation
     ) {
       return [];
     }
 
-    return this.editor.previewPage.translations.filter(
+    return this.save.previewPage.translations.filter(
       (item) =>
         item.website_page_locale !==
-          this.editor.previewPage?.website_page_default_locale &&
+          this.save.previewPage?.website_page_default_locale &&
         item.website_page_i18n_status === 0,
     );
   }
 
   get previewHeroMediaName(): string {
     return (
-      this.editor.previewPage?.attachments.find(
+      this.save.previewPage?.attachments.find(
         (item) =>
           item.website_page_attachment_role ===
           (this.editor.isGadgetHomeTemplate ? 'home_main' : 'hero'),
@@ -91,6 +94,6 @@ export class WebsitePagePreviewTab {
   }
 
   previewResultStatusKey(): string {
-    return `website_page.status_${this.editor.previewPage?.effective_status ?? 'draft'}`;
+    return `website_page.status_${this.save.previewPage?.effective_status ?? 'draft'}`;
   }
 }

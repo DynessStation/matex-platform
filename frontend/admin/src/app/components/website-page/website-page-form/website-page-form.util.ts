@@ -22,6 +22,11 @@ import {
   getGadgetHomeMediaRule,
 } from '../../../shared/data/gadget-home-media';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
+import {
+  IWebsitePageEditorAttachment,
+  IWebsitePageEditorDetail,
+  IWebsitePageEditorPayload,
+} from '../../../shared/interface/website-page-editor.interface';
 
 export function createHomeSectionVisibility(): HomeSectionVisibility {
   return { ...HOME_SECTION_DEFAULTS };
@@ -545,4 +550,155 @@ export function dateToNgbDate(date: Date): NgbDateStruct {
     month: date.getMonth() + 1,
     day: date.getDate(),
   };
+}
+
+//==================================================
+//==== SAVE PAYLOAD
+//==================================================
+
+/**
+ * The save request body for a built page. A base save keeps the stored lifecycle (status
+ * and publish dates); publication changes are sent as separate actions.
+ */
+export function buildSavePayload(
+  page: IWebsitePageEditorDetail,
+  mode: 'create' | 'edit',
+  stored: IWebsitePageEditorDetail | null,
+): IWebsitePageEditorPayload {
+  return {
+    id_parent_website_page: page.id_parent_website_page,
+
+    website_page_key: page.website_page_key,
+
+    website_page_type: page.website_page_type,
+
+    website_page_template: page.website_page_template,
+
+    website_page_content_mode: page.website_page_content_mode,
+
+    website_page_default_locale: page.website_page_default_locale,
+
+    // Base save tidak mengubah lifecycle.
+    website_page_status:
+      mode === 'edit' ? (stored?.website_page_status ?? 0) : 0,
+
+    website_page_visibility: page.website_page_visibility,
+
+    website_page_is_system: page.website_page_is_system,
+
+    website_page_is_featured: page.website_page_is_featured,
+
+    website_page_sort_order: page.website_page_sort_order,
+
+    website_page_publish_at:
+      mode === 'edit' ? (stored?.website_page_publish_at ?? null) : null,
+
+    website_page_unpublish_at:
+      mode === 'edit' ? (stored?.website_page_unpublish_at ?? null) : null,
+
+    website_page_settings_json: stored?.website_page_settings_json ?? null,
+
+    translations: page.translations.map((translation) => ({
+      locale: translation.website_page_locale,
+
+      slug: translation.website_page_slug,
+
+      title: translation.website_page_title,
+
+      excerpt: translation.website_page_excerpt,
+
+      content: translation.website_page_content,
+
+      content_json: translation.website_page_content_json,
+
+      meta_title: translation.website_page_meta_title,
+
+      meta_description: translation.website_page_meta_description,
+
+      meta_keywords: translation.website_page_meta_keywords,
+
+      meta_robots: translation.website_page_meta_robots,
+
+      canonical_url: translation.website_page_canonical_url,
+
+      og_title: translation.website_page_og_title,
+
+      og_description: translation.website_page_og_description,
+
+      schema_json: translation.website_page_schema_json,
+
+      status: translation.website_page_i18n_status,
+    })),
+
+    attachments: page.attachments.map((attachment) => ({
+      id_attachment: attachment.id_attachment,
+
+      role: attachment.website_page_attachment_role,
+
+      sort_order: attachment.website_page_attachment_sort_order,
+
+      is_public: attachment.website_page_attachment_is_public,
+
+      action_type: attachment.website_page_attachment_action_type,
+
+      action_value: attachment.website_page_attachment_action_value,
+
+      translations: attachment.translations.map((translation) => ({
+        locale: translation.website_page_attachment_locale,
+
+        caption: translation.website_page_attachment_caption,
+
+        alt_text: translation.website_page_attachment_alt_text,
+      })),
+    })),
+  };
+}
+
+//==================================================
+//==== MEDIA DRAFTS
+//==================================================
+
+/**
+ * Media drafts from the stored attachments. Old "hero" images move to the slot the
+ * template uses now (home: main banner, about: content image).
+ */
+export function mediaDraftsFromDetail(
+  attachments: IWebsitePageEditorAttachment[],
+  template: { gadgetHome: boolean; about: boolean },
+): WebsitePageEditorMediaDraft[] {
+  return attachments.map((item) => {
+    const translations = createEmptyMediaTranslations();
+
+    item.translations.forEach((translation) => {
+      const locale = parseLocale(translation.website_page_attachment_locale);
+
+      if (!locale) {
+        return;
+      }
+
+      translations[locale] = {
+        caption: translation.website_page_attachment_caption ?? '',
+        alt_text: translation.website_page_attachment_alt_text ?? '',
+      };
+    });
+
+    return {
+      attachment: item,
+
+      role:
+        template.gadgetHome && item.website_page_attachment_role === 'hero'
+          ? 'home_main'
+          : template.about && item.website_page_attachment_role === 'hero'
+            ? 'about_content'
+            : item.website_page_attachment_role || 'gallery',
+
+      is_public: item.website_page_attachment_is_public === 1,
+
+      action_type: item.website_page_attachment_action_type ?? 'none',
+
+      action_value: item.website_page_attachment_action_value ?? '',
+
+      translations,
+    };
+  });
 }

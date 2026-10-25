@@ -597,9 +597,9 @@
                   ? 'ri-translate-2'
                   : 'ri-edit-2-line'
               "
-              [loading]="editor.assistingPageField === 'excerpt'"
-              [disabled]="editor.assistingPageField !== null"
-              (requested)="editor.assistPageField('excerpt')"
+              [loading]="assistant.assistingPageField === 'excerpt'"
+              [disabled]="assistant.assistingPageField !== null"
+              (requested)="assistant.assistPageField('excerpt')"
             />
           </div>
 
@@ -756,9 +756,9 @@
                     ? 'ri-translate-2'
                     : 'ri-edit-2-line'
                 "
-                [loading]="editor.assistingPageField === 'content'"
-                [disabled]="editor.assistingPageField !== null"
-                (requested)="editor.assistPageField('content')"
+                [loading]="assistant.assistingPageField === 'content'"
+                [disabled]="assistant.assistingPageField !== null"
+                (requested)="assistant.assistPageField('content')"
               />
             </div>
 

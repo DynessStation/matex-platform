@@ -15,7 +15,7 @@
           [(activeId)]="editor.activeTab"
           class="nav-pills"
           orientation="vertical"
-          (navChange)="editor.onNavChange($event)"
+          (navChange)="save.onNavChange($event)"
         >
           <!-- GENERAL -->
 
@@ -109,7 +109,7 @@
             type="button"
             class="btn btn-theme w-100"
             [disabled]="editor.saving()"
-            (click)="editor.submitForm()"
+            (click)="save.submitForm()"
           >
             @if (editor.saving()) {
               <span
