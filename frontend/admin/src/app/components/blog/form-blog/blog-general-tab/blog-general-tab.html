@@ -1,0 +1,63 @@
+<section class="article-panel">
+  <div class="article-heading">
+    <h5>Pengaturan artikel</h5>
+    <p>Identitas internal dan penanda artikel untuk pengelolaan konten.</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-7">
+      <label class="form-label" for="key">Kunci internal <span>*</span></label>
+      <input
+        id="key"
+        class="form-control"
+        formControlName="key"
+        placeholder="contoh: manfaat-latex-alami"
+        [class.is-invalid]="
+          form.controls.key.touched && form.controls.key.invalid
+        "
+      />
+      <small class="text-muted"
+        >Dipakai sistem untuk mengenali artikel dan tidak tampil sebagai judul
+        publik.</small
+      >
+      @if (
+        form.controls.key.touched && form.controls.key.errors?.['required']
+      ) {
+        <div class="invalid-feedback d-block">Kunci internal wajib diisi.</div>
+      }
+      @if (form.controls.key.touched && form.controls.key.errors?.['pattern']) {
+        <div class="invalid-feedback d-block">
+          Gunakan huruf kecil, angka, dan tanda hubung.
+        </div>
+      }
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Penanda artikel</label>
+      <div class="article-checks">
+        <label class="app-check app-check-card"
+          ><input type="checkbox" formControlName="is_featured" />
+          <span
+            ><strong>Unggulan</strong
+            ><small>Tonjolkan pada blok artikel pilihan.</small></span
+          ></label
+        >
+        <label class="app-check app-check-card"
+          ><input type="checkbox" formControlName="is_sticky" />
+          <span
+            ><strong>Sematkan</strong
+            ><small>Prioritaskan pada urutan daftar artikel.</small></span
+          ></label
+        >
+      </div>
+    </div>
+  </div>
+  <div class="article-actions">
+    <span></span
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('content')"
+    >
+      Lanjut ke Konten <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>

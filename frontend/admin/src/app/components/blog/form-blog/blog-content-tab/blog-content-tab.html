@@ -1,0 +1,204 @@
+<section class="article-panel">
+  <div class="article-heading">
+    <h5>Konten & bahasa</h5>
+    <p>
+      Tulis versi Bahasa Indonesia dan English tanpa memenuhi layar dengan dua
+      formulir sekaligus.
+    </p>
+  </div>
+  <div class="article-language-tabs">
+    <button
+      type="button"
+      [class.active]="editor.activeLocale === 'id'"
+      (click)="editor.activeLocale = 'id'"
+    >
+      <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="editor.activeLocale === 'en'"
+      (click)="editor.activeLocale = 'en'"
+    >
+      <strong>EN</strong> English
+    </button>
+  </div>
+  @if (editor.activeLocale === 'id') {
+    <div class="row g-4">
+      <div class="col-md-5">
+        <label class="form-label" for="id_slug">Slug URL <span>*</span></label>
+        <div class="input-group">
+          <span class="input-group-text">/artikel/</span
+          ><input
+            id="id_slug"
+            class="form-control"
+            formControlName="id_slug"
+            [class.is-invalid]="
+              form.controls.id_slug.touched && form.controls.id_slug.invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-md-7">
+        <label class="form-label" for="id_title">Judul <span>*</span></label
+        ><input
+          id="id_title"
+          class="form-control"
+          formControlName="id_title"
+          [class.is-invalid]="
+            form.controls.id_title.touched && form.controls.id_title.invalid
+          "
+        />
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label" for="id_excerpt">Ringkasan</label>
+          <app-ai-field-action
+            label="Isi ringkasan otomatis"
+            [loading]="assistant.assistingField === 'id_excerpt'"
+            [disabled]="assistant.assistingField !== null"
+            (requested)="assistant.assistArticleField('id', 'excerpt')"
+          />
+        </div>
+        <textarea
+          id="id_excerpt"
+          class="form-control"
+          rows="3"
+          formControlName="id_excerpt"
+          placeholder="Ringkasan singkat untuk kartu dan daftar artikel"
+        ></textarea>
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label">Isi artikel <span>*</span></label>
+          <app-ai-field-action
+            label="Isi artikel otomatis"
+            loadingLabel="Sedang menyusun artikel…"
+            [loading]="assistant.assistingField === 'id_body'"
+            [disabled]="
+              assistant.assistingField !== null || !form.controls.id_title.value
+            "
+            (requested)="assistant.assistArticleField('id', 'body')"
+          />
+        </div>
+        @if (editor.browser && editor.idEditor) {
+          <div
+            class="article-rich-editor"
+            [class.is-invalid]="
+              form.controls.id_body.touched && form.controls.id_body.invalid
+            "
+          >
+            <ngx-editor-menu [editor]="editor.idEditor" /><ngx-editor
+              [editor]="editor.idEditor"
+              formControlName="id_body"
+            />
+          </div>
+          <small class="article-editor-help"
+            >Gunakan Heading 2 untuk bagian utama, Heading 3 untuk subbagian,
+            dan paragraf biasa untuk isi. Buat tautan dengan teks yang
+            menjelaskan tujuannya agar artikel mudah dibaca dan ramah
+            SEO.</small
+          >
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-md-5">
+        <label class="form-label" for="en_slug">URL slug <span>*</span></label>
+        <div class="input-group">
+          <span class="input-group-text">/en/article/</span
+          ><input
+            id="en_slug"
+            class="form-control"
+            formControlName="en_slug"
+            [class.is-invalid]="
+              form.controls.en_slug.touched && form.controls.en_slug.invalid
+            "
+          />
+        </div>
+      </div>
+      <div class="col-md-7">
+        <label class="form-label" for="en_title">Title <span>*</span></label
+        ><input
+          id="en_title"
+          class="form-control"
+          formControlName="en_title"
+          [class.is-invalid]="
+            form.controls.en_title.touched && form.controls.en_title.invalid
+          "
+        />
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label" for="en_excerpt">Excerpt</label>
+          <app-ai-field-action
+            label="Translate from Indonesian"
+            loadingLabel="Translating the excerpt…"
+            icon="ri-translate-2"
+            [loading]="assistant.assistingField === 'en_excerpt'"
+            [disabled]="
+              assistant.assistingField !== null ||
+              !form.controls.id_excerpt.value
+            "
+            (requested)="assistant.translateArticleField('excerpt')"
+          />
+        </div>
+        <textarea
+          id="en_excerpt"
+          class="form-control"
+          rows="3"
+          formControlName="en_excerpt"
+          placeholder="Short summary for article cards and listings"
+        ></textarea>
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label">Article body <span>*</span></label>
+          <app-ai-field-action
+            label="Translate from Indonesian"
+            loadingLabel="Translating the article…"
+            icon="ri-translate-2"
+            [loading]="assistant.assistingField === 'en_body'"
+            [disabled]="
+              assistant.assistingField !== null || !form.controls.id_body.value
+            "
+            (requested)="assistant.translateArticleField('body')"
+          />
+        </div>
+        @if (editor.browser && editor.enEditor) {
+          <div
+            class="article-rich-editor"
+            [class.is-invalid]="
+              form.controls.en_body.touched && form.controls.en_body.invalid
+            "
+          >
+            <ngx-editor-menu [editor]="editor.enEditor" /><ngx-editor
+              [editor]="editor.enEditor"
+              formControlName="en_body"
+            />
+          </div>
+          <small class="article-editor-help"
+            >Use Heading 2 for main sections, Heading 3 for subsections, and
+            normal paragraphs for body copy. Use descriptive link text for
+            readability and SEO.</small
+          >
+        }
+      </div>
+    </div>
+  }
+  <div class="article-actions">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="editor.setTab('general')"
+    >
+      <i class="ri-arrow-left-line"></i> Kembali ke Umum</button
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('seo')"
+    >
+      Lanjut ke SEO <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>

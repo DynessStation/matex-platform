@@ -1,0 +1,163 @@
+<section class="article-panel">
+  <div class="article-heading">
+    <h5>Publikasi artikel</h5>
+    <p>
+      Tentukan kapan artikel tersedia untuk pengunjung. Artikel tetap dapat
+      disimpan sebagai draf.
+    </p>
+  </div>
+  <div class="article-publication-options">
+    <label [class.active]="form.controls.status.value === 'draft'"
+      ><input
+        type="radio"
+        formControlName="status"
+        value="draft"
+        (change)="editor.selectStatus('draft')"
+      /><span
+        ><strong>Simpan sebagai Draf</strong
+        ><small>Artikel belum ditampilkan kepada pengunjung.</small></span
+      ></label
+    >
+    <label [class.active]="form.controls.status.value === 'published'"
+      ><input
+        type="radio"
+        formControlName="status"
+        value="published"
+        (change)="editor.selectStatus('published')"
+      /><span
+        ><strong>Publikasikan Sekarang</strong
+        ><small>Artikel tersedia setelah perubahan disimpan.</small></span
+      ></label
+    >
+    <label [class.active]="form.controls.status.value === 'scheduled'"
+      ><input
+        type="radio"
+        formControlName="status"
+        value="scheduled"
+        (change)="editor.selectStatus('scheduled')"
+      /><span
+        ><strong>Jadwalkan Publikasi</strong
+        ><small>Tentukan tanggal dan waktu artikel mulai tampil.</small></span
+      ></label
+    >
+    <label
+      class="danger"
+      [class.active]="form.controls.status.value === 'archived'"
+      ><input
+        type="radio"
+        formControlName="status"
+        value="archived"
+        (change)="editor.selectStatus('archived')"
+      /><span
+        ><strong>Arsipkan</strong
+        ><small>Sembunyikan artikel dari situs publik.</small></span
+      ></label
+    >
+  </div>
+  @if (form.controls.status.value === 'scheduled') {
+    <div class="article-schedule-card">
+      <h6>Mulai tayang</h6>
+      <div class="row g-3">
+        <div class="col-md-7">
+          <label class="form-label">Tanggal <span>*</span></label>
+          <div ngbDropdown class="article-date-dropdown">
+            <button
+              type="button"
+              ngbDropdownToggle
+              class="article-date-toggle"
+              [class.is-invalid]="editor.scheduledDateInvalid"
+            >
+              <span>{{ editor.dateLabel(editor.publishDate) }}</span
+              ><i class="ri-calendar-line"></i>
+            </button>
+            <div ngbDropdownMenu>
+              <ngb-datepicker
+                [(ngModel)]="editor.publishDate"
+                [ngModelOptions]="{ standalone: true }"
+                (dateSelect)="editor.syncSchedule()"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Waktu <span>*</span></label>
+          <div
+            class="article-timepicker"
+            [class.is-invalid]="editor.scheduledDateInvalid"
+          >
+            <ngb-timepicker
+              [(ngModel)]="editor.publishTime"
+              [ngModelOptions]="{ standalone: true }"
+              [spinners]="true"
+              (ngModelChange)="editor.syncSchedule()"
+            />
+          </div>
+        </div>
+      </div>
+      @if (editor.scheduledDateInvalid) {
+        <div class="text-danger mt-2">
+          Tanggal dan waktu mulai tayang wajib diisi.
+        </div>
+      }
+    </div>
+  }
+  <div class="article-schedule-card">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h6 class="mb-1">Berhenti tayang</h6>
+        <small class="text-muted"
+          >Opsional. Artikel otomatis disembunyikan setelah waktu ini.</small
+        >
+      </div>
+      @if (editor.unpublishDate || editor.unpublishTime) {
+        <button
+          type="button"
+          class="btn btn-sm btn-light"
+          (click)="editor.clearUnpublish()"
+        >
+          Hapus jadwal
+        </button>
+      }
+    </div>
+    <div class="row g-3">
+      <div class="col-md-7">
+        <label class="form-label">Tanggal</label>
+        <div ngbDropdown class="article-date-dropdown">
+          <button type="button" ngbDropdownToggle class="article-date-toggle">
+            <span>{{ editor.dateLabel(editor.unpublishDate) }}</span
+            ><i class="ri-calendar-line"></i>
+          </button>
+          <div ngbDropdownMenu>
+            <ngb-datepicker
+              [(ngModel)]="editor.unpublishDate"
+              [ngModelOptions]="{ standalone: true }"
+              (dateSelect)="editor.syncSchedule()"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Waktu</label>
+        <div class="article-timepicker">
+          <ngb-timepicker
+            [(ngModel)]="editor.unpublishTime"
+            [ngModelOptions]="{ standalone: true }"
+            [spinners]="true"
+            (ngModelChange)="editor.syncSchedule()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="article-actions">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="editor.setTab('media')"
+    >
+      <i class="ri-arrow-left-line"></i> Kembali ke Media</button
+    ><app-button id="article_save">{{
+      editor.type() === 'create' ? 'Simpan Artikel' : 'Perbarui Artikel'
+    }}</app-button>
+  </div>
+</section>

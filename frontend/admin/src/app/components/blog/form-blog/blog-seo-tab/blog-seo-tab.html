@@ -1,0 +1,159 @@
+<section class="article-panel">
+  <div class="article-heading">
+    <h5>SEO & tampilan saat dibagikan</h5>
+    <p>
+      Semua field di bagian ini opsional. Jika kosong, judul dan ringkasan
+      artikel akan digunakan.
+    </p>
+  </div>
+  <div class="article-language-tabs">
+    <button
+      type="button"
+      [class.active]="editor.activeLocale === 'id'"
+      (click)="editor.activeLocale = 'id'"
+    >
+      <strong>ID</strong> Bahasa Indonesia
+    </button>
+    <button
+      type="button"
+      [class.active]="editor.activeLocale === 'en'"
+      (click)="editor.activeLocale = 'en'"
+    >
+      <strong>EN</strong> English
+    </button>
+  </div>
+  @if (editor.activeLocale === 'id') {
+    <div class="row g-4">
+      <div class="col-md-6">
+        <label class="form-label">Judul SEO</label
+        ><input
+          class="form-control"
+          formControlName="id_meta_title"
+          placeholder="Kosongkan untuk memakai judul artikel"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Canonical URL</label
+        ><input
+          class="form-control"
+          formControlName="id_canonical_url"
+          placeholder="https://..."
+        />
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label">Deskripsi SEO</label>
+          <app-ai-field-action
+            label="Isi deskripsi otomatis"
+            [loading]="assistant.assistingField === 'id_meta_description'"
+            [disabled]="assistant.assistingField !== null"
+            (requested)="assistant.assistArticleField('id', 'meta_description')"
+          />
+        </div>
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="id_meta_description"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Judul saat dibagikan</label
+        ><input class="form-control" formControlName="id_og_title" />
+      </div>
+      <div class="col-md-6">
+        <div class="article-field-heading">
+          <label class="form-label">Deskripsi saat dibagikan</label>
+          <app-ai-field-action
+            label="Isi deskripsi otomatis"
+            [loading]="assistant.assistingField === 'id_og_description'"
+            [disabled]="assistant.assistingField !== null"
+            (requested)="assistant.assistArticleField('id', 'og_description')"
+          />
+        </div>
+        <textarea
+          class="form-control"
+          rows="2"
+          formControlName="id_og_description"
+        ></textarea>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-md-6">
+        <label class="form-label">SEO title</label
+        ><input
+          class="form-control"
+          formControlName="en_meta_title"
+          placeholder="Leave blank to use the article title"
+        />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Canonical URL</label
+        ><input
+          class="form-control"
+          formControlName="en_canonical_url"
+          placeholder="https://..."
+        />
+      </div>
+      <div class="col-12">
+        <div class="article-field-heading">
+          <label class="form-label">SEO description</label>
+          <app-ai-field-action
+            label="Translate from Indonesian"
+            icon="ri-translate-2"
+            [loading]="assistant.assistingField === 'en_meta_description'"
+            [disabled]="
+              assistant.assistingField !== null ||
+              !form.controls.id_meta_description.value
+            "
+            (requested)="assistant.translateArticleField('meta_description')"
+          />
+        </div>
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="en_meta_description"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Social sharing title</label
+        ><input class="form-control" formControlName="en_og_title" />
+      </div>
+      <div class="col-md-6">
+        <div class="article-field-heading">
+          <label class="form-label">Social sharing description</label>
+          <app-ai-field-action
+            label="Translate from Indonesian"
+            icon="ri-translate-2"
+            [loading]="assistant.assistingField === 'en_og_description'"
+            [disabled]="
+              assistant.assistingField !== null ||
+              !form.controls.id_og_description.value
+            "
+            (requested)="assistant.translateArticleField('og_description')"
+          />
+        </div>
+        <textarea
+          class="form-control"
+          rows="2"
+          formControlName="en_og_description"
+        ></textarea>
+      </div>
+    </div>
+  }
+  <div class="article-actions">
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="editor.setTab('content')"
+    >
+      <i class="ri-arrow-left-line"></i> Kembali ke Konten</button
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('media')"
+    >
+      Lanjut ke Media <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>

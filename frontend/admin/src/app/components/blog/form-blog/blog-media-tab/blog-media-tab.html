@@ -1,0 +1,61 @@
+<section class="article-panel">
+  <div class="article-heading">
+    <h5>Media artikel</h5>
+    <p>
+      Pilih gambar utama untuk daftar dan detail artikel. Gambar berbagi sosial
+      dapat memakai gambar berbeda.
+    </p>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div
+        class="article-media-box"
+        [class.is-invalid]="
+          form.controls.thumbnail_id.touched &&
+          form.controls.thumbnail_id.invalid
+        "
+      >
+        <label class="form-label">Gambar utama <span>*</span></label
+        ><small>Ditampilkan pada kartu, daftar, dan bagian atas artikel.</small
+        ><app-image-upload
+          [multipleImage]="false"
+          [accept]="[editor.mediaConfig.image]"
+          [collection]="'media_library'"
+          [image]="editor.article?.thumbnail ?? null"
+          (selectedFiles)="editor.media('thumbnail_id', $event)"
+        />
+      </div>
+      @if (
+        form.controls.thumbnail_id.touched && form.controls.thumbnail_id.invalid
+      ) {
+        <div class="text-danger mt-2">Gambar utama wajib dipilih.</div>
+      }
+    </div>
+    <div class="col-lg-6">
+      <div class="article-media-box">
+        <label class="form-label">Gambar berbagi sosial</label
+        ><small
+          >Opsional. Dipakai saat tautan dibagikan ke WhatsApp dan media
+          sosial.</small
+        ><app-image-upload
+          [multipleImage]="false"
+          [accept]="[editor.mediaConfig.image]"
+          [collection]="'media_library'"
+          [image]="editor.article?.og_image ?? null"
+          (selectedFiles)="editor.media('og_image_id', $event)"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="article-actions">
+    <button type="button" class="btn btn-light" (click)="editor.setTab('seo')">
+      <i class="ri-arrow-left-line"></i> Kembali ke SEO</button
+    ><button
+      type="button"
+      class="btn btn-primary"
+      (click)="editor.setTab('publication')"
+    >
+      Lanjut ke Publikasi <i class="ri-arrow-right-line"></i>
+    </button>
+  </div>
+</section>
