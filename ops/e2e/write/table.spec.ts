@@ -81,7 +81,7 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
   await expect(table.locator('#table-checkbox')).toBeChecked();
   await deleteAll.click();
   await expect(page.locator('.modal-content')).toBeVisible();
-  await page.keyboard.press('Escape');
+  await page.locator('#delete_no_btn').click();
   await expect(page.locator('.modal-content')).toHaveCount(0);
   await table.locator('#table-checkbox').uncheck();
   await expect(deleteAll).toHaveCount(0);

@@ -128,8 +128,11 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
     await panel(page).locator('button', { hasText: 'Pilih Media' }).click();
     const modal = page.locator('.modal-content');
     await expect(modal).toBeVisible();
-    const uploadTab = modal.locator('.nav-link', { hasText: /Unggah|Upload/ });
-    if (await uploadTab.count()) await uploadTab.first().click();
+    // The modal renders its tabs after it opens: wait for the upload tab, then open it.
+    await modal
+      .locator('.nav-link', { hasText: /Unggah|Upload/ })
+      .first()
+      .click();
     await modal.locator('input[type=file]').setInputFiles(fixture);
     const upload = page.waitForResponse(
       (r) => r.url().includes('/api/v1/attachment') && r.request().method() === 'POST',
