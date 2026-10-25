@@ -1,0 +1,105 @@
+@if (help.drawerOpen()) {
+  <aside
+    #panel
+    class="help-drawer"
+    tabindex="-1"
+    [style.top.px]="top()"
+    aria-labelledby="help-drawer-title"
+  >
+    <header class="help-drawer-header">
+      <div class="help-drawer-heading">
+        <span>{{ 'help_guide' | translate }}</span>
+        <h2 id="help-drawer-title">
+          {{ guide()?.title ?? ('help_guide' | translate) }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="help-drawer-close"
+        [attr.aria-label]="'help_close' | translate"
+        (click)="help.close()"
+      >
+        <i class="ri-close-line" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="help-drawer-switch">
+      <select
+        class="form-select"
+        [attr.aria-label]="'help_other_guides' | translate"
+        (change)="switchGuide($event)"
+      >
+        @for (entry of guides; track entry.key) {
+          <option
+            [value]="entry.key"
+            [selected]="entry.key === help.drawerKey()"
+          >
+            {{ entry.title | translate }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div #body class="help-drawer-body">
+      @switch (state().status) {
+        @case ('loading') {
+          <p class="help-drawer-muted">{{ 'help_loading' | translate }}</p>
+        }
+        @case ('failed') {
+          <p class="help-drawer-muted">{{ 'help_load_failed' | translate }}</p>
+        }
+        @default {
+          @if (guide(); as guide) {
+            @if (guide.summaryHtml) {
+              <div class="help-summary" [innerHTML]="guide.summaryHtml"></div>
+            }
+            @if (guide.introHtml) {
+              <div class="help-content" [innerHTML]="guide.introHtml"></div>
+            }
+            @if (guide.sections.length > 1) {
+              <nav
+                class="help-toc"
+                [attr.aria-label]="'help_on_this_page' | translate"
+              >
+                <span>{{ 'help_on_this_page' | translate }}</span>
+                <ul>
+                  @for (section of guide.sections; track section.id) {
+                    <li>
+                      <a
+                        [href]="'#help-' + section.id"
+                        (click)="onJump($event, section.id)"
+                      >
+                        <span aria-hidden="true">#</span>
+                        {{ section.title }}
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </nav>
+            }
+            @for (section of guide.sections; track section.id) {
+              <section
+                class="help-section"
+                [id]="'help-' + section.id"
+                [class.is-target]="target() === section.id"
+              >
+                <h3>
+                  <a
+                    class="help-anchor"
+                    [href]="'#help-' + section.id"
+                    aria-hidden="true"
+                    tabindex="-1"
+                    (click)="onJump($event, section.id)"
+                    >#</a
+                  >
+                  {{ section.title }}
+                </h3>
+                <div class="help-content" [innerHTML]="section.html"></div>
+              </section>
+            }
+          }
+        }
+      }
+    </div>
+  </aside>
+}

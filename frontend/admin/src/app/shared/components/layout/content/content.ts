@@ -5,6 +5,7 @@ import { NavService } from '../../../services/nav.service';
 import { Footer } from '../../footer/footer';
 import { Header } from '../../header/header';
 import { Sidebar } from '../../sidebar/sidebar';
+import { HelpDrawer } from '../../ui/help/help-drawer/help-drawer';
 import { SidebarMenuSkeleton } from '../../ui/skeleton/sidebar-menu-skeleton/sidebar-menu-skeleton';
 
 //==================================================
@@ -14,7 +15,14 @@ import { SidebarMenuSkeleton } from '../../ui/skeleton/sidebar-menu-skeleton/sid
 @Component({
   selector: 'app-content',
 
-  imports: [RouterModule, Header, Footer, SidebarMenuSkeleton, Sidebar],
+  imports: [
+    RouterModule,
+    Header,
+    Footer,
+    SidebarMenuSkeleton,
+    Sidebar,
+    HelpDrawer,
+  ],
 
   templateUrl: './content.html',
 

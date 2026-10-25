@@ -3,7 +3,10 @@
     <header class="analytics-heading">
       <div>
         <span class="analytics-kicker">Perilaku pengunjung</span>
-        <h1>Analitik Publik</h1>
+        <h1>
+          Analitik Publik
+          <app-help-tip page="public-analytics" />
+        </h1>
         <p>
           Data first-party MATEX untuk memahami trafik dan tindakan pengunjung
           tanpa menyimpan alamat IP mentah.
@@ -119,7 +122,10 @@
         <header class="panel-heading">
           <div>
             <span>Tren trafik</span>
-            <h2>Pengunjung dan page view</h2>
+            <h2>
+              Pengunjung dan page view
+              <app-help-tip page="public-analytics" section="tren-trafik" />
+            </h2>
           </div>
           <div class="chart-legend">
             <span><i class="legend-page"></i> Page view</span>
@@ -179,7 +185,13 @@
         <header class="panel-heading">
           <div>
             <span>Pengalaman pengguna nyata</span>
-            <h2>Core Web Vitals</h2>
+            <h2>
+              Core Web Vitals
+              <app-help-tip
+                page="public-analytics"
+                section="pengalaman-pengguna-nyata-core-web-vitals"
+              />
+            </h2>
           </div>
           <small>Rata-rata dari browser pengunjung pada rentang terpilih</small>
         </header>
@@ -221,7 +233,10 @@
           <header class="panel-heading">
             <div>
               <span>Funnel kontak</span>
-              <h2>Dari mulai isi sampai terkirim</h2>
+              <h2>
+                Dari mulai isi sampai terkirim
+                <app-help-tip page="public-analytics" section="funnel-kontak" />
+              </h2>
             </div>
           </header>
           <div class="funnel">
@@ -249,7 +264,13 @@
           <header class="panel-heading">
             <div>
               <span>Akuisisi</span>
-              <h2>Sumber trafik</h2>
+              <h2>
+                Sumber trafik
+                <app-help-tip
+                  page="public-analytics"
+                  section="akuisisi-sumber-trafik"
+                />
+              </h2>
             </div>
           </header>
           @if (data.sources.length) {
@@ -282,7 +303,13 @@
           <header class="panel-heading">
             <div>
               <span>Lokasi agregat</span>
-              <h2>Negara pengunjung</h2>
+              <h2>
+                Negara pengunjung
+                <app-help-tip
+                  page="public-analytics"
+                  section="lokasi-agregat"
+                />
+              </h2>
             </div>
           </header>
           @if (data.locations.length) {
@@ -318,7 +345,13 @@
         <header class="panel-heading">
           <div>
             <span>Minat pengunjung</span>
-            <h2>Halaman teratas</h2>
+            <h2>
+              Halaman teratas
+              <app-help-tip
+                page="public-analytics"
+                section="minat-pengunjung-halaman-teratas"
+              />
+            </h2>
           </div>
           <a routerLink="/dashboard">Kembali ke dasbor</a>
         </header>

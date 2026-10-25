@@ -3,7 +3,10 @@
     <header class="dashboard-heading">
       <div>
         <span class="dashboard-kicker">Ringkasan MATEX</span>
-        <h1>Dasbor operasional</h1>
+        <h1>
+          Dasbor operasional
+          <app-help-tip page="dashboard" />
+        </h1>
         <p>
           Trafik publik, minat pengunjung, dan kesiapan konten dalam satu
           tampilan.
@@ -135,7 +138,13 @@
           <header class="panel-heading">
             <div>
               <span>Trafik publik</span>
-              <h2>Pengunjung dan page view</h2>
+              <h2>
+                Pengunjung dan page view
+                <app-help-tip
+                  page="dashboard"
+                  section="grafik-trafik-publik-pengunjung-dan-page-view"
+                />
+              </h2>
             </div>
             <div class="chart-legend">
               <span><i class="legend-page"></i> Page view</span>
@@ -183,7 +192,13 @@
           <header class="panel-heading">
             <div>
               <span>Kesiapan konten</span>
-              <h2>Yang perlu diperhatikan</h2>
+              <h2>
+                Yang perlu diperhatikan
+                <app-help-tip
+                  page="dashboard"
+                  section="kesiapan-konten-yang-perlu-diperhatikan"
+                />
+              </h2>
             </div>
           </header>
           <div class="content-summary-list">
@@ -238,7 +253,13 @@
           <header class="panel-heading">
             <div>
               <span>Minat pengunjung</span>
-              <h2>Halaman teratas</h2>
+              <h2>
+                Halaman teratas
+                <app-help-tip
+                  page="dashboard"
+                  section="minat-pengunjung-halaman-teratas"
+                />
+              </h2>
             </div>
           </header>
           @if (data.top_pages.length) {
@@ -276,7 +297,13 @@
           <header class="panel-heading">
             <div>
               <span>Akuisisi</span>
-              <h2>Sumber trafik</h2>
+              <h2>
+                Sumber trafik
+                <app-help-tip
+                  page="dashboard"
+                  section="akuisisi-sumber-trafik"
+                />
+              </h2>
             </div>
           </header>
           @if (data.sources.length) {

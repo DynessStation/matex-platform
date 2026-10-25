@@ -7,10 +7,11 @@ import { Observable } from 'rxjs';
 
 import { LoaderState } from '../../store/state/loader.state';
 import { Loader } from '../loader/loader';
+import { HelpTip } from '../ui/help/help-tip/help-tip';
 
 @Component({
   selector: 'app-page-wrapper',
-  imports: [CommonModule, TranslateModule, Loader],
+  imports: [CommonModule, TranslateModule, Loader, HelpTip],
   templateUrl: './page-wrapper.html',
   styleUrl: './page-wrapper.scss',
 })

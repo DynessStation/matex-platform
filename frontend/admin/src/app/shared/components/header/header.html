@@ -52,6 +52,18 @@
       <li>
         <a
           href="javascript:void(0)"
+          class="header-help"
+          #helpTooltip="ngbTooltip"
+          [ngbTooltip]="'help_page_guide' | translate"
+          [attr.aria-label]="'help_page_guide' | translate"
+          (click)="helpTooltip.close(); help.open()"
+        >
+          <i class="ri-question-line"></i>
+        </a>
+      </li>
+      <li>
+        <a
+          href="javascript:void(0)"
           class="header-fullscreen"
           (click)="toggleFullScreen()"
         >

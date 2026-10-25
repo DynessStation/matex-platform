@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, DOCUMENT } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { ILanguage, IValues } from '../../interface/setting.interface';
+import { HelpService } from '../../services/help.service';
 import { NavService } from '../../services/nav.service';
 import { Languages } from './widgets/languages/languages';
 import { Mode } from './widgets/mode/mode';
@@ -21,6 +23,7 @@ import { SettingState } from '../../store/state/setting.state';
     CommonModule,
     RouterModule,
     TranslateModule,
+    NgbTooltip,
     Search,
     QuickView,
     Languages,
@@ -32,6 +35,7 @@ import { SettingState } from '../../store/state/setting.state';
 })
 export class Header {
   navServices = inject(NavService);
+  help = inject(HelpService);
   private document = inject(DOCUMENT);
 
   setting$: Observable<IValues> = inject(Store).select(

@@ -1,0 +1,41 @@
+<button
+  type="button"
+  class="help-tip"
+  #popover="ngbPopover"
+  [ngbPopover]="tipBody"
+  triggers="manual"
+  [autoClose]="false"
+  container="body"
+  placement="right left bottom top"
+  popoverClass="help-tip-popover"
+  [attr.aria-label]="'help_tip_label' | translate"
+  [attr.aria-expanded]="popover.isOpen()"
+  (mouseenter)="hoverOpen(popover)"
+  (mouseleave)="hoverLeave(popover)"
+  (click)="toggle(popover)"
+  (hidden)="onHidden()"
+>
+  <i class="ri-question-line" aria-hidden="true"></i>
+</button>
+
+<ng-template #tipBody>
+  <div
+    class="help-tip-content"
+    (mouseenter)="cancelClose()"
+    (mouseleave)="hoverLeave(popover)"
+  >
+    @if (text()) {
+      <p>{{ text() | translate }}</p>
+    } @else if (loading()) {
+      <p class="help-tip-muted">{{ 'help_loading' | translate }}</p>
+    } @else if (note()) {
+      <p>{{ note() }}</p>
+    } @else {
+      <p class="help-tip-muted">{{ 'help_load_failed' | translate }}</p>
+    }
+    <button type="button" class="help-tip-more" (click)="openDrawer(popover)">
+      {{ 'help_more' | translate }}
+      <i class="ri-arrow-right-line" aria-hidden="true"></i>
+    </button>
+  </div>
+</ng-template>

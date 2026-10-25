@@ -1,0 +1,391 @@
+@use '../utils/variables';
+
+/**=====================
+     Help tip (U-4) and help drawer (U-5)
+==========================**/
+
+:root {
+  --help-drawer-width: min(400px, 100vw);
+  --help-surface: #fff;
+  --help-border: #e6e8eb;
+  --help-text: #{variables.$theme-body-font-color};
+  --help-heading: #30343b;
+  --help-muted: #6b7280;
+  --help-soft: #f6f7f9;
+  --help-target: #fff6e0;
+}
+
+body.dark-only {
+  --help-surface: #{variables.$dark-card-background};
+  --help-border: #{variables.$dark-card-border};
+  --help-text: #{variables.$dark-all-font-color};
+  --help-heading: rgba(255, 255, 255, 0.85);
+  --help-muted: #{variables.$dark-small-font-color};
+  --help-soft: #{variables.$dark-body-background};
+  --help-target: rgba(255, 168, 0, 0.07);
+}
+
+// "?" button, inline after a title.
+.help-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0;
+  border: 1px solid var(--help-border);
+  border-radius: 50%;
+  background: var(--help-surface);
+  color: var(--help-muted);
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded='true'] {
+    color: var(--theme-color);
+    border-color: var(--theme-color);
+  }
+}
+
+.help-tip-popover {
+  max-width: 280px;
+  border-color: var(--help-border);
+  background: var(--help-surface);
+  font-size: var(--admin-text);
+  box-shadow: 0 6px 20px rgba(17, 24, 39, 0.12);
+
+  .popover-body {
+    padding: 0;
+    color: var(--help-text);
+  }
+
+  .popover-arrow::before {
+    border-right-color: var(--help-border);
+    border-left-color: var(--help-border);
+  }
+
+  .popover-arrow::after {
+    border-right-color: var(--help-surface);
+    border-left-color: var(--help-surface);
+  }
+}
+
+.help-tip-content {
+  padding: 10px 12px;
+
+  p {
+    display: -webkit-box;
+    margin: 0 0 6px;
+    overflow: hidden;
+    color: var(--help-text);
+    font-size: var(--admin-text);
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+  }
+
+  .help-tip-muted {
+    color: var(--help-muted);
+  }
+}
+
+.help-tip-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-color);
+  font-size: var(--admin-text);
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Drawer: below the header, on top of the footer; it does not block the page.
+.help-drawer {
+  position: fixed;
+  top: 0; // set below the header by the component
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  width: var(--help-drawer-width);
+  border-left: 1px solid var(--help-border);
+  background: var(--help-surface);
+  color: var(--help-text);
+  box-shadow: -8px 0 24px rgba(17, 24, 39, 0.08);
+  outline: none;
+  animation: help-drawer-in 0.2s ease-out;
+}
+
+@keyframes help-drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+.help-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 10px;
+
+  h2 {
+    margin: 2px 0 0;
+    color: var(--help-heading);
+    font-size: var(--admin-heading);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+}
+
+.help-drawer-heading > span {
+  color: var(--help-muted);
+  font-size: var(--admin-text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.help-drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--help-border);
+  border-radius: 6px;
+  background: var(--help-surface);
+  color: var(--help-muted);
+  font-size: 16px;
+
+  &:hover {
+    color: var(--theme-color);
+    border-color: var(--theme-color);
+  }
+}
+
+.help-drawer-switch {
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--help-border);
+
+  .form-select {
+    height: var(--admin-bar-height);
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: var(--admin-text);
+  }
+}
+
+.help-drawer-body {
+  flex: 1 1 auto;
+  padding: 14px 16px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-size: var(--admin-text);
+  line-height: 1.6;
+}
+
+.help-drawer-muted {
+  color: var(--help-muted);
+}
+
+.help-summary {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--theme-color);
+  border-radius: 6px;
+  background: var(--help-soft);
+
+  p {
+    margin: 0 0 4px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.help-toc {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--help-border);
+
+  > span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--help-heading);
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    display: flex;
+    gap: 6px;
+    padding: 3px 0;
+    color: var(--help-text);
+    font-size: var(--admin-text);
+    letter-spacing: normal;
+
+    span {
+      color: var(--theme-color);
+      font-weight: 600;
+    }
+
+    &:hover {
+      color: var(--theme-color);
+    }
+  }
+}
+
+.help-section {
+  margin: 0 -8px 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  scroll-margin-top: 8px;
+  transition: background-color 0.4s ease;
+
+  &.is-target {
+    background: var(--help-target);
+  }
+
+  h3 {
+    margin: 12px 0 8px;
+    letter-spacing: normal;
+    color: var(--help-heading);
+    font-size: var(--admin-subheading);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
+.help-anchor {
+  margin-right: 4px;
+  color: var(--theme-color);
+  text-decoration: none;
+}
+
+.help-content {
+  p,
+  ul,
+  ol {
+    margin: 0 0 8px;
+  }
+
+  ul,
+  ol {
+    padding-left: 18px;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  li {
+    display: list-item;
+    margin-bottom: 2px;
+    font-size: var(--admin-text);
+    line-height: 1.6;
+  }
+
+  ul ul {
+    list-style: circle;
+  }
+
+  h4 {
+    margin: 12px 0 4px;
+    color: var(--help-heading);
+    font-size: var(--admin-text);
+    font-weight: 600;
+  }
+
+  p,
+  li {
+    color: var(--help-text);
+    letter-spacing: normal;
+  }
+
+  strong {
+    color: var(--help-heading);
+    font-weight: 600;
+  }
+
+  code {
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--help-soft);
+    color: inherit;
+    font-size: 0.95em;
+  }
+
+  a {
+    color: var(--theme-color);
+    word-break: break-word;
+  }
+}
+
+.help-table {
+  margin: 0 0 10px;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--admin-text-sm);
+  }
+
+  th,
+  td {
+    padding: 5px 6px;
+    border: 1px solid var(--help-border);
+    color: var(--help-text);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--help-soft);
+    color: var(--help-heading);
+    font-weight: 600;
+  }
+}
+
+// Wide screens: the page makes room for the drawer instead of being covered.
+@media (min-width: 1400px) {
+  body.help-drawer-open {
+    .page-wrapper .page-body-wrapper .page-body {
+      margin-right: var(--help-drawer-width);
+    }
+
+    .footer {
+      padding-right: calc(15px + var(--help-drawer-width));
+    }
+  }
+}

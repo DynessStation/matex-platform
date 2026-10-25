@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { finalize } from 'rxjs';
 
+import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
 import {
   IPageSpeedResult,
   ISeoConsoleOverview,
@@ -18,7 +19,7 @@ import { SeoConsoleService } from '../../shared/services/seo-console.service';
 
 @Component({
   selector: 'app-seo-console',
-  imports: [CommonModule],
+  imports: [CommonModule, HelpTip],
   templateUrl: './seo-console.html',
   styleUrl: './seo-console.scss',
 })

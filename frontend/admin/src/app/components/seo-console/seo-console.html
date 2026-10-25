@@ -3,7 +3,10 @@
     <header class="seo-heading">
       <div>
         <span class="seo-kicker">Performa di mesin pencari</span>
-        <h1>SEO & Mesin Pencari</h1>
+        <h1>
+          SEO & Mesin Pencari
+          <app-help-tip page="seo-console" />
+        </h1>
         <p>
           Ringkasan Search Console dan audit PageSpeed untuk matexindo.com. Data
           pencarian Google bukan data realtime.
@@ -63,7 +66,13 @@
           </div>
           <div>
             <span class="seo-kicker">Belum terhubung</span>
-            <h2>Hubungkan Google Search Console</h2>
+            <h2>
+              Hubungkan Google Search Console
+              <app-help-tip
+                page="seo-console"
+                section="status-koneksi-search-console"
+              />
+            </h2>
             <p>
               Halaman admin sudah siap. Buat service account Google, aktifkan
               Search Console API, lalu tambahkan email service account sebagai
@@ -116,7 +125,13 @@
         <div class="seo-grid">
           <article class="data-panel">
             <header>
-              <h2>Kueri teratas</h2>
+              <h2>
+                Kueri teratas
+                <app-help-tip
+                  page="seo-console"
+                  section="kueri-dan-halaman-teratas"
+                />
+              </h2>
               <small>Berdasarkan klik</small>
             </header>
             @if (data.top_queries?.length) {
@@ -150,7 +165,13 @@
           </article>
           <article class="data-panel">
             <header>
-              <h2>Halaman teratas</h2>
+              <h2>
+                Halaman teratas
+                <app-help-tip
+                  page="seo-console"
+                  section="kueri-dan-halaman-teratas"
+                />
+              </h2>
               <small>Berdasarkan klik</small>
             </header>
             @if (data.top_pages?.length) {
@@ -191,7 +212,13 @@
         <header>
           <div>
             <span class="seo-kicker">Audit sesuai permintaan</span>
-            <h2>PageSpeed & Lighthouse</h2>
+            <h2>
+              PageSpeed & Lighthouse
+              <app-help-tip
+                page="seo-console"
+                section="pagespeed-lighthouse-audit-performa-website"
+              />
+            </h2>
             <p>
               Jalankan saat diperlukan. Setiap tombol memakai kuota API dan
               hasilnya bukan trafik realtime.

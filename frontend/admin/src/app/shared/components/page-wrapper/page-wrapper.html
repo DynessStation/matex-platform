@@ -11,6 +11,7 @@
             <div class="title-header">
               <div class="d-flex align-items-center">
                 <h5>{{ title() | translate }}</h5>
+                <app-help-tip />
                 <ng-content select="[option]" />
               </div>
               <ng-content select="[button]" />
