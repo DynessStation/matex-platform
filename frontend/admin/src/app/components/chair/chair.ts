@@ -108,7 +108,11 @@ export class Chair {
   //==== BUILD TABLE CONFIG
   //==================================================
 
-  private buildTableConfig(data: IChair[] = [], total = 0): ITableConfig {
+  private buildTableConfig(
+    data: IChair[] = [],
+    total = 0,
+    totalAll = total,
+  ): ITableConfig {
     return {
       columns: [
         {
@@ -225,6 +229,8 @@ export class Chair {
       data,
 
       total,
+
+      total_all: totalAll,
     };
   }
 
@@ -267,6 +273,8 @@ export class Chair {
           data: this.localizeRows(result.data),
 
           total: result.pagination.total,
+
+          total_all: result.pagination.total_all ?? result.pagination.total,
         };
       });
 
@@ -285,6 +293,7 @@ export class Chair {
           this.localizeRows(rows),
 
           total,
+          this.tableConfig.total_all,
         );
       });
   }

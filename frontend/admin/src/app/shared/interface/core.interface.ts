@@ -13,6 +13,7 @@ export interface IPaginateModel {
   prev_page_url?: string;
   to?: number;
   total: number;
+  total_all?: number;
 }
 
 export interface ILink {

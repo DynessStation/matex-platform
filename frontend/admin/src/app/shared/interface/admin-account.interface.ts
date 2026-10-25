@@ -69,6 +69,7 @@ export interface IAdminAccount {
 
 export interface IAdminAccountPagination {
   total: number;
+  total_all?: number;
 
   page: number;
 

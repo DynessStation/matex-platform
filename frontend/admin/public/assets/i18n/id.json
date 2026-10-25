@@ -243,6 +243,8 @@
   "create": "Buat",
   "show": "Tampilkan",
   "items_per_page": "Item per halaman",
+  "table_showing": "Menampilkan {{shown}} dari {{all}} data",
+  "table_load_seconds": "{{seconds}} detik",
   "search": "Cari",
   "edit_user": "Edit Pengguna",
   "save_user": "Simpan Pengguna",

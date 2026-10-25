@@ -57,6 +57,11 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
   await table.locator('.product-search input').fill(`tabel-${runId}`);
   expect(Object.fromEntries(await query)).toMatchObject({ search: `tabel-${runId}`, page: '1' });
   await expect(table.locator('tbody tr')).toHaveCount(3);
+  // The summary counts the matching rows against all rows (total and total_all).
+  const summary = table.locator('.table-summary');
+  await expect(summary).toContainText('Menampilkan 3 dari');
+  const all = Number(/dari ([\d.]+) data/.exec(await summary.innerText())![1].replace(/\./g, ''));
+  expect(all).toBeGreaterThan(3);
 
   // Sorting a column flips between ascending and descending.
   const header = table.locator('thead th', { hasText: 'Nama internal FAQ' });

@@ -243,6 +243,8 @@
   "create": "Create",
   "show": "Show",
   "items_per_page": "Items per page",
+  "table_showing": "Showing {{shown}} of {{all}} records",
+  "table_load_seconds": "{{seconds}} s",
   "search": "Search",
   "edit_user": "Edit User",
   "save_user": "Save User",

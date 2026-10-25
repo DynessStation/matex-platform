@@ -306,3 +306,25 @@ tbody {
 
   color: #2b2b2b;
 }
+
+//==================================================
+//==== FOOTER (U-3): "showing x of y" on the left, pages on the right
+//==================================================
+
+.table-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+
+  .custom-pagination {
+    margin-top: 0;
+  }
+}
+
+.table-summary {
+  margin: 0;
+  font-size: var(--admin-text-sm);
+}

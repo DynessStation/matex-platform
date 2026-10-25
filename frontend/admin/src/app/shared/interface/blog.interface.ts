@@ -39,6 +39,7 @@ export interface IArticleDetail extends IBlog {
 export interface IBlogModel {
   data: IBlog[];
   total: number;
+  total_all?: number;
   current_page?: number;
   per_page?: number;
 }

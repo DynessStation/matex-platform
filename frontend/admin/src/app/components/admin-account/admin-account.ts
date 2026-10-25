@@ -106,6 +106,7 @@ export class AdminAccount {
   private buildTableConfig(
     data: IAdminAccount[] = [],
     total = 0,
+    totalAll = total,
   ): ITableConfig {
     return {
       columns: [
@@ -259,6 +260,8 @@ export class AdminAccount {
       data,
 
       total,
+
+      total_all: totalAll,
     };
   }
 
@@ -293,6 +296,8 @@ export class AdminAccount {
           data: this.localizeRows(result.data),
 
           total: result.pagination.total,
+
+          total_all: result.pagination.total_all ?? result.pagination.total,
         };
       });
 
@@ -307,6 +312,7 @@ export class AdminAccount {
           this.localizeRows(rows),
 
           total,
+          this.tableConfig.total_all,
         );
       });
   }

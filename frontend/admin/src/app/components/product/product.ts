@@ -116,6 +116,7 @@ export class Product implements AfterViewInit {
           ...this.tableConfig,
           data,
           total: model?.total ?? 0,
+          total_all: model?.total_all,
         };
       });
     this.route.queryParamMap

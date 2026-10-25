@@ -3,6 +3,8 @@ export interface ITableConfig<T extends IBaseRow = IBaseRow> {
   rowActions?: ITableAction[];
   data?: T[];
   total?: number;
+  // Rows before search and filters (lists answer it since 5D, D-4).
+  total_all?: number;
   permission?: string | string[];
 }
 

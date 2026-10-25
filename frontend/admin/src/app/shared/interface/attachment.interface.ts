@@ -78,6 +78,8 @@ export interface IAttachmentPagination {
 
   total: number;
 
+  total_all?: number;
+
   length: number;
 
   total_pages: number;

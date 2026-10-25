@@ -37,6 +37,7 @@ export interface ICategoryDetail extends ICategory {
 export interface ICategoryModel {
   data: ICategory[];
   total: number;
+  total_all?: number;
 }
 export interface ICategoryPayload {
   key: string;

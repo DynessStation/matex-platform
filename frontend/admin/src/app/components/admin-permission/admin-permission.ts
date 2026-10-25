@@ -110,6 +110,7 @@ export class AdminPermission {
   private buildTableConfig(
     data: IAdminPermission[] = [],
     total = 0,
+    totalAll = total,
   ): ITableConfig {
     return {
       columns: [
@@ -237,6 +238,8 @@ export class AdminPermission {
       data,
 
       total,
+
+      total_all: totalAll,
     };
   }
 
@@ -271,6 +274,9 @@ export class AdminPermission {
           data: this.localizeRows(result?.data ?? []),
 
           total: result?.pagination?.total ?? 0,
+
+          total_all:
+            result?.pagination?.total_all ?? result?.pagination?.total ?? 0,
         };
       });
 
@@ -284,6 +290,7 @@ export class AdminPermission {
         this.tableConfig = this.buildTableConfig(
           this.localizeRows(rows),
           total,
+          this.tableConfig.total_all,
         );
       });
   }

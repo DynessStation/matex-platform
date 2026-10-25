@@ -43,6 +43,7 @@ export interface IAdminPermission {
 
 export interface IAdminPermissionPagination {
   total: number;
+  total_all?: number;
 
   page: number;
 

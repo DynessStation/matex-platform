@@ -110,6 +110,7 @@ export class Faq {
           : 'Belum lengkap',
       }));
       this.tableConfig.total = faq?.pagination.total ?? 0;
+      this.tableConfig.total_all = faq?.pagination.total_all;
     });
   }
 

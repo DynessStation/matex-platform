@@ -91,6 +91,7 @@ export class Office {
     data: IOffice[] = [],
 
     total = 0,
+    totalAll = total,
   ): ITableConfig {
     return {
       columns: [
@@ -238,6 +239,8 @@ export class Office {
       data,
 
       total,
+
+      total_all: totalAll,
     };
   }
 
@@ -271,6 +274,9 @@ export class Office {
           data: this.localizeRows(result?.data ?? []),
 
           total: result?.pagination.total ?? 0,
+
+          total_all:
+            result?.pagination.total_all ?? result?.pagination.total ?? 0,
         };
       });
 

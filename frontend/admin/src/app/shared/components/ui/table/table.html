@@ -527,16 +527,46 @@
   </div>
 </div>
 
-@if (pagination()) {
-  <nav class="custom-pagination">
-    <app-pagination
-      [total]="tableConfig()?.total"
-      [currentPage]="tableData['page']"
-      [pageSize]="tableData['paginate']"
-      (setPage)="onChangeTable($event, 'page')"
-    />
-  </nav>
-}
+<div class="table-footer">
+  <p class="table-summary text-muted">
+    {{
+      'table_showing'
+        | translate
+          : {
+              shown:
+                (tableConfig()?.total ?? 0
+                | number: '1.0-0' : localization.locale()),
+              all:
+                (tableConfig()?.total_all ?? tableConfig()?.total ?? 0
+                | number: '1.0-0' : localization.locale()),
+            }
+    }}
+    @if (loadSeconds !== null) {
+      <span class="table-summary-time">
+        ·
+        {{
+          'table_load_seconds'
+            | translate
+              : {
+                  seconds:
+                    (loadSeconds | number: '1.2-2' : localization.locale()),
+                }
+        }}
+      </span>
+    }
+  </p>
+
+  @if (pagination()) {
+    <nav class="custom-pagination">
+      <app-pagination
+        [total]="tableConfig()?.total"
+        [currentPage]="tableData['page']"
+        [pageSize]="tableData['paginate']"
+        (setPage)="onChangeTable($event, 'page')"
+      />
+    </nav>
+  }
+</div>
 
 <app-delete-modal
   #deleteModal

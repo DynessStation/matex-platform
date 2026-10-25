@@ -91,6 +91,8 @@ export interface IAuditLogPagination {
 
   total: number;
 
+  total_all?: number;
+
   length: number;
 
   pagerows: number;

@@ -113,7 +113,11 @@ export class AdminAccess {
   //==== BUILD TABLE CONFIG
   //==================================================
 
-  private buildTableConfig(data: IAdminAccess[] = [], total = 0): ITableConfig {
+  private buildTableConfig(
+    data: IAdminAccess[] = [],
+    total = 0,
+    totalAll = total,
+  ): ITableConfig {
     return {
       columns: [
         {
@@ -240,6 +244,8 @@ export class AdminAccess {
       data,
 
       total,
+
+      total_all: totalAll,
     };
   }
 
@@ -282,6 +288,8 @@ export class AdminAccess {
           data: this.localizeRows(result.data),
 
           total: result.pagination.total,
+
+          total_all: result.pagination.total_all ?? result.pagination.total,
         };
       });
 
@@ -300,6 +308,7 @@ export class AdminAccess {
           this.localizeRows(rows),
 
           total,
+          this.tableConfig.total_all,
         );
       });
   }

@@ -183,6 +183,17 @@ export class Table {
   public role: string;
 
   //==================================================
+  //==== LOAD TIME (U-3)
+  //==================================================
+
+  // Seconds the last list request took, shown under the table; null until measured.
+  public loadSeconds: number | null = null;
+
+  private requestStartedAt: number | null = null;
+
+  private requestLoading = false;
+
+  //==================================================
   //==== DATE RANGE
   //==================================================
 
@@ -221,6 +232,8 @@ export class Table {
 
   ngOnInit() {
     if (this.emitInitialChange()) {
+      this.startLoadTimer();
+
       this.tableChanged.emit({
         ...this.tableData,
       });
@@ -247,8 +260,14 @@ export class Table {
     //==================================================
 
     this.loadingStatus$.subscribe((res) => {
+      if (res === true && this.requestStartedAt !== null) {
+        this.requestLoading = true;
+      }
+
       if (res === false) {
         this.selected = [];
+
+        this.stopLoadTimer();
       }
     });
 
@@ -511,9 +530,38 @@ export class Table {
 
     this.renderer.addClass(this.document.body, 'loader-none');
 
+    this.startLoadTimer();
+
     this.tableChanged.emit({
       ...this.tableData,
     });
+  }
+
+  //==================================================
+  //==== LOAD TIMER
+  //==================================================
+
+  // From emitting a query until the global loader settles after its request.
+  private startLoadTimer(): void {
+    if (!this.isBrowser) {
+      return;
+    }
+
+    this.requestStartedAt = performance.now();
+
+    this.requestLoading = false;
+  }
+
+  private stopLoadTimer(): void {
+    if (this.requestStartedAt === null || !this.requestLoading) {
+      return;
+    }
+
+    this.loadSeconds = (performance.now() - this.requestStartedAt) / 1000;
+
+    this.requestStartedAt = null;
+
+    this.requestLoading = false;
   }
 
   //==================================================

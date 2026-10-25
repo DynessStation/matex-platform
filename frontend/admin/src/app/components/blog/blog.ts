@@ -104,6 +104,7 @@ export class Blog {
     this.blog$.subscribe((blog) => {
       this.tableConfig.data = blog ? blog?.data : [];
       this.tableConfig.total = blog ? blog?.total : 0;
+      this.tableConfig.total_all = blog?.total_all;
     });
   }
 

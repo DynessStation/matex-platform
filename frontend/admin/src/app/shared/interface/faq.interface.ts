@@ -41,7 +41,12 @@ export interface IFaqPayload {
 
 export interface IFaqModel {
   data: IFaq[];
-  pagination: { current_page: number; per_page: number; total: number };
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    total_all?: number;
+  };
 }
 
 export type IFaqDetailResponse = IApiResponse<IFaqDetail>;
