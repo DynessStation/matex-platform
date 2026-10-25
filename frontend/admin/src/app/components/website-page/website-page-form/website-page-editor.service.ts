@@ -645,6 +645,16 @@ export class WebsitePageEditorService {
     );
   }
 
+  gadgetHomeMediaAssigned(role: string): boolean {
+    return this.pageMedia.some(
+      (media) => media.is_public && media.role === role,
+    );
+  }
+
+  gadgetHomeMediaForRole(role: string): WebsitePageEditorMediaDraft | null {
+    return this.pageMedia.find((media) => media.role === role) ?? null;
+  }
+
   get aboutContentMedia(): WebsitePageEditorMediaDraft | null {
     return (
       this.pageMedia.find(

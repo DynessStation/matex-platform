@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MediaSelection } from '../../../../shared/components/ui/media-box/media-box';
 import { MediaModal } from '../../../../shared/components/ui/modal/media-modal/media-modal';
 import {
-  GADGET_HOME_MEDIA_RULES,
   GadgetHomeMediaRule,
   getGadgetHomeMediaRule,
 } from '../../../../shared/data/gadget-home-media';
@@ -14,7 +13,6 @@ import { WebsitePageEditorService } from '../website-page-editor.service';
 import {
   GADGET_HOME_MEDIA_ROLES,
   WebsitePageEditorLocale,
-  WebsitePageEditorMediaDraft,
   WebsitePageEditorMediaTranslationDraft,
 } from '../website-page-form.model';
 import {
@@ -26,12 +24,13 @@ import {
   sortGadgetHomeMedia,
   toAttachmentArray,
 } from '../website-page-form.util';
+import { WebsitePageHomeMedia } from '../website-page-home-media/website-page-home-media';
 
 // Media tab of the fixed website page form. Shared state lives in WebsitePageEditorService.
 @Component({
   selector: 'app-website-page-media-tab',
 
-  imports: [TranslateModule, MediaModal],
+  imports: [TranslateModule, MediaModal, WebsitePageHomeMedia],
 
   templateUrl: './website-page-media-tab.html',
 })
@@ -41,8 +40,6 @@ export class WebsitePageMediaTab {
   private readonly mediaModal = viewChild<MediaModal>('mediaModal');
 
   public activeHomeMediaRole: string | null = null;
-
-  public readonly gadgetHomeMediaRules = GADGET_HOME_MEDIA_RULES;
 
   public readonly gadgetHomeMediaRoles = GADGET_HOME_MEDIA_ROLES;
 
@@ -96,7 +93,7 @@ export class WebsitePageMediaTab {
 
   openHomeMedia(rule: GadgetHomeMediaRule): void {
     this.activeHomeMediaRole = rule.value;
-    const current = this.gadgetHomeMediaForRole(rule.value);
+    const current = this.editor.gadgetHomeMediaForRole(rule.value);
     const disabledSelectionIds = this.editor.pageMedia
       .filter((media) => media.role !== rule.value)
       .map((media) => media.attachment.id_attachment);
@@ -116,7 +113,7 @@ export class WebsitePageMediaTab {
   openHomeOgMedia(): void {
     const role = 'og';
     this.activeHomeMediaRole = role;
-    const current = this.gadgetHomeMediaForRole(role);
+    const current = this.editor.gadgetHomeMediaForRole(role);
     const disabledSelectionIds = this.editor.pageMedia
       .filter((media) => media.role !== role)
       .map((media) => media.attachment.id_attachment);
@@ -141,7 +138,9 @@ export class WebsitePageMediaTab {
 
   get selectedMedia(): IAttachment[] {
     if (this.editor.isGadgetHomeTemplate && this.activeHomeMediaRole) {
-      const current = this.gadgetHomeMediaForRole(this.activeHomeMediaRole);
+      const current = this.editor.gadgetHomeMediaForRole(
+        this.activeHomeMediaRole,
+      );
       return current ? [current.attachment] : [];
     }
 
@@ -280,16 +279,6 @@ export class WebsitePageMediaTab {
       this.mediaRoleOptions.find((option) => option.value === role)?.label ??
       role
     );
-  }
-
-  gadgetHomeMediaAssigned(role: string): boolean {
-    return this.editor.pageMedia.some(
-      (media) => media.is_public && media.role === role,
-    );
-  }
-
-  gadgetHomeMediaForRole(role: string): WebsitePageEditorMediaDraft | null {
-    return this.editor.pageMedia.find((media) => media.role === role) ?? null;
   }
 
   removeMedia(index: number): void {
