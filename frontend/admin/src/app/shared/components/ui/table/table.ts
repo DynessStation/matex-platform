@@ -556,6 +556,17 @@ export class Table {
   }
 
   //==================================================
+  //==== SORT STATE
+  //==================================================
+
+  /** Whether the list is currently sorted by this column. */
+  isSortedBy(column: ITableColumn): boolean {
+    return (
+      Boolean(column.dataField) && this.tableData['field'] === column.dataField
+    );
+  }
+
+  //==================================================
   //==== RELOAD AND RESET
   //==================================================
 

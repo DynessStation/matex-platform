@@ -249,6 +249,7 @@
   "table_reset": "Reload from the start",
   "table_import_soon": "Import (coming soon)",
   "table_export_soon": "Download (coming soon)",
+  "table_sort_by": "Sort by",
   "search": "Search",
   "edit_user": "Edit User",
   "save_user": "Save User",

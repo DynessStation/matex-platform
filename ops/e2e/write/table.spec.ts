@@ -63,8 +63,10 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
   const all = Number(/dari ([\d.]+) data/.exec(await summary.innerText())![1].replace(/\./g, ''));
   expect(all).toBeGreaterThan(3);
 
-  // Sorting a column flips between ascending and descending.
-  const header = table.locator('thead th', { hasText: 'Nama internal FAQ' });
+  // The small sort button in a header flips between ascending and descending.
+  const header = table
+    .locator('thead th', { hasText: 'Nama internal FAQ' })
+    .locator('.table-sort-btn');
   query = nextList(page, path);
   await header.click();
   expect(Object.fromEntries(await query)).toMatchObject({ field: 'key', sort: 'desc' });

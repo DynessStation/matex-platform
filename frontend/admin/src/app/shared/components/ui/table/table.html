@@ -228,32 +228,40 @@
                   'sm-width':
                     columnHead?.type === 'no' || columnHead?.type === 'image',
                 }"
-                [class.cursor-pointer]="columnHead?.sortable"
-                (click)="
-                  columnHead?.sortable && onChangeTable(columnHead, 'sort')
-                "
               >
-                <span class="table-heading-text">
-                  {{ columnHead?.title | translate }}
-                </span>
-                @if (columnHead?.sortable) {
-                  <div class="filter-arrow">
-                    <div>
-                      @if (
-                        columnHead?.sort_direction &&
-                        columnHead?.sort_direction === 'desc'
-                      ) {
-                        <i class="ri-arrow-up-s-fill"></i>
-                      }
-                      @if (
-                        columnHead?.sort_direction &&
-                        columnHead?.sort_direction === 'asc'
-                      ) {
-                        <i class="ri-arrow-down-s-fill"></i>
-                      }
-                    </div>
-                  </div>
-                }
+                <div class="table-head">
+                  <span class="table-heading-text">
+                    {{ columnHead?.title | translate }}
+                  </span>
+                  @if (columnHead?.sortable) {
+                    <button
+                      type="button"
+                      class="table-sort-btn"
+                      [class.active]="isSortedBy(columnHead)"
+                      [attr.aria-label]="
+                        ('table_sort_by' | translate) +
+                        ' ' +
+                        (columnHead?.title | translate)
+                      "
+                      [title]="
+                        ('table_sort_by' | translate) +
+                        ' ' +
+                        (columnHead?.title | translate)
+                      "
+                      (click)="onChangeTable(columnHead, 'sort')"
+                    >
+                      <i
+                        [class]="
+                          !isSortedBy(columnHead)
+                            ? 'ri-arrow-up-down-line'
+                            : columnHead?.sort_direction === 'desc'
+                              ? 'ri-sort-desc'
+                              : 'ri-sort-asc'
+                        "
+                      ></i>
+                    </button>
+                  }
+                </div>
               </th>
             }
           }
