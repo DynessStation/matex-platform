@@ -134,7 +134,8 @@
         }
 
         .select2-search__field {
-          border-color: variables.$light-semi-gray !important;
+          // U-2 (6D): same border as the other admin controls.
+          border-color: #dfe3e8 !important;
           border-radius: 5px;
           padding: 8px 10px !important;
         }

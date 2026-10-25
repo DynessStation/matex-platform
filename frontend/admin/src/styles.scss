@@ -261,10 +261,33 @@ form .custom-select.ng-invalid.ng-touched .select2-selection {
   min-height: var(--admin-control-height);
   padding-inline: 12px;
   border: 1px solid #dfe3e8;
-  background: #f6f3ec;
-  color: #343a40;
+  background: #f1f3f5;
+  color: #4b5563;
   line-height: 1;
   white-space: nowrap;
+}
+
+// U-2: the search box inside a select dropdown and the rich text editor look like the
+// other controls (white, grey border, theme border on focus).
+.page-body-wrapper
+  .select2-container
+  .select2-search--dropdown
+  .select2-search__field {
+  background-color: #fff !important;
+  color: #30343b !important;
+
+  &:focus {
+    border-color: var(--theme-color) !important;
+    outline: none;
+  }
+}
+
+// On body: ngx-editor sets its defaults on :root and loads after this sheet.
+body {
+  --ngx-editor-text-color: #30343b;
+  --ngx-editor-border-color: #dfe3e8;
+  --ngx-editor-wrapper-border-color: #dfe3e8;
+  --ngx-editor-placeholder-color: #8b9098;
 }
 
 .theme-form label.form-label {
@@ -361,6 +384,42 @@ body.dark-only {
     border-color: #414752 !important;
     background-color: #30353f !important;
     color: #aeb6c2 !important;
+  }
+
+  .input-group > .input-group-text {
+    border-color: #505765;
+    background: #30353f;
+    color: #c3c9d3;
+  }
+
+  .page-body-wrapper
+    .select2-container
+    .select2-search--dropdown
+    .select2-search__field {
+    background-color: #242832 !important;
+    color: #f2f4f7 !important;
+  }
+
+  // The rich text editor follows the dark input colors.
+  --ngx-editor-background-color: #242832;
+  --ngx-editor-text-color: #f2f4f7;
+  --ngx-editor-border-color: #505765;
+  --ngx-editor-wrapper-border-color: #505765;
+  --ngx-editor-menubar-bg-color: #242832;
+  --ngx-editor-seperator-color: #505765;
+  --ngx-editor-menu-item-hover-bg-color: #30353f;
+  --ngx-editor-menu-item-active-bg-color: #3a404c;
+  --ngx-editor-menu-item-active-color: #ffffff;
+  --ngx-editor-popup-bg-color: #242832;
+  --ngx-editor-placeholder-color: #8b93a1;
+
+  // Toolbar icons are SVGs without a fill, so they default to black.
+  .NgxEditor__MenuBar {
+    color: #f2f4f7;
+
+    svg {
+      fill: currentColor;
+    }
   }
 
   .btn.btn-light,
