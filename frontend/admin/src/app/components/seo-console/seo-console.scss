@@ -264,7 +264,15 @@ table {
 .path-cell {
   min-width: 210px;
   max-width: 360px;
-  overflow-wrap: anywhere;
+}
+
+// One line with "…" and the full path in a tooltip (TextFitDirective).
+.path-text {
+  display: block;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty-state {

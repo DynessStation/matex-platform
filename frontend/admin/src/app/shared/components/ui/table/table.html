@@ -59,7 +59,7 @@
                 }"
               >
                 <div class="table-head">
-                  <span class="table-heading-text">
+                  <span appTextFit class="table-heading-text">
                     {{ columnHead?.title | translate }}
                   </span>
                   @if (columnHead?.sortable) {
@@ -180,6 +180,7 @@
                 >
                   @if (columnHead?.type && columnHead?.type === 'no') {
                     <span
+                      appTextFit
                       class="table-cell-content table-cell-content--compact"
                     >
                       {{
@@ -279,11 +280,11 @@
                   } @else if (
                     columnHead?.type && columnHead?.type === 'price'
                   ) {
-                    <span class="table-cell-content">
+                    <span appTextFit class="table-cell-content">
                       {{ columnData[columnHead?.dataField] | currencySymbol }}
                     </span>
                   } @else if (columnHead?.type && columnHead?.type === 'date') {
-                    <span class="table-cell-content">
+                    <span appTextFit class="table-cell-content">
                       {{
                         columnData[columnHead?.dataField.toString()]
                           | date
@@ -303,6 +304,7 @@
                     />
                   } @else {
                     <div
+                      appTextFit
                       class="table-cell-content"
                       [innerHtml]="
                         getNestedPropertyValue(

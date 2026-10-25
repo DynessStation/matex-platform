@@ -574,15 +574,32 @@ body.dark-only {
   }
 }
 
-// Long names, labels, dates, and identifiers should form readable lines rather
-// than overflowing or being forced into a single row on narrow screens.
+// Long names, labels, dates, and identifiers form readable lines, broken only
+// between words; a word wider than its column puts the text on one line ending
+// in "…", with the full text in a tooltip (TextFitDirective).
 .page-body-wrapper .theme-table {
   .table-heading-text,
   .table-cell-content {
     white-space: normal !important;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
     word-break: normal;
   }
+}
+
+.text-fit-line {
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap !important;
+  text-overflow: ellipsis;
+}
+
+.page-body-wrapper .theme-table .text-fit-line {
+  white-space: nowrap !important;
+}
+
+.text-fit-tooltip .tooltip-inner {
+  max-width: 360px;
+  overflow-wrap: break-word;
 }
 
 //==================================================

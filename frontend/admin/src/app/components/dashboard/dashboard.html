@@ -276,7 +276,9 @@
                   @for (page of data.top_pages; track page.path) {
                     <tr>
                       <td>
-                        <span class="path-label">{{ page.path }}</span>
+                        <span appTextFit class="path-label">{{
+                          page.path
+                        }}</span>
                       </td>
                       <td>{{ page.visitors | number: '1.0-0' }}</td>
                       <td>{{ page.page_views | number: '1.0-0' }}</td>

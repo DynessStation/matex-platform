@@ -189,7 +189,11 @@
                   <tbody>
                     @for (row of data.top_pages; track row.key) {
                       <tr>
-                        <td class="path-cell">{{ row.key }}</td>
+                        <td class="path-cell">
+                          <span appTextFit class="path-text">{{
+                            row.key
+                          }}</span>
+                        </td>
                         <td>{{ row.clicks }}</td>
                         <td>{{ row.impressions }}</td>
                         <td>{{ row.ctr | percent: '1.1-1' }}</td>

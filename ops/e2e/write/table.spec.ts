@@ -190,3 +190,96 @@ test('the activity log table filters by a date range', async ({ page }) => {
 
   expect(errors).toEqual([]);
 });
+
+/** Words of these elements that the browser drew on more than one line. */
+function splitWords(page: Page, selector: string): Promise<string[]> {
+  return page.locator(selector).evaluateAll((elements) =>
+    elements.flatMap((element) => {
+      const split: string[] = [];
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const text = node as Text;
+        for (const match of text.data.matchAll(/\S+/g)) {
+          const range = document.createRange();
+          range.setStart(text, match.index!);
+          range.setEnd(text, match.index! + match[0].length);
+          const lines = new Set(
+            [...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)),
+          );
+          if (lines.size > 1) split.push(match[0]);
+        }
+      }
+      return split;
+    }),
+  );
+}
+
+test('table text breaks only between words; cut text ends in "…" with a tooltip', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const sku = `MTX-SKU-TANPASPASIYANGSANGATPANJANGSEKALI-${runId}`.toUpperCase();
+  const name = `Kasur lateks ${runId} dengan nama yang sangat panjang sekali untuk menguji batas dua baris di tabel`;
+  const owner = await apiLogin(admin.identity, admin.password);
+  const category = await owner.post('/api/v1/product-categories', {
+    data: {
+      key: `teks-${runId}`,
+      status: 'published',
+      translations: [
+        { locale: 'id-ID', slug: `teks-${runId}`, name: 'Kategori Teks' },
+        { locale: 'en-US', slug: `text-${runId}`, name: 'Text Category' },
+      ],
+    },
+  });
+  expect(category.status(), await category.text()).toBe(201);
+  const product = await owner.post('/api/v1/products', {
+    data: {
+      key: `teks-${runId}`,
+      sku,
+      status: 'draft',
+      unit: 'pcs',
+      price_visibility: 'contact',
+      category_ids: [(await category.json()).data.id],
+      translations: [
+        { locale: 'id-ID', slug: `teks-${runId}`, name },
+        { locale: 'en-US', slug: `text-${runId}`, name: `Text ${runId}` },
+      ],
+    },
+  });
+  expect(product.status(), await product.text()).toBe(201);
+  await owner.dispose();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto(`${stack.adminOrigin}/product`);
+  const table = page.locator('app-table');
+  await table.locator('.product-search input').fill(sku);
+  const row = table.locator('tbody tr', { hasText: sku.slice(0, 12) });
+  await expect(row).toHaveCount(1);
+
+  // No heading or cell is drawn with a word split over two lines ("Gamb / ar").
+  expect(await splitWords(page, 'app-table .table-heading-text, app-table .table-cell-content')).toEqual([]);
+
+  // The SKU is one word wider than its column: one line with "…" and a tooltip.
+  const skuCell = row.locator('.table-cell-content', { hasText: sku.slice(0, 12) });
+  await expect(skuCell).toHaveClass(/text-fit-line/);
+  await skuCell.hover();
+  await expect(page.locator('.text-fit-tooltip')).toHaveText(sku);
+  await page.mouse.move(5, 600);
+  await expect(page.locator('.text-fit-tooltip')).toHaveCount(0);
+
+  // The long name wraps between words and is cut after two lines, with a tooltip.
+  const nameCell = row.locator('.table-cell-content', { hasText: 'Kasur' });
+  await expect(nameCell).not.toHaveClass(/text-fit-line/);
+  await nameCell.hover();
+  await expect(page.locator('.text-fit-tooltip')).toContainText(/dua baris di tabel/i);
+  await page.mouse.move(5, 600);
+
+  // Text that fits gets no tooltip.
+  await table.locator('.table-heading-text', { hasText: 'Status' }).hover();
+  await page.waitForTimeout(500);
+  await expect(page.locator('.text-fit-tooltip')).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});

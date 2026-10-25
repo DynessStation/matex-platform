@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
+import { TextFitDirective } from '../../shared/directives/text-fit.directive';
 import {
   IAnalyticsDailyPoint,
   IAnalyticsOverview,
@@ -27,7 +28,7 @@ interface DashboardChartPoint extends IAnalyticsDailyPoint {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink, HelpTip],
+  imports: [CommonModule, RouterLink, HelpTip, TextFitDirective],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

@@ -26,6 +26,7 @@ import {
   nextSwitchValue,
   TableViewSettings,
 } from './table.util';
+import { TextFitDirective } from '../../../directives/text-fit.directive';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
 import {
@@ -54,6 +55,7 @@ import { DeleteModal } from '../modal/delete-modal/delete-modal';
     ConfirmationModal,
     TableToolbar,
     TableFooter,
+    TextFitDirective,
   ],
   templateUrl: './table.html',
   styleUrl: './table.scss',

@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
+import { TextFitDirective } from '../../shared/directives/text-fit.directive';
 import {
   IPageSpeedResult,
   ISeoConsoleOverview,
@@ -19,7 +20,7 @@ import { SeoConsoleService } from '../../shared/services/seo-console.service';
 
 @Component({
   selector: 'app-seo-console',
-  imports: [CommonModule, HelpTip],
+  imports: [CommonModule, HelpTip, TextFitDirective],
   templateUrl: './seo-console.html',
   styleUrl: './seo-console.scss',
 })
