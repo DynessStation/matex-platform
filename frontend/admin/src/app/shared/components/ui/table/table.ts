@@ -24,6 +24,7 @@ import {
   isPermissionGranted,
   isSwitchActive,
   nextSwitchValue,
+  TableViewSettings,
 } from './table.util';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
@@ -112,12 +113,6 @@ export class Table {
   readonly emitInitialChange = input<boolean>(true);
 
   //==================================================
-  //==== ACTION DISPLAY
-  //==================================================
-
-  readonly actionMode = input<'inline' | 'dropdown'>('inline');
-
-  //==================================================
   //==== EXTERNAL PERMISSION
   //==================================================
 
@@ -132,8 +127,6 @@ export class Table {
   readonly tableChanged = output<Params>();
 
   readonly action = output<ITableClickedAction>();
-
-  readonly rowClicked = output<any>();
 
   readonly selectedItems = output<TableRowId[]>();
 
@@ -241,18 +234,32 @@ export class Table {
   }
 
   //==================================================
-  //==== CAN ALLOW
+  //==== VISIBLE COLUMNS
   //==================================================
 
-  checkIsCanAllow() {
+  /** Columns shown to this admin (some are limited to roles). */
+  visibleColumnCount(): number {
     return (
-      this.tableConfig()
-        ?.columns?.map(
-          (data) => data.canAllow != undefined && data.canAllow.length,
-        )
-        .includes(1) && this.role == 'vendor'
+      this.tableConfig()?.columns?.filter(
+        (column) =>
+          !column.canAllow ||
+          (column.canAllow.length &&
+            this.role &&
+            column.canAllow.includes(this.role)),
+      ).length ?? 0
     );
   }
+
+  //==================================================
+  //==== DISPLAY SETTINGS (U-3)
+  //==================================================
+
+  // Options in the gear menu of the action column header.
+  readonly settingOptions: { key: keyof TableViewSettings; label: string }[] = [
+    { key: 'fullText', label: 'table_full_text' },
+    { key: 'hideSort', label: 'table_hide_sort' },
+    { key: 'striped', label: 'table_striped' },
+  ];
 
   //==================================================
   //==== HAS PERMISSION
@@ -342,16 +349,6 @@ export class Table {
     });
 
     this.ConfirmationModal()?.closeModal();
-  }
-
-  //==================================================
-  //==== ROW CLICK
-  //==================================================
-
-  onRowClicked(rowData: any): void {
-    if (this.hasPermission(['edit', 'view'])) {
-      this.rowClicked.emit(rowData);
-    }
   }
 
   //==================================================

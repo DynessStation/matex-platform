@@ -11,7 +11,12 @@
 }
 <ng-content select="[advanceFilter]" />
 <div>
-  <div class="table-responsive datatable-wrapper border-table">
+  <div
+    class="table-responsive datatable-wrapper border-table"
+    [class.table-full-text]="state.settings.fullText"
+    [class.table-hide-sort]="state.settings.hideSort"
+    [class.table-striped-rows]="state.settings.striped"
+  >
     @if ((loadingStatus$ | async) && loading()) {
       <div class="table-loader">
         <span>{{ 'please_wait' | translate }}...</span>
@@ -89,11 +94,44 @@
               </th>
             }
           }
-          @if (hasVisibleRowActions()) {
-            <th class="action-column sticky-action-column">
-              {{ 'actions' | translate }}
-            </th>
-          }
+          <th class="action-column sticky-action-column">
+            <div
+              ngbDropdown
+              container="body"
+              placement="bottom-end"
+              autoClose="outside"
+              class="table-settings"
+            >
+              <button
+                type="button"
+                class="table-settings-toggle"
+                ngbDropdownToggle
+                [attr.aria-label]="'table_settings' | translate"
+                [title]="'table_settings' | translate"
+              >
+                <i class="ri-settings-3-line"></i>
+              </button>
+
+              <div ngbDropdownMenu class="table-settings-menu">
+                <h6 class="dropdown-header">
+                  {{ 'table_settings' | translate }}
+                </h6>
+                @for (option of settingOptions; track option.key) {
+                  <label class="table-settings-option">
+                    <span>{{ option.label | translate }}</span>
+                    <span class="switch switch-sm">
+                      <input
+                        type="checkbox"
+                        [checked]="state.settings[option.key]"
+                        (change)="state.toggleSetting(option.key)"
+                      />
+                      <span class="switch-state"></span>
+                    </span>
+                  </label>
+                }
+              </div>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -139,13 +177,6 @@
                     'sm-width':
                       columnHead?.type === 'no' || columnHead?.type === 'image',
                   }"
-                  class="cursor-pointer"
-                  (click)="
-                    columnHead.type !== 'switch' &&
-                    columnData['system_reserve'] !== '1'
-                      ? onRowClicked(columnData)
-                      : true
-                  "
                 >
                   @if (columnHead?.type && columnHead?.type === 'no') {
                     <span
@@ -284,116 +315,74 @@
                 </td>
               }
             }
-            @if (hasVisibleRowActions()) {
-              <td
-                class="action-column sticky-action-column"
-                (click)="$event.stopPropagation()"
-              >
-                <!--==================================================-->
-                <!--==== SYSTEM RESERVED =============================-->
-                <!--==================================================-->
+            <td
+              class="action-column sticky-action-column"
+              (click)="$event.stopPropagation()"
+            >
+              <!--==================================================-->
+              <!--==== SYSTEM RESERVED =============================-->
+              <!--==================================================-->
 
-                @if (columnData['system_reserve'] === '1') {
-                  <span class="action-locked">
-                    <i class="ri-lock-line"></i>
-                  </span>
-                }
+              @if (columnData['system_reserve'] === '1') {
+                <span class="action-locked">
+                  <i class="ri-lock-line"></i>
+                </span>
+              }
 
-                <!--==================================================-->
-                <!--==== DROPDOWN MODE ===============================-->
-                <!--==================================================-->
+              <!--==================================================-->
+              <!--==== ROW ACTIONS (menu) ==========================-->
+              <!--==================================================-->
 
-                @else if (actionMode() === 'dropdown') {
-                  <div ngbDropdown container="body" class="action-dropdown">
-                    <button
-                      type="button"
-                      class="action-dropdown-toggle"
-                      ngbDropdownToggle
-                      [attr.aria-label]="'actions' | translate"
-                      (click)="$event.stopPropagation()"
-                    >
-                      <i class="ri-more-2-fill"></i>
-                    </button>
+              @else if (hasVisibleRowActions()) {
+                <div ngbDropdown container="body" class="action-dropdown">
+                  <button
+                    type="button"
+                    class="action-dropdown-toggle"
+                    ngbDropdownToggle
+                    [attr.aria-label]="'actions' | translate"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <i class="ri-more-2-fill"></i>
+                  </button>
 
-                    <div ngbDropdownMenu class="action-dropdown-menu">
-                      @for (action of tableConfig()?.rowActions; track action) {
-                        @if (
-                          canShowAction(action) &&
-                          (!action?.conditional ||
-                            isConditionMet(action?.conditional, columnData))
-                        ) {
-                          @if (action?.actionToPerform === 'delete') {
-                            <div class="dropdown-divider"></div>
-                          }
-
-                          <button
-                            type="button"
-                            ngbDropdownItem
-                            class="action-dropdown-item"
-                            [class.text-danger]="
-                              action?.actionToPerform === 'delete'
-                            "
-                            (click)="
-                              handleRowAction(action, columnData, $event)
-                            "
-                          >
-                            <i [class]="action?.icon"></i>
-
-                            <span>
-                              {{ action?.label | translate }}
-                            </span>
-                          </button>
-                        }
-                      }
-                    </div>
-                  </div>
-                }
-
-                <!--==================================================-->
-                <!--==== ORIGINAL INLINE MODE ========================-->
-                <!--==================================================-->
-
-                @else {
-                  <ul id="actions">
+                  <div ngbDropdownMenu class="action-dropdown-menu">
                     @for (action of tableConfig()?.rowActions; track action) {
                       @if (
                         canShowAction(action) &&
                         (!action?.conditional ||
                           isConditionMet(action?.conditional, columnData))
                       ) {
-                        <li>
-                          <a
-                            href="javascript:void(0)"
-                            [attr.aria-label]="action.label | translate"
-                            [attr.title]="action.label | translate"
-                            (click)="
-                              handleRowAction(action, columnData, $event)
-                            "
-                          >
-                            <i [class]="action?.icon"></i>
-                          </a>
-                        </li>
+                        @if (action?.actionToPerform === 'delete') {
+                          <div class="dropdown-divider"></div>
+                        }
+
+                        <button
+                          type="button"
+                          ngbDropdownItem
+                          class="action-dropdown-item"
+                          [class.text-danger]="
+                            action?.actionToPerform === 'delete'
+                          "
+                          (click)="handleRowAction(action, columnData, $event)"
+                        >
+                          <i [class]="action?.icon"></i>
+
+                          <span>
+                            {{ action?.label | translate }}
+                          </span>
+                        </button>
                       }
                     }
-                  </ul>
-                }
-              </td>
-            }
+                  </div>
+                </div>
+              }
+            </td>
           </tr>
         }
         @if (!tableConfig()?.data?.length) {
           <tr>
             <td
-              [attr.colspan]="
-                (hasCheckbox
-                  ? (tableConfig()?.rowActions?.length
-                      ? tableConfig()?.columns?.length + 1
-                      : tableConfig()?.columns?.length) + 1
-                  : tableConfig()?.rowActions?.length
-                    ? tableConfig()?.columns?.length + 1
-                    : tableConfig()?.columns?.length) -
-                (checkIsCanAllow() ? 1 : 0)
-              "
+              [attr.colspan]="visibleColumnCount() + (hasCheckbox ? 1 : 0) + 1"
             >
               <div class="no-data-added">
                 <h4>{{ 'no_records_found' | translate }}</h4>

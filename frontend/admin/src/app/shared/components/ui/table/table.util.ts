@@ -123,13 +123,13 @@ export function getNestedPropertyValue(
 export interface TableViewSettings {
   fullText: boolean; // cells show their whole text instead of two lines
   hideSort: boolean; // header sort buttons hidden
-  striped: boolean; // alternate row background
+  striped: boolean; // alternate row background (on by default, as before)
 }
 
 const DEFAULT_TABLE_VIEW_SETTINGS: TableViewSettings = {
   fullText: false,
   hideSort: false,
-  striped: false,
+  striped: true,
 };
 
 function tableViewKey(owner: string | null): string {
@@ -145,7 +145,7 @@ export function readTableViewSettings(owner: string | null): TableViewSettings {
     return {
       fullText: stored?.fullText === true,
       hideSort: stored?.hideSort === true,
-      striped: stored?.striped === true,
+      striped: stored?.striped !== false,
     };
   } catch {
     return { ...DEFAULT_TABLE_VIEW_SETTINGS };

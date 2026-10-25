@@ -414,3 +414,110 @@ tbody {
     color: var(--theme-color);
   }
 }
+
+//==================================================
+//==== CELLS (U-3): two lines unless "full text" is on
+//==================================================
+
+.datatable-wrapper:not(.table-full-text) .table-cell-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.table-hide-sort .table-sort-btn {
+  display: none;
+}
+
+// Rows alternate by default; with the setting off every row gets the odd-row color.
+.datatable-wrapper:not(.table-striped-rows)
+  tbody
+  tr:nth-child(even):not(:hover) {
+  background-color: #fff;
+
+  > td,
+  .sticky-action-column {
+    background-color: #fff !important;
+  }
+}
+
+:host-context(body.dark-only)
+  .datatable-wrapper:not(.table-striped-rows)
+  .theme-table
+  tbody
+  tr:nth-child(even):not(:hover) {
+  > td,
+  .sticky-action-column {
+    background: #1c2128 !important;
+  }
+}
+
+//==================================================
+//==== SETTINGS (U-3): gear in the action column header
+//==================================================
+
+.table-settings-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+
+  &::after {
+    display: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: #dfe3e8;
+    color: var(--theme-color);
+  }
+}
+
+.table-settings-menu {
+  min-width: 230px;
+  padding: 6px 0;
+}
+
+.table-settings-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: var(--admin-text);
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(var(--theme-color-rgb), 0.06);
+  }
+
+  .switch {
+    margin: 0;
+  }
+}
+
+// One row on desktop: page size and bulk actions on the left; dates, search, filters,
+// and tools on the right. The template stretches the search area to 100% below 1290px.
+@media (min-width: 992px) {
+  .show-box {
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin-bottom: 18px;
+
+    .role-search {
+      width: auto;
+      flex-wrap: nowrap;
+      gap: 8px;
+    }
+  }
+}

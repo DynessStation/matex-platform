@@ -20,7 +20,6 @@
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
-    [actionMode]="'dropdown'"
     [externalPermissions]="(authPermissions$ | async) ?? []"
     [externalAllAccess]="(isAllAccess$ | async) ?? false"
     (tableChanged)="onTableChange($event)"

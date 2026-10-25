@@ -118,6 +118,33 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
   await page.locator('#confirm_no_btn').click();
   await expect(statusSwitch).toBeChecked({ checked: wasOn });
 
+  // Clicking a row does nothing; actions live in the row menu only.
+  await table.locator('tbody tr').first().locator('td').nth(2).click();
+  await expect(page).toHaveURL(/\/faq(?:[?#]|$)/);
+
+  // The gear in the action column header holds the display settings, kept per admin.
+  const wrapper = table.locator('.datatable-wrapper');
+  const gear = table.locator('.table-settings-toggle');
+  const option = (index: number) =>
+    page.locator('.table-settings-menu .table-settings-option').nth(index);
+  await expect(wrapper).toHaveClass(/table-striped-rows/);
+  await gear.click();
+  await option(0).locator('.switch-state').click();
+  await expect(wrapper).toHaveClass(/table-full-text/);
+  await option(1).locator('.switch-state').click();
+  await expect(table.locator('.table-sort-btn').first()).toBeHidden();
+  await option(2).locator('.switch-state').click();
+  await expect(wrapper).not.toHaveClass(/table-striped-rows/);
+  await page.keyboard.press('Escape');
+  await page.reload();
+  await expect(table.locator('.datatable-wrapper')).toHaveClass(/table-full-text/);
+  await expect(table.locator('.datatable-wrapper')).toHaveClass(/table-hide-sort/);
+  await gear.click();
+  for (const index of [0, 1, 2]) await option(index).locator('.switch-state').click();
+  await expect(table.locator('.datatable-wrapper')).toHaveClass(/table-striped-rows/);
+  await expect(table.locator('.table-sort-btn').first()).toBeVisible();
+  await page.keyboard.press('Escape');
+
   // The row action menu opens and Edit goes to the edit page.
   await table.locator('tbody tr').first().locator('.action-dropdown-toggle').click();
   const menu = page.locator('.action-dropdown-menu.show');

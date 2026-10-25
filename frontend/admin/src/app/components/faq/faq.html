@@ -22,9 +22,7 @@
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="true"
-    [actionMode]="'dropdown'"
     (tableChanged)="onTableChange($event)"
-    (rowClicked)="edit($event)"
     (action)="onActionClicked($event)"
   />
 </app-page-wrapper>
