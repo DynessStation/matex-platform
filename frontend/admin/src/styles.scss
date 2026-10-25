@@ -21,6 +21,7 @@
   --admin-heading: 14px; // h5 section titles
   --admin-title: 18px; // page titles
   --admin-control-height: 40px; // inputs, selects, check cards
+  --admin-bar-height: 36px; // every control in a table top bar
 }
 
 small,
@@ -103,6 +104,68 @@ h6,
   h6 {
     font-size: 14px;
   }
+}
+
+// Table top bar (U-3): page size, dates, search, filter, and tools share one height and
+// line up. The date inputs are read-only only because a calendar fills them, so they
+// look like normal inputs.
+.page-body-wrapper .show-box {
+  align-items: center;
+
+  .table-page-size,
+  .role-search .form-control,
+  .custom-dt-picker .form-control,
+  .custom-dt-picker .btn,
+  .table-tool,
+  .top-panel-selection .btn {
+    height: var(--admin-bar-height) !important;
+    min-height: var(--admin-bar-height) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .custom-dt-picker .btn,
+  .table-tool,
+  .top-panel-selection .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--admin-bar-height);
+    padding-inline: 0 !important;
+    font-size: 15px !important;
+  }
+
+  .search-input {
+    width: auto;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    .input-group {
+      width: auto;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .custom-dt-picker .form-control {
+    width: 120px;
+  }
+
+  .custom-dt-picker .form-control[readonly] {
+    border: 1px solid #dfe3e8 !important;
+    background-color: #fff !important;
+    color: #30343b !important;
+    cursor: pointer;
+  }
+}
+
+body.dark-only
+  .page-body-wrapper
+  .show-box
+  .custom-dt-picker
+  .form-control[readonly] {
+  border-color: #505765 !important;
+  background-color: #242832 !important;
+  color: #f2f4f7 !important;
 }
 
 // Header: menu text and the user name a step below the old sizes.

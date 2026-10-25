@@ -98,7 +98,7 @@
             <div
               ngbDropdown
               container="body"
-              placement="bottom-end"
+              placement="left-top left-bottom"
               autoClose="outside"
               class="table-settings"
             >
@@ -334,7 +334,12 @@
               <!--==================================================-->
 
               @else if (hasVisibleRowActions()) {
-                <div ngbDropdown container="body" class="action-dropdown">
+                <div
+                  ngbDropdown
+                  container="body"
+                  placement="left-top left-bottom"
+                  class="action-dropdown"
+                >
                   <button
                     type="button"
                     class="action-dropdown-toggle"

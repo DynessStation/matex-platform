@@ -360,14 +360,9 @@ tbody {
   align-items: center;
   gap: 6px;
 
+  // Size: the shared top-bar height in src/styles.scss.
   .table-tool {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--admin-control-height);
-    height: var(--admin-control-height);
     padding: 0;
-    font-size: 16px;
   }
 }
 
