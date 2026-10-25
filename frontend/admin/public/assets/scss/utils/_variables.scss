@@ -136,14 +136,15 @@ $dark-datatable-sorting-even: #22262f;
 $dark-even-hover-sorting: #191e27;
 
 //General tag settings
-$body-font-size: 14px;
+// U-1 (6D): admin base text size; the full type scale is in src/styles.scss.
+$body-font-size: 12px;
 $body-font-color: $theme-body-font-color;
 $ul-padding-left: 0px;
 $ancher-color: var(--theme-color);
 $btn-focus-box-shadow: none;
 $all-focus-outline-color: var(--theme-color);
 
-$paragraph-font-size: 14px;
+$paragraph-font-size: 12px;
 $paragraph-line-height: 1.5;
 $paragraph-letter-spacing: 0.4px;
 
@@ -210,8 +211,8 @@ $badge-svg-size: 10px;
 
 //form input settings
 $form-group-margin-bottom: 1.25em;
-$col-form-label-font-size: 14px;
-$form-control-font-size: 14px;
+$col-form-label-font-size: 12px;
+$form-control-font-size: 13px;
 $form-control-border-radious: 2px;
 $form-control-border-color: $light-gray;
 
@@ -220,7 +221,7 @@ $breadcrumb-ancher-color: $white;
 $breadcrumb-ancher-dark-color: $black;
 
 //buttons setting
-$btn-font-size: 14px;
+$btn-font-size: 12px;
 $btn-padding: 0.375rem 1.75rem;
 $btn-lg-font-size: 18px;
 $btn-sm-font-size: 12px;
@@ -252,9 +253,8 @@ $footer_dark__txt_color: $white;
 $form-group-margin-bottom: 20px;
 $sm-form-margin-bottom: 14px;
 $form-placeholder-color: $dark-gray;
-$form-placeholder-font-size: calc(
-  14px + (16 - 14) * ((100vw - 320px) / (1920 - 320))
-);
+// U-1 (6D): form text follows the admin type scale (src/styles.scss).
+$form-placeholder-font-size: var(--admin-control);
 $form-placeholder-letter-spacing: 1px;
 $form-placeholder-font-weight: 100;
 $form-input-border-color: $light-semi-gray;

@@ -23,7 +23,7 @@
 .form-control,
 .form-select,
 .input-group-text {
-  min-height: 46px;
+  min-height: var(--admin-control-height);
 }
 .category-field-heading {
   display: flex;
@@ -39,7 +39,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  min-height: 46px;
+  min-height: var(--admin-control-height);
   padding: 0 12px;
   border: 1px solid #e8e8e8;
   border-radius: 4px;
@@ -67,7 +67,7 @@
   }
   span {
     margin-left: 8px;
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.8;
   }
 }

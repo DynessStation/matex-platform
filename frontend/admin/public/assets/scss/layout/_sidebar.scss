@@ -422,7 +422,7 @@
         }
 
         input {
-          font-size: 16px;
+          font-size: var(--admin-control);
           line-height: 32px;
           padding: 6px;
           padding-right: 65px;
@@ -608,13 +608,13 @@
 
                   span {
                     font-weight: 600;
-                    font-size: 15px;
+                    font-size: 13px;
                     color: inherit;
                     text-transform: capitalize;
                   }
 
                   p {
-                    font-size: 13px;
+                    font-size: 11px;
                     line-height: 1;
                     color: variables.$theme-body-font-color;
                     text-transform: capitalize;
@@ -2388,7 +2388,7 @@
 
                   a {
                     padding: 9px 25px;
-                    font-size: 14px;
+                    font-size: var(--admin-text);
                     color: #c5c5c5;
                     display: block;
                     position: relative;

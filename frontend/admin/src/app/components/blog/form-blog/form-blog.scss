@@ -29,7 +29,7 @@
 .form-control,
 .form-select,
 .input-group-text {
-  min-height: 46px;
+  min-height: var(--admin-control-height);
 }
 
 .article-field-heading {
@@ -100,7 +100,7 @@
 
   span {
     margin-left: 8px;
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.8;
   }
 }
@@ -170,7 +170,7 @@
   .NgxEditor__Content {
     min-height: 480px;
     padding: 20px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.7;
   }
 }
@@ -260,7 +260,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 46px;
+  min-height: var(--admin-control-height);
   padding: 10px 12px;
   background: #f8f8f8;
   border: 1px solid #efefef;

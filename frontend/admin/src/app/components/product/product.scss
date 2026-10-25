@@ -6,7 +6,7 @@
 
   .theme-table .tbl-image img {
     width: 46px;
-    height: 46px;
+    height: var(--admin-control-height);
     border-radius: 6px;
     object-fit: cover;
   }

@@ -75,7 +75,7 @@
         align-items: center;
         gap: 13px;
         color: #212529;
-        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+        font-size: var(--admin-control);
         font-weight: 500;
         text-transform: capitalize;
 

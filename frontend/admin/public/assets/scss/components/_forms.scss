@@ -164,7 +164,8 @@
     background-color: variables.$inner-bg !important;
     font-size: variables.$form-placeholder-font-size;
     color: #444;
-    padding: calc(10px + (12 - 10) * ((100vw - 320px) / (1920 - 320))) 10px;
+    // U-1 (6D): 9px keeps the 40px control height of the admin type scale.
+    padding: 9px 10px;
     outline: inherit;
     box-shadow: none;
     border-radius: 0;

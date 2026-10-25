@@ -39,7 +39,7 @@ a {
 }
 
 .btn {
-  font-size: 14px;
+  font-size: variables.$btn-font-size;
 }
 
 *.btn:focus {

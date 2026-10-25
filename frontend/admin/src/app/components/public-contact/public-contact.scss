@@ -45,7 +45,7 @@
 }
 
 .checks--compact .app-check-card {
-  min-height: 46px;
+  min-height: var(--admin-control-height);
   padding-block: 9px;
 }
 
@@ -87,14 +87,14 @@
   display: grid;
   place-items: center;
   width: 46px;
-  height: 46px;
+  height: var(--admin-control-height);
   border-radius: 50%;
   background: rgba(255, 153, 0, 0.1);
 }
 
 .office-note__icon i {
   color: var(--theme-color);
-  font-size: 24px;
+  font-size: 20.5px;
 }
 
 .office-note__content {

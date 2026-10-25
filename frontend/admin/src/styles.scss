@@ -7,6 +7,139 @@
 @use '../public/assets/scss/app.scss';
 
 //==================================================
+//==== TYPE SCALE (U-1)
+//==================================================
+
+// One type scale for the whole admin (header, sidebar, content, footer), about 0.86 of
+// the template sizes so the proportions stay the same. Template rules size text in px,
+// rem, and responsive calc(); these rules pin the elements the admin uses to the scale.
+:root {
+  --admin-text: 12px; // body text, sidebar menu, footer, buttons
+  --admin-text-sm: 11px; // help text, small labels
+  --admin-control: 13px; // inputs, selects, tabs, table headings
+  --admin-subheading: 12.5px; // h6 section labels
+  --admin-heading: 14px; // h5 section titles
+  --admin-title: 18px; // page titles
+  --admin-control-height: 40px; // inputs, selects, check cards
+}
+
+small,
+.small {
+  font-size: var(--admin-text-sm);
+}
+
+h6,
+.h6 {
+  font-size: var(--admin-subheading);
+}
+
+.page-body {
+  h5,
+  .h5 {
+    font-size: var(--admin-heading);
+  }
+
+  .title-header h5,
+  .page-title h5,
+  .card-header-2 h5 {
+    font-size: var(--admin-title);
+  }
+}
+
+.page-body-wrapper,
+.modal {
+  .form-control,
+  .form-select,
+  .input-group-text,
+  .select2-container,
+  .select2-search__field,
+  .select2-selection__rendered,
+  .select2-results__option,
+  .nav-link,
+  .table th,
+  .table-heading-text,
+  .form-label-title,
+  .breadcrumb-item a {
+    font-size: var(--admin-control);
+  }
+
+  .form-label,
+  label {
+    font-size: var(--admin-text);
+  }
+}
+
+// Template rules that are more specific than the list above.
+.page-body .title-header a,
+.page-body .title-header a.btn {
+  font-size: var(--admin-text);
+}
+
+.page-body-wrapper .custom-select .select2-results__options li,
+.modal .custom-select .select2-results__options li {
+  font-size: var(--admin-control);
+}
+
+.badge {
+  --bs-badge-font-size: 10px;
+}
+
+// Headings inside the rich text editor, kept in proportion with the form around them.
+.NgxEditor__Content {
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 17px;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 14px;
+  }
+}
+
+// Header: menu text and the user name a step below the old sizes.
+.page-header {
+  .header-wrapper {
+    font-size: var(--admin-text);
+
+    .btn,
+    .form-control {
+      font-size: var(--admin-text);
+    }
+
+    h4 {
+      font-size: 15px;
+    }
+  }
+}
+
+.sidebar-wrapper {
+  font-size: var(--admin-text);
+
+  .sidebar-main-link,
+  .form-control {
+    font-size: var(--admin-text);
+  }
+}
+
+app-footer,
+.footer {
+  font-size: var(--admin-text);
+
+  p {
+    font-size: var(--admin-text);
+  }
+}
+
+//==================================================
 //==== NGX TOASTR
 //==================================================
 
@@ -82,7 +215,7 @@
 .page-body-wrapper .custom-select .select2-selection {
   display: flex;
   align-items: center;
-  min-height: 46px;
+  min-height: var(--admin-control-height);
 }
 
 .page-body-wrapper .custom-select .select2-selection__rendered {
@@ -125,7 +258,7 @@ form .custom-select.ng-invalid.ng-touched .select2-selection {
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  min-height: 46px;
+  min-height: var(--admin-control-height);
   padding-inline: 12px;
   border: 1px solid #dfe3e8;
   background: #f6f3ec;
@@ -148,7 +281,7 @@ form .custom-select.ng-invalid.ng-touched .select2-selection {
 
 .app-check-card {
   width: 100%;
-  min-height: 46px;
+  min-height: var(--admin-control-height);
   padding: 11px 12px;
   border: 1px solid #e8e8e8;
   border-radius: 5px;

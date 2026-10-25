@@ -21,7 +21,7 @@
   h1 {
     margin: 3px 0 7px;
     color: var(--analytics-text);
-    font-size: clamp(24px, 3vw, 32px);
+    font-size: clamp(20.5px, 2.58vw, 27.5px);
     font-weight: 700;
   }
 
@@ -29,14 +29,14 @@
     max-width: 720px;
     margin: 0;
     color: var(--analytics-muted);
-    font-size: 14px;
+    font-size: 12px;
   }
 }
 
 .analytics-kicker,
 .panel-heading > div > span {
   color: var(--theme-color);
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -52,12 +52,12 @@
 .range-button,
 .refresh-button,
 .analytics-message button {
-  min-height: 42px;
+  min-height: 36px;
   border: 1px solid var(--analytics-border);
   background: var(--analytics-surface);
   color: var(--analytics-text);
   padding: 9px 14px;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   transition: 0.2s ease;
 
@@ -112,7 +112,7 @@
 
   > i {
     color: var(--theme-color);
-    font-size: 23px;
+    font-size: 20px;
   }
 
   div {
@@ -122,7 +122,7 @@
 
   span {
     color: var(--analytics-muted);
-    font-size: 13px;
+    font-size: 11px;
   }
 
   button {
@@ -177,7 +177,7 @@
     place-items: center;
     background: #fff2df;
     color: var(--theme-color);
-    font-size: 23px;
+    font-size: 20px;
   }
 
   > div {
@@ -191,20 +191,20 @@
   }
 
   span {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
   }
 
   strong {
     margin: 2px 0;
     color: var(--analytics-text);
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1.1;
   }
 
   small {
     overflow: hidden;
-    font-size: 11px;
+    font-size: 10px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -238,7 +238,7 @@
 
 .performance-panel .panel-heading > small {
   color: var(--analytics-muted);
-  font-size: 11px;
+  font-size: 10px;
   text-align: right;
 }
 
@@ -270,13 +270,13 @@
 
   strong {
     margin-top: 4px;
-    font-size: 25px;
+    font-size: 21.5px;
   }
 
   > span,
   small {
     color: var(--analytics-muted);
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .performance-score {
@@ -284,7 +284,7 @@
 
     b {
       flex: 0 0 auto;
-      font-size: 12px;
+      font-size: 10.5px;
     }
   }
 }
@@ -307,13 +307,13 @@
   h2 {
     margin: 4px 0 0;
     color: var(--analytics-text);
-    font-size: 19px;
+    font-size: 16.5px;
     font-weight: 700;
   }
 
   a {
     color: var(--theme-color);
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     text-decoration: none;
   }
@@ -323,7 +323,7 @@
   display: flex;
   gap: 14px;
   color: var(--analytics-muted);
-  font-size: 11px;
+  font-size: 10px;
 
   span {
     display: inline-flex;
@@ -369,7 +369,7 @@
   .chart-values {
     overflow: hidden;
     color: var(--analytics-muted);
-    font-size: 9px;
+    font-size: 10px;
     text-align: center;
     white-space: nowrap;
   }
@@ -400,7 +400,7 @@
   gap: 14px;
   padding-top: 13px;
   color: var(--analytics-muted);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .analytics-grid {
@@ -420,7 +420,7 @@
 
   > i {
     color: var(--analytics-muted);
-    font-size: 22px;
+    font-size: 19px;
   }
 }
 
@@ -434,7 +434,7 @@
   color: var(--analytics-text);
 
   strong {
-    font-size: 20px;
+    font-size: 17px;
   }
 }
 
@@ -458,7 +458,7 @@
 
   strong {
     color: var(--theme-color);
-    font-size: 24px;
+    font-size: 20.5px;
   }
 }
 
@@ -477,7 +477,7 @@
   justify-content: space-between;
   gap: 12px;
   color: var(--analytics-text);
-  font-size: 13px;
+  font-size: 11px;
 
   span {
     overflow: hidden;
@@ -510,7 +510,7 @@
     border-color: var(--analytics-border);
     background: var(--analytics-surface-soft);
     color: var(--analytics-muted);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
   }
@@ -551,7 +551,7 @@
 
   i {
     color: #b5bbc5;
-    font-size: 32px;
+    font-size: 27.5px;
   }
 }
 
