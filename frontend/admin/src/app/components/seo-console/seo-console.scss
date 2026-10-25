@@ -53,8 +53,16 @@
   flex-wrap: wrap;
 }
 
+// One height for every control in the row, the shared refresh button's too.
+.seo-actions > button,
+.seo-actions > a {
+  height: var(--admin-bar-height);
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .range-button,
-.primary-button,
 .secondary-button,
 .seo-message button {
   min-height: 36px;
@@ -77,15 +85,6 @@
 .secondary-button:focus-visible {
   border-color: var(--theme-color);
   color: var(--theme-color);
-}
-
-.primary-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border-color: var(--theme-color);
-  background: var(--theme-color);
-  color: #fff;
 }
 
 .secondary-button {
@@ -336,11 +335,6 @@ table {
   height: 15px;
 }
 
-.spin {
-  display: inline-block;
-  animation: seo-spin 0.8s linear infinite;
-}
-
 :host-context(body.dark-only) .seo-page {
   --seo-surface: #1d222b;
   --seo-soft: #252b36;
@@ -375,13 +369,12 @@ table {
 
   .seo-actions,
   .range-button,
-  .primary-button,
-  .secondary-button {
+  .secondary-button,
+  app-refresh-button {
     width: 100%;
   }
 
   .range-button,
-  .primary-button,
   .secondary-button {
     justify-content: center;
   }

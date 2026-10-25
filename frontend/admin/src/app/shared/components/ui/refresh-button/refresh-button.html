@@ -1,0 +1,28 @@
+<button
+  type="button"
+  class="refresh-button"
+  [class.is-paused]="remaining() > 0 && !loading()"
+  [disabled]="loading() || remaining() > 0"
+  [attr.aria-label]="
+    remaining() > 0 && !loading()
+      ? ('refresh_wait' | translate: { time: countdown() })
+      : ('refresh' | translate)
+  "
+  [title]="
+    remaining() > 0 && !loading()
+      ? ('refresh_wait' | translate: { time: countdown() })
+      : ('refresh' | translate)
+  "
+  (click)="press()"
+>
+  @if (loading()) {
+    <i class="ri-refresh-line refresh-spin" aria-hidden="true"></i>
+    <span>{{ 'refresh' | translate }}</span>
+  } @else if (remaining() > 0) {
+    <i class="ri-time-line" aria-hidden="true"></i>
+    <span class="refresh-countdown">{{ countdown() }}</span>
+  } @else {
+    <i class="ri-refresh-line" aria-hidden="true"></i>
+    <span>{{ 'refresh' | translate }}</span>
+  }
+</button>

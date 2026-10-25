@@ -24,19 +24,12 @@
             {{ days }} hari
           </button>
         }
-        <button
-          type="button"
-          class="primary-button"
-          [disabled]="loading()"
-          (click)="load()"
-        >
-          <i
-            class="ri-refresh-line"
-            [class.spin]="loading()"
-            aria-hidden="true"
-          ></i>
-          Perbarui
-        </button>
+        <app-refresh-button
+          key="seo-console"
+          [cooldownSeconds]="300"
+          [loading]="loading()"
+          (refresh)="load()"
+        />
       </div>
     </header>
 

@@ -264,6 +264,8 @@
   "help_on_this_page": "On this page",
   "help_other_guides": "Choose a page guide",
   "help_tip_label": "Short explanation",
+  "refresh": "Refresh",
+  "refresh_wait": "Can refresh again in {{time}}",
   "search": "Search",
   "edit_user": "Edit User",
   "save_user": "Save User",

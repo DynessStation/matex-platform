@@ -48,8 +48,16 @@
   flex-wrap: wrap;
 }
 
+// One height for every control in the row, the shared refresh button's too.
+.dashboard-actions > button,
+.dashboard-actions > a {
+  height: var(--admin-bar-height);
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .range-button,
-.refresh-button,
 .analytics-link,
 .dashboard-message button {
   min-height: 36px;
@@ -80,26 +88,6 @@
   justify-content: center;
   gap: 6px;
   text-decoration: none;
-}
-
-.refresh-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border-color: var(--theme-color);
-  background: var(--theme-color);
-  color: #fff;
-
-  &:hover:not(:disabled),
-  &:focus-visible {
-    color: #fff;
-    filter: brightness(0.94);
-  }
-}
-
-.spin {
-  display: inline-block;
-  animation: dashboard-spin 0.8s linear infinite;
 }
 
 .dashboard-message,
@@ -535,9 +523,8 @@
     flex: 1;
   }
 
-  .refresh-button {
+  app-refresh-button {
     width: 100%;
-    justify-content: center;
   }
 
   .analytics-link {

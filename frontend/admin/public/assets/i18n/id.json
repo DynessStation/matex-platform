@@ -264,6 +264,8 @@
   "help_on_this_page": "Di halaman ini",
   "help_other_guides": "Pilih panduan halaman",
   "help_tip_label": "Penjelasan singkat",
+  "refresh": "Perbarui",
+  "refresh_wait": "Bisa diperbarui lagi dalam {{time}}",
   "search": "Cari",
   "edit_user": "Edit Pengguna",
   "save_user": "Simpan Pengguna",
