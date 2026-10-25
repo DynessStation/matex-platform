@@ -1,0 +1,39 @@
+<div class="table-footer">
+  <p class="table-summary text-muted">
+    {{
+      'table_showing'
+        | translate
+          : {
+              shown: (total() ?? 0 | number: '1.0-0' : localization.locale()),
+              all:
+                (totalAll() ?? total() ?? 0
+                | number: '1.0-0' : localization.locale()),
+            }
+    }}
+    @if (state.loadSeconds !== null) {
+      <span class="table-summary-time">
+        ·
+        {{
+          'table_load_seconds'
+            | translate
+              : {
+                  seconds:
+                    (state.loadSeconds
+                    | number: '1.2-2' : localization.locale()),
+                }
+        }}
+      </span>
+    }
+  </p>
+
+  @if (pagination()) {
+    <nav class="custom-pagination">
+      <app-pagination
+        [total]="total()"
+        [currentPage]="state.tableData['page']"
+        [pageSize]="state.tableData['paginate']"
+        (setPage)="state.onChangeTable($event, 'page')"
+      />
+    </nav>
+  }
+</div>

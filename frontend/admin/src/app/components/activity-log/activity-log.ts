@@ -545,7 +545,7 @@ export class ActivityLog implements AfterViewInit {
     //==== RETURN TO PAGE 1
     //==================================================
 
-    this.table()?.onChangeTable(1, 'page');
+    this.table()?.state.onChangeTable(1, 'page');
   }
 
   //==================================================
@@ -593,15 +593,15 @@ export class ActivityLog implements AfterViewInit {
       return;
     }
 
-    table.fromDate = null;
+    table.state.fromDate = null;
 
-    table.toDate = null;
+    table.state.toDate = null;
 
-    delete table.tableData['start_date'];
+    delete table.state.tableData['start_date'];
 
-    delete table.tableData['end_date'];
+    delete table.state.tableData['end_date'];
 
-    table.onChangeTable(1, 'page');
+    table.state.onChangeTable(1, 'page');
   }
   //==================================================
   //==== FETCH

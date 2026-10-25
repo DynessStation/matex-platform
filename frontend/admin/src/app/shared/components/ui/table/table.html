@@ -1,189 +1,13 @@
 @if (topbar()) {
-  <div class="show-box">
-    <div class="selection-box">
-      <select
-        class="form-control table-page-size"
-        [value]="tableData['paginate']"
-        [attr.aria-label]="'items_per_page' | translate"
-        [title]="'items_per_page' | translate"
-        (change)="onChangeTable($event, 'paginate')"
-      >
-        @for (item of rows; track item) {
-          <option [value]="item">{{ item }}</option>
-        }
-      </select>
-      @if (deleteButtonStatus) {
-        <a
-          href="javascript:void(0)"
-          class="align-items-center btn btn-light-bg btn-sm d-flex"
-          (click)="DeleteModal().openModal('deleteAll', selected)"
-        >
-          <i [class]="'ri-delete-bin-line'"></i> {{ 'delete' | translate }}
-        </a>
-      }
-      @if (duplicateButtonStatus && hasDuplicate()) {
-        <a
-          href="javascript:void(0)"
-          class="align-items-center btn btn-light-bg btn-sm d-flex"
-          (click)="
-            ConfirmationModal().openModal('duplicate', selected);
-            $event.preventDefault();
-            $event.stopPropagation()
-          "
-        >
-          <i [class]="'ri-file-copy-line'"></i> {{ 'duplicate' | translate }}
-        </a>
-      }
-    </div>
-    <div class="role-search">
-      @if (dateRange()) {
-        <div class="dp-hidden position-absolute custom-dp-dropdown">
-          <div class="input-group">
-            <input
-              name="datepicker"
-              class="form-control"
-              ngbDatepicker
-              #datepicker="ngbDatepicker"
-              [autoClose]="'outside'"
-              (dateSelect)="onDateSelection($event)"
-              [displayMonths]="2"
-              [dayTemplate]="t"
-              outsideDays="hidden"
-              [startDate]="fromDate!"
-              [footerTemplate]="footerTemplate"
-              id="start_date"
-              tabindex="-1"
-              readonly
-            />
-            <ng-template #t let-date let-focused="focused">
-              <span
-                class="custom-day"
-                [class.focused]="focused"
-                [class.range]="isRange(date)"
-                [class.faded]="isHovered(date) || isInside(date)"
-                (mouseenter)="hoveredDate = date"
-                (mouseleave)="hoveredDate = null"
-              >
-                {{ date.day }}
-              </span>
-            </ng-template>
-          </div>
-        </div>
-        <div class="search-input">
-          <div class="input-group custom-dt-picker">
-            <input
-              #dpFromDate
-              class="form-control"
-              placeholder="{{ 'yyyy-mm-dd' | translate }}"
-              name="dpFromDate"
-              [value]="formatter.format(fromDate)"
-              id="end_date"
-              (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
-              readonly
-            />
-            <button
-              class="btn btn-light-bg-secondary"
-              (click)="datepicker.toggle()"
-              type="button"
-            >
-              <i class="ri-calendar-line"></i>
-            </button>
-          </div>
-
-          <div class="input-group custom-dt-picker">
-            <input
-              #dpToDate
-              class="form-control"
-              placeholder="{{ 'yyyy-mm-dd' | translate }}"
-              name="dpToDate"
-              [value]="formatter.format(toDate)"
-              (input)="toDate = validateInput(toDate, dpToDate.value)"
-              readonly
-            />
-            <button
-              class="btn btn-light-bg-secondary"
-              (click)="datepicker.toggle()"
-              type="button"
-            >
-              <i class="ri-calendar-line"></i>
-            </button>
-          </div>
-        </div>
-
-        <ng-template #footerTemplate>
-          <hr class="my-0" />
-          <button
-            class="btn btn-primary btn-sm m-2 float-start"
-            (click)="clearDateRange(); datepicker.close()"
-          >
-            {{ 'clear' | translate }}
-          </button>
-          <button
-            class="btn btn-secondary btn-sm m-2 float-end"
-            (click)="datepicker.close()"
-          >
-            {{ 'close' | translate }}
-          </button>
-        </ng-template>
-      }
-      <div class="role-search product-search table-search w-auto">
-        <i class="ri-search-line" aria-hidden="true"></i>
-        <input
-          type="search"
-          class="form-control"
-          id="role-search"
-          [placeholder]="'search' | translate"
-          [attr.aria-label]="'search' | translate"
-          [formControl]="term"
-        />
-      </div>
-      <ng-content select="[filter]" />
-
-      <!-- Tools: reload, reset, import and export (not built yet). -->
-      <div class="table-tools">
-        <button
-          type="button"
-          class="btn btn-light-bg table-tool"
-          [disabled]="toolsCoolingDown"
-          [ngbTooltip]="'table_reload' | translate"
-          [attr.aria-label]="'table_reload' | translate"
-          (click)="reloadTable()"
-        >
-          <i class="ri-refresh-line"></i>
-        </button>
-        <button
-          type="button"
-          class="btn btn-light-bg table-tool"
-          [disabled]="toolsCoolingDown"
-          [ngbTooltip]="'table_reset' | translate"
-          [attr.aria-label]="'table_reset' | translate"
-          (click)="resetTable()"
-        >
-          <i class="ri-restart-line"></i>
-        </button>
-        <span [ngbTooltip]="'table_import_soon' | translate">
-          <button
-            type="button"
-            class="btn btn-light-bg table-tool"
-            disabled
-            [attr.aria-label]="'table_import_soon' | translate"
-          >
-            <i class="ri-upload-2-line"></i>
-          </button>
-        </span>
-        <span [ngbTooltip]="'table_export_soon' | translate">
-          <button
-            type="button"
-            class="btn btn-light-bg table-tool"
-            disabled
-            [attr.aria-label]="'table_export_soon' | translate"
-          >
-            <i class="ri-download-2-line"></i>
-          </button>
-        </span>
-      </div>
-    </div>
-  </div>
+  <app-table-toolbar
+    [dateRange]="dateRange()"
+    [canDeleteSelected]="deleteButtonStatus"
+    [canDuplicateSelected]="duplicateButtonStatus && hasDuplicate()"
+    (deleteSelected)="DeleteModal().openModal('deleteAll', selected)"
+    (duplicateSelected)="ConfirmationModal().openModal('duplicate', selected)"
+  >
+    <ng-content select="[filter]" ngProjectAs="[filter]" />
+  </app-table-toolbar>
 }
 <ng-content select="[advanceFilter]" />
 <div>
@@ -237,7 +61,7 @@
                     <button
                       type="button"
                       class="table-sort-btn"
-                      [class.active]="isSortedBy(columnHead)"
+                      [class.active]="state.isSortedBy(columnHead)"
                       [attr.aria-label]="
                         ('table_sort_by' | translate) +
                         ' ' +
@@ -248,11 +72,11 @@
                         ' ' +
                         (columnHead?.title | translate)
                       "
-                      (click)="onChangeTable(columnHead, 'sort')"
+                      (click)="state.onChangeTable(columnHead, 'sort')"
                     >
                       <i
                         [class]="
-                          !isSortedBy(columnHead)
+                          !state.isSortedBy(columnHead)
                             ? 'ri-arrow-up-down-line'
                             : columnHead?.sort_direction === 'desc'
                               ? 'ri-sort-desc'
@@ -328,7 +152,10 @@
                       class="table-cell-content table-cell-content--compact"
                     >
                       {{
-                        i + 1 + (tableData['page'] - 1) * tableData['paginate']
+                        i +
+                          1 +
+                          (state.tableData['page'] - 1) *
+                            state.tableData['paginate']
                       }}
                     </span>
                   } @else if (
@@ -579,46 +406,11 @@
   </div>
 </div>
 
-<div class="table-footer">
-  <p class="table-summary text-muted">
-    {{
-      'table_showing'
-        | translate
-          : {
-              shown:
-                (tableConfig()?.total ?? 0
-                | number: '1.0-0' : localization.locale()),
-              all:
-                (tableConfig()?.total_all ?? tableConfig()?.total ?? 0
-                | number: '1.0-0' : localization.locale()),
-            }
-    }}
-    @if (loadSeconds !== null) {
-      <span class="table-summary-time">
-        ·
-        {{
-          'table_load_seconds'
-            | translate
-              : {
-                  seconds:
-                    (loadSeconds | number: '1.2-2' : localization.locale()),
-                }
-        }}
-      </span>
-    }
-  </p>
-
-  @if (pagination()) {
-    <nav class="custom-pagination">
-      <app-pagination
-        [total]="tableConfig()?.total"
-        [currentPage]="tableData['page']"
-        [pageSize]="tableData['paginate']"
-        (setPage)="onChangeTable($event, 'page')"
-      />
-    </nav>
-  }
-</div>
+<app-table-footer
+  [total]="tableConfig()?.total"
+  [totalAll]="tableConfig()?.total_all"
+  [pagination]="pagination()"
+/>
 
 <app-delete-modal
   #deleteModal

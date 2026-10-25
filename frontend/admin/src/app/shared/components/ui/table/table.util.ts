@@ -114,3 +114,54 @@ export function getNestedPropertyValue(
 
   return value;
 }
+
+//==================================================
+//==== DISPLAY SETTINGS (U-3)
+//==================================================
+
+/** Per-admin table display settings, kept in this browser only. */
+export interface TableViewSettings {
+  fullText: boolean; // cells show their whole text instead of two lines
+  hideSort: boolean; // header sort buttons hidden
+  striped: boolean; // alternate row background
+}
+
+const DEFAULT_TABLE_VIEW_SETTINGS: TableViewSettings = {
+  fullText: false,
+  hideSort: false,
+  striped: false,
+};
+
+function tableViewKey(owner: string | null): string {
+  return `matex-admin-table-view:${owner ?? 'guest'}`;
+}
+
+export function readTableViewSettings(owner: string | null): TableViewSettings {
+  try {
+    const stored = JSON.parse(
+      globalThis.localStorage?.getItem(tableViewKey(owner)) ?? 'null',
+    );
+
+    return {
+      fullText: stored?.fullText === true,
+      hideSort: stored?.hideSort === true,
+      striped: stored?.striped === true,
+    };
+  } catch {
+    return { ...DEFAULT_TABLE_VIEW_SETTINGS };
+  }
+}
+
+export function writeTableViewSettings(
+  owner: string | null,
+  settings: TableViewSettings,
+): void {
+  try {
+    globalThis.localStorage?.setItem(
+      tableViewKey(owner),
+      JSON.stringify(settings),
+    );
+  } catch {
+    // Storage blocked (private window, quota): the setting lasts for this page only.
+  }
+}

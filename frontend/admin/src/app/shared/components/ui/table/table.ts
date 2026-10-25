@@ -1,4 +1,4 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   Component,
   DOCUMENT,
@@ -6,32 +6,24 @@ import {
   input,
   Input,
   output,
-  PLATFORM_ID,
-  Renderer2,
   viewChild,
 } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Params } from '@angular/router';
 
-import {
-  NgbCalendar,
-  NgbDate,
-  NgbDateParserFormatter,
-  NgbModule,
-  NgbRatingConfig,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbRatingConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { debounceTime, distinctUntilChanged, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { TableFooter } from './table-footer/table-footer';
+import { TableStateService } from './table-state.service';
+import { TableToolbar } from './table-toolbar/table-toolbar';
 import {
   getNestedPropertyValue,
   isConditionMet,
   isPermissionGranted,
   isSwitchActive,
   nextSwitchValue,
-  normalizeTableState,
-  TABLE_PAGE_SIZES,
 } from './table.util';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
@@ -49,7 +41,6 @@ import { AuthState } from '../../../store/state/auth.state';
 import { LoaderState } from '../../../store/state/loader.state';
 import { ConfirmationModal } from '../modal/confirmation-modal/confirmation-modal';
 import { DeleteModal } from '../modal/delete-modal/delete-modal';
-import { Pagination } from '../pagination/pagination';
 
 @Component({
   selector: 'app-table',
@@ -57,23 +48,22 @@ import { Pagination } from '../pagination/pagination';
     CommonModule,
     TranslateModule,
     NgbModule,
-    FormsModule,
-    ReactiveFormsModule,
     CurrencySymbolPipe,
-    Pagination,
     DeleteModal,
     ConfirmationModal,
+    TableToolbar,
+    TableFooter,
   ],
   templateUrl: './table.html',
   styleUrl: './table.scss',
+  providers: [TableStateService],
 })
 export class Table {
   private document = inject<Document>(DOCUMENT);
-  private renderer = inject(Renderer2);
-  private calendar = inject(NgbCalendar);
   public localization = inject(LocalizationService);
 
-  formatter = inject(NgbDateParserFormatter);
+  // Query state, tools, load timer, and display settings (shared with toolbar and footer).
+  readonly state = inject(TableStateService);
 
   //==================================================
   //==== TEMPLATE STATE
@@ -156,22 +146,6 @@ export class Table {
   readonly ConfirmationModal =
     viewChild<ConfirmationModal>('confirmationModal');
 
-  //==================================================
-  //==== TABLE STATE
-  //==================================================
-
-  public term = new FormControl();
-
-  public rows = TABLE_PAGE_SIZES;
-
-  public tableData: Params = {
-    search: '',
-    field: '',
-    sort: '',
-    page: 1,
-    paginate: 15,
-  };
-
   public selected: TableRowId[] = [];
 
   public permissions: string[] = [];
@@ -183,61 +157,19 @@ export class Table {
   public role: string;
 
   //==================================================
-  //==== LOAD TIME (U-3)
-  //==================================================
-
-  // Seconds the last list request took, shown under the table; null until measured.
-  public loadSeconds: number | null = null;
-
-  private requestStartedAt: number | null = null;
-
-  private requestLoading = false;
-
-  //==================================================
-  //==== TOOLS (U-3)
-  //==================================================
-
-  // Reload and reset pause for a moment after use, so a list is not hammered.
-  public toolsCoolingDown = false;
-
-  public readonly toolsCooldownMs = 3000;
-
-  private toolsCooldownTimer: ReturnType<typeof setTimeout> | null = null;
-
-  // Sort direction each column starts with, restored by reset.
-  private initialSortDirections = new Map<ITableColumn, string | undefined>();
-
-  //==================================================
-  //==== DATE RANGE
-  //==================================================
-
-  public hoveredDate: NgbDate | null = null;
-
-  public fromDate: NgbDate | null;
-
-  public toDate: NgbDate | null;
-
-  public isBrowser: boolean;
-
-  //==================================================
   //==== CONSTRUCTOR
   //==================================================
 
   constructor() {
     const config = inject(NgbRatingConfig);
 
-    const platformId = inject(PLATFORM_ID);
-
-    this.isBrowser = isPlatformBrowser(platformId);
-
     config.max = 5;
     config.readonly = true;
 
-    this.term.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe((data: string) => {
-        this.onChangeTable(data, 'search');
-      });
+    this.state.connect({
+      tableConfig: this.tableConfig,
+      tableChanged: this.tableChanged,
+    });
   }
 
   //==================================================
@@ -245,17 +177,7 @@ export class Table {
   //==================================================
 
   ngOnInit() {
-    this.tableConfig()?.columns?.forEach((column) =>
-      this.initialSortDirections.set(column, column.sort_direction),
-    );
-
-    if (this.emitInitialChange()) {
-      this.startLoadTimer();
-
-      this.tableChanged.emit({
-        ...this.tableData,
-      });
-    }
+    this.state.init(this.emitInitialChange());
 
     //==================================================
     //==== LEGACY TEMPLATE PERMISSIONS
@@ -278,14 +200,8 @@ export class Table {
     //==================================================
 
     this.loadingStatus$.subscribe((res) => {
-      if (res === true && this.requestStartedAt !== null) {
-        this.requestLoading = true;
-      }
-
       if (res === false) {
         this.selected = [];
-
-        this.stopLoadTimer();
       }
     });
 
@@ -405,257 +321,9 @@ export class Table {
   //==== SYNC EXTERNAL STATE
   //==================================================
 
+  /** Called by pages that keep the table query in their URL (products, activity log). */
   public syncState(params: Params): void {
-    this.tableData = normalizeTableState(params, this.tableData);
-
-    //==================================================
-    //==== SEARCH
-    //==================================================
-
-    this.term.setValue(this.tableData['search'], {
-      emitEvent: false,
-    });
-
-    //==================================================
-    //==== DATE RANGE
-    //==================================================
-
-    this.fromDate = this.parseDateState(params['start_date']);
-
-    this.toDate = this.parseDateState(params['end_date']);
-
-    if (this.fromDate) {
-      this.tableData['start_date'] = this.formatter.format(this.fromDate);
-    } else {
-      delete this.tableData['start_date'];
-    }
-
-    if (this.toDate) {
-      this.tableData['end_date'] = this.formatter.format(this.toDate);
-    } else {
-      delete this.tableData['end_date'];
-    }
-
-    //==================================================
-    //==== SORT INDICATOR
-    //==================================================
-
-    const field = this.tableData['field'];
-
-    const sort = this.tableData['sort'];
-
-    if (field && (sort === 'asc' || sort === 'desc')) {
-      const column = this.tableConfig()?.columns?.find(
-        (item) => item.dataField === field,
-      );
-
-      if (column) {
-        column.sort_direction = sort;
-      }
-    }
-  }
-
-  //==================================================
-  //==== PARSE DATE STATE
-  //==================================================
-
-  private parseDateState(value: unknown): NgbDate | null {
-    if (typeof value !== 'string' || !value) {
-      return null;
-    }
-
-    const parsed = this.formatter.parse(value);
-
-    if (!parsed) {
-      return null;
-    }
-
-    const date = NgbDate.from(parsed);
-
-    return this.calendar.isValid(date) ? date : null;
-  }
-
-  //==================================================
-  //==== CHANGE TABLE
-  //==================================================
-
-  onChangeTable(
-    data: ITableColumn | any,
-
-    type: string,
-  ): void {
-    //==================================================
-    //==== SORT
-    //==================================================
-
-    if (type === 'sort' && data && data.sortable !== false) {
-      const nextSort = data.sort_direction === 'asc' ? 'desc' : 'asc';
-
-      data.sort_direction = nextSort;
-
-      this.tableData['field'] = data.dataField!;
-
-      this.tableData['sort'] = nextSort;
-
-      this.tableData['page'] = 1;
-    }
-
-    //==================================================
-    //==== PAGINATE
-    //==================================================
-    else if (type === 'paginate') {
-      this.tableData['paginate'] = Number(
-        (data.target as HTMLInputElement)?.value,
-      );
-
-      this.tableData['page'] = 1;
-    }
-
-    //==================================================
-    //==== PAGE
-    //==================================================
-    else if (type === 'page') {
-      this.tableData['page'] = Number(data);
-    }
-
-    //==================================================
-    //==== SEARCH
-    //==================================================
-    else if (type === 'search') {
-      this.tableData['search'] = typeof data === 'string' ? data.trim() : '';
-
-      this.tableData['page'] = 1;
-    }
-
-    //==================================================
-    //==== DATE RANGE
-    //==================================================
-    else if (type === 'daterange') {
-      if (data?.start_date) {
-        this.tableData['start_date'] = data.start_date;
-      } else {
-        delete this.tableData['start_date'];
-      }
-
-      if (data?.end_date && !String(data.end_date).includes('undefined')) {
-        this.tableData['end_date'] = data.end_date;
-      } else {
-        delete this.tableData['end_date'];
-      }
-
-      this.tableData['page'] = 1;
-    }
-
-    this.renderer.addClass(this.document.body, 'loader-none');
-
-    this.startLoadTimer();
-
-    this.tableChanged.emit({
-      ...this.tableData,
-    });
-  }
-
-  //==================================================
-  //==== SORT STATE
-  //==================================================
-
-  /** Whether the list is currently sorted by this column. */
-  isSortedBy(column: ITableColumn): boolean {
-    return (
-      Boolean(column.dataField) && this.tableData['field'] === column.dataField
-    );
-  }
-
-  //==================================================
-  //==== RELOAD AND RESET
-  //==================================================
-
-  /** Loads the list again with the same query. */
-  reloadTable(): void {
-    if (this.toolsCoolingDown) {
-      return;
-    }
-
-    this.startToolsCooldown();
-
-    this.onChangeTable(null, 'reload');
-  }
-
-  /** Clears search, sort, dates, and paging, then loads page 1. */
-  resetTable(): void {
-    if (this.toolsCoolingDown) {
-      return;
-    }
-
-    this.startToolsCooldown();
-
-    this.term.setValue('', { emitEvent: false });
-
-    this.fromDate = null;
-
-    this.toDate = null;
-
-    this.tableConfig()?.columns?.forEach((column) => {
-      column.sort_direction = this.initialSortDirections.get(column);
-    });
-
-    const next: Params = { ...this.tableData };
-
-    delete next['start_date'];
-
-    delete next['end_date'];
-
-    this.tableData = {
-      ...next,
-      search: '',
-      field: '',
-      sort: '',
-      page: 1,
-      paginate: TABLE_PAGE_SIZES[0],
-    };
-
-    this.onChangeTable(null, 'reload');
-  }
-
-  private startToolsCooldown(): void {
-    this.toolsCoolingDown = true;
-
-    if (this.toolsCooldownTimer) {
-      clearTimeout(this.toolsCooldownTimer);
-    }
-
-    this.toolsCooldownTimer = setTimeout(() => {
-      this.toolsCoolingDown = false;
-
-      this.toolsCooldownTimer = null;
-    }, this.toolsCooldownMs);
-  }
-
-  //==================================================
-  //==== LOAD TIMER
-  //==================================================
-
-  // From emitting a query until the global loader settles after its request.
-  private startLoadTimer(): void {
-    if (!this.isBrowser) {
-      return;
-    }
-
-    this.requestStartedAt = performance.now();
-
-    this.requestLoading = false;
-  }
-
-  private stopLoadTimer(): void {
-    if (this.requestStartedAt === null || !this.requestLoading) {
-      return;
-    }
-
-    this.loadSeconds = (performance.now() - this.requestStartedAt) / 1000;
-
-    this.requestStartedAt = null;
-
-    this.requestLoading = false;
+    this.state.syncState(params);
   }
 
   //==================================================
@@ -663,7 +331,7 @@ export class Table {
   //==================================================
 
   onActionClicked(actionType: string, rowData: any, value?: number) {
-    this.renderer.addClass(this.document.body, 'loader-none');
+    this.document.body.classList.add('loader-none');
 
     rowData[actionType] = value;
 
@@ -779,108 +447,10 @@ export class Table {
   }
 
   //==================================================
-  //==== DATE SELECTION
-  //==================================================
-
-  onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (
-      this.fromDate &&
-      !this.toDate &&
-      date &&
-      date.after(this.fromDate)
-    ) {
-      this.toDate = date;
-    } else {
-      this.toDate = null;
-
-      this.fromDate = date;
-    }
-
-    const params: Params = {
-      start_date: this.fromDate ? this.formatter.format(this.fromDate) : '',
-    };
-
-    if (this.toDate) {
-      params['end_date'] = this.formatter.format(this.toDate);
-    }
-
-    this.onChangeTable(params, 'daterange');
-  }
-
-  //==================================================
-  //==== DATE HOVER
-  //==================================================
-
-  isHovered(date: NgbDate) {
-    return (
-      this.fromDate &&
-      !this.toDate &&
-      this.hoveredDate &&
-      date.after(this.fromDate) &&
-      date.before(this.hoveredDate)
-    );
-  }
-
-  //==================================================
-  //==== DATE INSIDE
-  //==================================================
-
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  //==================================================
-  //==== DATE RANGE
-  //==================================================
-
-  isRange(date: NgbDate) {
-    return (
-      date.equals(this.fromDate) ||
-      (this.toDate && date.equals(this.toDate)) ||
-      this.isInside(date) ||
-      this.isHovered(date)
-    );
-  }
-
-  //==================================================
-  //==== VALIDATE DATE
-  //==================================================
-
-  validateInput(
-    currentValue: NgbDate | null,
-
-    input: string,
-  ): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-
-    return parsed && this.calendar.isValid(NgbDate.from(parsed))
-      ? NgbDate.from(parsed)
-      : currentValue;
-  }
-
-  //==================================================
-  //==== CLEAR DATE RANGE
-  //==================================================
-
-  clearDateRange() {
-    this.fromDate = null;
-
-    this.toDate = null;
-
-    this.onChangeTable(null, 'daterange');
-  }
-
-  //==================================================
   //==== DESTROY
   //==================================================
 
   ngOnDestroy() {
-    if (this.toolsCooldownTimer) {
-      clearTimeout(this.toolsCooldownTimer);
-    }
-
-    this.renderer.removeClass(this.document.body, 'loader-none');
+    this.document.body.classList.remove('loader-none');
   }
 }
