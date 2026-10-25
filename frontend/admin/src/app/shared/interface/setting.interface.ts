@@ -1,6 +1,5 @@
 import { IAttachment } from './attachment.interface';
 import { ICurrency } from './currency.interface';
-import { ICategoriesIconList, IFeaturedBanners } from './theme.interface';
 
 export interface ISetting {
   id?: number;
@@ -173,11 +172,6 @@ export interface IDeliveryDay {
   description: string;
 }
 
-export interface IDeliveryBlock {
-  delivery_description: string | null;
-  delivery_interval: string | null;
-}
-
 export interface IPaymentMethods {
   paypal: IPaypal;
   stripe: IStripeAndRazorpay;
@@ -297,60 +291,6 @@ export interface IMaintenance {
   end_date: string;
 }
 
-export interface IAppSetting {
-  id?: number;
-  values: IAppValues;
-}
-
-export interface IAppValues {
-  home_banner: IFeaturedBanners;
-  categories_list: ICategoriesIconList;
-  offer_products: IProductSection;
-  section_1_products: IProductSection;
-  section_2_products: IProductSection;
-  coupons: ICoupons;
-  section_3_products: IProductSection;
-  seller: ISeller;
-  brands: IBrands;
-  blogs: IBlogs;
-  navigate_button: INavigateButton;
-  products_ids: number[];
-}
-
-export interface ISeller {
-  status: boolean;
-  title: number[];
-  sub_title: number[];
-  store_ids: number[];
-}
-
-export interface IBlogs {
-  title: string;
-  sub_title?: string;
-  status: boolean;
-  blog_ids: number[];
-}
-
-export interface IBrands {
-  status: boolean;
-  title: string;
-  brand_ids: number[];
-}
-
-export interface INavigateButton {
-  status: boolean;
-  title: string;
-  button_text: string;
-  path: string;
-}
-
-export interface ICoupons {
-  status: boolean;
-  title: string;
-  sub_title: string;
-  coupon_ids: number[];
-}
-
 export interface IAnalytics {
   facebook_pixel: {
     status: number | boolean;
@@ -360,11 +300,4 @@ export interface IAnalytics {
     status: number | boolean;
     measurement_id: string;
   };
-}
-
-export interface IProductSection {
-  title: string;
-  sub_title?: string;
-  product_ids: number[];
-  status: boolean;
 }
