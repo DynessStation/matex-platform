@@ -20,20 +20,13 @@ import {
 @Injectable()
 export class WebsitePagePublicationService {
   // Bound to the form's inputs through WebsitePageEditorService.connect().
-  mode: Signal<'create' | 'edit'> = signal('create');
-
   editData: Signal<IWebsitePageEditorDetail | null> = signal(null);
 
-  connect(form: {
-    mode: Signal<'create' | 'edit'>;
-    editData: Signal<IWebsitePageEditorDetail | null>;
-  }): void {
-    this.mode = form.mode;
+  connect(form: { editData: Signal<IWebsitePageEditorDetail | null> }): void {
     this.editData = form.editData;
   }
 
-  public publicationChoice: WebsitePageEditorPublicationChoice =
-    this.mode() === 'edit' ? 'current' : 'draft';
+  public publicationChoice: WebsitePageEditorPublicationChoice = 'current';
 
   public publicationPublishAt = '';
 
@@ -194,7 +187,7 @@ export class WebsitePagePublicationService {
         return [];
 
       case 'draft':
-        if (this.mode() === 'create' || currentStatus === 'draft') {
+        if (currentStatus === 'draft') {
           return [];
         }
 
@@ -225,7 +218,7 @@ export class WebsitePagePublicationService {
         return [];
 
       case 'archive':
-        if (this.mode() === 'create' || currentStatus === 'archived') {
+        if (currentStatus === 'archived') {
           return [];
         }
 

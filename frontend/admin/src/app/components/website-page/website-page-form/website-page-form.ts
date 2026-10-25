@@ -48,8 +48,6 @@ export class WebsitePageForm {
 
   readonly save = inject(WebsitePageSaveService);
 
-  readonly mode = input<'create' | 'edit'>('create');
-
   readonly editData = input<IWebsitePageEditorDetail | null>(null);
 
   readonly saving = input(false);
@@ -58,7 +56,6 @@ export class WebsitePageForm {
 
   constructor() {
     this.editor.connect({
-      mode: this.mode,
       editData: this.editData,
       saving: this.saving,
     });

@@ -13,7 +13,7 @@
   <!--==== CURRENT STATUS ===============================-->
   <!--==================================================-->
 
-  @if (editor.mode() === 'edit' && editor.editData(); as page) {
+  @if (editor.editData(); as page) {
     <div class="cms-publication-current mb-4">
       <div>
         <small class="text-muted d-block mb-1">
@@ -68,30 +68,28 @@
   <!--==================================================-->
 
   <div class="cms-publication-options">
-    @if (editor.mode() === 'edit') {
-      <label
-        class="cms-publication-option"
-        [class.active]="publication.publicationChoice === 'current'"
-      >
-        <input
-          type="radio"
-          name="publicationChoice"
-          value="current"
-          [checked]="publication.publicationChoice === 'current'"
-          (change)="selectPublicationChoice('current')"
-        />
+    <label
+      class="cms-publication-option"
+      [class.active]="publication.publicationChoice === 'current'"
+    >
+      <input
+        type="radio"
+        name="publicationChoice"
+        value="current"
+        [checked]="publication.publicationChoice === 'current'"
+        (change)="selectPublicationChoice('current')"
+      />
 
-        <div>
-          <strong>
-            {{ 'website_page.publication_keep_current' | translate }}
-          </strong>
+      <div>
+        <strong>
+          {{ 'website_page.publication_keep_current' | translate }}
+        </strong>
 
-          <small>
-            {{ 'website_page.publication_keep_current_help' | translate }}
-          </small>
-        </div>
-      </label>
-    }
+        <small>
+          {{ 'website_page.publication_keep_current_help' | translate }}
+        </small>
+      </div>
+    </label>
 
     <label
       class="cms-publication-option"
@@ -162,7 +160,7 @@
       </div>
     </label>
 
-    @if (editor.mode() === 'edit' && !editor.isSystemPage) {
+    @if (!editor.isSystemPage) {
       <label
         class="cms-publication-option cms-publication-option-danger"
         [class.active]="publication.publicationChoice === 'archive'"

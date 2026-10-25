@@ -230,20 +230,18 @@
       </h6>
 
       <div class="row g-3">
-        @if (editor.mode() === 'edit') {
-          <div class="col-xl-3 col-md-6">
-            <small class="text-muted d-block">
-              {{ 'website_page.current_status' | translate }}
-            </small>
+        <div class="col-xl-3 col-md-6">
+          <small class="text-muted d-block">
+            {{ 'website_page.current_status' | translate }}
+          </small>
 
-            <strong>
-              {{
-                'website_page.status_' +
-                  (editor.editData()?.effective_status ?? 'draft') | translate
-              }}
-            </strong>
-          </div>
-        }
+          <strong>
+            {{
+              'website_page.status_' +
+                (editor.editData()?.effective_status ?? 'draft') | translate
+            }}
+          </strong>
+        </div>
 
         <div class="col-xl-3 col-md-6">
           <small class="text-muted d-block">
@@ -335,12 +333,7 @@
         } @else {
           <i class="ri-save-line me-1"></i>
 
-          {{
-            (editor.mode() === 'create'
-              ? 'website_page.create_page'
-              : 'website_page.save_changes'
-            ) | translate
-          }}
+          {{ 'website_page.save_changes' | translate }}
         }
       </button>
     </div>

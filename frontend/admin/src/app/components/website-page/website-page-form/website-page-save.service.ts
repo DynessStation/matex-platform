@@ -342,11 +342,7 @@ export class WebsitePageSaveService {
     }
 
     this.submitted?.emit({
-      payload: buildSavePayload(
-        this.buildPreviewPage(),
-        editor.mode(),
-        editor.editData(),
-      ),
+      payload: buildSavePayload(this.buildPreviewPage(), editor.editData()),
 
       publicationActions: this.publication.buildPublicationActions(),
     });

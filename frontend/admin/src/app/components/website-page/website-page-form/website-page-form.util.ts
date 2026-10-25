@@ -562,7 +562,6 @@ export function dateToNgbDate(date: Date): NgbDateStruct {
  */
 export function buildSavePayload(
   page: IWebsitePageEditorDetail,
-  mode: 'create' | 'edit',
   stored: IWebsitePageEditorDetail | null,
 ): IWebsitePageEditorPayload {
   return {
@@ -579,8 +578,7 @@ export function buildSavePayload(
     website_page_default_locale: page.website_page_default_locale,
 
     // Base save tidak mengubah lifecycle.
-    website_page_status:
-      mode === 'edit' ? (stored?.website_page_status ?? 0) : 0,
+    website_page_status: stored?.website_page_status ?? 0,
 
     website_page_visibility: page.website_page_visibility,
 
@@ -590,11 +588,9 @@ export function buildSavePayload(
 
     website_page_sort_order: page.website_page_sort_order,
 
-    website_page_publish_at:
-      mode === 'edit' ? (stored?.website_page_publish_at ?? null) : null,
+    website_page_publish_at: stored?.website_page_publish_at ?? null,
 
-    website_page_unpublish_at:
-      mode === 'edit' ? (stored?.website_page_unpublish_at ?? null) : null,
+    website_page_unpublish_at: stored?.website_page_unpublish_at ?? null,
 
     website_page_settings_json: stored?.website_page_settings_json ?? null,
 

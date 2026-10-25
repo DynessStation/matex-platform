@@ -76,18 +76,14 @@ export class WebsitePageEditorService {
   //==================================================
 
   // Bound to the form's inputs and output in connect().
-  mode: Signal<'create' | 'edit'> = signal('create');
-
   editData: Signal<IWebsitePageEditorDetail | null> = signal(null);
 
   saving: Signal<boolean> = signal(false);
 
   connect(form: {
-    mode: Signal<'create' | 'edit'>;
     editData: Signal<IWebsitePageEditorDetail | null>;
     saving: Signal<boolean>;
   }): void {
-    this.mode = form.mode;
     this.editData = form.editData;
     this.saving = form.saving;
     this.publication.connect(form);
@@ -442,9 +438,7 @@ export class WebsitePageEditorService {
   //==================================================
 
   get isSystemPage(): boolean {
-    return (
-      this.mode() === 'edit' && this.editData()?.website_page_is_system === 1
-    );
+    return this.editData()?.website_page_is_system === 1;
   }
 
   get canViewAttachments(): boolean {

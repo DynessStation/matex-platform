@@ -292,9 +292,9 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Tombol simpan profil, kata sandi, dan detail toko men-dispatch action NGXS yang isinya masih kosong dari template Kartify (`account.state.ts`: "Update profile logic hre"). Pengguna mengira datanya tersimpan. Form "detail toko" juga sisa toko Kartify.
 - Saran: halaman "Profil saya" yang benar (U-16 di `rencana-ui-admin.md`): ubah nama, foto, dan kata sandi lewat API yang sudah ada; buang form toko.
 
-**FE-014 — Mode "buat" di form halaman website tidak bisa dicapai** · P3 · Terbuka
+**FE-014 — Mode "buat" di form halaman website tidak bisa dicapai** · P3 · **Selesai**
 - Halaman website adalah halaman tetap; route admin hanya `website-page/:key` (ubah). Cabang `mode === 'create'` di form (label, pilihan template untuk halaman baru, aksi publikasi) tidak pernah dipakai.
-- Saran: buang mode buat bersama sisa pecahan form halaman website (6C).
+- Perbaikan (25 Okt, 6C): input `mode` di form dan sinyal `mode` di service editor dan publikasi dibuang beserta semua cabang `'create'` (label "Buat Halaman", status awal draf, aksi publikasi untuk halaman baru); `buildSavePayload` memakai nilai tersimpan saja. Pilihan template di tab Umum tetap, karena diatur `isSystemPage`, bukan mode. Bukti: rekaman simpan dan dokumen pratinjau identik, 52 screenshot sama (±1 noise).
 
 ### Build, deploy, test, dan dokumentasi
 
