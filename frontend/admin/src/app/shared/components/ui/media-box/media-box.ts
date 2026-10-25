@@ -17,10 +17,12 @@ import { Store } from '@ngxs/store';
 import { Observable, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { ImagePreviewDirective } from '../../../directives/image-preview.directive';
 import {
   IAttachment,
   IAttachmentModel,
 } from '../../../interface/attachment.interface';
+import { imagePreviewItems } from '../../../services/lightbox.service';
 import { NotificationService } from '../../../services/notification.service';
 import {
   DeleteAttachmentAction,
@@ -55,6 +57,7 @@ export type MediaSelection =
     Pagination,
     NoData,
     HasPermissionDirective,
+    ImagePreviewDirective,
   ],
 
   templateUrl: './media-box.html',
@@ -62,6 +65,9 @@ export type MediaSelection =
   styleUrl: './media-box.scss',
 })
 export class MediaBox {
+  // The images on this page of the library, as one set in the preview (U-15).
+  readonly previewItems = imagePreviewItems;
+
   //==================================================
   //==== INJECT
   //==================================================

@@ -22,10 +22,17 @@
       let index = $index
     ) {
       <div class="office-media-item">
-        <img
-          [src]="media.attachment.asset_url"
-          [alt]="'office.media_alt' | translate"
-        />
+        <span
+          class="image-preview-inline"
+          [appImagePreview]="media.attachment.asset_url"
+          [previewAlt]="media.attachment.original_name"
+          [previewSet]="previews"
+        >
+          <img
+            [src]="media.attachment.asset_url"
+            [alt]="'office.media_alt' | translate"
+          />
+        </span>
 
         <div class="office-media-content">
           <div class="d-flex justify-content-between gap-3">

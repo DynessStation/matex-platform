@@ -24,7 +24,14 @@
   @for (img of showImages; track img.id_attachment; let i = $index) {
     <li>
       @if (img) {
-        <div class="media-img-box">
+        <div
+          class="media-img-box"
+          [appImagePreview]="
+            img.mime_type?.startsWith('image') ? img.asset_url : ''
+          "
+          [previewAlt]="img.original_name || img.file_name"
+          [previewSet]="previewItems"
+        >
           @if (img.mime_type && img.mime_type.startsWith('image')) {
             <img [src]="img.asset_url" alt="image" class="img-fluid" />
           } @else {
@@ -58,7 +65,13 @@
 
   @if (showImage) {
     <li>
-      <div class="media-img-box">
+      <div
+        class="media-img-box"
+        [appImagePreview]="
+          showImage.mime_type?.startsWith('image') ? showImage.asset_url : ''
+        "
+        [previewAlt]="showImage.original_name || showImage.file_name"
+      >
         @if (showImage.mime_type && showImage.mime_type.startsWith('image')) {
           <img [src]="showImage.asset_url" alt="image" class="img-fluid" />
         } @else {
@@ -90,7 +103,12 @@
 
   @if (showImageUrl) {
     <li>
-      <div class="media-img-box">
+      <div
+        class="media-img-box"
+        [appImagePreview]="
+          isVideoUrl(showImageUrl) ? '' : resolveMediaUrl(showImageUrl)
+        "
+      >
         @if (isVideoUrl(showImageUrl)) {
           <img src="assets/images/video.png" class="img-fluid" alt="video" />
         } @else {

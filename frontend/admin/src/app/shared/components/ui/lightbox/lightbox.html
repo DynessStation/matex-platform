@@ -1,0 +1,57 @@
+@if (lightbox.current(); as item) {
+  <div
+    class="lightbox"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'image_preview' | translate"
+    (click)="onBackdropClick($event)"
+  >
+    <button
+      #closeButton
+      type="button"
+      class="lightbox-button lightbox-close"
+      [attr.aria-label]="'image_preview_close' | translate"
+      [title]="'image_preview_close' | translate"
+      (click)="lightbox.close()"
+    >
+      <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+
+    @if (lightbox.items().length > 1) {
+      <button
+        type="button"
+        class="lightbox-button lightbox-previous"
+        [attr.aria-label]="'image_preview_previous' | translate"
+        [title]="'image_preview_previous' | translate"
+        (click)="lightbox.previous()"
+      >
+        <i class="ri-arrow-left-s-line" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="lightbox-button lightbox-next"
+        [attr.aria-label]="'image_preview_next' | translate"
+        [title]="'image_preview_next' | translate"
+        (click)="lightbox.next()"
+      >
+        <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+      </button>
+    }
+
+    <figure class="lightbox-figure">
+      <img class="lightbox-image" [src]="item.src" [alt]="item.alt || ''" />
+      @if (item.alt || lightbox.items().length > 1) {
+        <figcaption class="lightbox-caption">
+          @if (item.alt) {
+            <span class="lightbox-name">{{ item.alt }}</span>
+          }
+          @if (lightbox.items().length > 1) {
+            <span class="lightbox-count">
+              {{ lightbox.index() + 1 }} / {{ lightbox.items().length }}
+            </span>
+          }
+        </figcaption>
+      }
+    </figure>
+  </div>
+}

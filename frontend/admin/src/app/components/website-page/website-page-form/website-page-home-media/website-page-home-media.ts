@@ -6,6 +6,7 @@ import {
   GADGET_HOME_MEDIA_RULES,
   GadgetHomeMediaRule,
 } from '../../../../shared/data/gadget-home-media';
+import { ImagePreviewDirective } from '../../../../shared/directives/image-preview.directive';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import { gadgetHomeMediaRequirement } from '../website-page-form.util';
 
@@ -14,7 +15,7 @@ import { gadgetHomeMediaRequirement } from '../website-page-form.util';
 @Component({
   selector: 'app-website-page-home-media',
 
-  imports: [TranslateModule],
+  imports: [TranslateModule, ImagePreviewDirective],
 
   templateUrl: './website-page-home-media.html',
 })

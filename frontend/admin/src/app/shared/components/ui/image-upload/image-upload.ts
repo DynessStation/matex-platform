@@ -8,14 +8,15 @@ import {
 } from '@angular/core';
 
 import { environment } from '../../../../../environments/environment';
-
-import { IAttachment } from '../../../interface/attachment.interface';
-
-import { MediaModal } from '../modal/media-modal/media-modal';
-
-import { MediaSelection } from '../media-box/media-box';
-
 import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { ImagePreviewDirective } from '../../../directives/image-preview.directive';
+import { IAttachment } from '../../../interface/attachment.interface';
+import {
+  PreviewItem,
+  imagePreviewItems,
+} from '../../../services/lightbox.service';
+import { MediaSelection } from '../media-box/media-box';
+import { MediaModal } from '../modal/media-modal/media-modal';
 
 //==================================================
 //==== COMPONENT
@@ -24,7 +25,7 @@ import { HasPermissionDirective } from '../../../directives/has-permission.direc
 @Component({
   selector: 'app-image-upload',
 
-  imports: [MediaModal, HasPermissionDirective],
+  imports: [MediaModal, HasPermissionDirective, ImagePreviewDirective],
 
   templateUrl: './image-upload.html',
 
@@ -124,6 +125,11 @@ export class ImageUpload {
   //==================================================
 
   public showImages: IAttachment[] = [];
+
+  // The images of a multiple selection, as one set in the preview (U-15).
+  get previewItems(): PreviewItem[] {
+    return imagePreviewItems(this.showImages);
+  }
 
   public showImage: IAttachment | null = null;
 

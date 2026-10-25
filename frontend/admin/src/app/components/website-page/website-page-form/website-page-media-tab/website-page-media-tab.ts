@@ -8,7 +8,12 @@ import {
   GadgetHomeMediaRule,
   getGadgetHomeMediaRule,
 } from '../../../../shared/data/gadget-home-media';
+import { ImagePreviewDirective } from '../../../../shared/directives/image-preview.directive';
 import { IAttachment } from '../../../../shared/interface/attachment.interface';
+import {
+  PreviewItem,
+  imagePreviewItems,
+} from '../../../../shared/services/lightbox.service';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import {
   GADGET_HOME_MEDIA_ROLES,
@@ -30,12 +35,24 @@ import { WebsitePageHomeMedia } from '../website-page-home-media/website-page-ho
 @Component({
   selector: 'app-website-page-media-tab',
 
-  imports: [TranslateModule, MediaModal, WebsitePageHomeMedia],
+  imports: [
+    TranslateModule,
+    MediaModal,
+    WebsitePageHomeMedia,
+    ImagePreviewDirective,
+  ],
 
   templateUrl: './website-page-media-tab.html',
 })
 export class WebsitePageMediaTab {
   readonly editor = inject(WebsitePageEditorService);
+
+  // The page's media, as one set in the preview (U-15).
+  get previews(): PreviewItem[] {
+    return imagePreviewItems(
+      this.editor.pageMedia.map((media) => media.attachment),
+    );
+  }
 
   private readonly mediaModal = viewChild<MediaModal>('mediaModal');
 

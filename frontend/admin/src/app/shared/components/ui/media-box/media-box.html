@@ -43,6 +43,7 @@
       <div
         class="row row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-sm-3 row-cols-2 g-sm-3 g-2 media-library-sec ratio_square"
       >
+        @let previews = previewItems((attachment$ | async)?.data);
         @for (
           attachment of (attachment$ | async)?.data;
           track attachment.id_attachment
@@ -68,7 +69,16 @@
                 [class.is-disabled]="isSelectionDisabled(attachment)"
                 [title]="selectionDisabledReason(attachment)"
               >
-                <div class="ratio ratio-1x1">
+                <div
+                  class="ratio ratio-1x1"
+                  [appImagePreview]="
+                    attachment.mime_type?.startsWith('image')
+                      ? attachment.asset_url
+                      : ''
+                  "
+                  [previewAlt]="attachment.original_name || attachment.name"
+                  [previewSet]="previews"
+                >
                   @if (
                     attachment.mime_type &&
                     attachment.mime_type.startsWith('image')

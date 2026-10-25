@@ -26,6 +26,7 @@ import {
   nextSwitchValue,
   TableViewSettings,
 } from './table.util';
+import { ImagePreviewDirective } from '../../../directives/image-preview.directive';
 import { TextFitDirective } from '../../../directives/text-fit.directive';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
@@ -56,6 +57,7 @@ import { DeleteModal } from '../modal/delete-modal/delete-modal';
     TableToolbar,
     TableFooter,
     TextFitDirective,
+    ImagePreviewDirective,
   ],
   templateUrl: './table.html',
   styleUrl: './table.scss',

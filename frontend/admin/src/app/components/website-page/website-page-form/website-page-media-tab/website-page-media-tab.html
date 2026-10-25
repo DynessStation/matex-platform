@@ -111,7 +111,12 @@
         let index = $index
       ) {
         <div class="website-page-media-item">
-          <div class="website-page-media-preview">
+          <div
+            class="website-page-media-preview"
+            [appImagePreview]="media.attachment.asset_url"
+            [previewAlt]="media.attachment.original_name"
+            [previewSet]="previews"
+          >
             <img
               [src]="media.attachment.asset_url"
               [alt]="

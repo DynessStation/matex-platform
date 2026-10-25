@@ -1,0 +1,186 @@
+/**=====================
+     Image preview (U-15): eye button on images, full-screen lightbox
+==========================**/
+
+// The box around an image (ImagePreviewDirective).
+.image-preview {
+  position: relative;
+
+  &:hover .image-preview-button,
+  &:focus-within .image-preview-button {
+    opacity: 1;
+  }
+}
+
+.image-preview-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(17, 24, 39, 0.68);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--theme-color);
+    opacity: 1;
+  }
+
+  // Touch screens have no hover: the button stays visible.
+  @media (hover: none) {
+    opacity: 1;
+  }
+}
+
+// A span added around a lone <img> shrinks to the image.
+.image-preview-inline {
+  display: inline-block;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+// Small images (table thumbnails) get a smaller button.
+.image-preview-sm .image-preview-button {
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1090; // above modals (the media picker)
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 72px;
+  background: rgba(10, 14, 20, 0.88);
+  animation: lightbox-in 0.15s ease-out;
+
+  @media (max-width: 575px) {
+    padding: 56px 12px 72px;
+  }
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+}
+
+.lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 150px);
+  object-fit: contain;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.lightbox-caption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--admin-text);
+}
+
+.lightbox-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-count {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lightbox-button {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--theme-color);
+    background: var(--theme-color);
+    outline: none;
+  }
+}
+
+.lightbox-close {
+  top: 12px;
+  right: 12px;
+}
+
+.lightbox-previous,
+.lightbox-next {
+  top: 50%;
+  transform: translateY(-50%);
+
+  @media (max-width: 575px) {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
+}
+
+.lightbox-previous {
+  left: 16px;
+
+  @media (max-width: 575px) {
+    left: calc(50% - 52px);
+  }
+}
+
+.lightbox-next {
+  right: 16px;
+
+  @media (max-width: 575px) {
+    right: calc(50% - 52px);
+  }
+}

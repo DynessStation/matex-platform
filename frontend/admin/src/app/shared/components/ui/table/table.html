@@ -194,13 +194,25 @@
                     columnHead?.type && columnHead?.type === 'image'
                   ) {
                     @if (columnData[columnHead?.dataField.toString()]) {
-                      <img
-                        [class]="columnHead?.class"
-                        [src]="
+                      <span
+                        class="image-preview-inline image-preview-sm"
+                        [appImagePreview]="
                           columnData[columnHead?.dataField.toString()].asset_url
                         "
-                        alt="image"
-                      />
+                        [previewAlt]="
+                          columnData[columnHead?.dataField.toString()]
+                            .original_name
+                        "
+                      >
+                        <img
+                          [class]="columnHead?.class"
+                          [src]="
+                            columnData[columnHead?.dataField.toString()]
+                              .asset_url
+                          "
+                          alt="image"
+                        />
+                      </span>
                     } @else if (columnHead?.placeholder) {
                       <img
                         [class]="columnHead?.class"

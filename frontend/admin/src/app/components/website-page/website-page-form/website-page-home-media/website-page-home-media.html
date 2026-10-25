@@ -40,10 +40,16 @@
 
         @if (editor.gadgetHomeMediaForRole(rule.value); as assignedMedia) {
           <div class="cms-home-media-rule-preview">
-            <img
-              [src]="assignedMedia.attachment.asset_url"
-              [alt]="assignedMedia.attachment.original_name"
-            />
+            <span
+              class="image-preview-inline"
+              [appImagePreview]="assignedMedia.attachment.asset_url"
+              [previewAlt]="assignedMedia.attachment.original_name"
+            >
+              <img
+                [src]="assignedMedia.attachment.asset_url"
+                [alt]="assignedMedia.attachment.original_name"
+              />
+            </span>
             <div>
               <strong>
                 {{ assignedMedia.attachment.original_name }}
@@ -109,10 +115,16 @@
 
       @if (editor.gadgetHomeMediaForRole('og'); as assignedMedia) {
         <div class="cms-home-media-rule-preview">
-          <img
-            [src]="assignedMedia.attachment.asset_url"
-            [alt]="assignedMedia.attachment.original_name"
-          />
+          <span
+            class="image-preview-inline"
+            [appImagePreview]="assignedMedia.attachment.asset_url"
+            [previewAlt]="assignedMedia.attachment.original_name"
+          >
+            <img
+              [src]="assignedMedia.attachment.asset_url"
+              [alt]="assignedMedia.attachment.original_name"
+            />
+          </span>
           <div>
             <strong>
               {{ assignedMedia.attachment.original_name }}

@@ -6,6 +6,7 @@ import { Footer } from '../../footer/footer';
 import { Header } from '../../header/header';
 import { Sidebar } from '../../sidebar/sidebar';
 import { HelpDrawer } from '../../ui/help/help-drawer/help-drawer';
+import { Lightbox } from '../../ui/lightbox/lightbox';
 import { SidebarMenuSkeleton } from '../../ui/skeleton/sidebar-menu-skeleton/sidebar-menu-skeleton';
 
 //==================================================
@@ -22,6 +23,7 @@ import { SidebarMenuSkeleton } from '../../ui/skeleton/sidebar-menu-skeleton/sid
     SidebarMenuSkeleton,
     Sidebar,
     HelpDrawer,
+    Lightbox,
   ],
 
   templateUrl: './content.html',

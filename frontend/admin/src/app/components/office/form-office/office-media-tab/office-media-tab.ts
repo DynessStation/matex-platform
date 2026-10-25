@@ -4,7 +4,12 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { MediaSelection } from '../../../../shared/components/ui/media-box/media-box';
 import { MediaModal } from '../../../../shared/components/ui/modal/media-modal/media-modal';
+import { ImagePreviewDirective } from '../../../../shared/directives/image-preview.directive';
 import { IAttachment } from '../../../../shared/interface/attachment.interface';
+import {
+  PreviewItem,
+  imagePreviewItems,
+} from '../../../../shared/services/lightbox.service';
 import { OFFICE_MEDIA_ACCEPT, OfficeMediaDraft } from '../form-office.model';
 import { toAttachmentArray } from '../form-office.util';
 import { OfficeFormService } from '../office-form.service';
@@ -14,12 +19,19 @@ import { OfficeFormService } from '../office-form.service';
 @Component({
   selector: 'app-office-media-tab',
 
-  imports: [TranslateModule, MediaModal],
+  imports: [TranslateModule, MediaModal, ImagePreviewDirective],
 
   templateUrl: './office-media-tab.html',
 })
 export class OfficeMediaTab {
   readonly office = inject(OfficeFormService);
+
+  // The office photos, as one set in the preview (U-15).
+  get previews(): PreviewItem[] {
+    return imagePreviewItems(
+      this.office.officeMedia.map((media) => media.attachment),
+    );
+  }
 
   readonly mediaModal = viewChild<MediaModal>('mediaModal');
 
