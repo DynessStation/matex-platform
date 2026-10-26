@@ -63,6 +63,30 @@ const MEDIA_SLOT: Record<string, string> = {
   about: 'Gambar utama Tentang MATEX',
 };
 
+// U-11: the tab list and "Simpan Perubahan" stay in view while a long tab scrolls.
+test('the save button stays in view while the content scrolls', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 800 });
+  await login(page);
+  await openPage(page, 'home');
+  await openTab(page, 'Konten');
+  const save = page.locator('.website-page-sidebar-save button');
+  const header = (await page.locator('.page-header').boundingBox())!;
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollHeight))
+    .toBeGreaterThan(2000);
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+
+  for (const y of [800, 2000, height]) {
+    await page.evaluate((top) => window.scrollTo(0, top), y);
+    await page.waitForTimeout(150);
+    const box = (await save.boundingBox())!;
+    expect(box.y, `scrolled to ${y}`).toBeGreaterThanOrEqual(header.y + header.height);
+    expect(box.y + box.height, `scrolled to ${y}`).toBeLessThanOrEqual(800);
+  }
+  // Still the real button: a click from the scrolled page saves.
+  await saveForm(page, 'home');
+});
+
 test('every tab renders for terms, home, and about', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

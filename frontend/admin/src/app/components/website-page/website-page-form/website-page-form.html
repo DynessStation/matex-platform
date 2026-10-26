@@ -9,120 +9,123 @@
       <!--==================================================-->
 
       <div class="col-xl-3 col-lg-4">
-        <ul
-          ngbNav
-          #nav="ngbNav"
-          [(activeId)]="editor.activeTab"
-          class="nav-pills"
-          orientation="vertical"
-          (navChange)="save.onNavChange($event)"
-        >
-          <!-- GENERAL -->
+        <!-- Tabs and the save button stay in view while the content scrolls (U-11). -->
+        <div class="website-page-sidebar">
+          <ul
+            ngbNav
+            #nav="ngbNav"
+            [(activeId)]="editor.activeTab"
+            class="nav-pills"
+            orientation="vertical"
+            (navChange)="save.onNavChange($event)"
+          >
+            <!-- GENERAL -->
 
-          <li [ngbNavItem]="'general'">
-            <button ngbNavLink type="button">
-              <i class="ri-settings-3-line"></i>
-
-              {{ 'website_page.form_general' | translate }}
-            </button>
-
-            <ng-template ngbNavContent>
-              <app-website-page-general-tab />
-            </ng-template>
-          </li>
-
-          <!-- CONTENT -->
-
-          <li [ngbNavItem]="'content'">
-            <button ngbNavLink type="button">
-              <i class="ri-translate-2"></i>
-
-              {{ 'website_page.content_languages' | translate }}
-            </button>
-
-            <ng-template ngbNavContent>
-              <app-website-page-content-tab />
-            </ng-template>
-          </li>
-
-          <!-- SEO -->
-
-          <li [ngbNavItem]="'seo'">
-            <button ngbNavLink type="button">
-              <i class="ri-search-eye-line"></i>
-
-              SEO
-            </button>
-
-            <ng-template ngbNavContent>
-              <app-website-page-seo-tab />
-            </ng-template>
-          </li>
-
-          <!-- MEDIA -->
-
-          @if (editor.canViewAttachments) {
-            <li [ngbNavItem]="'media'">
+            <li [ngbNavItem]="'general'">
               <button ngbNavLink type="button">
-                <i class="ri-image-line"></i>
+                <i class="ri-settings-3-line"></i>
 
-                {{ 'website_page.media' | translate }}
+                {{ 'website_page.form_general' | translate }}
               </button>
 
               <ng-template ngbNavContent>
-                <app-website-page-media-tab />
+                <app-website-page-general-tab />
               </ng-template>
             </li>
-          }
 
-          <!-- PUBLICATION -->
+            <!-- CONTENT -->
 
-          <li [ngbNavItem]="'publication'">
-            <button ngbNavLink type="button">
-              <i class="ri-send-plane-line"></i>
+            <li [ngbNavItem]="'content'">
+              <button ngbNavLink type="button">
+                <i class="ri-translate-2"></i>
 
-              {{ 'website_page.publication' | translate }}
-            </button>
+                {{ 'website_page.content_languages' | translate }}
+              </button>
 
-            <ng-template ngbNavContent>
-              <app-website-page-publication-tab />
-            </ng-template>
-          </li>
+              <ng-template ngbNavContent>
+                <app-website-page-content-tab />
+              </ng-template>
+            </li>
 
-          <!-- PREVIEW -->
+            <!-- SEO -->
 
-          <li [ngbNavItem]="'preview'">
-            <button ngbNavLink type="button">
-              <i class="ri-eye-line"></i>
+            <li [ngbNavItem]="'seo'">
+              <button ngbNavLink type="button">
+                <i class="ri-search-eye-line"></i>
 
-              {{ 'website_page.preview' | translate }}
-            </button>
+                SEO
+              </button>
 
-            <ng-template ngbNavContent>
-              <app-website-page-preview-tab />
-            </ng-template>
-          </li>
-        </ul>
+              <ng-template ngbNavContent>
+                <app-website-page-seo-tab />
+              </ng-template>
+            </li>
 
-        <div class="website-page-sidebar-save">
-          <button
-            type="button"
-            class="btn btn-theme w-100"
-            [disabled]="editor.saving()"
-            (click)="save.submitForm()"
-          >
-            @if (editor.saving()) {
-              <span
-                class="spinner-border spinner-border-sm me-2"
-                aria-hidden="true"
-              ></span>
-              {{ 'website_page.saving' | translate }}
-            } @else {
-              <i class="ri-save-line me-1"></i>
-              {{ 'website_page.save_changes' | translate }}
+            <!-- MEDIA -->
+
+            @if (editor.canViewAttachments) {
+              <li [ngbNavItem]="'media'">
+                <button ngbNavLink type="button">
+                  <i class="ri-image-line"></i>
+
+                  {{ 'website_page.media' | translate }}
+                </button>
+
+                <ng-template ngbNavContent>
+                  <app-website-page-media-tab />
+                </ng-template>
+              </li>
             }
-          </button>
-          <small>Simpan tanpa harus membuka tab Pratinjau.</small>
+
+            <!-- PUBLICATION -->
+
+            <li [ngbNavItem]="'publication'">
+              <button ngbNavLink type="button">
+                <i class="ri-send-plane-line"></i>
+
+                {{ 'website_page.publication' | translate }}
+              </button>
+
+              <ng-template ngbNavContent>
+                <app-website-page-publication-tab />
+              </ng-template>
+            </li>
+
+            <!-- PREVIEW -->
+
+            <li [ngbNavItem]="'preview'">
+              <button ngbNavLink type="button">
+                <i class="ri-eye-line"></i>
+
+                {{ 'website_page.preview' | translate }}
+              </button>
+
+              <ng-template ngbNavContent>
+                <app-website-page-preview-tab />
+              </ng-template>
+            </li>
+          </ul>
+
+          <div class="website-page-sidebar-save">
+            <button
+              type="button"
+              class="btn btn-theme w-100"
+              [disabled]="editor.saving()"
+              (click)="save.submitForm()"
+            >
+              @if (editor.saving()) {
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  aria-hidden="true"
+                ></span>
+                {{ 'website_page.saving' | translate }}
+              } @else {
+                <i class="ri-save-line me-1"></i>
+                {{ 'website_page.save_changes' | translate }}
+              }
+            </button>
+            <small>Simpan tanpa harus membuka tab Pratinjau.</small>
+          </div>
         </div>
       </div>
 
