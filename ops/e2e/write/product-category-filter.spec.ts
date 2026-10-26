@@ -149,7 +149,7 @@ test('without category rights the list shows without the panel', async ({ page }
   const access = await createAccessProfile(owner, 'Produk Tanpa Kategori', ['product.view']);
   const account = await createAdminAccount(
     owner,
-    'Filterkat',
+    'Panelkat',
     await adminReferences(owner, { id_access: access }),
   );
   const denied: string[] = [];
