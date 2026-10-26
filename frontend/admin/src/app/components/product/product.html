@@ -34,12 +34,22 @@
       (cancel)="ordering = false"
     />
   }
-  <app-table
-    [hidden]="ordering"
-    [tableConfig]="tableConfig"
-    [hasCheckbox]="false"
-    [emitInitialChange]="false"
-    (tableChanged)="onTableChange($event)"
-    (action)="onActionClicked($event)"
-  />
+  <div class="row g-4 product-list-layout" [hidden]="ordering">
+    <aside class="col-xl-3 col-lg-4" *hasPermission="'product_category.view'">
+      <app-product-category-filter
+        [selected]="filter['category']"
+        [totalAll]="tableConfig.total_all"
+        (selectCategory)="selectCategory($event)"
+      />
+    </aside>
+    <div class="col">
+      <app-table
+        [tableConfig]="tableConfig"
+        [hasCheckbox]="false"
+        [emitInitialChange]="false"
+        (tableChanged)="onTableChange($event)"
+        (action)="onActionClicked($event)"
+      />
+    </div>
+  </div>
 </app-page-wrapper>

@@ -1,0 +1,63 @@
+<nav class="product-category-filter" aria-label="Filter kategori produk">
+  <input
+    class="form-control"
+    type="search"
+    id="product_category_search"
+    placeholder="Cari kategori"
+    [value]="search()"
+    (input)="search.set($any($event.target).value)"
+  />
+
+  <ul class="product-category-filter__list">
+    <li>
+      <button
+        type="button"
+        class="product-category-filter__item"
+        [class.active]="!selected()"
+        [attr.aria-current]="!selected() ? 'true' : null"
+        (click)="choose('')"
+      >
+        <span class="product-category-filter__name">Semua produk</span>
+        @if (totalAll() !== null && totalAll() !== undefined) {
+          <small>{{ totalAll() }}</small>
+        }
+      </button>
+    </li>
+    <ng-container
+      *ngTemplateOutlet="level; context: { $implicit: categories(), depth: 0 }"
+    />
+  </ul>
+
+  @if (search() && !categories().length) {
+    <p class="product-category-filter__empty">Kategori tidak ditemukan.</p>
+  }
+</nav>
+
+<ng-template #level let-items let-depth="depth">
+  @for (category of items; track category.id) {
+    <li>
+      <button
+        type="button"
+        class="product-category-filter__item"
+        [attr.data-id]="category.id"
+        [style.padding-left.px]="12 + depth * 16"
+        [class.active]="selected() === category.id"
+        [class.muted]="category.status !== 'published'"
+        [attr.aria-current]="selected() === category.id ? 'true' : null"
+        [title]="category.name"
+        (click)="choose(category.id)"
+      >
+        <span class="product-category-filter__name">{{ category.name }}</span>
+        <small>{{ category.product_count ?? 0 }}</small>
+      </button>
+    </li>
+    @if (category.subcategories?.length) {
+      <ng-container
+        *ngTemplateOutlet="
+          level;
+          context: { $implicit: category.subcategories, depth: depth + 1 }
+        "
+      />
+    }
+  }
+</ng-template>

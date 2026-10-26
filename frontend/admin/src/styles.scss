@@ -670,6 +670,129 @@ body.dark-only
 }
 
 //==================================================
+//==== PRODUCT CATEGORY FILTER (U-13)
+//==================================================
+
+// Category panel beside the product list (components/product/product-category-filter): a
+// search box, then one row per category (indented by level) with its product count.
+.product-category-filter {
+  position: sticky;
+  top: 90px;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+
+  .form-control {
+    height: var(--admin-bar-height);
+    min-height: var(--admin-bar-height);
+    font-size: var(--admin-control);
+  }
+
+  &__list {
+    max-height: calc(100vh - 200px);
+    margin: 10px 0 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 32px;
+    padding: 4px 10px 4px 12px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #30343b;
+    font-size: var(--admin-text);
+    text-align: left;
+
+    small {
+      flex: none;
+      margin-left: auto;
+      color: #5b6472;
+      font-variant-numeric: tabular-nums;
+    }
+
+    &:hover {
+      background: #f3f5f8;
+    }
+
+    &.muted .product-category-filter__name {
+      color: #7a8290;
+    }
+
+    &.active {
+      background: #fff3df;
+      color: #814900;
+      font-weight: 600;
+
+      small {
+        color: #814900;
+      }
+    }
+  }
+
+  // One line per category; a name too long ends in "…" (full name in the tooltip).
+  &__name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__empty {
+    margin: 10px 0 0;
+    color: #5b6472;
+    font-size: var(--admin-text-sm);
+  }
+}
+
+// The table column may shrink below the table's own width (the table scrolls inside it),
+// so the list stays beside the panel instead of dropping under it.
+.product-list-layout > .col {
+  min-width: 0;
+}
+
+@media (max-width: 1199.98px) {
+  .product-category-filter {
+    position: static;
+  }
+}
+
+body.dark-only .product-category-filter {
+  border-color: #404754;
+
+  .product-category-filter__item {
+    color: #e7ebf0;
+
+    small,
+    &.muted .product-category-filter__name {
+      color: #aeb6c2;
+    }
+
+    &:hover {
+      background: #2a303a;
+    }
+
+    &.active {
+      background: #3a2f1c;
+      color: #ffb44d;
+
+      small {
+        color: #ffb44d;
+      }
+    }
+  }
+
+  .product-category-filter__empty {
+    color: #aeb6c2;
+  }
+}
+
+//==================================================
 //==== ORDER LIST ("Atur urutan")
 //==================================================
 

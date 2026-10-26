@@ -14,7 +14,11 @@ URL: https://internal.matexindo.com/product
 
 ## Daftar Produk
 
-Kotak **Cari** mencari di kunci internal, SKU, dan nama produk. Pencarian, urutan, dan halaman tersimpan di alamat halaman, jadi bisa dibagikan atau dibuka lagi.
+Kotak **Cari** mencari di kunci internal, SKU, dan nama produk. Pencarian, urutan, halaman, dan kategori yang dipilih tersimpan di alamat halaman, jadi bisa dibagikan atau dibuka lagi, dan tombol **Kembali** di formulir produk membawa Anda ke daftar yang sama.
+
+### Filter kategori
+
+Panel di kiri daftar berisi **Semua produk** dan semua kategori bertingkat, masing-masing dengan jumlah produk yang langsung masuk kategori itu (produk di subkategori dihitung di subkategorinya). Klik kategori untuk menampilkan produknya saja; klik **Semua produk** untuk kembali ke seluruh daftar. Kotak **Cari kategori** menyaring panel dan tetap menampilkan induk dari kategori yang cocok. Kategori yang belum Dipublikasikan tampil lebih redup. Panel hanya tampil bagi pengguna yang boleh melihat kategori (product_category.view).
 
 ### Harga
 

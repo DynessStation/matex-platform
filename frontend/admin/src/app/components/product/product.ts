@@ -17,6 +17,7 @@ import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { OrderList } from '../../shared/components/ui/order-list/order-list';
+import { ProductCategoryFilter } from './product-category-filter/product-category-filter';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';
@@ -44,6 +45,7 @@ import { ProductState } from '../../shared/store/state/product.state';
     PageWrapper,
     Table,
     OrderList,
+    ProductCategoryFilter,
   ],
   templateUrl: './product.html',
   styleUrl: './product.scss',
@@ -63,7 +65,14 @@ export class Product implements AfterViewInit {
   savingOrder = false;
   readonly table = viewChild(Table);
   private pendingTableState: Params | null = null;
-  filter: Params = { search: '', page: 1, paginate: 15, field: '', sort: '' };
+  filter: Params = {
+    search: '',
+    page: 1,
+    paginate: 15,
+    field: '',
+    sort: '',
+    category: '',
+  };
   product$: Observable<IProductModel> = this.store.select(ProductState.product);
   tableConfig: ITableConfig = {
     columns: [
@@ -155,6 +164,8 @@ export class Product implements AfterViewInit {
         params.get('sort') === 'asc' || params.get('sort') === 'desc'
           ? params.get('sort')
           : '',
+      // Category panel (U-13): products in this category only.
+      category: params.get('category')?.trim() ?? '',
     };
     this.filter = state;
     if (this.table()) this.table()?.syncState(state);
@@ -174,6 +185,8 @@ export class Product implements AfterViewInit {
       query['field'] = String(state['field']).trim();
     if (state['sort'] === 'asc' || state['sort'] === 'desc')
       query['sort'] = state['sort'];
+    if (String(state['category'] ?? '').trim())
+      query['category'] = String(state['category']).trim();
     const replaceUrl =
       (this.route.snapshot.queryParamMap.get('search') ?? '') !==
       String(query['search'] ?? '');
@@ -182,6 +195,11 @@ export class Product implements AfterViewInit {
       queryParams: query,
       replaceUrl,
     });
+  }
+
+  /** Category panel: show that category's products from page 1 ('' for every product). */
+  selectCategory(id: string) {
+    this.onTableChange({ category: id, page: 1 });
   }
 
   onActionClicked(action: ITableClickedAction) {
