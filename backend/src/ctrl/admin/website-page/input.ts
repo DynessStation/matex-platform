@@ -123,9 +123,39 @@ const normalizeHomeContent = (value: unknown): Record<string, unknown> => {
     if (!isRecord(section) || typeof section['status'] !== 'boolean') {
       throw homeInvalid(`Home section ${key} requires a visibility setting`);
     }
-    content[key] = { ...section };
+    content[key] = key === 'tags' ? normalizeHomeTags(section) : { ...section };
   }
   return content;
+};
+
+export const HOME_TAG_LIMIT = 12;
+const HOME_TAG_LABEL_MAX_LENGTH = 60;
+
+// "Tag populer" (P-2): up to 12 shortcuts in this language, each a label and a destination:
+// a product category (encoded id; the public API drops it when the category is gone or not
+// published) or a catalog search for the label itself. Older fields (tags_ids) are dropped.
+const normalizeHomeTags = (section: Record<string, unknown>): Record<string, unknown> => {
+  const tagsInvalid = (message: string) => invalid('WEBSITE_HOME_TAGS_INVALID', message);
+  const items = section['items'] ?? [];
+  if (!Array.isArray(items) || items.length > HOME_TAG_LIMIT) {
+    throw tagsInvalid(`Popular tags support up to ${HOME_TAG_LIMIT} items`);
+  }
+  return {
+    status: section['status'],
+    items: items.map((item) => {
+      const label = isRecord(item) && typeof item['label'] === 'string' ? item['label'].trim() : '';
+      if (!label || label.length > HOME_TAG_LABEL_MAX_LENGTH) {
+        throw tagsInvalid(
+          `Each popular tag needs a label of up to ${HOME_TAG_LABEL_MAX_LENGTH} characters`,
+        );
+      }
+      if (item['type'] === 'search') return { label, type: 'search' };
+      if (item['type'] === 'category' && decodeId(item['category_id'], keyhsid.idProductCategory)) {
+        return { label, type: 'category', category_id: String(item['category_id']) };
+      }
+      throw tagsInvalid('Each popular tag goes to a product category or a catalog search');
+    }),
+  };
 };
 
 // About content: up to three highlights, each with a title and description.

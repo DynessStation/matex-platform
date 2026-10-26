@@ -8,6 +8,7 @@ import {
   createAdminAccount,
   expectCode,
   login,
+  runId,
   saveRecording,
   uploadSample,
 } from './api-contract';
@@ -173,6 +174,108 @@ test('save validates structured content of home and about', async () => {
     400,
     'WEBSITE_ABOUT_CONTENT_INVALID',
   );
+});
+
+test('home popular tags: validation, save, and links on the public page', async () => {
+  const home = payloadFrom(original.home);
+  const withTags = (tags: (locale: string) => unknown) => ({
+    ...home,
+    translations: home.translations.map((item: any) => ({
+      ...item,
+      content: { ...item.content, tags: tags(item.locale) },
+    })),
+  });
+  const category = async (key: string, status: string) => {
+    const created = await expectCode(
+      await owner.post('/api/v1/product-categories', {
+        data: {
+          key: `tag-${key}-${runId}`,
+          status,
+          translations: [
+            { locale: 'id-ID', slug: `tag-${key}-${runId}-id`, name: `Tag ${key}` },
+            { locale: 'en-US', slug: `tag-${key}-${runId}-en`, name: `Tag ${key} EN` },
+          ],
+        },
+      }),
+      201,
+    );
+    return created.data.id as string;
+  };
+  const published = await category('terbit', 'published');
+  const draft = await category('draf', 'draft');
+
+  const label = (text: string) => ({ label: text, type: 'search' });
+  for (const tags of [
+    { status: true, items: 'x' },
+    { status: true, items: Array.from({ length: 13 }, (_, i) => label(`Tag ${i}`)) },
+    { status: true, items: [label(' ')] },
+    { status: true, items: [label('L'.repeat(61))] },
+    { status: true, items: [{ label: 'Tanpa tujuan', type: 'link' }] },
+    { status: true, items: [{ label: 'Kategori salah', type: 'category', category_id: 'x' }] },
+  ]) {
+    await expectCode(
+      await save(
+        'home',
+        withTags(() => tags),
+      ),
+      400,
+      'WEBSITE_HOME_TAGS_INVALID',
+    );
+  }
+
+  const saved = withTags((locale) => {
+    const english = locale === 'en-US';
+    return {
+      status: true,
+      tags_ids: [1, 2],
+      items: [
+        {
+          label: english ? 'Latex mattress' : 'Kasur lateks',
+          type: 'category',
+          category_id: published,
+        },
+        { label: english ? 'Draft one' : 'Kategori draf', type: 'category', category_id: draft },
+        { label: english ? 'Anti dust mite' : ' Anti tungau ', type: 'search' },
+      ],
+    };
+  });
+  await expectCode(await save('home', saved), 200, 'WEBSITE_PAGE_UPDATED');
+  const stored = (await detail('home')).translations.find((item: any) => item.locale === 'id-ID');
+  expect(stored.content.tags).toEqual({
+    status: true,
+    items: [
+      { label: 'Kasur lateks', type: 'category', category_id: published },
+      { label: 'Kategori draf', type: 'category', category_id: draft },
+      { label: 'Anti tungau', type: 'search' },
+    ],
+  });
+
+  // The public page gets links; the draft category is left out.
+  const publicTags = async (locale: string) =>
+    (
+      await expectCode(
+        await anonymous.get(`/api/public/website-page/${locale}/home`),
+        200,
+        'WEBSITE_PAGE_FOUND',
+      )
+    ).data.content.tags;
+  expect(await publicTags('id-ID')).toEqual({
+    status: true,
+    items: [
+      { label: 'Kasur lateks', url: `/kategori/tag-terbit-${runId}-id` },
+      { label: 'Anti tungau', url: '/search?q=Anti%20tungau' },
+    ],
+  });
+  expect(await publicTags('en-US')).toEqual({
+    status: true,
+    items: [
+      { label: 'Latex mattress', url: `/en/category/tag-terbit-${runId}-en` },
+      { label: 'Anti dust mite', url: '/en/search?q=Anti%20dust%20mite' },
+    ],
+  });
+
+  await expectCode(await save('home', home), 200, 'WEBSITE_PAGE_UPDATED');
+  for (const id of [published, draft]) await owner.delete(`/api/v1/product-categories/${id}`);
 });
 
 test('save validates media and banner actions', async () => {

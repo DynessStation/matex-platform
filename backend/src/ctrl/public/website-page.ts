@@ -5,6 +5,8 @@ import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 import { parseJsonValue } from '../../helper/json.helper';
+import { decodeId } from '../../helper/id.helper';
+import keyhsid from '../../hsid';
 
 const router = Router();
 
@@ -22,6 +24,56 @@ const PUBLIC_MEDIA_SLOTS = [
   'gallery',
   'og',
 ] as const;
+
+const isRecord = (value: unknown): value is Record<string, any> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Home "Tag populer" (P-2): every saved shortcut becomes { label, url }. A category shortcut
+ * links to the category page in this language and is left out when the category is deleted,
+ * not published, or has no name in this language; a search shortcut searches for its label.
+ */
+const resolveHomeTags = async (content: unknown, company: number, locale: string) => {
+  if (!isRecord(content) || !isRecord(content['tags'])) return content;
+  const items: any[] = Array.isArray(content['tags']['items']) ? content['tags']['items'] : [];
+  const english = locale === 'en-US';
+  const ids = items
+    .filter((item) => item?.type === 'category')
+    .map((item) => decodeId(item.category_id, keyhsid.idProductCategory))
+    .filter((id): id is number => id !== null);
+  const slugs = new Map<number, string>();
+  if (ids.length) {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT c.id_product_category, i.product_category_slug
+       FROM product_category c
+       JOIN product_category_i18n i ON i.id_product_category = c.id_product_category
+         AND i.product_category_locale = ? AND i.product_category_i18n_status = 1
+       WHERE c.id_master_comp = ? AND c.product_category_deleted_at IS NULL
+         AND c.product_category_status = 'published'
+         AND c.id_product_category IN (${ids.map(() => '?').join(',')})`,
+      [locale, company, ...ids],
+    );
+    for (const row of rows) slugs.set(Number(row.id_product_category), row.product_category_slug);
+  }
+  const resolved = items.flatMap((item) => {
+    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    if (!label) return [];
+    if (item.type === 'search') {
+      return [
+        {
+          label,
+          url: `${english ? '/en/search' : '/search'}?q=${encodeURIComponent(label)}`,
+        },
+      ];
+    }
+    const slug = slugs.get(decodeId(item.category_id, keyhsid.idProductCategory) ?? 0);
+    return slug ? [{ label, url: `${english ? '/en/category' : '/kategori'}/${slug}` }] : [];
+  });
+  return {
+    ...content,
+    tags: { status: content['tags']['status'] === true, items: resolved },
+  };
+};
 
 // Public company scope is deployment-owned.
 // No request parameter, cookie, or header may override it.
@@ -151,7 +203,10 @@ router.get(
       title: page.website_page_title,
       summary: page.website_page_summary,
       body_html: page.website_page_body_html,
-      content: parseJsonValue(page.website_page_content_json),
+      content:
+        page.website_page_key === 'home'
+          ? await resolveHomeTags(parseJsonValue(page.website_page_content_json), company, locale)
+          : parseJsonValue(page.website_page_content_json),
       seo: {
         title: page.website_page_seo_title || page.website_page_title,
         description: page.website_page_seo_description || page.website_page_summary || '',
