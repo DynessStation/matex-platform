@@ -187,6 +187,54 @@ test('create renders every section, drives the handlers, and saves', async ({ pa
   expect(errors).toEqual([]);
 });
 
+// U-10: the code picker used to lie over the number box, so a click on the number opened the
+// code list. fill() focuses without a pointer, so this test clicks like a user.
+test('a click on the phone number types the number; the code picker has its own column', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await login(page);
+  await page.goto(`${stack.adminOrigin}/admin-account/create`);
+  const number = form(page).locator('#phone_1');
+  const picker = form(page).locator('.phone-code-wrapper').first();
+  await expect(picker.locator('.select2-selection')).toBeVisible();
+
+  for (const share of [0.05, 0.5, 0.95]) {
+    const box = (await number.boundingBox())!;
+    const hit = await page.evaluate(
+      ([x, y]) => document.elementFromPoint(x, y)?.id ?? '',
+      [box.x + box.width * share, box.y + box.height / 2],
+    );
+    expect(hit, `click at ${share} of the number box`).toBe('phone_1');
+  }
+  await number.click();
+  await expect(number).toBeFocused();
+  await expect(page.locator('.select2-container--open')).toHaveCount(0);
+  await page.keyboard.type('81234567');
+  await expect(number).toHaveValue('81234567');
+
+  // One row, one height; the picker stays left of the number box.
+  const code = (await picker.locator('.select2-selection').boundingBox())!;
+  const input = (await number.boundingBox())!;
+  expect(Math.abs(code.height - input.height)).toBeLessThanOrEqual(1);
+  expect(Math.abs(code.y - input.y)).toBeLessThanOrEqual(1);
+  expect(code.x + code.width).toBeLessThanOrEqual(input.x);
+
+  // The picker still opens its list and sets the code.
+  await picker.locator('.select2-selection').click();
+  const search = page.locator('.select2-container--open .select2-search__field');
+  await expect(search).toBeVisible();
+  await search.fill('+65');
+  await page
+    .locator('.select2-container--open .select2-results__option', { hasText: '+65' })
+    .first()
+    .click();
+  await expect(picker.locator('.select2-selection__rendered')).toContainText('+65');
+  await expect(number).toHaveValue('81234567');
+  expect(errors).toEqual([]);
+});
+
 test('edit shows the stored account and saves it unchanged', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

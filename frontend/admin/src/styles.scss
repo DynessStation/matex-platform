@@ -603,6 +603,55 @@ body.dark-only {
 }
 
 //==================================================
+//==== PHONE COUNTRY CODE (U-10)
+//==================================================
+
+// The country code picker next to a phone number has its own column (.phone-code-wrapper).
+// The template's .intl-tel-input rules float the picker over an input (absolute, as wide as
+// the row), which left an invisible layer over the number box: clicking the number opened
+// the code list. Here it stays in its column, one control height, colored like other inputs.
+// The row stretches, so the picker takes the number box's height.
+.page-body-wrapper .phone-control-row {
+  align-items: stretch;
+}
+
+.page-body-wrapper .phone-code-wrapper .custom-select.intl-tel-input {
+  display: block;
+  position: static;
+  height: 100%;
+
+  .select2,
+  .selection {
+    width: 100% !important;
+    height: 100%;
+  }
+
+  .select2-container .select2-selection {
+    width: 100%;
+    min-width: 0;
+    height: 100% !important;
+    min-height: 0;
+  }
+
+  .select2-container .select2-selection .select2-selection__rendered {
+    background: transparent !important;
+  }
+
+  &:not(.ng-select-disabled) .select2-container .select2-selection {
+    background: #fff !important;
+  }
+}
+
+body.dark-only
+  .page-body-wrapper
+  .phone-code-wrapper
+  .custom-select.intl-tel-input:not(.ng-select-disabled)
+  .select2-container
+  .select2-selection {
+  background: #242832 !important;
+}
+
+//==================================================
 //==== ORDER LIST ("Atur urutan")
 //==================================================
 
