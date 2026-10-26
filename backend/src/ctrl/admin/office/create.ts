@@ -9,6 +9,7 @@ import { adminHasPermission, getAdminScope } from '../../../helper/admin-scope.h
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { HttpError } from '../../../helper/http-error.helper';
+import { nextPosition } from '../../../helper/sort-order.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
@@ -21,6 +22,7 @@ import {
   officePublicationAudit,
   readOfficeInput,
 } from './input';
+import { publicOfficeGroup } from './order';
 import {
   insertOfficeAttachments,
   insertOperatingHours,
@@ -58,6 +60,13 @@ router.post(
         input.attachments,
       );
       await assertOfficeUnique(connection, scope.idMasterComp, input);
+      // A new public office goes last in the public order.
+      if (input.isPublic === 1) {
+        input.publicSortOrder = await nextPosition(
+          connection,
+          publicOfficeGroup(scope.idMasterComp),
+        );
+      }
 
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO office (id_master_comp, ${OFFICE_COLUMNS.join(', ')}, created, updated, status)

@@ -34,6 +34,9 @@ const publicKeys = async (locale = 'id-ID') =>
     await expectCode(await anonymous.get(`/api/public/faq/${locale}`), 200, 'FAQ_FOUND')
   ).data.items.map((item: any) => item.key);
 
+const orderList = async () =>
+  (await expectCode(await owner.get(`${base}/order`), 200, 'FAQ_ORDER_FOUND')).data.data;
+
 test.beforeAll(async () => {
   anonymous = await apiContext();
 });
@@ -47,6 +50,7 @@ test.afterAll(async () => {
 test('FAQ endpoints require a session', async () => {
   await expectCode(await anonymous.get(base), 401, 'AUTH_TOKEN_REQUIRED');
   await expectCode(await anonymous.post(base, { data: {} }), 401, 'AUTH_TOKEN_REQUIRED');
+  await expectCode(await anonymous.put(`${base}/order`, { data: {} }), 401, 'AUTH_TOKEN_REQUIRED');
 });
 
 test('list, paging, and sorting', async () => {
@@ -73,13 +77,12 @@ test('list, paging, and sorting', async () => {
 
 test('create validates input and unique keys', async () => {
   const create = (data: Record<string, unknown>) => owner.post(base, { data });
-  const valid = { key, sort_order: 5, translations: translations() };
+  // sort_order is ignored: the server puts a new FAQ last.
+  const valid = { key, sort_order: 1, translations: translations() };
   const invalid: Record<string, unknown>[] = [
     { ...valid, key: '' },
     { ...valid, key: '***' },
     { ...valid, key: 'k'.repeat(101) },
-    { ...valid, sort_order: -1 },
-    { ...valid, sort_order: 1.5 },
     { ...valid, translations: 'x' },
     { ...valid, translations: translations().slice(1) },
     { ...valid, translations: [translations()[0], translations()[0]] },
@@ -105,10 +108,11 @@ test('create validates input and unique keys', async () => {
   await expectCode(await create(valid), 409, 'FAQ_KEY_EXISTS');
 
   const detail = await expectCode(await owner.get(`${base}/${faqId}`), 200, 'FAQ_FOUND');
+  expect(detail.data.position).toBe(detail.data.position_total);
+  expect(detail.data.sort_order).toBe(detail.data.position_total);
   expect(detail.data).toMatchObject({
     id: faqId,
     key,
-    sort_order: 5,
     status: 1,
     translations: [
       { locale: 'en-US', question: 'Test question?', status: 1 },
@@ -150,9 +154,10 @@ test('update changes the FAQ and its translations', async () => {
     'FAQ_UPDATED',
   );
   const detail = await expectCode(await owner.get(`${base}/${faqId}`), 200);
+  // The update ignores sort_order: the FAQ keeps its place.
+  expect(detail.data.position).toBe(detail.data.position_total);
   expect(detail.data).toMatchObject({
     key: `${key}-ubah`,
-    sort_order: 2,
     translations: [
       { locale: 'en-US', question: 'Test question ubah?', status: 0 },
       { locale: 'id-ID', question: 'Pertanyaan uji ubah?', status: 1 },
@@ -160,6 +165,35 @@ test('update changes the FAQ and its translations', async () => {
   });
   expect(await publicKeys('id-ID')).toContain(`${key}-ubah`);
   expect(await publicKeys('en-US')).not.toContain(`${key}-ubah`);
+});
+
+test('order: one list numbered 1..n, saved only as a whole', async () => {
+  const save = (ids: unknown) => owner.put(`${base}/order`, { data: { ids } });
+  const before = await orderList();
+  expect(before.map((item: any) => item.position)).toEqual(
+    before.map((_: any, i: number) => i + 1),
+  );
+  // The FAQ created above went last.
+  expect(before.at(-1)).toMatchObject({ id: faqId, key: `${key}-ubah`, status: 1 });
+  const ids: string[] = before.map((item: any) => item.id);
+  expect(ids.length).toBeGreaterThan(1);
+
+  await expectCode(await save('x'), 400, 'FAQ_ORDER_INVALID');
+  await expectCode(await save([...ids.slice(1), 'not-a-hash']), 400, 'FAQ_ORDER_INVALID');
+  await expectCode(await save([ids[0], ...ids.slice(0, -1)]), 400, 'FAQ_ORDER_DUPLICATE');
+  await expectCode(await save(ids.slice(1)), 409, 'FAQ_ORDER_INCOMPLETE');
+
+  const moved = [faqId, ...ids.filter((id) => id !== faqId)];
+  const saved = await expectCode(await save(moved), 200, 'FAQ_ORDER_SAVED');
+  expect(saved.data).toEqual({ item_count: ids.length });
+  expect((await orderList()).map((item: any) => item.id)).toEqual(moved);
+  const detail = await expectCode(await owner.get(`${base}/${faqId}`), 200);
+  expect(detail.data).toMatchObject({ position: 1, sort_order: 1, position_total: ids.length });
+  const listed = await expectCode(await owner.get(base, { params: { limit: '100' } }), 200);
+  expect(listed.data.data[0].id).toBe(faqId);
+
+  // Back to the order before, so other specs see the seeded order.
+  await expectCode(await save(ids), 200, 'FAQ_ORDER_SAVED');
 });
 
 test('an account without FAQ rights is refused', async () => {
@@ -174,6 +208,12 @@ test('an account without FAQ rights is refused', async () => {
     await expectCode(await limited.get(base), 403, 'AUTH_PERMISSION_DENIED');
     await expectCode(await limited.post(base, { data: {} }), 403, 'AUTH_PERMISSION_DENIED');
     await expectCode(await limited.delete(`${base}/${faqId}`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(await limited.get(`${base}/order`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(
+      await limited.put(`${base}/order`, { data: { ids: [faqId] } }),
+      403,
+      'AUTH_PERMISSION_DENIED',
+    );
   } finally {
     await limited.dispose();
   }
@@ -190,8 +230,15 @@ test('status and delete', async () => {
   await expectCode(await status(1), 200, 'FAQ_STATUS_UPDATED');
   expect(await publicKeys()).toContain(`${key}-ubah`);
 
+  const total = (await orderList()).length;
   await expectCode(await owner.delete(`${base}/${faqId}`), 200, 'FAQ_DELETED');
   await expectCode(await owner.get(`${base}/${faqId}`), 404, 'FAQ_NOT_FOUND');
+  // The deleted FAQ leaves no gap.
+  const after = await orderList();
+  expect(after.map((item: any) => item.id)).not.toContain(faqId);
+  expect(after.map((item: any) => item.position)).toEqual(
+    Array.from({ length: total - 1 }, (_, i) => i + 1),
+  );
   await expectCode(await owner.delete(`${base}/${faqId}`), 404, 'FAQ_NOT_FOUND');
   await expectCode(await status(1), 404, 'FAQ_NOT_FOUND');
   await expectCode(await owner.delete(`${base}/not-a-hash`), 404, 'FAQ_NOT_FOUND');

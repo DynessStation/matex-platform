@@ -156,6 +156,15 @@ router.get(
     const office = (officeRows as any[])[0];
     if (!office) return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
 
+    // Place in the public order ("Posisi 2 dari 3"), shown read-only in the form.
+    const [placeRows] = await pool.query(
+      `SELECT COUNT(*) AS total,
+         SUM(public_sort_order < ? OR (public_sort_order = ? AND id_office <= ?)) AS position
+       FROM office WHERE id_master_comp = ? AND is_public = 1 AND status IN (0, 1)`,
+      [office.public_sort_order, office.public_sort_order, idOffice, scope.idMasterComp],
+    );
+    const place = (placeRows as any[])[0];
+
     const [hourRows] = await pool.query(
       `SELECT id_office_operating_hour, day_of_week, sequence, open_time, close_time, is_closed
        FROM office_operating_hour
@@ -198,6 +207,8 @@ router.get(
         is_public: Number(office.is_public),
         public_slug: office.public_slug,
         public_sort_order: Number(office.public_sort_order ?? 0),
+        public_position: Number(office.is_public) === 1 ? Number(place?.position ?? 0) : null,
+        public_total: Number(place?.total ?? 0),
         google_place_id: office.google_place_id,
         google_maps_url: office.google_maps_url,
         google_business_url: office.google_business_url,

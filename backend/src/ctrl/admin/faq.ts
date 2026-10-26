@@ -1,4 +1,6 @@
 // FAQ (both languages per entry), under /api/v1/faq. The public list is ctrl/public/faq.ts.
+// Positions are kept by the server (helper/sort-order.helper.ts): a new FAQ goes last, a deleted
+// one closes its gap, and /order sets the whole order. /order is registered before /:id.
 // Contract: ops/e2e/write/faq-api.spec.ts.
 import express = require('express');
 import { Response } from 'express';
@@ -18,6 +20,15 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
 import { sortColumn, countOf } from '../../helper/list-query.helper';
+import {
+  assertSameItems,
+  lockGroup,
+  nextPosition,
+  readOrderIds,
+  renumber,
+  SortGroup,
+  writeOrder,
+} from '../../helper/sort-order.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -71,21 +82,22 @@ const normalizeTranslations = (value: unknown): TranslationInput[] | null => {
   return PUBLIC_CONTENT_LOCALES.every((locale) => seen.has(locale)) ? result : null;
 };
 
+/** Live FAQ of the company, numbered 1..n. */
+const faqGroup = (idMasterComp: number): SortGroup => ({
+  table: 'faq',
+  id: 'id_faq',
+  column: 'faq_sort_order',
+  where: 'id_master_comp = ? AND faq_deleted_at IS NULL',
+  params: [idMasterComp],
+});
+
+// A sort_order in the body is ignored: positions come from the order list.
 const getPayload = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
-  const sortOrder = Number(body?.sort_order ?? 0);
   const status = Number(body?.status) === 0 ? 0 : 1;
   const translations = normalizeTranslations(body?.translations);
-  if (
-    !key ||
-    key.length > 100 ||
-    !Number.isSafeInteger(sortOrder) ||
-    sortOrder < 0 ||
-    !translations
-  ) {
-    return null;
-  }
-  return { key, sortOrder, status, translations };
+  if (!key || key.length > 100 || !translations) return null;
+  return { key, status, translations };
 };
 
 const payloadInvalid = (res: Response) =>
@@ -214,6 +226,69 @@ router.get(
   },
 );
 
+// Every live FAQ in its order, for the "Atur urutan" list.
+router.get(
+  '/api/v1/faq/order',
+  verifyToken,
+  requirePermission('faq.view'),
+  onFailure('FAQ_ORDER_LOAD_FAILED', 'Unable to load FAQ order'),
+  async (req: AuthRequest, res: Response) => {
+    const scope = await getAdminScope(req, pool);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
+
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT f.id_faq, f.faq_key, f.faq_status, t.faq_question
+       FROM faq f
+       LEFT JOIN faq_i18n t ON t.id_faq = f.id_faq AND t.id_master_comp = f.id_master_comp
+         AND t.faq_locale = 'id-ID'
+       WHERE f.id_master_comp = ? AND f.faq_deleted_at IS NULL
+       ORDER BY f.faq_sort_order, f.id_faq`,
+      [scope.idMasterComp],
+    );
+    return sendSuccess(res, 200, 'FAQ_ORDER_FOUND', 'FAQ order loaded', {
+      data: rows.map((row, index) => ({
+        id: keyhsid.idFaq.encode(Number(row.id_faq)),
+        key: row.faq_key,
+        label: row.faq_question ?? row.faq_key,
+        status: Number(row.faq_status),
+        position: index + 1,
+      })),
+    });
+  },
+);
+
+// `ids` lists every live FAQ once, first = position 1.
+router.put(
+  '/api/v1/faq/order',
+  verifyToken,
+  requirePermission('faq.update'),
+  onFailure('FAQ_ORDER_FAILED', 'Unable to save FAQ order'),
+  async (req: AuthRequest, res: Response) => {
+    const scope = await getAdminScope(req, pool);
+    if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
+    const ids = readOrderIds(req.body?.ids, keyhsid.idFaq, 'FAQ_ORDER');
+
+    await withTransaction(pool, async (connection) => {
+      const group = faqGroup(scope.idMasterComp);
+      const current = await lockGroup(connection, group);
+      assertSameItems(current, ids, 'FAQ_ORDER');
+      await writeOrder(connection, group, ids);
+      await writeAuditLog({
+        ...auditBase(req, connection, scope, 0),
+        entityId: null,
+        eventCode: 'faq.reordered',
+        action: 'reorder',
+        before: { ids: current.map((row) => row.id) },
+        after: { ids },
+        metadata: { item_count: ids.length },
+        httpStatus: 200,
+      });
+    });
+
+    return sendSuccess(res, 200, 'FAQ_ORDER_SAVED', 'FAQ order saved', { item_count: ids.length });
+  },
+);
+
 router.get(
   '/api/v1/faq/:id',
   verifyToken,
@@ -231,6 +306,12 @@ router.get(
     );
     if (!rows.length) return faqNotFound(res);
 
+    const [[place]] = await pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS total,
+         SUM(faq_sort_order < ? OR (faq_sort_order = ? AND id_faq <= ?)) AS position
+       FROM faq WHERE id_master_comp = ? AND faq_deleted_at IS NULL`,
+      [rows[0].faq_sort_order, rows[0].faq_sort_order, idFaq, scope.idMasterComp],
+    );
     const [translations] = await pool.query<RowDataPacket[]>(
       `SELECT faq_locale AS locale, faq_question AS question,
         faq_answer AS answer, faq_i18n_status AS status
@@ -242,6 +323,8 @@ router.get(
       id: keyhsid.idFaq.encode(idFaq),
       key: rows[0].faq_key,
       sort_order: Number(rows[0].faq_sort_order),
+      position: Number(place.position),
+      position_total: Number(place.total),
       status: Number(rows[0].faq_status),
       translations: translations.map((item) => ({ ...item, status: Number(item.status) })),
       created: rows[0].created,
@@ -262,13 +345,14 @@ router.post(
     if (!payload) return payloadInvalid(res);
 
     const idFaq = await withTransaction(pool, async (connection) => {
+      const sortOrder = await nextPosition(connection, faqGroup(scope.idMasterComp));
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO faq (id_master_comp, faq_key, faq_sort_order, faq_status,
           id_created_by, id_updated_by) VALUES (?, ?, ?, ?, ?, ?)`,
         [
           scope.idMasterComp,
           payload.key,
-          payload.sortOrder,
+          sortOrder,
           payload.status,
           scope.idAdminAcct,
           scope.idAdminAcct,
@@ -280,7 +364,7 @@ router.post(
         eventCode: 'faq.created',
         action: 'create',
         entityLabel: payload.key,
-        after: payload,
+        after: { ...payload, sortOrder },
         httpStatus: 201,
       });
       return insert.insertId;
@@ -308,16 +392,9 @@ router.put(
     await withTransaction(pool, async (connection) => {
       const before = await lockFaq(connection, idFaq, scope.idMasterComp);
       await connection.query(
-        `UPDATE faq SET faq_key = ?, faq_sort_order = ?, faq_status = ?,
+        `UPDATE faq SET faq_key = ?, faq_status = ?,
           id_updated_by = ?, updated = NOW() WHERE id_faq = ? AND id_master_comp = ?`,
-        [
-          payload.key,
-          payload.sortOrder,
-          payload.status,
-          scope.idAdminAcct,
-          idFaq,
-          scope.idMasterComp,
-        ],
+        [payload.key, payload.status, scope.idAdminAcct, idFaq, scope.idMasterComp],
       );
       await saveTranslations(connection, idFaq, scope.idMasterComp, payload.translations);
       await writeAuditLog({
@@ -326,7 +403,7 @@ router.put(
         action: 'update',
         entityLabel: payload.key,
         before,
-        after: payload,
+        after: { ...payload, sortOrder: Number(before.faq_sort_order) },
         httpStatus: 200,
       });
     });
@@ -393,6 +470,7 @@ router.delete(
          WHERE id_faq = ? AND id_master_comp = ?`,
         [scope.idAdminAcct, idFaq, scope.idMasterComp],
       );
+      await renumber(connection, faqGroup(scope.idMasterComp));
       await writeAuditLog({
         ...auditBase(req, connection, scope, idFaq),
         eventCode: 'faq.deleted',

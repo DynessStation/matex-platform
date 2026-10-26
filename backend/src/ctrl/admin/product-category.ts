@@ -1,6 +1,8 @@
 // Product categories (a tree; both languages per category; image, icon, and share image), under
 // /api/v1/product-categories. The public list and detail are ctrl/public/product-category.ts.
-// /reorder is registered before /:id. Contract: ops/e2e/write/product-category-api.spec.ts.
+// Positions are kept by the server per level (siblings 1..n, helper/sort-order.helper.ts): a new
+// or moved category goes last among its new siblings, and the tree drag saves a level through
+// /reorder, which is registered before /:id. Contract: ops/e2e/write/product-category-api.spec.ts.
 import express = require('express');
 import { Response } from 'express';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
@@ -21,6 +23,7 @@ import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug, trimTo } from '../../helper/input.helper';
+import { nextPosition, renumber, SortGroup, writeOrder } from '../../helper/sort-order.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -92,7 +95,6 @@ const payloadOf = (body: any) => {
     parentId,
     media,
     isFeatured: body?.is_featured ? 1 : 0,
-    sortOrder: Math.max(0, Number(body?.sort_order) || 0),
     translations,
   };
 };
@@ -198,10 +200,24 @@ const auditBase = (req: AuthRequest, connection: PoolConnection, scope: AdminSco
   entityType: 'product_category',
 });
 
+/** Live categories under `parentId` (null: the top level), numbered 1..n. */
+const siblingGroup = (idMasterComp: number, parentId: number | null): SortGroup => ({
+  table: 'product_category',
+  id: 'id_product_category',
+  column: 'product_category_sort_order',
+  where:
+    'id_master_comp = ? AND product_category_deleted_at IS NULL AND id_parent_product_category <=> ?',
+  params: [idMasterComp, parentId],
+});
+
+const parentOfRow = (row: RowDataPacket) => Number(row.id_parent_product_category) || null;
+
 /** The live category (locked), or null. */
 const lockCategory = async (connection: PoolConnection, id: number, idMasterComp: number) => {
   const [rows] = await connection.query<RowDataPacket[]>(
-    `SELECT product_category_key, product_category_status FROM product_category
+    `SELECT product_category_key, product_category_status, id_parent_product_category,
+       product_category_sort_order
+     FROM product_category
      WHERE id_product_category = ? AND id_master_comp = ? AND product_category_deleted_at IS NULL
      FOR UPDATE`,
     [id, idMasterComp],
@@ -384,6 +400,12 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       if (current.product_category_status === 'published' && payload.status !== 'published') {
         await assertNoProducts(connection, id, scope.idMasterComp);
       }
+      // Same parent: the category keeps its place. New parent: it goes last there.
+      const oldParent = parentOfRow(current);
+      const moved = oldParent !== payload.parentId;
+      const sortOrder = moved
+        ? await nextPosition(connection, siblingGroup(scope.idMasterComp, payload.parentId))
+        : Number(current.product_category_sort_order);
       await connection.query(
         `UPDATE product_category SET id_parent_product_category = ?, product_category_key = ?,
            product_category_status = ?, product_category_is_featured = ?,
@@ -394,13 +416,18 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           payload.key,
           payload.status,
           payload.isFeatured,
-          payload.sortOrder,
+          sortOrder,
           scope.idAdminAcct,
           id,
         ],
       );
+      if (moved) await renumber(connection, siblingGroup(scope.idMasterComp, oldParent));
       savedId = id;
     } else {
+      const sortOrder = await nextPosition(
+        connection,
+        siblingGroup(scope.idMasterComp, payload.parentId),
+      );
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO product_category (id_master_comp, id_parent_product_category,
            product_category_key, product_category_status, product_category_is_featured,
@@ -412,7 +439,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           payload.key,
           payload.status,
           payload.isFeatured,
-          payload.sortOrder,
+          sortOrder,
           scope.idAdminAcct,
           scope.idAdminAcct,
         ],
@@ -488,10 +515,16 @@ router.patch(
       sendError(res, 400, 'PRODUCT_CATEGORY_ORDER_INVALID', 'Category order is invalid');
     const rawItems = Array.isArray(req.body?.items) ? req.body.items : [];
     if (!rawItems.length || rawItems.length > 500) return orderInvalid();
-    const items = rawItems.map((item: any) => ({
-      id: decodeId(item?.id, keyhsid.idProductCategory),
-      sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
-    }));
+    // The items are one level in the order given by sort_order (ties keep the list order);
+    // they are saved as positions 1..n.
+    const items = rawItems
+      .map((item: any, index: number) => ({
+        id: decodeId(item?.id, keyhsid.idProductCategory),
+        sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
+        index,
+      }))
+      .sort((a: any, b: any) => a.sortOrder - b.sortOrder || a.index - b.index)
+      .map((item: any, index: number) => ({ id: item.id, sortOrder: index + 1 }));
     if (items.some((item: any) => !item.id)) return orderInvalid();
     if (new Set(items.map((item: any) => item.id)).size !== items.length) {
       return sendError(
@@ -517,14 +550,11 @@ router.patch(
           'One or more categories were not found',
         );
       }
-      for (const item of items) {
-        await connection.query(
-          `UPDATE product_category SET product_category_sort_order = ?, id_updated_by = ?,
-             updated = NOW()
-           WHERE id_product_category = ? AND id_master_comp = ?`,
-          [item.sortOrder, scope.idAdminAcct, item.id, scope.idMasterComp],
-        );
-      }
+      await writeOrder(
+        connection,
+        siblingGroup(scope.idMasterComp, null),
+        items.map((item: any) => item.id),
+      );
       await writeAuditLog({
         ...auditBase(req, connection, scope),
         eventCode: 'product_category.reordered',
@@ -556,6 +586,21 @@ router.get(
       [id, scope.idMasterComp],
     );
     if (!rows.length) return categoryNotFound(res);
+    const [[place]] = await pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS total,
+         SUM(product_category_sort_order < ?
+           OR (product_category_sort_order = ? AND id_product_category <= ?)) AS position
+       FROM product_category
+       WHERE id_master_comp = ? AND product_category_deleted_at IS NULL
+         AND id_parent_product_category <=> ?`,
+      [
+        rows[0].product_category_sort_order,
+        rows[0].product_category_sort_order,
+        id,
+        scope.idMasterComp,
+        rows[0].id_parent_product_category,
+      ],
+    );
     const [translations] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM product_category_i18n WHERE id_product_category = ?
        ORDER BY product_category_locale`,
@@ -582,6 +627,8 @@ router.get(
       status: row.product_category_status,
       is_featured: Boolean(row.product_category_is_featured),
       sort_order: Number(row.product_category_sort_order),
+      position: Number(place.position),
+      position_total: Number(place.total),
       category_image: mediaDto(byRole.get('image')),
       category_icon: mediaDto(byRole.get('icon')),
       category_meta_image: mediaDto(byRole.get('og')),
@@ -664,6 +711,7 @@ router.delete(
          WHERE id_product_category = ? AND id_master_comp = ?`,
         [scope.idAdminAcct, id, scope.idMasterComp],
       );
+      await renumber(connection, siblingGroup(scope.idMasterComp, parentOfRow(category)));
       await writeAuditLog({
         ...auditBase(req, connection, scope),
         eventCode: 'product_category.deleted',

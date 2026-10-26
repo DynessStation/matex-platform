@@ -11,8 +11,10 @@ import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { HttpError } from '../../../helper/http-error.helper';
+import { nextPosition, renumber } from '../../../helper/sort-order.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest } from '../../../middleware/auth-jwt.middleware';
+import { FRONT_MAX, frontFull, frontGroup } from './front';
 import { ProductPayload, parsePayload } from './input';
 
 const { pool } = db;
@@ -136,6 +138,7 @@ export const hydrate = async (rows: RowDataPacket[], company: number, locale: st
       sale_price: publicPrice?.amount ?? 0,
       is_featured: Boolean(row.product_is_featured),
       sort_order: Number(row.product_sort_order),
+      catalog_front: Number(row.product_sort_order) > 0,
       product_thumbnail: productMedia.find((item) => item.role === 'thumbnail') ?? null,
       product_galleries: productMedia.filter((item) => item.role === 'gallery'),
       media: productMedia,
@@ -406,13 +409,23 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
   const productId = await withTransaction(pool, async (connection) => {
     await assertUnique(connection, scope.idMasterComp, id, payload);
     let savedId: number;
+    let frontBefore = 0;
     if (id) {
       const [exists] = await connection.query<RowDataPacket[]>(
-        `SELECT id_product FROM product_catalog
+        `SELECT id_product, product_sort_order FROM product_catalog
          WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL FOR UPDATE`,
         [id, scope.idMasterComp],
       );
       if (!exists.length) throw new HttpError(404, 'PRODUCT_NOT_FOUND', 'Product not found');
+      frontBefore = Number(exists[0].product_sort_order);
+    }
+    // A product at the front keeps its place; one newly put there goes last (at most FRONT_MAX).
+    const group = frontGroup(scope.idMasterComp);
+    if (payload.catalogFront) {
+      payload.sortOrder = frontBefore > 0 ? frontBefore : await nextPosition(connection, group);
+      if (payload.sortOrder > FRONT_MAX) throw frontFull();
+    }
+    if (id) {
       await connection.query(
         `UPDATE product_catalog SET ${PRODUCT_COLUMNS.map((column) => `${column} = ?`).join(', ')},
            id_updated_by = ?
@@ -429,6 +442,7 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
       );
       savedId = insert.insertId;
     }
+    if (frontBefore > 0 || payload.catalogFront) await renumber(connection, group);
     await replaceRelations(connection, savedId, scope.idMasterComp, payload);
     await writeAuditLog({
       req,

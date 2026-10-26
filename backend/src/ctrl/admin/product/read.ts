@@ -14,6 +14,7 @@ import { sortColumn, countOf } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 import { onFailure } from '../../../middleware/error-handler.middleware';
+import { FRONT_MAX } from './front';
 import { BASE_SELECT, hydrate, productNotFound } from './records';
 
 const { pool } = db;
@@ -54,7 +55,8 @@ router.get(
     const direction = req.query.sort === 'desc' ? 'DESC' : 'ASC';
     const orderBy = sortField
       ? `${sortField} ${direction}, p.id_product ASC`
-      : 'p.product_sort_order ASC, i.product_name ASC';
+      : // The front of the catalog in its order first, then the rest by name.
+        'p.product_sort_order = 0, p.product_sort_order, i.product_name ASC';
 
     const [countRows] = await pool.query<RowDataPacket[]>(
       `SELECT COUNT(DISTINCT p.id_product) AS total
@@ -127,8 +129,20 @@ router.get(
       [id, scope.idMasterComp],
     );
     const [product] = await hydrate(rows, scope.idMasterComp, 'id-ID');
+    // Positions at the front are 1..n, so the sort order is the place ("Posisi 2 dari 5").
+    const front_total = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM product_catalog
+       WHERE id_master_comp = ? AND product_deleted_at IS NULL AND product_sort_order > 0`,
+      [scope.idMasterComp],
+    );
 
-    return sendSuccess(res, 200, 'PRODUCT_FOUND', 'Product loaded', { ...product, translations });
+    return sendSuccess(res, 200, 'PRODUCT_FOUND', 'Product loaded', {
+      ...product,
+      front_total,
+      front_max: FRONT_MAX,
+      translations,
+    });
   },
 );
 

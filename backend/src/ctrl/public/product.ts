@@ -281,8 +281,8 @@ router.get(
           ? 'i.product_name ASC'
           : sortBy === 'z-a'
             ? 'i.product_name DESC'
-            : // Default: products with an admin "Urutan" first (small numbers first), then
-              // the rest (Urutan 0) from newest.
+            : // Default: the products the admin put at the front of the catalog (positions
+              // 1..n, see ctrl/admin/product/front.ts), then the rest (0) from newest.
               'unordered, p.product_sort_order, p.id_product DESC';
     // DISTINCT needs the ordering expression in the select list.
     const distinctBase = base.replace(

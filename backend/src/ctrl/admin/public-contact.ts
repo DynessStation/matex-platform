@@ -63,8 +63,9 @@ const normalizeTranslations = (value: unknown): Translation[] | null => {
   return PUBLIC_CONTENT_LOCALES.every((locale) => seen.has(locale)) ? result : null;
 };
 
-const sortOrder = (value: unknown, index: number) =>
-  Number.isSafeInteger(Number(value)) ? Math.max(0, Number(value)) : index;
+// Channels and topics are shown in the order of the list (positions 1..n); a sort_order in the
+// body is ignored. The admin page moves cards up and down.
+const sortOrder = (index: number) => index + 1;
 
 const normalizeChannels = (value: unknown) => {
   if (!Array.isArray(value) || value.length > 30) return null;
@@ -97,7 +98,7 @@ const normalizeChannels = (value: unknown) => {
       url,
       isPrimary: Number(item?.is_primary) === 1 ? 1 : 0,
       isPublic: Number(item?.is_public) === 0 ? 0 : 1,
-      sortOrder: sortOrder(item?.sort_order, index),
+      sortOrder: sortOrder(index),
       translations,
     });
   }
@@ -128,7 +129,7 @@ const normalizeTopics = (value: unknown) => {
     result.push({
       key,
       email,
-      sortOrder: sortOrder(item?.sort_order, index),
+      sortOrder: sortOrder(index),
       status,
       translations,
     });

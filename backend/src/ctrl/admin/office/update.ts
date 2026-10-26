@@ -9,6 +9,7 @@ import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { HttpError } from '../../../helper/http-error.helper';
 import { decodeId } from '../../../helper/id.helper';
+import { nextPosition, renumber } from '../../../helper/sort-order.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
@@ -23,6 +24,7 @@ import {
   officePublicationAuditFromRow,
   readOfficeInput,
 } from './input';
+import { publicOfficeGroup } from './order';
 import {
   getOfficeAttachmentDiff,
   insertOfficeAttachments,
@@ -74,6 +76,14 @@ router.put(
         input.attachments,
       );
       await assertOfficeUnique(connection, scope.idMasterComp, input, idOffice);
+      // A public office keeps its place; one made public goes last; an internal one has none.
+      const group = publicOfficeGroup(scope.idMasterComp);
+      const wasPublic = Number(current.is_public) === 1;
+      if (input.isPublic === 1) {
+        input.publicSortOrder = wasPublic
+          ? Number(current.public_sort_order)
+          : await nextPosition(connection, group);
+      }
 
       const coreBefore = officeCoreAuditFromRow(current);
       const coreAfter = officeCoreAudit(input);
@@ -104,6 +114,7 @@ router.put(
            WHERE id_office = ? AND id_master_comp = ?`,
           [...officeColumnValues(input), idOffice, scope.idMasterComp],
         );
+        if (wasPublic || input.isPublic === 1) await renumber(connection, group);
       }
       if (hoursChanged) {
         await connection.query('DELETE FROM office_operating_hour WHERE id_office = ?', [idOffice]);

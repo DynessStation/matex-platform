@@ -9,11 +9,13 @@ import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { HttpError } from '../../../helper/http-error.helper';
 import { decodeId } from '../../../helper/id.helper';
+import { renumber } from '../../../helper/sort-order.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
 import { OFFICE_COLUMNS, officeCoreAuditFromRow, officePublicationAuditFromRow } from './input';
+import { publicOfficeGroup } from './order';
 import {
   readOfficeAttachmentLinks,
   readOfficeHours,
@@ -107,6 +109,9 @@ router.delete(
         'UPDATE office SET status = 99, updated = NOW() WHERE id_office = ? AND id_master_comp = ?',
         [idOffice, scope.idMasterComp],
       );
+      if (Number(office.is_public) === 1) {
+        await renumber(connection, publicOfficeGroup(scope.idMasterComp));
+      }
 
       await writeAuditLog({
         req,

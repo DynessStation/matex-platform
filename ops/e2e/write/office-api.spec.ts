@@ -50,7 +50,8 @@ const newOffice = () => ({
   website_url: 'https://example.invalid/kantor',
   is_public: 1,
   public_slug: `kantor-uji-${runId}`,
-  public_sort_order: 3,
+  // Ignored: a new public office goes last in the public order.
+  public_sort_order: 1,
   google_maps_url: 'https://maps.example.invalid/kantor',
   operating_hours: hours,
   attachments: [
@@ -58,6 +59,9 @@ const newOffice = () => ({
     { id_attachment: galleryId, attachment_role: 'gallery' },
   ],
 });
+
+const publicOrder = async () =>
+  (await expectCode(await owner.get(`${base}/public-order`), 200, 'OFFICE_ORDER_FOUND')).data.data;
 
 test.beforeAll(async () => {
   anonymous = await apiContext();
@@ -80,6 +84,7 @@ test('office endpoints require a session', async () => {
   await expectCode(await anonymous.get(base), 401, 'AUTH_TOKEN_REQUIRED');
   await expectCode(await anonymous.get(`${base}/anything`), 401, 'AUTH_TOKEN_REQUIRED');
   await expectCode(await anonymous.post(base, { data: {} }), 401, 'AUTH_TOKEN_REQUIRED');
+  await expectCode(await anonymous.get(`${base}/public-order`), 401, 'AUTH_TOKEN_REQUIRED');
 });
 
 test("the list shows the company's first office", async () => {
@@ -223,6 +228,9 @@ test('create an office, then find and read it', async () => {
     status: 1,
     admin_count: 0,
   });
+  // The new public office went last.
+  expect(detail.data.public_position).toBe(detail.data.public_total);
+  expect(detail.data.public_sort_order).toBe(detail.data.public_total);
   expect(detail.data.operating_hours).toHaveLength(3);
   expect(detail.data.attachments).toHaveLength(2);
   expect(
@@ -358,6 +366,70 @@ test('office photos need attachment.view', async () => {
   }
 });
 
+test('public order: public offices only, numbered 1..n, saved as a whole', async () => {
+  const save = (ids: unknown) => owner.put(`${base}/public-order`, { data: { ids } });
+  // A second public office, so there is something to reorder.
+  const second = await expectCode(
+    await owner.post(base, {
+      data: {
+        ...newOffice(),
+        office_code: `${code}-B`,
+        office_name: 'Kantor Uji Kontrak B',
+        public_slug: `kantor-uji-b-${runId}`,
+        email: null,
+        attachments: [],
+      },
+    }),
+    201,
+  );
+  const secondId = second.data.id_office;
+  const before = await publicOrder();
+  const ids: string[] = before.map((item: any) => item.id);
+  expect(before.map((item: any) => item.position)).toEqual(ids.map((_, i) => i + 1));
+  expect(ids.slice(-2)).toEqual([officeId, secondId]);
+
+  await expectCode(await save({}), 400, 'OFFICE_ORDER_INVALID');
+  await expectCode(await save([...ids, ids[0]]), 400, 'OFFICE_ORDER_DUPLICATE');
+  await expectCode(await save(ids.slice(1)), 409, 'OFFICE_ORDER_INCOMPLETE');
+
+  const moved = [secondId, ...ids.filter((id) => id !== secondId)];
+  await expectCode(await save(moved), 200, 'OFFICE_ORDER_SAVED');
+  expect((await publicOrder()).map((item: any) => item.id)).toEqual(moved);
+  const contact = await expectCode(await anonymous.get('/api/public/contact/id-ID'), 200);
+  expect(contact.data.offices[0].code).toBe(`${code}-B`);
+
+  // Made internal, it leaves the order without a gap; made public again, it goes last.
+  const internal = {
+    ...newOffice(),
+    office_code: `${code}-B`,
+    office_name: 'Kantor Uji Kontrak B',
+    email: null,
+    attachments: [],
+  };
+  await expectCode(
+    await owner.put(`${base}/${secondId}`, { data: { ...internal, is_public: 0 } }),
+    200,
+  );
+  const without = await publicOrder();
+  expect(without.map((item: any) => item.id)).toEqual(ids.filter((id) => id !== secondId));
+  expect(without.map((item: any) => item.position)).toEqual(
+    without.map((_: any, i: number) => i + 1),
+  );
+  await expectCode(
+    await owner.put(`${base}/${secondId}`, {
+      data: { ...internal, public_slug: `kantor-uji-b-${runId}` },
+    }),
+    200,
+  );
+  expect((await publicOrder()).at(-1).id).toBe(secondId);
+
+  await expectCode(await owner.patch(`${base}/${secondId}/status`, { data: { status: 0 } }), 200);
+  await expectCode(await owner.delete(`${base}/${secondId}`), 200);
+  expect((await publicOrder()).map((item: any) => item.id)).toEqual(
+    ids.filter((id) => id !== secondId),
+  );
+});
+
 test('an account without office permissions is refused', async () => {
   const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Kantor', []);
   const references = await adminReferences(owner, { id_access: noPermissions });
@@ -372,6 +444,12 @@ test('an account without office permissions is refused', async () => {
       'AUTH_PERMISSION_DENIED',
     );
     await expectCode(await limited.delete(`${base}/${officeId}`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(await limited.get(`${base}/public-order`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(
+      await limited.put(`${base}/public-order`, { data: { ids: [officeId] } }),
+      403,
+      'AUTH_PERMISSION_DENIED',
+    );
   } finally {
     await limited.dispose();
   }

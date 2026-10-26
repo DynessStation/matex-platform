@@ -10,6 +10,8 @@ import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
+import { renumber } from '../../../helper/sort-order.helper';
+import { frontGroup } from './front';
 import { changeProduct, productNotFound } from './records';
 
 const { pool } = db;
@@ -29,10 +31,12 @@ router.delete(
     const found = await changeProduct(id, scope.idMasterComp, async (connection, product) => {
       await connection.query(
         `UPDATE product_catalog
-         SET product_status = 'archived', product_deleted_at = NOW(), id_updated_by = ?
+         SET product_status = 'archived', product_deleted_at = NOW(), product_sort_order = 0,
+           id_updated_by = ?
          WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL`,
         [scope.idAdminAcct, id, scope.idMasterComp],
       );
+      await renumber(connection, frontGroup(scope.idMasterComp));
       await writeAuditLog({
         req,
         connection,

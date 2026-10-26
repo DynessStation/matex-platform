@@ -84,7 +84,8 @@ test('create validates input', async () => {
   }
 
   const parent = await expectCode(
-    await create({ ...valid, image_id: image, icon_id: image, sort_order: 7, is_featured: 1 }),
+    // sort_order is ignored: a new category goes last on its level.
+    await create({ ...valid, image_id: image, icon_id: image, sort_order: 1, is_featured: 1 }),
     201,
     'PRODUCT_CATEGORY_CREATED',
   );
@@ -132,7 +133,6 @@ test('list tree, detail, and the public site', async () => {
     name: 'Kategori Uji ID',
     type: 'product',
     is_featured: true,
-    sort_order: 7,
     category_image: { id_attachment: image },
     category_icon: { id_attachment: image },
     subcategories: [{ id: childId, parent_id: parentId, name: 'Anak ID', category_image: null }],
@@ -148,6 +148,10 @@ test('list tree, detail, and the public site', async () => {
     200,
     'PRODUCT_CATEGORY_FOUND',
   );
+  expect(detail.data.position).toBe(detail.data.position_total);
+  expect(detail.data.sort_order).toBe(detail.data.position_total);
+  const childDetail = await expectCode(await owner.get(`${base}/${childId}`), 200);
+  expect(childDetail.data).toMatchObject({ sort_order: 1, position: 1, position_total: 1 });
   expect(detail.data).toMatchObject({
     id: parentId,
     parent_id: null,
@@ -206,10 +210,11 @@ test('update guards the parent tree', async () => {
     'PRODUCT_CATEGORY_UPDATED',
   );
   const detail = await expectCode(await owner.get(`${base}/${parentId}`), 200);
+  // Saved under the same parent, the category keeps its place.
+  expect(detail.data.position).toBe(detail.data.position_total);
   expect(detail.data).toMatchObject({
     status: 'draft',
     is_featured: false,
-    sort_order: 0,
     category_image: null,
     translations: [{ name: 'Kategori Ubah EN', status: 0 }, { name: 'Kategori Ubah ID' }],
   });
@@ -217,7 +222,7 @@ test('update guards the parent tree', async () => {
   expect(shown).not.toContain(key);
 });
 
-test('reorder', async () => {
+test('reorder one level; moved and deleted categories keep each level 1..n', async () => {
   const reorder = (items: unknown) => owner.patch(`${base}/reorder`, { data: { items } });
   await expectCode(await reorder([]), 400, 'PRODUCT_CATEGORY_ORDER_INVALID');
   await expectCode(
@@ -233,16 +238,43 @@ test('reorder', async () => {
     400,
     'PRODUCT_CATEGORY_ORDER_DUPLICATE',
   );
+  const position = async (id: string) =>
+    (await expectCode(await owner.get(`${base}/${id}`), 200)).data;
+
+  // A second child goes last under the parent.
+  const secondBody = {
+    key: `${key}-anak-dua`,
+    status: 'published',
+    parent_id: parentId,
+    translations: translations(`${key}-anak-dua`, 'Anak Dua'),
+  };
+  const second = (await expectCode(await owner.post(base, { data: secondBody }), 201)).data.id;
+  expect(await position(second)).toMatchObject({ position: 2, position_total: 2 });
+
+  // The tree sends the level as 0..n-1 (or any rising numbers); the server stores 1..n.
   await expectCode(
     await reorder([
-      { id: childId, sort_order: 4 },
-      { id: parentId, sort_order: 3 },
+      { id: second, sort_order: 0 },
+      { id: childId, sort_order: 7 },
     ]),
     200,
     'PRODUCT_CATEGORY_REORDERED',
   );
-  const detail = await expectCode(await owner.get(`${base}/${childId}`), 200);
-  expect(detail.data.sort_order).toBe(4);
+  expect(await position(second)).toMatchObject({ sort_order: 1, position: 1 });
+  expect(await position(childId)).toMatchObject({ sort_order: 2, position: 2 });
+
+  // Moved to the top level it goes last there, and the old level closes the gap.
+  await expectCode(
+    await owner.put(`${base}/${second}`, { data: { ...secondBody, parent_id: null } }),
+    200,
+  );
+  const moved = await position(second);
+  expect(moved.position).toBe(moved.position_total);
+  expect(await position(childId)).toMatchObject({ sort_order: 1, position: 1, position_total: 1 });
+
+  const topBefore = moved.position_total;
+  await expectCode(await owner.delete(`${base}/${second}`), 200, 'PRODUCT_CATEGORY_DELETED');
+  expect((await position(parentId)).position_total).toBe(topBefore - 1);
 });
 
 test('categories that hold products', async () => {
@@ -338,5 +370,6 @@ test('delete', async () => {
     }),
     200,
   );
-  expect(audit.data).toHaveLength(2);
+  // The two here and the second child deleted in the reorder test.
+  expect(audit.data).toHaveLength(3);
 });

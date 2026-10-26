@@ -105,8 +105,6 @@ export const readOfficeInput = (body: any): OfficeInput => {
   if (isPublic === 1 && !publicSlug) {
     throw invalid('OFFICE_PUBLIC_SLUG_REQUIRED', 'Public slug is required for public office');
   }
-  const sortOrder = Number(body?.public_sort_order ?? 0);
-
   return {
     code,
     name,
@@ -124,7 +122,8 @@ export const readOfficeInput = (body: any): OfficeInput => {
     websiteUrl,
     isPublic,
     publicSlug,
-    publicSortOrder: Number.isInteger(sortOrder) && sortOrder >= 0 ? sortOrder : 0,
+    // Set by create and update from the public order (order.ts); a value in the body is ignored.
+    publicSortOrder: 0,
     googlePlaceId: nullableString(body?.google_place_id),
     googleMapsUrl,
     googleBusinessUrl,

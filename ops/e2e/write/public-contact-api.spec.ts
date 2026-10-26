@@ -178,8 +178,20 @@ test('save replaces channels and topics', async () => {
     url: null,
     is_primary: 0,
     is_public: 1,
-    sort_order: 90,
   });
+  // Positions follow the list order (1..n); the sort_order sent is ignored.
+  expect(saved.data.channels.map((item: any) => item.key)).toEqual([
+    ...valid.channels.map((item: any) => item.key),
+    `wa-uji-${runId}`,
+    `instagram-${runId}`,
+    `hidden-${runId}`,
+  ]);
+  expect(saved.data.channels.map((item: any) => item.sort_order)).toEqual(
+    saved.data.channels.map((_: any, i: number) => i + 1),
+  );
+  expect(saved.data.topics.find((item: any) => item.key === `topik-${runId}`).sort_order).toBe(
+    valid.topics.length + 1,
+  );
 
   const page = await publicContact();
   const keys = page.channels.map((item: any) => item.key);

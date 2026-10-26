@@ -78,6 +78,7 @@ test.afterAll(async () => {
 test('product endpoints require a session', async () => {
   await expectCode(await anonymous.get(base), 401, 'AUTH_TOKEN_REQUIRED');
   await expectCode(await anonymous.post(base, { data: {} }), 401, 'AUTH_TOKEN_REQUIRED');
+  await expectCode(await anonymous.put(`${base}/front`, { data: {} }), 401, 'AUTH_TOKEN_REQUIRED');
 });
 
 test('list, paging, and sorting', async () => {
@@ -329,7 +330,14 @@ test('status changes', async () => {
   expect(await publicSlugs()).toContain(`${key}-id`);
 });
 
-test('the public catalog lists products by their Urutan first, then newest', async () => {
+test('the front of the catalog: checkbox, order list, and the public catalog', async () => {
+  const front = async () =>
+    (await expectCode(await owner.get(`${base}/front`), 200, 'PRODUCT_FRONT_FOUND')).data;
+  const save = (ids: unknown) => owner.put(`${base}/front`, { data: { ids } });
+  const original = await front();
+  expect(original.max).toBe(12);
+  const originalIds: string[] = original.data.map((item: any) => item.id);
+
   const category = await expectCode(
     await owner.post('/api/v1/product-categories', {
       data: {
@@ -343,34 +351,93 @@ test('the public catalog lists products by their Urutan first, then newest', asy
     }),
     201,
   );
-  // Created in this order; Urutan 0 means "no position".
-  for (const [name, sortOrder] of [
-    ['a', 0],
-    ['b', 2],
-    ['c', 0],
-    ['d', 1],
+  // Created in this order; b and d are ticked "Tampilkan di depan katalog" (a sort_order in the
+  // body is ignored).
+  const ids: Record<string, string> = {};
+  for (const [name, catalogFront] of [
+    ['a', false],
+    ['b', true],
+    ['c', false],
+    ['d', true],
   ] as const) {
-    await expectCode(
+    const created = await expectCode(
       await owner.post(base, {
         data: {
           key: `urutan-${name}-${runId}`,
           sku: `URT-${name}-${runId}`.toUpperCase(),
           status: 'published',
-          sort_order: sortOrder,
+          sort_order: 5,
+          catalog_front: catalogFront,
           category_ids: [category.data.id],
           translations: translations(`urutan-${name}-${runId}`, `Urutan ${name}`),
         },
       }),
       201,
     );
+    ids[name] = created.data.id;
   }
-  const list = await expectCode(
-    await anonymous.get('/api/public/products/id-ID', { params: { category: `urutan-${runId}` } }),
-    200,
+  const publicOrder = async () =>
+    (
+      await expectCode(
+        await anonymous.get('/api/public/products/id-ID', {
+          params: { category: `urutan-${runId}` },
+        }),
+        200,
+      )
+    ).data.data.map((item: any) => item.slug.split('-')[1]);
+
+  // New front products go last: b, then d; the rest newest first.
+  const added = await front();
+  expect(added.data.map((item: any) => item.id)).toEqual([...originalIds, ids.b, ids.d]);
+  expect(added.data.map((item: any) => item.position)).toEqual(
+    added.data.map((_: any, i: number) => i + 1),
   );
-  expect(list.data.data.map((item: any) => item.slug)).toEqual(
-    ['d', 'b', 'c', 'a'].map((name) => `urutan-${name}-${runId}-id`),
-  );
+  expect(added.data.at(-1)).toMatchObject({ label: 'Urutan d ID', status: 'published' });
+  expect(await publicOrder()).toEqual(['b', 'd', 'c', 'a']);
+  const detail = await expectCode(await owner.get(`${base}/${ids.d}`), 200);
+  expect(detail.data).toMatchObject({
+    catalog_front: true,
+    sort_order: originalIds.length + 2,
+    front_total: originalIds.length + 2,
+    front_max: 12,
+  });
+  expect((await expectCode(await owner.get(`${base}/${ids.a}`), 200)).data).toMatchObject({
+    catalog_front: false,
+    sort_order: 0,
+  });
+
+  // The order list is saved as a whole; products left out leave the front.
+  await expectCode(await save('x'), 400, 'PRODUCT_FRONT_INVALID');
+  await expectCode(await save(['not-a-hash']), 400, 'PRODUCT_FRONT_INVALID');
+  await expectCode(await save([ids.d, ids.d]), 400, 'PRODUCT_FRONT_DUPLICATE');
+  await expectCode(await save(Array(13).fill(ids.d)), 409, 'PRODUCT_FRONT_FULL');
+  await expectCode(await save([ids.d, ids.a]), 200, 'PRODUCT_FRONT_SAVED');
+  expect((await front()).data.map((item: any) => item.id)).toEqual([ids.d, ids.a]);
+  expect(await publicOrder()).toEqual(['d', 'a', 'c', 'b']);
+
+  // Unticking in the form takes the product off the front and closes the gap.
+  const product = (name: string, catalogFront: boolean) => ({
+    key: `urutan-${name}-${runId}`,
+    sku: `URT-${name}-${runId}`.toUpperCase(),
+    status: 'published',
+    catalog_front: catalogFront,
+    category_ids: [category.data.id],
+    translations: translations(`urutan-${name}-${runId}`, `Urutan ${name}`),
+  });
+  await expectCode(await owner.put(`${base}/${ids.d}`, { data: product('d', false) }), 200);
+  expect((await front()).data).toMatchObject([{ id: ids.a, position: 1 }]);
+  // Ticked again it goes last; saved again while ticked it keeps its place.
+  await expectCode(await owner.put(`${base}/${ids.d}`, { data: product('d', true) }), 200);
+  await expectCode(await owner.put(`${base}/${ids.a}`, { data: product('a', true) }), 200);
+  expect((await front()).data.map((item: any) => item.id)).toEqual([ids.a, ids.d]);
+  // A deleted product leaves the front.
+  await expectCode(await owner.delete(`${base}/${ids.a}`), 200);
+  expect((await front()).data).toMatchObject([{ id: ids.d, position: 1 }]);
+
+  // Unknown products are refused; the front goes back to how it was.
+  await expectCode(await save([ids.a]), 404, 'PRODUCT_NOT_FOUND');
+  await expectCode(await save(originalIds), 200, 'PRODUCT_FRONT_SAVED');
+  expect((await front()).data.map((item: any) => item.id)).toEqual(originalIds);
 });
 
 test('an account without product rights is refused', async () => {
@@ -385,6 +452,12 @@ test('an account without product rights is refused', async () => {
     await expectCode(await limited.get(base), 403, 'AUTH_PERMISSION_DENIED');
     await expectCode(await limited.post(base, { data: {} }), 403, 'AUTH_PERMISSION_DENIED');
     await expectCode(await limited.delete(`${base}/${productId}`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(await limited.get(`${base}/front`), 403, 'AUTH_PERMISSION_DENIED');
+    await expectCode(
+      await limited.put(`${base}/front`, { data: { ids: [] } }),
+      403,
+      'AUTH_PERMISSION_DENIED',
+    );
   } finally {
     await limited.dispose();
   }

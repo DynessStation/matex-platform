@@ -246,7 +246,10 @@ export const parsePayload = (body: any) => {
     stockQuantity,
     internalCommerce: body?.internal_commerce_enabled ? 1 : 0,
     isFeatured: body?.is_featured ? 1 : 0,
-    sortOrder: Math.max(0, Number(body?.sort_order) || 0),
+    // "Tampilkan di depan katalog"; saveProduct turns it into the front position (front.ts).
+    // A sort_order in the body is ignored.
+    catalogFront: body?.catalog_front ? 1 : 0,
+    sortOrder: 0,
   };
 };
 
