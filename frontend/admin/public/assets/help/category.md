@@ -12,11 +12,11 @@ URL: https://internal.matexindo.com/category
 
 ## Tata Letak Halaman
 
-Panel kiri berisi pohon kategori, panel kanan berisi formulir.
+Pohon kategori dan formulir ada dalam satu kartu: pohon di kiri, formulir di kanan. Tab formulir (Umum, Konten & Bahasa, SEO, Media) ada di atas formulir, dan tombol **Simpan Kategori** (atau **Perbarui Kategori** saat mengubah) ada di bawahnya, sehingga bisa disimpan dari tab mana pun. Bila ada isian wajib yang kosong, formulir langsung membuka tab dan bahasa tempat isian itu berada.
 
 ### Pohon kategori
 
-Semua kategori bertingkat, dengan kotak **Cari Kategori**. Ikon pensil membuka kategori di formulir, ikon tempat sampah menghapusnya. Kategori yang belum Dipublikasikan tampil lebih redup.
+Semua kategori bertingkat, dengan kotak **Cari Kategori**. Di samping nama tertulis jumlah produk yang memakai kategori itu; kategori Draft atau Diarsipkan diberi label dan tampil lebih redup. Arahkan kursor ke baris untuk memunculkan ikon pensil (membuka kategori di formulir) dan ikon tempat sampah (menghapusnya). Pencarian tetap berlaku setelah pohon dimuat ulang, misalnya sesudah menghapus atau memindahkan kategori.
 
 ### Mengubah urutan
 
@@ -58,7 +58,7 @@ Nama dan isi kategori, diisi untuk Bahasa Indonesia dan English.
 
 ### Slug URL
 
-Bagian alamat halaman kategori di website, wajib per bahasa, misalnya sarung-tangan-lateks. Ditulis manual dengan huruf kecil, angka, dan tanda hubung, dan harus unik.
+Bagian alamat halaman kategori di website, wajib per bahasa, misalnya sarung-tangan-lateks. Bila masih kosong, terisi otomatis dari nama kategori setelah nama diketik; bisa diubah, dengan huruf kecil, angka, dan tanda hubung, dan harus unik.
 
 ### Nama kategori
 

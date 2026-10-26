@@ -30,20 +30,19 @@ export class Tree {
   public dataToShow: ICategory[] = [];
 
   constructor() {
-    this.treeSearch.valueChanges.subscribe((data) => {
-      if (data) {
-        this.dataToShow = [];
-        (this.data() ?? []).forEach((item) => {
-          this.hasValue(item) && this.dataToShow.push(item);
-        });
-      } else {
-        this.dataToShow = this.data() ?? [];
-      }
-    });
+    this.treeSearch.valueChanges.subscribe(() => this.applySearch());
   }
 
+  // Reloaded data (after a drag or delete) keeps the search that is still typed.
   ngOnChanges() {
-    this.dataToShow = this.data() ?? [];
+    this.applySearch();
+  }
+
+  private applySearch() {
+    const all = this.data() ?? [];
+    this.dataToShow = this.treeSearch.value
+      ? all.filter((item) => this.hasValue(item))
+      : all;
   }
 
   hasValue(item: ICategory) {

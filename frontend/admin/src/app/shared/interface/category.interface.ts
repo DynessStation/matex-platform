@@ -24,6 +24,8 @@ export interface ICategory {
   status: ProductCategoryStatus;
   is_featured: boolean;
   sort_order: number;
+  /** Products (not deleted) that use the category. */
+  product_count?: number;
   category_image: IAttachment | null;
   category_icon: IAttachment | null;
   category_meta_image?: IAttachment | null;

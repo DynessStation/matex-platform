@@ -269,7 +269,8 @@ app-footer,
 // that cannot currently be edited.
 .page-body-wrapper .form-control:not(:disabled):not([readonly]),
 .page-body-wrapper .form-select:not(:disabled),
-.page-body-wrapper .custom-select:not(.ng-select-disabled) .select2-selection {
+.page-body-wrapper .custom-select:not(.ng-select-disabled) .select2-selection,
+.page-body-wrapper .category-breadcrumb-select {
   border: 1px solid #dfe3e8 !important;
   background-color: #fff !important;
   color: #30343b !important;
@@ -284,6 +285,22 @@ app-footer,
 .page-body-wrapper .custom-select .select2-selection__rendered {
   background-color: transparent !important;
   color: inherit !important;
+}
+
+// The category picker (shared advance-dropdown, U-12) is a control like the others: one
+// control height and the control text size (the template made it grey, like a disabled box).
+.page-body-wrapper .category-breadcrumb-select {
+  display: flex;
+  align-items: center;
+  min-height: var(--admin-control-height);
+  padding: 6px 36px 6px 12px !important;
+  border-radius: 4px;
+  font-size: var(--admin-control);
+
+  .breadcrumb .breadcrumb-item,
+  .breadcrumb .breadcrumb-item a {
+    font-size: var(--admin-control);
+  }
 }
 
 .page-body-wrapper .form-control:disabled,
@@ -432,6 +449,7 @@ body {
 body.dark-only {
   .page-body-wrapper .form-control:not(:disabled):not([readonly]),
   .page-body-wrapper .form-select:not(:disabled),
+  .page-body-wrapper .category-breadcrumb-select,
   .page-body-wrapper
     .custom-select:not(.ng-select-disabled)
     .select2-selection {

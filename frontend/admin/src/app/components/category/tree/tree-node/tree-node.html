@@ -25,10 +25,23 @@
       ></i>
     }
     <span
-      [class]="node().id === id ? 'active' : ''"
+      class="category-node-name"
+      [class.active]="node().id === id"
       [class.disabled]="node().status !== 'published'"
       >{{ node()[displayKey()] || node()?.name }}</span
     >
+    <span class="category-node-meta">
+      @if (node().status === 'draft') {
+        <span class="badge category-node-state">Draft</span>
+      } @else if (node().status === 'archived') {
+        <span class="badge category-node-state">Diarsipkan</span>
+      }
+      <small
+        class="category-node-count"
+        [title]="node().product_count + ' produk memakai kategori ini'"
+        >{{ node().product_count ?? 0 }} produk</small
+      >
+    </span>
     <div class="tree-options">
       <a
         href="javascript:void(0)"

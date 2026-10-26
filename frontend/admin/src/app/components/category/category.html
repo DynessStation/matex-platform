@@ -1,18 +1,15 @@
-<div class="row">
-  <div class="col-xl-4 p-0">
-    <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'categories'">
-      <div button *hasPermission="'product_category.create'">
-        @if (type() === 'edit') {
-          <button
-            type="button"
-            class="btn btn-sm btn-light-bg"
-            (click)="create(type())"
-          >
-            <i class="ri-add-line"></i> Kategori baru
-          </button>
-        }
-      </div>
-      <div class="category-tree-box">
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'categories'">
+  <div button *hasPermission="'product_category.create'">
+    @if (type() === 'edit') {
+      <a routerLink="/category" class="align-items-center btn btn-theme d-flex">
+        <i class="ri-add-line"></i> Kategori baru
+      </a>
+    }
+  </div>
+  <!-- U-12: tree and form share one card; the form has its tabs on top. -->
+  <div class="row g-4 category-layout">
+    <div class="col-xl-4 col-lg-5">
+      <div class="category-tree-box category-tree-panel">
         <app-tree
           [data]="(category$ | async)?.data"
           [recursionKey]="'subcategories'"
@@ -20,18 +17,18 @@
           [categoryType]="categoryType()"
         />
       </div>
-    </app-page-wrapper>
+    </div>
+    <div class="col-xl-8 col-lg-7">
+      <app-form-category
+        [categories]="(category$ | async)?.data"
+        [type]="type()"
+        [categoryType]="categoryType()"
+        *hasPermission="
+          type() === 'edit'
+            ? 'product_category.update'
+            : 'product_category.create'
+        "
+      />
+    </div>
   </div>
-  <div class="col-xl-8 p-0">
-    <app-form-category
-      [categories]="(category$ | async)?.data"
-      [type]="type()"
-      [categoryType]="categoryType()"
-      *hasPermission="
-        type() === 'edit'
-          ? 'product_category.update'
-          : 'product_category.create'
-      "
-    />
-  </div>
-</div>
+</app-page-wrapper>

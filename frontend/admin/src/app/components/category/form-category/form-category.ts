@@ -168,8 +168,12 @@ export class FormCategory {
       .subscribe((category) => this.patch(category));
   }
 
-  setTab(tab: string) {
-    this.activeTab = tab;
+  /** Indonesian name of the category being edited, shown next to the form title. */
+  get categoryName(): string {
+    const name = this.category?.translations.find(
+      (item) => item.locale === 'id-ID',
+    )?.name;
+    return name || this.category?.key || '';
   }
   selectItem(value: any[]) {
     this.form.controls.parent_id.setValue(value?.[0] ?? '');
@@ -370,10 +374,25 @@ export class FormCategory {
     };
   }
 
+  // The tab (and on Konten, the language) with the first missing field, so it is visible.
   private invalidTab() {
-    const content = ['id_slug', 'id_name', 'en_slug', 'en_name'];
-    return content.some((key) => this.form.get(key)?.invalid)
-      ? 'content'
-      : 'general';
+    for (const locale of ['id', 'en'] as const) {
+      if (
+        this.form.get(`${locale}_slug`)?.invalid ||
+        this.form.get(`${locale}_name`)?.invalid
+      ) {
+        this.activeLocale = locale;
+        return 'content';
+      }
+    }
+    return 'general';
+  }
+
+  /** Fills an empty slug from the name once the name is typed (U-12). */
+  fillSlug(locale: 'id' | 'en') {
+    const slug = this.form.get(`${locale}_slug`);
+    if (slug && !slug.value) {
+      slug.setValue(this.slugify(this.form.get(`${locale}_name`)?.value));
+    }
   }
 }

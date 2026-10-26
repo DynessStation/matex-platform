@@ -1,0 +1,137 @@
+/**=====================
+    Product category page CSS start
+==========================**/
+// The category page (components/category, U-12): the tree and the form share one card; the
+// form has its tabs on top and one save button under them.
+
+.category-layout {
+  align-items: flex-start;
+}
+
+// Tree panel: a bordered box like the form beside it.
+.category-tree-panel {
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+
+  // The template sizes tree rows at 16px; the admin type scale is smaller.
+  .theme-tree-box .tree-main-ul li > div {
+    flex-wrap: nowrap;
+    font-size: var(--admin-control);
+  }
+
+  // Long names break between words next to the handle, not below it.
+  .category-node-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  // The template's file icon only takes room; the edit and delete icons float at the right of
+  // the hovered row, over the count, so names keep the width.
+  .theme-tree-box .tree-main-ul li > div {
+    position: relative;
+
+    > .tree-icon.file-icon {
+      display: none;
+    }
+
+    > .tree-options {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: inherit;
+      transform: translateY(-50%);
+    }
+  }
+
+  .category-node-meta {
+    margin-left: auto;
+  }
+
+  .category-node-meta {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .category-node-count {
+    color: #5b6472;
+    font-size: var(--admin-text-sm);
+    white-space: nowrap;
+  }
+
+  .category-node-state {
+    border: 1px solid #c9ced6;
+    background: #eef1f5;
+    color: #3f4856;
+    font-weight: 600;
+  }
+
+  .category-order-hint {
+    font-size: var(--admin-text-sm);
+  }
+}
+
+.category-form {
+  padding: 16px 20px 20px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.category-form-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 12px;
+
+  h5 {
+    margin: 0;
+    font-size: var(--admin-heading);
+  }
+}
+
+.category-form-name {
+  color: #5b6472;
+  font-size: var(--admin-text);
+}
+
+.category-nav {
+  margin-bottom: 0;
+}
+
+.category-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+
+  .btn {
+    margin: 0 !important;
+  }
+}
+
+body.dark-only {
+  .category-tree-panel,
+  .category-form,
+  .category-form-footer {
+    border-color: #404754;
+  }
+
+  .category-form-name,
+  .category-tree-panel .category-node-count {
+    color: #aeb6c2;
+  }
+
+  .category-tree-panel .category-node-state {
+    border-color: #505765;
+    background: #30353f;
+    color: #e7ebf0;
+  }
+}

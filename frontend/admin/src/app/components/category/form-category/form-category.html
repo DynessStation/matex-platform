@@ -3,559 +3,491 @@
   [formGroup]="form"
   (ngSubmit)="submit()"
 >
-  <div class="vertical-tabs category-form">
-    <div class="row g-4">
-      <div class="col-xl-3 col-lg-4">
-        <ul
-          ngbNav
-          #nav="ngbNav"
-          [(activeId)]="activeTab"
-          class="nav-pills"
-          orientation="vertical"
-        >
-          <li [ngbNavItem]="'general'">
-            <button ngbNavLink type="button">
-              <i class="ri-settings-3-line"></i> Umum
-            </button>
-            <ng-template ngbNavContent>
-              <section class="category-panel">
-                <div class="category-heading">
-                  <h5>Pengaturan kategori</h5>
-                  <p>
-                    Identitas internal, susunan, dan status kategori produk.
-                  </p>
-                </div>
-                <div class="row g-4">
-                  <div class="col-md-7">
-                    <label class="form-label" for="key"
-                      >Kunci internal <span>*</span>
-                      <app-help-tip section="tab-umum--kunci-internal"
-                    /></label>
-                    <input
-                      id="key"
-                      class="form-control"
-                      formControlName="key"
-                      placeholder="contoh: kasur-latex"
-                      [class.is-invalid]="
-                        form.controls.key.touched && form.controls.key.invalid
-                      "
-                    />
-                    <small class="text-muted"
-                      >Gunakan huruf kecil, angka, dan tanda hubung.</small
-                    >
-                    @if (form.controls.key.errors?.['duplicate']) {
-                      <div class="invalid-feedback d-block">
-                        Kunci atau alamat kategori ini sudah digunakan.
-                      </div>
-                    }
-                  </div>
-                  <div class="col-md-5">
-                    <label class="form-label" for="status"
-                      >Status <app-help-tip section="tab-umum--status"
-                    /></label>
-                    <select
-                      id="status"
-                      class="form-select"
-                      formControlName="status"
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="published">Dipublikasikan</option>
-                      <option value="archived">Diarsipkan</option>
-                    </select>
-                  </div>
-                  <div class="col-md-7">
-                    <label class="form-label"
-                      >Induk kategori
-                      <app-help-tip section="tab-umum--induk-kategori"
-                    /></label>
-                    <app-advance-dropdown
-                      [selectSingle]="true"
-                      [selectedOption]="
-                        category?.parent_id ? [category!.parent_id!] : []
-                      "
-                      [options]="categories()"
-                      [subArrayKey]="'subcategories'"
-                      (selectedItem)="selectItem($event)"
-                    />
-                    <small class="text-muted"
-                      >Kosongkan untuk kategori utama.</small
-                    >
-                  </div>
-                  <div class="col-md-3">
-                    <label class="form-label" for="position"
-                      >Urutan <app-help-tip section="tab-umum--urutan"
-                    /></label>
-                    <input
-                      id="position"
-                      class="form-control"
-                      readonly
-                      tabindex="-1"
-                      [value]="position"
-                    />
-                  </div>
-                  <div class="col-md-2">
-                    <label class="form-label"
-                      >Penanda <app-help-tip section="tab-umum--unggulan"
-                    /></label>
-                    <label class="app-check app-check-card category-check"
-                      ><input type="checkbox" formControlName="is_featured" />
-                      Unggulan</label
-                    >
-                  </div>
-                </div>
-                <div class="category-actions">
-                  <span></span
-                  ><button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="setTab('content')"
-                  >
-                    Lanjut ke Konten <i class="ri-arrow-right-line"></i>
-                  </button>
-                </div>
-              </section>
-            </ng-template>
-          </li>
-
-          <li [ngbNavItem]="'content'">
-            <button ngbNavLink type="button">
-              <i class="ri-translate-2"></i> Konten & Bahasa
-            </button>
-            <ng-template ngbNavContent>
-              <section class="category-panel">
-                <div class="category-heading">
-                  <h5>Nama dan deskripsi</h5>
-                  <p>
-                    Kelola teks publik Indonesia dan English dalam satu tempat.
-                  </p>
-                </div>
-                <div class="category-language-tabs">
-                  <button
-                    type="button"
-                    [class.active]="activeLocale === 'id'"
-                    (click)="activeLocale = 'id'"
-                  >
-                    <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
-                  </button>
-                  <button
-                    type="button"
-                    [class.active]="activeLocale === 'en'"
-                    (click)="activeLocale = 'en'"
-                  >
-                    <strong>EN</strong> English
-                  </button>
-                </div>
-                @if (activeLocale === 'id') {
-                  <div class="row g-4">
-                    <div class="col-md-5">
-                      <label class="form-label"
-                        >Slug URL <span>*</span>
-                        <app-help-tip section="tab-konten-bahasa--slug-url"
-                      /></label>
-                      <div class="input-group">
-                        <span class="input-group-text">/kategori/</span
-                        ><input
-                          class="form-control"
-                          formControlName="id_slug"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-7">
-                      <label class="form-label"
-                        >Nama kategori <span>*</span>
-                        <app-help-tip
-                          section="tab-konten-bahasa--nama-kategori" /></label
-                      ><input class="form-control" formControlName="id_name" />
-                    </div>
-                    <div class="col-12">
-                      <div
-                        class="d-flex align-items-center justify-content-between gap-2 mb-2"
-                      >
-                        <label class="form-label mb-0"
-                          >Deskripsi
-                          <app-help-tip section="tab-konten-bahasa--deskripsi"
-                        /></label>
-                        <app-ai-field-action
-                          label="Isi ini otomatis"
-                          [loading]="assistingField === 'id_description'"
-                          [disabled]="assistingField !== null"
-                          (requested)="assistCategoryField('id', 'description')"
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="5"
-                        formControlName="id_description"
-                      ></textarea>
-                    </div>
-                  </div>
-                } @else {
-                  <div class="row g-4">
-                    <div class="col-md-5">
-                      <label class="form-label"
-                        >URL slug <span>*</span>
-                        <app-help-tip section="tab-konten-bahasa--slug-url"
-                      /></label>
-                      <div class="input-group">
-                        <span class="input-group-text">/en/category/</span
-                        ><input
-                          class="form-control"
-                          formControlName="en_slug"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-md-7">
-                      <label class="form-label"
-                        >Category name <span>*</span>
-                        <app-help-tip
-                          section="tab-konten-bahasa--nama-kategori" /></label
-                      ><input class="form-control" formControlName="en_name" />
-                    </div>
-                    <div class="col-12">
-                      <div
-                        class="d-flex align-items-center justify-content-between gap-2 mb-2"
-                      >
-                        <label class="form-label mb-0"
-                          >Description
-                          <app-help-tip section="tab-konten-bahasa--deskripsi"
-                        /></label>
-                        <app-ai-field-action
-                          label="Translate from Indonesian"
-                          icon="ri-translate-2"
-                          [loading]="assistingField === 'en_description'"
-                          [disabled]="
-                            assistingField !== null ||
-                            !form.controls.id_description.value
-                          "
-                          (requested)="
-                            assistCategoryField(
-                              'en',
-                              'description',
-                              'translate'
-                            )
-                          "
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="5"
-                        formControlName="en_description"
-                      ></textarea>
-                    </div>
+  <div class="category-form">
+    <div class="category-form-heading">
+      <h5>{{ type() === 'edit' ? 'Ubah kategori' : 'Kategori baru' }}</h5>
+      @if (type() === 'edit' && category) {
+        <span class="category-form-name">{{ categoryName }}</span>
+      }
+    </div>
+    <ul
+      ngbNav
+      #nav="ngbNav"
+      [(activeId)]="activeTab"
+      class="nav-tabs category-nav"
+    >
+      <li [ngbNavItem]="'general'">
+        <button ngbNavLink type="button">
+          <i class="ri-settings-3-line"></i> Umum
+        </button>
+        <ng-template ngbNavContent>
+          <section class="category-panel">
+            <div class="category-heading">
+              <h5>Pengaturan kategori</h5>
+              <p>Identitas internal, susunan, dan status kategori produk.</p>
+            </div>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label" for="key"
+                  >Kunci internal <span>*</span>
+                  <app-help-tip section="tab-umum--kunci-internal"
+                /></label>
+                <input
+                  id="key"
+                  class="form-control"
+                  formControlName="key"
+                  placeholder="contoh: kasur-latex"
+                  [class.is-invalid]="
+                    form.controls.key.touched && form.controls.key.invalid
+                  "
+                />
+                <small class="text-muted"
+                  >Gunakan huruf kecil, angka, dan tanda hubung.</small
+                >
+                @if (form.controls.key.errors?.['duplicate']) {
+                  <div class="invalid-feedback d-block">
+                    Kunci atau alamat kategori ini sudah digunakan.
                   </div>
                 }
-                <div class="category-actions">
-                  <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="setTab('general')"
-                  >
-                    <i class="ri-arrow-left-line"></i> Kembali</button
-                  ><button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="setTab('seo')"
-                  >
-                    Lanjut ke SEO <i class="ri-arrow-right-line"></i>
-                  </button>
-                </div>
-              </section>
-            </ng-template>
-          </li>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="status"
+                  >Status <app-help-tip section="tab-umum--status"
+                /></label>
+                <select
+                  id="status"
+                  class="form-select"
+                  formControlName="status"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Dipublikasikan</option>
+                  <option value="archived">Diarsipkan</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label"
+                  >Induk kategori
+                  <app-help-tip section="tab-umum--induk-kategori"
+                /></label>
+                <app-advance-dropdown
+                  [selectSingle]="true"
+                  [selectedOption]="
+                    category?.parent_id ? [category!.parent_id!] : []
+                  "
+                  [options]="categories()"
+                  [subArrayKey]="'subcategories'"
+                  (selectedItem)="selectItem($event)"
+                />
+                <small class="text-muted"
+                  >Kosongkan untuk kategori utama.</small
+                >
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="position"
+                  >Urutan <app-help-tip section="tab-umum--urutan"
+                /></label>
+                <input
+                  id="position"
+                  class="form-control"
+                  readonly
+                  tabindex="-1"
+                  [value]="position"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"
+                  >Penanda <app-help-tip section="tab-umum--unggulan"
+                /></label>
+                <label class="app-check app-check-card category-check"
+                  ><input type="checkbox" formControlName="is_featured" />
+                  Unggulan</label
+                >
+              </div>
+            </div>
+          </section>
+        </ng-template>
+      </li>
 
-          <li [ngbNavItem]="'seo'">
-            <button ngbNavLink type="button">
-              <i class="ri-search-eye-line"></i> SEO
-            </button>
-            <ng-template ngbNavContent>
-              <section class="category-panel">
-                <div class="category-heading">
-                  <h5>SEO & tampilan saat dibagikan</h5>
-                  <p>
-                    Opsional; nama dan deskripsi kategori dipakai sebagai nilai
-                    bawaan.
-                  </p>
-                </div>
-                <div class="category-language-tabs">
-                  <button
-                    type="button"
-                    [class.active]="activeLocale === 'id'"
-                    (click)="activeLocale = 'id'"
-                  >
-                    <strong>ID</strong> Bahasa Indonesia
-                  </button>
-                  <button
-                    type="button"
-                    [class.active]="activeLocale === 'en'"
-                    (click)="activeLocale = 'en'"
-                  >
-                    <strong>EN</strong> English
-                  </button>
-                </div>
-                @if (activeLocale === 'id') {
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >Judul SEO
-                        <app-help-tip section="tab-seo--judul-seo" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="id_meta_title"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >Canonical URL
-                        <app-help-tip section="tab-seo--canonical-url" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="id_canonical_url"
-                        placeholder="https://..."
-                      />
-                    </div>
-                    <div class="col-12">
-                      <div class="category-field-heading">
-                        <label class="form-label"
-                          >Deskripsi SEO
-                          <app-help-tip section="tab-seo--deskripsi-seo"
-                        /></label>
-                        <app-ai-field-action
-                          label="Isi ini otomatis"
-                          [loading]="assistingField === 'id_meta_description'"
-                          [disabled]="assistingField !== null"
-                          (requested)="
-                            assistCategoryField('id', 'meta_description')
-                          "
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="3"
-                        formControlName="id_meta_description"
-                      ></textarea>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >Judul saat dibagikan
-                        <app-help-tip
-                          section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="id_og_title"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <div class="category-field-heading">
-                        <label class="form-label"
-                          >Deskripsi saat dibagikan</label
-                        >
-                        <app-ai-field-action
-                          label="Isi ini otomatis"
-                          [loading]="assistingField === 'id_og_description'"
-                          [disabled]="assistingField !== null"
-                          (requested)="
-                            assistCategoryField('id', 'og_description')
-                          "
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="2"
-                        formControlName="id_og_description"
-                      ></textarea>
-                    </div>
+      <li [ngbNavItem]="'content'">
+        <button ngbNavLink type="button">
+          <i class="ri-translate-2"></i> Konten & Bahasa
+        </button>
+        <ng-template ngbNavContent>
+          <section class="category-panel">
+            <div class="category-heading">
+              <h5>Nama dan deskripsi</h5>
+              <p>Kelola teks publik Indonesia dan English dalam satu tempat.</p>
+            </div>
+            <div class="category-language-tabs">
+              <button
+                type="button"
+                [class.active]="activeLocale === 'id'"
+                (click)="activeLocale = 'id'"
+              >
+                <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
+              </button>
+              <button
+                type="button"
+                [class.active]="activeLocale === 'en'"
+                (click)="activeLocale = 'en'"
+              >
+                <strong>EN</strong> English
+              </button>
+            </div>
+            @if (activeLocale === 'id') {
+              <div class="row g-4">
+                <div class="col-md-5">
+                  <label class="form-label"
+                    >Slug URL <span>*</span>
+                    <app-help-tip section="tab-konten-bahasa--slug-url"
+                  /></label>
+                  <div class="input-group">
+                    <span class="input-group-text">/kategori/</span
+                    ><input class="form-control" formControlName="id_slug" />
                   </div>
-                } @else {
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >SEO title
-                        <app-help-tip section="tab-seo--judul-seo" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="en_meta_title"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >Canonical URL
-                        <app-help-tip section="tab-seo--canonical-url" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="en_canonical_url"
-                        placeholder="https://..."
-                      />
-                    </div>
-                    <div class="col-12">
-                      <div class="category-field-heading">
-                        <label class="form-label"
-                          >SEO description
-                          <app-help-tip section="tab-seo--deskripsi-seo"
-                        /></label>
-                        <app-ai-field-action
-                          label="Translate from Indonesian"
-                          icon="ri-translate-2"
-                          [loading]="assistingField === 'en_meta_description'"
-                          [disabled]="
-                            assistingField !== null ||
-                            !form.controls.id_meta_description.value
-                          "
-                          (requested)="
-                            assistCategoryField(
-                              'en',
-                              'meta_description',
-                              'translate'
-                            )
-                          "
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="3"
-                        formControlName="en_meta_description"
-                      ></textarea>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label"
-                        >Social sharing title
-                        <app-help-tip
-                          section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
-                      ><input
-                        class="form-control"
-                        formControlName="en_og_title"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <div class="category-field-heading">
-                        <label class="form-label"
-                          >Social sharing description</label
-                        >
-                        <app-ai-field-action
-                          label="Translate from Indonesian"
-                          icon="ri-translate-2"
-                          [loading]="assistingField === 'en_og_description'"
-                          [disabled]="
-                            assistingField !== null ||
-                            !form.controls.id_og_description.value
-                          "
-                          (requested)="
-                            assistCategoryField(
-                              'en',
-                              'og_description',
-                              'translate'
-                            )
-                          "
-                        />
-                      </div>
-                      <textarea
-                        class="form-control"
-                        rows="2"
-                        formControlName="en_og_description"
-                      ></textarea>
-                    </div>
-                  </div>
-                }
-                <div class="category-actions">
-                  <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="setTab('content')"
-                  >
-                    <i class="ri-arrow-left-line"></i> Kembali</button
-                  ><button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="setTab('media')"
-                  >
-                    Lanjut ke Media <i class="ri-arrow-right-line"></i>
-                  </button>
                 </div>
-              </section>
-            </ng-template>
-          </li>
+                <div class="col-md-7">
+                  <label class="form-label"
+                    >Nama kategori <span>*</span>
+                    <app-help-tip
+                      section="tab-konten-bahasa--nama-kategori" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="id_name"
+                    (blur)="fillSlug('id')"
+                  />
+                </div>
+                <div class="col-12">
+                  <div
+                    class="d-flex align-items-center justify-content-between gap-2 mb-2"
+                  >
+                    <label class="form-label mb-0"
+                      >Deskripsi
+                      <app-help-tip section="tab-konten-bahasa--deskripsi"
+                    /></label>
+                    <app-ai-field-action
+                      label="Isi ini otomatis"
+                      [loading]="assistingField === 'id_description'"
+                      [disabled]="assistingField !== null"
+                      (requested)="assistCategoryField('id', 'description')"
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="5"
+                    formControlName="id_description"
+                  ></textarea>
+                </div>
+              </div>
+            } @else {
+              <div class="row g-4">
+                <div class="col-md-5">
+                  <label class="form-label"
+                    >URL slug <span>*</span>
+                    <app-help-tip section="tab-konten-bahasa--slug-url"
+                  /></label>
+                  <div class="input-group">
+                    <span class="input-group-text">/en/category/</span
+                    ><input class="form-control" formControlName="en_slug" />
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <label class="form-label"
+                    >Category name <span>*</span>
+                    <app-help-tip
+                      section="tab-konten-bahasa--nama-kategori" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="en_name"
+                    (blur)="fillSlug('en')"
+                  />
+                </div>
+                <div class="col-12">
+                  <div
+                    class="d-flex align-items-center justify-content-between gap-2 mb-2"
+                  >
+                    <label class="form-label mb-0"
+                      >Description
+                      <app-help-tip section="tab-konten-bahasa--deskripsi"
+                    /></label>
+                    <app-ai-field-action
+                      label="Translate from Indonesian"
+                      icon="ri-translate-2"
+                      [loading]="assistingField === 'en_description'"
+                      [disabled]="
+                        assistingField !== null ||
+                        !form.controls.id_description.value
+                      "
+                      (requested)="
+                        assistCategoryField('en', 'description', 'translate')
+                      "
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="5"
+                    formControlName="en_description"
+                  ></textarea>
+                </div>
+              </div>
+            }
+          </section>
+        </ng-template>
+      </li>
 
-          <li [ngbNavItem]="'media'">
-            <button ngbNavLink type="button">
-              <i class="ri-image-line"></i> Media
-            </button>
-            <ng-template ngbNavContent>
-              <section class="category-panel">
-                <div class="category-heading">
-                  <h5>Media kategori</h5>
-                  <p>
-                    Gambar utama untuk kartu/banner, ikon untuk navigasi, dan
-                    gambar sosial untuk SEO.
-                  </p>
+      <li [ngbNavItem]="'seo'">
+        <button ngbNavLink type="button">
+          <i class="ri-search-eye-line"></i> SEO
+        </button>
+        <ng-template ngbNavContent>
+          <section class="category-panel">
+            <div class="category-heading">
+              <h5>SEO & tampilan saat dibagikan</h5>
+              <p>
+                Opsional; nama dan deskripsi kategori dipakai sebagai nilai
+                bawaan.
+              </p>
+            </div>
+            <div class="category-language-tabs">
+              <button
+                type="button"
+                [class.active]="activeLocale === 'id'"
+                (click)="activeLocale = 'id'"
+              >
+                <strong>ID</strong> Bahasa Indonesia
+              </button>
+              <button
+                type="button"
+                [class.active]="activeLocale === 'en'"
+                (click)="activeLocale = 'en'"
+              >
+                <strong>EN</strong> English
+              </button>
+            </div>
+            @if (activeLocale === 'id') {
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Judul SEO
+                    <app-help-tip section="tab-seo--judul-seo" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="id_meta_title"
+                  />
                 </div>
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <div class="category-media">
-                      <h6>
-                        Gambar utama
-                        <app-help-tip section="tab-media--gambar-utama" />
-                      </h6>
-                      <small>Rasio lebar 4:3 direkomendasikan.</small
-                      ><app-image-upload
-                        [multipleImage]="false"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
-                        [image]="category?.category_image ?? null"
-                        (selectedFiles)="selectMedia('image_id', $event)"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="category-media">
-                      <h6>
-                        Ikon kategori
-                        <app-help-tip section="tab-media--ikon-kategori" />
-                      </h6>
-                      <small>Gambar persegi atau transparan.</small
-                      ><app-image-upload
-                        [multipleImage]="false"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
-                        [image]="category?.category_icon ?? null"
-                        (selectedFiles)="selectMedia('icon_id', $event)"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="category-media">
-                      <h6>
-                        Gambar berbagi sosial
-                        <app-help-tip
-                          section="tab-media--gambar-berbagi-sosial"
-                        />
-                      </h6>
-                      <small>Rekomendasi 1200 × 630px.</small
-                      ><app-image-upload
-                        [multipleImage]="false"
-                        [accept]="[mediaConfig.image]"
-                        [collection]="'media_library'"
-                        [image]="category?.category_meta_image ?? null"
-                        (selectedFiles)="selectMedia('og_image_id', $event)"
-                      />
-                    </div>
-                  </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Canonical URL
+                    <app-help-tip section="tab-seo--canonical-url" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="id_canonical_url"
+                    placeholder="https://..."
+                  />
                 </div>
-                <div class="category-actions">
-                  <button
-                    type="button"
-                    class="btn btn-light"
-                    (click)="setTab('seo')"
-                  >
-                    <i class="ri-arrow-left-line"></i> Kembali</button
-                  ><app-button [id]="'category_btn'">{{
-                    type() === 'edit' ? 'Perbarui Kategori' : 'Simpan Kategori'
-                  }}</app-button>
+                <div class="col-12">
+                  <div class="category-field-heading">
+                    <label class="form-label"
+                      >Deskripsi SEO
+                      <app-help-tip section="tab-seo--deskripsi-seo"
+                    /></label>
+                    <app-ai-field-action
+                      label="Isi ini otomatis"
+                      [loading]="assistingField === 'id_meta_description'"
+                      [disabled]="assistingField !== null"
+                      (requested)="
+                        assistCategoryField('id', 'meta_description')
+                      "
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    formControlName="id_meta_description"
+                  ></textarea>
                 </div>
-              </section>
-            </ng-template>
-          </li>
-        </ul>
-      </div>
-      <div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Judul saat dibagikan
+                    <app-help-tip
+                      section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
+                  ><input class="form-control" formControlName="id_og_title" />
+                </div>
+                <div class="col-md-6">
+                  <div class="category-field-heading">
+                    <label class="form-label">Deskripsi saat dibagikan</label>
+                    <app-ai-field-action
+                      label="Isi ini otomatis"
+                      [loading]="assistingField === 'id_og_description'"
+                      [disabled]="assistingField !== null"
+                      (requested)="assistCategoryField('id', 'og_description')"
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="2"
+                    formControlName="id_og_description"
+                  ></textarea>
+                </div>
+              </div>
+            } @else {
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >SEO title
+                    <app-help-tip section="tab-seo--judul-seo" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="en_meta_title"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Canonical URL
+                    <app-help-tip section="tab-seo--canonical-url" /></label
+                  ><input
+                    class="form-control"
+                    formControlName="en_canonical_url"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div class="col-12">
+                  <div class="category-field-heading">
+                    <label class="form-label"
+                      >SEO description
+                      <app-help-tip section="tab-seo--deskripsi-seo"
+                    /></label>
+                    <app-ai-field-action
+                      label="Translate from Indonesian"
+                      icon="ri-translate-2"
+                      [loading]="assistingField === 'en_meta_description'"
+                      [disabled]="
+                        assistingField !== null ||
+                        !form.controls.id_meta_description.value
+                      "
+                      (requested)="
+                        assistCategoryField(
+                          'en',
+                          'meta_description',
+                          'translate'
+                        )
+                      "
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    formControlName="en_meta_description"
+                  ></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"
+                    >Social sharing title
+                    <app-help-tip
+                      section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
+                  ><input class="form-control" formControlName="en_og_title" />
+                </div>
+                <div class="col-md-6">
+                  <div class="category-field-heading">
+                    <label class="form-label">Social sharing description</label>
+                    <app-ai-field-action
+                      label="Translate from Indonesian"
+                      icon="ri-translate-2"
+                      [loading]="assistingField === 'en_og_description'"
+                      [disabled]="
+                        assistingField !== null ||
+                        !form.controls.id_og_description.value
+                      "
+                      (requested)="
+                        assistCategoryField('en', 'og_description', 'translate')
+                      "
+                    />
+                  </div>
+                  <textarea
+                    class="form-control"
+                    rows="2"
+                    formControlName="en_og_description"
+                  ></textarea>
+                </div>
+              </div>
+            }
+          </section>
+        </ng-template>
+      </li>
+
+      <li [ngbNavItem]="'media'">
+        <button ngbNavLink type="button">
+          <i class="ri-image-line"></i> Media
+        </button>
+        <ng-template ngbNavContent>
+          <section class="category-panel">
+            <div class="category-heading">
+              <h5>Media kategori</h5>
+              <p>
+                Gambar utama untuk kartu/banner, ikon untuk navigasi, dan gambar
+                sosial untuk SEO.
+              </p>
+            </div>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="category-media">
+                  <h6>
+                    Gambar utama
+                    <app-help-tip section="tab-media--gambar-utama" />
+                  </h6>
+                  <small>Rasio lebar 4:3 direkomendasikan.</small
+                  ><app-image-upload
+                    [multipleImage]="false"
+                    [accept]="[mediaConfig.image]"
+                    [collection]="'media_library'"
+                    [image]="category?.category_image ?? null"
+                    (selectedFiles)="selectMedia('image_id', $event)"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="category-media">
+                  <h6>
+                    Ikon kategori
+                    <app-help-tip section="tab-media--ikon-kategori" />
+                  </h6>
+                  <small>Gambar persegi atau transparan.</small
+                  ><app-image-upload
+                    [multipleImage]="false"
+                    [accept]="[mediaConfig.image]"
+                    [collection]="'media_library'"
+                    [image]="category?.category_icon ?? null"
+                    (selectedFiles)="selectMedia('icon_id', $event)"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="category-media">
+                  <h6>
+                    Gambar berbagi sosial
+                    <app-help-tip section="tab-media--gambar-berbagi-sosial" />
+                  </h6>
+                  <small>Rekomendasi 1200 × 630px.</small
+                  ><app-image-upload
+                    [multipleImage]="false"
+                    [accept]="[mediaConfig.image]"
+                    [collection]="'media_library'"
+                    [image]="category?.category_meta_image ?? null"
+                    (selectedFiles)="selectMedia('og_image_id', $event)"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="category-tab-content"></div>
+    <!-- One save for every tab: the form keeps all tabs' values. -->
+    <div class="category-form-footer">
+      <app-button [id]="'category_btn'" [class]="'btn btn-theme'">{{
+        type() === 'edit' ? 'Perbarui Kategori' : 'Simpan Kategori'
+      }}</app-button>
     </div>
   </div>
 </form>

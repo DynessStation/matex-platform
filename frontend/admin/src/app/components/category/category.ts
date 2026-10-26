@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
@@ -18,6 +18,7 @@ import { CategoryState } from '../../shared/store/state/category.state';
   selector: 'app-category',
   imports: [
     CommonModule,
+    RouterModule,
     TranslateModule,
     HasPermissionDirective,
     PageWrapper,
@@ -29,7 +30,6 @@ import { CategoryState } from '../../shared/store/state/category.state';
 })
 export class Category {
   private store = inject(Store);
-  private router = inject(Router);
 
   category$: Observable<ICategoryModel> = inject(Store).select(
     CategoryState.category,
@@ -40,11 +40,5 @@ export class Category {
 
   ngOnInit(): void {
     this.store.dispatch(new GetCategoriesAction({ type: this.categoryType() }));
-  }
-
-  create(type: string) {
-    void this.router.navigate([
-      type == 'post' ? '/blog/category' : '/category',
-    ]);
   }
 }
