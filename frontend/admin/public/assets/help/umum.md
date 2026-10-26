@@ -26,7 +26,7 @@ Tombol ini digunakan untuk menampilkan atau menyembunyikan Sidebar. Fitur terseb
 
 ### Tombol Shortcut
 
-Tombol Shortcut menyediakan akses cepat ke beberapa fungsi yang sering digunakan. Pada versi 1.0.10, pintasan yang tersedia meliputi:
+Tombol Shortcut menyediakan akses cepat ke beberapa fungsi yang sering digunakan. Saat ini, pintasan yang tersedia meliputi:
 
 - **Tambah Produk:** membuka halaman pembuatan produk baru di https://internal.matexindo.com/product/create.
 - **Tambah Artikel:** membuka halaman pembuatan artikel baru di https://internal.matexindo.com/blog/create.
@@ -58,7 +58,7 @@ Pengguna juga dapat memanfaatkan tombol F11 pada keyboard untuk mengaktifkan ata
 
 ### Pengaturan Bahasa
 
-Fitur pengaturan bahasa memungkinkan pengguna memilih bahasa antarmuka antara Bahasa Indonesia dan Bahasa Inggris. Pada versi 1.0.10, Bahasa Indonesia menjadi pilihan default.
+Fitur pengaturan bahasa memungkinkan pengguna memilih bahasa antarmuka antara Bahasa Indonesia dan Bahasa Inggris. Saat ini, Bahasa Indonesia menjadi pilihan default.
 
 Preferensi bahasa yang dipilih akan disimpan pada browser. Dengan demikian, ketika pengguna memuat ulang halaman atau kembali mengakses platform melalui browser yang sama, sistem dapat menggunakan kembali pilihan bahasa terakhir yang tersimpan.
 
@@ -79,11 +79,11 @@ Apabila ditekan, bagian ini menampilkan menu yang berkaitan dengan pengelolaan a
 - **Profil Saya:** membuka halaman /account untuk mengubah foto, nama, kontak cadangan, dan kata sandi Anda.
 - **Keluar:** menampilkan kotak konfirmasi; setelah Anda menyetujui, sesi diakhiri dan Anda dikembalikan ke halaman login. Peristiwa keluar tercatat pada Log Aktivitas.
 
-Sejak versi 1.1, halaman Profil Saya menyimpan foto, nama, kontak cadangan, dan kata sandi lewat sistem. Data lain akun (email dan telepon utama, kantor, jabatan, profil akses) tetap diubah oleh admin berwenang melalui halaman Akun Admin.
+Halaman Profil Saya menyimpan foto, nama, kontak cadangan, dan kata sandi lewat sistem. Data lain akun (email dan telepon utama, kantor, jabatan, profil akses) tetap diubah oleh admin berwenang melalui halaman Akun Admin.
 
 ## Footer
 
-Footer merupakan bagian antarmuka yang berada di bagian bawah platform internal. Pada versi 1.0.10, Footer menampilkan teks hak cipta dan penghitung waktu sesi login yang tersisa. Versi aplikasi tidak ditampilkan pada Footer.
+Footer merupakan bagian antarmuka yang berada di bagian bawah platform internal. Saat ini, Footer menampilkan teks hak cipta dan penghitung waktu sesi login yang tersisa. Versi aplikasi tidak ditampilkan pada Footer.
 
 ### Informasi Hak Cipta
 
@@ -113,7 +113,7 @@ Sidebar merupakan panel navigasi utama yang digunakan untuk mengakses berbagai m
 
 Susunan menu yang ditampilkan dapat berbeda antara satu pengguna dan pengguna lainnya, bergantung pada profil akses serta hak akses yang diberikan kepada akun tersebut.
 
-Berikut adalah kelompok menu beserta fungsi dan alamat URL masing-masing pada versi 1.0.10.
+Berikut adalah kelompok menu beserta fungsi dan alamat URL masing-masing.
 
 ### Dasbor
 
@@ -242,6 +242,68 @@ Tombol **Kembali** di kepala formulir membuka daftar asalnya dengan pencarian, u
 
 Arahkan kursor ke gambar lalu klik ikon mata untuk melihatnya penuh di layar. Kumpulan gambar bisa digeser dengan panah kiri dan kanan. Tutup dengan Esc, klik area gelap, atau tombol ×.
 
+## Editor Halaman Website
+
+Halaman tetap website (Beranda, Tentang MATEX, Syarat dan Ketentuan, Karir, serta pengaturan halaman Kontak dan FAQ) memakai editor yang sama dengan tab di kiri: Umum, Konten & Bahasa, SEO, Media, Publikasi, dan Pratinjau. Isi khusus tiap halaman dijelaskan di panduan halamannya; bagian ini menjelaskan kolom yang sama di semua halaman. Simpan kapan saja dengan **Simpan Perubahan** di sisi kiri.
+
+### Tab Umum
+
+Kolom di tab Umum (Identitas internal, Bahasa Utama, Akses halaman, Urutan, Unggulan, Jenis halaman, dan Tampilan halaman) hanya informasi untuk halaman tetap: nilainya diatur sistem dan perubahan di sini tidak disimpan. Yang menentukan tayang adalah tab Publikasi dan status tiap bahasa.
+
+### Identitas internal
+
+Kode tetap halaman, misalnya home atau about, hanya untuk dibaca.
+
+### Akses halaman
+
+Pilihan Publik, Privat, atau Tidak Terdaftar ini belum berpengaruh: halaman tetap selalu bisa dibuka publik saat dipublikasikan. Untuk menyembunyikan halaman, pakai Simpan sebagai Draf di tab Publikasi.
+
+### Judul halaman
+
+Judul halaman per bahasa, wajib, paling banyak 255 karakter. Alamat halaman tetap tidak bisa diubah.
+
+### Status bahasa
+
+Draf atau Dipublikasikan untuk tiap bahasa. Halaman baru bisa terbit bila versi Bahasa Indonesia berstatus Dipublikasikan; versi English boleh tetap Draf.
+
+### Judul SEO
+
+Judul di hasil pencarian Google, paling banyak 255 karakter; bila kosong, judul halaman dipakai. Kotak **Pratinjau hasil pencarian** menunjukkan perkiraan tampilannya.
+
+### Deskripsi SEO
+
+Teks di bawah judul pada hasil pencarian Google, paling banyak 500 karakter; bila kosong, ringkasan halaman dipakai.
+
+### Alamat utama untuk mesin pencari
+
+Alamat canonical halaman, diawali http:// atau https://. Biarkan kosong kecuali developer meminta.
+
+### Meta robots
+
+Petunjuk untuk mesin pencari; bawaannya index,follow. Isi noindex hanya bila halaman memang tidak boleh muncul di Google.
+
+### Kata kunci
+
+Kata kunci dipisah koma, opsional. Google hampir tidak memakainya; isi seperlunya.
+
+### Judul dan deskripsi saat dibagikan
+
+Judul dan teks yang tampil saat tautan halaman dibagikan di media sosial atau aplikasi pesan.
+
+### Pilihan publikasi
+
+**Jangan Ubah Status** (bawaan) menyimpan isi tanpa mengubah tayang. **Simpan sebagai Draf** menyembunyikan halaman. **Publikasikan Sekarang** menayangkan setelah disimpan. **Jadwalkan Publikasi** menayangkan otomatis mulai waktu yang dipilih. **Arsipkan Halaman** menghentikan tayang; hasilnya sama dengan Simpan sebagai Draf.
+
+Status saat ini tampil di atas pilihan: Draf, Terjadwal, Dipublikasikan, atau Kedaluwarsa (waktu berakhir sudah lewat).
+
+### Mulai publikasi
+
+Tanggal dan waktu halaman mulai tampil untuk Jadwalkan Publikasi; harus di masa mendatang.
+
+### Waktu berakhir
+
+Tanggal dan waktu opsional setelah itu halaman otomatis berhenti tampil; harus setelah waktu mulai. Kosongkan dengan tombol pengosong tanggal dan waktu.
+
 ## Ketentuan Tampilan Menu dan Hak Akses Pengguna
 
 Tidak semua pengguna akan melihat susunan Sidebar yang sama. Menu yang ditampilkan dan tindakan yang dapat dilakukan ditentukan berdasarkan profil akses serta hak akses yang diberikan kepada akun pengguna.
@@ -285,7 +347,7 @@ Cari kalimat pesan atau gejala yang Anda lihat pada kolom pertama, lalu baca pen
 | Muncul "Akun Anda tidak aktif" | Akun dinonaktifkan oleh admin. | Hubungi admin berakses penuh untuk mengaktifkan kembali. |
 | Muncul "Profil akses Anda tidak aktif" | Profil Akses yang dipakai akun sedang dinonaktifkan. | Minta admin mengaktifkan kembali profil atau memindahkan akun Anda ke profil aktif. |
 | Muncul "Too many login attempts. Please try again later." | Batas 10 percobaan per 15 menit dari satu alamat IP tercapai (percobaan berhasil ikut dihitung; rekan sekantor satu jaringan berbagi kuota). | Berhenti mencoba, tunggu sekitar 15 menit, lalu coba lagi. Akun Anda tidak dikunci. |
-| Tombol Lupa Kata Sandi tidak mengirim email | Fitur pemulihan belum aktif pada versi 1.0.10. | Jangan menunggu email. Hubungi developer atau admin berwenang untuk mengatur ulang kata sandi. |
+| Tombol Lupa Kata Sandi tidak mengirim email | Fitur pemulihan belum aktif. | Jangan menunggu email. Hubungi developer atau admin berwenang untuk mengatur ulang kata sandi. |
 | Tiba-tiba kembali ke halaman login | Sesi 24 jam habis, atau server menolak sesi yang tidak valid. | Masuk kembali, lalu periksa apakah perubahan terakhir Anda sudah tersimpan. |
 | Menu yang dibutuhkan tidak ada di Sidebar | Akun tidak memiliki izin untuk menu itu. | Minta admin menambah izin pada Profil Akses Anda, lalu login ulang agar menu diperbarui. |
 | Menu tampil, tetapi tindakan ditolak ("Anda tidak memiliki hak akses…") | Izin dicabut setelah Anda login (server selalu memeriksa izin terbaru), atau izin view ada tetapi create/update/delete tidak. | Muat ulang halaman atau login ulang; minta izin yang sesuai. |

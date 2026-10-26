@@ -28,8 +28,9 @@
                 <div class="row g-4">
                   <div class="col-md-7">
                     <label class="form-label" for="key"
-                      >Kunci internal <span>*</span></label
-                    >
+                      >Kunci internal <span>*</span>
+                      <app-help-tip section="tab-umum--kunci-internal"
+                    /></label>
                     <input
                       id="key"
                       class="form-control"
@@ -49,7 +50,9 @@
                     }
                   </div>
                   <div class="col-md-5">
-                    <label class="form-label" for="status">Status</label>
+                    <label class="form-label" for="status"
+                      >Status <app-help-tip section="tab-umum--status"
+                    /></label>
                     <select
                       id="status"
                       class="form-select"
@@ -61,7 +64,10 @@
                     </select>
                   </div>
                   <div class="col-md-7">
-                    <label class="form-label">Induk kategori</label>
+                    <label class="form-label"
+                      >Induk kategori
+                      <app-help-tip section="tab-umum--induk-kategori"
+                    /></label>
                     <app-advance-dropdown
                       [selectSingle]="true"
                       [selectedOption]="
@@ -76,7 +82,9 @@
                     >
                   </div>
                   <div class="col-md-3">
-                    <label class="form-label" for="sort_order">Urutan</label>
+                    <label class="form-label" for="sort_order"
+                      >Urutan <app-help-tip section="tab-umum--urutan"
+                    /></label>
                     <input
                       id="sort_order"
                       class="form-control"
@@ -87,7 +95,9 @@
                     />
                   </div>
                   <div class="col-md-2">
-                    <label class="form-label">Penanda</label>
+                    <label class="form-label"
+                      >Penanda <app-help-tip section="tab-umum--unggulan"
+                    /></label>
                     <label class="app-check app-check-card category-check"
                       ><input type="checkbox" formControlName="is_featured" />
                       Unggulan</label
@@ -139,7 +149,10 @@
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-5">
-                      <label class="form-label">Slug URL <span>*</span></label>
+                      <label class="form-label"
+                        >Slug URL <span>*</span>
+                        <app-help-tip section="tab-konten-bahasa--slug-url"
+                      /></label>
                       <div class="input-group">
                         <span class="input-group-text">/kategori/</span
                         ><input
@@ -150,14 +163,19 @@
                     </div>
                     <div class="col-md-7">
                       <label class="form-label"
-                        >Nama kategori <span>*</span></label
+                        >Nama kategori <span>*</span>
+                        <app-help-tip
+                          section="tab-konten-bahasa--nama-kategori" /></label
                       ><input class="form-control" formControlName="id_name" />
                     </div>
                     <div class="col-12">
                       <div
                         class="d-flex align-items-center justify-content-between gap-2 mb-2"
                       >
-                        <label class="form-label mb-0">Deskripsi</label>
+                        <label class="form-label mb-0"
+                          >Deskripsi
+                          <app-help-tip section="tab-konten-bahasa--deskripsi"
+                        /></label>
                         <app-ai-field-action
                           label="Isi ini otomatis"
                           [loading]="assistingField === 'id_description'"
@@ -175,7 +193,10 @@
                 } @else {
                   <div class="row g-4">
                     <div class="col-md-5">
-                      <label class="form-label">URL slug <span>*</span></label>
+                      <label class="form-label"
+                        >URL slug <span>*</span>
+                        <app-help-tip section="tab-konten-bahasa--slug-url"
+                      /></label>
                       <div class="input-group">
                         <span class="input-group-text">/en/category/</span
                         ><input
@@ -186,14 +207,19 @@
                     </div>
                     <div class="col-md-7">
                       <label class="form-label"
-                        >Category name <span>*</span></label
+                        >Category name <span>*</span>
+                        <app-help-tip
+                          section="tab-konten-bahasa--nama-kategori" /></label
                       ><input class="form-control" formControlName="en_name" />
                     </div>
                     <div class="col-12">
                       <div
                         class="d-flex align-items-center justify-content-between gap-2 mb-2"
                       >
-                        <label class="form-label mb-0">Description</label>
+                        <label class="form-label mb-0"
+                          >Description
+                          <app-help-tip section="tab-konten-bahasa--deskripsi"
+                        /></label>
                         <app-ai-field-action
                           label="Translate from Indonesian"
                           icon="ri-translate-2"
@@ -270,14 +296,18 @@
                 @if (activeLocale === 'id') {
                   <div class="row g-4">
                     <div class="col-md-6">
-                      <label class="form-label">Judul SEO</label
+                      <label class="form-label"
+                        >Judul SEO
+                        <app-help-tip section="tab-seo--judul-seo" /></label
                       ><input
                         class="form-control"
                         formControlName="id_meta_title"
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Canonical URL</label
+                      <label class="form-label"
+                        >Canonical URL
+                        <app-help-tip section="tab-seo--canonical-url" /></label
                       ><input
                         class="form-control"
                         formControlName="id_canonical_url"
@@ -286,7 +316,10 @@
                     </div>
                     <div class="col-12">
                       <div class="category-field-heading">
-                        <label class="form-label">Deskripsi SEO</label>
+                        <label class="form-label"
+                          >Deskripsi SEO
+                          <app-help-tip section="tab-seo--deskripsi-seo"
+                        /></label>
                         <app-ai-field-action
                           label="Isi ini otomatis"
                           [loading]="assistingField === 'id_meta_description'"
@@ -303,7 +336,10 @@
                       ></textarea>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Judul saat dibagikan</label
+                      <label class="form-label"
+                        >Judul saat dibagikan
+                        <app-help-tip
+                          section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
                       ><input
                         class="form-control"
                         formControlName="id_og_title"
@@ -333,14 +369,18 @@
                 } @else {
                   <div class="row g-4">
                     <div class="col-md-6">
-                      <label class="form-label">SEO title</label
+                      <label class="form-label"
+                        >SEO title
+                        <app-help-tip section="tab-seo--judul-seo" /></label
                       ><input
                         class="form-control"
                         formControlName="en_meta_title"
                       />
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Canonical URL</label
+                      <label class="form-label"
+                        >Canonical URL
+                        <app-help-tip section="tab-seo--canonical-url" /></label
                       ><input
                         class="form-control"
                         formControlName="en_canonical_url"
@@ -349,7 +389,10 @@
                     </div>
                     <div class="col-12">
                       <div class="category-field-heading">
-                        <label class="form-label">SEO description</label>
+                        <label class="form-label"
+                          >SEO description
+                          <app-help-tip section="tab-seo--deskripsi-seo"
+                        /></label>
                         <app-ai-field-action
                           label="Translate from Indonesian"
                           icon="ri-translate-2"
@@ -374,7 +417,10 @@
                       ></textarea>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Social sharing title</label
+                      <label class="form-label"
+                        >Social sharing title
+                        <app-help-tip
+                          section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
                       ><input
                         class="form-control"
                         formControlName="en_og_title"
@@ -445,7 +491,10 @@
                 <div class="row g-4">
                   <div class="col-md-6">
                     <div class="category-media">
-                      <h6>Gambar utama</h6>
+                      <h6>
+                        Gambar utama
+                        <app-help-tip section="tab-media--gambar-utama" />
+                      </h6>
                       <small>Rasio lebar 4:3 direkomendasikan.</small
                       ><app-image-upload
                         [multipleImage]="false"
@@ -458,7 +507,10 @@
                   </div>
                   <div class="col-md-6">
                     <div class="category-media">
-                      <h6>Ikon kategori</h6>
+                      <h6>
+                        Ikon kategori
+                        <app-help-tip section="tab-media--ikon-kategori" />
+                      </h6>
                       <small>Gambar persegi atau transparan.</small
                       ><app-image-upload
                         [multipleImage]="false"
@@ -471,7 +523,12 @@
                   </div>
                   <div class="col-md-6">
                     <div class="category-media">
-                      <h6>Gambar berbagi sosial</h6>
+                      <h6>
+                        Gambar berbagi sosial
+                        <app-help-tip
+                          section="tab-media--gambar-berbagi-sosial"
+                        />
+                      </h6>
                       <small>Rekomendasi 1200 × 630px.</small
                       ><app-image-upload
                         [multipleImage]="false"

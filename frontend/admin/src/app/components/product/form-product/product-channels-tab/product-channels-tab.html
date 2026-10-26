@@ -8,7 +8,10 @@
   </div>
   <div class="row g-4 mb-4">
     <div class="col-md-6">
-      <label class="form-label">Tampilan harga publik</label>
+      <label class="form-label"
+        >Tampilan harga publik
+        <app-help-tip section="tab-harga-kanal--tampilan-harga-publik"
+      /></label>
       @if (editor.isBrowser) {
         <select2
           class="custom-select d-block"
@@ -22,6 +25,7 @@
       <label class="app-check app-check-card category-check mt-4"
         ><input type="checkbox" formControlName="internal_commerce_enabled" />
         Aktifkan commerce internal
+        <app-help-tip section="tab-harga-kanal--commerce-internal" />
         <small>(belum untuk v1)</small></label
       >
     </div>
@@ -68,7 +72,10 @@
         </div>
         <div class="row g-3">
           <div class="col-lg-3 col-md-6">
-            <label class="form-label">Untuk siapa?</label>
+            <label class="form-label"
+              >Untuk siapa?
+              <app-help-tip section="tab-harga-kanal--untuk-siapa"
+            /></label>
             @if (editor.isBrowser) {
               <select2
                 class="custom-select d-block"
@@ -97,7 +104,10 @@
             >
           </div>
           <div class="col-lg-3 col-md-6">
-            <label class="form-label">Nominal harga</label>
+            <label class="form-label"
+              >Nominal harga
+              <app-help-tip section="tab-harga-kanal--mata-uang-dan-nominal"
+            /></label>
             <div class="input-group">
               <span class="input-group-text">{{ priceSymbol($index) }}</span>
               <input
@@ -121,7 +131,9 @@
             }
           </div>
           <div class="col-lg-3 col-md-6">
-            <label class="form-label">Nama harga</label>
+            <label class="form-label"
+              >Nama harga <app-help-tip section="tab-harga-kanal--nama-harga"
+            /></label>
             <input
               class="form-control"
               formControlName="label"
@@ -133,7 +145,11 @@
           </div>
           @if (row.get('type')?.value === 'wholesale') {
             <div class="col-lg-3 col-md-6">
-              <label class="form-label">Minimum pembelian</label>
+              <label class="form-label"
+                >Minimum pembelian
+                <app-help-tip
+                  section="tab-harga-kanal--minimum-dan-maksimum-pembelian"
+              /></label>
               <input
                 type="text"
                 inputmode="numeric"
@@ -156,7 +172,10 @@
             </div>
           } @else {
             <div class="col-lg-3 col-md-6">
-              <label class="form-label">Harga pembanding</label>
+              <label class="form-label"
+                >Harga pembanding
+                <app-help-tip section="tab-harga-kanal--harga-pembanding"
+              /></label>
               <div class="input-group">
                 <span class="input-group-text">{{ priceSymbol($index) }}</span>
                 <input
@@ -251,7 +270,9 @@
         </div>
         <div class="row g-3">
           <div class="col-xl-3 col-md-5">
-            <label class="form-label">Platform *</label>
+            <label class="form-label"
+              >Platform * <app-help-tip section="tab-harga-kanal--platform"
+            /></label>
             @if (editor.isBrowser) {
               <select2
                 class="custom-select d-block"
@@ -277,9 +298,10 @@
                 ><input
                   type="checkbox"
                   formControlName="is_primary"
-                  (change)="selectPrimaryMarketplace(index)"
-                />
-                Rekomendasi utama</label
+                  (change)="selectPrimaryMarketplace(index)" />
+                Rekomendasi utama
+                <app-help-tip
+                  section="tab-harga-kanal--rekomendasi-utama" /></label
               ><label class="app-check app-check-card category-check"
                 ><input
                   type="checkbox"
@@ -291,7 +313,9 @@
             </div>
           </div>
           <div class="col-12">
-            <label class="form-label">Tautan produk *</label
+            <label class="form-label"
+              >Tautan produk *
+              <app-help-tip section="tab-harga-kanal--tautan-produk" /></label
             ><input
               type="url"
               class="form-control"

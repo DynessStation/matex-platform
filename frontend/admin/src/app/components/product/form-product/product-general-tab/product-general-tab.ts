@@ -5,6 +5,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { Select2Module } from 'ng-select2-component';
 
 import { AdvanceDropdown } from '../../../../shared/components/ui/advance-dropdown/advance-dropdown';
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
 import { ProductFormService } from '../product-form.service';
 
@@ -14,6 +15,7 @@ import { ProductFormService } from '../product-form.service';
   selector: 'app-product-general-tab',
 
   imports: [
+    HelpTip,
     AsyncPipe,
     ReactiveFormsModule,
     Select2Module,

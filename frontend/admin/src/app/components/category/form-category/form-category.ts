@@ -14,9 +14,10 @@ import { filter, finalize, switchMap, take } from 'rxjs';
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
+import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
-import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { mediaConfig } from '../../../shared/data/media-config';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   ICategory,
@@ -38,6 +39,7 @@ import { CategoryState } from '../../../shared/store/state/category.state';
 @Component({
   selector: 'app-form-category',
   imports: [
+    HelpTip,
     FormsModule,
     ReactiveFormsModule,
     NgbModule,

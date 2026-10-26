@@ -1,93 +1,120 @@
 # Halaman Artikel
 
 > **Untuk apa:** menulis, mengedit, dan menerbitkan artikel blog di website.
-> **Izin yang dibutuhkan:** article.view, .create, .update, .delete.
-> **Perlu diperhatikan:** jadwal tayang belum diproses otomatis; artikel yang dihapus hanya diarsipkan; unggah gambar lewat menu Media dahulu.
+> **Izin yang dibutuhkan:** article.view untuk melihat; article.create, article.update, article.delete untuk mengubah.
+> **Perlu diperhatikan:** status Dijadwalkan belum tayang otomatis saat waktunya tiba; artikel yang dihapus hanya diarsipkan.
 
 ## Gambaran Umum
 
-Halaman **Artikel** digunakan untuk mengelola artikel edukatif dan informatif yang dipublikasikan pada website MATEX, misalnya pengetahuan mengenai lateks dan produk berbahan dasar lateks. Artikel mendukung upaya penguatan citra merek dan optimalisasi SEO.
+Artikel adalah tulisan edukatif di halaman artikel website matexindo.com, misalnya pengetahuan tentang lateks. Setiap artikel ditulis dalam Bahasa Indonesia dan English, dilengkapi SEO, gambar, dan pengaturan tayang.
 
-Setiap artikel disusun dalam dua bahasa, yaitu Bahasa Indonesia dan English, serta dilengkapi pengaturan SEO, gambar, dan jadwal tayang.
+Formulir terdiri atas lima tab: Umum, Konten & Bahasa, SEO, Media, dan Publikasi. Tombol **Lanjut ke …** dan **Kembali ke …** di bawah tiap tab membantu berpindah; simpan dengan **Simpan Artikel**. Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/blog
 
-## Menampilkan dan Mencari Data Artikel
+## Daftar Artikel
 
-Daftar artikel tampil dalam tabel dengan kolom **Gambar**, **Judul**, **Dibuat Pada**, dan **Status**. Gunakan kolom **Cari** untuk mencari berdasarkan kunci internal atau judul, serta pilihan **Tampilkan** untuk mengatur jumlah baris per halaman. Artikel yang diberi tanda **Sematkan** tampil lebih atas pada daftar, diikuti artikel terbaru.
+Kotak **Cari** mencari di kunci internal dan judul. Menu aksi berisi Edit, Hapus, dan **Lihat** (membuka artikel di website pada tab baru). Kotak centang di kiri dipakai untuk menghapus beberapa artikel sekaligus.
 
-Kolom **Status** menampilkan nilai apa adanya, yaitu:
+### Status
 
-- **draft:** artikel belum tampil kepada pengunjung.
-- **published:** artikel sudah diterbitkan.
-- **scheduled:** artikel dijadwalkan (lihat catatan pada bagian Pengaturan Publikasi).
-- **archived:** artikel disembunyikan dari website.
+draft (belum tampil), published (tampil), scheduled (dijadwalkan, lihat catatan di tab Publikasi), atau archived (disembunyikan dari website).
 
-Pada kolom **Aksi** tersedia **Edit**, **Delete**, dan **View**. **View** membuka artikel pada website publik di tab baru. Tersedia pula kotak centang untuk menghapus beberapa artikel sekaligus.
+## Tab Umum
 
-## Menambahkan Artikel Baru
+Identitas internal dan penanda artikel.
 
-Klik tombol **Tambah Artikel**. Formulir **Buat Artikel** terdiri atas lima tab. Gunakan tombol **Lanjut ke …** dan **Kembali ke …** untuk berpindah antartab, lalu klik **Simpan Artikel** pada akhir pengisian.
+### Kunci internal
 
-### Tab Umum
+Kode tetap artikel untuk sistem, wajib dan unik, paling banyak 120 karakter, misalnya manfaat-lateks-alami. Hanya huruf kecil, angka, dan tanda hubung; tidak tampil sebagai judul.
 
-Isi **Kunci internal** (wajib, maksimal 120 karakter) dengan huruf kecil, angka, dan tanda hubung, misalnya manfaat-latex-alami. Kunci ini dipakai sistem untuk mengenali artikel dan tidak tampil sebagai judul. Kunci tidak boleh sama dengan artikel lain.
+### Penanda artikel
 
-Pilihan **Unggulan** menonjolkan artikel pada blok artikel pilihan, sedangkan **Sematkan** memprioritaskan artikel pada urutan daftar.
+**Unggulan** mendahulukan artikel di bagian artikel beranda website (3 artikel). **Sematkan** menaruh artikel paling atas di halaman daftar artikel website, sebelum artikel terbaru.
 
-### Tab Konten & Bahasa
+## Tab Konten & Bahasa
 
-Tersedia dua sub-tab, yaitu **Bahasa Indonesia (Utama)** dan **English**. Untuk setiap bahasa isi:
+Isi artikel, diisi untuk Bahasa Indonesia dan English (pilih bahasa dengan tombol di atas tab).
 
-- **Slug URL** (wajib): bagian akhir alamat artikel, ditulis manual dengan huruf kecil, angka, dan tanda hubung. Sistem tidak membuatnya otomatis dari judul.
-- **Judul** (wajib, maksimal 500 karakter).
-- **Ringkasan** (opsional, maksimal 2.000 karakter) yang tampil pada kartu dan daftar artikel.
-- **Isi artikel** (wajib) menggunakan editor teks. Gunakan Heading 2 untuk bagian utama, Heading 3 untuk subbagian, dan teks tautan yang menjelaskan tujuan tautan.
-3. Tab SEO
+### Slug URL
 
-Seluruh kolom bersifat opsional untuk setiap bahasa: **Judul SEO**, **Canonical URL**, **Deskripsi SEO**, **Judul saat dibagikan**, dan **Deskripsi saat dibagikan**. Apabila dikosongkan, judul dan ringkasan artikel digunakan.
+Bagian alamat artikel di website, wajib per bahasa, misalnya mengenal-lateks-alam. Ditulis manual dengan huruf kecil, angka, dan tanda hubung; tidak dibuat otomatis dari judul. Harus unik.
 
-### Tab Media
+### Judul
 
-**Gambar utama** (wajib) ditampilkan pada kartu, daftar, dan bagian atas artikel. **Gambar berbagi sosial** (opsional) dipakai ketika tautan artikel dibagikan ke WhatsApp dan media sosial.
+Judul artikel, wajib per bahasa, paling banyak 500 karakter.
 
-Gambar dipilih dari Media Library. Unggah gambar terlebih dahulu melalui menu **Media**, kemudian pilih melalui tab **Pilih File** pada formulir artikel.
+### Ringkasan
 
-### Tab Publikasi
+Satu atau dua kalimat yang tampil di kartu dan daftar artikel, opsional, paling banyak 2.000 karakter.
 
-Pilih salah satu status: **Simpan sebagai Draf**, **Publikasikan Sekarang**, **Jadwalkan Publikasi**, atau **Arsipkan**. Pada pilihan jadwal, isi **tanggal** dan **waktu** mulai tayang. **Berhenti tayang** bersifat opsional dan dapat dibatalkan dengan **Hapus jadwal**.
+### Isi artikel
 
-**Contoh simulasi (bukan data aktual MATEX)**
+Isi tulisan dengan editor teks, wajib per bahasa. Gunakan Heading 2 untuk bagian utama dan Heading 3 untuk subbagian; tulis teks tautan yang menjelaskan tujuannya. Kode skrip di dalam isi ditolak sistem.
 
-Kunci internal: mengenal-lateks-alam
+### Bantuan menulis
 
-Slug (ID): mengenal-lateks-alam | Slug (EN): getting-to-know-natural-latex
+Tombol **Isi ini otomatis** dan **Translate from Indonesian** membuat draf ringkasan, isi, atau terjemahan dengan bantuan AI. Selalu baca dan perbaiki hasilnya sebelum menyimpan.
 
-Judul (ID): Mengenal Lateks Alam dan Manfaatnya
+## Tab SEO
 
-Status: Publikasikan Sekarang
+Cara artikel tampil di Google dan saat dibagikan, per bahasa. Semua opsional; bila kosong, judul dan ringkasan artikel dipakai.
 
-## Mengelola Artikel yang Sudah Ada
+### Judul SEO
 
-- **Edit:** membuka formulir **Edit Artikel** dengan tab yang sama. Simpan dengan **Perbarui Artikel**.
-- **Delete:** memindahkan artikel ke tempat sampah sehingga tidak lagi tampil pada daftar dan website. Sistem meminta konfirmasi sebelum tindakan dilakukan.
-- **View:** melihat tampilan artikel pada website publik.
+Judul di hasil pencarian Google; idealnya sekitar 60 karakter.
 
-## Ketentuan Penting dalam Pengelolaan Artikel
+### Deskripsi SEO
 
-- Artikel hanya tampil pada website apabila berstatus **published**, versi bahasa yang dibuka tersedia, serta waktu tayang belum berakhir.
-- Kedua bahasa wajib dilengkapi sebelum artikel disimpan. Isi artikel yang memuat kode skrip akan ditolak oleh sistem.
-- Apabila kunci internal sudah dipakai artikel lain, sistem menampilkan pesan duplikat dan mengembalikan pengguna ke tab **Umum**.
-- Setiap perubahan artikel tercatat pada **Log Aktivitas**.
+Teks di bawah judul pada hasil pencarian Google; idealnya sekitar 155 karakter.
 
-Catatan**:** pada versi 1.0.10, status **scheduled** belum diproses otomatis menjadi **published** ketika waktu tayang tiba. Agar artikel tampil, gunakan pilihan **Publikasikan Sekarang** pada waktu yang diinginkan. Pengguna disarankan menguji pilihan **Jadwalkan Publikasi** terlebih dahulu dan memastikan hasilnya pada website sebelum mengandalkannya.
+### Canonical URL
 
-Informasi**:** Kategori Artikel dan Tag yang terdapat pada struktur sistem belum tersedia sebagai fitur pada versi 1.0.10 dan tidak digunakan pada formulir artikel.
+Alamat utama artikel bila isinya juga ada di alamat lain. Biarkan kosong kecuali developer meminta.
 
-## Praktik Pengelolaan Artikel yang Disarankan
+### Judul dan deskripsi saat dibagikan
 
-- Gunakan judul yang jelas dan memuat kata kunci yang relevan dengan topik.
-- Susun isi dengan heading yang berurutan agar mudah dibaca dan dipahami mesin pencari.
-- Lengkapi deskripsi SEO dan gambar berbagi sosial untuk artikel penting.
-- Periksa kembali fakta, istilah teknis, dan klaim produk sebelum mempublikasikan.
-- Gunakan bantuan penulisan otomatis hanya sebagai draf awal dan tinjau hasilnya. Judul, nama, label, dan slug harus ditulis sendiri oleh pengguna.
+Judul dan teks yang tampil saat tautan artikel dibagikan di WhatsApp atau media sosial.
+
+## Tab Media
+
+Gambar artikel dari Media. Unggah gambar lewat menu Media bila belum ada.
+
+### Gambar utama
+
+Gambar wajib yang tampil di kartu, daftar, dan bagian atas artikel.
+
+### Gambar berbagi sosial
+
+Gambar opsional saat tautan artikel dibagikan; bila kosong, gambar utama dipakai.
+
+## Tab Publikasi
+
+Pilih salah satu status lalu simpan.
+
+### Simpan sebagai draf
+
+Artikel disimpan tetapi belum tampil di website.
+
+### Publikasikan sekarang
+
+Artikel tampil di website setelah disimpan. Waktu terbit tercatat saat pertama kali dipublikasikan.
+
+### Jadwalkan publikasi
+
+Menyimpan tanggal dan waktu mulai tayang, tetapi saat ini status Dijadwalkan belum berubah otomatis menjadi tayang. Pada waktunya, buka artikel dan pilih **Publikasikan sekarang**.
+
+### Berhenti tayang
+
+Tanggal dan waktu opsional setelah itu artikel otomatis tidak tampil lagi. Hapus dengan **Hapus jadwal**.
+
+### Arsipkan
+
+Menyembunyikan artikel dari website tanpa menghapusnya.
+
+## Aturan Penting
+
+- Artikel tampil di website hanya bila berstatus published, versi bahasanya tersedia, sudah lewat waktu terbit, dan belum lewat waktu berhenti tayang.
+- Kedua bahasa wajib dilengkapi; kunci internal dan slug tiap bahasa harus unik. Bila kunci sudah dipakai, sistem kembali ke tab Umum dengan pesan duplikat.
+- Menghapus artikel mengarsipkannya sehingga tidak tampil lagi.
+- Perubahan artikel tercatat di Log Aktivitas.

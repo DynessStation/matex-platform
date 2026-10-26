@@ -9,7 +9,7 @@
   <div class="row g-4">
     <div class="col-md-6">
       <div class="category-media">
-        <h6>Gambar utama</h6>
+        <h6>Gambar utama <app-help-tip section="tab-media--gambar-utama" /></h6>
         <small>Rekomendasi minimal 1000 × 1000px.</small
         ><app-image-upload
           [multipleImage]="false"
@@ -22,7 +22,9 @@
     </div>
     <div class="col-md-6">
       <div class="category-media">
-        <h6>Gambar sosial</h6>
+        <h6>
+          Gambar sosial <app-help-tip section="tab-media--gambar-sosial" />
+        </h6>
         <small>Rekomendasi 1200 × 630px.</small
         ><app-image-upload
           [multipleImage]="false"
@@ -35,7 +37,9 @@
     </div>
     <div class="col-12">
       <div class="category-media">
-        <h6>Galeri produk</h6>
+        <h6>
+          Galeri produk <app-help-tip section="tab-media--galeri-produk" />
+        </h6>
         <small
           >Pilih maksimal 10 gambar atau video (MP4, WebM, OGG). Urutan pilihan
           menjadi urutan tampil di publik. Video potret ditampilkan maksimal

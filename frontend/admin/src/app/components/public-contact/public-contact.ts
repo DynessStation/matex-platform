@@ -14,10 +14,11 @@ import { Select2Data, Select2Module } from 'ng-select2-component';
 import { finalize } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-import { Button } from '../../shared/components/ui/button/button';
 import { AiFieldAction } from '../../shared/components/ui/ai-field-action/ai-field-action';
-import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
+import { Button } from '../../shared/components/ui/button/button';
+import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { ContentAssistantService } from '../../shared/services/content-assistant.service';
@@ -28,6 +29,7 @@ import { PublicContactService } from '../../shared/services/public-contact.servi
 @Component({
   selector: 'app-public-contact',
   imports: [
+    HelpTip,
     ReactiveFormsModule,
     RouterModule,
     TranslateModule,

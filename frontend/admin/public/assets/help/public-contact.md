@@ -1,64 +1,80 @@
 # Halaman Pengaturan Kontak
 
-> **Untuk apa:** mengatur kanal kontak (WhatsApp, email, dll.) dan topik formulir kontak beserta email penerimanya.
-> **Izin yang dibutuhkan:** public_contact.view, .update.
-> **Perlu diperhatikan:** belum ada halaman admin untuk membaca pesan masuk — pesan datang lewat email penerima; pastikan email penerima aktif.
+> **Untuk apa:** mengatur kanal kontak (WhatsApp, email, dan lainnya) dan topik formulir kontak beserta email penerimanya.
+> **Izin yang dibutuhkan:** public_contact.view untuk melihat; public_contact.update untuk mengubah.
+> **Perlu diperhatikan:** belum ada halaman admin untuk membaca pesan masuk; pesan datang lewat email penerima, jadi pastikan email itu aktif.
 
 ## Gambaran Umum
 
-Halaman **Pengaturan Kontak** digunakan untuk mengelola informasi kontak yang ditampilkan kepada pengunjung website, serta pilihan topik pada formulir kontak publik beserta alamat email penerimanya. Seluruh pengaturan pada halaman ini disimpan sekaligus melalui satu tombol simpan.
+Halaman ini mengatur informasi kontak di halaman kontak website dan pilihan topik di formulir kontak. Semua pengaturan disimpan sekaligus dengan **Simpan Pengaturan Kontak**. Alamat, peta, dan jam operasional diatur di halaman Kantor.
 
 URL: https://internal.matexindo.com/public-contact
 
 ## Kanal Kontak
 
-Bagian **Kanal Kontak** berisi nomor, email, dan tautan yang tampil pada website publik. Klik **Tambah Kanal** untuk menambahkan kanal baru. Setiap kanal ditampilkan dalam kartu bernomor dengan isian berikut:
+Nomor, email, dan tautan yang tampil di website. Klik **Tambah Kanal** untuk menambah kanal (paling banyak 30). Kanal yang dihapus dari daftar disembunyikan dari website setelah pengaturan disimpan.
 
-- **Nama internal** (wajib): pembeda kanal bagi sistem dan tidak tampil kepada pengunjung. Gunakan huruf kecil, angka, dan tanda hubung, misalnya whatsapp-sales. Nama tidak boleh sama dengan kanal lain.
-- **Jenis** (wajib): WhatsApp, Email, Telepon, Media sosial, Website, atau Lainnya.
-- **Nilai** (wajib): isi kanal, misalnya nomor atau alamat email. Untuk WhatsApp, nomor ditulis dengan awalan tanda plus dan kode negara, misalnya +62…
-- **Tautan:** untuk jenis WhatsApp, Email, dan Telepon, tautan dibuat otomatis dari nilai kanal. Untuk jenis lain, isi alamat tautan secara manual dengan awalan http, https, mailto, atau tel.
-- **Urutan:** menentukan urutan tampil.
-- **Utama:** menandai kanal utama untuk jenis kontak tersebut.
-- **Publik:** menentukan apakah kanal ditampilkan kepada pengunjung (bawaan aktif).
-- **Label dan Keterangan** dalam Bahasa Indonesia dan English. Kedua label wajib diisi.
+### Nama internal
 
-Jumlah kanal maksimal 30. Kanal yang dihapus dari daftar akan disembunyikan dari website setelah pengaturan disimpan.
+Kode pembeda kanal untuk sistem, wajib dan unik, misalnya whatsapp-sales. Hanya huruf kecil, angka, dan tanda hubung; tidak tampil ke pengunjung.
+
+### Jenis
+
+WhatsApp, Email, Telepon, Media sosial, Website, atau Lainnya, wajib. Jenis menentukan ikon dan cara tautan dibuat.
+
+### Nilai
+
+Isi kanal yang ditampilkan, wajib, misalnya nomor atau alamat email. Nomor WhatsApp ditulis dengan tanda plus dan kode negara, misalnya +6281234567890.
+
+### Tautan
+
+Untuk WhatsApp, Email, dan Telepon dibuat otomatis dari nilai. Untuk jenis lain, isi alamat yang diawali http, https, mailto, atau tel.
+
+### Urutan
+
+Angka urutan tampil kanal di website; angka kecil tampil lebih dulu.
+
+### Utama
+
+Menandai kanal utama untuk jenisnya, misalnya nomor WhatsApp yang dipakai tombol chat utama.
+
+### Publik
+
+Bila dimatikan, kanal tetap tersimpan tetapi tidak tampil di website.
+
+### Label dan keterangan
+
+Nama kanal dan penjelasan singkat untuk pengunjung, dalam Bahasa Indonesia dan English. Kedua label wajib; tombol bantuan menulis bisa membuat draf keterangan atau terjemahannya.
 
 ## Topik Pesan
 
-Bagian **Topik Pesan** menentukan pilihan topik pada formulir kontak website dan alamat email yang menerima notifikasi untuk topik tersebut. Klik **Tambah Topik** untuk menambahkan topik. Isian setiap topik:
+Pilihan topik di formulir kontak website dan email yang menerima pesan untuk tiap topik. Klik **Tambah Topik** untuk menambah. Minimal satu topik harus aktif agar formulir bisa dikirim; topik yang dihapus dari daftar hanya dinonaktifkan.
 
-- **Nama internal** (wajib) dengan aturan penulisan yang sama seperti kanal, misalnya general-inquiry.
-- **Email Penerima** (wajib): alamat email yang menerima pesan untuk topik ini.
-- **Urutan** dan **Aktif:** menentukan urutan dan apakah topik tampil sebagai pilihan pada formulir publik.
-- **Topik** dalam Bahasa Indonesia dan English (keduanya wajib).
+### Nama internal
 
-Minimal satu topik harus tersedia agar formulir kontak publik dapat dikirim. Topik yang dihapus dari daftar tidak dihapus permanen, tetapi dinonaktifkan. Topik bawaan yang tersedia saat ini adalah Informasi Produk, Penawaran & Pembelian, Kemitraan & Kerja Sama, dan Lainnya.
+Kode pembeda topik untuk sistem, wajib dan unik, misalnya general-inquiry, dengan aturan penulisan yang sama seperti kanal.
 
-## Alamat dan Peta
+### Email penerima
 
-Bagian ini hanya berisi informasi bahwa alamat, koordinat, tautan peta, dan jam operasional dikelola dari halaman **Kantor**. Gunakan tombol **Kelola Kantor** untuk berpindah ke halaman tersebut.
+Alamat email yang menerima pesan untuk topik ini, wajib. Pastikan alamatnya aktif dan dipantau.
 
-## Menyimpan Pengaturan
+### Urutan dan aktif
 
-1. Periksa seluruh kanal dan topik, terutama kolom yang wajib diisi.
-2. Klik **Simpan Pengaturan Kontak**.
-3. Apabila terdapat isian yang belum lengkap atau nama internal yang sama, sistem menandai kolom dengan warna merah dan menampilkan pesan peringatan. Perbaiki kolom tersebut kemudian simpan kembali.
+Urutan pilihan topik di formulir, dan apakah topik ditawarkan ke pengunjung.
 
-## Pembuatan Teks Otomatis
+### Topik
 
-Pada kolom keterangan tersedia tombol bantuan penulisan, yaitu **Isi ini otomatis** untuk membuat draf keterangan Bahasa Indonesia dan **Translate from Indonesian** untuk menerjemahkan keterangan ke Bahasa Inggris. Fitur ini bergantung pada konfigurasi layanan di server; apabila belum aktif, sistem menampilkan pesan bahwa fitur belum aktif. Hasil bantuan penulisan harus selalu diperiksa kembali sebelum disimpan.
+Teks topik yang dipilih pengunjung, wajib dalam Bahasa Indonesia dan English, misalnya Informasi Produk.
 
 ## Alur Pesan dari Pengunjung
 
-Pengunjung website mengirim pesan melalui formulir kontak dengan memilih topik, mengisi nama, email atau telepon, dan pesan, serta menyetujui ketentuan. Pesan disimpan oleh sistem dan notifikasi dikirim melalui email ke alamat penerima sesuai topik yang dipilih. Sistem membatasi pengiriman berulang dalam waktu singkat untuk mengurangi penyalahgunaan.
+Pengunjung memilih topik, mengisi nama, email atau telepon, dan pesan, lalu menyetujui ketentuan. Pesan disimpan sistem dengan nomor MSG-<nomor> dan dikirim ke email penerima topiknya. Pengiriman berulang dalam waktu singkat dibatasi untuk mencegah penyalahgunaan.
 
-Catatan**:** pada versi 1.0.10 belum tersedia halaman admin untuk melihat dan mengelola pesan masuk. Pesan diterima melalui email penerima yang diatur pada topik. Pengguna perlu memastikan alamat email penerima aktif dan dipantau secara berkala.
+Jumlah pesan hari ini tampil di Dasbor. Isi pesan dan balasannya diurus lewat email; bila pengiriman email gagal, pesan tetap tersimpan di sistem.
 
-## Praktik Pengelolaan Kontak yang Disarankan
+## Aturan Penting
 
-- Gunakan nomor dan alamat email resmi yang aktif dan dipantau.
-- Lengkapi label dalam Bahasa Indonesia dan English agar tampil benar pada kedua bahasa website.
-- Periksa tautan WhatsApp dan email pada website setelah perubahan disimpan.
-- Gunakan satu alamat penerima per topik yang jelas penanggung jawabnya.
+- Bila ada isian yang belum lengkap atau nama internal yang sama, kolomnya ditandai merah dan penyimpanan dibatalkan.
+- Lengkapi label kedua bahasa agar tampil benar di website Bahasa Indonesia dan English.
+- Periksa tautan WhatsApp dan email di website setelah menyimpan.
+- Perubahan pengaturan kontak tercatat di Log Aktivitas.

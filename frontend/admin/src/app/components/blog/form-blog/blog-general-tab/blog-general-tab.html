@@ -5,7 +5,10 @@
   </div>
   <div class="row g-4">
     <div class="col-md-7">
-      <label class="form-label" for="key">Kunci internal <span>*</span></label>
+      <label class="form-label" for="key"
+        >Kunci internal <span>*</span>
+        <app-help-tip section="tab-umum--kunci-internal"
+      /></label>
       <input
         id="key"
         class="form-control"
@@ -31,7 +34,9 @@
       }
     </div>
     <div class="col-md-5">
-      <label class="form-label">Penanda artikel</label>
+      <label class="form-label"
+        >Penanda artikel <app-help-tip section="tab-umum--penanda-artikel"
+      /></label>
       <div class="article-checks">
         <label class="app-check app-check-card"
           ><input type="checkbox" formControlName="is_featured" />

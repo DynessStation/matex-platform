@@ -21,19 +21,25 @@
   @if (editor.activeLocale === 'id') {
     <div class="row g-4">
       <div class="col-md-5">
-        <label class="form-label">Slug URL *</label>
+        <label class="form-label"
+          >Slug URL * <app-help-tip section="tab-konten-bahasa--slug-url"
+        /></label>
         <div class="input-group">
           <span class="input-group-text">/produk/</span
           ><input class="form-control" formControlName="id_slug" />
         </div>
       </div>
       <div class="col-md-7">
-        <label class="form-label">Nama produk *</label
+        <label class="form-label"
+          >Nama produk *
+          <app-help-tip section="tab-konten-bahasa--nama-produk" /></label
         ><input class="form-control" formControlName="id_name" />
       </div>
       <div class="col-12">
         <div class="field-heading">
-          <label class="form-label">Ringkasan</label>
+          <label class="form-label"
+            >Ringkasan <app-help-tip section="tab-konten-bahasa--ringkasan"
+          /></label>
           <app-ai-field-action
             label="Isi ringkasan otomatis"
             [loading]="assistant.assistingField === 'id_short_description'"
@@ -51,7 +57,10 @@
       </div>
       <div class="col-12">
         <div class="field-heading">
-          <label class="form-label">Deskripsi lengkap</label>
+          <label class="form-label"
+            >Deskripsi lengkap
+            <app-help-tip section="tab-konten-bahasa--deskripsi-lengkap"
+          /></label>
           <app-ai-field-action
             label="Isi deskripsi otomatis"
             loadingLabel="Sedang menyusun deskripsi…"
@@ -104,7 +113,10 @@
               </button>
               <div class="row g-3">
                 <div class="col-md-5">
-                  <label class="form-label">Nama spesifikasi</label
+                  <label class="form-label"
+                    >Nama spesifikasi
+                    <app-help-tip
+                      section="tab-konten-bahasa--spesifikasi" /></label
                   ><input
                     class="form-control"
                     formControlName="label"
@@ -156,19 +168,25 @@
   } @else {
     <div class="row g-4">
       <div class="col-md-5">
-        <label class="form-label">URL slug *</label>
+        <label class="form-label"
+          >URL slug * <app-help-tip section="tab-konten-bahasa--slug-url"
+        /></label>
         <div class="input-group">
           <span class="input-group-text">/en/product/</span
           ><input class="form-control" formControlName="en_slug" />
         </div>
       </div>
       <div class="col-md-7">
-        <label class="form-label">Product name *</label
+        <label class="form-label"
+          >Product name *
+          <app-help-tip section="tab-konten-bahasa--nama-produk" /></label
         ><input class="form-control" formControlName="en_name" />
       </div>
       <div class="col-12">
         <div class="field-heading">
-          <label class="form-label">Summary</label>
+          <label class="form-label"
+            >Summary <app-help-tip section="tab-konten-bahasa--ringkasan"
+          /></label>
           <app-ai-field-action
             label="Translate Indonesian summary"
             loadingLabel="Translating the summary…"
@@ -189,7 +207,10 @@
       </div>
       <div class="col-12">
         <div class="field-heading">
-          <label class="form-label">Full description</label>
+          <label class="form-label"
+            >Full description
+            <app-help-tip section="tab-konten-bahasa--deskripsi-lengkap"
+          /></label>
           <app-ai-field-action
             label="Translate Indonesian description"
             loadingLabel="Translating the description…"
@@ -246,7 +267,10 @@
               </button>
               <div class="row g-3">
                 <div class="col-md-5">
-                  <label class="form-label">Specification name</label
+                  <label class="form-label"
+                    >Specification name
+                    <app-help-tip
+                      section="tab-konten-bahasa--spesifikasi" /></label
                   ><input
                     class="form-control"
                     formControlName="label"

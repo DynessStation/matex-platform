@@ -3,6 +3,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { Select2Module } from 'ng-select2-component';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
 import { formatPrice } from '../form-product.util';
 import { ProductFormService } from '../product-form.service';
@@ -12,7 +13,12 @@ import { ProductFormService } from '../product-form.service';
 @Component({
   selector: 'app-product-channels-tab',
 
-  imports: [ReactiveFormsModule, Select2Module, LocalizedNumberInputDirective],
+  imports: [
+    HelpTip,
+    ReactiveFormsModule,
+    Select2Module,
+    LocalizedNumberInputDirective,
+  ],
 
   templateUrl: './product-channels-tab.html',
 

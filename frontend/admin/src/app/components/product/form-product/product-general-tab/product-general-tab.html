@@ -5,7 +5,9 @@
   </div>
   <div class="row g-4">
     <div class="col-md-6">
-      <label class="form-label">Kunci internal *</label
+      <label class="form-label"
+        >Kunci internal *
+        <app-help-tip section="tab-umum--kunci-internal" /></label
       ><input
         class="form-control"
         formControlName="key"
@@ -22,7 +24,8 @@
       }
     </div>
     <div class="col-md-6">
-      <label class="form-label">SKU *</label
+      <label class="form-label"
+        >SKU * <app-help-tip section="tab-umum--sku" /></label
       ><input
         class="form-control"
         formControlName="sku"
@@ -37,7 +40,9 @@
       }
     </div>
     <div class="col-md-4">
-      <label class="form-label">Bentuk produk</label>
+      <label class="form-label"
+        >Bentuk produk <app-help-tip section="tab-umum--bentuk-produk"
+      /></label>
       @if (editor.isBrowser) {
         <select2
           class="custom-select d-block"
@@ -51,7 +56,9 @@
       >
     </div>
     <div class="col-md-4">
-      <label class="form-label">Status</label>
+      <label class="form-label"
+        >Status <app-help-tip section="tab-umum--status"
+      /></label>
       @if (editor.isBrowser) {
         <select2
           class="custom-select d-block"
@@ -62,7 +69,8 @@
       }
     </div>
     <div class="col-md-4">
-      <label class="form-label">Satuan</label
+      <label class="form-label"
+        >Satuan <app-help-tip section="tab-umum--satuan" /></label
       ><input
         class="form-control"
         formControlName="unit"
@@ -70,7 +78,9 @@
       />
     </div>
     <div class="col-md-6">
-      <label class="form-label">Jenis / kelompok produk</label
+      <label class="form-label"
+        >Jenis / kelompok produk
+        <app-help-tip section="tab-umum--jenis-kelompok-produk" /></label
       ><input
         class="form-control"
         formControlName="product_kind"
@@ -81,7 +91,8 @@
       >
     </div>
     <div class="col-12">
-      <label class="form-label">Kategori</label
+      <label class="form-label"
+        >Kategori <app-help-tip section="tab-umum--kategori" /></label
       ><app-advance-dropdown
         [selectSingle]="false"
         [selectedOption]="editor.categoryIds"
@@ -96,19 +107,24 @@
       }
     </div>
     <div class="col-md-4">
-      <label class="form-label">Barcode / GTIN</label
+      <label class="form-label"
+        >Barcode / GTIN <app-help-tip section="tab-umum--barcode-gtin" /></label
       ><input class="form-control" formControlName="barcode" />
     </div>
     <div class="col-md-4">
-      <label class="form-label">Kode manufaktur</label
+      <label class="form-label"
+        >Kode manufaktur
+        <app-help-tip section="tab-umum--kode-manufaktur" /></label
       ><input class="form-control" formControlName="manufacturer_code" />
     </div>
     <div class="col-md-4">
-      <label class="form-label">HS code</label
+      <label class="form-label"
+        >HS code <app-help-tip section="tab-umum--hs-code" /></label
       ><input class="form-control" formControlName="hs_code" />
     </div>
     <div class="col-md-4">
-      <label class="form-label">Negara asal</label
+      <label class="form-label"
+        >Negara asal <app-help-tip section="tab-umum--asal-produk" /></label
       ><input class="form-control" formControlName="country_origin" />
     </div>
     <div class="col-md-4">
@@ -128,7 +144,9 @@
       />
     </div>
     <div class="col-xl-3 col-md-6">
-      <label class="form-label">Berat (gram)</label
+      <label class="form-label"
+        >Berat (gram)
+        <app-help-tip section="tab-umum--berat-dan-dimensi" /></label
       ><input
         type="text"
         inputmode="numeric"
@@ -180,7 +198,9 @@
       }
     </div>
     <div class="col-md-3">
-      <label class="form-label">Minimum pesanan</label
+      <label class="form-label"
+        >Minimum pesanan
+        <app-help-tip section="tab-umum--minimum-pesanan" /></label
       ><input
         type="text"
         inputmode="numeric"
@@ -190,7 +210,8 @@
       />
     </div>
     <div class="col-md-3">
-      <label class="form-label">Lead time (hari)</label
+      <label class="form-label"
+        >Lead time (hari) <app-help-tip section="tab-umum--lead-time" /></label
       ><input
         type="text"
         inputmode="numeric"
@@ -200,7 +221,9 @@
       />
     </div>
     <div class="col-md-3">
-      <label class="form-label">Status stok</label>
+      <label class="form-label"
+        >Status stok <app-help-tip section="tab-umum--status-stok"
+      /></label>
       @if (editor.isBrowser) {
         <select2
           class="custom-select d-block"
@@ -222,18 +245,19 @@
     </div>
     <div class="col-md-4">
       <label class="app-check app-check-card category-check"
-        ><input type="checkbox" formControlName="manage_stock" /> Kelola
-        stok</label
-      >
+        ><input type="checkbox" formControlName="manage_stock" /> Kelola stok
+        <app-help-tip section="tab-umum--kelola-stok"
+      /></label>
     </div>
     <div class="col-md-4">
       <label class="app-check app-check-card category-check"
-        ><input type="checkbox" formControlName="is_featured" /> Produk
-        unggulan</label
-      >
+        ><input type="checkbox" formControlName="is_featured" /> Produk unggulan
+        <app-help-tip section="tab-umum--produk-unggulan"
+      /></label>
     </div>
     <div class="col-md-4">
-      <label class="form-label">Urutan</label
+      <label class="form-label"
+        >Urutan <app-help-tip section="tab-umum--urutan" /></label
       ><input
         type="text"
         inputmode="numeric"

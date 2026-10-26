@@ -1,65 +1,60 @@
 # Halaman FAQ
 
 > **Untuk apa:** mengelola daftar tanya-jawab di halaman FAQ website.
-> **Izin yang dibutuhkan:** faq.view, .create, .update, .delete.
+> **Izin yang dibutuhkan:** faq.view untuk melihat; faq.create, faq.update, faq.delete untuk mengubah.
 > **Perlu diperhatikan:** setiap FAQ wajib dua bahasa; FAQ yang dihapus langsung hilang dari website.
 
 ## Gambaran Umum
 
-Halaman **FAQ** digunakan untuk mengelola daftar pertanyaan dan jawaban yang ditampilkan pada halaman FAQ website publik. Setiap FAQ disusun dalam dua bahasa, yaitu Bahasa Indonesia dan English.
+FAQ adalah pasangan pertanyaan dan jawaban di halaman FAQ website matexindo.com, ditulis dalam Bahasa Indonesia dan English. Judul dan SEO halaman FAQ sendiri diatur lewat tombol **Pengaturan Halaman & SEO** di kepala halaman.
+
+Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/faq
 
-## Menampilkan dan Mencari Data FAQ
+## Daftar FAQ
 
-Gunakan kolom **Cari** untuk mencari berdasarkan teks pertanyaan atau nama internal FAQ, dan pilihan **Tampilkan** untuk mengatur jumlah baris per halaman (15, 25, 50, atau 100). Mengeklik baris pada tabel membuka halaman edit FAQ tersebut.
+Kotak **Cari** mencari di teks pertanyaan dan nama internal. Buka FAQ lewat menu tiga titik › Edit. Kotak centang di kiri dipakai untuk menghapus beberapa FAQ sekaligus.
 
-## Memahami Tabel Daftar FAQ
+### Bahasa
 
-- **Pertanyaan:** teks pertanyaan.
-- **Nama internal FAQ:** pembeda FAQ bagi sistem.
-- **Bahasa:** menunjukkan kelengkapan, yaitu Indonesia + English apabila kedua bahasa lengkap.
-- **Urutan:** urutan tampil pada website.
-- **Dibuat Pada:** tanggal data dibuat.
-- **Tampil di website:** sakelar untuk menampilkan atau menyembunyikan FAQ.
+"Indonesia + English" bila kedua bahasa lengkap, "Belum lengkap" bila salah satu belum diisi.
 
-## Menambahkan FAQ Baru
+### Urutan
 
-1. Klik tombol **+ Tambah FAQ**.
-2. Isi **Nama internal FAQ** dengan huruf kecil, angka, dan tanda hubung, misalnya pengiriman-produk. Nama ini tidak tampil kepada pengunjung dan tidak boleh sama dengan FAQ lain.
-3. Isi **Urutan** dengan angka 0 atau lebih; angka lebih kecil tampil lebih awal.
-4. Pada kartu **Bahasa Indonesia**, isi **Pertanyaan** (maksimal 500 karakter) dan **Jawaban**.
-5. Pada kartu **English**, isi pertanyaan dan jawaban dalam Bahasa Inggris.
-6. Pastikan pilihan **Aktif** sesuai kebutuhan, lalu klik **Simpan FAQ**.
+Urutan tampil di website; angka kecil tampil lebih dulu.
 
-Kedua bahasa wajib dilengkapi. Tersedia pula tombol bantuan penulisan seperti **Isi jawaban otomatis** dan **Terjemahkan jawaban Indonesia**. Draf yang dihasilkan perlu diperiksa kembali sebelum disimpan.
+### Tampil di website
 
-**Contoh simulasi (bukan data aktual MATEX)**
+Sakelar untuk menampilkan atau menyembunyikan FAQ di website tanpa menghapusnya. Sistem meminta konfirmasi sebelum mengubah.
 
-Nama internal: pemesanan-produk | Urutan: 1
+## Formulir FAQ
 
-Pertanyaan (ID): Bagaimana cara memesan produk MATEX?
+Formulir dibuka dari **+ Tambah FAQ** atau menu aksi **Edit**; simpan dengan tombol di bawah formulir.
 
-Jawaban (ID): Pengunjung dapat menghubungi kami melalui halaman Kontak atau membeli melalui tautan marketplace pada halaman produk.
+### Nama internal FAQ
 
-## Mengelola FAQ yang Sudah Ada
+Kode pembeda FAQ untuk sistem, wajib dan unik, misalnya pengiriman-produk. Hanya huruf kecil, angka, dan tanda hubung; tidak tampil ke pengunjung.
 
-- **Edit:** mengubah isi FAQ, urutan, atau status. Simpan dengan **Perbarui FAQ**.
-- **Sakelar Tampil / Disembunyikan:** menampilkan atau menyembunyikan FAQ pada website. Sistem meminta konfirmasi sebelum status berubah.
-- **Hapus:** menghapus FAQ dari daftar. Penghapusan dapat dilakukan satu per satu atau massal dengan mencentang beberapa baris.
+### Urutan
 
-## Ketentuan Penting dalam Pengelolaan FAQ
+Angka 0 atau lebih untuk mengatur posisi di website; angka kecil tampil lebih dulu.
 
-- FAQ hanya tampil pada website apabila berstatus aktif dan memiliki isi pada bahasa yang sedang dibuka pengunjung.
-- Nama internal FAQ tidak dapat digunakan ulang. Sistem menampilkan pesan bahwa kunci FAQ sudah digunakan.
-- FAQ yang dihapus tidak lagi tampil pada website. Berbeda dengan Jabatan dan Kantor, FAQ tidak perlu dinonaktifkan terlebih dahulu.
-- Judul, ringkasan, SEO, dan status publikasi halaman FAQ diatur pada **Pengaturan halaman & SEO** (tombol pada halaman ini). Daftar pertanyaan dan jawaban tetap dikelola melalui menu FAQ.
+### Pertanyaan
 
-Catatan**:** pengelompokan FAQ berdasarkan kategori telah disiapkan pada struktur data, tetapi belum tersedia pengelolaannya melalui halaman admin pada versi 1.0.10.
+Pertanyaan yang dilihat pengunjung, wajib untuk kedua bahasa, paling banyak 500 karakter.
 
-## Praktik Pengelolaan FAQ yang Disarankan
+### Jawaban
 
-- Tuliskan pertanyaan sebagaimana yang biasa diajukan pengunjung.
-- Gunakan jawaban yang singkat, jelas, dan konsisten dengan informasi produk pada website.
-- Tinjau FAQ secara berkala dan sembunyikan FAQ yang sudah tidak berlaku.
-- Pastikan terjemahan English memiliki makna yang setara dengan versi Indonesia.
+Jawaban pertanyaan, wajib untuk kedua bahasa. Tombol **Isi jawaban otomatis** dan **Terjemahkan jawaban Indonesia** membuat draf dengan bantuan AI; selalu periksa hasilnya sebelum menyimpan.
+
+### Aktif
+
+Bila tidak dicentang, FAQ disimpan tetapi tidak tampil di website.
+
+## Aturan Penting
+
+- Kedua bahasa wajib dilengkapi sebelum disimpan.
+- Nama internal tidak boleh sama dengan FAQ lain.
+- FAQ yang dihapus langsung hilang dari website.
+- Perubahan FAQ tercatat di Log Aktivitas.

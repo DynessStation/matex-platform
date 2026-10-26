@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { BlogFormService } from '../blog-form.service';
 
 // General tab (key, flags) of the article form.
@@ -8,7 +9,7 @@ import { BlogFormService } from '../blog-form.service';
 @Component({
   selector: 'app-blog-general-tab',
 
-  imports: [ReactiveFormsModule],
+  imports: [HelpTip, ReactiveFormsModule],
 
   templateUrl: './blog-general-tab.html',
 

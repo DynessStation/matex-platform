@@ -38,4 +38,4 @@ Apabila ketentuan di atas belum terpenuhi, sistem menampilkan pesan peringatan d
 - Pastikan informasi perusahaan yang ditampilkan sudah disetujui pihak yang berwenang.
 - Tinjau kembali konten secara berkala agar tetap relevan dengan perkembangan perusahaan.
 
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** pada tab Media dapat muncul pesan merah "Slot gambar tidak dikenali" walaupun slot Gambar konten Tentang MATEX sudah dipilih. Abaikan pesan ini bila slot sudah benar; laporkan ke developer bila penyimpanan gagal.
+**Kendala yang diketahui:** pada tab Media dapat muncul pesan merah "Slot gambar tidak dikenali" walaupun slot Gambar konten Tentang MATEX sudah dipilih. Abaikan pesan ini bila slot sudah benar; laporkan ke developer bila penyimpanan gagal.

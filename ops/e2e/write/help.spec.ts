@@ -192,6 +192,13 @@ test('every "?" on lists and forms points at an anchor in its guide', async ({ p
     '/chair/create',
     '/office/create',
     '/product',
+    '/product/create',
+    '/category',
+    '/blog/create',
+    '/faq/create',
+    '/website-page/home',
+    '/public-contact',
+    '/activity-log',
     '/account',
   ]) {
     await page.goto(`${stack.adminOrigin}${path}`);

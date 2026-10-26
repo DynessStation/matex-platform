@@ -25,7 +25,8 @@
   @if (editor.activeLocale === 'id') {
     <div class="row g-4">
       <div class="col-md-6">
-        <label class="form-label">Judul SEO</label
+        <label class="form-label"
+          >Judul SEO <app-help-tip section="tab-seo--judul-seo" /></label
         ><input
           class="form-control"
           formControlName="id_meta_title"
@@ -33,7 +34,9 @@
         />
       </div>
       <div class="col-md-6">
-        <label class="form-label">Canonical URL</label
+        <label class="form-label"
+          >Canonical URL
+          <app-help-tip section="tab-seo--canonical-url" /></label
         ><input
           class="form-control"
           formControlName="id_canonical_url"
@@ -42,7 +45,9 @@
       </div>
       <div class="col-12">
         <div class="article-field-heading">
-          <label class="form-label">Deskripsi SEO</label>
+          <label class="form-label"
+            >Deskripsi SEO <app-help-tip section="tab-seo--deskripsi-seo"
+          /></label>
           <app-ai-field-action
             label="Isi deskripsi otomatis"
             [loading]="assistant.assistingField === 'id_meta_description'"
@@ -57,7 +62,10 @@
         ></textarea>
       </div>
       <div class="col-md-6">
-        <label class="form-label">Judul saat dibagikan</label
+        <label class="form-label"
+          >Judul saat dibagikan
+          <app-help-tip
+            section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
         ><input class="form-control" formControlName="id_og_title" />
       </div>
       <div class="col-md-6">
@@ -80,7 +88,8 @@
   } @else {
     <div class="row g-4">
       <div class="col-md-6">
-        <label class="form-label">SEO title</label
+        <label class="form-label"
+          >SEO title <app-help-tip section="tab-seo--judul-seo" /></label
         ><input
           class="form-control"
           formControlName="en_meta_title"
@@ -88,7 +97,9 @@
         />
       </div>
       <div class="col-md-6">
-        <label class="form-label">Canonical URL</label
+        <label class="form-label"
+          >Canonical URL
+          <app-help-tip section="tab-seo--canonical-url" /></label
         ><input
           class="form-control"
           formControlName="en_canonical_url"
@@ -97,7 +108,9 @@
       </div>
       <div class="col-12">
         <div class="article-field-heading">
-          <label class="form-label">SEO description</label>
+          <label class="form-label"
+            >SEO description <app-help-tip section="tab-seo--deskripsi-seo"
+          /></label>
           <app-ai-field-action
             label="Translate from Indonesian"
             icon="ri-translate-2"
@@ -116,7 +129,10 @@
         ></textarea>
       </div>
       <div class="col-md-6">
-        <label class="form-label">Social sharing title</label
+        <label class="form-label"
+          >Social sharing title
+          <app-help-tip
+            section="tab-seo--judul-dan-deskripsi-saat-dibagikan" /></label
         ><input class="form-control" formControlName="en_og_title" />
       </div>
       <div class="col-md-6">

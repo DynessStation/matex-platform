@@ -56,7 +56,10 @@
   </div>
   @if (form.controls.status.value === 'scheduled') {
     <div class="article-schedule-card">
-      <h6>Mulai tayang</h6>
+      <h6>
+        Mulai tayang
+        <app-help-tip section="tab-publikasi--jadwalkan-publikasi" />
+      </h6>
       <div class="row g-3">
         <div class="col-md-7">
           <label class="form-label">Tanggal <span>*</span></label>
@@ -104,7 +107,10 @@
   <div class="article-schedule-card">
     <div class="d-flex align-items-center justify-content-between mb-3">
       <div>
-        <h6 class="mb-1">Berhenti tayang</h6>
+        <h6 class="mb-1">
+          Berhenti tayang
+          <app-help-tip section="tab-publikasi--berhenti-tayang" />
+        </h6>
         <small class="text-muted"
           >Opsional. Artikel otomatis disembunyikan setelah waktu ini.</small
         >

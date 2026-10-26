@@ -4,6 +4,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { WebsitePageAssistantService } from '../website-page-assistant.service';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import { WebsitePageEditorLocale } from '../website-page-form.model';
@@ -12,7 +13,7 @@ import { WebsitePageEditorLocale } from '../website-page-form.model';
 @Component({
   selector: 'app-website-page-seo-tab',
 
-  imports: [ReactiveFormsModule, TranslateModule, AiFieldAction],
+  imports: [HelpTip, ReactiveFormsModule, TranslateModule, AiFieldAction],
 
   templateUrl: './website-page-seo-tab.html',
 

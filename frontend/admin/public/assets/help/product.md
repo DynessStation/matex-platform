@@ -1,61 +1,223 @@
 # Halaman Produk
 
-> **Untuk apa:** mengelola katalog produk: data, spesifikasi, harga, gambar, tautan marketplace, dan SEO.
-> **Izin yang dibutuhkan:** product.view, .create, .update, .delete.
-> **Perlu diperhatikan:** harga konsumen tampil di website, harga grosir bersifat internal; produk yang dihapus hanya diarsipkan.
+> **Untuk apa:** mengelola katalog produk: data, konten dua bahasa, spesifikasi, harga, tautan marketplace, gambar, dan SEO.
+> **Izin yang dibutuhkan:** product.view untuk melihat; product.create, product.update, product.delete untuk mengubah.
+> **Perlu diperhatikan:** hanya produk Dipublikasikan yang tampil di website; harga grosir tidak pernah tampil ke publik; menghapus produk hanya mengarsipkannya.
 
 ## Gambaran Umum
 
-Halaman **Produk** digunakan untuk mengelola data produk MATEX yang tampil pada katalog website publik, mencakup identitas produk, konten dua bahasa, spesifikasi, harga, tautan marketplace, media, dan SEO.
+Produk adalah isi katalog website matexindo.com. Formulir terdiri atas lima tab: Umum, Konten & Bahasa, Harga & Kanal, Media, dan SEO; simpan dengan **Simpan Produk** di bawah formulir. Konten wajib diisi untuk Bahasa Indonesia dan English.
 
-Bagian ini menjelaskan struktur halaman dan memberikan satu contoh pengisian sebagai simulasi. Seluruh produk diisi dengan pola yang sama.
+Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/product
 
-## Menampilkan dan Mencari Data Produk
+## Daftar Produk
 
-Daftar produk menampilkan kolom **Gambar**, **Nama**, **SKU**, **Harga**, **Stok**, dan **Status**. Kolom **Harga** menampilkan nominal apabila produk diatur untuk menampilkan harga, atau teks **Hubungi kami** apabila tidak. Gunakan kolom **Cari** untuk mencari berdasarkan kunci internal, SKU, atau nama produk. Tindakan **Edit**, **Delete**, dan **View** tersedia pada kolom **Aksi**.
+Kotak **Cari** mencari di kunci internal, SKU, dan nama produk. Pencarian, urutan, dan halaman tersimpan di alamat halaman, jadi bisa dibagikan atau dibuka lagi.
 
-## Menambahkan Produk Baru
+### Harga
 
-Klik **Tambah Produk**. Formulir terdiri atas lima tab, dan disimpan dengan tombol **Simpan Produk**.
+Nominal harga konsumen bila produk diatur menampilkan harga, atau "Hubungi kami" bila tidak.
 
-| Tab | Isian utama |
-| --- | --- |
-| Umum | Kunci internal, SKU, bentuk produk, status, satuan, kategori (minimal satu), berat dan dimensi, minimum pesanan, status dan jumlah stok, serta penanda unggulan. |
-| Konten & Bahasa | Slug URL, nama produk, ringkasan, deskripsi lengkap, dan daftar spesifikasi untuk Bahasa Indonesia dan English. |
-| Harga & Kanal | Tampilan harga publik, harga Rupiah dan Dollar, serta tautan pembelian pada marketplace. |
-| Media | Gambar utama, gambar berbagi sosial, dan galeri (maksimal 10 gambar atau video). |
-| SEO | Judul dan deskripsi SEO serta judul dan deskripsi saat dibagikan untuk setiap bahasa. |
+### Stok
 
-### Kategori dan Status
+Status stok produk: tersedia, habis, pre-order, atau dibuat sesuai pesanan.
 
-Pilih minimal satu kategori produk. Status produk adalah **Draft**, **Dipublikasikan**, atau **Diarsipkan**; hanya produk **Dipublikasikan** yang tampil pada website.
+### Status
 
-### Harga Publik
+Draft (belum tampil), Dipublikasikan (tampil di website), atau Diarsipkan (disimpan, tidak tampil).
 
-Pilihan **Tampilan harga publik** adalah **Tampilkan harga**, **Hubungi kami**, atau **Sembunyikan**. Apabila memilih **Tampilkan harga**, harga konsumen yang aktif dan tampil untuk Rupiah (IDR) dan Dollar (USD) wajib diisi.
+## Tab Umum
 
-### Tautan Marketplace
+Identitas, kategori, ukuran, dan stok produk.
 
-Gunakan **Tambah kanal** untuk memilih platform (misalnya Shopee atau Tokopedia) dan mengisi tautan langsung ke halaman produk (diawali http:// atau https://). Satu tautan dapat ditandai sebagai **Rekomendasi utama**. Tautan menjadi tujuan tombol pembelian pada halaman produk.
+### Kunci internal
 
-### Media
+Kode tetap produk untuk sistem, wajib dan unik, misalnya sarung-tangan-lateks-m. Hanya huruf kecil, angka, dan tanda hubung; huruf lain otomatis disesuaikan.
 
-Gambar utama dan gambar berbagi sosial harus berupa gambar. Galeri dapat memuat gambar maupun video (MP4, WebM, OGG). Unggah berkas melalui menu **Media** terlebih dahulu apabila belum tersedia.
+### SKU
 
-**Contoh simulasi (bukan data aktual MATEX)**
+Kode stok produk, wajib dan unik, paling banyak 120 karakter, misalnya MTX-GLV-M-001.
 
-Kunci internal: sarung-tangan-lateks-m | SKU: MTX-GLV-M-001 | Status: Draft
+### Bentuk produk
 
-Kategori: Sarung Tangan Lateks | Nama (ID): Sarung Tangan Lateks Ukuran M
+Fisik, jasa, atau digital. Menentukan cara produk dijelaskan; bawaannya Fisik.
 
-Tampilan harga publik: Hubungi kami | Kanal: Shopee (tautan produk), ditandai Rekomendasi utama
+### Status
 
-## Ketentuan Penting
+Draft untuk produk yang masih disiapkan, Dipublikasikan agar tampil di website, Diarsipkan untuk menyimpan tanpa menampilkan.
 
-- Kunci internal dan SKU tidak boleh sama dengan produk lain.
-- Kedua bahasa wajib dilengkapi, dan minimal satu kategori harus dipilih.
-- Menghapus produk akan mengarsipkannya sehingga tidak lagi tampil pada website.
-- Pilihan **Aktifkan commerce internal** dipersiapkan untuk tahap pengembangan berikutnya dan tidak digunakan pada versi 1.0.10.
-- Informasi harga, stok, dan klaim produk harus akurat dan sesuai kebijakan MATEX sebelum dipublikasikan.
+### Satuan
+
+Satuan jual, misalnya pcs, box, atau roll; paling banyak 40 karakter.
+
+### Jenis / kelompok produk
+
+Pengelompokan bebas untuk internal, misalnya "Sarung tangan medis"; paling banyak 120 karakter. Berbeda dengan kategori katalog.
+
+### Kategori
+
+Kategori katalog tempat produk tampil di website, wajib minimal satu. Hanya kategori yang tersedia yang bisa dipilih; daftarnya diatur di halaman Kategori Produk.
+
+### Barcode / GTIN
+
+Nomor barcode produk (misalnya EAN-13), opsional, paling banyak 120 karakter.
+
+### Kode manufaktur
+
+Kode produk dari pabrik pembuat, opsional.
+
+### HS code
+
+Kode tarif ekspor-impor (Harmonized System), opsional, paling banyak 50 karakter.
+
+### Asal produk
+
+Negara, provinsi, dan kota/kabupaten asal produk, opsional.
+
+### Berat dan dimensi
+
+Berat dalam gram serta panjang, lebar, dan tinggi dalam milimeter, opsional, tidak boleh negatif.
+
+### Minimum pesanan
+
+Jumlah paling sedikit yang bisa dipesan, minimal 1.
+
+### Lead time
+
+Perkiraan hari yang dibutuhkan sampai pesanan siap, opsional.
+
+### Status stok
+
+Tersedia, Habis, Pre-order, atau Dibuat sesuai pesanan. Tampil di website sebagai informasi ketersediaan.
+
+### Kelola stok
+
+Bila dicentang, jumlah stok dicatat di kolom **Jumlah stok**. Belum ada pengurangan stok otomatis karena website belum menerima pesanan langsung.
+
+### Produk unggulan
+
+Menandai produk unggulan, yang didahulukan di bagian produk beranda website (8 produk) dan dua yang pertama tampil di menu katalog pada header.
+
+### Urutan
+
+Angka urutan produk di panel. Saat ini belum memengaruhi urutan katalog website, yang diurutkan dari produk terbaru atau menurut nama.
+
+## Tab Konten & Bahasa
+
+Nama dan isi halaman produk, diisi untuk Bahasa Indonesia dan English (pilih bahasa dengan tombol di atas tab).
+
+### Slug URL
+
+Bagian alamat halaman produk di website, wajib per bahasa, misalnya sarung-tangan-lateks-m menjadi matexindo.com/produk/sarung-tangan-lateks-m. Harus unik.
+
+### Nama produk
+
+Nama produk yang tampil di katalog dan halaman produk, wajib per bahasa, paling banyak 255 karakter.
+
+### Ringkasan
+
+Kalimat singkat di bawah nama produk dan di kartu katalog, opsional.
+
+### Deskripsi lengkap
+
+Isi halaman produk dengan format teks (tebal, daftar, tautan), opsional.
+
+### Spesifikasi
+
+Daftar pasangan **Nama spesifikasi** dan **Nilai**, misalnya Bahan: Lateks alami. Tampil sebagai tabel spesifikasi di halaman produk.
+
+## Tab Harga & Kanal
+
+Harga publik, harga internal, dan tautan pembelian di marketplace.
+
+### Tampilan harga publik
+
+Tampilkan harga (harga konsumen tampil di website), Hubungi kami (pengunjung diarahkan menghubungi MATEX), atau Sembunyikan.
+
+Bila memilih Tampilkan harga, harga konsumen aktif dan publik wajib ada untuk Rupiah (IDR) dan Dollar (USD).
+
+### Untuk siapa?
+
+Konsumen (end user) atau Grosir. Harga grosir selalu internal dan tidak pernah tampil di website.
+
+### Mata uang dan nominal
+
+Rupiah (IDR) atau Dollar (USD), dengan nominal tidak boleh negatif. Tiap mata uang hanya boleh punya satu harga konsumen publik.
+
+### Nama harga
+
+Label harga untuk internal, misalnya "Harga konsumen" atau "Grosir 10 box".
+
+### Minimum dan maksimum pembelian
+
+Rentang jumlah pembelian yang berlaku untuk harga ini, opsional; berguna untuk harga grosir bertingkat.
+
+### Harga pembanding
+
+Harga sebelum diskon yang tampil dicoret di website, opsional.
+
+### Platform
+
+Marketplace tujuan tombol beli, misalnya Shopee atau Tokopedia, wajib per kanal. Tambah kanal dengan **Tambah kanal**.
+
+### Tautan produk
+
+Alamat halaman produk di marketplace, wajib, diawali http:// atau https://.
+
+### Rekomendasi utama
+
+Kanal yang ditonjolkan sebagai tombol beli utama. Hanya satu kanal aktif yang boleh menjadi rekomendasi; bila tidak ada yang dipilih, kanal aktif pertama dipakai.
+
+### Aktif di publik
+
+Kanal yang disembunyikan tetap tersimpan tetapi tidak tampil di website.
+
+### Commerce internal
+
+Disiapkan untuk toko internal MATEX di masa depan; belum dipakai.
+
+## Tab Media
+
+Gambar dan video produk dari Media.
+
+### Gambar utama
+
+Gambar yang tampil di kartu katalog dan paling depan di halaman produk; harus berupa gambar.
+
+### Gambar sosial
+
+Gambar yang tampil saat tautan produk dibagikan di media sosial atau aplikasi pesan; harus berupa gambar.
+
+### Galeri produk
+
+Paling banyak 10 gambar atau video (MP4, WebM, OGG) yang tampil di halaman produk. Unggah berkas lewat Media bila belum ada.
+
+## Tab SEO
+
+Cara produk tampil di Google dan saat dibagikan, per bahasa. Semua kolom opsional; bila kosong, nama dan ringkasan produk dipakai.
+
+### Judul SEO
+
+Judul di hasil pencarian Google, paling banyak 255 karakter; idealnya sekitar 60 karakter.
+
+### Deskripsi SEO
+
+Teks di bawah judul pada hasil pencarian Google, paling banyak 500 karakter; idealnya sekitar 155 karakter.
+
+### Canonical URL
+
+Alamat utama halaman bila konten yang sama ada di beberapa alamat. Biarkan kosong kecuali developer meminta.
+
+### Judul dan deskripsi OG
+
+Judul dan teks yang tampil saat tautan dibagikan di media sosial atau aplikasi pesan.
+
+## Aturan Penting
+
+- Kunci internal, SKU, dan slug tiap bahasa tidak boleh sama dengan produk lain.
+- Kedua bahasa wajib dilengkapi dan minimal satu kategori dipilih.
+- Menghapus produk mengarsipkannya sehingga tidak tampil di website.
+- Pastikan harga, stok, dan klaim produk akurat sebelum dipublikasikan.
+- Perubahan produk tercatat di Log Aktivitas.

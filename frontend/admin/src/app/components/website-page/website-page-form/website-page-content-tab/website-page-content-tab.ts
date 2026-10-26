@@ -15,6 +15,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { WebsitePageAboutContent } from '../website-page-about-content/website-page-about-content';
 import { WebsitePageAssistantService } from '../website-page-assistant.service';
 import { WebsitePageEditorService } from '../website-page-editor.service';
@@ -27,6 +28,7 @@ import { WebsitePageHomeContent } from '../website-page-home-content/website-pag
   selector: 'app-website-page-content-tab',
 
   imports: [
+    HelpTip,
     ReactiveFormsModule,
     FormsModule,
     TranslateModule,

@@ -6,7 +6,7 @@
 
 ## Gambaran Umum
 
-Halaman **Karir** disiapkan untuk informasi karier dan rekrutmen MATEX. Pada versi 1.0.10 halaman ini berupa halaman informasi statis dan **belum menyediakan modul pengelolaan lowongan**; karena itu pada sidebar menu ini diberi tanda **Segera**.
+Halaman **Karir** disiapkan untuk informasi karier dan rekrutmen MATEX. Saat ini halaman ini berupa halaman informasi statis dan **belum menyediakan modul pengelolaan lowongan**; karena itu pada sidebar menu ini diberi tanda **Segera**.
 
 URL: https://internal.matexindo.com/website-page/career
 

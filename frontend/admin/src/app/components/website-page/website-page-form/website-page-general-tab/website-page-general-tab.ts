@@ -3,6 +3,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 
@@ -11,6 +12,7 @@ import { WebsitePageEditorService } from '../website-page-editor.service';
   selector: 'app-website-page-general-tab',
 
   imports: [
+    HelpTip,
     ReactiveFormsModule,
     TranslateModule,
     LocalizedNumberInputDirective,

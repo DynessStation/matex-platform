@@ -117,6 +117,10 @@
         <div class="col-md-8">
           <label class="form-label">
             {{ 'website_page.translation_title' | translate }}
+            <app-help-tip
+              page="umum"
+              section="editor-halaman-website--judul-halaman"
+            />
             *
           </label>
 
@@ -170,6 +174,10 @@
         <div class="col-md-4">
           <label class="form-label">
             {{ 'website_page.translation_status' | translate }}
+            <app-help-tip
+              page="umum"
+              section="editor-halaman-website--status-bahasa"
+            />
           </label>
 
           <select class="form-select" formControlName="status">

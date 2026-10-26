@@ -60,7 +60,7 @@ Tabel utama menampilkan catatan peristiwa yang berhasil direkam oleh sistem. Inf
 - **Hasil:** success, failure, atau denied, juga dalam kode berbahasa Inggris.
 - **Metode:** metode permintaan yang digunakan, seperti GET, POST, PUT, PATCH, atau DELETE (judul kolom pada layar hanya "Metode").
 - **Status HTTP:** kode respons yang tercatat, misalnya 200 atau 201.
-- **Lihat:** ikon mata pada baris untuk membuka detail. Mengeklik barisnya juga membuka detail. Istilah "Aksi" di sini berbeda dengan filter Aksi; kolom aksi pada log hanya tampil di halaman detail.
+- **Menu aksi:** tombol tiga titik di ujung baris berisi **Lihat** untuk membuka detail. Istilah "Aksi" di sini berbeda dengan filter Aksi; kolom aksi pada log hanya tampil di halaman detail.
 
 Informasi pada tabel membantu administrator melakukan pemeriksaan awal sebelum membuka detail suatu peristiwa.
 
@@ -68,7 +68,7 @@ Perlu diperhatikan bahwa kode event, hasil aktivitas, dan status HTTP merupakan 
 
 ## Melihat Detail Log Aktivitas
 
-Untuk memeriksa informasi lebih lengkap, klik ikon mata (Lihat) pada baris log yang ingin diperiksa, atau klik barisnya. Alamat detail berbentuk /activity-log/<kode>, berupa kode acak, misalnya /activity-log/k3Mv7PmV.
+Untuk memeriksa informasi lebih lengkap, buka menu tiga titik pada baris log lalu pilih **Lihat**. Alamat detail berbentuk /activity-log/<kode>, berupa kode acak, misalnya /activity-log/k3Mv7PmV. Tombol **Kembali** di kepala halaman detail membuka daftar log dengan filter dan halaman terakhir.
 
 Sistem akan membuka halaman Detail Log Aktivitas, yang memuat kelompok informasi berikut secara berurutan.
 
@@ -139,7 +139,7 @@ Untuk membantu proses pemantauan dan penelusuran aktivitas, perhatikan hal-hal b
 
 Log Aktivitas merupakan sarana pendukung pemantauan dan audit internal. Kelengkapan serta ketepatan informasi yang ditampilkan bergantung pada jenis aktivitas yang dicatat, konfigurasi sistem, dan data yang tersedia. Oleh karena itu, halaman ini sebaiknya digunakan sebagai bagian dari proses pemeriksaan, bukan sebagai satu-satunya dasar untuk menarik kesimpulan atas suatu kejadian.
 
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** waktu pada Log Aktivitas memakai UTC, berbeda dengan halaman lain yang memakai WIB. Sebagian baris, misalnya product.updated, juga belum menampilkan Status HTTP. Mohon dimaklumi.
+**Kendala yang diketahui:** waktu pada Log Aktivitas memakai UTC, berbeda dengan halaman lain yang memakai WIB. Sebagian baris, misalnya product.updated, juga belum menampilkan Status HTTP. Mohon dimaklumi.
 
 ## Daftar kode peristiwa log aktivitas
 

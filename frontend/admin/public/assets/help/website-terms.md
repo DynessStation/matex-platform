@@ -32,4 +32,4 @@ Catatan**:** perubahan syarat dan ketentuan berdampak hukum. Pastikan isi yang d
 - Samakan makna antara versi Indonesia dan English.
 - Catat tanggal pembaruan ketentuan pada isi halaman apabila diperlukan.
 
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** teks bantuan pada tab Media halaman Syarat & Ketentuan dan Karir menyebut gambar hero, ilustrasi, atau galeri. Pada kedua halaman ini, gambar yang dipakai hanya gambar berbagi sosial yang bersifat opsional.
+**Kendala yang diketahui:** teks bantuan pada tab Media halaman Syarat & Ketentuan dan Karir menyebut gambar hero, ilustrasi, atau galeri. Pada kedua halaman ini, gambar yang dipakai hanya gambar berbagi sosial yang bersifat opsional.

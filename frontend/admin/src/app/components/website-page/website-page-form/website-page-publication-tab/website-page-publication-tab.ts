@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbDateStruct, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { WebsitePageEditorService } from '../website-page-editor.service';
 import { WebsitePageEditorPublicationChoice } from '../website-page-form.model';
 import {
@@ -19,7 +20,7 @@ import { WebsitePageSaveService } from '../website-page-save.service';
 @Component({
   selector: 'app-website-page-publication-tab',
 
-  imports: [DatePipe, FormsModule, NgbModule, TranslateModule],
+  imports: [HelpTip, DatePipe, FormsModule, NgbModule, TranslateModule],
 
   templateUrl: './website-page-publication-tab.html',
 })

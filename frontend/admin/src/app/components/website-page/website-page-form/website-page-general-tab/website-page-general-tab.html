@@ -6,6 +6,7 @@
   <div class="mb-4">
     <h5 class="mb-1">
       {{ 'website_page.form_general_title' | translate }}
+      <app-help-tip page="umum" section="editor-halaman-website--tab-umum" />
     </h5>
 
     <p class="text-muted mb-0">
@@ -27,6 +28,10 @@
     <div class="col-md-6">
       <label class="form-label">
         {{ 'website_page.key' | translate }}
+        <app-help-tip
+          page="umum"
+          section="editor-halaman-website--identitas-internal"
+        />
         *
       </label>
 
@@ -99,6 +104,10 @@
     <div class="col-md-6">
       <label class="form-label">
         {{ 'website_page.visibility' | translate }}
+        <app-help-tip
+          page="umum"
+          section="editor-halaman-website--akses-halaman"
+        />
       </label>
 
       <select class="form-select" formControlName="website_page_visibility">

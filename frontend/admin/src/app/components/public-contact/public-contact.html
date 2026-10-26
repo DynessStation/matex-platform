@@ -51,7 +51,10 @@
               </div>
               <div class="row g-3">
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.key' | translate }}</label
+                  <label
+                    >{{ 'public_contact.key' | translate }}
+                    <app-help-tip
+                      section="kanal-kontak--nama-internal" /></label
                   ><input
                     class="form-control"
                     formControlName="key"
@@ -74,7 +77,10 @@
                   }
                 </div>
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.type' | translate }}</label>
+                  <label
+                    >{{ 'public_contact.type' | translate }}
+                    <app-help-tip section="kanal-kontak--jenis"
+                  /></label>
                   @if (isBrowser) {
                     <select2
                       class="custom-select d-block"
@@ -85,7 +91,9 @@
                   }
                 </div>
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.value' | translate }}</label
+                  <label
+                    >{{ 'public_contact.value' | translate }}
+                    <app-help-tip section="kanal-kontak--nilai" /></label
                   ><input
                     class="form-control"
                     formControlName="value"
@@ -99,7 +107,9 @@
                   }
                 </div>
                 <div class="col-lg-6">
-                  <label>{{ 'public_contact.url' | translate }}</label
+                  <label
+                    >{{ 'public_contact.url' | translate }}
+                    <app-help-tip section="kanal-kontak--tautan" /></label
                   ><input
                     class="form-control"
                     formControlName="url"
@@ -112,7 +122,9 @@
                   </small>
                 </div>
                 <div class="col-lg-2">
-                  <label>{{ 'public_contact.order' | translate }}</label
+                  <label
+                    >{{ 'public_contact.order' | translate }}
+                    <app-help-tip section="kanal-kontak--urutan" /></label
                   ><input
                     class="form-control"
                     type="text"
@@ -146,7 +158,11 @@
                   <div
                     class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
                   >
-                    <label class="mb-0">Label — Bahasa Indonesia</label>
+                    <label class="mb-0"
+                      >Label — Bahasa Indonesia
+                      <app-help-tip
+                        section="kanal-kontak--label-dan-keterangan"
+                    /></label>
                   </div>
                   <input class="form-control" formControlName="id_label" />
                   @if (
@@ -252,7 +268,9 @@
               </div>
               <div class="row g-3">
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.key' | translate }}</label
+                  <label
+                    >{{ 'public_contact.key' | translate }}
+                    <app-help-tip section="topik-pesan--nama-internal" /></label
                   ><input
                     class="form-control"
                     formControlName="key"
@@ -269,7 +287,10 @@
                   }
                 </div>
                 <div class="col-lg-4">
-                  <label>{{ 'public_contact.recipient' | translate }} *</label
+                  <label
+                    >{{ 'public_contact.recipient' | translate }} *
+                    <app-help-tip
+                      section="topik-pesan--email-penerima" /></label
                   ><input
                     class="form-control"
                     type="email"
@@ -289,7 +310,10 @@
                   }
                 </div>
                 <div class="col-lg-2">
-                  <label>{{ 'public_contact.order' | translate }}</label
+                  <label
+                    >{{ 'public_contact.order' | translate }}
+                    <app-help-tip
+                      section="topik-pesan--urutan-dan-aktif" /></label
                   ><input
                     class="form-control"
                     type="text"
@@ -312,7 +336,9 @@
               </div>
               <div formGroupName="translations" class="row g-3 language-row">
                 <div class="col-lg-6">
-                  <label>Topik — Bahasa Indonesia</label
+                  <label
+                    >Topik — Bahasa Indonesia
+                    <app-help-tip section="topik-pesan--topik" /></label
                   ><input class="form-control" formControlName="id_label" />
                   @if (
                     topic.get('translations.id_label')?.touched &&

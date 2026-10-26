@@ -4,6 +4,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { NgxEditorModule } from 'ngx-editor';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { ProductAssistantService } from '../product-assistant.service';
 import { ProductFormService } from '../product-form.service';
 
@@ -12,7 +13,7 @@ import { ProductFormService } from '../product-form.service';
 @Component({
   selector: 'app-product-content-tab',
 
-  imports: [ReactiveFormsModule, NgxEditorModule, AiFieldAction],
+  imports: [HelpTip, ReactiveFormsModule, NgxEditorModule, AiFieldAction],
 
   templateUrl: './product-content-tab.html',
 

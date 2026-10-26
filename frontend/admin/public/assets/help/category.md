@@ -1,47 +1,113 @@
 # Halaman Kategori Produk
 
-> **Untuk apa:** mengelola kelompok produk yang dipakai pada katalog dan filter website.
-> **Izin yang dibutuhkan:** product_category.view, .create, .update, .delete.
-> **Perlu diperhatikan:** penghapusan belum memeriksa apakah kategori masih dipakai produk; pastikan dahulu tidak ada produk yang bergantung.
+> **Untuk apa:** mengelola kelompok produk bertingkat yang dipakai katalog, menu kategori header, dan beranda website.
+> **Izin yang dibutuhkan:** product_category.view untuk melihat; product_category.create, product_category.update, product_category.delete untuk mengubah.
+> **Perlu diperhatikan:** kategori Dipublikasikan yang masih berisi produk tidak bisa dijadikan draft, diarsipkan, atau dihapus; pindahkan produknya dulu.
 
 ## Gambaran Umum
 
-Halaman **Kategori Produk** digunakan untuk mengelompokkan produk dalam struktur bertingkat (induk dan anak). Kategori ditampilkan pada katalog website dan menjadi dasar dropdown **Kategori** pada header.
-
-Bagian ini menjelaskan cara kerja halaman dan sebuah contoh pengisian. Pengisian data kategori mengikuti pola yang sama untuk setiap kategori.
+Kategori mengelompokkan produk dalam struktur induk dan anak, misalnya Sarung Tangan › Sarung Tangan Lateks. Kategori tampil di katalog website, menu kategori pada header, dan bagian kategori di beranda.
 
 URL: https://internal.matexindo.com/category
 
 ## Tata Letak Halaman
 
-- **Panel kiri (pohon kategori):** menampilkan seluruh kategori bertingkat. Kolom **Cari Kategori** membantu menemukan kategori, dan setiap kategori dilengkapi ikon pensil (ubah) serta ikon hapus. Kategori yang belum berstatus Dipublikasikan tampil lebih redup.
-- **Panel kanan (formulir):** digunakan untuk menambah kategori baru atau mengubah kategori yang dipilih. Pada mode ubah, tombol **Kategori baru** muncul untuk kembali ke mode tambah.
+Panel kiri berisi pohon kategori, panel kanan berisi formulir.
 
-Urutan kategori pada tingkat yang sama dapat diubah dengan menyeret pegangan di samping nama kategori. Fitur ini tidak dapat digunakan selama kolom pencarian terisi. Untuk memindahkan kategori ke induk lain, ubah isian **Induk kategori** pada formulir.
+### Pohon kategori
 
-## Mengisi Formulir Kategori
+Semua kategori bertingkat, dengan kotak **Cari Kategori**. Ikon pensil membuka kategori di formulir, ikon tempat sampah menghapusnya. Kategori yang belum Dipublikasikan tampil lebih redup.
 
-Formulir terdiri atas empat tab:
+### Mengubah urutan
 
-| Tab | Isian utama |
-| --- | --- |
-| Umum | Kunci internal (wajib), Status (Draft, Dipublikasikan, Diarsipkan), Induk kategori, Urutan, dan penanda Unggulan. |
-| Konten & Bahasa | Slug URL, Nama kategori (wajib), dan Deskripsi, untuk Bahasa Indonesia dan English. |
-| SEO | Judul SEO, Canonical URL, Deskripsi SEO, serta judul dan deskripsi saat dibagikan (opsional). |
-| Media | Gambar utama (rasio 4:3), Ikon kategori, dan Gambar berbagi sosial (1200 × 630 px). |
+Seret pegangan di samping nama kategori untuk mengubah urutannya di antara kategori setingkat. Tidak bisa dipakai selama kotak pencarian terisi. Untuk memindahkan ke induk lain, ubah **Induk kategori** di formulir.
 
-**Contoh simulasi (bukan data aktual MATEX)**
+### Kategori baru
 
-Kunci internal: sarung-tangan-lateks | Status: Dipublikasikan | Induk kategori: (kosong / kategori utama)
+Saat sedang mengubah kategori, tombol **Kategori baru** mengosongkan formulir untuk membuat kategori lain.
 
-Nama kategori (ID): Sarung Tangan Lateks | Slug (ID): sarung-tangan-lateks
+## Tab Umum
 
-Nama kategori (EN): Latex Gloves | Slug (EN): latex-gloves
+Pengaturan dasar kategori.
 
-## Ketentuan Penting
+### Kunci internal
 
-- Kunci internal tidak boleh sama dengan kategori lain. Slug ditulis manual dengan huruf kecil, angka, dan tanda hubung.
-- Kategori tidak dapat menjadi induk bagi dirinya sendiri atau dipindahkan ke bawah turunannya sendiri.
-- Kategori yang masih memiliki kategori anak tidak dapat dihapus. Pindahkan atau hapus kategori anak terlebih dahulu.
-- Sistem belum memeriksa apakah kategori masih digunakan oleh produk saat dihapus. Pastikan produk yang terkait sudah dipindahkan ke kategori lain sebelum menghapus.
+Kode tetap kategori untuk sistem, wajib dan unik, misalnya sarung-tangan-lateks. Hanya huruf kecil, angka, dan tanda hubung.
+
+### Status
+
+Draft (belum tampil), Dipublikasikan (tampil di website), atau Diarsipkan (disimpan, tidak tampil).
+
+Kategori Dipublikasikan yang masih berisi produk tidak bisa diubah menjadi Draft atau Diarsipkan; pindahkan dulu produknya ke kategori lain.
+
+### Induk kategori
+
+Kategori di atasnya; kosongkan untuk kategori utama. Kategori tidak bisa menjadi induk dirinya sendiri atau dipindahkan ke bawah turunannya.
+
+### Urutan
+
+Angka urutan di antara kategori setingkat; angka kecil tampil lebih dulu di website. Bisa juga diatur dengan menyeret di pohon kategori.
+
+### Unggulan
+
+Kategori unggulan didahulukan di bagian kategori beranda website (6 kategori), sebelum urutan biasa.
+
+## Tab Konten & Bahasa
+
+Nama dan isi kategori, diisi untuk Bahasa Indonesia dan English.
+
+### Slug URL
+
+Bagian alamat halaman kategori di website, wajib per bahasa, misalnya sarung-tangan-lateks. Ditulis manual dengan huruf kecil, angka, dan tanda hubung, dan harus unik.
+
+### Nama kategori
+
+Nama yang tampil di katalog, menu, dan beranda, wajib per bahasa.
+
+### Deskripsi
+
+Teks pengantar di halaman kategori, opsional.
+
+## Tab SEO
+
+Cara halaman kategori tampil di Google dan saat dibagikan, per bahasa. Semua opsional; bila kosong, nama dan deskripsi kategori dipakai.
+
+### Judul SEO
+
+Judul di hasil pencarian Google; idealnya sekitar 60 karakter.
+
+### Deskripsi SEO
+
+Teks di bawah judul pada hasil pencarian Google; idealnya sekitar 155 karakter.
+
+### Canonical URL
+
+Alamat utama halaman bila konten yang sama ada di beberapa alamat. Biarkan kosong kecuali developer meminta.
+
+### Judul dan deskripsi saat dibagikan
+
+Judul dan teks yang tampil saat tautan kategori dibagikan di media sosial atau aplikasi pesan.
+
+## Tab Media
+
+Gambar kategori dari Media.
+
+### Gambar utama
+
+Gambar kategori di katalog dan beranda, sebaiknya rasio 4:3.
+
+### Ikon kategori
+
+Ikon kecil di samping nama kategori pada menu kategori header.
+
+### Gambar berbagi sosial
+
+Gambar saat tautan kategori dibagikan, sebaiknya 1200 × 630 piksel.
+
+## Aturan Penting
+
+- Kunci internal dan slug tiap bahasa tidak boleh sama dengan kategori lain.
 - Kedua bahasa wajib dilengkapi sebelum disimpan.
+- Kategori yang masih punya kategori anak tidak bisa dihapus; pindahkan atau hapus dulu anaknya.
+- Kategori yang masih berisi produk tidak bisa dihapus, dan bila Dipublikasikan tidak bisa dijadikan Draft atau Diarsipkan. Pindahkan produknya lewat halaman Produk.
+- Perubahan kategori tercatat di Log Aktivitas.

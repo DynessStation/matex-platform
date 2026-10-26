@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../../shared/components/ui/image-upload/image-upload';
 import { BlogFormService } from '../blog-form.service';
 
@@ -8,7 +9,7 @@ import { BlogFormService } from '../blog-form.service';
 @Component({
   selector: 'app-blog-media-tab',
 
-  imports: [ImageUpload],
+  imports: [HelpTip, ImageUpload],
 
   templateUrl: './blog-media-tab.html',
 

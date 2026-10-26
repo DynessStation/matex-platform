@@ -39,6 +39,18 @@ Panel **Urutan menu** menampilkan keenam bagian header sesuai urutan tampil. Bag
 5. Atur sakelar **Tampilkan di header**. Matikan apabila bagian tersebut belum siap ditampilkan kepada pengunjung.
 6. Klik **Simpan perubahan**. Klik **Batal** apabila tidak jadi mengubah.
 
+### Bagian menu
+
+Satu dari enam bagian tetap header (Beranda, Tentang MATEX, Kategori, Produk, Artikel, Hubungi). Tidak bisa diganti saat mengubah; tujuan tautannya diatur sistem agar alamat Bahasa Indonesia dan English tidak rusak.
+
+### Teks yang tampil di header
+
+Label menu yang dilihat pengunjung, wajib untuk Bahasa Indonesia dan English, paling banyak 255 karakter. Usahakan singkat supaya tetap rapi di layar ponsel.
+
+### Tampilkan di header
+
+Matikan untuk menyembunyikan bagian ini dari header website tanpa menghapusnya, misalnya saat halaman tujuannya belum siap.
+
 | Bagian | Label awal (ID / EN) | Perilaku pada website |
 | --- | --- | --- |
 | Beranda | Beranda / Home | Membuka halaman beranda sesuai bahasa situs. |
@@ -52,7 +64,7 @@ Apabila suatu bagian pernah dihapus dari daftar sehingga belum lengkap, formulir
 
 ## Ketentuan Penting dalam Pengaturan Navigasi
 
-- Header hanya mendukung enam bagian tetap. Menambahkan menu baru, tautan bebas, submenu, ikon, atau lencana tidak tersedia pada versi 1.0.10.
+- Header hanya mendukung enam bagian tetap. Menambahkan menu baru, tautan bebas, submenu, ikon, atau lencana tidak tersedia.
 - Label Bahasa Indonesia dan English wajib diisi bersama. Label dapat disesuaikan, tetapi sebaiknya tetap mencerminkan tujuan menu agar tidak membingungkan pengunjung.
 - Daftar urutan harus tersimpan lengkap; sistem menolak penyimpanan urutan apabila daftar tidak lengkap. Muat ulang halaman apabila hal ini terjadi.
 - Tombol dan tindakan pada halaman ini tampil sesuai hak akses pengguna (melihat, menambah, mengubah, dan menampilkan/menyembunyikan header).

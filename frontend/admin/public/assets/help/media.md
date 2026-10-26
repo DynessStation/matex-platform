@@ -1,59 +1,55 @@
 # Halaman Media
 
-> **Untuk apa:** mengunggah dan mengelola gambar yang dipakai di website, kantor, artikel, dan profil.
-> **Izin yang dibutuhkan:** attachment.view (wajib), attachment.create, attachment.delete.
-> **Perlu diperhatikan:** gambar yang sedang dipakai tidak dapat dihapus, kecuali pemakaian pada produk/kategori yang belum diperiksa sistem — cek manual.
+> **Untuk apa:** mengunggah dan mengelola gambar (dan video produk) yang dipakai website, produk, artikel, kantor, dan profil.
+> **Izin yang dibutuhkan:** attachment.view untuk melihat; attachment.create untuk mengunggah; attachment.delete untuk menghapus.
+> **Perlu diperhatikan:** berkas yang sedang dipakai tidak bisa dihapus; sistem menolak dengan pesan bahwa media sedang digunakan.
 
 ## Gambaran Umum
 
-Halaman **Media** (**Pustaka Media**) digunakan untuk mengunggah dan mengelola gambar yang dipakai pada konten website, seperti gambar banner, artikel, kategori, produk, dan kantor. Gambar yang diunggah dapat dipilih kembali pada berbagai formulir tanpa perlu diunggah ulang.
+**Pustaka Media** menyimpan semua berkas yang bisa dipilih di formulir lain, jadi gambar cukup diunggah sekali lalu dipakai berulang. Akun yang bukan Akses Sistem Penuh hanya melihat media milik kantornya.
 
 URL: https://internal.matexindo.com/media
 
 ## Menampilkan dan Mencari Media
 
-- **Cari file...:** mencari berdasarkan nama berkas.
-- **Urutan:** pilihan **Terbaru**, **Terlama**, **Ukuran Terkecil**, atau **Ukuran Terbesar**.
-- **Kisi gambar:** setiap kartu menampilkan miniatur, nama berkas, dan dimensi gambar. Halaman memuat 20 gambar per halaman.
+Kisi menampilkan 20 berkas per halaman, masing-masing dengan miniatur, nama, dan ukuran piksel. Selain unggahan Pustaka Media, kisi juga memuat berkas galeri produk, termasuk video.
 
-Selain gambar unggahan Pustaka Media, kisi juga menampilkan berkas dari galeri produk, termasuk video (MP4, WebM, OGG), dan berkas lama yang namanya masih berakhiran .jpg, .jpeg, atau .png.
+### Cari file
 
-Pengguna yang bukan pemilik akses penuh hanya melihat media yang dimiliki kantornya.
+Mencari berdasarkan nama berkas.
+
+### Urutkan
+
+Terbaru, Terlama, Ukuran Terkecil, atau Ukuran Terbesar.
+
+### Lihat gambar
+
+Arahkan kursor ke kartu lalu klik ikon mata untuk melihat gambar penuh di layar; geser ke gambar lain di halaman yang sama dengan panah kiri dan kanan. Ikon mata tidak ikut mencentang kartu.
 
 ## Mengunggah Media Baru
 
-1. Klik tombol **Tambah Media**.
-2. Pada jendela **Pilih Media**, buka tab **Unggah Baru**.
-3. Letakkan berkas pada area **Letakkan file di sini** atau pilih berkas dari komputer.
-4. Tunggu hingga proses selesai. Media yang berhasil diunggah tampil pada kisi.
+Klik **Tambah Media**, buka tab **Unggah Baru**, lalu letakkan atau pilih berkas. Media yang berhasil diunggah langsung tampil di kisi.
 
-| Ketentuan | Nilai |
-| --- | --- |
-| Format berkas | JPEG, PNG, dan WebP |
-| Jumlah berkas per unggah | Maksimal 5 berkas |
-| Ukuran per berkas | Maksimal 12 MB |
-| Pemrosesan otomatis | Gambar diperkecil hingga maksimal 1920 × 1920 piksel dan disimpan dalam format WebP |
+### Ketentuan unggahan
 
-Galeri produk menggunakan koleksi tersendiri yang juga menerima video (MP4, WebM, OGG) dengan batas ukuran lebih besar. Pengaturan tersebut berlaku pada formulir produk.
+JPEG, PNG, atau WebP; paling banyak 5 berkas sekali unggah dan 12 MB per berkas. Gambar otomatis diperkecil sampai paling besar 1920 × 1920 piksel dan disimpan sebagai WebP.
+
+Galeri produk memakai koleksi sendiri yang juga menerima video MP4, WebM, dan OGG sampai 50 MB, dan diunggah dari formulir produk.
 
 ## Menghapus Media
 
-Klik ikon tempat sampah pada kartu untuk menghapus satu berkas. Untuk menghapus beberapa berkas, centang kartu yang dimaksud lalu gunakan ikon hapus pada bagian atas halaman (**Dipilih (n)**). Tindakan ini hanya tersedia bagi pengguna yang memiliki izin hapus.
+Ikon tempat sampah pada kartu menghapus satu berkas. Untuk beberapa berkas, centang kartunya lalu pakai ikon hapus di atas kisi (**Dipilih (n)**). Hanya untuk akun dengan izin hapus.
 
-- Media yang sedang digunakan pada foto profil admin, kantor, halaman website, atau artikel tidak dapat dihapus, dan sistem menampilkan pesan bahwa media sedang digunakan.
-- Pemeriksaan penggunaan **belum mencakup** gambar pada produk dan kategori produk. Pastikan gambar tidak sedang dipakai pada produk atau kategori sebelum dihapus agar tampilan katalog tidak terganggu.
+### Media yang sedang dipakai
+
+Berkas yang dipakai sebagai foto profil admin, foto kantor, media halaman website, gambar artikel, gambar produk, atau gambar kategori tidak bisa dihapus. Lepaskan dulu dari tempat pemakaiannya.
 
 ## Memilih Media dari Formulir Lain
 
-Pada formulir yang membutuhkan gambar, tombol pilih gambar membuka jendela **Pilih Media** dengan tab **Pilih File** (memilih dari pustaka) dan **Unggah Baru** (bagi pengguna yang berwenang). Gambar yang sudah dipakai pada slot lain diberi tanda **Sudah digunakan pada slot lain**. Setelah memilih, klik **Pilih Media**.
+Tombol pilih gambar di formulir membuka jendela **Pilih Media** dengan tab **Pilih File** dan **Unggah Baru** (bagi akun yang berwenang). Gambar yang sudah dipakai di slot lain pada formulir yang sama diberi tanda **Sudah digunakan pada slot lain**. Setelah memilih, klik **Pilih Media**. Ikon mata pada kartu juga tersedia di jendela ini.
 
-Catatan**:** pada formulir artikel, unggahan baru dari jendela pemilih dapat gagal. Unggah gambar melalui menu **Media** terlebih dahulu, lalu pilih pada formulir artikel.
+## Praktik yang Disarankan
 
-## Praktik Pengelolaan Media yang Disarankan
-
-- Gunakan nama berkas yang deskriptif sebelum mengunggah.
-- Siapkan gambar sesuai ukuran rekomendasi slot yang akan digunakan.
-- Hindari menghapus media yang kemungkinan masih digunakan pada konten.
-- Pastikan Anda memiliki hak penggunaan atas gambar yang diunggah.
-
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** Pustaka Media masih memuat beberapa berkas ganda, misalnya banner-home-samping-atas-latex-mattress.webp. Jangan menghapusnya sendiri, karena pemeriksaan pemakaian belum mencakup produk dan kategori produk; pembersihan akan dilakukan developer.
+- Beri nama berkas yang jelas sebelum mengunggah, karena nama itulah yang dicari.
+- Siapkan gambar sesuai ukuran yang disarankan slotnya.
+- Pastikan Anda berhak memakai gambar yang diunggah.
