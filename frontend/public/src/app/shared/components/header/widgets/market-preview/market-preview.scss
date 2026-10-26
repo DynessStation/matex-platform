@@ -1,0 +1,217 @@
+// The theme hides "header li > * > div" below 992px (its old dropdowns); this one stays.
+.market-preview {
+  position: relative;
+  display: block !important;
+}
+
+.market-preview__icons {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 6px;
+
+  @media (max-width: 575.98px) {
+    gap: 9px;
+  }
+}
+
+.market-preview__icon {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(var(--title-color), 1);
+
+  i {
+    font-size: 26px;
+  }
+
+  &.active,
+  &:hover,
+  &:focus-visible {
+    color: #b96f00;
+  }
+}
+
+// Always visible (not only on hover): the icons are a sign of what is coming.
+.market-preview__badge {
+  position: absolute;
+  top: -9px;
+  right: -10px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: #fff3df;
+  color: #8a5300;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.market-preview__panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 1060;
+  width: min(330px, calc(100vw - 24px));
+  padding: 16px;
+  border: 1px solid rgba(13, 65, 36, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(13, 65, 36, 0.16);
+  text-align: left;
+
+  p {
+    margin: 0 0 12px;
+    color: #4f5b53;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+// The theme paints every icon in the header white (for the dark header bar); inside the white
+// panel they take the panel colors.
+.market-preview__panel i {
+  color: #0d4124 !important;
+}
+
+.market-preview__panel .market-preview__head > i {
+  color: #b96f00 !important;
+}
+
+.market-preview__panel .market-preview__primary i {
+  color: #fff !important;
+}
+
+.market-preview__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  > i {
+    color: #b96f00;
+    font-size: 22px;
+  }
+
+  strong {
+    flex: 1;
+    color: #0d4124;
+    font-size: 15px;
+  }
+}
+
+.market-preview__close {
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: #4f5b53;
+  font-size: 18px;
+}
+
+.market-preview__features {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2f3a33;
+    font-size: 14px;
+
+    i {
+      font-size: 18px;
+    }
+
+    &.current {
+      font-weight: 700;
+      color: #0d4124;
+    }
+  }
+}
+
+.market-preview__actions {
+  display: flex;
+  gap: 8px;
+
+  a {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.market-preview__primary {
+  background: #0d4124;
+  color: #fff;
+
+  &:hover {
+    color: #fff;
+    background: #135a33;
+  }
+}
+
+.market-preview__secondary {
+  border: 1px solid rgba(13, 65, 36, 0.3);
+  color: #0d4124;
+
+  &:hover {
+    color: #0d4124;
+    background: #f1f6f2;
+  }
+}
+
+:host-context(body.dark) {
+  .market-preview__panel i {
+    color: #eef1f5 !important;
+  }
+
+  .market-preview__panel .market-preview__head > i {
+    color: #ffb44d !important;
+  }
+
+  .market-preview__badge {
+    background: #3a2f1c;
+    color: #ffb44d;
+  }
+
+  .market-preview__panel {
+    border-color: #3a4048;
+    background: #1f2328;
+
+    p,
+    .market-preview__close {
+      color: #c3c9d3;
+    }
+  }
+
+  .market-preview__head strong,
+  .market-preview__features li,
+  .market-preview__features li.current {
+    color: #eef1f5;
+  }
+
+  .market-preview__secondary {
+    border-color: #4a525c;
+    color: #eef1f5;
+
+    &:hover {
+      background: #2a3038;
+    }
+  }
+}

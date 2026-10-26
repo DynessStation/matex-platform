@@ -66,3 +66,44 @@ p {
   min-height: 46px;
   padding: 12px 22px;
 }
+
+.market-features {
+  display: inline-grid;
+  gap: 8px;
+  margin: 0 auto 28px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2f3a33;
+    font-size: 15px;
+
+    i {
+      color: #b96f00;
+      font-size: 20px;
+    }
+  }
+}
+
+.market-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.secondary-link {
+  align-items: center;
+  border: 1px solid rgba(13, 65, 36, 0.3);
+  border-radius: 7px;
+  color: #0d4124;
+  display: inline-flex;
+  font-weight: 600;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 22px;
+}

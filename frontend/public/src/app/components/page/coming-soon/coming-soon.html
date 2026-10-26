@@ -1,3 +1,4 @@
+<!-- Account and other market pages (P-1): the same text as the header "Segera" panel. -->
 <section class="v2-page">
   <div class="v2-card">
     <a
@@ -8,21 +9,29 @@
       <img src="assets/images/logo/1.svg" alt="MATEX" />
     </a>
 
-    <span class="version-label">{{
-      isEnglish ? 'PLANNED FOR VERSION 2' : 'DIRENCANAKAN UNTUK VERSI 2'
-    }}</span>
-    <h1>{{ isEnglish ? 'This feature is being prepared' : 'Fitur ini sedang disiapkan' }}</h1>
-    <p>
-      {{
-        isEnglish
-          ? 'Account and online commerce features will be released after the product catalog and company information are ready.'
-          : 'Fitur akun dan transaksi online akan dirilis setelah katalog produk dan informasi perusahaan siap.'
-      }}
-    </p>
+    <span class="version-label">{{ text.badge }}</span>
+    <h1>{{ text.title }}</h1>
+    <p>{{ text.body }}</p>
 
-    <a [routerLink]="homePath" class="back-home">
-      <i class="ri-arrow-left-line"></i>
-      {{ isEnglish ? 'Back to MATEX' : 'Kembali ke MATEX' }}
-    </a>
+    <ul class="market-features">
+      @for (feature of features; track feature) {
+        <li>
+          <i class="iconsax" [attr.icon-name]="icons[feature]" aria-hidden="true"></i>
+          {{ text.features[feature] }}
+        </li>
+      }
+    </ul>
+
+    <div class="market-actions">
+      @if (whatsapp$ | async; as whatsapp) {
+        <a [href]="whatsapp" target="_blank" rel="noopener" class="back-home">
+          <i class="ri-whatsapp-line" aria-hidden="true"></i>
+          {{ text.whatsapp }}
+        </a>
+      } @else {
+        <a [routerLink]="contactPath" class="back-home">{{ text.contact }}</a>
+      }
+      <a [routerLink]="catalogPath" class="secondary-link">{{ text.catalog }}</a>
+    </div>
   </div>
 </section>

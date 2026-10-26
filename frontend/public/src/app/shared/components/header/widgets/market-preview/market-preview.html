@@ -1,0 +1,70 @@
+<div class="market-preview">
+  <div class="market-preview__icons">
+    @for (feature of features; track feature) {
+      <button
+        class="btn market-preview__icon"
+        type="button"
+        [attr.data-feature]="feature"
+        [class.active]="open() === feature"
+        [attr.aria-label]="text.open[feature]"
+        [attr.aria-expanded]="open() === feature"
+        aria-controls="market-preview-panel"
+        (click)="toggle(feature)"
+      >
+        <i class="iconsax" [attr.icon-name]="icons[feature]"></i>
+      </button>
+    }
+    <span class="market-preview__badge" aria-hidden="true">{{ text.badge }}</span>
+  </div>
+
+  @if (open(); as active) {
+    <section
+      class="market-preview__panel"
+      id="market-preview-panel"
+      role="dialog"
+      [attr.aria-label]="text.title"
+    >
+      <div class="market-preview__head">
+        <i class="iconsax" [attr.icon-name]="icons[active]" aria-hidden="true"></i>
+        <strong>{{ text.title }}</strong>
+        <button
+          class="btn market-preview__close"
+          type="button"
+          [attr.aria-label]="text.close"
+          (click)="close()"
+        >
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <p>{{ text.body }}</p>
+      <ul class="market-preview__features">
+        @for (feature of features; track feature) {
+          <li [class.current]="feature === active">
+            <i class="iconsax" [attr.icon-name]="icons[feature]" aria-hidden="true"></i>
+            {{ text.features[feature] }}
+          </li>
+        }
+      </ul>
+      <div class="market-preview__actions">
+        @if (whatsapp$ | async; as whatsapp) {
+          <a
+            class="market-preview__primary"
+            [href]="whatsapp"
+            target="_blank"
+            rel="noopener"
+            (click)="close()"
+          >
+            <i class="ri-whatsapp-line" aria-hidden="true"></i> {{ text.whatsapp }}
+          </a>
+        } @else {
+          <a class="market-preview__primary" [routerLink]="contactPath" (click)="close()">
+            {{ text.contact }}
+          </a>
+        }
+        <a class="market-preview__secondary" [routerLink]="catalogPath" (click)="close()">
+          {{ text.catalog }}
+        </a>
+      </div>
+    </section>
+  }
+</div>

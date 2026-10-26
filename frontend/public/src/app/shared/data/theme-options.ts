@@ -279,7 +279,7 @@ export const THEME_OPTIONS = {
     },
     seller: {
       home_section: {
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         description: 'Program mitra belum dibuka pada versi ini.',
         button_text: 'Get started',
         image: 'assets/images/inner-page/become-seller/marketing.jpg',
@@ -287,30 +287,30 @@ export const THEME_OPTIONS = {
       },
       why_selling: {
         status: false,
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         description: 'Program mitra belum dibuka pada versi ini.',
         seller_benefits: [],
       },
       seller_stories: {
         status: false,
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         description: 'Program mitra belum dibuka pada versi ini.',
         review: [],
       },
       selling_steps: {
         status: false,
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         description: 'Program mitra belum dibuka pada versi ini.',
         sell_steps: [],
       },
       about: {
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         status: false,
         image_url: '/storage/3831/vendor.jpg',
         description: 'Program mitra belum dibuka pada versi ini.',
       },
       steps: {
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         status: false,
         step_1: {
           title: 'List your products & Get support service provider',
@@ -329,7 +329,7 @@ export const THEME_OPTIONS = {
         },
       },
       services: {
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         status: false,
         service_1: {
           title: 'lowest cost',
@@ -353,7 +353,7 @@ export const THEME_OPTIONS = {
         },
       },
       start_selling: {
-        title: 'Fitur mitra tersedia pada versi 2',
+        title: 'Program mitra segera hadir',
         status: false,
         description: 'Program mitra belum dibuka pada versi ini.',
       },

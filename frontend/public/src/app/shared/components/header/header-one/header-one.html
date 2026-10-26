@@ -59,36 +59,8 @@
             <i class="iconsax search-btn" icon-name="search-normal-2"></i>
           </button>
         </li>
-        <li class="dropdown-box">
-          <app-user-profile />
-        </li>
-        <li>
-          <button
-            class="btn header-action-button"
-            type="button"
-            (click)="openWishlist()"
-            [attr.aria-label]="navigation.locale() === 'en-US' ? 'Open wishlist' : 'Buka wishlist'"
-          >
-            <i class="iconsax" icon-name="heart"></i>
-          </button>
-          <ng-template #wishlistOffcanvas>
-            <div class="offcanvas-header">
-              <h4>{{ navigation.locale() === 'en-US' ? 'Wishlist' : 'Favorit' }}</h4>
-              <button
-                class="btn close-btn"
-                type="button"
-                (click)="closeWishlist()"
-                [attr.aria-label]="
-                  navigation.locale() === 'en-US' ? 'Close wishlist' : 'Tutup favorit'
-                "
-              >
-                <i class="ri-close-fill"></i>
-              </button>
-            </div>
-            <app-wishlist [type]="'wishlistOffcanvas'" />
-          </ng-template>
-        </li>
-        <li><app-cart /></li>
+        <!-- Account, favorites, and cart: "MATEX Market segera hadir" (P-1). -->
+        <li class="market-preview-item"><app-market-preview /></li>
       </ul>
     </div>
   </div>
