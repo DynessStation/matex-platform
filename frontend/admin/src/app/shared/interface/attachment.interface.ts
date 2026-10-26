@@ -36,6 +36,11 @@ export interface IAttachment {
 
   updated?: string;
 
+  /** Places that use the file (D-5, U-14); a used file cannot be deleted. */
+  usage_total?: number;
+
+  usage?: { source: string; total: number }[];
+
   //==================================================
   //==== LEGACY TEMPLATE COMPATIBILITY
   //==================================================

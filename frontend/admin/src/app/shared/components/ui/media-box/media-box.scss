@@ -49,6 +49,25 @@
   }
 }
 
+// "Dipakai: n" (U-14): theme color when used, muted when not; the places show on hover.
+.media-card-meta .media-card-usage {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 1px 6px;
+  border: 1px solid #d5dae1;
+  border-radius: 3px;
+  color: #5b6472;
+  font-size: 10px;
+  line-height: 1.5;
+  cursor: help;
+
+  &.is-used {
+    border-color: #f0c98a;
+    background: #fff3df;
+    color: #814900;
+  }
+}
+
 .media-card-status {
   display: flex;
   align-items: flex-start;
@@ -135,5 +154,16 @@
 
   .media-card-meta span {
     color: #aaa;
+  }
+
+  .media-card-meta .media-card-usage {
+    border-color: #505765;
+    color: #c3c9d3;
+
+    &.is-used {
+      border-color: #7a5a24;
+      background: #3a2f1c;
+      color: #ffb44d;
+    }
   }
 }

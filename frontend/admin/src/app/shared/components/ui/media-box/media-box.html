@@ -103,6 +103,16 @@
                     attachment.original_name || attachment.name
                   }}</strong>
                   <span>{{ attachmentDimensions(attachment) }}</span>
+                  <span
+                    class="media-card-usage"
+                    [class.is-used]="attachment.usage_total"
+                    [ngbTooltip]="usageDetail(attachment)"
+                    container="body"
+                    [attr.aria-label]="
+                      usageLabel(attachment) + '. ' + usageDetail(attachment)
+                    "
+                    >{{ usageLabel(attachment) }}</span
+                  >
                 </div>
 
                 @if (isSelectionDisabled(attachment)) {

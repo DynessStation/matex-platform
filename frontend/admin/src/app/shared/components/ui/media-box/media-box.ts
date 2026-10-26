@@ -12,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Params } from '@angular/router';
 
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
@@ -45,6 +46,16 @@ export type MediaSelection =
 //==== COMPONENT
 //==================================================
 
+// Where a file is used (backend attachment.ts REFERENCES), in words.
+const USAGE_SOURCES: Record<string, string> = {
+  'admin_account.profile_photo': 'Foto profil akun',
+  'office.attachment': 'Kantor',
+  'website_page.media': 'Halaman website',
+  'article.attachment': 'Artikel',
+  'product.attachment': 'Produk',
+  'product_category.attachment': 'Kategori produk',
+};
+
 @Component({
   selector: 'app-media-box',
 
@@ -58,6 +69,7 @@ export type MediaSelection =
     NoData,
     HasPermissionDirective,
     ImagePreviewDirective,
+    NgbTooltip,
   ],
 
   templateUrl: './media-box.html',
@@ -479,6 +491,23 @@ export class MediaBox {
     }
 
     return this.selectionIssue(attachment) ?? '';
+  }
+
+  /** "Dipakai: n" on each card (U-14); the tooltip lists the places. */
+  usageLabel(attachment: IAttachment): string {
+    const total = attachment.usage_total ?? 0;
+    return total ? `Dipakai: ${total}` : 'Belum dipakai';
+  }
+
+  usageDetail(attachment: IAttachment): string {
+    const places = (attachment.usage ?? [])
+      .map(
+        (item) => `${USAGE_SOURCES[item.source] ?? item.source}: ${item.total}`,
+      )
+      .join(', ');
+    return places
+      ? `${places}. Media yang dipakai tidak bisa dihapus.`
+      : 'Belum dipakai di mana pun; aman dihapus.';
   }
 
   attachmentDimensions(attachment: IAttachment): string {

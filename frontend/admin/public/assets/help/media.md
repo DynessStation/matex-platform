@@ -22,6 +22,10 @@ Mencari berdasarkan nama berkas.
 
 Terbaru, Terlama, Ukuran Terkecil, atau Ukuran Terbesar.
 
+### Dipakai
+
+Di bawah ukuran gambar tiap kartu tertulis **Dipakai: n**, yaitu berapa kali berkas itu dipakai, atau **Belum dipakai**. Arahkan kursor ke tanda itu untuk melihat tempat pemakaiannya, misalnya "Produk: 2, Halaman website: 1". Tanda yang sama juga tampil saat memilih media dari formulir lain.
+
 ### Lihat gambar
 
 Arahkan kursor ke kartu lalu klik ikon mata untuk melihat gambar penuh di layar; geser ke gambar lain di halaman yang sama dengan panah kiri dan kanan. Ikon mata tidak ikut mencentang kartu.
@@ -42,7 +46,7 @@ Ikon tempat sampah pada kartu menghapus satu berkas. Untuk beberapa berkas, cent
 
 ### Media yang sedang dipakai
 
-Berkas yang dipakai sebagai foto profil admin, foto kantor, media halaman website, gambar artikel, gambar produk, atau gambar kategori tidak bisa dihapus. Lepaskan dulu dari tempat pemakaiannya.
+Berkas yang dipakai sebagai foto profil admin, foto kantor, media halaman website, gambar artikel, gambar produk, atau gambar kategori tidak bisa dihapus; tanda **Dipakai** di kartu menunjukkan tempatnya. Lepaskan dulu dari tempat pemakaiannya.
 
 ## Memilih Media dari Formulir Lain
 
