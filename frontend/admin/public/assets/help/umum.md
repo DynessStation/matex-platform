@@ -2,7 +2,7 @@
 
 > **Untuk apa:** berpindah antarhalaman, mencari menu, mengganti bahasa/tema, dan keluar dengan aman.
 > **Izin yang dibutuhkan:** menu yang tampil mengikuti hak akses akun Anda.
-> **Perlu diperhatikan:** menu yang terlihat belum tentu berarti semua tindakan di dalamnya boleh Anda lakukan; halaman Akun Saya belum berfungsi.
+> **Perlu diperhatikan:** menu yang terlihat belum tentu berarti semua tindakan di dalamnya boleh Anda lakukan.
 
 ## Gambaran Umum
 
@@ -76,10 +76,10 @@ Pada bagian kanan Header, sistem menampilkan foto profil (atau huruf inisial nam
 
 Apabila ditekan, bagian ini menampilkan menu yang berkaitan dengan pengelolaan akun, antara lain:
 
-- **Akun Saya:** membuka halaman /account (lihat catatan di bawah).
+- **Profil Saya:** membuka halaman /account untuk mengubah foto, nama, kontak cadangan, dan kata sandi Anda.
 - **Keluar:** menampilkan kotak konfirmasi; setelah Anda menyetujui, sesi diakhiri dan Anda dikembalikan ke halaman login. Peristiwa keluar tercatat pada Log Aktivitas.
 
-Pada versi 1.0.10, halaman Akun Saya BELUM berfungsi. Tab Pengaturan Profil dan Ubah Kata Sandi merupakan tampilan bawaan template dan tombol simpannya tidak menyimpan perubahan apa pun. Jangan gunakan halaman ini untuk mengubah data. Perubahan data akun dilakukan oleh admin berwenang melalui halaman Akun Admin.
+Sejak versi 1.1, halaman Profil Saya menyimpan foto, nama, kontak cadangan, dan kata sandi lewat sistem. Data lain akun (email dan telepon utama, kantor, jabatan, profil akses) tetap diubah oleh admin berwenang melalui halaman Akun Admin.
 
 ## Footer
 

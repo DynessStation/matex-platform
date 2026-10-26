@@ -1,4 +1,5 @@
 import {
+  IAuthAdminUser,
   IAuthUserForgotModel,
   IAuthUserStateModel,
   IUpdatePasswordModel,
@@ -35,4 +36,10 @@ export class AuthClearAction {
 
 export class CheckAuthAction {
   static readonly type = '[Auth] Check';
+}
+
+/** The signed-in account after the admin changed their own profile (U-16). */
+export class UpdateAuthUserAction {
+  static readonly type = '[Auth] Update User';
+  constructor(public user: IAuthAdminUser) {}
 }

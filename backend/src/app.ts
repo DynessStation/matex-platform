@@ -137,6 +137,19 @@ const loginRateLimiter = rateLimit({
   },
 });
 
+// Wrong current passwords count like failed logins (same window and limit, own counter).
+const passwordChangeRateLimiter = rateLimit({
+  windowMs: positiveInteger(process.env.LOGIN_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000),
+  limit: positiveInteger(process.env.LOGIN_RATE_LIMIT_MAX, 10),
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    code: 'AUTH_RATE_LIMITED',
+    message: 'Too many password change attempts. Please try again later.',
+  },
+});
+
 const apiRateLimiter = rateLimit({
   windowMs: positiveInteger(process.env.API_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000),
   limit: positiveInteger(process.env.API_RATE_LIMIT_MAX, 600),
@@ -154,6 +167,7 @@ const apiRateLimiter = rateLimit({
 });
 
 app.use('/api/v1/admin-acct/login', loginRateLimiter);
+app.use('/api/v1/admin-acct/me/password', passwordChangeRateLimiter);
 app.use('/api', apiRateLimiter);
 
 const loadRoutes = (folder: string, namespace: 'admin' | 'public'): void => {

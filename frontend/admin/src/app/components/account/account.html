@@ -1,510 +1,307 @@
-<app-page-wrapper [title]="'my_account'">
-  <div class="inside-horizontal-tabs mt-0">
-    <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
-      <li ngbNavItem="profile">
-        <a ngbNavLink
-          ><i class="ri-account-pin-box-line"></i
-          >{{ 'profile_setting' | translate }}</a
-        >
-        <ng-template ngbNavContent>
-          <form
-            class="theme-form theme-form-2 mega-form"
-            [formGroup]="profileForm"
-            (ngSubmit)="profileFormSubmit()"
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'profile.title'">
+  @if (user(); as user) {
+    <div class="profile-page row g-4">
+      <!--==================================================
+      ==== PHOTO AND ACCOUNT INFO
+      ==================================================-->
+
+      <div class="col-xl-4">
+        <section class="profile-panel profile-identity">
+          <div
+            class="profile-avatar"
+            [appImagePreview]="user.profile_photo?.asset_url"
+            [previewAlt]="user.name"
           >
-            <div class="row">
-              <app-form-fields
-                [label]="'avatar'"
-                [for]="'image'"
-                [required]="false"
-              >
-                <app-image-upload
-                  [multipleImage]="false"
-                  [accept]="[mediaConfig.image]"
-                  [image]="(user$ | async)?.profile_image"
-                  (selectedFiles)="selectedFiles($event)"
-                  [helpText]="'*Upload image size 100x100px recommended'"
-                />
-              </app-form-fields>
+            @if (user.profile_photo?.asset_url) {
+              <img [src]="user.profile_photo?.asset_url" [alt]="user.name" />
+            } @else {
+              <span aria-hidden="true">{{ initial() }}</span>
+            }
+          </div>
 
-              <app-form-fields
-                [label]="'name' | translate"
-                [for]="'name'"
-                [required]="true"
-              >
-                <input
-                  class="form-control"
-                  type="text"
-                  placeholder="{{ 'enter_full_name' | translate }}"
-                  name="name"
-                  formControlName="name"
-                />
+          <h3 class="profile-name">{{ user.name }}</h3>
+          <span class="profile-alias">
+            {{ user.alias }}
+            @if (user.is_all_access === 1) {
+              <span class="profile-badge">
+                {{ 'profile.full_access' | translate }}
+              </span>
+            }
+          </span>
 
-                @if (
-                  profileForm.controls['name'].touched &&
-                  profileForm.controls['name'].errors?.['required']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'name_is_required' | translate }}
-                  </div>
-                }
-              </app-form-fields>
-
-              <app-form-fields
-                [label]="'email'"
-                [for]="'email'"
-                [required]="true"
-              >
-                <input
-                  class="form-control"
-                  type="email"
-                  placeholder="{{ 'enter_email' | translate }}"
-                  name="email"
-                  formControlName="email"
-                />
-
-                @if (
-                  profileForm.controls['email'].touched &&
-                  profileForm.controls['email'].errors?.['required']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'email_is_required' | translate }}
-                  </div>
-                }
-                @if (
-                  profileForm.controls['email'].touched &&
-                  profileForm.controls['email'].errors?.['email']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'enter_valid_email' | translate }}
-                  </div>
-                }
-              </app-form-fields>
-
-              <app-form-fields
-                [label]="'phone'"
-                [for]="'phone'"
-                [required]="true"
-              >
-                @if (isBrowser) {
-                  <select2
-                    class="custom-select intl-tel-input"
-                    [templates]="template"
-                    [data]="codes"
-                    [value]="(user$ | async)?.country_code"
-                    (update)="selectCode($event)"
-                  >
-                    <ng-template #template let-data="data">
-                      <div class="country">
-                        <div class="flag-box">
-                          <div class="iti-flag {{ data?.class }}"></div>
-                        </div>
-                        <span class="dial-code">{{ data.code }}</span>
-                      </div>
-                    </ng-template>
-                  </select2>
-                }
-                <input
-                  type="number"
-                  class="form-control intl-input-padding"
-                  formControlName="phone"
-                  placeholder="{{ 'enter_phone' | translate }}"
-                  name="phone"
-                />
-
-                @if (
-                  profileForm.controls['phone'].touched &&
-                  profileForm.controls['phone'].errors?.['required']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'phone_number_is_required' | translate }}
-                  </div>
-                }
-                @if (
-                  profileForm.controls['phone'].touched &&
-                  profileForm.controls['phone'].errors?.['pattern']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'phone_number_is_invalid' | translate }}
-                  </div>
-                }
-              </app-form-fields>
-            </div>
-            <app-button [id]="'profile_btn'">{{
-              'save' | translate
-            }}</app-button>
-          </form>
-        </ng-template>
-      </li>
-
-      @if ((roleName$ | async) === 'vendor' && !flicker) {
-        <li ngbNavItem="vendor-setting">
-          <a ngbNavLink
-            ><i class="ri-account-pin-box-line"></i
-            >{{ 'store_setting' | translate }}</a
-          >
-          <ng-template ngbNavContent>
-            <form
-              class="theme-form theme-form-2 mega-form"
-              [formGroup]="form"
-              (ngSubmit)="updateStore()"
+          <div class="profile-photo-actions">
+            <input
+              #photoInput
+              type="file"
+              class="d-none"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onPhotoChosen($event)"
+            />
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              id="profile_photo_btn"
+              [disabled]="photoBusy()"
+              (click)="choosePhoto()"
             >
-              <div class="row">
-                <app-form-fields
-                  [label]="'store_logo' | translate"
-                  [for]="'logo'"
-                  [required]="false"
-                >
-                  <app-image-upload
-                    [accept]="[mediaConfig.image]"
-                    [multipleImage]="false"
-                    [image]="(user$ | async)?.store?.store_logo"
-                    (selectedFiles)="selectStoreLogo($event)"
-                  />
-                </app-form-fields>
+              <i class="ri-image-edit-line" aria-hidden="true"></i>
+              {{ 'profile.change_photo' | translate }}
+            </button>
+            @if (user.profile_photo) {
+              <button
+                type="button"
+                class="btn btn-light-bg"
+                id="profile_photo_remove_btn"
+                [disabled]="photoBusy()"
+                (click)="removePhoto()"
+              >
+                {{ 'profile.remove_photo' | translate }}
+              </button>
+            }
+          </div>
+          <p class="profile-hint">{{ 'profile.photo_hint' | translate }}</p>
 
-                <app-form-fields
-                  [label]="'store_name'"
-                  [for]="'store_name'"
-                  [required]="true"
-                >
-                  <input
-                    class="form-control"
-                    type="text"
-                    placeholder="{{ 'enter_store_name' | translate }}"
-                    formControlName="store_name"
-                  />
-                  @if (
-                    form?.controls['store_name'].touched &&
-                    form.controls['store_name'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'store_name_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
+          <dl class="profile-facts">
+            <div>
+              <dt>{{ 'profile.email_1' | translate }}</dt>
+              <dd appTextFit>{{ user.email_1 }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'profile.phone_1' | translate }}</dt>
+              <dd appTextFit>{{ user.phone_1 }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'profile.company' | translate }}</dt>
+              <dd appTextFit>{{ user.master_comp?.comp_name }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'profile.office' | translate }}</dt>
+              <dd appTextFit>{{ user.office?.office_name }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'profile.position' | translate }}</dt>
+              <dd appTextFit>{{ user.chair?.chair_name }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'profile.access' | translate }}</dt>
+              <dd appTextFit>
+                {{ user.access?.access_name }}
+              </dd>
+            </div>
+          </dl>
+          <p class="profile-hint">{{ 'profile.managed_hint' | translate }}</p>
+        </section>
+      </div>
 
-                <app-form-fields
-                  [label]="'store_description'"
-                  [for]="'description'"
-                  [required]="true"
-                >
-                  <textarea
-                    class="form-control"
-                    placeholder="{{ 'enter_description' | translate }}"
-                    formControlName="description"
-                    rows="3"
-                  ></textarea>
-                  @if (
-                    form.controls['description'].touched &&
-                    form.controls['description'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'description_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
+      <div class="col-xl-8">
+        <!--==================================================
+        ==== NAME AND BACKUP CONTACTS
+        ==================================================-->
 
-                <app-form-fields
-                  [label]="'country'"
-                  [for]="'country'"
-                  [required]="true"
-                >
-                  @if (isBrowser) {
-                    <select2
-                      class="custom-select"
-                      [data]="
-                        (countries$ | async)?.length ? (countries$ | async) : []
-                      "
-                      [placeholder]="'select_country' | translate"
-                      formControlName="country_id"
-                      (update)="countryChange($event)"
-                      resettable
-                    />
-                  }
-                  @if (
-                    form?.controls['country_id']?.touched &&
-                    form?.controls['country_id']?.errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'country_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
+        <section class="profile-panel">
+          <header class="profile-panel-header">
+            <h4>{{ 'profile.details' | translate }}</h4>
+            <p>{{ 'profile.details_hint' | translate }}</p>
+          </header>
 
-                <app-form-fields
-                  [label]="'state'"
-                  [for]="'state'"
-                  [required]="true"
-                >
-                  @if (isBrowser) {
-                    <select2
-                      class="custom-select"
-                      [data]="
-                        (states$ | async)?.length ? (states$ | async) : []
-                      "
-                      [placeholder]="'select_state' | translate"
-                      formControlName="state_id"
-                      resettable
-                    />
-                  }
-                  @if (
-                    form?.controls['state_id'].touched &&
-                    form?.controls['state_id'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'state_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
-
-                <app-form-fields
-                  [label]="'city'"
-                  [for]="'city'"
-                  [required]="true"
-                >
-                  <input
-                    class="form-control"
-                    type="text"
-                    placeholder="{{ 'enter_city_name' | translate }}"
-                    name="city"
-                    formControlName="city"
-                  />
-
-                  @if (
-                    form.controls['city'].touched &&
-                    form.controls['city'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'city_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
-
-                <app-form-fields
-                  [label]="'address'"
-                  [for]="'address'"
-                  [required]="true"
-                >
-                  <input
-                    class="form-control"
-                    type="text"
-                    placeholder="{{ 'enter_store_address' | translate }}"
-                    name="address"
-                    formControlName="address"
-                  />
-
-                  @if (
-                    form.controls['address'].touched &&
-                    form.controls['address'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'address_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
-
-                <app-form-fields
-                  [label]="'pincode'"
-                  [for]="'pincode'"
-                  [required]="true"
-                >
-                  <input
-                    class="form-control"
-                    type="number"
-                    placeholder="{{ 'enter_pincode' | translate }}"
-                    name="pincode"
-                    formControlName="pincode"
-                  />
-                  @if (
-                    form.controls['pincode'].touched &&
-                    form.controls['pincode'].errors?.['required']
-                  ) {
-                    <div class="invalid-feedback">
-                      {{ 'pincode_is_required' | translate }}
-                    </div>
-                  }
-                </app-form-fields>
-
-                <app-form-fields [label]="'faceBook'" [for]="'facebook'">
-                  <input
-                    type="url"
-                    class="form-control"
-                    placeholder="{{ 'enter_url' | translate }}"
-                    formControlName="facebook"
-                  />
-                </app-form-fields>
-
-                <app-form-fields [label]="'instagram'" [for]="'instagram'">
-                  <input
-                    type="url"
-                    class="form-control"
-                    placeholder="{{ 'enter_url' | translate }}"
-                    formControlName="instagram"
-                  />
-                </app-form-fields>
-
-                <app-form-fields [label]="'twitter'" [for]="'Twitter'">
-                  <input
-                    type="url"
-                    class="form-control"
-                    placeholder="{{ 'enter_url' | translate }}"
-                    formControlName="twitter"
-                  />
-                </app-form-fields>
-
-                <app-form-fields [label]="'youtube'" [for]="'youtube'">
-                  <input
-                    type="url"
-                    class="form-control"
-                    placeholder="{{ 'enter_url' | translate }}"
-                    formControlName="youtube"
-                  />
-                </app-form-fields>
-
-                <app-form-fields [label]="'pinterest'" [for]="'pinterest'">
-                  <input
-                    type="url"
-                    class="form-control"
-                    placeholder="{{ 'enter_url' | translate }}"
-                    formControlName="pinterest"
-                  />
-                </app-form-fields>
-
-                <app-form-fields
-                  [label]="'hide_email' | translate"
-                  [for]="'hide_vendor_email'"
-                  [required]="false"
-                >
-                  <div class="form-check form-switch ps-0">
-                    <label class="switch">
-                      <input
-                        type="checkbox"
-                        id="hide_vendor_email"
-                        formControlName="hide_vendor_email"
-                      />
-                      <span class="switch-state"></span>
-                    </label>
-                  </div>
-                </app-form-fields>
-
-                <app-form-fields
-                  [label]="'hide_phone' | translate"
-                  [for]="'hide_vendor_phone'"
-                  [required]="false"
-                >
-                  <div class="form-check form-switch ps-0">
-                    <label class="switch">
-                      <input
-                        type="checkbox"
-                        id="hide_vendor_phone"
-                        formControlName="hide_vendor_phone"
-                      />
-                      <span class="switch-state"></span>
-                    </label>
-                  </div>
-                </app-form-fields>
-              </div>
-              <app-button [id]="'store_setting_btn'">{{
-                'save' | translate
-              }}</app-button>
-            </form>
-          </ng-template>
-        </li>
-      }
-
-      <li ngbNavItem="password">
-        <a ngbNavLink
-          ><i class="ri-phone-lock-line"></i>
-          {{ 'change_password' | translate }}</a
-        >
-        <ng-template ngbNavContent>
           <form
-            class="theme-form theme-form-2 mega-form"
-            [formGroup]="passwordForm"
-            (ngSubmit)="passwordFormSubmit()"
+            class="theme-form"
+            [formGroup]="profileForm"
+            (ngSubmit)="saveProfile()"
           >
-            <div class="row">
-              <app-form-fields
-                [label]="'current_password'"
-                [for]="'current_password'"
-                [required]="true"
-              >
-                <input
-                  class="form-control"
-                  type="password"
-                  placeholder="{{ 'enter_current_password' | translate }}"
-                  name="current_password"
-                  formControlName="current_password"
-                />
-                @if (
-                  passwordForm.controls['current_password'].touched &&
-                  passwordForm.controls['current_password'].errors?.['required']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'current_password_is_required' | translate }}
+            <app-form-fields
+              [label]="'profile.name' | translate"
+              [for]="'profile_name'"
+              [required]="true"
+            >
+              <input
+                id="profile_name"
+                type="text"
+                class="form-control"
+                formControlName="name"
+                maxlength="50"
+                autocomplete="name"
+              />
+              @if (profileForm.controls.name.touched) {
+                @if (profileForm.controls.name.hasError('required')) {
+                  <div class="text-danger mt-1">
+                    {{ 'profile.name_required' | translate }}
+                  </div>
+                } @else if (profileForm.controls.name.invalid) {
+                  <div class="text-danger mt-1">
+                    {{ 'profile.name_invalid' | translate }}
                   </div>
                 }
-              </app-form-fields>
+              }
+            </app-form-fields>
 
+            <app-form-fields
+              [label]="'profile.email_2' | translate"
+              [for]="'profile_email_2'"
+            >
+              <input
+                id="profile_email_2"
+                type="email"
+                class="form-control"
+                formControlName="email_2"
+                autocomplete="email"
+                [placeholder]="'profile.optional' | translate"
+              />
+              @if (
+                profileForm.controls.email_2.touched &&
+                profileForm.controls.email_2.invalid
+              ) {
+                <div class="text-danger mt-1">
+                  {{ 'enter_valid_email' | translate }}
+                </div>
+              }
+            </app-form-fields>
+
+            <app-form-fields
+              [label]="'profile.phone_2' | translate"
+              [for]="'profile_phone_2'"
+            >
+              <input
+                id="profile_phone_2"
+                type="tel"
+                class="form-control"
+                formControlName="phone_2"
+                autocomplete="tel"
+                placeholder="+6281234567890"
+              />
+              @if (
+                profileForm.controls.phone_2.touched &&
+                profileForm.controls.phone_2.invalid
+              ) {
+                <div class="text-danger mt-1">
+                  {{ 'profile.phone_invalid' | translate }}
+                </div>
+              } @else {
+                <div class="profile-hint mt-1">
+                  {{ 'profile.phone_hint' | translate }}
+                </div>
+              }
+            </app-form-fields>
+
+            <div class="profile-actions">
+              <app-button
+                [id]="'profile_save_btn'"
+                [class]="'btn btn-theme'"
+                [disabled]="savingProfile()"
+              >
+                {{ 'profile.save_details' | translate }}
+              </app-button>
+            </div>
+          </form>
+        </section>
+
+        <!--==================================================
+        ==== PASSWORD
+        ==================================================-->
+
+        <section class="profile-panel">
+          <header class="profile-panel-header">
+            <h4>{{ 'profile.password' | translate }}</h4>
+            <p>{{ 'profile.password_hint' | translate }}</p>
+          </header>
+
+          <form
+            class="theme-form"
+            [formGroup]="passwordForm"
+            (ngSubmit)="changePassword()"
+          >
+            @for (
+              field of [
+                'current_password',
+                'password',
+                'password_confirmation',
+              ];
+              track field
+            ) {
               <app-form-fields
-                [label]="'new_password'"
-                [for]="'new_password'"
+                [label]="
+                  (field === 'password'
+                    ? 'profile.password_new'
+                    : 'profile.' + field
+                  ) | translate
+                "
+                [for]="'profile_' + field"
                 [required]="true"
               >
-                <input
-                  class="form-control"
-                  type="password"
-                  placeholder="{{ 'enter_new_password' | translate }}"
-                  name="password"
-                  formControlName="password"
-                />
-                @if (
-                  passwordForm.controls['password'].touched &&
-                  passwordForm.controls['password'].errors?.['required']
-                ) {
-                  <div class="invalid-feedback">
-                    {{ 'new_password_is_required' | translate }}
+                <div class="input-group profile-password">
+                  <input
+                    [id]="'profile_' + field"
+                    class="form-control"
+                    [type]="showPassword()[field] ? 'text' : 'password'"
+                    [formControlName]="field"
+                    [attr.autocomplete]="
+                      field === 'current_password'
+                        ? 'current-password'
+                        : 'new-password'
+                    "
+                  />
+                  <button
+                    type="button"
+                    class="input-group-text"
+                    [attr.aria-label]="
+                      (showPassword()[field]
+                        ? 'profile.hide_password'
+                        : 'profile.show_password'
+                      ) | translate
+                    "
+                    (click)="togglePassword(field)"
+                  >
+                    <i
+                      [class]="
+                        showPassword()[field]
+                          ? 'ri-eye-off-line'
+                          : 'ri-eye-line'
+                      "
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                </div>
+                @let control = passwordForm.get(field)!;
+                @if (control.touched && control.hasError('required')) {
+                  <div class="text-danger mt-1">
+                    {{ 'profile.field_required' | translate }}
                   </div>
-                }
-              </app-form-fields>
-
-              <app-form-fields
-                [label]="'confirm_password'"
-                [for]="'confirm_password'"
-                [required]="true"
-              >
-                <input
-                  class="form-control"
-                  type="password"
-                  placeholder="{{ 'enter_confirm_password' | translate }}"
-                  name="password_confirmation"
-                  formControlName="password_confirmation"
-                />
-
-                @if (
-                  passwordForm.controls['password_confirmation'].touched &&
-                  passwordForm.controls['password_confirmation'].errors?.[
-                    'required'
-                  ]
+                } @else if (
+                  field === 'password' &&
+                  control.touched &&
+                  control.hasError('pattern')
                 ) {
-                  <div class="invalid-feedback">
-                    {{ 'confirm_password_is_required' | translate }}
+                  <div class="text-danger mt-1">
+                    {{ 'profile.password_rule' | translate }}
                   </div>
-                } @else if (passwordMatchError) {
-                  <div class="invalid-feedback">
+                } @else if (
+                  field === 'password_confirmation' &&
+                  control.touched &&
+                  passwordForm.hasError('mismatch')
+                ) {
+                  <div class="text-danger mt-1">
                     {{ 'confirm_password_does_not_matched' | translate }}
                   </div>
+                } @else if (field === 'password') {
+                  <div class="profile-hint mt-1">
+                    {{ 'profile.password_rule' | translate }}
+                  </div>
                 }
               </app-form-fields>
+            }
+
+            <div class="profile-actions">
+              <app-button
+                [id]="'profile_password_btn'"
+                [class]="'btn btn-theme'"
+                [disabled]="savingPassword()"
+              >
+                {{ 'profile.change_password' | translate }}
+              </app-button>
             </div>
-            <app-button [id]="'password_btn'">{{
-              'save' | translate
-            }}</app-button>
           </form>
-        </ng-template>
-      </li>
-    </ul>
-    <div [ngbNavOutlet]="nav" class="mt-3"></div>
-  </div>
+        </section>
+      </div>
+    </div>
+  }
 </app-page-wrapper>

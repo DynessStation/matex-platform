@@ -15,6 +15,7 @@ import {
   ForgotPassWordAction,
   LoginAction,
   LogoutAction,
+  UpdateAuthUserAction,
   UpdatePasswordAction,
   VerifyEmailOtpAction,
 } from '../action/auth.action';
@@ -205,6 +206,26 @@ export class AuthState {
         this.sessionService.startExpiryWatcher();
       }),
     );
+  }
+
+  //==================================================
+  //==== OWN PROFILE CHANGED (U-16)
+  //==================================================
+
+  @Action(UpdateAuthUserAction)
+  updateUser(
+    ctx: StateContext<AuthStateModel>,
+    { user }: UpdateAuthUserAction,
+  ) {
+    ctx.patchState({
+      user,
+
+      email: user?.email_1 ?? '',
+
+      permissions: user?.access?.permissions ?? [],
+
+      is_all_access: user?.is_all_access === 1,
+    });
   }
 
   //==================================================

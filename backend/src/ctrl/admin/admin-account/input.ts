@@ -29,6 +29,20 @@ const invalid = (code: string, message: string) => new HttpError(400, code, mess
 
 const PHONE = /^\+[1-9]\d{6,14}$/;
 
+/** Letters, spaces, and . , ' - only, at most 50 characters. */
+export const isValidAccountName = (name: string): boolean =>
+  name.length <= 50 && /^[\p{L}\s.,'-]+$/u.test(name);
+
+/** International format: "+" and 7 to 15 digits. */
+export const isValidAccountPhone = (phone: string): boolean => PHONE.test(phone);
+
+/** 8 to 64 characters, no spaces, at least one character that is not a letter. */
+export const isValidAccountPassword = (password: string): boolean =>
+  password.length >= 8 &&
+  password.length <= 64 &&
+  !/\s/.test(password) &&
+  /[^a-zA-Z]/.test(password);
+
 /** Reads and validates the account fields; `withPassword` on create. */
 export const readAccountInput = (
   body: any,
@@ -56,7 +70,7 @@ export const readAccountInput = (
   const phone1 = String(body.phone_1).trim();
   const phone2 = body.phone_2 ? String(body.phone_2).trim() : null;
 
-  if (name.length > 50 || !/^[\p{L}\s.,'-]+$/u.test(name)) {
+  if (!isValidAccountName(name)) {
     throw invalid('ADMIN_ACCOUNT_NAME_INVALID', 'Invalid name format');
   }
   if (alias.length > 15 || !/^[a-zA-Z0-9]+$/.test(alias)) {
@@ -65,18 +79,12 @@ export const readAccountInput = (
   if (!isValidEmail(email1) || (email2 && !isValidEmail(email2))) {
     throw invalid('ADMIN_ACCOUNT_EMAIL_INVALID', 'Invalid email address');
   }
-  if (!PHONE.test(phone1) || (phone2 && !PHONE.test(phone2))) {
+  if (!isValidAccountPhone(phone1) || (phone2 && !isValidAccountPhone(phone2))) {
     throw invalid('ADMIN_ACCOUNT_PHONE_INVALID', 'Invalid phone number');
   }
 
   const password = withPassword ? String(body.password) : null;
-  if (
-    password !== null &&
-    (password.length < 8 ||
-      password.length > 64 ||
-      /\s/.test(password) ||
-      !/[^a-zA-Z]/.test(password))
-  ) {
+  if (password !== null && !isValidAccountPassword(password)) {
     throw invalid('ADMIN_ACCOUNT_PASSWORD_INVALID', 'Invalid password format');
   }
 
@@ -182,7 +190,7 @@ export const assertAccountReferences = async (
  */
 export const assertAccountUnique = async (
   connection: PoolConnection,
-  input: AccountInput,
+  input: Pick<AccountInput, 'alias' | 'email1' | 'email2' | 'phone1' | 'phone2'>,
   excludeIdAdminAcct?: number,
 ): Promise<void> => {
   const exclude = excludeIdAdminAcct ? 'id_admin_acct != ? AND' : '';

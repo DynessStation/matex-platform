@@ -149,8 +149,8 @@ Berikut kode peristiwa (event) yang ditulis oleh server saat ini. Gunakan kode i
 
 | Kelompok | Kode peristiwa |
 | --- | --- |
-| Autentikasi dan sesi | auth.login.succeeded, auth.login.failed, auth.login.denied, auth.logout, auth.session.invalid, auth.account.inactive, auth.access_company_mismatch, auth.access_profile.inactive, auth.permission.denied |
-| Akun admin | admin_account.created, .updated, .status_changed, .deleted |
+| Autentikasi dan sesi | auth.login.succeeded, auth.login.failed, auth.login.denied, auth.logout, auth.session.invalid, auth.account.inactive, auth.access_company_mismatch, auth.access_profile.inactive, auth.permission.denied, auth.password.changed, auth.password.change_failed |
+| Akun admin | admin_account.created, .updated, .status_changed, .deleted, .profile_updated (perubahan Profil Saya) |
 | Profil akses | admin_access.created, .updated, .permissions_changed, .status_changed, .deleted |
 | Hak akses | admin_permission.created, .updated, .status_changed, .deleted |
 | Jabatan | chair.created, .updated, .status_changed, .deleted |

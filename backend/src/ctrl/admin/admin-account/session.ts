@@ -12,6 +12,7 @@ import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 
 import { readPermissionKeys, SESSION_ACCOUNT_SELECT, sessionAccountDto } from './records';
+import { issueAccessToken } from './token';
 
 const { pool } = db;
 
@@ -119,22 +120,7 @@ router.post('/api/v1/admin-acct/login', multer().none(), async (req: Request, re
 
   const permissions = await readPermissionKeys(user.id_access);
 
-  const secretKey = process.env.JWT_SECRET;
-  if (!secretKey) throw new Error('JWT_SECRET is not configured');
-  const token = jwt.sign(
-    {
-      id_admin_acct: user.id_admin_acct,
-      alias: user.alias,
-      id_access: user.id_access,
-      tv: Number(user.token_version ?? 0),
-    },
-    secretKey,
-    {
-      expiresIn: (process.env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn']) || '24h',
-    },
-  );
-  res.cookie('access_token', token, { ...accessTokenCookieOptions(), maxAge: 24 * 60 * 60 * 1000 });
-  const decoded = jwt.decode(token) as jwt.JwtPayload;
+  const decoded = issueAccessToken(res, user);
 
   await securityAudit(req, user, {
     eventCode: 'auth.login.succeeded',

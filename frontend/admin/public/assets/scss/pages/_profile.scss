@@ -1,0 +1,172 @@
+/**=====================
+     Profil saya (U-16)
+==========================**/
+
+.profile-page {
+  --profile-border: #e6e8eb;
+  --profile-muted: #6b7280;
+  --profile-heading: #30343b;
+  --profile-soft: #f6f7f9;
+}
+
+body.dark-only .profile-page {
+  --profile-border: #404040;
+  --profile-muted: #98a6ad;
+  --profile-heading: rgba(255, 255, 255, 0.85);
+  --profile-soft: #0b141d;
+}
+
+.profile-panel {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid var(--profile-border);
+  border-radius: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.profile-panel-header {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--profile-border);
+
+  h4 {
+    margin: 0 0 4px;
+    color: var(--profile-heading);
+    font-size: var(--admin-heading);
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: var(--profile-muted);
+    font-size: var(--admin-text);
+  }
+}
+
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  overflow: hidden;
+  border: 1px solid var(--profile-border);
+  border-radius: 50%;
+  background: var(--profile-soft);
+  color: var(--theme-color);
+  font-size: 40px;
+  font-weight: 600;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-name {
+  margin: 14px 0 2px;
+  color: var(--profile-heading);
+  font-size: var(--admin-heading);
+  font-weight: 600;
+}
+
+.profile-alias {
+  color: var(--profile-muted);
+  font-size: var(--admin-text);
+}
+
+.profile-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--admin-bar-height);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.profile-hint {
+  margin: 8px 0 0;
+  color: var(--profile-muted);
+  font-size: var(--admin-text-sm);
+}
+
+.profile-facts {
+  width: 100%;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--profile-border);
+  text-align: left;
+
+  > div {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  dt {
+    color: var(--profile-muted);
+    font-size: var(--admin-text);
+    font-weight: 500;
+  }
+
+  // One line; a long value (an email) ends in "…" with a tooltip (appTextFit).
+  dd {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--profile-heading);
+    font-size: var(--admin-text);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.profile-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--theme-color) 14%, transparent);
+  color: var(--theme-color);
+  font-size: var(--admin-text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.profile-password {
+  flex-wrap: nowrap;
+
+  .input-group-text {
+    cursor: pointer;
+  }
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  .btn {
+    margin: 0;
+  }
+}

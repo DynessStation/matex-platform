@@ -1,221 +1,244 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID } from '@angular/core';
 import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import {
+  AbstractControl,
   FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import {
-  Select2Data,
-  Select2Module,
-  Select2UpdateEvent,
-} from 'ng-select2-component';
-import { Observable, map } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
 import { FormFields } from '../../shared/components/ui/form-fields/form-fields';
-import { ImageUpload } from '../../shared/components/ui/image-upload/image-upload';
-import * as data from '../../shared/data/country-code';
-import * as media from '../../shared/data/media-config';
-import { IAccountUser } from '../../shared/interface/account.interface';
-import { IAttachment } from '../../shared/interface/attachment.interface';
-import { IStores } from '../../shared/interface/store.interface';
-import {
-  UpdateUserPasswordAction,
-  UpdateUserProfileAction,
-  UpdateStoreDetailsAction,
-} from '../../shared/store/action/account.action';
-import { AccountState } from '../../shared/store/state/account.state';
-import { GetCountriesAction } from '../../shared/store/action/country.action';
-import { GetStatesAction } from '../../shared/store/action/state.action';
-import { CountryState } from '../../shared/store/state/country.state';
-import { StateState } from '../../shared/store/state/state.state';
-import { StoreState } from '../../shared/store/state/store.state';
-import { CustomValidators } from '../../shared/validator/password-match';
+import { ImagePreviewDirective } from '../../shared/directives/image-preview.directive';
+import { TextFitDirective } from '../../shared/directives/text-fit.directive';
+import { IAuthResponse } from '../../shared/interface/auth.interface';
+import { ApiMessageService } from '../../shared/services/api-message.service';
+import { NotificationService } from '../../shared/services/notification.service';
+import { ProfileService } from '../../shared/services/profile.service';
+import { UpdateAuthUserAction } from '../../shared/store/action/auth.action';
+import { AuthState } from '../../shared/store/state/auth.state';
 
+// The same rules as the API (admin-account input): letters and . , ' - for names,
+// "+" and 7-15 digits for phones, 8-64 characters with a non-letter for passwords.
+const NAME = /^[\p{L}\s.,'-]+$/u;
+const PHONE = /^\+[1-9]\d{6,14}$/;
+const PASSWORD = /^(?=.*[^a-zA-Z])\S{8,64}$/;
+
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value;
+
+  const confirmation = group.get('password_confirmation')?.value;
+
+  return confirmation && password !== confirmation ? { mismatch: true } : null;
+}
+
+// "Profil saya" (U-16): the signed-in admin's photo, name, and backup contacts, and a
+// password change that signs out other devices. Login identities, office, position, and
+// access profile are shown only; they change through Akun Admin.
 @Component({
   selector: 'app-account',
   imports: [
     TranslateModule,
-    FormsModule,
     ReactiveFormsModule,
-    NgbModule,
-    CommonModule,
-    Select2Module,
     PageWrapper,
     FormFields,
-    ImageUpload,
     Button,
+    ImagePreviewDirective,
+    TextFitDirective,
   ],
   templateUrl: './account.html',
-  styleUrl: './account.scss',
 })
 export class Account {
-  private store = inject(Store);
-  private formBuilder = inject(FormBuilder);
-  private platformId = inject<Object>(PLATFORM_ID);
+  private readonly store = inject(Store);
+  private readonly profiles = inject(ProfileService);
+  private readonly notifications = inject(NotificationService);
+  private readonly apiMessages = inject(ApiMessageService);
+  private readonly translate = inject(TranslateService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly formBuilder = inject(FormBuilder);
 
-  user$: Observable<IAccountUser> = inject(Store).select(AccountState.user);
-  store$: Observable<IStores> = inject(Store).select(
-    StoreState.selectedStore,
-  ) as Observable<IStores>;
-  countries$: Observable<Select2Data> = inject(Store).select(
-    CountryState.countries,
-  ) as Observable<Select2Data>;
-  roleName$: Observable<string> = inject(Store).select(
-    AccountState.getRoleName,
-  ) as Observable<string>;
+  readonly user = toSignal(this.store.select(AuthState.user));
 
-  public active = 'profile';
-  public profileForm: FormGroup;
-  public passwordForm: FormGroup;
-  public form: FormGroup;
-  public codes = data.countryCodes;
-  public states$: Observable<Select2Data>;
-  public flicker: boolean = false;
-  public mediaConfig = media.mediaConfig;
-  public isBrowser: boolean;
+  private readonly photoInput =
+    viewChild<ElementRef<HTMLInputElement>>('photoInput');
+
+  readonly profileForm = this.formBuilder.nonNullable.group({
+    name: [
+      '',
+      [Validators.required, Validators.maxLength(50), Validators.pattern(NAME)],
+    ],
+    email_2: ['', [Validators.email]],
+    phone_2: ['', [Validators.pattern(PHONE)]],
+  });
+
+  readonly passwordForm = this.formBuilder.nonNullable.group(
+    {
+      current_password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.pattern(PASSWORD)]],
+      password_confirmation: ['', [Validators.required]],
+    },
+    { validators: passwordsMatch },
+  );
+
+  readonly savingProfile = signal(false);
+
+  readonly savingPassword = signal(false);
+
+  readonly photoBusy = signal(false);
+
+  readonly showPassword = signal<Record<string, boolean>>({});
 
   constructor() {
-    const platformId = this.platformId;
+    // The form shows the account until the admin starts editing it.
+    effect(() => {
+      const user = this.user();
 
-    this.isBrowser = isPlatformBrowser(platformId);
-    this.user$.subscribe((user) => {
-      this.profileForm = this.formBuilder.group({
-        name: new FormControl(user?.name, [Validators.required]),
-        email: new FormControl(user?.email, [
-          Validators.required,
-          Validators.email,
-        ]),
-        phone: new FormControl(user?.phone, [
-          Validators.required,
-          Validators.pattern(/^[0-9]*$/),
-        ]),
-        country_code: new FormControl(user?.country_code, [
-          Validators.required,
-        ]),
-        profile_image_id: new FormControl(user?.profile_image_id),
-      });
-
-      this.flicker = true;
-
-      if (user?.store) {
-        this.form = this.formBuilder.group({
-          store_name: new FormControl(user.store.store_name, [
-            Validators.required,
-          ]),
-          description: new FormControl(user.store.description, [
-            Validators.required,
-          ]),
-          country_id: new FormControl(user.store?.country_id, [
-            Validators.required,
-          ]),
-          state_id: new FormControl(user?.store?.state_id, [
-            Validators.required,
-          ]),
-          city: new FormControl(user?.store?.city, [Validators.required]),
-          address: new FormControl(user?.store?.address, [Validators.required]),
-          pincode: new FormControl(user?.store?.pincode, [Validators.required]),
-          store_logo_id: new FormControl(user?.store?.store_logo_id),
-          hide_vendor_email: new FormControl(user?.store?.hide_vendor_email),
-          hide_vendor_phone: new FormControl(user?.store?.hide_vendor_phone),
-          facebook: new FormControl(user?.store?.facebook),
-          instagram: new FormControl(user?.store?.instagram),
-          pinterest: new FormControl(user?.store?.pinterest),
-          youtube: new FormControl(user?.store?.youtube),
-          twitter: new FormControl(user?.store?.twitter),
+      if (user && this.profileForm.pristine) {
+        this.profileForm.reset({
+          name: user.name ?? '',
+          email_2: user.email_2 ?? '',
+          phone_2: user.phone_2 ?? '',
         });
       }
-
-      setTimeout(() => (this.flicker = false), 200);
     });
-
-    this.passwordForm = this.formBuilder.group(
-      {
-        current_password: new FormControl('', [Validators.required]),
-        password: new FormControl('', [Validators.required]),
-        password_confirmation: new FormControl('', [Validators.required]),
-      },
-      {
-        validator: CustomValidators.MatchValidator(
-          'password',
-          'password_confirmation',
-        ),
-      },
-    );
   }
 
-  ngOnInit() {
-    // Only this page uses the country and state lists (loaded here, not on every admin visit).
-    this.store.dispatch([new GetCountriesAction(), new GetStatesAction()]);
-    this.states$ = this.store
-      .select(StateState.states)
-      .pipe(map((filterFn) => filterFn(null)));
+  initial(): string {
+    return (this.user()?.name ?? '?').trim().charAt(0).toUpperCase();
   }
 
-  countryChange(data: Select2UpdateEvent) {
-    if (data && data?.value) {
-      this.states$ = this.store
-        .select(StateState.states)
-        .pipe(map((filterFn) => filterFn(+data?.value)));
-
-      if (data.component.focused) this.form.controls['state_id'].setValue('');
-    } else {
-      this.form.controls['state_id'].setValue('');
-    }
+  togglePassword(field: string): void {
+    this.showPassword.update((shown) => ({ ...shown, [field]: !shown[field] }));
   }
 
-  get passwordMatchError() {
-    return (
-      this.passwordForm?.getError('mismatch') &&
-      this.passwordForm?.get('password_confirmation')?.touched
-    );
-  }
+  //==================================================
+  //==== NAME AND BACKUP CONTACTS
+  //==================================================
 
-  selectCode(data: Select2UpdateEvent) {
-    this.profileForm.controls['country_code'].setValue(data?.value);
-  }
-
-  selectedFiles(data: IAttachment) {
-    if (!Array.isArray(data)) {
-      this.profileForm.controls['profile_image_id'].setValue(
-        data ? data.id : '',
-      );
-    }
-  }
-
-  profileFormSubmit() {
+  saveProfile(): void {
     this.profileForm.markAllAsTouched();
-    if (this.profileForm.valid) {
-      this.store.dispatch(new UpdateUserProfileAction(this.profileForm.value));
+
+    if (this.profileForm.invalid || this.savingProfile()) {
+      return;
     }
+
+    const value = this.profileForm.getRawValue();
+
+    this.savingProfile.set(true);
+
+    this.applyAccount(
+      this.profiles.updateProfile({
+        name: value.name.trim(),
+        email_2: value.email_2.trim() || null,
+        phone_2: value.phone_2.trim() || null,
+      }),
+      () => this.savingProfile.set(false),
+      () => this.profileForm.markAsPristine(),
+    );
   }
 
-  passwordFormSubmit() {
+  //==================================================
+  //==== PHOTO
+  //==================================================
+
+  choosePhoto(): void {
+    this.photoInput()?.nativeElement.click();
+  }
+
+  onPhotoChosen(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const file = input.files?.[0];
+
+    input.value = '';
+
+    if (!file || this.photoBusy()) {
+      return;
+    }
+
+    this.photoBusy.set(true);
+
+    this.applyAccount(this.profiles.uploadPhoto(file), () =>
+      this.photoBusy.set(false),
+    );
+  }
+
+  removePhoto(): void {
+    if (this.photoBusy()) {
+      return;
+    }
+
+    this.photoBusy.set(true);
+
+    this.applyAccount(this.profiles.removePhoto(), () =>
+      this.photoBusy.set(false),
+    );
+  }
+
+  //==================================================
+  //==== PASSWORD
+  //==================================================
+
+  changePassword(): void {
     this.passwordForm.markAllAsTouched();
-    if (this.passwordForm.valid) {
-      this.store.dispatch(
-        new UpdateUserPasswordAction(this.passwordForm.value),
-      );
-      this.passwordForm.reset();
+
+    if (this.passwordForm.invalid || this.savingPassword()) {
+      return;
     }
+
+    this.savingPassword.set(true);
+
+    this.profiles
+      .changePassword(this.passwordForm.getRawValue())
+      .pipe(
+        finalize(() => this.savingPassword.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        this.passwordForm.reset();
+
+        this.showPassword.set({});
+
+        this.notifications.showSuccess(
+          this.translate.instant('profile.password_changed'),
+        );
+      });
   }
 
-  selectStoreLogo(data: IAttachment) {
-    if (!Array.isArray(data)) {
-      this.form.controls['store_logo_id'].setValue(data ? data.id : '');
-    }
-  }
+  //==================================================
+  //==== SAVED ACCOUNT
+  //==================================================
 
-  updateStore() {
-    this.store.dispatch(new UpdateStoreDetailsAction(this.form.value));
+  // Errors are shown by the global error interceptor.
+  private applyAccount(
+    request: Observable<IAuthResponse>,
+    done: () => void,
+    saved?: () => void,
+  ): void {
+    request
+      .pipe(finalize(done), takeUntilDestroyed(this.destroyRef))
+      .subscribe((response) => {
+        this.store.dispatch(new UpdateAuthUserAction(response.data));
+
+        saved?.();
+
+        this.notifications.showSuccess(
+          this.apiMessages.resolve(response.code, response.message),
+        );
+      });
   }
 }

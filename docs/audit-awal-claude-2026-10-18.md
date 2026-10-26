@@ -288,9 +288,10 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Resolver ketiganya memasang status 404 lalu mengalihkan ke `/404`. Build e2e (tidak dioptimasi, mode pengembangan Angular) menolak "redirect dengan status 404" dan menjawab 500. Production menjawab 404 dengan benar (dicek 21 Oktober), jadi pengunjung tidak terdampak.
 - Saran: resolver cukup menampilkan halaman 404 tanpa redirect berstatus 404. Dikerjakan di 6E.
 
-**FE-013 — Halaman "My account" admin tidak menyimpan apa pun** · P2 · Terbuka
+**FE-013 — Halaman "My account" admin tidak menyimpan apa pun** · P2 · **Selesai**
 - Tombol simpan profil, kata sandi, dan detail toko men-dispatch action NGXS yang isinya masih kosong dari template Kartify (`account.state.ts`: "Update profile logic hre"). Pengguna mengira datanya tersimpan. Form "detail toko" juga sisa toko Kartify.
 - Saran: halaman "Profil saya" yang benar (U-16 di `rencana-ui-admin.md`): ubah nama, foto, dan kata sandi lewat API yang sudah ada; buang form toko.
+- Perbaikan (26 Okt, U-16): API yang dibutuhkan ternyata belum ada, jadi dibuat `backend/src/ctrl/admin/admin-account/profile.ts` (`PUT /me`, `POST`/`DELETE /me/photo`, `PUT /me/password`, cukup sesi aktif; ganti kata sandi menaikkan `token_version` sehingga perangkat lain keluar, sesi yang dipakai tetap sampai waktu habisnya, percobaan dibatasi seperti login). Halaman `/account` ditulis ulang jadi "Profil Saya"; form toko dan store/country/state NGXS sisa Kartify dibuang. Test kontrak `admin-profile-api.spec.ts`, test browser `account-profile.spec.ts`. Sisa: `AccountState` lama masih dibaca tabel bersama (izin per role Kartify), dibersihkan di 6E.
 
 **FE-014 — Mode "buat" di form halaman website tidak bisa dicapai** · P3 · **Selesai**
 - Halaman website adalah halaman tetap; route admin hanya `website-page/:key` (ubah). Cabang `mode === 'create'` di form (label, pilihan template untuk halaman baru, aksi publikasi) tidak pernah dipakai.
