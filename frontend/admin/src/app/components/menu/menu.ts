@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
@@ -45,8 +45,6 @@ import { WebNavigationState } from '../../shared/store/state/web-navigation.stat
 })
 export class Menu {
   private store = inject(Store);
-
-  readonly type = input<string>('create');
 
   readonly primaryNavigation$: Observable<IWebNavigationSummary | null> =
     this.store
@@ -223,12 +221,10 @@ export class Menu {
     return navigation?.items.some((item) => item.status === 1) ?? false;
   }
 
-  toggleNavigationStatus(navigation: IWebNavigationSummary): void {
-    if (this.changingStatus) {
-      return;
-    }
-
-    if (navigation.status === 0 && !this.canActivateNavigation()) {
+  // The header cannot be switched off (U-9, API: WEB_NAVIGATION_PRIMARY_PROTECTED); this only
+  // turns an inactive one back on.
+  activateNavigation(navigation: IWebNavigationSummary): void {
+    if (this.changingStatus || !this.canActivateNavigation()) {
       return;
     }
 
@@ -237,7 +233,7 @@ export class Menu {
     this.store
       .dispatch(
         new UpdateWebNavigationStatusAction(navigation.id_web_navigation, {
-          web_navigation_status: navigation.status === 1 ? 0 : 1,
+          web_navigation_status: 1,
         }),
       )
       .pipe(

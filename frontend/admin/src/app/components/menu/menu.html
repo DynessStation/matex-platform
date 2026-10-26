@@ -29,30 +29,22 @@
           }}
         </span>
 
-        <ng-container *hasPermission="'web_navigation.publish'">
-          <app-button
-            [id]="'toggle_navigation_status'"
-            [type]="'button'"
-            [spinner]="true"
-            [class]="
-              primary.status === 1
-                ? 'btn btn-sm btn-outline-danger'
-                : 'btn btn-sm btn-theme'
-            "
-            [disabled]="
-              changingStatus ||
-              (primary.status === 0 && !canActivateNavigation())
-            "
-            (click)="toggleNavigationStatus(primary)"
-          >
-            {{
-              (primary.status === 1
-                ? 'navigation_admin.deactivate'
-                : 'navigation_admin.activate'
-              ) | translate
-            }}
-          </app-button>
-        </ng-container>
+        <!-- The header is always shown (U-9): it cannot be switched off. "Aktifkan" only
+             brings back a header that older data left inactive. -->
+        @if (primary.status === 0) {
+          <ng-container *hasPermission="'web_navigation.publish'">
+            <app-button
+              [id]="'activate_navigation'"
+              [type]="'button'"
+              [spinner]="true"
+              [class]="'btn btn-sm btn-theme'"
+              [disabled]="changingStatus || !canActivateNavigation()"
+              (click)="activateNavigation(primary)"
+            >
+              {{ 'navigation_admin.activate' | translate }}
+            </app-button>
+          </ng-container>
+        }
       </div>
 
       @if (primary.status === 0) {

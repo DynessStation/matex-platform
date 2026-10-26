@@ -14,11 +14,11 @@ URL: https://internal.matexindo.com/menu
 
 ## Status Header dan Cara Kerja Menu
 
-Pada bagian atas halaman terdapat lencana status **Tampil** atau **Disembunyikan** beserta keterangan apakah menu header sedang tampil pada website publik. Kotak informasi **Cara kerja menu header** merangkum ketentuan bahwa label, visibilitas, dan urutan dapat diubah, sedangkan tujuan halaman dijaga otomatis.
+Pada bagian atas halaman terdapat lencana status **Tampil** beserta keterangan bahwa menu header sedang tampil pada website publik. Header website selalu tampil dan tidak bisa dimatikan; yang bisa disembunyikan hanya tiap bagian menu lewat sakelar **Tampilkan di header**. Kotak informasi **Cara kerja menu header** merangkum ketentuan bahwa label, visibilitas, dan urutan dapat diubah, sedangkan tujuan halaman dijaga otomatis.
 
 Dropdown **Kategori** dan **Produk** pada header website terisi otomatis dari data katalog yang sudah dipublikasikan. Pengguna tidak mengatur isi dropdown tersebut pada halaman ini; perubahannya dilakukan melalui halaman **Kategori Produk** dan **Produk**.
 
-Tombol **Sembunyikan header** atau **Tampilkan header** (bagi pengguna yang berwenang) digunakan untuk menyembunyikan seluruh menu header dari website atau menampilkannya kembali. Gunakan fitur ini dengan hati-hati karena berdampak pada seluruh pengunjung. Tombol **Tampilkan header** tidak dapat digunakan apabila belum ada satu pun bagian yang berstatus tampil.
+Bila karena data lama header tercatat **Disembunyikan**, tombol **Aktifkan** (bagi pengguna yang berwenang) menampilkannya kembali. Tombol ini hanya muncul pada kondisi tersebut dan tidak dapat digunakan apabila belum ada satu pun bagian yang berstatus tampil.
 
 Catatan**:** apabila menu header belum pernah disiapkan, halaman menampilkan pesan **Menu header belum disiapkan** beserta tombol **Siapkan menu header**. Pada kondisi normal menu sudah tersedia sejak awal sehingga pesan ini tidak muncul.
 
@@ -71,7 +71,7 @@ Apabila suatu bagian pernah dihapus dari daftar sehingga belum lengkap, formulir
 - Header hanya mendukung enam bagian tetap. Menambahkan menu baru, tautan bebas, submenu, ikon, atau lencana tidak tersedia.
 - Label Bahasa Indonesia dan English wajib diisi bersama. Label dapat disesuaikan, tetapi sebaiknya tetap mencerminkan tujuan menu agar tidak membingungkan pengunjung.
 - Daftar urutan harus tersimpan lengkap; sistem menolak penyimpanan urutan apabila daftar tidak lengkap. Muat ulang halaman apabila hal ini terjadi.
-- Tombol dan tindakan pada halaman ini tampil sesuai hak akses pengguna (melihat, menambah, mengubah, dan menampilkan/menyembunyikan header).
+- Tombol dan tindakan pada halaman ini tampil sesuai hak akses pengguna (melihat, menambah, mengubah, dan mengaktifkan kembali header).
 - Setiap perubahan tercatat pada **Log Aktivitas**.
 
 ## Praktik Pengelolaan Navigasi yang Disarankan
