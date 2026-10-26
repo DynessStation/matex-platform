@@ -256,16 +256,25 @@
 <!-- tambahan ini menyesuaikan dan disesuaikan nanti dengan BE dan Adminnya -->
 <!--/// ======= ///-->
 
-@if (data()?.tags?.status) {
-  <section class="section-t-space d-md-block d-none">
+<!-- "Tag populer" (P-2): shortcuts set in the admin home editor, on every screen size. -->
+@if (data()?.tags?.status && data()?.tags?.items?.length) {
+  <section class="section-t-space home-tags-section">
     <div class="custom-container">
       <div class="light-bg-color">
         <div class="title-2 title-timer justify-content-between">
-          <h3>{{ data()?.tags?.title }}</h3>
+          <h3>{{ data()?.tags?.title || (isEnglish ? 'Popular tags' : 'Tag populer') }}</h3>
         </div>
-        <ul class="hot-tag-list">
-          <app-home-tags [tagsIds]="data()?.tags?.tags_ids!"></app-home-tags>
-        </ul>
+        <div class="hot-tag-list">
+          <ul>
+            @for (tag of data()?.tags?.items; track $index) {
+              <li>
+                <a [routerLink]="tagPath(tag.url)" [queryParams]="tagQuery(tag.url)">{{
+                  tag.label
+                }}</a>
+              </li>
+            }
+          </ul>
+        </div>
       </div>
     </div>
   </section>

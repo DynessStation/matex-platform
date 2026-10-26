@@ -50,6 +50,20 @@ export interface HomeAdvertisementDraft {
   cta_url: string;
 }
 
+/**
+ * One "Tag populer" shortcut (P-2), the same in both languages except its text. A category
+ * shortcut opens the category page; a search shortcut searches for its text.
+ */
+export interface HomeTagDraft {
+  label_id: string;
+  label_en: string;
+  type: 'category' | 'search';
+  category_id: string;
+}
+
+export const HOME_TAG_LIMIT = 12;
+export const HOME_TAG_LABEL_MAX_LENGTH = 60;
+
 export interface AboutFeatureDraft {
   title: string;
   description: string;

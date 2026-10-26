@@ -186,6 +186,142 @@
           </div>
         }
 
+        @if (section.key === 'tags') {
+          <div class="cms-home-section-editor home-tags-editor">
+            <div class="home-tags-editor__head">
+              <span
+                >Teks tag ditulis untuk dua bahasa sekaligus; tujuan sama di
+                keduanya.
+                <app-help-tip
+                  section="bagian-yang-tampil-di-beranda--tag-populer"
+              /></span>
+              <small id="home_tags_count"
+                >{{ editor.homeTags.length }} dari maksimal
+                {{ editor.homeTagLimit }}</small
+              >
+            </div>
+
+            @for (tag of editor.homeTags; track $index; let tagIndex = $index) {
+              <div
+                class="home-tags-editor__row"
+                [class.is-invalid]="
+                  editor.homeTagsValidationAttempted &&
+                  editor.homeTagIncomplete(tag)
+                "
+              >
+                <span class="home-tags-editor__position">{{
+                  tagIndex + 1
+                }}</span>
+                <input
+                  type="text"
+                  class="form-control"
+                  [attr.maxlength]="editor.homeTagLabelMaxLength"
+                  placeholder="Teks Indonesia"
+                  [attr.aria-label]="'Teks Indonesia tag ' + (tagIndex + 1)"
+                  [value]="tag.label_id"
+                  (input)="
+                    editor.updateHomeTag(tagIndex, {
+                      label_id: $any($event.target).value,
+                    })
+                  "
+                />
+                <input
+                  type="text"
+                  class="form-control"
+                  [attr.maxlength]="editor.homeTagLabelMaxLength"
+                  placeholder="English text"
+                  [attr.aria-label]="'Teks English tag ' + (tagIndex + 1)"
+                  [value]="tag.label_en"
+                  (input)="
+                    editor.updateHomeTag(tagIndex, {
+                      label_en: $any($event.target).value,
+                    })
+                  "
+                />
+                <select
+                  class="form-select"
+                  [attr.aria-label]="'Tujuan tag ' + (tagIndex + 1)"
+                  [value]="
+                    tag.type === 'search' ? 'search' : tag.category_id || ''
+                  "
+                  (change)="
+                    $any($event.target).value === 'search'
+                      ? editor.updateHomeTag(tagIndex, {
+                          type: 'search',
+                          category_id: '',
+                        })
+                      : editor.updateHomeTag(tagIndex, {
+                          type: 'category',
+                          category_id: $any($event.target).value,
+                        })
+                  "
+                >
+                  <option value="">Pilih tujuan</option>
+                  <option value="search">Pencarian: teks tag</option>
+                  @for (option of categoryOptions(); track option.id) {
+                    <option
+                      [value]="option.id"
+                      [selected]="
+                        tag.type === 'category' && tag.category_id === option.id
+                      "
+                    >
+                      Kategori: {{ option.label
+                      }}{{ option.published ? '' : ' (belum terbit)' }}
+                    </option>
+                  }
+                </select>
+                <span class="home-tags-editor__buttons">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Naikkan"
+                    [attr.aria-label]="'Naikkan tag ' + (tagIndex + 1)"
+                    [disabled]="tagIndex === 0"
+                    (click)="editor.moveHomeTag(tagIndex, -1)"
+                  >
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Turunkan"
+                    [attr.aria-label]="'Turunkan tag ' + (tagIndex + 1)"
+                    [disabled]="tagIndex === editor.homeTags.length - 1"
+                    (click)="editor.moveHomeTag(tagIndex, 1)"
+                  >
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Hapus"
+                    [attr.aria-label]="'Hapus tag ' + (tagIndex + 1)"
+                    (click)="editor.removeHomeTag(tagIndex)"
+                  >
+                    <i class="ri-close-line"></i>
+                  </button>
+                </span>
+              </div>
+            }
+
+            @if (editor.homeTagsValidationAttempted && editor.homeTagsInvalid) {
+              <div class="invalid-feedback d-block">
+                Lengkapi teks Indonesia, teks English, dan tujuan tiap tag.
+              </div>
+            }
+
+            <button
+              type="button"
+              id="add_home_tag"
+              class="btn btn-outline-theme mt-2"
+              [disabled]="editor.homeTags.length >= editor.homeTagLimit"
+              (click)="editor.addHomeTag()"
+            >
+              <i class="ri-add-line"></i> Tambah tag
+            </button>
+          </div>
+        }
+
         @if (section.key === 'advertisement') {
           <div class="cms-home-section-editor">
             <div class="row g-3">

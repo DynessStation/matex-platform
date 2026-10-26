@@ -98,10 +98,11 @@ export interface OfferBanner extends BannerLink {
   status: boolean;
 }
 
+/** Home "Tag populer" (P-2): shortcuts the API resolves to links in the page language. */
 export interface Tags {
   status: boolean;
-  title: string;
-  tags_ids: number[];
+  title?: string;
+  items?: { label: string; url: string }[];
 }
 
 export interface OffersProduct {

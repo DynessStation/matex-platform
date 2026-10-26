@@ -2118,7 +2118,7 @@
     "home_section_articles": "Artikel terbaru",
     "home_section_articles_help": "Menampilkan artikel terbaru yang sudah dipublikasikan.",
     "home_section_tags": "Tag populer",
-    "home_section_tags_help": "Menampilkan pintasan tag untuk membantu pengunjung menjelajahi konten.",
+    "home_section_tags_help": "Pintasan ke kategori produk atau pencarian katalog, tampil sebagai chip di beranda (maksimal 12).",
     "home_section_newsletter": "Langganan informasi",
     "home_section_newsletter_help": "Menampilkan formulir pendaftaran pembaruan melalui email.",
     "home_section_advertisement": "Banner promosi sebelum footer",

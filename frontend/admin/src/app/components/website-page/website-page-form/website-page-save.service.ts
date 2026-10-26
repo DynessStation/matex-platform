@@ -9,6 +9,7 @@ import {
   buildHomeContentJson,
   buildSavePayload,
   slugify,
+  homeTagItems,
 } from './website-page-form.util';
 import { WebsitePagePublicationService } from './website-page-publication.service';
 import {
@@ -144,6 +145,7 @@ export class WebsitePageSaveService {
                 editor.homeSectionVisibility[language.locale],
                 editor.homeLatexContent[language.locale],
                 editor.homeAdvertisementContent[language.locale],
+                homeTagItems(editor.homeTags, language.locale),
               )
             : editor.isAboutTemplate
               ? buildAboutContentJson(editor.aboutFeatures[language.locale])
@@ -300,6 +302,17 @@ export class WebsitePageSaveService {
 
       this.reject(
         'Pengaturan halaman belum lengkap. Periksa field yang ditandai merah.',
+      );
+
+      return;
+    }
+
+    if (editor.homeTagsInvalid) {
+      editor.activeTab = 'content';
+      editor.homeTagsValidationAttempted = true;
+
+      this.reject(
+        'Tag populer belum lengkap: isi teks Indonesia, teks English, dan kategori tujuan tiap tag.',
       );
 
       return;

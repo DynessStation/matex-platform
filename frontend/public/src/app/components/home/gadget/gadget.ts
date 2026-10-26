@@ -18,7 +18,6 @@ import { ThemeOptionService } from '../../../shared/services/theme-option.servic
 import { SettingState } from '../../../shared/store/state/setting.state';
 import { HomeBanner } from '../widgets/home-banner/home-banner';
 import { HomeNewsletter } from '../widgets/home-newsletter/home-newsletter';
-import { HomeTags } from '../widgets/home-tags/home-tags';
 
 interface HomeContent {
   categories: Category[];
@@ -40,7 +39,7 @@ interface LatexFeatureContent {
 
 @Component({
   selector: 'app-gadget',
-  imports: [AsyncPipe, DatePipe, HomeBanner, HomeTags, HomeNewsletter, RouterLink],
+  imports: [AsyncPipe, DatePipe, HomeBanner, HomeNewsletter, RouterLink],
   templateUrl: './gadget.html',
   styleUrl: './gadget.scss',
 })
@@ -97,6 +96,16 @@ export class Gadget {
 
   get locale(): string {
     return this.navigation.locale();
+  }
+
+  /** The path of a tag link (the API gives "/search?q=..." or "/kategori/slug"). */
+  tagPath(url: string): string {
+    return url.split('?')[0];
+  }
+
+  tagQuery(url: string): Record<string, string> | null {
+    const query = url.split('?')[1];
+    return query ? Object.fromEntries(new URLSearchParams(query)) : null;
   }
 
   get isEnglish(): boolean {

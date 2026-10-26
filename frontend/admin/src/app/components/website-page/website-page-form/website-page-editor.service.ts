@@ -23,6 +23,9 @@ import {
   ABOUT_HIGHLIGHT_DESCRIPTION_MAX_LENGTH,
   WebsitePageEditorMediaDraft,
   PAGE_MEDIA_ACCEPT,
+  HOME_TAG_LABEL_MAX_LENGTH,
+  HOME_TAG_LIMIT,
+  HomeTagDraft,
 } from './website-page-form.model';
 import {
   createHomeSectionVisibility,
@@ -37,6 +40,7 @@ import {
   parseLocale,
   gadgetHomeMediaIssue,
   gadgetHomeMediaActionIssue,
+  readHomeTags,
 } from './website-page-form.util';
 import { WebsitePagePublicationService } from './website-page-publication.service';
 import {
@@ -156,6 +160,15 @@ export class WebsitePageEditorService {
     'id-ID': createAboutFeatures(),
     'en-US': createAboutFeatures(),
   };
+
+  /** "Tag populer" (P-2): one list for both languages, at most HOME_TAG_LIMIT. */
+  public homeTags: HomeTagDraft[] = [];
+
+  public homeTagsValidationAttempted = false;
+
+  readonly homeTagLimit = HOME_TAG_LIMIT;
+
+  readonly homeTagLabelMaxLength = HOME_TAG_LABEL_MAX_LENGTH;
 
   //==================================================
   //==== TRANSLATION FORM
@@ -321,6 +334,16 @@ export class WebsitePageEditorService {
         'id-ID': createAboutFeatures(),
         'en-US': createAboutFeatures(),
       };
+
+      this.homeTags = readHomeTags(
+        data.translations.find(
+          (item) => parseLocale(item.website_page_locale) === 'id-ID',
+        )?.website_page_content_json,
+        data.translations.find(
+          (item) => parseLocale(item.website_page_locale) === 'en-US',
+        )?.website_page_content_json,
+      );
+      this.homeTagsValidationAttempted = false;
 
       this.translationForm('id-ID').disable({
         emitEvent: false,
@@ -501,6 +524,47 @@ export class WebsitePageEditorService {
   //==================================================
   //==== HOME AND ABOUT DRAFTS
   //==================================================
+
+  addHomeTag(): void {
+    if (this.homeTags.length >= HOME_TAG_LIMIT) return;
+    this.homeTags = [
+      ...this.homeTags,
+      { label_id: '', label_en: '', type: 'category', category_id: '' },
+    ];
+  }
+
+  updateHomeTag(index: number, changes: Partial<HomeTagDraft>): void {
+    this.homeTags = this.homeTags.map((tag, i) =>
+      i === index ? { ...tag, ...changes } : tag,
+    );
+  }
+
+  moveHomeTag(index: number, step: -1 | 1): void {
+    const tags = [...this.homeTags];
+    const [tag] = tags.splice(index, 1);
+    tags.splice(index + step, 0, tag);
+    this.homeTags = tags;
+  }
+
+  removeHomeTag(index: number): void {
+    this.homeTags = this.homeTags.filter((_, i) => i !== index);
+  }
+
+  /** A tag misses a text in either language, or its category. */
+  homeTagIncomplete(tag: HomeTagDraft): boolean {
+    return (
+      !tag.label_id.trim() ||
+      !tag.label_en.trim() ||
+      (tag.type === 'category' && !tag.category_id)
+    );
+  }
+
+  get homeTagsInvalid(): boolean {
+    return (
+      this.isGadgetHomeTemplate &&
+      this.homeTags.some((tag) => this.homeTagIncomplete(tag))
+    );
+  }
 
   updateHomeLatexItem(
     locale: WebsitePageEditorLocale,

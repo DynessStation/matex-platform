@@ -116,13 +116,8 @@ export const HOME_LAYOUT = {
     redirection_type: 'product',
     link: 'apple-iphone-16',
   },
-  tags: {
-    status: true,
-    title: 'Hot Tag:',
-    tags_ids: [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    ],
-  },
+  // Filled from the home page content ("Tag populer", P-2).
+  tags: { status: false, items: [] },
   offers_product: {
     status: true,
     button_text: 'See All',

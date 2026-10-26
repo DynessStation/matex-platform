@@ -46,13 +46,22 @@ Pada bagian **Bagian yang tampil di Beranda**, tersedia tujuh sakelar untuk seti
 | Kategori produk | Menampilkan kategori produk dari katalog. | Aktif |
 | Produk unggulan | Menampilkan produk pilihan dari katalog. | Aktif |
 | Artikel terbaru | Menampilkan artikel yang sudah dipublikasikan. | Aktif |
-| Tag populer | Disiapkan untuk pengembangan berikutnya (aktifkan setelah sumber data siap). | Tidak aktif |
+| Tag populer | Pintasan berbentuk chip ke kategori produk atau pencarian katalog. | Tidak aktif |
 | Langganan informasi | Disiapkan untuk pengembangan berikutnya (aktifkan setelah alur siap). | Tidak aktif |
 | Banner promosi sebelum footer | Menampilkan banner promosi di atas bagian footer. | Tidak aktif |
 
 ### Keunggulan Lateks MATEX
 
 Isi **Label kecil** (maksimal 80 karakter), **Judul bagian** (maksimal 180), dan **Deskripsi** (maksimal 700). Tambahkan daftar manfaat dengan **Judul manfaat** (maksimal 160) dan **Penjelasan manfaat** (maksimal 1.000). Pasangan judul dan penjelasan yang tidak lengkap tidak disimpan.
+
+### Tag Populer
+
+Daftar pintasan yang tampil sebagai chip di beranda, di desktop dan ponsel; paling banyak 12. Klik **Tambah tag**, lalu isi untuk tiap tag:
+
+- **Teks Indonesia** dan **Teks English** (wajib, maksimal 60 karakter); teks tampil sesuai bahasa website.
+- **Tujuan**: sebuah kategori produk (chip membuka halaman kategori itu) atau **Pencarian: teks tag** (chip membuka halaman pencarian dengan teks tag sebagai kata cari).
+
+Urutan chip mengikuti urutan baris; ubah dengan tombol panah naik dan turun, dan hapus baris dengan tombol silang. Daftar tag sama untuk kedua bahasa, tetapi sakelar tampil tetap per bahasa. Tag dengan kategori yang dihapus atau belum Dipublikasikan tidak ditampilkan di website. Halaman tidak bisa disimpan selama ada tag yang teks atau tujuannya belum lengkap.
 
 ### Banner Promosi Sebelum Footer
 

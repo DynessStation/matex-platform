@@ -15,6 +15,7 @@ import {
   WebsitePageEditorMediaDraft,
   PAGE_MEDIA_ACCEPT,
   GADGET_HOME_MEDIA_ROLES,
+  HomeTagDraft,
 } from './website-page-form.model';
 import { MediaSelection } from '../../../shared/components/ui/media-box/media-box';
 import {
@@ -52,11 +53,49 @@ export function readHomeSectionVisibility(
   return visibility;
 }
 
+/** The shared tag list from the Indonesian and English home content (matched by position). */
+export function readHomeTags(
+  indonesian: unknown,
+  english: unknown,
+): HomeTagDraft[] {
+  const items = (content: unknown): Record<string, unknown>[] =>
+    isRecord(content) &&
+    isRecord(content['tags']) &&
+    Array.isArray(content['tags']['items'])
+      ? content['tags']['items'].filter(isRecord)
+      : [];
+  const id = items(indonesian);
+  const en = items(english);
+  return id.map((item, index) => ({
+    label_id: typeof item['label'] === 'string' ? item['label'] : '',
+    label_en:
+      typeof en[index]?.['label'] === 'string'
+        ? String(en[index]['label'])
+        : '',
+    type: item['type'] === 'category' ? 'category' : 'search',
+    category_id:
+      typeof item['category_id'] === 'string' ? item['category_id'] : '',
+  }));
+}
+
+/** The tag items saved in one language's home content. */
+export function homeTagItems(
+  tags: HomeTagDraft[],
+  locale: WebsitePageEditorLocale,
+): Record<string, string>[] {
+  return tags.map((tag) => ({
+    label: (locale === 'en-US' ? tag.label_en : tag.label_id).trim(),
+    type: tag.type,
+    ...(tag.type === 'category' ? { category_id: tag.category_id } : {}),
+  }));
+}
+
 export function buildHomeContentJson(
   existing: unknown,
   visibility: HomeSectionVisibility,
   latex: HomeLatexContentDraft,
   advertisement: HomeAdvertisementDraft,
+  tags: Record<string, string>[] = [],
 ): Record<string, unknown> {
   const source = isRecord(existing) ? existing : {};
   const content: Record<string, unknown> = { home_contract_version: 3 };
@@ -85,6 +124,7 @@ export function buildHomeContentJson(
     ...advertisement,
     status: visibility.advertisement,
   };
+  content['tags'] = { status: visibility.tags, items: tags };
 
   return content;
 }

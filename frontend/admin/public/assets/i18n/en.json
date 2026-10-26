@@ -2118,7 +2118,7 @@
     "home_section_articles": "Latest articles",
     "home_section_articles_help": "Shows the latest published articles.",
     "home_section_tags": "Popular tags",
-    "home_section_tags_help": "Shows tag shortcuts that help visitors explore content.",
+    "home_section_tags_help": "Shortcuts to product categories or a catalog search, shown as chips on the home page (up to 12).",
     "home_section_newsletter": "Information subscription",
     "home_section_newsletter_help": "Shows the email update subscription form.",
     "home_section_advertisement": "Promotion banner before footer",
