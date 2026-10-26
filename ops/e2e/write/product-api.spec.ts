@@ -329,6 +329,50 @@ test('status changes', async () => {
   expect(await publicSlugs()).toContain(`${key}-id`);
 });
 
+test('the public catalog lists products by their Urutan first, then newest', async () => {
+  const category = await expectCode(
+    await owner.post('/api/v1/product-categories', {
+      data: {
+        key: `urutan-${runId}`,
+        status: 'published',
+        translations: [
+          { locale: 'id-ID', slug: `urutan-${runId}`, name: 'Kategori Urutan' },
+          { locale: 'en-US', slug: `order-${runId}`, name: 'Order Category' },
+        ],
+      },
+    }),
+    201,
+  );
+  // Created in this order; Urutan 0 means "no position".
+  for (const [name, sortOrder] of [
+    ['a', 0],
+    ['b', 2],
+    ['c', 0],
+    ['d', 1],
+  ] as const) {
+    await expectCode(
+      await owner.post(base, {
+        data: {
+          key: `urutan-${name}-${runId}`,
+          sku: `URT-${name}-${runId}`.toUpperCase(),
+          status: 'published',
+          sort_order: sortOrder,
+          category_ids: [category.data.id],
+          translations: translations(`urutan-${name}-${runId}`, `Urutan ${name}`),
+        },
+      }),
+      201,
+    );
+  }
+  const list = await expectCode(
+    await anonymous.get('/api/public/products/id-ID', { params: { category: `urutan-${runId}` } }),
+    200,
+  );
+  expect(list.data.data.map((item: any) => item.slug)).toEqual(
+    ['d', 'b', 'c', 'a'].map((name) => `urutan-${name}-${runId}-id`),
+  );
+});
+
 test('an account without product rights is refused', async () => {
   const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Produk', []);
   const account = await createAdminAccount(

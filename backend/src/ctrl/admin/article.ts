@@ -99,6 +99,18 @@ const readTranslations = (value: unknown) => {
   return PUBLIC_CONTENT_LOCALES.every((locale) => seen.has(locale)) ? translations : null;
 };
 
+/**
+ * Status as admins read it: a published article whose publish time is still ahead is
+ * "scheduled"; an older "scheduled" row whose time has passed is live, so "published".
+ * `ahead` comes from SQL (publish time > UTC_TIMESTAMP()); times are stored in UTC.
+ */
+const effectiveStatus = (status: string, ahead: unknown, hasPublishTime: boolean): string => {
+  const isAhead = Number(ahead) === 1;
+  if (status === 'published' && isAhead) return 'scheduled';
+  if (status === 'scheduled' && hasPublishTime && !isAhead) return 'published';
+  return status;
+};
+
 /** The save body, or null when anything is missing or invalid. */
 const payloadOf = (body: any) => {
   const key = normalizePublicContentKey(body?.key);
@@ -122,7 +134,9 @@ const payloadOf = (body: any) => {
   if (!translations) return null;
   return {
     key,
-    status,
+    // A schedule is a published article with a future publish time: the public site shows it
+    // from that time on, with no job to switch it (see effectiveStatus).
+    status: status === 'scheduled' ? 'published' : status,
     publishedAt,
     unpublishedAt,
     thumbnailId,
@@ -378,6 +392,7 @@ router.get(
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT a.id_article, a.article_key, a.article_status, a.article_is_featured,
          a.article_is_sticky, a.article_published_at, a.created, a.updated,
+         (a.article_published_at > UTC_TIMESTAMP()) AS publish_ahead,
          i.article_slug, i.article_title, i.article_excerpt, i.article_i18n_status,
          th.id_attachment, th.storage_path, th.name, th.width, th.height, th.mime_type
        FROM article a
@@ -399,7 +414,11 @@ router.get(
         title: row.article_title ?? '',
         slug: row.article_slug ?? '',
         description: row.article_excerpt ?? '',
-        status: row.article_status,
+        status: effectiveStatus(
+          row.article_status,
+          row.publish_ahead,
+          row.article_published_at != null,
+        ),
         locale_status: Number(row.article_i18n_status ?? 0),
         is_featured: Boolean(row.article_is_featured),
         is_sticky: Boolean(row.article_is_sticky),
@@ -433,7 +452,8 @@ router.get(
 
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT article_key, article_status, article_is_featured, article_is_sticky,
-         article_published_at, article_unpublished_at
+         article_published_at, article_unpublished_at,
+         (article_published_at > UTC_TIMESTAMP()) AS publish_ahead
        FROM article WHERE id_article = ? AND id_master_comp = ? AND article_deleted_at IS NULL`,
       [id, scope.idMasterComp],
     );
@@ -456,7 +476,11 @@ router.get(
     return sendSuccess(res, 200, 'ARTICLE_FOUND', 'Article loaded', {
       id: req.params.id,
       key: row.article_key,
-      status: row.article_status,
+      status: effectiveStatus(
+        row.article_status,
+        row.publish_ahead,
+        row.article_published_at != null,
+      ),
       is_featured: Boolean(row.article_is_featured),
       is_sticky: Boolean(row.article_is_sticky),
       published_at: row.article_published_at,
@@ -520,7 +544,7 @@ router.patch(
       await connection.query(
         `UPDATE article SET article_status = ?,
            article_published_at = CASE WHEN ? = 'published' AND article_published_at IS NULL
-             THEN NOW() ELSE article_published_at END,
+             THEN UTC_TIMESTAMP() ELSE article_published_at END,
            id_updated_by = ?
          WHERE id_article = ? AND id_master_comp = ? AND article_deleted_at IS NULL`,
         [status, status, scope.idAdminAcct, id, scope.idMasterComp],

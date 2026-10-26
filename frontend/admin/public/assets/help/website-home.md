@@ -18,7 +18,7 @@ Editor halaman terdiri atas tab vertikal di sisi kiri. Pengguna dapat berpindah 
 
 | Tab | Fungsi |
 | --- | --- |
-| Umum | Informasi dasar halaman tetap (Identitas internal, Bahasa Utama, Akses halaman, Urutan, Unggulan, Jenis dan Tampilan halaman). Nilainya diatur sistem dan perubahan di tab ini tidak disimpan; lihat Panduan umum bagian Editor Halaman Website. |
+| Umum | Informasi halaman yang diatur sistem, hanya untuk dibaca: kode halaman, alamat tiap bahasa, dan status tayang saat ini. |
 | Konten & Bahasa | Judul, ringkasan, dan isi khusus halaman untuk Bahasa Indonesia dan English. |
 | SEO | Pengaturan tampilan halaman pada mesin pencari dan saat dibagikan. |
 | Media | Pemilihan gambar halaman dari Media Library. Tab ini hanya tampil bagi pengguna yang memiliki akses Media. |
@@ -143,5 +143,3 @@ Judul SEO (ID): MATEX — Produk Berbahan Lateks | Status: Publikasikan Sekarang
 - Lengkapi Bahasa Indonesia dan English agar tampilan kedua bahasa konsisten.
 - Gunakan **Pratinjau** pada ukuran Desktop dan Mobile sebelum menerbitkan.
 - Periksa halaman website setelah publikasi untuk memastikan perubahan tampil sesuai harapan.
-
-**Kendala yang diketahui:** tab Umum pada halaman tetap masih menampilkan isian yang tampak bisa diubah, padahal perubahannya tidak disimpan. Biarkan saja; yang menentukan tayang adalah tab Publikasi.

@@ -155,10 +155,14 @@ router.get(
                WHERE id_master_comp = ? AND article_deleted_at IS NULL) AS articles_total,
              (SELECT COUNT(*) FROM article
                WHERE id_master_comp = ? AND article_deleted_at IS NULL
-                 AND article_status = 'published') AS articles_published,
+                 AND ((article_status = 'published' AND article_published_at IS NULL)
+                   OR (article_status IN ('published', 'scheduled')
+                     AND article_published_at <= UTC_TIMESTAMP()))) AS articles_published,
              (SELECT COUNT(*) FROM article
                WHERE id_master_comp = ? AND article_deleted_at IS NULL
-                 AND article_status IN ('draft', 'scheduled')) AS articles_pending,
+                 AND (article_status = 'draft'
+                   OR (article_status IN ('published', 'scheduled')
+                     AND article_published_at > UTC_TIMESTAMP()))) AS articles_pending,
              (SELECT COUNT(*) FROM faq
                WHERE id_master_comp = ? AND faq_deleted_at IS NULL
                  AND faq_status = 1) AS faq_active,

@@ -281,8 +281,14 @@ router.get(
           ? 'i.product_name ASC'
           : sortBy === 'z-a'
             ? 'i.product_name DESC'
-            : 'p.id_product DESC';
-    const distinctBase = base.replace(/^SELECT /, 'SELECT DISTINCT ');
+            : // Default: products with an admin "Urutan" first (small numbers first), then
+              // the rest (Urutan 0) from newest.
+              'unordered, p.product_sort_order, p.id_product DESC';
+    // DISTINCT needs the ordering expression in the select list.
+    const distinctBase = base.replace(
+      /^SELECT /,
+      'SELECT DISTINCT (p.product_sort_order = 0) AS unordered, ',
+    );
     const [rows] = await pool.query<RowDataPacket[]>(
       `${distinctBase}${categoryJoin} WHERE ${clauses.join(' AND ')} ORDER BY ${order}`,
       params,

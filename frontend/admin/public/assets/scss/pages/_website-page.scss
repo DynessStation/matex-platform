@@ -6,6 +6,33 @@
 // attribute selectors had, so the cascade against the theme is unchanged.
 .website-page-form {
   //==================================================
+  //==== GENERAL TAB (read-only facts)
+  //==================================================
+
+  .website-page-facts {
+    margin: 0;
+
+    > div {
+      display: grid;
+      grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(127, 127, 127, 0.3);
+    }
+
+    dt {
+      opacity: 0.75;
+      font-weight: 500;
+    }
+
+    dd {
+      margin: 0;
+      font-family: var(--bs-font-monospace);
+      overflow-wrap: break-word;
+    }
+  }
+
+  //==================================================
   //==== CONTENT EDITOR
   //==================================================
 

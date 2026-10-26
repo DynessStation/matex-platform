@@ -2,7 +2,7 @@
 
 > **Untuk apa:** menulis, mengedit, dan menerbitkan artikel blog di website.
 > **Izin yang dibutuhkan:** article.view untuk melihat; article.create, article.update, article.delete untuk mengubah.
-> **Perlu diperhatikan:** status Dijadwalkan belum tayang otomatis saat waktunya tiba; artikel yang dihapus hanya diarsipkan.
+> **Perlu diperhatikan:** artikel terjadwal tayang sendiri tepat pada waktunya; artikel yang dihapus hanya diarsipkan.
 
 ## Gambaran Umum
 
@@ -18,7 +18,7 @@ Kotak **Cari** mencari di kunci internal dan judul. Menu aksi berisi Edit, Hapus
 
 ### Status
 
-draft (belum tampil), published (tampil), scheduled (dijadwalkan, lihat catatan di tab Publikasi), atau archived (disembunyikan dari website).
+draft (belum tampil), published (tampil), scheduled (terjadwal, tampil otomatis saat waktunya tiba), atau archived (disembunyikan dari website).
 
 ## Tab Umum
 
@@ -102,7 +102,7 @@ Artikel tampil di website setelah disimpan. Waktu terbit tercatat saat pertama k
 
 ### Jadwalkan publikasi
 
-Menyimpan tanggal dan waktu mulai tayang, tetapi saat ini status Dijadwalkan belum berubah otomatis menjadi tayang. Pada waktunya, buka artikel dan pilih **Publikasikan sekarang**.
+Isi tanggal dan waktu mulai tayang. Artikel tampil di website tepat pada waktu itu tanpa langkah lain; sampai saat itu daftar admin menampilkannya sebagai scheduled, lalu otomatis menjadi published.
 
 ### Berhenti tayang
 

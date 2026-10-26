@@ -233,6 +233,41 @@ test('status changes', async () => {
   expect(await publicSlugs()).not.toContain(`artikel-uji-${runId}-ubah`);
 });
 
+test('a scheduled article goes live by itself at its publish time', async () => {
+  test.setTimeout(60_000);
+  const publishAt = new Date(Date.now() + 5_000).toISOString();
+  const created = await expectCode(
+    await owner.post(base, {
+      data: {
+        // Its own key, so the audit check of the main article below stays exact.
+        key: `jadwal-uji-${runId}`,
+        status: 'scheduled',
+        published_at: publishAt,
+        translations: translations('-jadwal'),
+      },
+    }),
+    201,
+  );
+  const id = created.data.id;
+
+  // Before the time: admins see it scheduled, the public site does not list it.
+  const before = await expectCode(await owner.get(`${base}/${id}`), 200, 'ARTICLE_FOUND');
+  expect(before.data.status).toBe('scheduled');
+  expect(await publicSlugs()).not.toContain(`artikel-uji-${runId}-jadwal`);
+
+  // After the time, with no other step: live on the public site, published for admins.
+  await expect
+    .poll(async () => (await publicSlugs()).includes(`artikel-uji-${runId}-jadwal`), {
+      timeout: 30_000,
+      intervals: [1_000],
+    })
+    .toBe(true);
+  const after = await expectCode(await owner.get(`${base}/${id}`), 200, 'ARTICLE_FOUND');
+  expect(after.data.status).toBe('published');
+
+  await expectCode(await owner.delete(`${base}/${id}`), 200);
+});
+
 test('an account without article rights is refused', async () => {
   const noPermissions = await createAccessProfile(owner, 'Tanpa Izin Artikel', []);
   const account = await createAdminAccount(

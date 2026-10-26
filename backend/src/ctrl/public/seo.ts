@@ -158,11 +158,12 @@ const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]>
          ON translation.id_article = article.id_article
         AND translation.id_master_comp = article.id_master_comp
       WHERE article.id_master_comp = ?
-        AND article.article_status = 'published'
+        AND (article.article_status = 'published'
+          OR (article.article_status = 'scheduled' AND article.article_published_at IS NOT NULL))
         AND translation.article_i18n_status = 1
         AND article.article_deleted_at IS NULL
-        AND (article.article_published_at IS NULL OR article.article_published_at <= NOW())
-        AND (article.article_unpublished_at IS NULL OR article.article_unpublished_at > NOW())`,
+        AND (article.article_published_at IS NULL OR article.article_published_at <= UTC_TIMESTAMP())
+        AND (article.article_unpublished_at IS NULL OR article.article_unpublished_at > UTC_TIMESTAMP())`,
     [idMasterComp],
   );
 

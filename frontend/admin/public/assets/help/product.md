@@ -102,7 +102,7 @@ Menandai produk unggulan, yang didahulukan di bagian produk beranda website (8 p
 
 ### Urutan
 
-Angka urutan produk di panel. Saat ini belum memengaruhi urutan katalog website, yang diurutkan dari produk terbaru atau menurut nama.
+Posisi produk di urutan bawaan katalog website: produk dengan angka 1, 2, 3, dan seterusnya tampil paling depan sesuai angkanya, lalu produk dengan Urutan 0 (tanpa posisi) menyusul dari yang terbaru. Pilihan urut pengunjung (A-Z, harga) tetap berlaku.
 
 ## Tab Konten & Bahasa
 

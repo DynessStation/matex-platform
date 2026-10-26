@@ -163,31 +163,6 @@
         </small>
       </div>
     </label>
-
-    @if (!editor.isSystemPage) {
-      <label
-        class="cms-publication-option cms-publication-option-danger"
-        [class.active]="publication.publicationChoice === 'archive'"
-      >
-        <input
-          type="radio"
-          name="publicationChoice"
-          value="archive"
-          [checked]="publication.publicationChoice === 'archive'"
-          (change)="selectPublicationChoice('archive')"
-        />
-
-        <div>
-          <strong>
-            {{ 'website_page.publication_archive' | translate }}
-          </strong>
-
-          <small>
-            {{ 'website_page.publication_archive_help' | translate }}
-          </small>
-        </div>
-      </label>
-    }
   </div>
 
   <!--==================================================-->

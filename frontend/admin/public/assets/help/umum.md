@@ -248,15 +248,7 @@ Halaman tetap website (Beranda, Tentang MATEX, Syarat dan Ketentuan, Karir, sert
 
 ### Tab Umum
 
-Kolom di tab Umum (Identitas internal, Bahasa Utama, Akses halaman, Urutan, Unggulan, Jenis halaman, dan Tampilan halaman) hanya informasi untuk halaman tetap: nilainya diatur sistem dan perubahan di sini tidak disimpan. Yang menentukan tayang adalah tab Publikasi dan status tiap bahasa.
-
-### Identitas internal
-
-Kode tetap halaman, misalnya home atau about, hanya untuk dibaca.
-
-### Akses halaman
-
-Pilihan Publik, Privat, atau Tidak Terdaftar ini belum berpengaruh: halaman tetap selalu bisa dibuka publik saat dipublikasikan. Untuk menyembunyikan halaman, pakai Simpan sebagai Draf di tab Publikasi.
+Informasi halaman yang diatur sistem dan hanya untuk dibaca: kode halaman (misalnya home atau about), alamat halaman tiap bahasa, dan status tayang saat ini. Untuk menyembunyikan halaman, pakai Simpan sebagai Draf di tab Publikasi.
 
 ### Judul halaman
 
@@ -292,7 +284,7 @@ Judul dan teks yang tampil saat tautan halaman dibagikan di media sosial atau ap
 
 ### Pilihan publikasi
 
-**Jangan Ubah Status** (bawaan) menyimpan isi tanpa mengubah tayang. **Simpan sebagai Draf** menyembunyikan halaman. **Publikasikan Sekarang** menayangkan setelah disimpan. **Jadwalkan Publikasi** menayangkan otomatis mulai waktu yang dipilih. **Arsipkan Halaman** menghentikan tayang; hasilnya sama dengan Simpan sebagai Draf.
+**Jangan Ubah Status** (bawaan) menyimpan isi tanpa mengubah tayang. **Simpan sebagai Draf** menyembunyikan halaman. **Publikasikan Sekarang** menayangkan setelah disimpan. **Jadwalkan Publikasi** menayangkan otomatis mulai waktu yang dipilih.
 
 Status saat ini tampil di atas pilihan: Draf, Terjadwal, Dipublikasikan, atau Kedaluwarsa (waktu berakhir sudah lewat).
 
