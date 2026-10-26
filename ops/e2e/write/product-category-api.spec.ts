@@ -370,6 +370,10 @@ test('delete', async () => {
     }),
     200,
   );
-  // The two here and the second child deleted in the reorder test.
-  expect(audit.data).toHaveLength(3);
+  // The two here and the second child deleted in the reorder test (other specs delete their
+  // own categories too).
+  const deleted = audit.data
+    .map((item: any) => item.entity.label)
+    .filter((label: string) => label.startsWith(key));
+  expect(deleted).toHaveLength(3);
 });
