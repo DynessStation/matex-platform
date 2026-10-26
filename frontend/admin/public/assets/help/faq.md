@@ -22,11 +22,17 @@ Kotak **Cari** mencari di teks pertanyaan dan nama internal. Buka FAQ lewat menu
 
 ### Urutan
 
-Urutan tampil di website; angka kecil tampil lebih dulu.
+Posisi FAQ di halaman FAQ website (1 tampil paling atas). Angka ini diatur sistem; ubah lewat **Atur urutan**.
 
 ### Tampil di website
 
 Sakelar untuk menampilkan atau menyembunyikan FAQ di website tanpa menghapusnya. Sistem meminta konfirmasi sebelum mengubah.
+
+## Atur Urutan
+
+Tombol **Atur urutan** di kepala halaman mengganti tabel dengan daftar semua FAQ sesuai urutan di website. Seret baris lewat pegangan di kiri, atau pakai tombol panah naik dan turun, lalu klik **Simpan urutan**. **Batal** menutup daftar tanpa menyimpan. FAQ yang disembunyikan ikut diurutkan dan diberi tanda Disembunyikan.
+
+Nomor posisi diatur otomatis menjadi 1, 2, 3, dan seterusnya tanpa celah: FAQ baru masuk paling akhir, dan FAQ yang dihapus tidak meninggalkan nomor kosong. Bila daftar berubah oleh admin lain saat Anda mengatur urutan, sistem menolak penyimpanan; muat ulang lalu ulangi.
 
 ## Formulir FAQ
 
@@ -38,7 +44,7 @@ Kode pembeda FAQ untuk sistem, wajib dan unik, misalnya pengiriman-produk. Hanya
 
 ### Urutan
 
-Angka 0 atau lebih untuk mengatur posisi di website; angka kecil tampil lebih dulu.
+Hanya informasi, misalnya "Posisi 3 dari 8". FAQ baru masuk paling akhir. Untuk memindahkan, pakai **Atur urutan** di daftar FAQ.
 
 ### Pertanyaan
 

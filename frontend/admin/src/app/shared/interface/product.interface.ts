@@ -130,6 +130,10 @@ export interface IProduct {
   min_order_qty?: number;
   lead_time_days?: number | null;
   sort_order?: number;
+  /** "Tampilkan di depan katalog"; sort_order is then its place 1..n. */
+  catalog_front?: boolean;
+  front_total?: number;
+  front_max?: number;
 }
 
 export type ProductCatalogStatus = 'draft' | 'published' | 'archived';
@@ -202,7 +206,7 @@ export interface IProductPayload {
   price_visibility: ProductPriceVisibility;
   internal_commerce_enabled: 0 | 1;
   is_featured: 0 | 1;
-  sort_order: number;
+  catalog_front: 0 | 1;
   category_ids: string[];
   media: Array<{ id: string; role: ProductMediaRole; sort_order: number }>;
   prices: IProductPrice[];

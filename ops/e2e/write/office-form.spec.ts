@@ -150,6 +150,8 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await expect(items).toHaveCount(2);
   await expect(items.first().locator('.badge')).toHaveText('Sampul');
   await items.nth(1).locator('input.form-control').fill('Ruang tunggu');
+  // Each photo shows its place read-only next to the arrows.
+  await expect(items.nth(1).locator('.order-position')).toHaveText('Posisi 2 dari 2');
   await items.nth(1).locator('.ri-arrow-up-line').click();
   await expect(items.first().locator('input.form-control')).toHaveValue('Ruang tunggu');
   await items.first().locator('button', { hasText: 'Jadikan Sampul' }).click();
@@ -160,15 +162,15 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await items.nth(1).locator('.office-media-delete').click();
   await expect(items).toHaveCount(1);
 
-  // Publication: the slug and sort order show only for a public office.
+  // Publication: the slug and the read-only place show only for a public office; a new
+  // public office goes last.
   await openTab(page, 'Publikasi');
   await expect(panel(page).locator('[formcontrolname=public_slug]')).toHaveCount(0);
   await panel(page).locator('label.office-switch-label').first().click();
   await panel(page).locator('[formcontrolname=public_slug]').fill(`kantor-form-${runId}`);
-  const sortOrder = panel(page).locator('[formcontrolname=public_sort_order]');
-  await sortOrder.fill('12345');
-  await expect(sortOrder).toHaveValue('12.345');
-  await sortOrder.fill('4');
+  const position = panel(page).locator('#public_position');
+  await expect(position).toHaveValue('Paling akhir setelah disimpan');
+  await expect(position).toHaveAttribute('readonly', '');
 
   const created = await submit(page, 'POST');
   createdId = created.data.id_office;
@@ -246,7 +248,8 @@ test('edit saves the form-created office unchanged', async ({ page }) => {
   await page.goto(`${stack.adminOrigin}/office/edit/${createdId}`);
   await expect(panel(page).locator('[formcontrolname=office_code]')).toHaveValue(code);
   await openTab(page, 'Publikasi');
-  await expect(panel(page).locator('[formcontrolname=public_sort_order]')).toHaveValue('4');
+  // Created as a public office, it went last.
+  await expect(panel(page).locator('#public_position')).toHaveValue(/^Posisi (\d+) dari \1$/);
   await submit(page, 'PUT');
   await saveRecording('office-form', ['office', 'office_operating_hour', 'office_attachment']);
 });

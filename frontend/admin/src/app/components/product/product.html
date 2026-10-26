@@ -1,13 +1,41 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'products'">
-  <div button *hasPermission="'product.create'">
+  <div button class="d-flex flex-wrap gap-2">
+    @if (!ordering) {
+      <button
+        *hasPermission="'product.update'"
+        type="button"
+        id="open_product_front"
+        class="align-items-center btn btn-outline-primary d-flex gap-1"
+        (click)="openFront()"
+      >
+        <i class="ri-drag-move-2-line"></i>
+        Produk di depan
+      </button>
+    }
     <a
+      *hasPermission="'product.create'"
       [routerLink]="['/product/create']"
       class="align-items-center btn btn-theme d-flex"
     >
       <i class="ri-add-line"></i> {{ 'add_product' | translate }}
     </a>
   </div>
+  @if (ordering) {
+    <app-order-list
+      title="Produk di depan katalog"
+      hint="Produk ini tampil paling depan di katalog website, sesuai urutan di bawah. Produk lain menyusul dari yang terbaru. Tambah produk dengan mencentang Tampilkan di depan katalog di form produk."
+      help="produk-di-depan"
+      emptyText="Belum ada produk di depan katalog. Centang Tampilkan di depan katalog di form produk."
+      [items]="orderItems"
+      [removable]="true"
+      [max]="orderMax"
+      [saving]="savingOrder"
+      (save)="saveFront($event)"
+      (cancel)="ordering = false"
+    />
+  }
   <app-table
+    [hidden]="ordering"
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
     [emitInitialChange]="false"

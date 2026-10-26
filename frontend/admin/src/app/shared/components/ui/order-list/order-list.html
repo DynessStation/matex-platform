@@ -1,0 +1,112 @@
+<section class="order-panel" aria-label="Atur urutan">
+  <div class="order-panel__head">
+    <div>
+      <h6 class="order-panel__title">
+        {{ title() }}
+        @if (help()) {
+          <app-help-tip [section]="help()" />
+        }
+      </h6>
+      <p class="order-panel__hint">{{ hint() }}</p>
+    </div>
+    <div class="order-panel__actions">
+      <button
+        type="button"
+        class="btn btn-outline-theme"
+        id="cancel_order"
+        (click)="cancel.emit()"
+      >
+        Batal
+      </button>
+      <button
+        type="button"
+        class="btn btn-theme"
+        id="save_order"
+        [disabled]="saving() || !changed"
+        (click)="submit()"
+      >
+        Simpan urutan
+      </button>
+    </div>
+  </div>
+
+  @if (list.length) {
+    <ol
+      cdkDropList
+      class="order-list"
+      cdkDropListLockAxis="y"
+      (cdkDropListDropped)="drop($event)"
+    >
+      @for (item of list; track item.id; let index = $index) {
+        <li class="order-list__item" cdkDrag [attr.data-id]="item.id">
+          <span
+            class="order-list__handle"
+            cdkDragHandle
+            title="Geser untuk memindahkan"
+          >
+            <i class="ri-draggable" aria-hidden="true"></i>
+          </span>
+          <span class="order-list__position">{{ index + 1 }}</span>
+          @if (item.thumbnail_url !== undefined) {
+            @if (item.thumbnail_url) {
+              <img
+                class="order-list__thumb"
+                [src]="item.thumbnail_url"
+                alt=""
+              />
+            } @else {
+              <span class="order-list__thumb" aria-hidden="true"></span>
+            }
+          }
+          <span class="order-list__text" [title]="item.label">
+            <strong>{{ item.label }}</strong>
+            @if (item.note) {
+              <small>{{ item.note }}</small>
+            }
+          </span>
+          <span class="order-list__buttons">
+            <button
+              type="button"
+              class="btn btn-sm btn-light-bg"
+              [disabled]="index === 0"
+              [attr.aria-label]="'Naikkan ' + item.label"
+              title="Naikkan"
+              (click)="move(index, -1)"
+            >
+              <i class="ri-arrow-up-line"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-light-bg"
+              [disabled]="index === list.length - 1"
+              [attr.aria-label]="'Turunkan ' + item.label"
+              title="Turunkan"
+              (click)="move(index, 1)"
+            >
+              <i class="ri-arrow-down-line"></i>
+            </button>
+            @if (removable()) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                [attr.aria-label]="'Keluarkan ' + item.label"
+                title="Keluarkan dari daftar"
+                (click)="remove(index)"
+              >
+                <i class="ri-close-line"></i>
+              </button>
+            }
+          </span>
+        </li>
+      }
+    </ol>
+  } @else {
+    <div class="order-panel__empty">{{ emptyText() }}</div>
+  }
+
+  @if (max()) {
+    <small class="order-panel__count"
+      >{{ list.length }} dari maksimal {{ max() }}</small
+    >
+  }
+</section>

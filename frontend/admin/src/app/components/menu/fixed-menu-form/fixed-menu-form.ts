@@ -12,6 +12,7 @@ import { Store } from '@ngxs/store';
 
 import { Button } from '../../../shared/components/ui/button/button';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
+import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import {
   IWebNavigationDetail,
@@ -260,6 +261,23 @@ export class FixedMenuForm {
       this.definitions.find((definition) =>
         [definition.key, ...(definition.aliases ?? [])].includes(key),
       ) ?? null
+    );
+  }
+
+  /** Read-only place in the header; the order is changed by dragging the structure. */
+  get position(): string {
+    const items = [...(this.navigation()?.items ?? [])].sort(
+      (first, second) => first.sort_order - second.sort_order,
+    );
+    const index = items.findIndex(
+      (candidate) =>
+        candidate.id_web_navigation_item ===
+        this.item()?.id_web_navigation_item,
+    );
+    return positionText(
+      index + 1,
+      items.length,
+      'Paling akhir setelah ditambahkan',
     );
   }
 

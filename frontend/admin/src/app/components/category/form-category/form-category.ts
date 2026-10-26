@@ -17,7 +17,7 @@ import { Button } from '../../../shared/components/ui/button/button';
 import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import { mediaConfig } from '../../../shared/data/media-config';
-import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
+import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   ICategory,
@@ -45,7 +45,6 @@ import { CategoryState } from '../../../shared/store/state/category.state';
     NgbModule,
     AdvanceDropdown,
     AiFieldAction,
-    LocalizedNumberInputDirective,
     ImageUpload,
     Button,
   ],
@@ -67,6 +66,16 @@ export class FormCategory {
   readonly mediaConfig = mediaConfig;
 
   category: ICategoryDetail | null = null;
+
+  // Read-only: categories are ordered by dragging them in the tree. A new or moved category
+  // goes last on its level.
+  get position(): string {
+    const category = this.category;
+    const parent = this.form.controls.parent_id.value || null;
+    return category && (category.parent_id ?? null) === parent
+      ? positionText(category.position, category.position_total)
+      : positionText(null, null);
+  }
   id: string | null = null;
   activeTab = 'general';
   activeLocale: 'id' | 'en' = 'id';
@@ -125,7 +134,6 @@ export class FormCategory {
     parent_id: [''],
     status: ['draft' as ProductCategoryStatus, Validators.required],
     is_featured: [false],
-    sort_order: [0, [Validators.required, Validators.min(0)]],
     image_id: [''],
     icon_id: [''],
     og_image_id: [''],
@@ -288,7 +296,7 @@ export class FormCategory {
           void this.router.navigateByUrl('/category');
           return;
         }
-        this.form.reset({ status: 'draft', sort_order: 0, is_featured: false });
+        this.form.reset({ status: 'draft', is_featured: false });
         this.category = null;
         this.activeTab = 'general';
         this.store.dispatch(new GetCategoriesAction({ type: 'product' }));
@@ -314,7 +322,6 @@ export class FormCategory {
       parent_id: category.parent_id ?? '',
       status: category.status,
       is_featured: category.is_featured,
-      sort_order: category.sort_order,
       image_id: category.category_image?.id_attachment ?? '',
       icon_id: category.category_icon?.id_attachment ?? '',
       og_image_id: category.category_meta_image?.id_attachment ?? '',
@@ -356,7 +363,6 @@ export class FormCategory {
       parent_id: value.parent_id || null,
       status: value.status!,
       is_featured: value.is_featured ? 1 : 0,
-      sort_order: Number(value.sort_order) || 0,
       image_id: value.image_id || null,
       icon_id: value.icon_id || null,
       og_image_id: value.og_image_id || null,

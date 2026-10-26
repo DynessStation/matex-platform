@@ -256,15 +256,17 @@
       /></label>
     </div>
     <div class="col-md-4">
-      <label class="form-label"
-        >Urutan <app-help-tip section="tab-umum--urutan" /></label
-      ><input
-        type="text"
-        inputmode="numeric"
-        appLocalizedNumber
-        class="form-control"
-        formControlName="sort_order"
-      />
+      <label class="app-check app-check-card category-check"
+        ><input
+          type="checkbox"
+          id="catalog_front"
+          formControlName="catalog_front" />
+        Tampilkan di depan katalog
+        <app-help-tip section="tab-umum--tampilkan-di-depan-katalog"
+      /></label>
+      <small class="field-help" id="catalog_front_info">{{
+        editor.frontInfo
+      }}</small>
     </div>
   </div>
   <div class="category-actions">

@@ -15,13 +15,15 @@ export interface IPublicContactChannel {
   url: string | null;
   is_primary: 0 | 1;
   is_public: 0 | 1;
-  sort_order: number;
+  /** Read-only: the place in the list (1..n), set by the list order. */
+  sort_order?: number;
   translations: IPublicContactTranslation[];
 }
 export interface IContactInquiryTopic {
   key: string;
   recipient_email: string | null;
-  sort_order: number;
+  /** Read-only: the place in the list (1..n), set by the list order. */
+  sort_order?: number;
   status: 0 | 1;
   translations: IPublicContactTranslation[];
 }

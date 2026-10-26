@@ -28,6 +28,16 @@ Status stok produk: tersedia, habis, pre-order, atau dibuat sesuai pesanan.
 
 Draft (belum tampil), Dipublikasikan (tampil di website), atau Diarsipkan (disimpan, tidak tampil).
 
+Tanpa pilihan urut, daftar menampilkan produk di depan katalog lebih dulu sesuai urutannya, lalu produk lain menurut nama.
+
+## Produk di Depan
+
+Tombol **Produk di depan** di kepala halaman menampilkan produk yang tampil paling depan di katalog website, paling banyak 12, sesuai urutannya. Produk lain menyusul dari yang terbaru. Pilihan urut pengunjung (A-Z, harga) tetap berlaku.
+
+Seret baris atau pakai tombol panah untuk mengubah urutan. Tombol silang mengeluarkan produk dari depan katalog; produk itu tetap ada dan kembali tampil dari yang terbaru. Klik **Simpan urutan** untuk menyimpan, atau **Batal** untuk menutup tanpa menyimpan. Produk Draft atau Diarsipkan diberi tanda karena belum tampil di website.
+
+Produk ditambahkan ke depan katalog dengan mencentang **Tampilkan di depan katalog** di tab Umum formulir produk; produk itu masuk paling akhir.
+
 ## Tab Umum
 
 Identitas, kategori, ukuran, dan stok produk.
@@ -100,9 +110,11 @@ Bila dicentang, jumlah stok dicatat di kolom **Jumlah stok**. Belum ada penguran
 
 Menandai produk unggulan, yang didahulukan di bagian produk beranda website (8 produk) dan dua yang pertama tampil di menu katalog pada header.
 
-### Urutan
+### Tampilkan di depan katalog
 
-Posisi produk di urutan bawaan katalog website: produk dengan angka 1, 2, 3, dan seterusnya tampil paling depan sesuai angkanya, lalu produk dengan Urutan 0 (tanpa posisi) menyusul dari yang terbaru. Pilihan urut pengunjung (A-Z, harga) tetap berlaku.
+Bila dicentang, produk tampil paling depan di katalog website. Produk yang baru dicentang masuk paling akhir di antara produk di depan; di bawah kotak tertulis posisinya, misalnya "Posisi 2 dari 5 di depan katalog". Paling banyak 12 produk; bila sudah penuh, keluarkan produk lain dulu lewat **Produk di depan**. Urutannya diubah lewat tombol **Produk di depan** di daftar produk.
+
+Bila tidak dicentang, produk tampil setelah produk di depan, dari yang terbaru.
 
 ## Tab Konten & Bahasa
 
@@ -218,6 +230,7 @@ Judul dan teks yang tampil saat tautan dibagikan di media sosial atau aplikasi p
 
 - Kunci internal, SKU, dan slug tiap bahasa tidak boleh sama dengan produk lain.
 - Kedua bahasa wajib dilengkapi dan minimal satu kategori dipilih.
-- Menghapus produk mengarsipkannya sehingga tidak tampil di website.
+- Menghapus produk mengarsipkannya sehingga tidak tampil di website, dan mengeluarkannya dari depan katalog.
+- Paling banyak 12 produk di depan katalog.
 - Pastikan harga, stok, dan klaim produk akurat sebelum dipublikasikan.
 - Perubahan produk tercatat di Log Aktivitas.

@@ -16,14 +16,19 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { OrderList } from '../../shared/components/ui/order-list/order-list';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';
+import { IOrderItem } from '../../shared/interface/order-list.interface';
 import { IProductModel } from '../../shared/interface/product.interface';
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
+import { ApiMessageService } from '../../shared/services/api-message.service';
+import { NotificationService } from '../../shared/services/notification.service';
+import { ProductService } from '../../shared/services/product.service';
 import {
   DeleteProductAction,
   GetProductsAction,
@@ -38,6 +43,7 @@ import { ProductState } from '../../shared/store/state/product.state';
     HasPermissionDirective,
     PageWrapper,
     Table,
+    OrderList,
   ],
   templateUrl: './product.html',
   styleUrl: './product.scss',
@@ -47,6 +53,14 @@ export class Product implements AfterViewInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  private productService = inject(ProductService);
+  private notifications = inject(NotificationService);
+  private messages = inject(ApiMessageService);
+  // "Produk di depan": products ticked "Tampilkan di depan katalog", in their order.
+  ordering = false;
+  orderItems: IOrderItem[] = [];
+  orderMax: number | null = null;
+  savingOrder = false;
   readonly table = viewChild(Table);
   private pendingTableState: Params | null = null;
   filter: Params = { search: '', page: 1, paginate: 15, field: '', sort: '' };
@@ -181,6 +195,36 @@ export class Product implements AfterViewInit {
         );
     if (action.actionToPerform === 'view')
       window.open(`/product/${action.data.slug}`, '_blank');
+  }
+
+  openFront() {
+    this.productService.getFront().subscribe((response) => {
+      this.orderMax = response.data?.max ?? null;
+      this.orderItems = (response.data?.data ?? []).map((item) => ({
+        ...item,
+        // Only published products show on the website.
+        note:
+          item.status === 'draft'
+            ? 'Draf, belum tampil'
+            : item.status === 'archived'
+              ? 'Diarsipkan, belum tampil'
+              : '',
+      }));
+      this.ordering = true;
+    });
+  }
+
+  saveFront(ids: string[]) {
+    this.savingOrder = true;
+    this.productService.saveFront(ids).subscribe({
+      next: (response) => {
+        this.savingOrder = false;
+        this.ordering = false;
+        this.notifications.showSuccess(this.messages.resolveResponse(response));
+        this.store.dispatch(new GetProductsAction(this.filter));
+      },
+      error: () => (this.savingOrder = false),
+    });
   }
 
   private positiveNumber(value: string | null, fallback: number) {

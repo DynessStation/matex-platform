@@ -6,14 +6,19 @@ import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { OrderList } from '../../shared/components/ui/order-list/order-list';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';
 import { IFaq, IFaqModel } from '../../shared/interface/faq.interface';
+import { IOrderItem } from '../../shared/interface/order-list.interface';
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
+import { ApiMessageService } from '../../shared/services/api-message.service';
+import { FaqService } from '../../shared/services/faq.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import {
   DeleteAllFaqAction,
   DeleteFaqAction,
@@ -30,13 +35,22 @@ import { FaqState } from '../../shared/store/state/faq.state';
     HasPermissionDirective,
     PageWrapper,
     Table,
+    OrderList,
   ],
   templateUrl: './faq.html',
   styleUrl: './faq.scss',
 })
 export class Faq {
   private store = inject(Store);
+  private faqService = inject(FaqService);
+  private notifications = inject(NotificationService);
+  private messages = inject(ApiMessageService);
   router = inject(Router);
+
+  // "Atur urutan": the table is replaced by the drag list until it is saved or cancelled.
+  ordering = false;
+  orderItems: IOrderItem[] = [];
+  savingOrder = false;
 
   faq$: Observable<IFaqModel | null> = this.store.select(FaqState.faq);
   private currentTableParams: Params = {
@@ -124,6 +138,29 @@ export class Faq {
     else if (action.actionToPerform == 'status') this.status(action.data);
     else if (action.actionToPerform == 'delete') this.delete(action.data);
     else if (action.actionToPerform == 'deleteAll') this.deleteAll(action.data);
+  }
+
+  openOrder() {
+    this.faqService.getOrder().subscribe((response) => {
+      this.orderItems = (response.data?.data ?? []).map((item) => ({
+        ...item,
+        note: Number(item.status) === 0 ? 'Disembunyikan' : '',
+      }));
+      this.ordering = true;
+    });
+  }
+
+  saveOrder(ids: string[]) {
+    this.savingOrder = true;
+    this.faqService.saveOrder(ids).subscribe({
+      next: (response) => {
+        this.savingOrder = false;
+        this.ordering = false;
+        this.notifications.showSuccess(this.messages.resolveResponse(response));
+        this.store.dispatch(new GetFaqsAction(this.currentTableParams));
+      },
+      error: () => (this.savingOrder = false),
+    });
   }
 
   edit(data: IFaq) {

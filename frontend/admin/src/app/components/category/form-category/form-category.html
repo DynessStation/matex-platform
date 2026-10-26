@@ -82,16 +82,15 @@
                     >
                   </div>
                   <div class="col-md-3">
-                    <label class="form-label" for="sort_order"
+                    <label class="form-label" for="position"
                       >Urutan <app-help-tip section="tab-umum--urutan"
                     /></label>
                     <input
-                      id="sort_order"
+                      id="position"
                       class="form-control"
-                      type="text"
-                      inputmode="numeric"
-                      appLocalizedNumber
-                      formControlName="sort_order"
+                      readonly
+                      tabindex="-1"
+                      [value]="position"
                     />
                   </div>
                   <div class="col-md-2">

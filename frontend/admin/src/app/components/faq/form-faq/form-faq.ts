@@ -9,7 +9,7 @@ import { finalize } from 'rxjs';
 import { Button } from '../../../shared/components/ui/button/button';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
-import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
+import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import {
   IFaqDetail,
   IFaqPayload,
@@ -33,7 +33,6 @@ import { FaqState } from '../../../shared/store/state/faq.state';
     FormFields,
     Button,
     AiFieldAction,
-    LocalizedNumberInputDirective,
   ],
   templateUrl: './form-faq.html',
   styleUrl: './form-faq.scss',
@@ -51,13 +50,14 @@ export class FormFaq {
 
   readonly type = input<'create' | 'edit'>('create');
   private faq: IFaqDetail | null = null;
+  // Read-only: the place is set with "Atur urutan" in the FAQ list.
+  position = positionText(null, null);
 
   readonly form = this.fb.group({
     key: [
       '',
       [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)],
     ],
-    sort_order: [0, [Validators.required, Validators.min(0)]],
     status: [true],
     id_question: ['', [Validators.required, Validators.maxLength(500)]],
     id_answer: ['', [Validators.required, Validators.maxLength(50000)]],
@@ -72,13 +72,13 @@ export class FormFaq {
       const faq = this.store.selectSnapshot(FaqState.selectedFaq);
       if (!faq) return;
       this.faq = faq;
+      this.position = positionText(faq.position, faq.position_total);
       const indonesia = faq.translations.find(
         (item) => item.locale === 'id-ID',
       );
       const english = faq.translations.find((item) => item.locale === 'en-US');
       this.form.patchValue({
         key: faq.key,
-        sort_order: faq.sort_order,
         status: faq.status === 1,
         id_question: indonesia?.question ?? '',
         id_answer: indonesia?.answer ?? '',
@@ -191,7 +191,6 @@ export class FormFaq {
     ];
     const payload: IFaqPayload = {
       key: value.key!,
-      sort_order: Number(value.sort_order),
       status: value.status ? 1 : 0,
       translations,
     };

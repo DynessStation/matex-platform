@@ -39,15 +39,38 @@
               <div class="card-heading">
                 <strong
                   >{{ 'public_contact.channel' | translate }}
-                  {{ index + 1 }}</strong
-                >
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="channels.removeAt(index)"
-                >
-                  <i class="ri-delete-bin-line"></i>
-                </button>
+                  {{ index + 1 }}
+                  <app-help-tip section="kanal-kontak--urutan"
+                /></strong>
+                <span class="card-heading__actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Naikkan"
+                    [attr.aria-label]="'Naikkan kanal ' + (index + 1)"
+                    [disabled]="index === 0"
+                    (click)="move(channels, index, -1)"
+                  >
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Turunkan"
+                    [attr.aria-label]="'Turunkan kanal ' + (index + 1)"
+                    [disabled]="index === channels.length - 1"
+                    (click)="move(channels, index, 1)"
+                  >
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="channels.removeAt(index)"
+                  >
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </span>
               </div>
               <div class="row g-3">
                 <div class="col-lg-4">
@@ -106,7 +129,7 @@
                     <div class="invalid-feedback">Nilai kanal wajib diisi.</div>
                   }
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                   <label
                     >{{ 'public_contact.url' | translate }}
                     <app-help-tip section="kanal-kontak--tautan" /></label
@@ -120,18 +143,6 @@
                       Tautan dibuat otomatis dari nilai kanal.
                     }
                   </small>
-                </div>
-                <div class="col-lg-2">
-                  <label
-                    >{{ 'public_contact.order' | translate }}
-                    <app-help-tip section="kanal-kontak--urutan" /></label
-                  ><input
-                    class="form-control"
-                    type="text"
-                    inputmode="numeric"
-                    appLocalizedNumber
-                    formControlName="sort_order"
-                  />
                 </div>
                 <div class="col-lg-4 checks checks--inline">
                   <label class="app-check app-check-card"
@@ -257,14 +268,38 @@
               <div class="card-heading">
                 <strong
                   >{{ 'public_contact.topic' | translate }}
-                  {{ index + 1 }}</strong
-                ><button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="topics.removeAt(index)"
-                >
-                  <i class="ri-delete-bin-line"></i>
-                </button>
+                  {{ index + 1 }}
+                  <app-help-tip section="topik-pesan--urutan-dan-aktif"
+                /></strong>
+                <span class="card-heading__actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Naikkan"
+                    [attr.aria-label]="'Naikkan topik ' + (index + 1)"
+                    [disabled]="index === 0"
+                    (click)="move(topics, index, -1)"
+                  >
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light-bg"
+                    title="Turunkan"
+                    [attr.aria-label]="'Turunkan topik ' + (index + 1)"
+                    [disabled]="index === topics.length - 1"
+                    (click)="move(topics, index, 1)"
+                  >
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="topics.removeAt(index)"
+                  >
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </span>
               </div>
               <div class="row g-3">
                 <div class="col-lg-4">
@@ -309,20 +344,7 @@
                     </div>
                   }
                 </div>
-                <div class="col-lg-2">
-                  <label
-                    >{{ 'public_contact.order' | translate }}
-                    <app-help-tip
-                      section="topik-pesan--urutan-dan-aktif" /></label
-                  ><input
-                    class="form-control"
-                    type="text"
-                    inputmode="numeric"
-                    appLocalizedNumber
-                    formControlName="sort_order"
-                  />
-                </div>
-                <div class="col-lg-2 checks checks--compact">
+                <div class="col-lg-4 checks checks--compact">
                   <label class="app-check app-check-card"
                     ><input type="checkbox" formControlName="status" />
                     <span

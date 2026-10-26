@@ -101,6 +101,23 @@
     </div>
 
     <app-form-fields
+      [label]="'Urutan'"
+      [for]="'fixed_navigation_position'"
+      help="mengubah-label-dan-visibilitas-bagian-header--urutan"
+    >
+      <input
+        id="fixed_navigation_position"
+        class="form-control"
+        readonly
+        tabindex="-1"
+        [value]="position"
+      />
+      <p class="help-text">
+        Ubah urutan dengan menggeser menu di Struktur menu, lalu Simpan urutan.
+      </p>
+    </app-form-fields>
+
+    <app-form-fields
       [label]="'navigation_admin.visible_in_header' | translate"
       [for]="'fixed_navigation_status'"
       help="mengubah-label-dan-visibilitas-bagian-header--tampilkan-di-header"

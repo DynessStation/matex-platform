@@ -18,7 +18,6 @@ import { AiFieldAction } from '../../shared/components/ui/ai-field-action/ai-fie
 import { Button } from '../../shared/components/ui/button/button';
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
 import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { ContentAssistantService } from '../../shared/services/content-assistant.service';
@@ -37,7 +36,6 @@ import { PublicContactService } from '../../shared/services/public-contact.servi
     PageWrapper,
     Button,
     AiFieldAction,
-    LocalizedNumberInputDirective,
     HasPermissionDirective,
   ],
   templateUrl: './public-contact.html',
@@ -199,7 +197,6 @@ export class PublicContact {
         url: [value?.url ?? ''],
         is_primary: [value?.is_primary === 1],
         is_public: [value?.is_public !== 0],
-        sort_order: [value?.sort_order ?? this.channels.length],
         translations: this.translations(value?.translations),
       }),
     );
@@ -219,11 +216,18 @@ export class PublicContact {
           value?.recipient_email ?? '',
           [Validators.required, Validators.email],
         ],
-        sort_order: [value?.sort_order ?? this.topics.length],
         status: [value?.status !== 0],
         translations: this.translations(value?.translations),
       }),
     );
+  }
+
+  /** Moves a card up or down; the list order is the order on the website (saved as 1..n). */
+  move(array: FormArray, index: number, step: -1 | 1): void {
+    const control = array.at(index);
+    array.removeAt(index, { emitEvent: false });
+    array.insert(index + step, control);
+    array.markAsDirty();
   }
 
   private load(settings: IPublicContactSettings): void {
@@ -273,13 +277,11 @@ export class PublicContact {
         url: this.isDerivedChannel(item.type) ? null : item.url || null,
         is_primary: item.is_primary ? 1 : 0,
         is_public: item.is_public ? 1 : 0,
-        sort_order: Number(item.sort_order),
         translations: mapTranslations(item.translations),
       })),
       topics: raw.topics.map((item: any) => ({
         key: item.key,
         recipient_email: item.recipient_email || null,
-        sort_order: Number(item.sort_order),
         status: item.status ? 1 : 0,
         translations: mapTranslations(item.translations),
       })),

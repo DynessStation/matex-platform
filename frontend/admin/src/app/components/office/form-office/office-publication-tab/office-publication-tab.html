@@ -27,17 +27,17 @@
     </div>
 
     <div class="col-md-4">
-      <label class="form-label">
+      <label class="form-label" for="public_position">
         {{ 'office.sort_order' | translate }}
         <app-help-tip section="tab-publikasi--urutan" />
       </label>
 
       <input
-        type="text"
-        inputmode="numeric"
-        appLocalizedNumber
+        id="public_position"
         class="form-control"
-        formControlName="public_sort_order"
+        readonly
+        tabindex="-1"
+        [value]="position"
       />
     </div>
   </div>

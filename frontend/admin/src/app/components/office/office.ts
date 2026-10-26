@@ -14,6 +14,8 @@ import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 
 import { ConfirmationModal } from '../../shared/components/ui/modal/confirmation-modal/confirmation-modal';
 
+import { OrderList } from '../../shared/components/ui/order-list/order-list';
+
 import { Table } from '../../shared/components/ui/table/table';
 
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
@@ -21,6 +23,14 @@ import { HasPermissionDirective } from '../../shared/directives/has-permission.d
 import { IOffice, IOfficeModel } from '../../shared/interface/office.interface';
 
 import { Params } from '../../shared/interface/core.interface';
+
+import { IOrderItem } from '../../shared/interface/order-list.interface';
+
+import { ApiMessageService } from '../../shared/services/api-message.service';
+
+import { NotificationService } from '../../shared/services/notification.service';
+
+import { OfficeService } from '../../shared/services/office.service';
 
 import {
   ITableClickedAction,
@@ -53,6 +63,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     Table,
     HasPermissionDirective,
     ConfirmationModal,
+    OrderList,
   ],
 
   templateUrl: './office.html',
@@ -67,6 +78,19 @@ export class Office {
   private destroyRef = inject(DestroyRef);
 
   private translate = inject(TranslateService);
+
+  private officeService = inject(OfficeService);
+
+  private notifications = inject(NotificationService);
+
+  private messages = inject(ApiMessageService);
+
+  // "Atur urutan": public offices only, as shown on the Contact page and in the footer.
+  ordering = false;
+
+  orderItems: IOrderItem[] = [];
+
+  savingOrder = false;
 
   readonly confirmationModal =
     viewChild<ConfirmationModal>('confirmationModal');
@@ -370,6 +394,36 @@ export class Office {
           },
         });
     }
+  }
+
+  //==================================================
+  //==== PUBLIC ORDER
+  //==================================================
+
+  openOrder(): void {
+    this.officeService.getPublicOrder().subscribe((response) => {
+      this.orderItems = (response.data?.data ?? []).map((item) => ({
+        ...item,
+        note:
+          Number(item.status) === 1
+            ? ''
+            : this.translate.instant('office.inactive'),
+      }));
+      this.ordering = true;
+    });
+  }
+
+  saveOrder(ids: string[]): void {
+    this.savingOrder = true;
+    this.officeService.savePublicOrder(ids).subscribe({
+      next: (response) => {
+        this.savingOrder = false;
+        this.ordering = false;
+        this.notifications.showSuccess(this.messages.resolveResponse(response));
+        this.refresh();
+      },
+      error: () => (this.savingOrder = false),
+    });
   }
 
   private refresh(): void {

@@ -133,6 +133,11 @@ export interface IOfficeAttachment extends IAttachment {
 //==================================================
 
 export interface IOfficeDetail extends Omit<IOffice, 'id'> {
+  /** Place in the public order ("Posisi 2 dari 3"); null for an internal office. */
+  public_position: number | null;
+
+  public_total: number;
+
   operating_hours: IOfficeOperatingHour[];
 
   attachments: IOfficeAttachment[];
@@ -196,8 +201,6 @@ export interface IOfficePayload {
   is_public: 0 | 1;
 
   public_slug: string | null;
-
-  public_sort_order: number;
 
   google_place_id: string | null;
 

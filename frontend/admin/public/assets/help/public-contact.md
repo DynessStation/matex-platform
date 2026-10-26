@@ -32,7 +32,7 @@ Untuk WhatsApp, Email, dan Telepon dibuat otomatis dari nilai. Untuk jenis lain,
 
 ### Urutan
 
-Angka urutan tampil kanal di website; angka kecil tampil lebih dulu.
+Kanal tampil di website sesuai urutan kartu di halaman ini. Pakai tombol panah naik dan turun di kepala kartu untuk memindahkan, lalu simpan pengaturan. Kanal baru masuk paling akhir.
 
 ### Utama
 
@@ -60,7 +60,7 @@ Alamat email yang menerima pesan untuk topik ini, wajib. Pastikan alamatnya akti
 
 ### Urutan dan aktif
 
-Urutan pilihan topik di formulir, dan apakah topik ditawarkan ke pengunjung.
+Topik ditawarkan di formulir website sesuai urutan kartu; pakai tombol panah naik dan turun di kepala kartu, lalu simpan pengaturan. Centang **Aktif** menentukan apakah topik ditawarkan ke pengunjung.
 
 ### Topik
 

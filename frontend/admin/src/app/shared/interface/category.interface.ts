@@ -33,6 +33,9 @@ export interface ICategory {
 }
 export interface ICategoryDetail extends ICategory {
   translations: ICategoryTranslation[];
+  /** Place among its siblings ("Posisi 2 dari 5"). */
+  position: number;
+  position_total: number;
 }
 export interface ICategoryModel {
   data: ICategory[];
@@ -44,7 +47,6 @@ export interface ICategoryPayload {
   parent_id: string | null;
   status: ProductCategoryStatus;
   is_featured: 0 | 1;
-  sort_order: number;
   image_id: string | null;
   icon_id: string | null;
   og_image_id: string | null;

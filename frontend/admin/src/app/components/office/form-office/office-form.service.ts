@@ -129,8 +129,6 @@ export class OfficeFormService {
 
     public_slug: [''],
 
-    public_sort_order: [0],
-
     google_place_id: [''],
 
     google_maps_url: [''],
@@ -183,8 +181,6 @@ export class OfficeFormService {
           is_public: data.is_public === 1,
 
           public_slug: data.public_slug ?? '',
-
-          public_sort_order: data.public_sort_order,
 
           google_place_id: data.google_place_id ?? '',
 
@@ -359,8 +355,6 @@ export class OfficeFormService {
       is_public: value.is_public ? 1 : 0,
 
       public_slug: value.is_public ? emptyToNull(value.public_slug) : null,
-
-      public_sort_order: Number(value.public_sort_order || 0),
 
       google_place_id: emptyToNull(value.google_place_id),
 

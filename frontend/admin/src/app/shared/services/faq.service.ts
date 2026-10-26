@@ -12,6 +12,10 @@ import {
   IFaqPayload,
 } from '../interface/faq.interface';
 import { IApiResponse } from '../interface/api-response.interface';
+import {
+  IOrderListResponse,
+  IOrderSaveResponse,
+} from '../interface/order-list.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +46,16 @@ export class FaqService {
           },
       ),
     );
+  }
+
+  /** Every FAQ in its order, for "Atur urutan". */
+  getOrder(): Observable<IOrderListResponse> {
+    return this.http.get<IOrderListResponse>(`${this.apiUrl}/order`);
+  }
+
+  /** Saves the whole order (`ids`: every FAQ, first = position 1). */
+  saveOrder(ids: string[]): Observable<IOrderSaveResponse> {
+    return this.http.put<IOrderSaveResponse>(`${this.apiUrl}/order`, { ids });
   }
 
   getFaq(id: string): Observable<IFaqDetailResponse> {

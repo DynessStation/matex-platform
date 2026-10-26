@@ -307,7 +307,11 @@
                 media.role === 'gallery' &&
                 editor.pageMedia.length > 1
               ) {
-                <div class="ms-auto d-flex gap-2">
+                <div class="ms-auto d-flex align-items-center gap-2">
+                  <span class="order-position"
+                    >Posisi {{ index + 1 }} dari
+                    {{ editor.pageMedia.length }}</span
+                  >
                   <button
                     type="button"
                     class="btn btn-sm btn-light-bg"

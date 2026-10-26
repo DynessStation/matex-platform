@@ -20,7 +20,7 @@ Semua kategori bertingkat, dengan kotak **Cari Kategori**. Ikon pensil membuka k
 
 ### Mengubah urutan
 
-Seret pegangan di samping nama kategori untuk mengubah urutannya di antara kategori setingkat. Tidak bisa dipakai selama kotak pencarian terisi. Untuk memindahkan ke induk lain, ubah **Induk kategori** di formulir.
+Seret pegangan di samping nama kategori dan lepaskan di atas kategori setingkat untuk menaruhnya di posisi itu; urutan langsung tersimpan. Tidak bisa dipakai selama kotak pencarian terisi. Untuk memindahkan ke induk lain, ubah **Induk kategori** di formulir; kategori itu masuk paling akhir di induk barunya.
 
 ### Kategori baru
 
@@ -46,7 +46,7 @@ Kategori di atasnya; kosongkan untuk kategori utama. Kategori tidak bisa menjadi
 
 ### Urutan
 
-Angka urutan di antara kategori setingkat; angka kecil tampil lebih dulu di website. Bisa juga diatur dengan menyeret di pohon kategori.
+Hanya informasi, misalnya "Posisi 2 dari 5" di antara kategori setingkat. Kategori baru masuk paling akhir di tingkatnya. Untuk memindahkan, seret kategori di pohon kategori.
 
 ### Unggulan
 

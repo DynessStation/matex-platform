@@ -5,6 +5,10 @@ import { environment } from '../../../environments/environment';
 import { IApiResponse } from '../interface/api-response.interface';
 import { Params } from '../interface/core.interface';
 import {
+  IOrderListResponse,
+  IOrderSaveResponse,
+} from '../interface/order-list.interface';
+import {
   IProduct,
   IProductModel,
   IProductPayload,
@@ -23,6 +27,14 @@ export class ProductService {
     return this.http
       .get<IApiResponse<IProductModel>>(this.api, { params })
       .pipe(map((r) => r.data ?? { data: [], total: 0 }));
+  }
+  /** Products at the front of the catalog, in their order (at most `max`). */
+  getFront() {
+    return this.http.get<IOrderListResponse>(`${this.api}/front`);
+  }
+  /** Saves the whole front (`ids`, first = position 1); left-out products leave it. */
+  saveFront(ids: string[]) {
+    return this.http.put<IOrderSaveResponse>(`${this.api}/front`, { ids });
   }
   getProduct(id: string) {
     return this.http.get<IApiResponse<IProduct>>(`${this.api}/${id}`);

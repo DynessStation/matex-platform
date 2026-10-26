@@ -31,17 +31,15 @@
     <div class="col-lg-4">
       <app-form-fields
         [label]="'faq_admin.order'"
-        [for]="'sort_order'"
+        [for]="'position'"
         help="formulir-faq--urutan"
-        [required]="true"
       >
         <input
           class="form-control"
-          id="sort_order"
-          type="text"
-          inputmode="numeric"
-          appLocalizedNumber
-          formControlName="sort_order"
+          id="position"
+          readonly
+          tabindex="-1"
+          [value]="position"
         />
       </app-form-fields>
     </div>

@@ -2,8 +2,21 @@
   [gridClass]="'col-sm-12'"
   [title]="'office.title' | translate"
 >
-  <div button class="d-flex flex-wrap gap-2" *hasPermission="'office.create'">
+  <div button class="d-flex flex-wrap gap-2">
+    @if (!ordering) {
+      <button
+        *hasPermission="'office.update'"
+        type="button"
+        id="open_office_order"
+        class="align-items-center btn btn-outline-primary d-flex gap-1"
+        (click)="openOrder()"
+      >
+        <i class="ri-drag-move-2-line"></i>
+        Atur urutan
+      </button>
+    }
     <a
+      *hasPermission="'office.create'"
       [routerLink]="['/office/create']"
       class="align-items-center btn btn-theme"
     >
@@ -13,7 +26,21 @@
     </a>
   </div>
 
+  @if (ordering) {
+    <app-order-list
+      title="Atur urutan kantor publik"
+      hint="Hanya kantor publik. Urutan ini dipakai di halaman Kontak dan footer website."
+      help="atur-urutan"
+      emptyText="Belum ada kantor publik. Aktifkan Tampilkan di website pada tab Publikasi."
+      [items]="orderItems"
+      [saving]="savingOrder"
+      (save)="saveOrder($event)"
+      (cancel)="ordering = false"
+    />
+  }
+
   <app-table
+    [hidden]="ordering"
     [tableConfig]="tableConfig"
     [hasCheckbox]="false"
     [externalPermissions]="(authPermissions$ | async) ?? []"

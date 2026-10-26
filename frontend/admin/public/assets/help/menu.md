@@ -47,6 +47,10 @@ Satu dari enam bagian tetap header (Beranda, Tentang MATEX, Kategori, Produk, Ar
 
 Label menu yang dilihat pengunjung, wajib untuk Bahasa Indonesia dan English, paling banyak 255 karakter. Usahakan singkat supaya tetap rapi di layar ponsel.
 
+### Urutan
+
+Hanya informasi, misalnya "Posisi 3 dari 6". Ubah urutan dengan menyeret bagian menu di panel **Urutan menu**, lalu klik **Simpan urutan**.
+
 ### Tampilkan di header
 
 Matikan untuk menyembunyikan bagian ini dari header website tanpa menghapusnya, misalnya saat halaman tujuannya belum siap.

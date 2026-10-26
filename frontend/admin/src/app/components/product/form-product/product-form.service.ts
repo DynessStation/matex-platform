@@ -27,6 +27,7 @@ import {
   specificationRows,
   uniqueGallery,
 } from './form-product.util';
+import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import { ICategoryModel } from '../../../shared/interface/category.interface';
 import {
@@ -107,7 +108,7 @@ export class ProductFormService {
     origin_city: [''],
     hs_code: [''],
     is_featured: [false],
-    sort_order: [0],
+    catalog_front: [false],
     weight_grams: [null as number | null, Validators.min(0)],
     length_mm: [null as number | null, Validators.min(0)],
     width_mm: [null as number | null, Validators.min(0)],
@@ -396,7 +397,7 @@ export class ProductFormService {
       price_visibility: v.price_visibility as any,
       internal_commerce_enabled: v.internal_commerce_enabled ? 1 : 0,
       is_featured: v.is_featured ? 1 : 0,
-      sort_order: Number(v.sort_order) || 0,
+      catalog_front: v.catalog_front ? 1 : 0,
       category_ids: this.categoryIds,
       media,
       prices: v.prices.map((x: any, i: number) => ({
@@ -453,7 +454,7 @@ export class ProductFormService {
         raw.product_internal_commerce_enabled ?? p.internal_commerce_enabled,
       ),
       is_featured: p.is_featured,
-      sort_order: p.sort_order,
+      catalog_front: Boolean(p.catalog_front),
     };
     for (const [prefix, t] of [
       ['id', id],
@@ -509,8 +510,22 @@ export class ProductFormService {
     return 'general';
   }
 
+  /** Line under "Tampilkan di depan katalog": the read-only place, or what saving does. */
+  get frontInfo(): string {
+    const product = this.product;
+    if (!this.form.controls.catalog_front.value)
+      return 'Tidak ditandai: tampil setelah produk di depan, dari yang terbaru.';
+    return product?.catalog_front
+      ? `${positionText(product.sort_order, product.front_total)} di depan katalog. Ubah lewat "Produk di depan".`
+      : 'Masuk paling akhir di depan katalog setelah disimpan (maksimal 12 produk).';
+  }
+
   private handleSaveError(error: any): void {
     const code = String(error?.error?.code || '');
+    if (code === 'PRODUCT_FRONT_FULL') {
+      this.activeTab = 'general';
+      return;
+    }
     if (code === 'PRODUCT_CATEGORY_INVALID') {
       this.activeTab = 'general';
       this.categoryError = true;

@@ -28,6 +28,12 @@ Jumlah foto di galeri kantor.
 
 Publik berarti kantor ditampilkan di halaman kontak website (bila juga Aktif); Internal berarti hanya dipakai di panel admin.
 
+## Atur Urutan
+
+Tombol **Atur urutan** di kepala halaman menampilkan semua kantor publik sesuai urutan di halaman Kontak dan footer website. Kantor internal tidak ikut. Seret baris atau pakai tombol panah, lalu klik **Simpan urutan**; **Batal** menutup daftar tanpa menyimpan. Kantor publik yang Nonaktif ikut diurutkan dan diberi tanda Nonaktif.
+
+Nomor posisi diatur otomatis tanpa celah: kantor yang baru dijadikan publik masuk paling akhir, dan kantor yang dijadikan internal atau dihapus tidak meninggalkan nomor kosong.
+
 ## Tab Umum
 
 Identitas dasar kantor.
@@ -114,7 +120,7 @@ Menentukan apakah foto boleh ditampilkan di website. Foto yang tidak publik teta
 
 ### Urutan foto
 
-Tombol naik dan turun mengatur urutan tampil foto; ikon hapus mengeluarkan foto dari galeri tanpa menghapus berkasnya dari Media.
+Tombol naik dan turun mengatur urutan tampil foto, dan teks di sampingnya menunjukkan posisinya, misalnya "Posisi 2 dari 5". Ikon hapus mengeluarkan foto dari galeri tanpa menghapus berkasnya dari Media.
 
 ## Tab Publikasi
 
@@ -130,7 +136,7 @@ Bagian alamat halaman kantor di website, misalnya kantor-pusat. Bila dikosongkan
 
 ### Urutan
 
-Angka urutan tampil kantor di website; angka kecil tampil lebih dulu.
+Hanya informasi, misalnya "Posisi 2 dari 3" di antara kantor publik. Kantor yang baru dijadikan publik masuk paling akhir. Untuk memindahkan, pakai **Atur urutan** di daftar kantor.
 
 ### Google Place ID dan URL Google Maps
 

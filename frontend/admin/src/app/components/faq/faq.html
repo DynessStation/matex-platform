@@ -11,6 +11,18 @@
       <i class="ri-settings-3-line"></i>
       {{ 'page_settings_seo' | translate }}
     </a>
+    @if (!ordering) {
+      <button
+        *hasPermission="'faq.update'"
+        type="button"
+        id="open_faq_order"
+        class="align-items-center btn btn-outline-primary d-flex gap-1"
+        (click)="openOrder()"
+      >
+        <i class="ri-drag-move-2-line"></i>
+        Atur urutan
+      </button>
+    }
     <a
       *hasPermission="'faq.create'"
       [routerLink]="['/faq/create']"
@@ -19,7 +31,20 @@
       <i class="ri-add-line"></i> {{ 'add_faq' | translate }}
     </a>
   </div>
+  @if (ordering) {
+    <app-order-list
+      title="Atur urutan FAQ"
+      hint="Urutan ini dipakai di halaman FAQ website. Geser baris atau pakai panah, lalu simpan."
+      help="atur-urutan"
+      [items]="orderItems"
+      [saving]="savingOrder"
+      (save)="saveOrder($event)"
+      (cancel)="ordering = false"
+    />
+  }
+  <!-- Kept (hidden) while ordering, so the table keeps its search and page. -->
   <app-table
+    [hidden]="ordering"
     [tableConfig]="tableConfig"
     [hasCheckbox]="true"
     (tableChanged)="onTableChange($event)"

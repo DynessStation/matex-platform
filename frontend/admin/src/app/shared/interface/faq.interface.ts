@@ -26,6 +26,9 @@ export interface IFaqDetail {
   id: string;
   key: string;
   sort_order: number;
+  /** Place in the FAQ order ("Posisi 3 dari 8"). */
+  position: number;
+  position_total: number;
   status: 0 | 1;
   translations: IFaqTranslation[];
   created: string;
@@ -34,7 +37,6 @@ export interface IFaqDetail {
 
 export interface IFaqPayload {
   key: string;
-  sort_order: number;
   status: 0 | 1;
   translations: IFaqTranslation[];
 }

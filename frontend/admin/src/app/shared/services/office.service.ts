@@ -17,6 +17,11 @@ import {
 
 import { Params } from '../interface/core.interface';
 
+import {
+  IOrderListResponse,
+  IOrderSaveResponse,
+} from '../interface/order-list.interface';
+
 //==================================================
 //==== SERVICE
 //==================================================
@@ -82,6 +87,18 @@ export class OfficeService {
   //==================================================
   //==== DETAIL
   //==================================================
+
+  /** Public offices in their order (Contact page and footer), for "Atur urutan". */
+  getPublicOrder(): Observable<IOrderListResponse> {
+    return this.http.get<IOrderListResponse>(`${this.apiUrl}/public-order`);
+  }
+
+  /** Saves the public order (`ids`: every public office, first = position 1). */
+  savePublicOrder(ids: string[]): Observable<IOrderSaveResponse> {
+    return this.http.put<IOrderSaveResponse>(`${this.apiUrl}/public-order`, {
+      ids,
+    });
+  }
 
   getOfficeDetail(id: string): Observable<IOfficeDetailResponse> {
     return this.http.get<IOfficeDetailResponse>(`${this.apiUrl}/${id}`);
