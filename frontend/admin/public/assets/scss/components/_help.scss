@@ -53,6 +53,12 @@ body.dark-only {
     color: var(--theme-color);
     border-color: var(--theme-color);
   }
+
+  // Template rules color and size icons inside form labels; the tip keeps its own.
+  i {
+    color: inherit !important;
+    font-size: inherit !important;
+  }
 }
 
 .help-tip-popover {
@@ -321,9 +327,20 @@ body.dark-only {
 
   h4 {
     margin: 12px 0 4px;
+    border-radius: 3px;
     color: var(--help-heading);
     font-size: var(--admin-text);
     font-weight: 600;
+    scroll-margin-top: 8px;
+    transition:
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+
+    // An item opened from its "?" tip.
+    &.is-target {
+      background: var(--help-target);
+      box-shadow: 0 0 0 4px var(--help-target);
+    }
   }
 
   p,

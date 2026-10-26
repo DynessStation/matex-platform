@@ -1,6 +1,9 @@
 <div class="row g-4">
   <div class="col-md-6">
-    <label class="form-label"> {{ 'office.email' | translate }} </label>
+    <label class="form-label">
+      {{ 'office.email' | translate }}
+      <app-help-tip section="tab-kontak--email" />
+    </label>
 
     <input
       type="email"
@@ -18,7 +21,10 @@
   </div>
 
   <div class="col-md-6">
-    <label class="form-label"> {{ 'office.phone' | translate }} </label>
+    <label class="form-label">
+      {{ 'office.phone' | translate }}
+      <app-help-tip section="tab-kontak--telepon" />
+    </label>
 
     <input class="form-control" formControlName="phone" />
   </div>
@@ -26,6 +32,7 @@
   <div class="col-12">
     <label class="form-label">
       {{ 'office.website_url' | translate }}
+      <app-help-tip section="tab-kontak--url-website" />
     </label>
 
     <input
@@ -38,6 +45,7 @@
   <div class="col-12">
     <label class="form-label">
       {{ 'office.google_business_url' | translate }}
+      <app-help-tip section="tab-kontak--url-google-business" />
     </label>
 
     <input

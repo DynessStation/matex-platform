@@ -2,6 +2,7 @@ import { Component, inject, viewChild } from '@angular/core';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { MediaSelection } from '../../../../shared/components/ui/media-box/media-box';
 import { MediaModal } from '../../../../shared/components/ui/modal/media-modal/media-modal';
 import { ImagePreviewDirective } from '../../../../shared/directives/image-preview.directive';
@@ -19,7 +20,7 @@ import { OfficeFormService } from '../office-form.service';
 @Component({
   selector: 'app-office-media-tab',
 
-  imports: [TranslateModule, MediaModal, ImagePreviewDirective],
+  imports: [HelpTip, TranslateModule, MediaModal, ImagePreviewDirective],
 
   templateUrl: './office-media-tab.html',
 })

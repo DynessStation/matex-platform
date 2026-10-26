@@ -176,3 +176,60 @@ test('the header button opens the page guide; sections, other guides, and naviga
 
   expect(errors).toEqual([]);
 });
+
+test('every "?" on lists and forms points at an anchor in its guide', async ({ page }) => {
+  test.setTimeout(240_000);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await login(page);
+  const drawer = page.locator('app-help-drawer .help-drawer');
+  const select = drawer.locator('.help-drawer-switch select');
+
+  for (const path of [
+    '/admin-account/create',
+    '/admin-access/create',
+    '/admin-permission/create',
+    '/chair/create',
+    '/office/create',
+    '/product',
+    '/account',
+  ]) {
+    await page.goto(`${stack.adminOrigin}${path}`);
+    await expect(page.locator('.title-header h5')).toBeVisible();
+
+    // Tips inside tabs exist only while their tab is open.
+    const found = new Set<string>();
+    const collect = async () => {
+      const tips = await page.evaluate(() =>
+        [...document.querySelectorAll('app-help-tip[data-anchor]')].map(
+          (tip) => `${tip.getAttribute('data-guide') ?? ''}|${tip.getAttribute('data-anchor')}`,
+        ),
+      );
+      tips.forEach((tip) => found.add(tip));
+    };
+    await collect();
+    const tabs = page.locator('.page-body .nav-link');
+    for (let index = 0; index < (await tabs.count()); index++) {
+      await tabs.nth(index).click();
+      await collect();
+    }
+    expect(found.size, path).toBeGreaterThan(0);
+
+    // Each tip's guide (the page's own unless the tip names one) has its anchor.
+    await page.locator('.header-help').click();
+    await expect(drawer.locator('.help-section').first()).toBeVisible();
+    const own = await select.inputValue();
+    for (const tip of found) {
+      const [guide, anchor] = tip.split('|');
+      const key = guide || own;
+      if ((await select.inputValue()) !== key) {
+        await select.selectOption(key);
+        await expect(drawer.locator('.help-section').first()).toBeVisible();
+      }
+      await expect(drawer.locator(`[id="help-${anchor}"]`), `${path} ${key}#${anchor}`).toHaveCount(1);
+    }
+    await drawer.locator('.help-drawer-close').click();
+  }
+
+  expect(errors).toEqual([]);
+});

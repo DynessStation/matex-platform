@@ -1,141 +1,82 @@
 # Halaman Hak Akses
 
 > **Untuk apa:** melihat dan mengatur daftar izin tunggal (misalnya product.create) yang menjadi bahan penyusun Profil Akses.
-> **Izin yang dibutuhkan:** admin_permission.view, .create, .update, .delete.
-> **Perlu diperhatikan:** kunci izin tidak bisa diubah setelah dibuat; membuat izin baru di sini tidak otomatis melindungi fitur apa pun; halaman ini cukup dikelola oleh pengelola sistem.
+> **Izin yang dibutuhkan:** admin_permission.view untuk melihat; admin_permission.create, admin_permission.update, admin_permission.delete untuk mengubah.
+> **Perlu diperhatikan:** kunci izin tidak bisa diubah setelah dibuat; izin baru dari halaman ini tidak melindungi fitur apa pun sampai kode memakainya.
 
 ## Gambaran Umum
 
-Halaman **Hak Akses** digunakan untuk mengelola daftar izin spesifik (permissions) yang tersedia pada platform internal MATEX.
+Hak akses adalah izin untuk satu tindakan pada satu modul, ditulis dengan pola modul.aksi, misalnya product.create (membuat produk). Hak akses digabung menjadi **Profil Akses**, lalu profil dipasang pada **Akun Admin**.
 
-Setiap hak akses mewakili izin untuk melakukan tindakan tertentu pada modul atau fitur sistem. Hak akses tersebut kemudian dapat dihubungkan dengan profil akses melalui halaman Profil Akses, sehingga kewenangan setiap akun admin dapat disesuaikan dengan tanggung jawabnya.
+Daftar ini berlaku untuk semua perusahaan dan sebaiknya dikelola pengelola sistem saja. Pemeriksaan izin dipasang di kode server setiap fitur, jadi membuat izin baru di sini tidak menambah menu atau fitur.
 
-Contoh kunci hak akses antara lain admin_access.create dan product.create. Kunci tersebut merepresentasikan izin untuk melakukan tindakan tertentu pada modul terkait.
+Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
-Dengan pengelolaan hak akses yang terstruktur, administrator dapat menentukan izin yang tersedia untuk setiap profil dan menjaga agar pembagian kewenangan di dalam sistem tetap sesuai kebutuhan operasional.
+URL: https://internal.matexindo.com/admin-permission
 
-## Menampilkan dan Mencari Data Hak Akses
+## Daftar Hak Akses
 
-Halaman ini menyediakan tabel daftar hak akses yang telah terdaftar, dilengkapi fitur untuk memudahkan pencarian dan pengelolaan data.
+Kotak **Cari** mencari di kunci, nama, grup, dan deskripsi. Deskripsi izin tidak tampil di tabel; buka Edit untuk membacanya.
 
-- **Tampilkan:** digunakan untuk mengatur jumlah baris data yang ditampilkan pada setiap halaman tabel, dengan pilihan mulai dari 15 hingga 100 item.
-- **Pencarian:** digunakan untuk mencari hak akses berdasarkan kunci, nama, grup, atau deskripsi. Halaman ini berlaku global untuk seluruh perusahaan.
+### Kunci hak akses
 
-Fitur ini membantu administrator menemukan izin tertentu dengan lebih cepat, terutama ketika jumlah hak akses semakin banyak.
+Kode unik izin dengan pola modul.aksi, misalnya admin_access.create. Kode inilah yang diperiksa server.
 
-## Memahami Tabel Daftar Hak Akses
+### Grup
 
-Tabel utama menampilkan informasi setiap hak akses yang terdaftar dalam sistem, meliputi:
+Kelompok modul izin, misalnya Catalog atau Website Content. Grup menentukan pengelompokan izin di formulir Profil Akses.
 
-- **Kunci Hak Akses:** kode unik yang digunakan untuk mengidentifikasi izin tertentu, misalnya admin_access.create atau product.create.
-- **Nama Hak Akses:** nama atau label yang menjelaskan fungsi izin agar lebih mudah dikenali.
-- **Grup:** kategori modul atau kelompok fitur yang menaungi izin tersebut, misalnya Admin Access, Catalog, atau Website Content.
-- **Jumlah Profil Akses:** jumlah profil akses yang tertaut dengan izin tersebut, termasuk profil yang nonaktif. Deskripsi izin tidak tampil di tabel.
-- **Status:** menunjukkan apakah hak akses berstatus aktif atau tidak aktif.
-- **Dibuat:** menunjukkan waktu pembuatan hak akses di dalam sistem.
+### Profil akses
 
-Informasi tersebut membantu administrator mengetahui fungsi suatu izin, modul yang terkait, serta profil akses yang menggunakan izin tersebut.
+Jumlah profil akses (aktif maupun nonaktif) yang memakai izin ini. Periksa angka ini sebelum menonaktifkan atau menghapus izin.
 
-## Menambahkan Hak Akses Baru
+### Status
 
-Penambahan hak akses dilakukan oleh pengguna yang memiliki kewenangan untuk mengelola konfigurasi izin sistem.
+Izin Nonaktif dianggap tidak dimiliki semua profil: fitur yang dilindunginya langsung ditolak bagi semua akun selain Akses Sistem Penuh.
 
-Langkah-langkahnya adalah sebagai berikut:
+## Formulir Hak Akses
 
-1. Klik tombol **+ Tambah Hak Akses** di bagian kanan atas halaman.
-2. Isi Kunci Hak Akses dengan pola modul.aksi, hanya huruf kecil, angka, dan garis bawah, minimal dua bagian yang dipisah titik, maksimal 100 karakter (contoh: product.view atau web_navigation.publish). Kunci tidak dapat diubah setelah disimpan, jadi periksa ejaannya.
-3. Isi **Nama Hak Akses** dengan nama yang menjelaskan fungsi izin tersebut.
-4. Isi Grup dengan nama kelompok modul. Grup berupa kolom teks bebas (opsional, maksimal 100 karakter), bukan pilihan. Gunakan ejaan yang sama persis dengan grup yang sudah ada agar tidak terbentuk grup ganda; bila dikosongkan, izin masuk ke grup "Other".
-5. Masukkan **Deskripsi** singkat mengenai fungsi dan tujuan izin tersebut.
-6. Periksa kembali data yang dimasukkan, kemudian klik tombol **Buat Hak Akses** untuk menyimpan.
+Formulir dibuka dari tombol **+ Tambah Hak Akses** atau menu aksi **Edit**.
 
-Gunakan kunci hak akses yang jelas, konsisten, dan mudah dikenali. Sebelum membuat izin baru, periksa terlebih dahulu apakah izin dengan fungsi yang sama sudah tersedia agar tidak terjadi duplikasi atau kebingungan dalam pengelolaan.
+### Kunci hak akses
 
-Penambahan hak akses juga perlu mempertimbangkan dukungan implementasi pada sistem. Pemeriksaan izin dipasang di kode server pada setiap fitur, sehingga hak akses baru yang dibuat dari halaman ini tidak berfungsi untuk apa pun sampai kode memakainya, dan tidak menambah menu atau fitur baru.
+Kode izin dengan pola modul.aksi: hanya huruf kecil, angka, dan garis bawah, minimal dua bagian dipisah titik, paling banyak 100 karakter (contoh: product.view, web_navigation.publish).
 
-## Mengelola Hak Akses yang Sudah Ada
+Kunci harus unik dan tidak bisa diubah setelah disimpan; bila salah, buat izin baru lalu nonaktifkan yang lama.
 
-Pada kolom **Aksi** di sisi kanan tabel, klik ikon titik tiga (⋮) untuk membuka pilihan tindakan yang tersedia.
+### Nama hak akses
+
+Nama yang mudah dipahami untuk izin ini, wajib, misalnya "Buat produk". Nama inilah yang tampil di formulir Profil Akses.
+
+### Grup
+
+Nama kelompok modul, opsional, teks bebas paling banyak 100 karakter. Tulis persis sama dengan grup yang sudah ada (misalnya Catalog) agar tidak terbentuk grup ganda; bila kosong, izin masuk grup "Other".
+
+### Deskripsi
+
+Penjelasan singkat apa yang diizinkan, opsional. Tampil di bawah nama izin pada formulir Profil Akses sehingga membantu admin memilih izin yang tepat.
+
+## Mengubah Status dan Menghapus
+
+Tindakan ini ada di menu tiga titik pada baris izin.
 
 ### Edit
 
-Digunakan untuk memperbarui informasi hak akses, seperti nama, grup, atau deskripsi, sesuai pilihan yang tersedia pada formulir.
+Mengubah nama, grup, atau deskripsi. Kolom kunci terkunci.
 
-Kunci hak akses tidak dapat diubah setelah dibuat (kolom kunci terkunci pada formulir Edit). Bila kunci salah, buat hak akses baru dan nonaktifkan yang lama. Yang dapat diubah hanya Nama, Grup, dan Deskripsi.
+### Nonaktifkan dan aktifkan
 
-### Nonaktifkan
-
-Digunakan untuk menonaktifkan hak akses yang sudah tidak diperlukan atau tidak lagi digunakan sesuai kebutuhan sistem.
-
-Izin yang dinonaktifkan langsung dianggap tidak dimiliki oleh semua profil: fitur yang dilindunginya ditolak bagi seluruh pengguna selain Akses Sistem Penuh. Periksa profil yang menggunakannya sebelum menonaktifkan.
-
-### Aktifkan
-
-Menu Aktifkan tampil pada izin yang nonaktif dan mengembalikan izin tersebut setelah konfirmasi.
+Nonaktifkan langsung mencabut izin dari semua profil yang memakainya (kecuali akun Akses Sistem Penuh); Aktifkan mengembalikannya. Sistem meminta konfirmasi.
 
 ### Hapus
 
-Hak akses tidak dapat langsung dihapus. Hak akses harus dinonaktifkan terlebih dahulu sebelum proses penghapusan dapat dilakukan.
+Menghapus izin dari daftar; tidak bisa dibatalkan dari panel. Hanya untuk izin Nonaktif yang sudah tidak terpasang di profil mana pun ("Hak akses admin masih digunakan oleh satu atau beberapa profil akses").
 
-Penghapusan juga ditolak selama izin masih terpasang pada profil mana pun ("Hak akses admin masih digunakan oleh satu atau beberapa profil akses"). Penghapusan bersifat menyembunyikan data dari daftar dan tidak dapat dibatalkan dari panel admin.
+## Aturan Penting
 
-Sebelum menghapus suatu izin, pastikan izin tersebut tidak lagi diperlukan oleh konfigurasi profil akses maupun bagian sistem yang terkait.
-
-## Hubungan Hak Akses dengan Profil Akses
-
-Hak akses merupakan komponen dasar dalam pengaturan kewenangan platform internal MATEX. Hubungan keduanya dapat dipahami sebagai berikut:
-
-- **Hak Akses:** mendefinisikan izin spesifik yang tersedia, misalnya izin untuk membuat produk atau mengelola akun admin.
-- **Grup Hak Akses:** mengelompokkan izin berdasarkan modul atau fungsi agar pengelolaannya lebih terstruktur.
-- **Profil Akses:** menggabungkan sejumlah hak akses menjadi satu kelompok kewenangan.
-- **Akun Admin:** menggunakan profil akses untuk memperoleh kewenangan sesuai konfigurasi yang berlaku.
-
-Daftar grup dan hak akses yang dikelola pada halaman ini menjadi pilihan ketika administrator membuat atau mengedit profil akses.
-
-Untuk mengatur hak akses yang diberikan kepada suatu profil, pengguna dapat membuka halaman **Profil Akses** dan menyesuaikan izin yang dibutuhkan.
-
-## Rencana Pengembangan Tampilan — Humanized View
-
-Sebagai rencana pengembangan di masa mendatang, tampilan tabel Hak Akses direncanakan untuk dibuat lebih intuitif dan mudah dipahami melalui pendekatan Humanized View.
-
-Tujuannya adalah membantu administrator memahami struktur izin berdasarkan modul, tanpa harus membaca daftar panjang yang disajikan dalam format tabel datar (flat list).
-
-Rencana pengembangan tersebut mencakup:
-
-### Pengelompokan Berdasarkan Modul (Grouping)
-
-Hak akses direncanakan untuk dikelompokkan secara visual berdasarkan modul atau kategori terkait, misalnya Catalog, Website Content, dan Admin Access.
-
-Pengelompokan ini diharapkan memudahkan administrator menemukan izin yang berkaitan dengan fungsi tertentu.
-
-### Tampilan Daftar Terstruktur (List View)
-
-Di dalam setiap kelompok modul, hak akses direncanakan untuk disajikan dalam bentuk daftar yang lebih terstruktur, dengan label dan indikator visual yang mudah dikenali.
-
-Pendekatan ini diharapkan membantu administrator memahami cakupan izin per modul secara lebih cepat dan mengurangi kesulitan ketika mengelola daftar hak akses yang semakin banyak.
-
-Kedua hal tersebut merupakan rencana pengembangan tampilan, bukan fitur yang dinyatakan sudah tersedia pada versi platform saat ini.
-
-Catatan: pengelompokan per grup sebenarnya sudah tersedia pada formulir Profil Akses (panel Grup Hak Akses); rencana ini menyangkut tampilan pada halaman Hak Akses ini.
-
-## Praktik Pengelolaan Hak Akses yang Disarankan
-
-Untuk menjaga konsistensi konfigurasi dan keamanan sistem, perhatikan hal-hal berikut:
-
-- Gunakan kunci hak akses yang jelas dan konsisten dengan struktur sistem.
-- Berikan nama dan deskripsi yang menjelaskan fungsi izin secara spesifik.
-- Kelompokkan izin berdasarkan modul atau fungsi yang sesuai.
-- Periksa profil akses yang menggunakan izin sebelum melakukan perubahan atau penonaktifan.
-- Nonaktifkan hak akses sebelum menghapusnya.
-- Pastikan perubahan konfigurasi diselaraskan dengan implementasi pemeriksaan izin pada sistem.
-
-Pengelolaan hak akses yang baik membantu menjaga pembagian kewenangan tetap terstruktur, memudahkan pemeliharaan konfigurasi, serta mendukung keamanan platform internal MATEX.
-
-- Deskripsi hak akses pada tabel basis data dibatasi 255 karakter walaupun formulir menerima hingga 500; tulis deskripsi singkat.
-
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** daftar hak akses belum sepenuhnya rapi. Terdapat dua set izin kategori produk (product_category.* pada grup Catalog dan category_product.* pada grup Produk), izin uji contoh.view yang nonaktif, serta nama izin yang bercampur Bahasa Indonesia dan Inggris. Jangan menghapus atau mengubah izin tersebut sebelum ada arahan developer.
-
-## Daftar kode hak akses
+- Periksa dulu apakah izin dengan fungsi yang sama sudah ada sebelum membuat izin baru.
+- Izin baru baru berguna setelah developer memakainya di kode server.
+- Perubahan hak akses tercatat di Log Aktivitas.
 
 ## Cara Membaca Kode
 

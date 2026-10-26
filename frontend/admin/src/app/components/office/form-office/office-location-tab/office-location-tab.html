@@ -7,6 +7,7 @@
   <div class="col-12">
     <label class="form-label">
       {{ 'office.address' | translate }}
+      <app-help-tip section="tab-lokasi--alamat" />
     </label>
 
     <input class="form-control" formControlName="address" readonly />
@@ -37,6 +38,7 @@
   <div class="col-md-6">
     <label class="form-label">
       {{ 'office.latitude' | translate }}
+      <app-help-tip section="tab-lokasi--latitude-dan-longitude" />
     </label>
 
     <input
@@ -74,6 +76,7 @@
 
   <label class="office-switch-label" for="attendance_enabled">
     {{ 'office.enable_attendance_geofence' | translate }}
+    <app-help-tip section="tab-lokasi--geofence-absensi" />
   </label>
 </div>
 
@@ -81,6 +84,7 @@
   <div class="col-md-4">
     <label class="form-label">
       {{ 'office.attendance_radius' | translate }}
+      <app-help-tip section="tab-lokasi--radius-absensi" />
     </label>
 
     <div class="input-group">

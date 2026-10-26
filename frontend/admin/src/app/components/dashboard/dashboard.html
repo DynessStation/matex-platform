@@ -30,6 +30,7 @@
           [loading]="loading()"
           (refresh)="load()"
         />
+        <app-help-tip page="dashboard" section="rentang-waktu-dan-tombol" />
         <a class="analytics-link" routerLink="/public-analytics">
           Analitik lengkap
           <i class="ri-arrow-right-line" aria-hidden="true"></i>
@@ -76,7 +77,13 @@
             <i class="ri-pulse-line" aria-hidden="true"></i>
           </div>
           <div>
-            <span>Aktif sekarang</span>
+            <span>
+              Aktif sekarang
+              <app-help-tip
+                page="dashboard"
+                section="kartu-ringkasan--aktif-sekarang"
+              />
+            </span>
             <strong>{{ data.totals.active_visitors | number: '1.0-0' }}</strong>
             <small>Terlihat dalam 5 menit terakhir</small>
           </div>
@@ -86,7 +93,13 @@
             <i class="ri-user-3-line" aria-hidden="true"></i>
           </div>
           <div>
-            <span>Pengunjung</span>
+            <span>
+              Pengunjung
+              <app-help-tip
+                page="dashboard"
+                section="kartu-ringkasan--pengunjung"
+              />
+            </span>
             <strong>{{ data.totals.visitors | number: '1.0-0' }}</strong>
             <small>Sesi anonim pada rentang terpilih</small>
           </div>
@@ -96,7 +109,13 @@
             <i class="ri-eye-line" aria-hidden="true"></i>
           </div>
           <div>
-            <span>Page view</span>
+            <span>
+              Page view
+              <app-help-tip
+                page="dashboard"
+                section="kartu-ringkasan--page-view"
+              />
+            </span>
             <strong>{{ data.totals.page_views | number: '1.0-0' }}</strong>
             <small>Total halaman yang dibuka</small>
           </div>
@@ -106,7 +125,13 @@
             <i class="ri-cursor-line" aria-hidden="true"></i>
           </div>
           <div>
-            <span>Klik keluar</span>
+            <span>
+              Klik keluar
+              <app-help-tip
+                page="dashboard"
+                section="kartu-ringkasan--klik-keluar"
+              />
+            </span>
             <strong>{{ data.totals.outbound_clicks | number: '1.0-0' }}</strong>
             <small>Marketplace dan tautan eksternal</small>
           </div>
@@ -116,7 +141,13 @@
             <i class="ri-mail-send-line" aria-hidden="true"></i>
           </div>
           <div>
-            <span>Pesan terkirim</span>
+            <span>
+              Pesan terkirim
+              <app-help-tip
+                page="dashboard"
+                section="kartu-ringkasan--pesan-terkirim"
+              />
+            </span>
             <strong>{{
               data.totals.contact_submissions | number: '1.0-0'
             }}</strong>
@@ -134,7 +165,7 @@
                 Pengunjung dan page view
                 <app-help-tip
                   page="dashboard"
-                  section="grafik-trafik-publik-pengunjung-dan-page-view"
+                  section="grafik-pengunjung-dan-page-view"
                 />
               </h2>
             </div>
@@ -186,10 +217,7 @@
               <span>Kesiapan konten</span>
               <h2>
                 Yang perlu diperhatikan
-                <app-help-tip
-                  page="dashboard"
-                  section="kesiapan-konten-yang-perlu-diperhatikan"
-                />
+                <app-help-tip page="dashboard" section="kesiapan-konten" />
               </h2>
             </div>
           </header>
@@ -247,10 +275,7 @@
               <span>Minat pengunjung</span>
               <h2>
                 Halaman teratas
-                <app-help-tip
-                  page="dashboard"
-                  section="minat-pengunjung-halaman-teratas"
-                />
+                <app-help-tip page="dashboard" section="halaman-teratas" />
               </h2>
             </div>
           </header>
@@ -293,10 +318,7 @@
               <span>Akuisisi</span>
               <h2>
                 Sumber trafik
-                <app-help-tip
-                  page="dashboard"
-                  section="akuisisi-sumber-trafik"
-                />
+                <app-help-tip page="dashboard" section="sumber-trafik" />
               </h2>
             </div>
           </header>

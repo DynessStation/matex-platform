@@ -6,11 +6,13 @@
 //   # Page title
 //   > **Untuk apa:** ...            summary box; the first quote line is the page tip
 //   ## Section                      a drawer section with a # anchor (slug of the title)
-//   ### Sub-heading
+//   ### Item                        a card, field, or button inside the section, with its
+//                                   own anchor "<section>--<item>" (slugs of both titles)
 //   paragraphs, "- " and "1. " lists (two spaces per level), | tables |,
 //   **bold**, `code`, [text](https://...) and bare https:// links.
 //
-// The first paragraph of a section is its tip text.
+// The first paragraph of a section or item is its tip text, so write it as a short,
+// complete explanation; details follow in the next paragraphs.
 
 //==================================================
 //==== GUIDE LIST
@@ -90,12 +92,36 @@ export interface HelpSection {
   tip: string; // first paragraph as plain text
 }
 
+export interface HelpItem {
+  id: string; // "<section id>--<item slug>"
+  title: string;
+  tip: string; // first paragraph as plain text
+}
+
 export interface HelpGuide {
   title: string;
   summaryHtml: string; // the "> " box
   tip: string; // first summary line as plain text
   introHtml: string; // text between the summary and the first section
   sections: HelpSection[];
+  items: HelpItem[]; // the ### headings of all sections
+}
+
+/** The tip of a section or item anchor; '' when the guide has no such anchor. */
+export function helpTipFor(guide: HelpGuide, anchor: string): string {
+  return (
+    guide.items.find((item) => item.id === anchor)?.tip ??
+    guide.sections.find((section) => section.id === anchor)?.tip ??
+    ''
+  );
+}
+
+/** Whether the guide has this section or item anchor. */
+export function helpHasAnchor(guide: HelpGuide, anchor: string): boolean {
+  return (
+    guide.sections.some((section) => section.id === anchor) ||
+    guide.items.some((item) => item.id === anchor)
+  );
 }
 
 /** Anchor of a section title: "Akuisisi — Sumber Trafik" -> "akuisisi-sumber-trafik". */
@@ -117,6 +143,7 @@ export function parseHelpGuide(markdown: string): HelpGuide {
     tip: '',
     introHtml: '',
     sections: [],
+    items: [],
   };
 
   const summary: string[] = [];
@@ -143,8 +170,28 @@ export function parseHelpGuide(markdown: string): HelpGuide {
     guide.sections.push({
       id,
       title: current.title,
-      html: renderHelpBlocks(current.lines),
+      html: renderHelpBlocks(current.lines, id),
       tip: firstParagraph(current.lines),
+    });
+
+    current.lines.forEach((line, index) => {
+      if (!line.startsWith('### ')) {
+        return;
+      }
+
+      const title = line.slice(4).trim();
+
+      const next = current!.lines.findIndex(
+        (other, at) => at > index && /^#{2,3} /.test(other),
+      );
+
+      guide.items.push({
+        id: `${id}--${helpSlug(title)}`,
+        title,
+        tip: firstParagraph(
+          current!.lines.slice(index + 1, next < 0 ? undefined : next),
+        ),
+      });
     });
   };
 
@@ -237,8 +284,11 @@ export function renderInline(text: string): string {
     );
 }
 
-/** Block markdown (headings, paragraphs, lists, tables) to escaped HTML. */
-export function renderHelpBlocks(lines: string[]): string {
+/**
+ * Block markdown (headings, paragraphs, lists, tables) to escaped HTML. Item headings get
+ * the id "help-<section>--<item>" when the section id is given.
+ */
+export function renderHelpBlocks(lines: string[], sectionId = ''): string {
   const html: string[] = [];
 
   let i = 0;
@@ -249,7 +299,11 @@ export function renderHelpBlocks(lines: string[]): string {
     if (!line.trim()) {
       i++;
     } else if (line.startsWith('### ')) {
-      html.push(`<h4>${renderInline(line.slice(4).trim())}</h4>`);
+      const title = line.slice(4).trim();
+
+      const id = sectionId ? ` id="help-${sectionId}--${helpSlug(title)}"` : '';
+
+      html.push(`<h4${id}>${renderInline(title)}</h4>`);
 
       i++;
     } else if (line.startsWith('|')) {

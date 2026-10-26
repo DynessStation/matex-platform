@@ -9,13 +9,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { filter, map, startWith, switchMap } from 'rxjs';
 
 import { HelpService } from '../../../../services/help.service';
-import { HELP_GUIDES, HelpGuide } from '../help.util';
+import { HELP_GUIDES, HelpGuide, helpHasAnchor } from '../help.util';
 
 type GuideState =
   | { status: 'loading' }
@@ -40,6 +41,16 @@ export class HelpDrawer {
   private readonly router = inject(Router);
 
   readonly guides = HELP_GUIDES;
+
+  private readonly sanitizer = inject(DomSanitizer);
+
+  /**
+   * Guide HTML is built by help.util from first-party files with every text escaped;
+   * trusting it keeps the item ids that Angular's sanitizer would strip.
+   */
+  trusted(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
 
   private readonly body = viewChild<ElementRef<HTMLElement>>('body');
 
@@ -131,7 +142,7 @@ export class HelpDrawer {
       }
 
       setTimeout(() => {
-        if (anchor && guide.sections.some((section) => section.id === anchor)) {
+        if (anchor && helpHasAnchor(guide, anchor)) {
           this.jump(anchor);
         } else if (fresh) {
           this.body()?.nativeElement.scrollTo({ top: 0 });
@@ -165,13 +176,22 @@ export class HelpDrawer {
 
     section.scrollIntoView({ block: 'start', behavior: 'smooth' });
 
-    this.target.set(id);
+    // An item heading lives in the section's rendered HTML: highlighted directly.
+    const item = section.tagName === 'H4' ? section : null;
+
+    item?.classList.add('is-target');
+
+    this.target.set(item ? null : id);
 
     if (this.targetTimer) {
       clearTimeout(this.targetTimer);
     }
 
-    this.targetTimer = setTimeout(() => this.target.set(null), 1600);
+    this.targetTimer = setTimeout(() => {
+      this.target.set(null);
+
+      item?.classList.remove('is-target');
+    }, 1600);
   }
 
   switchGuide(event: Event): void {

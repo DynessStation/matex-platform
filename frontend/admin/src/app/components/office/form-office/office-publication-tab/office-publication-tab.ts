@@ -3,6 +3,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
 import { OfficeFormService } from '../office-form.service';
 
@@ -12,6 +13,7 @@ import { OfficeFormService } from '../office-form.service';
   selector: 'app-office-publication-tab',
 
   imports: [
+    HelpTip,
     ReactiveFormsModule,
     TranslateModule,
     LocalizedNumberInputDirective,

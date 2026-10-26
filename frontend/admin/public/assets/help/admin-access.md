@@ -1,119 +1,75 @@
 # Halaman Profil Akses
 
-> **Untuk apa:** membuat paket izin (peran) yang kemudian dipasang pada akun admin.
-> **Izin yang dibutuhkan:** admin_access.view, .create, .update, .delete.
-> **Perlu diperhatikan:** menonaktifkan profil langsung mencabut akses semua akun yang memakainya; tinjau izin sebelum memilih Pilih Semua.
+> **Untuk apa:** menyusun paket izin (peran) yang dipasang pada akun admin.
+> **Izin yang dibutuhkan:** admin_access.view untuk melihat; admin_access.create, admin_access.update, admin_access.delete untuk mengubah.
+> **Perlu diperhatikan:** menonaktifkan profil langsung mencabut akses semua akun yang memakainya; tinjau izin sebelum memakai Pilih Semua.
 
 ## Gambaran Umum
 
-Halaman **Profil Akses** digunakan untuk mengelola kelompok peran beserta hak akses yang diberikan kepada pengguna pada platform internal MATEX.
+Profil akses adalah kumpulan hak akses, misalnya "Marketing" yang boleh mengelola produk dan artikel. Profil yang aktif dapat dipilih saat membuat atau mengubah akun di halaman **Akun Admin**; daftar izin yang bisa dipilih diatur di halaman **Hak Akses**.
 
-Profil akses berfungsi sebagai kumpulan izin yang menentukan tindakan dan modul apa saja yang dapat diakses oleh akun admin. Dengan adanya profil akses, pemberian kewenangan dapat disesuaikan dengan tanggung jawab masing-masing pengguna tanpa harus mengatur seluruh izin secara terpisah pada setiap akun.
+Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
-Contoh profil akses antara lain **Super Admin** dan **Marketing**, dengan susunan hak akses yang disesuaikan berdasarkan kebutuhan operasional.
+URL: https://internal.matexindo.com/admin-access
 
-Profil akses berkaitan langsung dengan halaman Akun Admin. Profil yang berstatus aktif akan tersedia sebagai pilihan ketika admin yang berwenang membuat atau mengedit akun admin.
+## Daftar Profil Akses
 
-## Menampilkan dan Mencari Data Profil Akses
+Kotak **Cari** mencari di nama dan deskripsi profil.
 
-Halaman ini menyediakan tabel daftar profil akses yang telah dibuat beserta fitur untuk mempermudah pencarian data.
+### Hak akses
 
-- **Tampilkan:** digunakan untuk mengatur jumlah baris data yang ditampilkan pada setiap halaman tabel, dengan pilihan mulai dari 15 hingga 100 item.
-- **Pencarian:** digunakan untuk menemukan profil akses berdasarkan nama atau deskripsi.
+Jumlah izin aktif di profil. Izin yang dinonaktifkan di halaman Hak Akses tidak dihitung, jadi angkanya bisa lebih kecil dari yang pernah dicentang. Angka ini bukan ukuran tingkat keamanan.
 
-Fitur ini membantu pengguna menemukan profil tertentu dengan lebih cepat, terutama ketika jumlah profil akses bertambah.
+### Admin
 
-## Memahami Tabel Daftar Profil Akses
+Jumlah akun (aktif maupun nonaktif) yang memakai profil ini. Periksa angka ini sebelum mengubah izin atau menonaktifkan profil.
 
-Tabel utama menampilkan informasi mengenai setiap profil akses yang tersedia di dalam sistem, meliputi:
+### Status
 
-- **Nama Akses dan Deskripsi:** nama profil beserta penjelasan singkatnya (dua kolom terpisah).
-- **Hak Akses:** jumlah izin yang aktif pada profil tersebut. Izin yang sudah dinonaktifkan tidak dihitung, sehingga angka ini dapat lebih kecil dari jumlah izin yang pernah dicentang.
-- **Admin:** jumlah akun admin (aktif maupun nonaktif) yang menggunakan profil akses terkait.
-- **Status:** menunjukkan apakah profil akses berstatus aktif atau tidak aktif.
-- **Dibuat:** menunjukkan waktu pembuatan profil akses di dalam sistem.
+Aktif berarti profil bisa dipilih dan berlaku. Nonaktif berarti semua akun pemakainya (kecuali Akses Sistem Penuh) langsung tidak bisa menjalankan fitur apa pun.
 
-Informasi tersebut membantu pengelola memahami cakupan kewenangan setiap profil, mengetahui profil yang sedang digunakan, serta mengevaluasi apakah konfigurasi akses masih sesuai dengan kebutuhan operasional.
+## Formulir Profil Akses
 
-Jumlah hak akses menunjukkan banyaknya izin yang terhubung dengan profil, bukan tingkat keamanan atau luas kewenangan secara otomatis. Untuk mengetahui tindakan yang benar-benar diizinkan, pengelola perlu memeriksa daftar izin yang terhubung pada profil tersebut.
+Formulir dibuka dari tombol **+ Tambah Profil Akses** atau menu aksi **Edit**. Perubahan izin berlaku bagi akun pemakai mulai permintaan berikutnya, tanpa perlu login ulang.
 
-## Menambahkan Profil Akses Baru
+### Nama akses
 
-Pembuatan profil akses dilakukan oleh pengguna yang memiliki kewenangan untuk mengelola profil.
+Nama profil, wajib, paling banyak 255 karakter, dan unik di perusahaan Anda (huruf besar dan kecil dianggap sama), misalnya Marketing.
 
-Langkah-langkahnya adalah sebagai berikut:
+### Deskripsi
 
-1. Klik tombol **+ Tambah Profil Akses** di bagian kanan atas halaman.
-2. Sistem akan menampilkan formulir pembuatan profil akses.
-3. Isi **Nama Akses** dengan nama yang mudah dikenali dan sesuai tujuan penggunaannya.
-4. Isi **Deskripsi** dengan keterangan singkat mengenai fungsi atau tanggung jawab yang diwakili oleh profil tersebut.
-5. Pada bagian **Hak Akses**, pilih grup atau modul yang relevan, kemudian tentukan izin yang akan diberikan.
-6. Periksa kembali seluruh izin yang dipilih, lalu klik tombol **Buat Profil Akses** untuk menyimpan data.
+Penjelasan singkat fungsi profil, opsional, paling banyak 500 karakter. Membantu admin lain memilih profil yang tepat untuk akun.
 
-Bagian Hak Akses pada formulir terdiri atas penghitung "X dari Y dipilih", kotak Pilih Semua untuk seluruh daftar, panel kiri "Grup Hak Akses" (dengan kolom Cari grup dan penanda jumlah terpilih), serta panel kanan yang memuat izin pada grup terpilih lengkap dengan nama, kunci, dan deskripsinya. Nama grup berasal dari data sistem, misalnya Web Navigation, Website Content, dan Catalog.
+### Hak akses
 
-Terdapat dua opsi Pilih Semua: satu untuk seluruh daftar dan satu khusus untuk grup yang sedang dibuka. Gunakan dengan hati-hati karena dapat memberikan kewenangan yang lebih luas daripada yang dibutuhkan.
+Daftar izin yang diberikan profil ini, dikelompokkan per grup. Panel kiri berisi grup (dengan kotak cari dan jumlah terpilih), panel kanan berisi izin grup yang dibuka beserta nama, kunci, dan deskripsinya.
 
-Sebelum menyimpan profil, pastikan setiap izin yang dipilih relevan dengan fungsi profil tersebut. Sebagai contoh, profil untuk kebutuhan pemasaran sebaiknya hanya memperoleh izin yang diperlukan untuk menjalankan tugas pemasaran dan pengelolaan konten yang menjadi tanggung jawabnya.
+Penghitung "X dari Y dipilih" menunjukkan total izin yang dicentang. Pasangkan izin view dengan create, update, atau delete modul yang sama agar menunya tampil. Mencentang attachment.create atau attachment.delete otomatis menyertakan attachment.view dan menguncinya.
 
-- **Nama Akses:** wajib, maksimal 255 karakter, dan tidak boleh sama dengan profil lain pada perusahaan (huruf besar/kecil dianggap sama). **Deskripsi:** opsional, maksimal 500 karakter.
-- **Ketergantungan izin:** mencentang attachment.create atau attachment.delete otomatis menyertakan attachment.view, dan kotak attachment.view terkunci selama izin turunannya aktif. Modul lain tidak memiliki aturan serupa; pasangkan view bersama create/update/delete agar menu muncul.
-- Profil boleh disimpan tanpa izin sama sekali, tetapi akun dengan profil kosong tidak dapat menjalankan fitur apa pun.
+Profil boleh disimpan tanpa izin, tetapi akun dengan profil kosong tidak bisa menjalankan fitur apa pun.
 
-## Mengelola Profil Akses yang Sudah Ada
+### Pilih semua
 
-Pada kolom **Aksi** di sisi kanan tabel, klik ikon titik tiga (⋮) untuk membuka pilihan tindakan yang tersedia.
+Ada dua kotak Pilih Semua: di atas untuk seluruh izin, di panel kanan untuk izin grup yang sedang dibuka. Keduanya bisa memberi kewenangan lebih luas dari kebutuhan, jadi tinjau hasilnya sebelum menyimpan.
 
-- **Edit:** membuka formulir Edit Profil Akses; simpan dengan tombol Perbarui Profil Akses. Perubahan izin berlaku pada akun yang memakainya mulai permintaan berikutnya.
-- **Aktifkan / Nonaktifkan:** mengembalikan atau menghentikan penggunaan profil, dengan konfirmasi.
-- **Hapus:** hanya tersedia untuk profil nonaktif yang tidak lagi dipakai akun mana pun.
+## Mengubah Status dan Menghapus
 
-## Ketentuan Penghapusan dan Penonaktifan Profil Akses
+Tindakan ini ada di menu tiga titik pada baris profil.
 
-Profil akses tidak dapat langsung dihapus. Profil harus dinonaktifkan terlebih dahulu, dan penghapusan hanya dapat dilakukan apabila tidak ada akun admin yang masih menggunakan profil tersebut.
+### Edit
 
-Sistem telah menerapkan **validasi dua lapis** untuk membatasi penghapusan profil akses yang belum memenuhi ketentuan.
+Membuka formulir untuk mengubah nama, deskripsi, atau izin profil. Periksa dampaknya pada akun pemakai sebelum menyimpan, terutama bila izin dikurangi.
 
-Secara umum, ketentuan tersebut mencakup:
+### Nonaktifkan dan aktifkan
 
-1. Status profil: profil harus dinonaktifkan sebelum dapat dihapus.
-2. Penggunaan profil: profil tidak boleh sedang digunakan oleh akun admin mana pun ketika proses penghapusan dilakukan.
+Nonaktifkan menghentikan profil; semua akun pemakainya (kecuali Akses Sistem Penuh) langsung ditolak dengan pesan "Your access profile is not active" sampai profil diaktifkan lagi atau akun dipindahkan. Anda tidak bisa menonaktifkan profil yang sedang Anda pakai.
 
-Jika masih terdapat akun admin yang menggunakan profil tersebut, penghapusan tidak dapat dilanjutkan. Pengelola perlu meninjau akun terkait dan, apabila sesuai dengan kebutuhan operasional, memindahkannya ke profil aktif lain yang memiliki kewenangan yang tepat sebelum melanjutkan proses.
+### Hapus
 
-Penonaktifan profil berdampak besar: semua akun yang memakai profil tersebut (kecuali akun Akses Sistem Penuh) langsung tidak dapat menjalankan fitur apa pun, karena setiap permintaan ditolak dengan pesan "Your access profile is not active", sampai profil diaktifkan kembali atau akun dipindahkan ke profil aktif lain. Anda juga tidak diperbolehkan menonaktifkan profil yang sedang Anda pakai sendiri.
+Menghapus profil dari daftar. Hanya untuk profil Nonaktif yang tidak lagi dipakai akun mana pun; pindahkan dulu akun terkait ke profil lain lewat Akun Admin.
 
-## Hubungan Profil Akses dengan Akun Admin
+## Aturan Penting
 
-Profil akses dan akun admin memiliki hubungan langsung dalam pengaturan kewenangan sistem.
-
-- **Profil Akses** berfungsi sebagai kumpulan hak akses yang telah ditentukan.
-- **Akun Admin** menggunakan profil akses untuk memperoleh kewenangan sesuai konfigurasi yang berlaku.
-- **Profil Aktif** tersedia sebagai pilihan profil ketika admin berwenang membuat atau mengedit akun admin melalui halaman Akun Admin.
-
-Dengan mekanisme ini, pengelola dapat menyesuaikan kewenangan pengguna melalui pengaturan profil akses tanpa harus menyusun ulang seluruh izin untuk setiap akun secara individual.
-
-Apabila suatu profil diubah, dampaknya terhadap akun yang menggunakannya perlu diperiksa sebelum perubahan diterapkan, terutama jika perubahan tersebut mengurangi atau menambah kewenangan yang berkaitan dengan pekerjaan pengguna.
-
-## Pengaturan Grup dan Daftar Hak Akses
-
-Daftar grup hak akses serta izin yang tersedia untuk dipilih pada profil dikelola melalui halaman **Hak Akses**.
-
-Halaman tersebut digunakan untuk mengatur struktur grup izin dan daftar hak akses yang nantinya menjadi pilihan pada formulir Profil Akses.
-
-Panduan penggunaan halaman Hak Akses akan dibahas pada bagian tersendiri dalam manual ini.
-
-Tautan halaman Hak Akses: https://internal.matexindo.com/admin-permission
-
-## Praktik Pengelolaan Profil Akses yang Disarankan
-
-Untuk menjaga keamanan dan keteraturan pengelolaan kewenangan, perhatikan hal-hal berikut:
-
-- Gunakan nama dan deskripsi profil yang jelas agar fungsi setiap profil mudah dipahami.
-- Berikan izin sesuai kebutuhan tugas dan tanggung jawab pengguna.
-- Hindari menggunakan opsi **Pilih Semua** tanpa meninjau izin yang akan diberikan.
-- Periksa akun admin yang menggunakan profil sebelum mengubah atau menonaktifkannya.
-- Pastikan profil yang akan dihapus sudah tidak digunakan oleh akun admin mana pun.
-- Tinjau kembali dampak perubahan profil terhadap akses pengguna sebelum menyimpan perubahan.
-
-Pengelolaan profil akses yang baik membantu MATEX menerapkan pembagian kewenangan secara lebih terstruktur, mengurangi pemberian izin yang tidak diperlukan, serta menjaga keberlangsungan operasional platform internal.
+- Berikan izin sesuai tugas pengguna saja.
+- Profil harus dinonaktifkan dan tidak dipakai akun sebelum dapat dihapus.
+- Perubahan profil akses tercatat di Log Aktivitas.

@@ -1,105 +1,160 @@
 # Halaman Kantor
 
 > **Untuk apa:** mengelola data kantor (alamat, peta, kontak, jam operasional, foto) yang juga tampil di halaman kontak website.
-> **Izin yang dibutuhkan:** office.view, .create, .update, .delete.
-> **Perlu diperhatikan:** kantor tampil di website hanya bila Aktif dan Publik; peta perlu layanan Google Maps yang berfungsi.
+> **Izin yang dibutuhkan:** office.view untuk melihat; office.create, office.update, office.delete untuk mengubah.
+> **Perlu diperhatikan:** kantor tampil di website hanya bila Aktif dan Publik; pemilih lokasi membutuhkan Google Maps yang berfungsi.
 
 ## Gambaran Umum
 
-Halaman **Kantor** digunakan untuk mengelola data kantor MATEX, mencakup identitas kantor, lokasi pada peta, kontak, jam operasional, galeri foto, serta pengaturan publikasi. Data kantor yang ditandai publik dapat ditampilkan pada halaman kontak website https://matexindo.com.
+Kantor dipakai di dua tempat: sebagai penempatan akun admin, dan sebagai daftar kantor di halaman kontak website matexindo.com. Alamat, peta, dan jam operasional hanya diatur di sini; halaman Pengaturan Kontak tidak menyimpannya terpisah.
 
-Data alamat, koordinat, tautan peta, dan jam operasional dikelola hanya pada halaman ini agar menjadi satu sumber data. Halaman **Pengaturan Kontak** tidak menyimpan alamat dan peta secara terpisah.
+Formulir terdiri atas enam tab: Umum, Lokasi, Kontak, Jam Operasional, Media, dan Publikasi. Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/office
 
-## Menampilkan dan Mencari Data Kantor
+## Daftar Kantor
 
-Pengguna dapat mencari data melalui kolom **Cari** berdasarkan kode, nama, alamat, kota, atau provinsi. Jumlah baris per halaman dapat diatur melalui pilihan **Tampilkan** (15, 25, 50, atau 100 item), dan kolom **Kode**, **Kantor**, **Kota**, **Admin**, **Media**, dan **Dibuat** dapat diurutkan dengan mengeklik judul kolom.
+Kotak **Cari** mencari di kode, nama, alamat, kota, dan provinsi. Kolom Kode, Kantor, Kota, Admin, Media, dan Dibuat dapat diurutkan.
 
-## Memahami Tabel Daftar Kantor
+### Admin
 
-- **Kode:** kode singkat kantor, misalnya KP-BGR.
-- **Kantor:** nama kantor.
-- **Kota:** kota lokasi kantor.
-- **Admin:** jumlah akun admin yang terkait dengan kantor tersebut.
-- **Media:** jumlah foto pada galeri kantor.
-- **Visibilitas: Publik** apabila ditampilkan pada website, atau **Internal** apabila hanya digunakan di dalam sistem.
-- **Status: Aktif** atau **Nonaktif**.
-- **Dibuat:** tanggal data dibuat.
-- **Aksi:** menu tindakan untuk mengubah, mengaktifkan, menonaktifkan, atau menghapus data.
+Jumlah akun admin yang ditempatkan di kantor ini. Kantor yang masih dipakai akun tidak bisa dihapus.
 
-## Menambahkan Kantor Baru
+### Media
 
-Klik tombol **+ Tambah Kantor**. Sistem menampilkan formulir **Buat Kantor** yang terdiri atas enam tab, yaitu **Umum**, **Lokasi**, **Kontak**, **Jam Operasional**, **Media**, dan **Publikasi**. Isi setiap tab sesuai kebutuhan, kemudian klik **Buat Kantor** untuk menyimpan.
+Jumlah foto di galeri kantor.
 
-### Tab Umum
+### Visibilitas
 
-Berisi identitas dasar kantor.
+Publik berarti kantor ditampilkan di halaman kontak website (bila juga Aktif); Internal berarti hanya dipakai di panel admin.
 
-- **Kode** (wajib): maksimal 50 karakter, hanya huruf, angka, tanda hubung, dan garis bawah. Sistem menyimpan kode dalam huruf kapital.
-- **Nama Kantor** (wajib): maksimal 255 karakter, misalnya Kantor Pusat.
-- **Deskripsi** (opsional): penjelasan singkat mengenai kantor.
-2. Tab Lokasi
+## Tab Umum
 
-Digunakan untuk menentukan posisi kantor pada peta. Pengguna dapat mencari lokasi melalui kolom pencarian, mengeklik titik pada peta, atau menggeser penanda. Kolom **Alamat**, **Kota**, **Provinsi**, **Kode Pos**, **Latitude**, dan **Longitude** terisi otomatis dan tidak dapat diketik manual.
+Identitas dasar kantor.
 
-Latitude dan longitude harus terisi bersamaan. Apabila peta gagal dimuat, sistem menampilkan pesan bahwa peta tidak dapat dimuat.
+### Kode
 
-Tersedia pula pilihan **Aktifkan geofence absensi** beserta **Radius Absensi** dalam satuan meter. Pada versi 1.0.10 pengaturan ini hanya tersimpan sebagai data dan belum digunakan oleh modul absensi.
+Kode singkat kantor, wajib, paling banyak 50 karakter: huruf, angka, tanda hubung, dan garis bawah, misalnya KP-BGR. Disimpan dalam huruf kapital dan harus unik.
 
-### Tab Kontak
+### Nama kantor
 
-Seluruh kolom bersifat opsional: **Email**, **Telepon**, **URL Website**, dan **URL Google Business**. Alamat email harus berformat valid, dan URL harus diawali http atau https.
+Nama kantor yang wajib, paling banyak 255 karakter, misalnya Kantor Pusat. Harus unik di perusahaan Anda dan menjadi dasar slug publik bila slug dikosongkan.
 
-### Tab Jam Operasional
+### Deskripsi
 
-Terdapat tujuh baris, Senin sampai Minggu. Setiap hari memiliki pilihan **Buka** atau **Tutup** (bawaan: Tutup). Saat hari dibuka, sistem menyiapkan satu rentang 08:00–17:00 yang dapat diubah.
+Penjelasan singkat tentang kantor, opsional.
 
-Tombol **Tambah Rentang Waktu** digunakan apabila dalam satu hari terdapat lebih dari satu rentang, misalnya jeda istirahat siang. Rentang yang tidak diperlukan dapat dihapus dengan **Hapus rentang waktu**. Jam buka dan jam tutup tidak boleh sama.
+## Tab Lokasi
 
-### Tab Media
+Posisi kantor di peta. Cari alamat di kotak pencarian peta, klik titik di peta, atau geser penanda.
 
-Tab ini hanya tampil bagi pengguna yang memiliki akses ke Media Library. Klik **Pilih Media** untuk memilih foto kantor dari Media Library (format JPEG, PNG, atau WEBP; maksimal 20 foto).
+### Alamat
 
-- Foto pertama otomatis menjadi **Sampul**, dan dapat diganti dengan **Jadikan Sampul**.
-- **Keterangan** dapat diisi untuk setiap foto (maksimal 255 karakter).
-- Kotak **Publik** menentukan apakah foto boleh ditampilkan kepada publik.
-- Urutan foto dapat diatur dengan tombol geser naik dan turun, dan foto dapat dihapus dari galeri dengan **Hapus media**.
-6. Tab Publikasi
+Alamat, kota, provinsi, dan kode pos terisi otomatis dari titik yang dipilih di peta dan tidak bisa diketik manual. Pastikan titiknya benar sebelum menyimpan.
 
-Aktifkan **Tampilkan kantor ini secara publik** agar kantor tampil pada website. Setelah aktif, tersedia **Slug Publik** (dibuat otomatis dari nama kantor apabila dikosongkan) dan **Urutan** tampil. **Google Place ID** dan **URL Google Maps** terisi otomatis dari pemilih lokasi.
+Bila peta gagal dimuat, lokasi tidak bisa diatur; hubungi developer untuk memeriksa layanan Google Maps.
 
-**Contoh simulasi (bukan data aktual MATEX)**
+### Latitude dan longitude
 
-Kode: KP-BGR | Nama Kantor: Kantor Pusat
+Koordinat titik kantor, terisi otomatis dari peta dan selalu tersimpan berpasangan.
 
-Jam operasional: Senin–Jumat, 08:00–12:00 dan 13:00–17:00; Sabtu–Minggu: Tutup
+### Geofence absensi
 
-Publikasi: tampil secara publik, slug kantor-pusat, urutan 1
+Pilihan untuk menandai area absensi di sekitar kantor. Saat ini hanya tersimpan sebagai data; belum dipakai modul absensi.
 
-## Mengelola Kantor yang Sudah Ada
+Bila diaktifkan, lokasi kantor dan radius absensi wajib diisi.
 
-- **Edit:** membuka formulir **Edit Kantor** dengan seluruh tab yang sama. Simpan dengan **Perbarui Kantor**.
-- **Nonaktifkan / Aktifkan:** menghentikan atau memulihkan penggunaan kantor. Kantor yang nonaktif tidak ditampilkan pada website publik.
-- **Hapus:** hanya tersedia untuk kantor berstatus **Nonaktif**.
+### Radius absensi
 
-## Ketentuan Penting dalam Pengelolaan Kantor
+Jarak dari titik kantor dalam meter (bilangan bulat lebih dari 0) untuk geofence absensi.
 
-- Kode atau nama kantor tidak boleh sama dengan kantor lain yang masih terdaftar.
-- Slug publik harus unik. Apabila sudah digunakan, sistem menolak penyimpanan.
-- Kantor harus dinonaktifkan terlebih dahulu sebelum dihapus, dan tidak dapat dihapus selama masih digunakan oleh akun admin.
-- Penghapusan kantor juga menghapus jam operasional dan daftar media yang terkait dengan kantor tersebut.
-- Kantor yang tampil pada website publik harus berstatus **Aktif** dan bervisibilitas **Publik**.
-- Apabila peta tidak dapat dimuat, penentuan lokasi tidak dapat dilakukan karena kolom lokasi bersifat otomatis. Hubungi pengembang untuk memeriksa konfigurasi layanan peta.
+## Tab Kontak
 
-## Hubungan Kantor dengan Halaman Lain
+Semua kolom opsional dan tampil di halaman kontak website untuk kantor publik.
 
-Data kantor digunakan oleh akun admin (penentuan kantor pengguna) dan oleh halaman kontak pada website publik. Perubahan pada alamat, jam operasional, atau koordinat akan tercermin pada halaman kontak setelah data disimpan dan kantor berstatus aktif serta publik.
+### Email
 
-## Praktik Pengelolaan Kantor yang Disarankan
+Alamat email kantor; harus berformat email yang valid.
 
-- Gunakan kode kantor yang singkat dan konsisten.
-- Pastikan lokasi pada peta sesuai dengan alamat kantor sebelum disimpan.
-- Perbarui jam operasional apabila terjadi perubahan, termasuk hari libur yang bersifat tetap.
-- Gunakan foto kantor yang jelas dan sudah tersedia pada Media Library.
-- Aktifkan visibilitas publik hanya untuk kantor yang memang akan diinformasikan kepada pengunjung.
+### Telepon
+
+Nomor telepon kantor yang ditampilkan ke pengunjung.
+
+### URL website
+
+Alamat website kantor, diawali http:// atau https://.
+
+### URL Google Business
+
+Tautan profil Google Business kantor, diawali http:// atau https://.
+
+## Tab Jam Operasional
+
+Tujuh baris, Senin sampai Minggu, masing-masing **Buka** atau **Tutup** (bawaan Tutup). Saat hari dibuka, sistem menyiapkan rentang 08:00–17:00 yang bisa diubah.
+
+### Rentang waktu
+
+Satu hari boleh punya beberapa rentang, misalnya 08:00–12:00 dan 13:00–17:00 untuk jeda istirahat. Tambah dengan **Tambah Rentang Waktu**, hapus dengan ikon hapus rentang. Jam buka dan tutup tidak boleh sama.
+
+## Tab Media
+
+Galeri foto kantor dari Media. Tab ini hanya tampil bagi akun yang punya izin melihat Media. Klik **Pilih Media** untuk memilih foto (JPEG, PNG, atau WebP; paling banyak 20 foto).
+
+### Sampul
+
+Foto pertama otomatis menjadi sampul yang tampil paling depan; ganti dengan **Jadikan Sampul** pada foto lain.
+
+### Keterangan
+
+Teks singkat untuk tiap foto, paling banyak 255 karakter, dipakai sebagai keterangan foto di website.
+
+### Publik
+
+Menentukan apakah foto boleh ditampilkan di website. Foto yang tidak publik tetap tersimpan di galeri panel.
+
+### Urutan foto
+
+Tombol naik dan turun mengatur urutan tampil foto; ikon hapus mengeluarkan foto dari galeri tanpa menghapus berkasnya dari Media.
+
+## Tab Publikasi
+
+Pengaturan tampil kantor di website.
+
+### Tampilkan kantor ini secara publik
+
+Aktifkan agar kantor tampil di halaman kontak website. Kantor juga harus berstatus Aktif.
+
+### Slug publik
+
+Bagian alamat halaman kantor di website, misalnya kantor-pusat. Bila dikosongkan, dibuat otomatis dari nama kantor. Harus unik.
+
+### Urutan
+
+Angka urutan tampil kantor di website; angka kecil tampil lebih dulu.
+
+### Google Place ID dan URL Google Maps
+
+Terisi otomatis dari pemilih lokasi dan dipakai untuk tombol peta di website.
+
+## Mengubah Status dan Menghapus
+
+Tindakan ini ada di menu tiga titik pada baris kantor.
+
+### Edit
+
+Membuka formulir dengan enam tab yang sama.
+
+### Nonaktifkan dan aktifkan
+
+Nonaktifkan menyembunyikan kantor dari website dan pilihan penempatan baru; Aktifkan mengembalikannya.
+
+### Hapus
+
+Hanya untuk kantor Nonaktif yang tidak lagi dipakai akun admin. Jam operasional dan daftar foto kantor ikut terhapus (berkas fotonya tetap di Media).
+
+## Aturan Penting
+
+- Kode dan nama kantor harus unik; slug publik juga harus unik.
+- Kantor tampil di website hanya bila Aktif dan Publik.
+- Perubahan alamat, jam, atau foto langsung terlihat di halaman kontak website setelah disimpan.
+- Perubahan kantor tercatat di Log Aktivitas.

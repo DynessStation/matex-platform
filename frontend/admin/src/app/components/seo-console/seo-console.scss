@@ -395,3 +395,8 @@ table {
     transform: rotate(360deg);
   }
 }
+
+// The property name (sc-domain:matexindo.com) is shown exactly as Google returns it.
+.status-strip span {
+  text-transform: none;
+}

@@ -8,6 +8,7 @@
       <div class="col-12">
         <label class="form-label" for="access_name">
           {{ 'admin_access.access_name' | translate }}
+          <app-help-tip section="formulir-profil-akses--nama-akses" />
 
           <span class="text-danger"> * </span>
         </label>
@@ -42,6 +43,7 @@
       <div class="col-12">
         <label class="form-label" for="access_description">
           {{ 'admin_access.description' | translate }}
+          <app-help-tip section="formulir-profil-akses--deskripsi" />
         </label>
 
         <textarea
@@ -74,6 +76,7 @@
         <div>
           <h5 class="permission-title">
             {{ 'admin_access.permissions' | translate }}
+            <app-help-tip section="formulir-profil-akses--hak-akses" />
           </h5>
 
           <p class="permission-description">
@@ -105,6 +108,7 @@
 
             <span>
               {{ 'admin_access.select_all' | translate }}
+              <app-help-tip section="formulir-profil-akses--pilih-semua" />
             </span>
           </label>
         </div>

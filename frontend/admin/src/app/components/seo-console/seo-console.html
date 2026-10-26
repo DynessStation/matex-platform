@@ -30,6 +30,7 @@
           [loading]="loading()"
           (refresh)="load()"
         />
+        <app-help-tip page="seo-console" section="rentang-waktu-dan-tombol" />
       </div>
     </header>
 
@@ -97,19 +98,39 @@
         @if (data.totals; as totals) {
           <div class="metric-grid">
             <article>
-              <span>Klik Google</span
+              <span
+                >Klik Google
+                <app-help-tip
+                  page="seo-console"
+                  section="kartu-search-console--klik-google"
+              /></span>
               ><strong>{{ totals.clicks | number: '1.0-0' }}</strong>
             </article>
             <article>
-              <span>Impresi</span
+              <span
+                >Impresi
+                <app-help-tip
+                  page="seo-console"
+                  section="kartu-search-console--impresi"
+              /></span>
               ><strong>{{ totals.impressions | number: '1.0-0' }}</strong>
             </article>
             <article>
-              <span>CTR rata-rata</span
+              <span
+                >CTR rata-rata
+                <app-help-tip
+                  page="seo-console"
+                  section="kartu-search-console--ctr-rata-rata"
+              /></span>
               ><strong>{{ totals.ctr | percent: '1.1-1' }}</strong>
             </article>
             <article>
-              <span>Posisi rata-rata</span
+              <span
+                >Posisi rata-rata
+                <app-help-tip
+                  page="seo-console"
+                  section="kartu-search-console--posisi-rata-rata"
+              /></span>
               ><strong>{{ totals.position | number: '1.1-1' }}</strong>
             </article>
           </div>
@@ -122,7 +143,7 @@
                 Kueri teratas
                 <app-help-tip
                   page="seo-console"
-                  section="kueri-dan-halaman-teratas"
+                  section="kueri-dan-halaman-teratas--kueri-teratas"
                 />
               </h2>
               <small>Berdasarkan klik</small>
@@ -162,7 +183,7 @@
                 Halaman teratas
                 <app-help-tip
                   page="seo-console"
-                  section="kueri-dan-halaman-teratas"
+                  section="kueri-dan-halaman-teratas--halaman-teratas"
                 />
               </h2>
               <small>Berdasarkan klik</small>
@@ -211,10 +232,7 @@
             <span class="seo-kicker">Audit sesuai permintaan</span>
             <h2>
               PageSpeed & Lighthouse
-              <app-help-tip
-                page="seo-console"
-                section="pagespeed-lighthouse-audit-performa-website"
-              />
+              <app-help-tip page="seo-console" section="pagespeed-lighthouse" />
             </h2>
             <p>
               Jalankan saat diperlukan. Setiap tombol memakai kuota API dan

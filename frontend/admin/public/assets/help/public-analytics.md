@@ -1,148 +1,120 @@
 # Halaman Analitik Publik
 
-> **Untuk apa:** membaca perilaku pengunjung website secara lebih rinci (trafik, sumber, halaman populer, performa, formulir kontak).
+> **Untuk apa:** membaca perilaku pengunjung website lebih rinci: tren, performa halaman di browser pengunjung, formulir kontak, sumber, negara, dan halaman populer.
 > **Izin yang dibutuhkan:** dashboard.view.
-> **Perlu diperhatikan:** data bersifat anonim dan hanya mencakup pengunjung yang tercatat; jangan menyamakan angka ini dengan laporan penjualan.
+> **Perlu diperhatikan:** data anonim dan hanya mencakup kunjungan yang tercatat; jangan menyamakannya dengan laporan penjualan.
 
 ## Gambaran Umum
 
-Halaman Analitik Publik merupakan pengembangan dari fitur analitik pada halaman Dasbor. Jika Dasbor menampilkan ringkasan kondisi website publik MATEX, halaman ini menyajikan informasi yang lebih terperinci mengenai perilaku pengunjung, tren trafik, pengalaman pengguna, sumber trafik, serta interaksi pengunjung dengan formulir kontak.
+Analitik Publik adalah versi lengkap dari ringkasan trafik di Dasbor. Datanya dikumpulkan sendiri oleh website matexindo.com (first-party) tanpa menyimpan alamat IP mentah atau identitas pengunjung.
 
-Data analitik menggunakan pendekatan first-party analytics untuk membantu MATEX memahami aktivitas pengunjung pada website tanpa menyimpan alamat IP mentah.
+Halaman memuat ulang datanya otomatis setiap 30 detik di latar belakang. Bila pencatatan pengunjung belum diaktifkan di server, muncul pita "Pencatatan pengunjung belum diaktifkan" dan semua angka nol.
 
-Pada bagian atas halaman, tersedia filter periode dan tombol Perbarui. Pengguna dapat memilih rentang waktu yang ingin dianalisis, kemudian memperbarui tampilan untuk melihat data sesuai periode tersebut.
+URL: https://internal.matexindo.com/public-analytics
 
-- Pilihan rentang: **7 hari**, **30 hari** (bawaan), atau **90 hari**. Rentang lebih dari 90 hari ditolak sistem; tidak ada pemilih tanggal bebas.
-- Halaman memuat ulang dirinya sendiri setiap 30 detik; tombol **Perbarui** memuat ulang seketika.
-- "Sesi anonim" berarti nomor acak yang disimpan di tab browser (sessionStorage); nomor ini hilang saat tab atau browser ditutup, sehingga orang yang sama dapat terhitung sebagai pengunjung berbeda.
-- Bila pencatatan belum diaktifkan, halaman menampilkan pita "Pencatatan pengunjung belum diaktifkan" dan angkanya nol.
+## Rentang Waktu dan Tombol
 
-## Ringkasan Analitik
+Tombol di kanan atas mengatur periode data dan memuat ulang halaman.
 
-Bagian ini menampilkan kartu ringkasan yang serupa dengan halaman Dasbor, tetapi digunakan sebagai bagian dari analisis trafik yang lebih mendalam.
+### 7, 30, dan 90 hari
 
-- **Aktif Sekarang:** jumlah pengunjung yang terdeteksi aktif dalam lima menit terakhir.
-- **Pengunjung:** jumlah sesi anonim unik pada periode yang dipilih. Angka ini bukan jumlah identitas individu yang telah diverifikasi.
-- **Page View:** total halaman yang dibuka atau dilihat selama periode terpilih.
-- **Klik Keluar:** jumlah klik menuju marketplace atau tautan eksternal yang tercatat oleh sistem.
-- **Pesan Terkirim:** jumlah formulir kontak yang berhasil dikirim. Teks di bawahnya berbentuk "N% konversi form" (terkirim dibagi mulai diisi). Nilainya selalu tampil (0% bila belum ada yang mulai mengisi) dan dapat melebihi 100% karena kedua kejadian dicatat terpisah.
+Memilih periode semua bagian di halaman: 7, 30 (bawaan), atau 90 hari terakhir termasuk hari ini. Tidak ada pemilih tanggal bebas.
 
-**Contoh simulasi:** kartu analitik dapat menampilkan 1 pengunjung aktif, 38 pengunjung, 134 page view, 3 klik keluar, dan 2 pesan terkirim dengan rasio penyelesaian formulir sebesar 67%. Angka tersebut hanya ilustrasi; data aktual akan berubah mengikuti aktivitas pengunjung dan periode yang dipilih.
+Mengganti periode langsung memuat data baru dan tidak memakai jeda tombol Perbarui.
+
+### Perbarui
+
+Memuat ulang data sekarang juga. Setelah itu tombol nonaktif dengan hitung mundur 5 menit sebelum bisa ditekan lagi; jeda tetap berjalan walaupun Anda pindah halaman.
+
+## Kartu Ringkasan
+
+Lima kartu di bagian atas menunjukkan angka utama kunjungan pada periode terpilih.
+
+### Aktif sekarang
+
+Jumlah pengunjung yang membuka halaman dalam 5 menit terakhir, tidak terpengaruh pilihan periode.
+
+### Pengunjung
+
+Jumlah sesi anonim yang membuka paling sedikit satu halaman pada periode terpilih; bukan jumlah orang yang terverifikasi.
+
+Sesi adalah nomor acak yang disimpan di tab browser (sessionStorage) dan hilang saat tab ditutup, jadi orang yang sama dapat terhitung lebih dari sekali.
+
+### Page view
+
+Jumlah halaman yang dibuka pada periode terpilih. Satu pengunjung dapat menghasilkan banyak page view.
+
+### Klik keluar
+
+Jumlah klik pada tautan yang keluar dari website, misalnya tombol beli ke marketplace atau tautan media sosial.
+
+### Pesan terkirim
+
+Jumlah formulir kontak yang berhasil dikirim pada periode terpilih. "N% konversi form" di bawahnya adalah pesan terkirim dibagi formulir yang mulai diisi.
+
+Nilainya 0% bila belum ada yang mulai mengisi, dan dapat melebihi 100% karena "mulai mengisi" dan "terkirim" dicatat sebagai kejadian terpisah.
 
 ## Tren Trafik
 
-Bagian **Tren Trafik** menampilkan grafik yang membandingkan jumlah pengunjung dengan jumlah page view selama periode yang dipilih.
+Grafik batang harian untuk periode terpilih: kuning-oranye untuk page view, biru keabuan untuk pengunjung. Arahkan kursor ke kolom untuk melihat angkanya.
 
-Grafik menggunakan dua indikator:
+Page view hampir selalu lebih tinggi dari pengunjung karena satu pengunjung membuka beberapa halaman. Tanggal dihitung per hari UTC.
 
-- **Kuning-oranye — Page View:** menunjukkan jumlah halaman yang dibuka.
-- **Biru keabuan — Pengunjung:** menunjukkan jumlah sesi anonim yang tercatat. Grafik berupa batang berpasangan per hari; arahkan kursor untuk melihat angka ("N page view, N pengunjung").
+## Core Web Vitals
 
-Grafik ini membantu pengguna mengamati perubahan trafik dari waktu ke waktu, misalnya ketika terjadi peningkatan kunjungan setelah artikel baru diterbitkan atau halaman produk diperbarui.
+Pengukuran kecepatan dan kenyamanan halaman yang dikirim langsung oleh browser pengunjung (pengalaman nyata), dirata-rata untuk periode terpilih.
 
-Perlu diperhatikan bahwa jumlah page view dapat lebih tinggi daripada jumlah pengunjung karena satu pengunjung dapat membuka beberapa halaman dalam satu sesi.
+Setiap kartu menampilkan nilai rata-rata, jumlah sampel, dan persentase sampel yang masuk kategori baik. Nilainya rata-rata biasa, bukan persentil ke-75 seperti laporan Google, sehingga bisa berbeda dari hasil PageSpeed. Data hanya muncul dari browser yang mendukung pengukuran ini.
 
-## Pengalaman Pengguna Nyata — Core Web Vitals
+### LCP — Kecepatan konten utama
 
-Bagian **Pengalaman Pengguna Nyata** menampilkan metrik Core Web Vitals berdasarkan data performa yang dikumpulkan dari browser pengunjung selama rentang waktu terpilih.
+Waktu sampai konten terbesar di layar (biasanya gambar utama atau judul) terlihat. Baik bila 2.500 ms atau kurang.
 
-Metrik ini membantu mengevaluasi pengalaman pengguna saat membuka dan berinteraksi dengan website MATEX.
+### INP — Respons interaksi
 
-- **LCP (Largest Contentful Paint):** mengukur waktu yang diperlukan hingga elemen konten utama terlihat. Nilai yang lebih rendah umumnya menunjukkan pemuatan konten utama yang lebih cepat.
-- **INP (Interaction to Next Paint):** mengukur responsivitas halaman terhadap interaksi pengguna. Nilai yang lebih rendah menunjukkan respons yang lebih cepat.
-- **CLS (Cumulative Layout Shift):** mengukur pergeseran tata letak yang tidak terduga selama halaman dimuat atau digunakan. Nilai yang lebih rendah menunjukkan tampilan yang lebih stabil.
+Waktu yang dibutuhkan halaman untuk merespons klik, ketukan, atau ketikan pengunjung. Baik bila 200 ms atau kurang.
 
-Setiap kartu menampilkan nilai rata-rata (LCP dan INP dalam milidetik, CLS tiga angka desimal), jumlah sampel, dan persentase sampel yang masuk kategori baik: LCP ≤ 2.500 ms, INP ≤ 200 ms, CLS ≤ 0,1. Perhatikan bahwa nilainya adalah rata-rata biasa, bukan persentil ke-75 seperti standar Google, sehingga dapat berbeda dari laporan PageSpeed. Data hanya muncul bila browser pengunjung mendukung pengukuran Web Vitals; bila kosong tampil keterangan bahwa data menunggu analytics production aktif.
+### CLS — Stabilitas tampilan
 
-Contoh simulasi:
-
-| Metrik | Sampel | Nilai rata-rata contoh | Acuan kategori baik |
-| --- | --- | --- | --- |
-| LCP | 48 | 1.253 ms | ≤ 2.500 ms |
-| INP | 26 | 162 ms | ≤ 200 ms |
-| CLS | 47 | 0,214 | ≤ 0,1 |
-
-Pada ilustrasi tersebut, LCP dan INP berada di bawah ambang batas kategori baik. Sebaliknya, CLS sebesar 0,214 menunjukkan bahwa stabilitas tampilan masih perlu diperhatikan. Persentase kategori baik yang ditampilkan pada halaman merupakan indikator tambahan dan tidak selalu dapat disimpulkan hanya dari nilai rata-rata.
-
-Angka sampel, nilai pengukuran, dan persentase pada tabel hanya contoh. Data aktual bergantung pada pengumpulan metrik dari browser pengunjung.
+Seberapa banyak isi halaman bergeser sendiri saat dimuat (misalnya tombol turun karena gambar baru muncul). Baik bila 0,1 atau kurang.
 
 ## Funnel Kontak
 
-Bagian **Funnel Kontak** menunjukkan perjalanan pengunjung dari mulai mengisi formulir kontak hingga formulir berhasil dikirim.
+Perjalanan pengunjung di formulir kontak website: dari mulai mengisi sampai berhasil terkirim.
 
-Indikator yang ditampilkan meliputi:
+### Mulai mengisi
 
-- **Mulai Mengisi:** jumlah aktivitas awal pengisian formulir yang berhasil tercatat.
-- **Berhasil Terkirim:** jumlah formulir yang berhasil dikirim.
-- **Rasio Penyelesaian Formulir:** persentase perbandingan jumlah formulir yang berhasil dikirim terhadap jumlah aktivitas mulai mengisi formulir yang tercatat.
+Jumlah kali pengunjung mulai mengetik di formulir kontak pada periode terpilih.
 
-Contoh simulasi: apabila terdapat 3 aktivitas mulai mengisi formulir dan 2 formulir berhasil terkirim, rasio penyelesaiannya adalah sekitar 67%.
+### Berhasil terkirim
 
-Informasi ini dapat digunakan untuk mengevaluasi apakah formulir kontak sudah cukup mudah digunakan. Jika banyak pengunjung mulai mengisi tetapi sedikit yang menyelesaikan pengiriman, MATEX dapat mempertimbangkan evaluasi terhadap susunan kolom, kejelasan instruksi, maupun pengalaman pengisian formulir.
+Jumlah formulir kontak yang berhasil dikirim pada periode terpilih.
 
-Rasio tersebut bergantung pada aktivitas yang berhasil direkam sistem. Angka ini tidak otomatis menjelaskan alasan pengunjung membatalkan pengisian formulir.
+### Rasio penyelesaian form
 
-## Akuisisi — Sumber Trafik
+Berhasil terkirim dibagi mulai mengisi. Bila banyak yang mulai tetapi sedikit yang selesai, susunan atau petunjuk formulir mungkin perlu diperbaiki.
 
-Bagian Akuisisi memperlihatkan sumber trafik yang membawa pengunjung ke website MATEX, maksimal 10 sumber teratas. Angka di samping nama sumber adalah jumlah page view dari sumber itu (bukan jumlah kunjungan), dan sumber diambil dari nama situs asal (referrer) saja; parameter UTM tidak ditampilkan.
+Angka ini tidak menjelaskan alasan pengunjung berhenti mengisi.
 
-Contoh sumber trafik yang dapat ditampilkan antara lain:
+## Sumber Trafik
 
-- **Direct:** kunjungan yang tidak memiliki informasi sumber rujukan yang dapat dikenali oleh sistem.
-- **www.google.com:** kunjungan yang tercatat berasal dari Google.
-- **matexindo.com:** kunjungan dengan informasi rujukan dari domain tersebut, jika tercatat oleh sistem.
+Sepuluh situs asal pengunjung terbanyak, diurutkan menurut page view. Angka di kanan adalah page view dari sumber itu, bukan jumlah orang; bilah di bawahnya hanya perbandingan antar sumber.
 
-Contoh simulasi: Direct sebanyak 117, www.google.com sebanyak 15, dan matexindo.com sebanyak 2 kunjungan tercatat.
+**Direct** berarti tidak ada informasi asal (alamat diketik langsung, dibuka dari aplikasi pesan, atau browser menyembunyikan asalnya). Sumber lain tampil sebagai nama domain apa adanya, misalnya www.google.com; parameter UTM tidak ditampilkan.
 
-Angka tersebut hanya ilustrasi. Sumber trafik yang muncul dan jumlahnya mengikuti data aktual serta informasi rujukan yang tersedia. Kunjungan tanpa informasi rujukan tidak selalu berarti pengunjung mengetik alamat website secara langsung; kondisi tersebut juga dapat terjadi karena keterbatasan data rujukan pada browser atau jalur kunjungan tertentu.
+## Negara Pengunjung
 
-Progress bar berfungsi sebagai visualisasi perbandingan jumlah trafik antar-sumber, bukan indikator kualitas atau tingkat konversi sumber tersebut.
+Sepuluh negara dengan pengunjung terbanyak, tampil sebagai kode dua huruf (misalnya ID atau US).
 
-## Lokasi Agregat
+Kode negara hanya terisi bila server diatur memercayai informasi negara dari perantara jaringan tepercaya (misalnya Cloudflare). Bila belum, tampil keterangan "Lokasi akan tampil setelah trusted proxy negara diaktifkan." Lokasi bersifat agregat per negara, tidak pernah lokasi tepat seseorang.
 
-Bagian Lokasi Agregat menampilkan kode negara dua huruf (misalnya ID atau US) beserta jumlah pengunjung unik, 10 teratas.
+## Halaman Teratas
 
-Kode negara hanya terisi bila server diatur memercayai header negara dari perantara jaringan tepercaya (trusted proxy, misalnya Cloudflare). Bila belum, tampil keterangan "Lokasi akan tampil setelah trusted proxy negara diaktifkan.".
+Halaman website yang paling banyak dibuka pada periode terpilih, diurutkan menurut page view.
 
-Lokasi yang ditampilkan bersifat agregat, bukan pelacakan alamat rumah atau lokasi presisi setiap pengunjung. Ketersediaan dan ketepatan informasi bergantung pada konfigurasi infrastruktur serta data lokasi yang diterima sistem.
+- **Halaman:** alamat halaman, misalnya /, /katalog, atau /kontak. Versi English berawalan /en dan dihitung terpisah. Alamat yang terlalu panjang dipotong dengan "…"; arahkan kursor untuk melihat alamat lengkap.
+- **Distribusi view:** bilah perbandingan page view antar halaman.
+- **Pengunjung:** jumlah sesi yang membuka halaman itu.
+- **Page view:** jumlah kali halaman dibuka.
 
-## Minat Pengunjung — Halaman Teratas
-
-Bagian **Minat Pengunjung** menampilkan halaman website yang paling banyak dikunjungi selama periode yang dipilih. Tabel ini membantu pengguna mengetahui konten yang paling sering dilihat oleh pengunjung.
-
-Kolom yang tersedia meliputi:
-
-- **Halaman:** alamat path halaman pada website, misalnya /, /katalog, atau /kontak. Versi bahasa Inggris berawalan /en dan tampil sebagai baris terpisah. Query string dan hash dibuang; path yang berbeda (misalnya / dan /home) dihitung terpisah.
-- **Distribusi View:** visualisasi perbandingan jumlah page view antarhalaman.
-- **Pengunjung:** jumlah pengunjung atau sesi anonim yang tercatat pada halaman tersebut sesuai definisi sistem.
-- **Page View:** jumlah pembukaan halaman yang tercatat.
-
-Contoh simulasi tabel halaman teratas:
-
-| Halaman | Pengunjung | Page View |
-| --- | --- | --- |
-| / (alias: /home) | 29 | 55 |
-| /katalog | 10 | 18 |
-| /kontak | 8 | 14 |
-| /tentang-matex | 8 | 11 |
-| /artikel | 4 | 9 |
-| /search | 4 | 5 |
-| /kategori/latex-mattress | 2 | 4 |
-| /en | 2 | 3 |
-| /artikel/kelebihan-kasur-latex | 2 | 2 |
-| /en/product/recon-mattress-180-200-8 | 1 | 2 |
-
-Tabel di atas hanya contoh simulasi untuk menjelaskan cara membaca data. Jumlah pengunjung dan page view pada setiap halaman akan berubah mengikuti aktivitas aktual dan periode analisis. Jumlah pengunjung antarhalaman juga tidak boleh dijumlahkan begitu saja untuk dianggap sebagai jumlah pengunjung unik seluruh website, karena pengunjung yang sama dapat membuka beberapa halaman.
-
-Halaman Analitik Publik digunakan sebagai alat bantu evaluasi website dan perilaku pengunjung, bukan sebagai laporan penjualan atau bukti bahwa seluruh pengunjung merupakan calon pembeli.
-
-Pengguna dapat memanfaatkan informasi trafik, sumber kunjungan, halaman populer, performa website, dan penyelesaian formulir kontak untuk menentukan bagian website yang perlu diperbaiki atau dikembangkan.
-
-Seluruh angka yang ditampilkan bersifat dinamis dan mengikuti periode yang dipilih serta data yang berhasil dikumpulkan oleh sistem. Angka-angka pada bagian contoh dalam manual ini hanya simulasi, bukan laporan aktual MATEX.
-
-- **Saringan otomatis.** Kunjungan dari bot atau alat uji (crawler, headless, Lighthouse, PageSpeed) diabaikan; pengunjung yang mengaktifkan Do Not Track atau Global Privacy Control tidak dicatat. Dua hal ini dapat membuat angka lebih kecil dari perkiraan.
-- **Retensi.** Tidak ada penghapusan otomatis data analitik; data menumpuk tanpa batas waktu.
-- **Peristiwa yang dicatat:** page_view, outbound_click (klik ke domain lain, termasuk mailto dan tel), contact_start, contact_submit, dan web_vital.
-- **Izin:** halaman ini membutuhkan dashboard.view. Bila gagal dimuat tampil "Data belum termuat" dan tombol Coba lagi.
-
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** angka desimal pada halaman Analitik Publik serta SEO & Mesin Pencari masih memakai titik (contoh: 0.222, 89.4%, 44.0%, 13.8), padahal acuan pada kartu memakai koma (≤ 0,1). Bacalah titik tersebut sebagai koma desimal.
+Query string dan tanda # dibuang dari alamat, jadi /katalog?q=lateks tercatat sebagai /katalog.

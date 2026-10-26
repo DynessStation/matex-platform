@@ -1,6 +1,9 @@
 <div class="row g-4">
   <div class="col-md-4">
-    <label class="form-label"> {{ 'office.code' | translate }} * </label>
+    <label class="form-label">
+      {{ 'office.code' | translate }}
+      <app-help-tip section="tab-umum--kode" /> *
+    </label>
 
     <input
       class="form-control"
@@ -39,7 +42,10 @@
   </div>
 
   <div class="col-md-8">
-    <label class="form-label"> {{ 'office.name' | translate }} *</label>
+    <label class="form-label">
+      {{ 'office.name' | translate }}
+      <app-help-tip section="tab-umum--nama-kantor" /> *</label
+    >
 
     <input
       class="form-control"
@@ -72,6 +78,7 @@
   <div class="col-12">
     <label class="form-label">
       {{ 'office.description' | translate }}
+      <app-help-tip section="tab-umum--deskripsi" />
     </label>
 
     <textarea

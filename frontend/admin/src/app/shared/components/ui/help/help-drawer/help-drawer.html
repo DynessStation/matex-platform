@@ -51,10 +51,16 @@
         @default {
           @if (guide(); as guide) {
             @if (guide.summaryHtml) {
-              <div class="help-summary" [innerHTML]="guide.summaryHtml"></div>
+              <div
+                class="help-summary"
+                [innerHTML]="trusted(guide.summaryHtml)"
+              ></div>
             }
             @if (guide.introHtml) {
-              <div class="help-content" [innerHTML]="guide.introHtml"></div>
+              <div
+                class="help-content"
+                [innerHTML]="trusted(guide.introHtml)"
+              ></div>
             }
             @if (guide.sections.length > 1) {
               <nav
@@ -94,7 +100,10 @@
                   >
                   {{ section.title }}
                 </h3>
-                <div class="help-content" [innerHTML]="section.html"></div>
+                <div
+                  class="help-content"
+                  [innerHTML]="trusted(section.html)"
+                ></div>
               </section>
             }
           }

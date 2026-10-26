@@ -1,7 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, effect, inject, input, output } from '@angular/core';
-
 import {
   FormBuilder,
   FormControl,
@@ -10,21 +8,17 @@ import {
 } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { Observable, combineLatest, map, shareReplay, startWith } from 'rxjs';
 
 import { Button } from '../../../shared/components/ui/button/button';
-
+import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import {
   IAdminAccessDetail,
   IAdminAccessPermission,
   IAdminAccessPermissionGroup,
 } from '../../../shared/interface/admin-access.interface';
-
 import { GetAdminAccessPermissionMatrixAction } from '../../../shared/store/action/admin-access.action';
-
 import { AdminAccessState } from '../../../shared/store/state/admin-access.state';
 
 //==================================================
@@ -46,7 +40,7 @@ export interface AdminAccessFormValue {
 @Component({
   selector: 'app-form-admin-access',
 
-  imports: [AsyncPipe, ReactiveFormsModule, TranslateModule, Button],
+  imports: [AsyncPipe, ReactiveFormsModule, TranslateModule, Button, HelpTip],
 
   templateUrl: './form-admin-access.html',
 

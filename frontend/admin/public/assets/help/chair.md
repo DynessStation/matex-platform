@@ -1,94 +1,73 @@
 # Halaman Jabatan
 
 > **Untuk apa:** mengelola daftar jabatan/posisi yang dipilih pada akun admin.
-> **Izin yang dibutuhkan:** chair.view, .create, .update, .delete.
+> **Izin yang dibutuhkan:** chair.view untuk melihat; chair.create, chair.update, chair.delete untuk mengubah.
 > **Perlu diperhatikan:** jabatan hanya label organisasi, bukan hak akses; jabatan yang masih dipakai akun tidak dapat dihapus.
 
 ## Gambaran Umum
 
-Halaman **Jabatan** digunakan untuk mengelola daftar jabatan atau posisi yang dapat dipilih pada akun administrator. Data jabatan berfungsi sebagai data referensi, sehingga setiap akun admin dapat dikaitkan dengan jabatannya di dalam organisasi MATEX.
+Jabatan adalah data referensi yang dipilih saat membuat atau mengubah akun admin, misalnya IT Support atau Marketing Executive. Jabatan hanya menjelaskan kedudukan seseorang di organisasi; menu dan tindakan yang boleh dilakukan diatur lewat **Profil Akses** dan **Hak Akses**.
 
-Jabatan hanya menjelaskan kedudukan seseorang dalam organisasi. Jabatan tidak menentukan menu atau tindakan yang boleh dilakukan pengguna; kewenangan tersebut diatur melalui Profil Akses dan Hak Akses.
-
-Halaman ini dapat diakses melalui menu **Administrasi › Jabatan** atau alamat berikut:
+Halaman ini dibuka dari **Administrasi › Jabatan**. Cara memakai tabel (cari, urutkan, muat ulang, menu aksi) dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/chair
 
-## Menampilkan dan Mencari Data Jabatan
+## Daftar Jabatan
 
-Daftar jabatan ditampilkan dalam bentuk tabel. Pengguna dapat memanfaatkan fitur berikut untuk menemukan data yang dibutuhkan.
+Tabel menampilkan semua jabatan perusahaan Anda yang belum dihapus. Kotak **Cari** mencari di nama dan deskripsi; kolom Jabatan / Posisi, Admin, dan Dibuat dapat diurutkan.
 
-### Kolom Pencarian
+### Jabatan / Posisi
 
-Ketik kata kunci pada kolom **Cari** untuk mencari jabatan berdasarkan nama atau deskripsi.
+Nama jabatan seperti yang tampil saat memilih jabatan di formulir Akun Admin.
 
-### Jumlah Data per Halaman
+### Deskripsi
 
-Pilihan **Tampilkan** digunakan untuk mengatur jumlah baris per halaman, yaitu 15, 25, 50, atau 100 item.
+Keterangan singkat tentang tanggung jawab jabatan; kosong bila tidak diisi.
 
-### Pengurutan Kolom
+### Admin
 
-Klik judul kolom yang dapat diurutkan, yaitu **Jabatan / Posisi**, **Admin**, dan **Dibuat**, untuk mengurutkan data secara menaik atau menurun.
+Jumlah akun admin (aktif maupun nonaktif) yang memakai jabatan ini. Periksa angka ini sebelum menonaktifkan atau menghapus jabatan.
 
-## Memahami Tabel Daftar Jabatan
+### Status
 
-Tabel daftar jabatan menampilkan informasi berikut:
+Aktif berarti jabatan bisa dipilih di formulir Akun Admin. Nonaktif berarti jabatan disimpan tetapi tidak ditawarkan lagi untuk akun baru.
 
-- **Jabatan / Posisi:** nama jabatan.
-- **Deskripsi:** keterangan mengenai tanggung jawab atau fungsi jabatan.
-- **Admin:** jumlah akun admin yang saat ini menggunakan jabatan tersebut.
-- **Status: Aktif** atau **Nonaktif**.
-- **Dibuat:** tanggal data jabatan dibuat.
-- **Aksi:** menu tindakan yang dapat dilakukan pada baris tersebut.
+## Formulir Jabatan
 
-Kolom **Admin** membantu pengguna mengetahui seberapa luas dampak suatu perubahan sebelum jabatan dinonaktifkan atau dihapus.
+Formulir dibuka dari tombol **+ Tambah Jabatan / Posisi** atau menu aksi **Edit**. Simpan dengan tombol di bawah formulir; jabatan baru langsung berstatus Aktif.
 
-## Menambahkan Jabatan Baru
+### Nama jabatan / posisi
 
-Langkah-langkahnya adalah sebagai berikut:
+Nama jabatan yang wajib diisi, paling banyak 255 karakter, misalnya IT Support.
 
-1. Klik tombol **+ Tambah Jabatan / Posisi** pada bagian atas halaman.
-2. Sistem menampilkan formulir **Buat Jabatan / Posisi**.
-3. Isi **Nama Jabatan / Posisi** (wajib, maksimal 255 karakter), misalnya IT Support.
-4. Isi **Deskripsi** (opsional) dengan penjelasan singkat mengenai tanggung jawab atau fungsi jabatan.
-5. Klik tombol **Buat Jabatan / Posisi** untuk menyimpan data.
+Nama tidak boleh sama dengan jabatan lain di perusahaan Anda, tanpa membedakan huruf besar dan kecil ("IT Support" dan "it support" dianggap sama). Bila sudah dipakai, muncul pesan bahwa nama jabatan / posisi sudah digunakan.
 
-Jabatan yang baru dibuat otomatis berstatus **Aktif**. Nama jabatan tidak boleh sama dengan jabatan lain yang masih terdaftar, tanpa membedakan huruf besar dan huruf kecil. Apabila nama sudah digunakan, sistem menampilkan pesan bahwa nama jabatan / posisi sudah digunakan.
+### Deskripsi
 
-**Contoh simulasi (bukan data aktual MATEX)**
+Penjelasan singkat tugas atau fungsi jabatan, opsional. Membantu admin lain memilih jabatan yang tepat.
 
-Nama Jabatan / Posisi: Marketing Executive
+## Mengubah Status dan Menghapus
 
-Deskripsi: Bertanggung jawab atas pengelolaan konten pemasaran dan informasi produk pada website.
-
-## Mengelola Jabatan yang Sudah Ada
-
-Tindakan pada jabatan yang sudah tersedia dilakukan melalui kolom **Aksi** pada baris yang bersangkutan. Menu yang tampil mengikuti hak akses pengguna dan status jabatan.
+Tindakan ini ada di menu tiga titik pada baris jabatan dan hanya tampil bila akun Anda memiliki izinnya.
 
 ### Edit
 
-Membuka formulir **Edit Jabatan / Posisi** untuk mengubah nama atau deskripsi. Simpan dengan tombol **Perbarui Jabatan / Posisi**.
+Membuka formulir untuk mengubah nama atau deskripsi jabatan. Perubahan nama langsung terlihat di semua akun yang memakai jabatan ini.
 
-### Nonaktifkan dan Aktifkan
+### Nonaktifkan dan aktifkan
 
-**Nonaktifkan** digunakan untuk menghentikan penggunaan jabatan tanpa menghapus datanya, sedangkan **Aktifkan** mengembalikan jabatan yang sebelumnya nonaktif. Sistem meminta konfirmasi sebelum tindakan dijalankan.
+Nonaktifkan menghentikan jabatan dipilih untuk akun tanpa menghapus datanya; Aktifkan mengembalikannya. Sistem meminta konfirmasi lebih dulu.
+
+Menonaktifkan jabatan yang masih dipakai akun tetap diperbolehkan; akun tersebut tetap menyimpan jabatannya.
 
 ### Hapus
 
-Menghapus jabatan dari daftar. Pilihan ini hanya tersedia untuk jabatan yang berstatus **Nonaktif**. Setelah dihapus, jabatan tidak lagi tampil pada daftar.
+Menghapus jabatan dari daftar. Hanya tersedia untuk jabatan Nonaktif yang sudah tidak dipakai akun mana pun.
 
-## Ketentuan Penghapusan dan Penonaktifan Jabatan
+Bila masih dipakai, pindahkan dulu akun terkait ke jabatan lain melalui halaman Akun Admin.
 
-- Jabatan harus dinonaktifkan terlebih dahulu sebelum dapat dihapus.
-- Jabatan yang masih digunakan oleh satu atau beberapa akun admin tidak dapat dihapus. Pindahkan terlebih dahulu akun terkait ke jabatan lain melalui halaman **Akun Admin**.
-- Menonaktifkan jabatan yang masih digunakan akun admin tetap diperbolehkan oleh sistem. Pengguna perlu memastikan bahwa penonaktifan tersebut memang dimaksudkan.
-- Setiap penambahan, perubahan, perubahan status, dan penghapusan jabatan tercatat pada halaman **Log Aktivitas**.
+## Aturan Penting
 
-## Praktik Pengelolaan Jabatan yang Disarankan
-
-- Gunakan nama jabatan yang konsisten dan mudah dipahami, serta hindari penulisan ganda untuk jabatan yang sama.
-- Tuliskan deskripsi singkat agar fungsi jabatan jelas bagi pengguna lain.
-- Periksa kolom **Admin** sebelum menonaktifkan atau menghapus jabatan.
-- Jangan menyamakan jabatan dengan hak akses; atur kewenangan melalui Profil Akses.
-
-Catatan**:** keberadaan menu dan tombol pada halaman ini mengikuti hak akses akun. Pengguna yang tidak memiliki izin membuat, mengubah, atau menghapus jabatan tidak akan melihat tombol terkait.
+- Jabatan harus dinonaktifkan dulu sebelum bisa dihapus, dan tidak boleh dipakai akun mana pun.
+- Gunakan nama yang konsisten dan hindari jabatan ganda dengan arti sama.
+- Setiap penambahan, perubahan, perubahan status, dan penghapusan jabatan tercatat di Log Aktivitas.

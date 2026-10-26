@@ -1,184 +1,113 @@
 # Halaman Dasbor
 
-> **Untuk apa:** melihat ringkasan cepat kunjungan website dan kesiapan konten (produk, artikel, FAQ, pesan).
-> **Izin yang dibutuhkan:** dashboard.view untuk memuat datanya.
-> **Perlu diperhatikan:** angka bernilai nol bila pencatatan pengunjung belum diaktifkan; "Pesan Hari Ini" mengikuti hari UTC; Dasbor tidak menyediakan unduhan/ekspor.
+> **Untuk apa:** melihat sekilas kunjungan website publik dan kondisi konten (produk, artikel, FAQ, pesan).
+> **Izin yang dibutuhkan:** dashboard.view.
+> **Perlu diperhatikan:** angka kunjungan bernilai nol selama pencatatan pengunjung belum aktif; "Pesan hari ini" dihitung per hari UTC (berganti pukul 07.00 WIB).
 
 ## Gambaran Umum
 
-Halaman Dasbor Operasional merupakan halaman utama yang menyajikan ringkasan aktivitas website publik MATEX dan kondisi pengelolaan konten dalam satu tampilan.
+Dasbor adalah halaman pertama setelah login. Isinya ringkasan trafik website publik matexindo.com dan pintasan ke konten yang perlu diurus. Semua angka di halaman ini hanya untuk perusahaan akun Anda.
 
-Halaman ini dirancang untuk membantu pengguna memantau trafik pengunjung, memahami minat pengunjung terhadap halaman website, melihat sumber kedatangan trafik, serta mengidentifikasi hal-hal yang perlu diperhatikan dalam pengelolaan konten.
+Data diperbarui otomatis setiap 30 detik di latar belakang tanpa tanda memuat. Untuk pemeriksaan lebih rinci gunakan halaman **Analitik Publik**.
 
-Halaman Dasbor dapat diakses melalui alamat berikut:
+URL: https://internal.matexindo.com/dashboard
 
-**URL:** https://internal.matexindo.com/dashboard
+## Rentang Waktu dan Tombol
 
-Pada versi 1.0.10, informasi yang ditampilkan terutama berfokus pada pemantauan website publik dan analisis awal yang mendukung evaluasi SEO serta aktivitas digital MATEX. Angka yang ditampilkan bersifat dinamis dan dapat berubah sesuai dengan data yang tercatat pada sistem, rentang waktu yang dipilih, serta waktu pembaruan data.
+Tombol di kanan atas mengatur periode data dan memuat ulang halaman.
 
-## Filter Periode dan Tombol Aksi
+### 7, 30, dan 90 hari
 
-Pada bagian atas Dasbor terdapat pilihan rentang waktu dan tombol aksi untuk membantu pengguna mengatur serta memperbarui informasi yang ditampilkan.
+Memilih periode kartu, grafik, halaman teratas, dan sumber trafik: 7, 30, atau 90 hari terakhir termasuk hari ini. Bawaannya 30 hari.
 
-### Filter Periode
+Mengganti periode langsung memuat data baru dan tidak memakai jeda tombol Perbarui. Bagian Kesiapan Konten tidak terpengaruh periode.
 
-Tersedia tiga pilihan rentang waktu:
+### Perbarui
 
-- **7 Hari:** menampilkan ringkasan data dalam rentang tujuh hari.
-- **30 Hari:** menampilkan ringkasan data dalam rentang tiga puluh hari.
-- **90 Hari:** menampilkan ringkasan data dalam rentang sembilan puluh hari.
+Memuat ulang semua data dasbor sekarang juga. Saat memuat ikonnya berputar; setelah itu tombol nonaktif dan menampilkan hitung mundur 2 menit sebelum bisa ditekan lagi.
 
-Filter periode digunakan untuk meninjau aktivitas website dalam rentang waktu yang berbeda. Pengguna dapat membandingkan kondisi trafik dan minat pengunjung secara umum berdasarkan periode yang dipilih.
+Jeda ini tetap berjalan walaupun Anda pindah halaman atau memuat ulang browser, supaya server tidak dibebani permintaan beruntun. Tanpa menekan tombol ini pun dasbor tetap diperbarui otomatis setiap 30 detik.
 
-### Tombol Perbarui
+### Analitik lengkap
 
-Tombol Perbarui memuat ulang seluruh data Dasbor. Selama proses berjalan, ikon berputar dan tombol tidak dapat ditekan. Dasbor tidak menyediakan tombol unduh atau ekspor.
+Membuka halaman Analitik Publik, yang memuat data kunjungan lebih rinci (performa halaman, formulir kontak, negara pengunjung).
 
-Apabila data belum mencerminkan aktivitas terkini, tekan tombol ini untuk meminta data kembali. Hasilnya tetap bergantung pada data yang tercatat pada saat permintaan dilakukan.
+## Kartu Ringkasan
 
-### Tombol Analitik Lengkap
+Lima kartu di bagian atas menunjukkan angka utama kunjungan pada periode terpilih. Kartu hanya informasi, tidak bisa diklik.
 
-Tombol **Analitik Lengkap** mengarahkan pengguna ke halaman Analitik Publik untuk melihat informasi analitik yang disediakan secara lebih terperinci.
+### Aktif sekarang
 
-URL: https://internal.matexindo.com/public-analytics
+Jumlah pengunjung yang membuka halaman dalam 5 menit terakhir, tidak terpengaruh pilihan periode.
 
-Dasbor digunakan untuk memperoleh gambaran umum secara cepat, sedangkan halaman Analitik Publik digunakan ketika pengguna memerlukan pemeriksaan lebih lanjut terhadap data aktivitas website.
+### Pengunjung
 
-## Kartu Ringkasan Operasional
+Jumlah sesi pengunjung anonim yang membuka paling sedikit satu halaman pada periode terpilih.
 
-Pada bagian atas Dasbor terdapat lima kartu ringkasan yang menyajikan indikator utama aktivitas website. Kartu-kartu ini berfungsi sebagai informasi visual untuk membantu pengguna memahami kondisi website secara cepat dan tidak dapat diklik untuk membuka halaman lain.
+Sesi adalah nomor acak yang disimpan di tab browser dan hilang saat tab ditutup, jadi orang yang sama dapat terhitung lebih dari sekali bila membuka tab baru atau kembali di lain waktu. Sistem tidak menyimpan alamat IP mentah atau identitas pengunjung.
 
-Indikator yang ditampilkan meliputi:
+### Page view
 
-- **Aktif Sekarang:** menunjukkan aktivitas pengunjung yang terdeteksi dalam lima menit terakhir.
-- **Pengunjung:** menunjukkan jumlah sesi pengunjung anonim dalam rentang waktu yang dipilih.
-- **Page View:** menunjukkan jumlah tampilan halaman yang tercatat selama rentang waktu yang dipilih.
-- **Klik Keluar:** menunjukkan jumlah klik pada tautan eksternal, termasuk tautan menuju marketplace atau kanal lain di luar website MATEX.
-- **Pesan Terkirim:** jumlah pengiriman formulir kontak yang tercatat oleh sistem analitik (bukan jumlah baris pada tabel pesan). Teks di bawah angka berbentuk "N% dari form yang mulai diisi", yaitu pesan terkirim dibagi formulir yang mulai diisi. Angka ini dapat berbeda dari "Pesan Hari Ini" karena sumber dan periodenya berbeda, dan akan nol bila pencatatan pengunjung belum aktif.
+Jumlah halaman yang dibuka pada periode terpilih. Satu pengunjung yang membuka lima halaman menghasilkan lima page view.
 
-Nilai pada setiap kartu bersifat dinamis dan dapat berubah mengikuti aktivitas website, rentang waktu yang dipilih, serta data yang berhasil dicatat oleh sistem.
+### Klik keluar
 
-## Grafik Trafik Publik: Pengunjung dan Page View
+Jumlah klik pada tautan yang keluar dari website, misalnya tombol beli ke marketplace atau tautan media sosial.
 
-Di bawah kartu ringkasan terdapat grafik **Pengunjung dan Page View** yang menggambarkan aktivitas website publik selama periode yang dipilih.
+### Pesan terkirim
 
-Grafik ini menggunakan dua indikator:
+Jumlah formulir kontak yang berhasil dikirim menurut pencatatan pengunjung pada periode terpilih. Persentase di bawahnya adalah pesan terkirim dibagi formulir yang mulai diisi.
 
-- **Batang kuning-oranye — Page View:** menunjukkan jumlah halaman yang dibuka.
-- **Batang biru keabuan — Pengunjung:** menunjukkan jumlah sesi pengunjung yang tercatat. Bila ragu, lihat legenda warna pada grafik.
+Angka ini dapat berbeda dari "Pesan hari ini" di Kesiapan Konten, karena sumbernya berbeda (pencatatan pengunjung, bukan data pesan) dan periodenya juga berbeda.
 
-Melalui grafik tersebut, pengguna dapat mengamati perubahan aktivitas website dari waktu ke waktu, termasuk periode dengan peningkatan atau penurunan trafik.
+## Grafik Pengunjung dan Page View
 
-Sebagai contoh, peningkatan page view dapat menunjukkan bertambahnya aktivitas penjelajahan halaman. Namun, peningkatan tersebut tidak selalu berarti jumlah pengunjung baru bertambah dalam proporsi yang sama karena satu pengunjung dapat membuka beberapa halaman dalam satu sesi.
+Grafik batang harian untuk periode terpilih: batang kuning-oranye untuk page view, batang biru keabuan untuk pengunjung. Arahkan kursor ke kolom untuk melihat tanggal dan jumlah page view.
 
-Seluruh Dasbor (kartu, kesiapan konten, dan tabel) diperbarui otomatis setiap 30 detik di latar belakang, tanpa indikator pemuatan. Pada kaki grafik tertulis "Otomatis diperbarui setiap 30 detik" dan "Terakhir masuk: tanggal dan jam" (waktu event terakhir) atau "belum ada event". Interval tersebut tidak menjamin bahwa seluruh data sumber sudah berubah pada setiap siklus.
+Kaki grafik menampilkan "Terakhir masuk", yaitu waktu data kunjungan terakhir yang diterima, atau "belum ada event" bila belum ada sama sekali. Tanggal dihitung per hari UTC.
 
-Apabila pengguna memerlukan informasi yang lebih terkini, tombol **Perbarui** dapat digunakan untuk meminta pengambilan data kembali.
+## Kesiapan Konten
 
-## Kesiapan Konten — Yang Perlu Diperhatikan
-
-Bagian **Kesiapan Konten** menyajikan ringkasan kondisi konten yang dikelola melalui platform internal. Bagian ini membantu pengguna memantau jumlah produk, artikel, FAQ aktif, dan pesan yang diterima melalui formulir kontak publik.
-
-Pada versi 1.0.10, bagian ini menampilkan empat indikator berikut.
+Ringkasan jumlah konten yang dikelola di panel admin, tidak terpengaruh pilihan periode. Klik salah satu baris untuk membuka halaman pengelolaannya.
 
 ### Produk
 
-Angka besar menunjukkan total produk yang belum dihapus; teks di bawahnya merinci jumlah yang terbit dan yang berstatus draft ("X terbit · Y draft").
+Angka besar adalah semua produk yang belum dihapus, termasuk yang diarsipkan. Teks di bawahnya merinci jumlah yang terbit dan yang masih draft.
 
-Contoh data saat dokumentasi dibuat:
-
-- 53 produk terbit.
-- 0 produk berstatus draft.
-
-Informasi ini membantu pengguna memantau jumlah produk yang sudah tersedia pada katalog publik dan mengidentifikasi produk yang masih memerlukan penyelesaian sebelum diterbitkan.
-
-Tautan terkait: Pengelolaan Produk
+Hanya produk berstatus terbit yang tampil di katalog website. Baris ini membuka halaman Produk.
 
 ### Artikel
 
-Angka besar menunjukkan total artikel yang belum dihapus; teks di bawahnya berbentuk "X terbit · Y perlu ditinjau". Yang dihitung "perlu ditinjau" adalah artikel berstatus draf dan terjadwal.
+Angka besar adalah semua artikel yang belum dihapus. "Perlu ditinjau" menghitung artikel berstatus draf dan terjadwal.
 
-Contoh data saat dokumentasi dibuat:
+Baris ini membuka halaman Artikel.
 
-- 4 artikel terbit.
-- 0 artikel perlu ditinjau.
+### FAQ aktif
 
-Informasi ini dapat digunakan untuk memantau aktivitas publikasi dan mengidentifikasi artikel yang masih memerlukan pemeriksaan atau tindak lanjut.
+Jumlah pertanyaan FAQ yang aktif dan tampil di website. Baris ini membuka halaman FAQ.
 
-Tautan terkait: Pengelolaan Artikel
+### Pesan hari ini
 
-### FAQ Aktif
+Jumlah pesan formulir kontak website yang diterima sejak awal hari ini menurut waktu UTC (pukul 07.00 WIB).
 
-Menampilkan jumlah FAQ aktif yang tersedia untuk membantu menjawab pertanyaan pengunjung website publik.
+Pesan juga dikirim ke email resmi perusahaan; isi pesan dan balasannya diurus lewat email. Baris ini membuka halaman Pengaturan Kontak.
 
-FAQ yang dikelola dengan baik dapat membantu pengunjung memperoleh informasi dasar mengenai MATEX dan produknya tanpa harus selalu menghubungi pihak internal.
+## Halaman Teratas
 
-Tautan terkait: Pengelolaan FAQ
+Sepuluh halaman website yang paling banyak dibuka pada periode terpilih, diurutkan menurut page view.
 
-### Pesan Hari Ini
+Kolom **Pengunjung** menghitung sesi yang membuka halaman itu, kolom **View** menghitung berapa kali halaman dibuka. Alamat halaman yang terlalu panjang dipotong dengan "…"; arahkan kursor untuk melihat alamat lengkapnya.
 
-Menampilkan jumlah pesan yang diterima melalui formulir kontak pada website publik MATEX (https://matexindo.com/kontak) pada hari ini. Hari dihitung menurut tanggal UTC sehingga hitungannya berganti pukul 07.00 WIB, bukan tengah malam WIB.
+## Sumber Trafik
 
-Formulir tersebut digunakan oleh pengunjung untuk mengirimkan pertanyaan, permintaan informasi, maupun pesan terkait MATEX. Informasi yang dapat dikirimkan melalui formulir meliputi:
+Sepuluh situs asal pengunjung terbanyak pada periode terpilih, diurutkan menurut page view. Angka di kanan adalah page view dari sumber itu, bukan jumlah orang.
 
-- Nama pengirim (wajib diisi).
-- Email pengirim. Salah satu dari email atau nomor telepon wajib diisi.
-- Nomor telepon.
-- Topik pesan. Pilihan bawaan adalah Informasi Produk, Penawaran & Pembelian, Kemitraan & Kerja Sama, serta Lainnya; daftar ini dapat diubah melalui halaman Pengaturan Kontak.
-- Isi pesan atau penjelasan mengenai kebutuhan pengirim (wajib diisi).
-- Persetujuan penggunaan data untuk keperluan menanggapi pesan (wajib disetujui).
+**Direct** berarti tidak ada informasi asal, misalnya alamat diketik langsung, dibuka dari aplikasi pesan, atau browser menyembunyikan asalnya. Sumber lain tampil sebagai nama domain apa adanya (misalnya www.google.com), tanpa dikelompokkan.
 
-Pesan yang berhasil dikirim melalui formulir tersebut akan diteruskan ke email resmi, yaitu **info@matexindo.com**, dengan **formcontact@matexindo.com** sebagai alamat pengirim email.
+## Membaca Angka Dasbor
 
-Oleh karena itu, pengguna yang bertanggung jawab menangani komunikasi dan pertanyaan dari calon pelanggan diharapkan memeriksa kotak masuk email info@matexindo.com secara berkala, termasuk folder spam atau junk. Setiap pesan juga disimpan oleh sistem dengan nomor referensi MSG-<nomor>; bila pengiriman email gagal, pesan tetap tersimpan tetapi emailnya tidak terkirim. Pengiriman dari satu alamat IP dibatasi 5 kali per 15 menit.
-
-Indikator pada Dasbor berfungsi sebagai ringkasan jumlah pesan yang tercatat oleh sistem, sedangkan pemeriksaan isi pesan dan tindak lanjut kepada pengirim dilakukan melalui email.
-
-Setiap indikator pada bagian Kesiapan Konten dapat digunakan sebagai pintasan menuju halaman pengelolaan terkait. Dengan demikian, pengguna dapat beralih dari ringkasan Dasbor ke halaman yang diperlukan tanpa harus mencari menu tersebut secara manual melalui Sidebar.
-
-Nilai yang ditampilkan pada bagian ini bersifat dinamis dan dapat berubah ketika data produk, artikel, FAQ, atau pesan diperbarui.
-
-## Minat Pengunjung — Halaman Teratas
-
-Bagian **Minat Pengunjung** menampilkan daftar halaman website yang memiliki aktivitas kunjungan tertinggi berdasarkan data analitik yang tersedia.
-
-Informasi disajikan dalam bentuk tabel dengan tiga kolom utama:
-
-- **Halaman:** menunjukkan alamat atau rute halaman website yang tercatat.
-- **Pengunjung:** menunjukkan jumlah sesi pengunjung yang berkaitan dengan halaman tersebut sesuai perhitungan sistem.
-- **View:** menunjukkan jumlah tampilan halaman (page view) yang tercatat.
-
-Bagian ini membantu pengguna memahami halaman yang paling banyak diakses oleh pengunjung. Informasi tersebut dapat digunakan sebagai bahan evaluasi untuk menentukan konten yang perlu dipertahankan, diperbarui, atau dikembangkan lebih lanjut.
-
-Sebagai contoh, apabila halaman katalog memperoleh aktivitas kunjungan yang tinggi, pengguna dapat mengevaluasi kelengkapan informasi produk, struktur kategori, dan kemudahan navigasi menuju halaman detail produk.
-
-Data halaman teratas tidak secara langsung menunjukkan jumlah transaksi atau keberhasilan penjualan. Penilaian terhadap hasil bisnis memerlukan indikator tambahan yang sesuai dengan proses penjualan MATEX.
-
-## Akuisisi — Sumber Trafik
-
-Bagian **Akuisisi** menampilkan sumber trafik yang mengarahkan pengunjung ke website MATEX berdasarkan informasi yang berhasil dicatat oleh sistem.
-
-Sumber trafik ditampilkan sebagai nama situs asal pengunjung (domain perujuk), maksimal 10 sumber teratas, diurutkan menurut jumlah page view. Angka di samping nama sumber adalah jumlah page view dari sumber itu, bukan jumlah orang.
-
-- **Direct:** kunjungan tanpa informasi asal, misalnya mengetik alamat langsung, membuka dari aplikasi pesan, atau informasi asal diblokir browser.
-- Nama situs perujuk, termasuk mesin pencari dan media sosial, muncul apa adanya sebagai nama domain (misalnya www.google.com). Sistem tidak mengelompokkannya ke kategori seperti "Mesin pencari" atau "Media sosial".
-- **Domain atau situs perujuk lainnya:** kunjungan yang terdeteksi berasal dari domain lain, termasuk perpindahan dari halaman atau situs yang merujuk ke website MATEX.
-
-Informasi sumber trafik dapat digunakan untuk memahami asal kunjungan dan menjadi bahan evaluasi terhadap aktivitas publikasi, navigasi website, serta strategi pemasaran digital.
-
-Pengguna perlu memahami bahwa klasifikasi sumber trafik bergantung pada mekanisme pencatatan yang diterapkan. Oleh karena itu, data tersebut sebaiknya dibaca sebagai indikator analitik dan tidak selalu dapat digunakan untuk menyimpulkan keseluruhan sumber kunjungan secara mutlak.
-
-## Pembaruan dan Interpretasi Data Dasbor
-
-Data pada Dasbor bersifat dinamis dan dapat berubah mengikuti aktivitas website serta proses pencatatan dan pengambilan data oleh sistem.
-
-Pembaruan dapat berlangsung secara otomatis sesuai mekanisme yang diterapkan pada setiap komponen. Namun, dalam kondisi tertentu, data terbaru mungkin belum langsung terlihat karena keterlambatan pencatatan, pemrosesan, atau pengambilan data dari sumbernya.
-
-Apabila informasi yang ditampilkan belum mencerminkan kondisi terbaru, pengguna dapat memilih rentang waktu yang sesuai, menekan tombol **Perbarui**, atau memuat ulang halaman apabila diperlukan.
-
-Pengguna juga perlu memahami bahwa data analitik merupakan indikator pendukung pengambilan keputusan, bukan kesimpulan bisnis yang berdiri sendiri. Perubahan trafik, tampilan halaman, atau klik tautan eksternal perlu ditafsirkan berdasarkan konteks aktivitas pemasaran, publikasi konten, dan kebutuhan bisnis MATEX.
-
-- **Pita informasi "Pencatatan pengunjung belum diaktifkan".** Bila pita ini muncul, angka akan nol karena pencatatan pengunjung belum dinyalakan di server. Ini bukan kerusakan.
-- **Pesan "Data belum termuat"** dengan tombol **Coba lagi** muncul bila server tidak dapat dihubungi atau akun tidak memiliki izin dashboard.view.
-- **Bahasa.** Teks Dasbor selalu Bahasa Indonesia walaupun bahasa panel diganti ke English.
-- **Batas hari.** Rentang tanggal dihitung dari browser, sedangkan server memotong data per hari UTC; batas hari dapat bergeser sekitar 7 jam dari waktu WIB.
+- Pita **Pencatatan pengunjung belum diaktifkan** berarti pencatatan kunjungan masih dimatikan di server, sehingga angka kunjungan nol. Ini bukan kerusakan.
+- Pesan **Data belum termuat** dengan tombol **Coba lagi** muncul bila server tidak dapat dihubungi atau akun tidak memiliki izin dashboard.view.
+- Rentang tanggal dihitung dari browser, sedangkan server memotong data per hari UTC, sehingga batas hari dapat bergeser sekitar 7 jam dari WIB.
+- Teks dasbor selalu berbahasa Indonesia walaupun bahasa panel diganti ke English.
+- Angka kunjungan adalah indikator, bukan laporan penjualan; baca bersama kegiatan pemasaran dan publikasi yang sedang berjalan.

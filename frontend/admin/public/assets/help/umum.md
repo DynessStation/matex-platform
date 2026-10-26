@@ -178,6 +178,70 @@ Menu **Media** digunakan untuk mengakses Media Library, yaitu fasilitas pengelol
 
 URL: https://internal.matexindo.com/media
 
+## Tabel Daftar
+
+Semua halaman daftar (Akun Admin, Jabatan, Produk, FAQ, dan lainnya) memakai tabel yang sama, jadi cara memakainya sama di setiap halaman.
+
+### Jumlah per halaman
+
+Kotak angka di kiri atas tabel (15, 25, 50, atau 100) mengatur berapa baris yang tampil per halaman. Mengganti angkanya kembali ke halaman 1.
+
+### Cari
+
+Ketik kata kunci di kotak **Cari**; daftar menyaring otomatis setelah Anda berhenti mengetik sebentar. Kolom yang dicari berbeda per halaman, misalnya nama dan email di Akun Admin, nama dan SKU di Produk.
+
+### Muat ulang
+
+Ikon panah melingkar memuat ulang daftar dengan pencarian, urutan, dan halaman yang sama. Setelah dipakai, tombol beristirahat 3 detik.
+
+### Muat ulang dari awal
+
+Ikon di sebelahnya menghapus pencarian, urutan, filter tanggal, dan jumlah per halaman, lalu memuat halaman 1. Juga beristirahat 3 detik setelah dipakai.
+
+### Impor dan unduh
+
+Dua ikon terakhir disiapkan untuk impor dan unduh data, tetapi belum aktif (segera hadir).
+
+### Urutkan kolom
+
+Tombol panah kecil di samping judul kolom mengurutkan daftar menurut kolom itu; tekan lagi untuk membalik urutan. Hanya kolom yang punya tombol ini yang bisa diurutkan.
+
+### Pengaturan tabel
+
+Ikon roda gigi di ujung kanan judul kolom berisi tiga pilihan tampilan yang tersimpan untuk akun Anda di browser ini: **Tampilkan teks penuh** (sel tidak dipotong setelah dua baris), **Sembunyikan tombol urut**, dan **Warna baris selang-seling**.
+
+### Menu aksi
+
+Tombol tiga titik di ujung baris membuka tindakan untuk baris itu, misalnya Edit, Nonaktifkan, atau Hapus. Pilihan yang tampil mengikuti hak akses akun Anda dan status data. Menu terbuka di samping tombol, jadi tombol baris berikutnya tetap bisa diklik langsung.
+
+### Teks terpotong
+
+Isi sel paling banyak dua baris dan hanya pindah baris di antara kata. Teks yang tidak muat diakhiri "…"; arahkan kursor ke teks itu untuk melihat isi lengkapnya.
+
+### Ringkasan di bawah tabel
+
+"Menampilkan x dari y data" membandingkan jumlah hasil pencarian dengan seluruh data, diikuti lama pemuatan terakhir dalam detik. Di kanan ada tombol halaman.
+
+## Tombol Bantu
+
+Beberapa tombol kecil tersedia di semua halaman untuk membantu memakai panel.
+
+### Tanda tanya (?)
+
+Ikon ? di samping judul, kartu, atau kolom isian menampilkan penjelasan singkat. Arahkan kursor untuk melihatnya sebentar, atau klik supaya tetap terbuka sampai Anda mengklik di tempat lain atau menekan Esc. **Selengkapnya** membuka panduan di bagian yang sama.
+
+### Panduan
+
+Ikon ? di Header membuka panel panduan halaman yang sedang dibuka di sisi kanan. Daftar "Di halaman ini" melompat ke bagian yang diklik, dan kotak pilihan di atas membuka panduan halaman lain. Panel tetap terbuka saat Anda bekerja dan pindah halaman; tutup dengan tombol × atau Esc.
+
+### Kembali
+
+Tombol **Kembali** di kepala formulir membuka daftar asalnya dengan pencarian, urutan, dan halaman terakhir yang Anda tinggalkan.
+
+### Pratinjau gambar
+
+Arahkan kursor ke gambar lalu klik ikon mata untuk melihatnya penuh di layar. Kumpulan gambar bisa digeser dengan panah kiri dan kanan. Tutup dengan Esc, klik area gelap, atau tombol ×.
+
 ## Ketentuan Tampilan Menu dan Hak Akses Pengguna
 
 Tidak semua pengguna akan melihat susunan Sidebar yang sama. Menu yang ditampilkan dan tindakan yang dapat dilakukan ditentukan berdasarkan profil akses serta hak akses yang diberikan kepada akun pengguna.

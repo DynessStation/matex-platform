@@ -5,6 +5,7 @@
 <app-form-fields
   [label]="'admin_account.profile_photo' | translate"
   [for]="'id_profile_photo'"
+  help="formulir-akun-admin--foto-profil"
 >
   <app-image-upload
     [image]="account.profilePhoto"
@@ -27,6 +28,7 @@
 <app-form-fields
   [label]="'admin_account.name' | translate"
   [for]="'name'"
+  help="formulir-akun-admin--nama"
   [required]="true"
 >
   <input
@@ -69,6 +71,7 @@
 <app-form-fields
   [label]="'admin_account.alias' | translate"
   [for]="'alias'"
+  help="formulir-akun-admin--alias"
   [required]="true"
 >
   <input

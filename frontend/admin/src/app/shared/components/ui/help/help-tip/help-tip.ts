@@ -13,7 +13,7 @@ import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { HelpService } from '../../../../services/help.service';
-import { HelpGuide } from '../help.util';
+import { HelpGuide, helpTipFor } from '../help.util';
 
 // The "?" help tip (U-4): a short note from the page guide, shown while hovered or
 // kept open by a click until a click outside; "Selengkapnya" opens the help drawer at
@@ -23,6 +23,9 @@ import { HelpGuide } from '../help.util';
   imports: [NgbPopover, TranslateModule],
   templateUrl: './help-tip.html',
   host: {
+    // The anchor and guide, readable from the page (the help spec checks them).
+    '[attr.data-anchor]': 'section() || null',
+    '[attr.data-guide]': 'page() || null',
     '(document:click)': 'onDocumentClick($event)',
     '(document:keydown.escape)': 'popover()?.close()',
   },
@@ -173,10 +176,6 @@ export class HelpTip {
   }
 
   private noteFrom(guide: HelpGuide): string {
-    const section = this.section()
-      ? guide.sections.find((item) => item.id === this.section())
-      : undefined;
-
-    return section?.tip || guide.tip;
+    return (this.section() && helpTipFor(guide, this.section())) || guide.tip;
   }
 }

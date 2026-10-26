@@ -30,6 +30,10 @@
           [loading]="loading()"
           (refresh)="load()"
         />
+        <app-help-tip
+          page="public-analytics"
+          section="rentang-waktu-dan-tombol"
+        />
       </div>
     </header>
 
@@ -70,7 +74,13 @@
         <article class="metric-card metric-card-live">
           <i class="ri-pulse-line" aria-hidden="true"></i>
           <div>
-            <span>Aktif sekarang</span>
+            <span>
+              Aktif sekarang
+              <app-help-tip
+                page="public-analytics"
+                section="kartu-ringkasan--aktif-sekarang"
+              />
+            </span>
             <strong>{{ data.totals.active_visitors | number: '1.0-0' }}</strong>
             <small>Terlihat dalam 5 menit terakhir</small>
           </div>
@@ -78,7 +88,13 @@
         <article class="metric-card metric-card-primary">
           <i class="ri-user-3-line" aria-hidden="true"></i>
           <div>
-            <span>Pengunjung</span>
+            <span>
+              Pengunjung
+              <app-help-tip
+                page="public-analytics"
+                section="kartu-ringkasan--pengunjung"
+              />
+            </span>
             <strong>{{ data.totals.visitors | number: '1.0-0' }}</strong>
             <small>Sesi anonim unik</small>
           </div>
@@ -86,7 +102,13 @@
         <article class="metric-card">
           <i class="ri-eye-line" aria-hidden="true"></i>
           <div>
-            <span>Page view</span>
+            <span>
+              Page view
+              <app-help-tip
+                page="public-analytics"
+                section="kartu-ringkasan--page-view"
+              />
+            </span>
             <strong>{{ data.totals.page_views | number: '1.0-0' }}</strong>
             <small>Total halaman dibuka</small>
           </div>
@@ -94,7 +116,13 @@
         <article class="metric-card">
           <i class="ri-cursor-line" aria-hidden="true"></i>
           <div>
-            <span>Klik keluar</span>
+            <span>
+              Klik keluar
+              <app-help-tip
+                page="public-analytics"
+                section="kartu-ringkasan--klik-keluar"
+              />
+            </span>
             <strong>{{ data.totals.outbound_clicks | number: '1.0-0' }}</strong>
             <small>Marketplace dan tautan luar</small>
           </div>
@@ -102,7 +130,13 @@
         <article class="metric-card">
           <i class="ri-mail-send-line" aria-hidden="true"></i>
           <div>
-            <span>Pesan terkirim</span>
+            <span>
+              Pesan terkirim
+              <app-help-tip
+                page="public-analytics"
+                section="kartu-ringkasan--pesan-terkirim"
+              />
+            </span>
             <strong>{{
               data.totals.contact_submissions | number: '1.0-0'
             }}</strong>
@@ -180,10 +214,7 @@
             <span>Pengalaman pengguna nyata</span>
             <h2>
               Core Web Vitals
-              <app-help-tip
-                page="public-analytics"
-                section="pengalaman-pengguna-nyata-core-web-vitals"
-              />
+              <app-help-tip page="public-analytics" section="core-web-vitals" />
             </h2>
           </div>
           <small>Rata-rata dari browser pengunjung pada rentang terpilih</small>
@@ -193,7 +224,13 @@
             @for (metric of data.performance; track metric.metric) {
               <div class="performance-card">
                 <header>
-                  <span>{{ metric.metric }}</span>
+                  <span>
+                    {{ metric.metric }}
+                    <app-help-tip
+                      page="public-analytics"
+                      [section]="vitalAnchor(metric.metric)"
+                    />
+                  </span>
                   <small>{{ metric.samples }} sampel</small>
                 </header>
                 <strong>{{
@@ -234,14 +271,26 @@
           </header>
           <div class="funnel">
             <div class="funnel-step funnel-start">
-              <span>Mulai mengisi</span>
+              <span>
+                Mulai mengisi
+                <app-help-tip
+                  page="public-analytics"
+                  section="funnel-kontak--mulai-mengisi"
+                />
+              </span>
               <strong>{{
                 data.totals.contact_starts | number: '1.0-0'
               }}</strong>
             </div>
             <i class="ri-arrow-down-line" aria-hidden="true"></i>
             <div class="funnel-step funnel-submit">
-              <span>Berhasil terkirim</span>
+              <span>
+                Berhasil terkirim
+                <app-help-tip
+                  page="public-analytics"
+                  section="funnel-kontak--berhasil-terkirim"
+                />
+              </span>
               <strong>{{
                 data.totals.contact_submissions | number: '1.0-0'
               }}</strong>
@@ -249,7 +298,13 @@
           </div>
           <div class="conversion-summary">
             <strong>{{ contactConversion() }}%</strong>
-            <span>rasio penyelesaian form</span>
+            <span>
+              rasio penyelesaian form
+              <app-help-tip
+                page="public-analytics"
+                section="funnel-kontak--rasio-penyelesaian-form"
+              />
+            </span>
           </div>
         </article>
 
@@ -259,10 +314,7 @@
               <span>Akuisisi</span>
               <h2>
                 Sumber trafik
-                <app-help-tip
-                  page="public-analytics"
-                  section="akuisisi-sumber-trafik"
-                />
+                <app-help-tip page="public-analytics" section="sumber-trafik" />
               </h2>
             </div>
           </header>
@@ -300,7 +352,7 @@
                 Negara pengunjung
                 <app-help-tip
                   page="public-analytics"
-                  section="lokasi-agregat"
+                  section="negara-pengunjung"
                 />
               </h2>
             </div>
@@ -340,10 +392,7 @@
             <span>Minat pengunjung</span>
             <h2>
               Halaman teratas
-              <app-help-tip
-                page="public-analytics"
-                section="minat-pengunjung-halaman-teratas"
-              />
+              <app-help-tip page="public-analytics" section="halaman-teratas" />
             </h2>
           </div>
           <a routerLink="/dashboard">Kembali ke dasbor</a>

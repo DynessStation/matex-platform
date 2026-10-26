@@ -3,6 +3,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { OfficeFormService } from '../office-form.service';
 
 // General tab (code, name, description) of the office form.
@@ -10,7 +11,7 @@ import { OfficeFormService } from '../office-form.service';
 @Component({
   selector: 'app-office-general-tab',
 
-  imports: [ReactiveFormsModule, TranslateModule],
+  imports: [HelpTip, ReactiveFormsModule, TranslateModule],
 
   templateUrl: './office-general-tab.html',
 

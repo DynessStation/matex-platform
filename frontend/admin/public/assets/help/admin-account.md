@@ -1,151 +1,121 @@
 # Halaman Akun Admin
 
-> **Untuk apa:** membuat dan mengelola akun pengguna yang dapat masuk ke platform internal.
-> **Izin yang dibutuhkan:** admin_account.view, .create, .update, .delete.
-> **Perlu diperhatikan:** berikan Akses Sistem Penuh hanya jika benar-benar perlu; akun harus dinonaktifkan sebelum dihapus; kata sandi tidak bisa diubah dari halaman ini.
+> **Untuk apa:** membuat dan mengelola akun yang dapat masuk ke panel admin.
+> **Izin yang dibutuhkan:** admin_account.view untuk melihat; admin_account.create, admin_account.update, admin_account.delete untuk mengubah.
+> **Perlu diperhatikan:** berikan Akses Sistem Penuh hanya bila benar-benar perlu; akun harus dinonaktifkan sebelum dihapus; kata sandi akun lain tidak bisa diatur ulang dari sini.
 
 ## Gambaran Umum
 
-Halaman **Akun Admin** digunakan untuk mengelola daftar pengguna yang memiliki akun pada platform internal MATEX. Melalui halaman ini, pengguna yang memiliki kewenangan dapat melihat informasi akun, menambahkan akun admin baru, memperbarui data akun, serta menonaktifkan akun yang tidak lagi memerlukan akses ke sistem.
+Halaman ini mengelola semua akun panel admin: identitas, kontak, penempatan (kantor, jabatan), dan profil akses yang menentukan menu serta tindakan yang boleh dilakukan.
 
-Pengelolaan akun perlu dilakukan secara hati-hati karena setiap akun dapat memiliki profil akses dan kewenangan yang berbeda. Pemberian akses harus disesuaikan dengan tanggung jawab masing-masing pengguna agar keamanan sistem dan data perusahaan tetap terjaga.
+Akun baru dibuat atas permintaan kepada admin berwenang; belum ada pendaftaran mandiri. Setiap admin mengubah foto, nama, kontak cadangan, dan kata sandinya sendiri lewat **Profil Saya**.
 
-## Menampilkan dan Mencari Data Admin
+Cara memakai tabel (cari, urutkan, muat ulang, menu aksi) dijelaskan di Panduan umum bagian Tabel Daftar.
 
-Pada halaman ini, tersedia tabel daftar akun admin beserta fitur untuk mempermudah pencarian dan pengelolaan data.
+URL: https://internal.matexindo.com/admin-account
 
-- **Tampilkan:** digunakan untuk mengatur jumlah data yang ditampilkan pada setiap halaman tabel. Pilihan yang tersedia mulai dari 15 hingga 100 item per halaman.
-- **Pencarian:** digunakan untuk menemukan akun berdasarkan nama, alias, email (utama maupun kedua), telepon (utama maupun kedua), atau UUID akun.
+## Daftar Akun Admin
 
-Pengguna dapat memanfaatkan fitur pencarian ketika jumlah akun semakin banyak, sehingga akun yang ingin diperiksa atau dikelola dapat ditemukan dengan lebih cepat.
+Tabel menampilkan akun pada perusahaan Anda; admin yang bukan Akses Sistem Penuh hanya melihat akun di kantornya sendiri. Kotak **Cari** mencari di nama, alias, email, telepon (utama maupun kedua), dan UUID akun. Kolom Nama, Alias, dan Dibuat dapat diurutkan.
 
-## Memahami Tabel Daftar Admin
+### Email dan telepon
 
-Tabel daftar admin menyajikan informasi utama setiap akun yang telah terdaftar, meliputi:
+Tabel hanya menampilkan email dan telepon utama, yang dipakai untuk login. Email yang terlalu panjang dipotong dengan "…"; arahkan kursor untuk melihatnya lengkap. Data kedua hanya terlihat di formulir.
 
-- **Foto, Nama, dan Alias:** foto profil, nama lengkap, dan alias akun (tiga kolom terpisah).
-- **Email dan Telepon:** hanya email utama dan telepon utama yang tampil pada tabel; data kedua hanya terlihat pada formulir.
-- **Kantor serta Jabatan / Posisi:** kantor penempatan dan jabatan pengguna. Tabel tidak memiliki kolom Perusahaan.
-- **Profil Akses:** nama profil akses yang dipakai akun, misalnya Super Admin atau Marketing apabila tersedia.
-- **Status:** Aktif atau Nonaktif (akun yang sudah dihapus tidak tampil).
-- **Dibuat:** tanggal pembuatan akun di dalam sistem.
+### Profil akses
 
-Informasi tersebut membantu pengelola mengidentifikasi pemilik akun, memahami penempatan kerjanya, serta memeriksa status dan tingkat akses yang dimiliki.
+Nama profil akses yang dipakai akun. Profil akses menentukan menu dan tindakan yang boleh dilakukan; nama seperti "Super Admin" tidak memberi kewenangan khusus selain hak yang ada di profil itu.
 
-- Tabel hanya menampilkan akun pada perusahaan dan kantor yang sama dengan Anda; admin kantor lain tidak akan terlihat. Ini bukan kesalahan.
-- Kolom yang dapat diurutkan hanya Nama, Alias, dan Dibuat.
+### Status
 
-## Menambahkan Akun Admin Baru
+Aktif berarti akun bisa dipakai login. Nonaktif berarti akun disimpan tetapi tidak bisa login sampai diaktifkan lagi. Akun yang dihapus tidak tampil.
 
-Pada versi platform saat ini, pembuatan akun admin dilakukan **berdasarkan permintaan kepada admin yang memiliki akses penuh**. Fitur ini tidak ditujukan sebagai registrasi mandiri oleh seluruh pengguna.
+## Formulir Akun Admin
 
-Untuk mengajukan pembuatan akun, pihak yang membutuhkan akses perlu menyampaikan permintaan kepada admin berwenang. Setelah permintaan disetujui dan akun dibuat, data pengguna dapat dikelola melalui halaman Akun Admin.
+Formulir dibuka dari tombol **+ Tambah Akun Admin** atau menu aksi **Edit**. Simpan dengan tombol di bawah formulir; akun baru langsung berstatus Aktif.
 
-Proses pembuatan akun melalui formulir dilakukan dengan langkah-langkah berikut oleh admin yang berwenang:
+### Foto profil
 
-1. Klik tombol **+ Tambah Akun Admin** di bagian kanan atas halaman.
-2. Sistem akan menampilkan formulir **Buat Akun Admin**.
-3. Isi data akun sesuai kebutuhan dan informasi yang benar.
+Foto akun, opsional. Pilih atau unggah gambar JPEG, PNG, atau WebP paling besar 8 MB; gambar otomatis dipotong persegi dan diubah menjadi WebP 512 × 512 piksel.
 
-Data yang perlu diisi meliputi:
+Foto harus berasal dari unggahan yang aktif di perusahaan (dan kantor) yang sama.
 
-  1. Foto Profil
+### Nama
 
-Unggah atau pilih foto profil berformat JPEG, PNG, atau WebP (maksimal 8 MB). Gambar otomatis dipotong dan dikonversi menjadi WebP berukuran 512 × 512 piksel.
+Nama lengkap pemilik akun, wajib, paling banyak 50 karakter. Hanya huruf, spasi, titik, koma, apostrof, dan tanda hubung.
 
-  2. Informasi Personal
+### Alias
 
-Masukkan nama lengkap dan alias pengguna sesuai identitas yang digunakan dalam lingkungan kerja.
+Nama pendek akun, wajib, paling banyak 15 karakter, hanya huruf dan angka tanpa spasi. Alias tampil di Log Aktivitas sebagai pelaku dan tidak boleh sama dengan akun lain.
 
-  3. Informasi Kontak
+### Email utama
 
-Lengkapi alamat email utama sebagai data wajib, serta email kedua apabila diperlukan. Masukkan pula nomor telepon utama dan nomor telepon kedua jika tersedia.
+Alamat email untuk login, wajib dan harus unik di semua akun. Hanya bisa diubah di halaman ini, tidak dari Profil Saya.
 
-  4. Penempatan dan Jabatan
+### Email kedua
 
-Pilih perusahaan atau instansi, kantor, jabatan atau posisi, serta profil akses yang sesuai dengan tanggung jawab pengguna.
+Email cadangan, opsional. Baru bisa diisi setelah email utama valid, dan tidak boleh sama dengan email akun lain.
 
-  5. Pengaturan Keamanan
+### Telepon utama
 
-Atur opsi **Akses Sistem Penuh** hanya apabila benar-benar diperlukan dan telah disetujui oleh pihak yang berwenang.
+Nomor telepon untuk login, wajib dan harus unik. Pilih kode negara (bawaan 62), lalu ketik nomor tanpa angka 0 di depan, misalnya 81234567890.
 
-Masukkan kata sandi dan konfirmasi kata sandi. Ketentuannya: 8–64 karakter, tanpa spasi, dan memuat minimal satu angka atau simbol (kata sandi yang hanya berisi huruf ditolak). Indikator Lemah/Sedang/Kuat membantu menilai kata sandi. Kata sandi hanya diisi saat akun dibuat, disimpan dalam bentuk ter-hash, dan tidak pernah ditampilkan kembali.
+### Telepon kedua
 
-4. Periksa kembali seluruh data yang telah diisi.
-5. Klik tombol **Buat Akun Admin** untuk menyimpan data.
+Nomor cadangan, opsional. Baru bisa diisi setelah telepon utama valid, dengan aturan yang sama.
 
-Setelah proses berhasil, pastikan akun muncul pada daftar admin dan informasi yang tersimpan sudah sesuai.
+### Perusahaan
 
-- **Nama:** wajib, maksimal 50 karakter; hanya huruf, spasi, titik, koma, apostrof, dan tanda hubung.
-- **Alias:** wajib, maksimal 15 karakter, hanya huruf dan angka; tidak boleh sama dengan alias lain.
-- **Email utama:** wajib dan berformat benar; **email kedua** baru dapat diisi setelah email utama valid. Email tidak boleh sama dengan akun lain.
-- **Telepon utama:** wajib. Pilih kode negara (bawaan 62), lalu ketik nomor tanpa angka 0 di depan; **telepon kedua** opsional. Nomor tidak boleh sama dengan akun lain.
-- **Perusahaan, Kantor, Jabatan / Posisi, dan Profil Akses:** semuanya wajib. Pilih Perusahaan lebih dulu; pilihan lainnya baru tersedia dan hanya menampilkan data milik perusahaan itu yang berstatus aktif.
-- Akun baru langsung berstatus **Aktif**. Anda hanya dapat membuat akun pada perusahaan Anda sendiri, dan hanya akun Akses Sistem Penuh yang dapat memberikan Akses Sistem Penuh.
+Perusahaan tempat akun bekerja, wajib dan dipilih paling awal. Anda hanya bisa memilih perusahaan Anda sendiri; pilihan Kantor, Jabatan, dan Profil Akses mengikuti perusahaan ini.
 
-## Mengelola Akun yang Sudah Ada
+### Kantor
 
-Pada kolom **Aksi** di sisi kanan tabel, klik ikon titik tiga (⋮) untuk menampilkan tindakan yang tersedia bagi akun terkait.
+Kantor penempatan akun, wajib. Hanya kantor aktif milik perusahaan terpilih yang ditawarkan. Admin yang bukan Akses Sistem Penuh hanya bisa memakai kantornya sendiri.
+
+### Jabatan / posisi
+
+Jabatan pemilik akun, wajib; hanya label organisasi, tidak memengaruhi hak akses. Daftarnya diatur di halaman Jabatan.
+
+### Profil akses
+
+Kumpulan hak akses yang dipakai akun, wajib. Menentukan menu yang tampil dan tindakan yang boleh dilakukan. Daftarnya diatur di halaman Profil Akses.
+
+### Akses sistem penuh
+
+Penanda yang melewati profil akses dan membuka semua fitur admin tanpa batas, termasuk melihat dan mengelola semua kantor.
+
+Hanya akun yang sendirinya Akses Sistem Penuh yang dapat memberikan atau mencabut penanda ini. Setiap perusahaan harus selalu punya minimal satu akun aktif dengan penanda ini.
+
+### Kata sandi
+
+Kata sandi awal akun, hanya diisi saat membuat akun: 8–64 karakter, tanpa spasi, minimal satu angka atau simbol. Indikator Lemah/Sedang/Kuat membantu menilai kekuatannya.
+
+Kata sandi disimpan ter-hash dan tidak pernah ditampilkan lagi. Pemilik akun bisa menggantinya sendiri lewat Profil Saya.
+
+### Konfirmasi kata sandi
+
+Ulangi kata sandi yang sama persis untuk memastikan tidak salah ketik.
+
+## Mengubah Status dan Menghapus
+
+Tindakan ini ada di menu tiga titik pada baris akun dan hanya tampil bila akun Anda memiliki izinnya.
 
 ### Edit
 
-Digunakan untuk memperbarui data akun yang sudah terdaftar, sesuai kewenangan pengguna yang sedang masuk. Periksa kembali perubahan sebelum menyimpan agar informasi identitas, kontak, penempatan kerja, dan profil akses tetap sesuai.
+Membuka formulir untuk mengubah data akun. Kata sandi tidak ikut diubah dari formulir edit.
 
-### Nonaktifkan
+### Nonaktifkan dan aktifkan
 
-Digunakan untuk menonaktifkan akun yang tidak lagi memerlukan akses ke sistem. Sistem meminta konfirmasi terlebih dahulu. Anda tidak dapat menonaktifkan akun Anda sendiri. Sebelum melakukan tindakan ini, pastikan akun memang tidak diperlukan untuk kegiatan operasional.
-
-Penonaktifan akun perlu dibedakan dari penghapusan. Akun nonaktif tidak dapat dipakai masuk, tetapi datanya tetap tersimpan dan dapat diaktifkan kembali. Penghapusan menyembunyikan akun dari daftar dan tidak dapat dibatalkan dari panel admin; Anda juga tidak dapat menghapus akun Anda sendiri.
-
-### Aktifkan
-
-Menu Aktifkan tampil pada akun yang nonaktif untuk mengembalikan akses akun setelah konfirmasi.
+Nonaktifkan membuat akun tidak bisa login tanpa menghapus datanya; Aktifkan mengembalikannya. Sistem meminta konfirmasi. Anda tidak bisa menonaktifkan akun Anda sendiri.
 
 ### Hapus
 
-Menu Hapus hanya tampil pada akun yang sudah nonaktif dan memerlukan konfirmasi.
+Menghapus akun dari daftar; tidak dapat dibatalkan dari panel. Hanya tersedia untuk akun Nonaktif, dan Anda tidak bisa menghapus akun Anda sendiri.
 
-## Ketentuan Penting dalam Pengelolaan Akun
+## Aturan Penting
 
-### Minimal satu akun Akses Sistem Penuh yang aktif harus tetap tersedia
-
-Sistem menjaga agar di setiap perusahaan selalu ada minimal satu akun aktif bertanda Akses Sistem Penuh. Aturan ini ditegakkan saat akun tersebut dinonaktifkan atau penandanya dicabut melalui Edit. Bila dilanggar, muncul pesan "Minimal satu akun akses penuh yang aktif harus tetap tersedia di perusahaan".
-
-Perhatikan bahwa yang dilindungi adalah penanda Akses Sistem Penuh pada akun, bukan nama profil seperti "Super Admin". Akun tanpa penanda itu tidak dilindungi walaupun profilnya bernama Super Admin.
-
-### Akun tidak dapat langsung dihapus
-
-Akun admin tidak dapat dihapus sebelum dinonaktifkan terlebih dahulu. Dengan demikian, proses pengelolaan akun harus mengikuti urutan dan ketentuan yang berlaku pada sistem.
-
-Sebelum menonaktifkan akun, pastikan tidak ada kebutuhan operasional yang masih bergantung pada akun tersebut.
-
-### Pembuatan akun berdasarkan permintaan
-
-Pada versi platform saat ini, pembuatan akun baru dilakukan melalui permintaan kepada admin yang memiliki akses penuh. Kebijakan ini membantu membatasi pendaftaran akun yang tidak berwenang dan memastikan setiap akun memiliki tujuan penggunaan yang jelas.
-
-### Pengembangan registrasi pada masa mendatang
-
-Apabila kebutuhan bisnis dan kesiapan keamanan memungkinkan, platform dapat dikembangkan dengan modul registrasi akun yang dilengkapi mekanisme otorisasi dan aktivasi terpusat.
-
-Rencana tersebut merupakan kemungkinan pengembangan di masa mendatang, bukan fitur yang sudah tersedia pada versi platform saat ini.
-
-- Akun yang bukan Akses Sistem Penuh tidak boleh mengubah, mengubah status, atau menghapus akun Akses Sistem Penuh.
-- Akun yang bukan Akses Sistem Penuh hanya dapat mengelola akun pada kantornya sendiri.
-- Foto profil harus berasal dari unggahan yang aktif pada lingkup perusahaan dan kantor yang sama.
-- Pembuatan, perubahan, perubahan status, dan penghapusan akun tercatat pada Log Aktivitas (modul admin_account).
-- Halaman ini tidak menyediakan pengaturan ulang kata sandi untuk akun lain; kebutuhan tersebut diarahkan ke developer.
-
-## Praktik Pengelolaan Akun yang Disarankan
-
-Untuk menjaga keamanan dan keteraturan administrasi, perhatikan hal-hal berikut:
-
-- Berikan akun hanya kepada pengguna yang benar-benar membutuhkan akses.
-- Sesuaikan profil akses dengan tanggung jawab masing-masing pengguna.
-- Hindari memberikan akses sistem penuh jika akses yang lebih terbatas sudah mencukupi.
-- Pastikan selalu ada akun Akses Sistem Penuh yang aktif dan dipegang oleh pihak berwenang.
-- Nonaktifkan akun yang sudah tidak diperlukan setelah memastikan tidak mengganggu operasional.
-- Periksa kembali perubahan data dan status akun setelah proses pengelolaan selesai.
-
-Pengelolaan akun yang baik membantu menjaga keamanan platform internal MATEX, membatasi akses yang tidak diperlukan, serta memastikan administrasi sistem tetap dapat dijalankan secara berkelanjutan.
-
-**Kendala yang diketahui (diperbaiki pada versi 1.1):** saat ini hanya akun dengan Akses Sistem Penuh yang dapat membuat, mengubah, dan menghapus akun admin, karena izin admin_account.create, admin_account.update, dan admin_account.delete belum tersedia di sistem. Pada formulir, beberapa kode negara tampil ganda atau tanpa tanda + (misalnya 387 dan 267), dan batas ukuran foto 8 MB belum tertulis di layar. Mohon dimaklumi.
+- Setiap perusahaan harus selalu punya minimal satu akun aktif dengan penanda Akses Sistem Penuh. Bila dilanggar saat menonaktifkan atau mencabut penanda, muncul pesan "Minimal satu akun akses penuh yang aktif harus tetap tersedia di perusahaan". Yang dilindungi adalah penandanya, bukan nama profil seperti "Super Admin".
+- Akun yang bukan Akses Sistem Penuh tidak boleh mengubah, mengubah status, atau menghapus akun Akses Sistem Penuh, dan hanya dapat mengelola akun di kantornya sendiri.
+- Alias, email, dan telepon harus unik di semua akun, termasuk akun yang sudah dihapus.
+- Lupa kata sandi akun lain tidak bisa diatur ulang dari halaman ini; hubungi developer.
+- Pembuatan, perubahan, perubahan status, dan penghapusan akun tercatat di Log Aktivitas (modul admin_account).

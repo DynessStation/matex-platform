@@ -20,20 +20,35 @@ Mengganti foto di halaman ini tidak memerlukan izin Media.
 
 ## Data Diri
 
-Bagian ini memuat isian yang boleh Anda ubah sendiri:
+Bagian ini memuat isian yang boleh Anda ubah sendiri.
 
-- **Nama lengkap** (wajib): huruf, spasi, dan tanda . , ' - dengan panjang paling banyak 50 karakter.
-- **Email cadangan** (opsional): alamat email yang valid dan belum dipakai akun lain.
-- **Telepon cadangan** (opsional): format internasional, misalnya +6281234567890, dan belum dipakai akun lain.
+### Nama lengkap
+
+Nama Anda yang tampil di Header dan Log Aktivitas, wajib: huruf, spasi, dan tanda . , ' - dengan panjang paling banyak 50 karakter.
+
+### Email cadangan
+
+Alamat email kedua, opsional; harus valid dan belum dipakai akun lain. Email untuk login tetap email utama.
+
+### Telepon cadangan
+
+Nomor kedua, opsional, dalam format internasional (misalnya +6281234567890) dan belum dipakai akun lain.
 
 Tekan **Simpan data diri**. Nama baru langsung tampil di Header. Mengosongkan email atau telepon cadangan lalu menyimpan akan menghapusnya.
 
 ## Ganti Kata Sandi
 
-1. Isi **Kata sandi saat ini**.
-2. Isi **Kata sandi baru**: 8 sampai 64 karakter, tanpa spasi, minimal satu angka atau simbol, dan berbeda dari kata sandi saat ini.
-3. Ulangi kata sandi baru di **Ulangi kata sandi baru**.
-4. Tekan **Ganti kata sandi**.
+### Kata sandi saat ini
+
+Kata sandi yang Anda pakai untuk login sekarang, untuk memastikan yang mengganti adalah pemilik akun.
+
+### Kata sandi baru
+
+Kata sandi pengganti: 8 sampai 64 karakter, tanpa spasi, minimal satu angka atau simbol, dan berbeda dari kata sandi saat ini.
+
+### Ulangi kata sandi baru
+
+Ketik ulang kata sandi baru yang sama persis, lalu tekan **Ganti kata sandi**.
 
 Ikon mata di samping kolom menampilkan atau menyembunyikan kata sandi yang diketik.
 

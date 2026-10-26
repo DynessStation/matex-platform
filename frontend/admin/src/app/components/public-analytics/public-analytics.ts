@@ -161,6 +161,17 @@ export class PublicAnalytics {
     return value > 0 ? Math.max(4, (value / maximum) * 100) : 0;
   }
 
+  /** Guide anchor of a Core Web Vitals card (public-analytics.md). */
+  vitalAnchor(metric: 'LCP' | 'INP' | 'CLS'): string {
+    const items = {
+      LCP: 'lcp-kecepatan-konten-utama',
+      INP: 'inp-respons-interaksi',
+      CLS: 'cls-stabilitas-tampilan',
+    };
+
+    return `core-web-vitals--${items[metric]}`;
+  }
+
   metricLabel(metric: 'LCP' | 'INP' | 'CLS'): string {
     if (metric === 'LCP') return 'Kecepatan konten utama';
     if (metric === 'INP') return 'Respons interaksi';

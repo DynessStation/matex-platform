@@ -112,6 +112,7 @@
             <app-form-fields
               [label]="'profile.name' | translate"
               [for]="'profile_name'"
+              help="data-diri--nama-lengkap"
               [required]="true"
             >
               <input
@@ -138,6 +139,7 @@
             <app-form-fields
               [label]="'profile.email_2' | translate"
               [for]="'profile_email_2'"
+              help="data-diri--email-cadangan"
             >
               <input
                 id="profile_email_2"
@@ -160,6 +162,7 @@
             <app-form-fields
               [label]="'profile.phone_2' | translate"
               [for]="'profile_phone_2'"
+              help="data-diri--telepon-cadangan"
             >
               <input
                 id="profile_phone_2"
@@ -226,6 +229,14 @@
                   ) | translate
                 "
                 [for]="'profile_' + field"
+                [help]="
+                  'ganti-kata-sandi--' +
+                  (field === 'current_password'
+                    ? 'kata-sandi-saat-ini'
+                    : field === 'password'
+                      ? 'kata-sandi-baru'
+                      : 'ulangi-kata-sandi-baru')
+                "
                 [required]="true"
               >
                 <div class="input-group profile-password">

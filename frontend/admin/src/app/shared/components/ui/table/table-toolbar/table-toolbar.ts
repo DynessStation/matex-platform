@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { HelpTip } from '../../help/help-tip/help-tip';
 import { TableStateService } from '../table-state.service';
 
 // Top bar of the list table: page size, bulk actions, date range, search, and the
@@ -12,7 +13,7 @@ import { TableStateService } from '../table-state.service';
 @Component({
   selector: 'app-table-toolbar',
 
-  imports: [ReactiveFormsModule, NgbModule, TranslateModule],
+  imports: [ReactiveFormsModule, NgbModule, TranslateModule, HelpTip],
 
   templateUrl: './table-toolbar.html',
 

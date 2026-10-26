@@ -19,6 +19,7 @@
 <app-form-fields
   [label]="'admin_account.primary_email' | translate"
   [for]="'email_1'"
+  help="formulir-akun-admin--email-utama"
   [required]="true"
 >
   <input
@@ -55,6 +56,7 @@
 <app-form-fields
   [label]="'admin_account.secondary_email' | translate"
   [for]="'email_2'"
+  help="formulir-akun-admin--email-kedua"
 >
   <input
     type="email"
@@ -88,6 +90,7 @@
 <app-form-fields
   [label]="'admin_account.primary_phone' | translate"
   [for]="'phone_1'"
+  help="formulir-akun-admin--telepon-utama"
   [required]="true"
 >
   <div class="phone-control-row">
@@ -149,6 +152,7 @@
 <app-form-fields
   [label]="'admin_account.secondary_phone' | translate"
   [for]="'phone_2'"
+  help="formulir-akun-admin--telepon-kedua"
 >
   <div class="phone-control-row">
     @if (account.isBrowser) {
