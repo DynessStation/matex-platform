@@ -1,13 +1,17 @@
-<app-breadcrumb [breadcrumb]="breadcrumb$ | async" />
+@if (missing()) {
+  <app-error-404 />
+} @else {
+  <app-breadcrumb [breadcrumb]="breadcrumb$ | async" />
 
-<section class="section-t-space shop-section">
-  <div class="custom-container">
-    <app-collection-products [filter]="filter"></app-collection-products>
-  </div>
-</section>
+  <section class="section-t-space shop-section">
+    <div class="custom-container">
+      <app-collection-products [filter]="filter"></app-collection-products>
+    </div>
+  </section>
 
-<section class="section-block-space newsletter-section">
-  <div class="custom-container">
-    <app-home-newsletter />
-  </div>
-</section>
+  <section class="section-block-space newsletter-section">
+    <div class="custom-container">
+      <app-home-newsletter />
+    </div>
+  </section>
+}

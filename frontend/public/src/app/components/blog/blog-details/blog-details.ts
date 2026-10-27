@@ -4,26 +4,31 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { IBlog } from '../../../shared/interface/blog.interface';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
+import { resolvedMissing } from '../../../shared/resolver/resolved-missing';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
 import { BlogState } from '../../../shared/store/state/blog.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
+import { Error404 } from '../../page/error-404/error-404';
 import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-blog-details',
-  imports: [Sidebar, HomeNewsletter, Breadcrumb, AsyncPipe, DatePipe],
+  imports: [Sidebar, HomeNewsletter, Breadcrumb, AsyncPipe, DatePipe, Error404],
   templateUrl: './blog-details.html',
   styleUrl: './blog-details.scss',
 })
 export class BlogDetails {
+  // Nothing found by the resolver: show the 404 view (status 404) instead.
+  readonly missing = resolvedMissing();
+
   private route = inject(ActivatedRoute);
   private navigation = inject(PublicNavigationContextService);
   private seo = inject(PublicSeoService);
@@ -47,21 +52,24 @@ export class BlogDetails {
   }
 
   constructor() {
-    this.blog$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((blog) => {
-      if (!blog) return;
-      this.breadcrumb = {
-        title: blog.title,
-        items: [
-          {
-            label: this.articleLabel,
-            url: this.locale === 'en-US' ? '/en/articles' : '/artikel',
-            active: false,
-          },
-          { label: blog.title, active: true },
-        ],
-      };
-      this.applySeo(blog);
-    });
+    // Route data too: the article may load before the resolver's answer reaches the route.
+    combineLatest([this.blog$, this.route.data])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([blog, data]) => {
+        if (!blog || data['data'] === false) return;
+        this.breadcrumb = {
+          title: blog.title,
+          items: [
+            {
+              label: this.articleLabel,
+              url: this.locale === 'en-US' ? '/en/articles' : '/artikel',
+              active: false,
+            },
+            { label: blog.title, active: true },
+          ],
+        };
+        this.applySeo(blog);
+      });
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       if (params['sidebar']) {

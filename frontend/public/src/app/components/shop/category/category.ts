@@ -10,6 +10,7 @@ import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { ICategory } from '../../../shared/interface/category.interface';
 import { Params } from '../../../shared/interface/core.interface';
 import { ProductModel } from '../../../shared/interface/product.interface';
+import { resolvedMissing } from '../../../shared/resolver/resolved-missing';
 import { LayoutService } from '../../../shared/services/layout.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
@@ -17,15 +18,19 @@ import { GetProducts } from '../../../shared/store/action/product.action';
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { HomeNewsletter } from '../../home/widgets/home-newsletter/home-newsletter';
+import { Error404 } from '../../page/error-404/error-404';
 import { CollectionProducts } from '../collection/widgets/collection-products/collection-products';
 
 @Component({
   selector: 'app-category',
-  imports: [CollectionProducts, HomeNewsletter, Breadcrumb, AsyncPipe],
+  imports: [CollectionProducts, HomeNewsletter, Breadcrumb, AsyncPipe, Error404],
   templateUrl: './category.html',
   styleUrl: './category.scss',
 })
 export class Category {
+  // Nothing found by the resolver: show the 404 view (status 404) instead.
+  readonly missing = resolvedMissing();
+
   private store = inject(Store);
   private seo = inject(PublicSeoService);
   public layoutService = inject(LayoutService);
@@ -71,19 +76,21 @@ export class Category {
 
   ngOnInit() {
     this.subscriptions.add(
-      combineLatest([this.route.paramMap, this.category$]).subscribe(([params, category]) => {
-        const slug = params.get('slug');
-        this.activeCategory = slug;
+      combineLatest([this.route.paramMap, this.category$, this.route.data]).subscribe(
+        ([params, category, data]) => {
+          const slug = params.get('slug');
+          this.activeCategory = slug;
 
-        // Angular reuses this component when only the slug changes. Ignore the
-        // previous store value until the resolver has loaded the requested category.
-        if (!slug || !category || category.slug !== slug) return;
+          // Angular reuses this component when only the slug changes. Ignore the
+          // previous store value until the resolver has loaded the requested category.
+          if (!slug || !category || category.slug !== slug || data['data'] === false) return;
 
-        this.category = category;
-        this.applySeo(category);
-        this.filter['page'] = 1;
-        this.updateFilterAndFetchProducts();
-      }),
+          this.category = category;
+          this.applySeo(category);
+          this.filter['page'] = 1;
+          this.updateFilterAndFetchProducts();
+        },
+      ),
     );
   }
 

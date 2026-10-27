@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 
 import { ProductThumbnail } from './product-details/product-thumbnail/product-thumbnail';
 import { RelatedProduct } from './product-details/widgets/related-product/related-product';
@@ -12,18 +12,23 @@ import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadc
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { TProduct } from '../../../shared/interface/product.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
+import { resolvedMissing } from '../../../shared/resolver/resolved-missing';
 import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
 import { RecentProductService } from '../../../shared/services/recent-product.service';
 import { ProductState } from '../../../shared/store/state/product.state';
 import { ThemeOptionState } from '../../../shared/store/state/theme-option.state';
+import { Error404 } from '../../page/error-404/error-404';
 
 @Component({
   selector: 'app-product',
-  imports: [AsyncPipe, ProductThumbnail, RelatedProduct, Breadcrumb],
+  imports: [AsyncPipe, ProductThumbnail, RelatedProduct, Breadcrumb, Error404],
   templateUrl: './product.html',
   styleUrl: './product.scss',
 })
 export class Product {
+  // Nothing found by the resolver: show the 404 view (status 404) instead.
+  readonly missing = resolvedMissing();
+
   private store = inject(Store);
   product$: Observable<TProduct | null> = this.store.select(ProductState.selectedProduct);
   themeOptions$: Observable<Option> = this.store.select(ThemeOptionState.themeOptions);
@@ -46,22 +51,25 @@ export class Product {
     private router: Router,
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    this.product$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((product) => {
-      if (!product) return;
-      this.breadcrumb.items = [];
-      this.breadcrumb.title = product.name;
-      this.breadcrumb.items.push(
-        {
-          label: this.isEnglish ? 'Products' : 'Produk',
-          url: this.isEnglish ? '/en/catalog' : '/katalog',
-          active: false,
-        },
-        { label: product.name, active: true },
-      );
-      this.product = product;
-      this.recentProducts.add(product);
-      this.applySeo(product);
-    });
+    // Route data too: the product may load before the resolver's answer reaches the route.
+    combineLatest([this.product$, this.route.data])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([product, data]) => {
+        if (!product || data['data'] === false) return;
+        this.breadcrumb.items = [];
+        this.breadcrumb.title = product.name;
+        this.breadcrumb.items.push(
+          {
+            label: this.isEnglish ? 'Products' : 'Produk',
+            url: this.isEnglish ? '/en/catalog' : '/katalog',
+            active: false,
+          },
+          { label: product.name, active: true },
+        );
+        this.product = product;
+        this.recentProducts.add(product);
+        this.applySeo(product);
+      });
 
     // One product layout; the Kartify demo layouts (switched with ?layout=) were removed in 6B.
     this.themeOptions$
