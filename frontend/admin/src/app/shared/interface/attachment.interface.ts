@@ -49,7 +49,7 @@ export interface IAttachment {
    * @deprecated
    * Use id_attachment.
    */
-  id?: any;
+  id?: string;
 
   /**
    * @deprecated

@@ -24,10 +24,14 @@ export function specificationRows(value: unknown): ProductSpecificationRow[] {
     }
   }
   if (Array.isArray(parsed))
-    return parsed.map((item: any, index) => ({
-      label: String(item?.label ?? item?.key ?? `Spesifikasi ${index + 1}`),
-      value: String(item?.value ?? item?.text ?? ''),
-    }));
+    return (parsed as Array<Record<string, unknown> | null>).map(
+      (item, index) => ({
+        label: String(
+          item?.['label'] ?? item?.['key'] ?? `Spesifikasi ${index + 1}`,
+        ),
+        value: String(item?.['value'] ?? item?.['text'] ?? ''),
+      }),
+    );
   if (parsed && typeof parsed === 'object')
     return Object.entries(parsed as Record<string, unknown>).map(
       ([label, itemValue]) => ({

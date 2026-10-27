@@ -11,8 +11,16 @@ export interface ITableConfig<T extends IBaseRow = IBaseRow> {
 export type TableRowId = number | string;
 export interface IBaseRow {
   id: TableRowId;
-  [key: string]: any;
+  isChecked?: boolean;
+  system_reserve?: string | number;
 }
+
+/** A row read by field name (column keys, conditions, row actions). */
+export type TableRowFields = Record<string, unknown>;
+
+/** The fields of a row, for reading or setting them by name. */
+export const rowFields = (row: IBaseRow): TableRowFields =>
+  row as unknown as TableRowFields;
 
 export interface ITableColumn {
   title?: string | undefined;
@@ -37,10 +45,12 @@ export interface ITableAction {
   conditional?: IConditional;
 }
 
-export interface ITableClickedAction {
+/** A table or modal action: one row (`data`) or, for bulk actions, the selected ids. */
+export interface ITableClickedAction<T = IBaseRow> {
   actionToPerform?: string;
-  data?: any;
-  value?: any;
+  data?: T;
+  ids?: TableRowId[];
+  value?: unknown;
 }
 
 export interface IConditional {

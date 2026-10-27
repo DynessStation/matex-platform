@@ -8,7 +8,7 @@ export interface IChair {
   /**
    * Compatibility field untuk generic table template.
    */
-  id: any;
+  id: string;
 
   id_chair: string;
 

@@ -1,5 +1,7 @@
 import { Params } from '@angular/router';
 
+import { IBaseRow, rowFields } from '../../../interface/table.interface';
+
 // Stateless helpers of the shared list table (table.ts).
 
 //==================================================
@@ -72,11 +74,10 @@ export function isConditionMet(
     condition: string;
     value: string;
   },
-  columnData: any,
+  columnData: IBaseRow,
 ): boolean {
-  const field = Array.isArray(columnData[condition.field])
-    ? columnData[condition.field].length
-    : columnData[condition.field];
+  const raw = rowFields(columnData)[condition.field];
+  const field = Array.isArray(raw) ? raw.length : raw;
 
   switch (condition.condition) {
     case '==':
@@ -94,7 +95,7 @@ export function isConditionMet(
 export function getNestedPropertyValue(
   dataField: string | undefined,
 
-  columnData: any,
+  columnData: IBaseRow,
 ): string {
   if (!dataField) {
     return '';
@@ -102,17 +103,17 @@ export function getNestedPropertyValue(
 
   const keys = dataField.split('.');
 
-  let value = columnData;
+  let value: unknown = columnData;
 
   for (const key of keys) {
     if (value && Object.prototype.hasOwnProperty.call(value, key)) {
-      value = value[key];
+      value = (value as Record<string, unknown>)[key];
     } else {
       return '';
     }
   }
 
-  return value;
+  return value as string;
 }
 
 //==================================================

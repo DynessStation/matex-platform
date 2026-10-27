@@ -12,7 +12,7 @@
       />
     </div>
   }
-  {{ data()[key()] }}
+  {{ label }}
   <a
     href="javascript:void(0)"
     class="select-btn"
@@ -24,7 +24,7 @@
     {{ selectedPillIds().includes(data().id) ? 'Selected' : 'Select' }}
   </a>
 
-  @if (data()[subArrayKey()]?.length) {
+  @if (hasChildren) {
     <a
       href="javascript:void(0)"
       class="right-arrow"

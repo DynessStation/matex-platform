@@ -16,9 +16,13 @@ import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-
 import { Button } from '../../../shared/components/ui/button/button';
 import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
+import {
+  MediaSelection,
+  selectedAttachment,
+} from '../../../shared/components/ui/media-box/media-box';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { mediaConfig } from '../../../shared/data/media-config';
-import { IAttachment } from '../../../shared/interface/attachment.interface';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import {
   ICategory,
   ICategoryDetail,
@@ -88,7 +92,7 @@ export class FormCategory {
     mode: 'generate' | 'translate' = 'generate',
   ) {
     if (this.assistingField) return;
-    const value = this.form.getRawValue() as any;
+    const value = this.form.getRawValue();
     const controlName = `${locale}_${field}`;
     this.assistingField = controlName;
     this.contentAssistant
@@ -175,18 +179,20 @@ export class FormCategory {
     )?.name;
     return name || this.category?.key || '';
   }
-  selectItem(value: any[]) {
-    this.form.controls.parent_id.setValue(value?.[0] ?? '');
+  selectItem(value: Array<string | number> | null) {
+    this.form.controls.parent_id.setValue(String(value?.[0] ?? ''));
   }
   selectMedia(
     control: 'image_id' | 'icon_id' | 'og_image_id',
-    media: IAttachment | null,
+    media: MediaSelection,
   ) {
-    this.form.controls[control].setValue(media?.id_attachment ?? '');
+    this.form.controls[control].setValue(
+      selectedAttachment(media)?.id_attachment ?? '',
+    );
   }
 
   generateDescription(locale: 'id' | 'en') {
-    const value = this.form.getRawValue() as any;
+    const value = this.form.getRawValue();
     this.assisting = true;
     this.contentAssistant
       .assist({
@@ -225,7 +231,7 @@ export class FormCategory {
   }
 
   copyAndTranslateToEnglish() {
-    const value = this.form.getRawValue() as any;
+    const value = this.form.getRawValue();
     this.assisting = true;
     this.contentAssistant
       .assist({
@@ -271,7 +277,7 @@ export class FormCategory {
       .slice(0, 255);
   }
 
-  private showAssistantError(error: any) {
+  private showAssistantError(error: IApiErrorResponse) {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
@@ -349,7 +355,7 @@ export class FormCategory {
   }
 
   private payload(): ICategoryPayload {
-    const value: any = this.form.getRawValue();
+    const value = this.form.getRawValue();
     const translation = (locale: 'id-ID' | 'en-US', prefix: 'id' | 'en') => ({
       locale,
       slug: value[`${prefix}_slug`]!,

@@ -37,19 +37,20 @@ export function dateLabel(value: NgbDateStruct | null): string {
 export function articleTranslation(
   locale: 'id-ID' | 'en-US',
   prefix: BlogFormLocale,
-  v: any,
+  v: Record<string, unknown>,
 ): IArticleTranslation {
+  const text = (field: string) => (v[`${prefix}_${field}`] as string) ?? '';
   return {
     locale,
-    slug: v[`${prefix}_slug`],
-    title: v[`${prefix}_title`],
-    excerpt: v[`${prefix}_excerpt`] ?? '',
-    body: v[`${prefix}_body`],
-    meta_title: v[`${prefix}_meta_title`] ?? '',
-    meta_description: v[`${prefix}_meta_description`] ?? '',
-    canonical_url: v[`${prefix}_canonical_url`] ?? '',
-    og_title: v[`${prefix}_og_title`] ?? '',
-    og_description: v[`${prefix}_og_description`] ?? '',
+    slug: text('slug'),
+    title: text('title'),
+    excerpt: text('excerpt'),
+    body: text('body'),
+    meta_title: text('meta_title'),
+    meta_description: text('meta_description'),
+    canonical_url: text('canonical_url'),
+    og_title: text('og_title'),
+    og_description: text('og_description'),
     schema_json: '',
     status: 1,
   };

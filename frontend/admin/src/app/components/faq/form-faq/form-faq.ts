@@ -10,6 +10,7 @@ import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-
 import { Button } from '../../../shared/components/ui/button/button';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import {
   IFaqDetail,
   IFaqPayload,
@@ -157,7 +158,7 @@ export class FormFaq {
       });
   }
 
-  private showAssistantError(error: any): void {
+  private showAssistantError(error: IApiErrorResponse): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'

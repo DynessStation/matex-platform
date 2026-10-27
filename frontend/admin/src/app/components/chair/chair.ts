@@ -88,7 +88,7 @@ export class Chair {
   //==== TABLE
   //==================================================
 
-  public tableConfig: ITableConfig = this.buildTableConfig();
+  public tableConfig: ITableConfig<IChair> = this.buildTableConfig();
 
   //==================================================
   //==== BUILD TABLE CONFIG
@@ -98,7 +98,7 @@ export class Chair {
     data: IChair[] = [],
     total = 0,
     totalAll = total,
-  ): ITableConfig {
+  ): ITableConfig<IChair> {
     return {
       columns: [
         {
@@ -302,7 +302,7 @@ export class Chair {
   //==== ACTION
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IChair>): void {
     switch (action.actionToPerform) {
       case 'edit':
         this.edit(action.data);
@@ -346,23 +346,19 @@ export class Chair {
   //==== CONFIRMED
   //==================================================
 
-  onConfirmed(action: ITableClickedAction): void {
+  onConfirmed(action: ITableClickedAction<unknown>): void {
     switch (action.actionToPerform) {
       case 'activate':
       case 'deactivate': {
         const status: 0 | 1 = Number(action.value) === 1 ? 1 : 0;
 
-        this.changeStatus(
-          action.data,
-
-          status,
-        );
+        this.changeStatus(action.data as IChair, status);
 
         break;
       }
 
       case 'delete':
-        this.delete(action.data);
+        this.delete(action.data as IChair);
 
         break;
     }

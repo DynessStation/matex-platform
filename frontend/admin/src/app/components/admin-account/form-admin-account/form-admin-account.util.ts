@@ -1,4 +1,4 @@
-import { Select2Data } from 'ng-select2-component';
+import { Select2Data, Select2Option } from 'ng-select2-component';
 
 import {
   ADMIN_DEFAULT_COUNTRY_CODE,
@@ -53,7 +53,7 @@ export function splitPhoneNumber(value: string | null): {
   //==== MATCH COUNTRY (longest code first)
   //==================================================
 
-  const codes = (countryCodes as any[])
+  const codes = (countryCodes as Select2Option[])
     .map((item) => String(item.value ?? ''))
     .filter(Boolean)
     .sort((a, b) => b.length - a.length);

@@ -6,7 +6,7 @@
           @for (pills of selectedPills; track pills) {
             <li class="breadcrumb-p ills">
               <span class="badge badge-pill badge-primary"
-                >{{ pills[displayKey()] }}
+                >{{ label(pills) }}
                 <i
                   class="ri-close-line"
                   (click)="removeItem(pills); $event.stopPropagation()"
@@ -61,7 +61,7 @@
             ) {
               <li class="breadcrumb-item">
                 <a href="javascript:void(0)" (click)="changeTo(breadCrumb)">{{
-                  breadCrumb[displayKey()]
+                  label(breadCrumb)
                 }}</a>
               </li>
             }

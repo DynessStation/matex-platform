@@ -38,7 +38,7 @@ export class AttachmentService {
     //==================================================
 
     if (payload) {
-      const mappedParams: Record<string, any> = {
+      const mappedParams: Record<string, unknown> = {
         page: payload['page'],
 
         limit: payload['paginate'] ?? payload['limit'],

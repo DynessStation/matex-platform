@@ -9,7 +9,7 @@ export interface IAdminAccount {
   /**
    * Compatibility untuk generic table template.
    */
-  id: any;
+  id: string;
 
   id_admin_acct: string;
 
@@ -100,7 +100,7 @@ export interface IAdminAccountSelectOption {
 
   label: string;
 
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export interface IAdminAccountSelectPagination {

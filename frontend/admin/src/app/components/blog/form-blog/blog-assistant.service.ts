@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { BlogFormService } from './blog-form.service';
 import { BlogAssistField, BlogFormLocale } from './form-blog.model';
 import { assistFieldType } from './form-blog.util';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
@@ -21,7 +22,7 @@ export class BlogAssistantService {
 
   assistArticleField(locale: BlogFormLocale, field: BlogAssistField) {
     if (this.assistingField) return;
-    const value = this.editor.form.getRawValue() as any;
+    const value = this.editor.form.getRawValue();
     const controlName = `${locale}_${field}`;
     this.assistingField = controlName;
     this.contentAssistant
@@ -49,7 +50,7 @@ export class BlogAssistantService {
 
   translateArticleField(field: BlogAssistField) {
     if (this.assistingField) return;
-    const value = this.editor.form.getRawValue() as any;
+    const value = this.editor.form.getRawValue();
     const controlName = `en_${field}`;
     this.assistingField = controlName;
     this.contentAssistant
@@ -73,7 +74,7 @@ export class BlogAssistantService {
       });
   }
 
-  private showAssistantError(error: any) {
+  private showAssistantError(error: IApiErrorResponse) {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'

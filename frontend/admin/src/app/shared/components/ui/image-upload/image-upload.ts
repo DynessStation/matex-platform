@@ -56,7 +56,7 @@ export class ImageUpload {
   //==== ACCEPT
   //==================================================
 
-  readonly accept = input<any>([]);
+  readonly accept = input<string | string[] | string[][] | null>([]);
 
   readonly acceptList = computed<string[]>(() => {
     const value = this.accept();
@@ -113,12 +113,8 @@ export class ImageUpload {
   //==== OUTPUT
   //==================================================
 
-  /**
-   * Keep `any` temporarily because many
-   * Legacy template components still consume this output
-   * using the old attachment contract.
-   */
-  readonly selectedFiles = output<any>();
+  /** The picked media: one or many attachments, URL text, or nothing. */
+  readonly selectedFiles = output<MediaSelection>();
 
   //==================================================
   //==== DISPLAY DATA
@@ -134,8 +130,6 @@ export class ImageUpload {
   public showImage: IAttachment | null = null;
 
   public showImageUrl: string | null = null;
-
-  public selected: any;
 
   public videoType = ['mp4', 'webm', 'ogg'];
 

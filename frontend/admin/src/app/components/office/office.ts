@@ -87,7 +87,7 @@ export class Office {
 
   private currentTableParams: Params = {};
 
-  public tableConfig: ITableConfig = this.buildTableConfig();
+  public tableConfig: ITableConfig<IOffice> = this.buildTableConfig();
 
   //==================================================
   //==== BUILD TABLE CONFIG
@@ -98,7 +98,7 @@ export class Office {
 
     total = 0,
     totalAll = total,
-  ): ITableConfig {
+  ): ITableConfig<IOffice> {
     return {
       columns: [
         {
@@ -313,7 +313,7 @@ export class Office {
   //==== ACTION
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IOffice>): void {
     switch (action.actionToPerform) {
       case 'edit':
         void this.router.navigateByUrl(`/office/edit/${action.data.id_office}`);
@@ -337,7 +337,7 @@ export class Office {
   //==== CONFIRMED
   //==================================================
 
-  onConfirmed(action: ITableClickedAction): void {
+  onConfirmed(action: ITableClickedAction<unknown>): void {
     if (
       action.actionToPerform === 'activate' ||
       action.actionToPerform === 'deactivate'
@@ -347,7 +347,7 @@ export class Office {
       this.store
         .dispatch(
           new UpdateOfficeStatusAction(
-            action.data.id_office,
+            (action.data as IOffice).id_office,
 
             {
               status,
@@ -367,7 +367,7 @@ export class Office {
 
     if (action.actionToPerform === 'delete') {
       this.store
-        .dispatch(new DeleteOfficeAction(action.data.id_office))
+        .dispatch(new DeleteOfficeAction((action.data as IOffice).id_office))
         .subscribe({
           complete: () => {
             this.confirmationModal()?.closeModal();

@@ -422,12 +422,10 @@
 
 <app-delete-modal
   #deleteModal
-  (deleteItem)="onActionClicked($event?.actionToPerform, $event?.data)"
+  (deleteItem)="onModalAction($event)"
 />
 
 <app-confirmation-modal
   #confirmationModal
-  (confirmed)="
-    onActionClicked($event?.actionToPerform, $event?.data, $event?.value)
-  "
+  (confirmed)="onModalAction($event)"
 />

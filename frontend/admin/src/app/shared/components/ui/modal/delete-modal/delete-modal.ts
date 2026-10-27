@@ -28,13 +28,13 @@ export class DeleteModal {
 
   public closeResult: string;
   public modalOpen: boolean = false;
-  public userAction = {};
+  public userAction: ITableClickedAction<unknown> = {};
 
   readonly DeleteModal = viewChild<TemplateRef<string>>('deleteModal');
 
-  readonly deleteItem = output<ITableClickedAction>();
+  readonly deleteItem = output<ITableClickedAction<unknown>>();
 
-  async openModal(action: string, data: any) {
+  async openModal(action: string, data: unknown) {
     this.modalOpen = true;
     this.userAction = {
       actionToPerform: action,

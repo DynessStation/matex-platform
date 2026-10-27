@@ -61,7 +61,7 @@ export class Faq {
     sort: '',
   };
 
-  public tableConfig: ITableConfig = {
+  public tableConfig: ITableConfig<IFaq> = {
     columns: [
       {
         title: 'faq_admin.question',
@@ -133,11 +133,12 @@ export class Faq {
     this.store.dispatch(new GetFaqsAction(this.currentTableParams));
   }
 
-  onActionClicked(action: ITableClickedAction) {
+  onActionClicked(action: ITableClickedAction<IFaq>) {
     if (action.actionToPerform == 'edit') this.edit(action.data);
     else if (action.actionToPerform == 'status') this.status(action.data);
     else if (action.actionToPerform == 'delete') this.delete(action.data);
-    else if (action.actionToPerform == 'deleteAll') this.deleteAll(action.data);
+    else if (action.actionToPerform == 'deleteAll')
+      this.deleteAll((action.ids ?? []).map(String));
   }
 
   openOrder() {

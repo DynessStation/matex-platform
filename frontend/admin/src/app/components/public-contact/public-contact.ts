@@ -18,12 +18,43 @@ import { AiFieldAction } from '../../shared/components/ui/ai-field-action/ai-fie
 import { Button } from '../../shared/components/ui/button/button';
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-import { IPublicContactSettings } from '../../shared/interface/public-contact.interface';
+import { IApiErrorResponse } from '../../shared/interface/api-response.interface';
+import {
+  IContactInquiryTopic,
+  IPublicContactChannel,
+  IPublicContactSettings,
+  PublicContactType,
+} from '../../shared/interface/public-contact.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
 import { ContentAssistantService } from '../../shared/services/content-assistant.service';
 import { FormIssueNavigatorService } from '../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { PublicContactService } from '../../shared/services/public-contact.service';
+
+/** One language pair of a card, as the form keeps it. */
+interface ContactTranslationRow {
+  id_label: string;
+  id_description: string;
+  en_label: string;
+  en_description: string;
+}
+
+interface ContactChannelRow {
+  key: string;
+  type: PublicContactType;
+  value: string;
+  url: string;
+  is_primary: boolean;
+  is_public: boolean;
+  translations: ContactTranslationRow;
+}
+
+interface ContactTopicRow {
+  key: string;
+  recipient_email: string;
+  status: boolean;
+  translations: ContactTranslationRow;
+}
 
 @Component({
   selector: 'app-public-contact',
@@ -145,7 +176,7 @@ export class PublicContact {
       });
   }
 
-  private showAssistantError(error: any): void {
+  private showAssistantError(error: IApiErrorResponse): void {
     this.notifications.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'
@@ -182,7 +213,7 @@ export class PublicContact {
     });
   }
 
-  addChannel(value?: any): void {
+  addChannel(value?: Partial<IPublicContactChannel>): void {
     this.channels.push(
       this.fb.group({
         key: [
@@ -202,7 +233,7 @@ export class PublicContact {
     );
   }
 
-  addTopic(value?: any): void {
+  addTopic(value?: Partial<IContactInquiryTopic>): void {
     this.topics.push(
       this.fb.group({
         key: [
@@ -255,7 +286,7 @@ export class PublicContact {
       return;
     }
     const raw = this.form.getRawValue();
-    const mapTranslations = (value: any) => [
+    const mapTranslations = (value: ContactTranslationRow) => [
       {
         locale: 'id-ID' as const,
         label: value.id_label,
@@ -270,7 +301,7 @@ export class PublicContact {
       },
     ];
     const payload: IPublicContactSettings = {
-      channels: raw.channels.map((item: any) => ({
+      channels: (raw.channels as ContactChannelRow[]).map((item) => ({
         key: item.key,
         type: item.type,
         value: item.value,
@@ -279,7 +310,7 @@ export class PublicContact {
         is_public: item.is_public ? 1 : 0,
         translations: mapTranslations(item.translations),
       })),
-      topics: raw.topics.map((item: any) => ({
+      topics: (raw.topics as ContactTopicRow[]).map((item) => ({
         key: item.key,
         recipient_email: item.recipient_email || null,
         status: item.status ? 1 : 0,

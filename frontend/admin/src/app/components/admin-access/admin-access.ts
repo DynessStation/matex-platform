@@ -93,7 +93,7 @@ export class AdminAccess {
   //==== TABLE
   //==================================================
 
-  public tableConfig: ITableConfig = this.buildTableConfig();
+  public tableConfig: ITableConfig<IAdminAccess> = this.buildTableConfig();
 
   //==================================================
   //==== BUILD TABLE CONFIG
@@ -103,7 +103,7 @@ export class AdminAccess {
     data: IAdminAccess[] = [],
     total = 0,
     totalAll = total,
-  ): ITableConfig {
+  ): ITableConfig<IAdminAccess> {
     return {
       columns: [
         {
@@ -317,7 +317,7 @@ export class AdminAccess {
   //==== ACTION
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IAdminAccess>): void {
     switch (action.actionToPerform) {
       case 'edit':
         this.edit(action.data);
@@ -361,23 +361,19 @@ export class AdminAccess {
   //==== CONFIRMED
   //==================================================
 
-  onConfirmed(action: ITableClickedAction): void {
+  onConfirmed(action: ITableClickedAction<unknown>): void {
     switch (action.actionToPerform) {
       case 'activate':
       case 'deactivate': {
         const status: 0 | 1 = Number(action.value) === 1 ? 1 : 0;
 
-        this.changeStatus(
-          action.data,
-
-          status,
-        );
+        this.changeStatus(action.data as IAdminAccess, status);
 
         break;
       }
 
       case 'delete':
-        this.delete(action.data);
+        this.delete(action.data as IAdminAccess);
 
         break;
     }

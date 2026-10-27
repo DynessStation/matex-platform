@@ -31,8 +31,11 @@ import { TextFitDirective } from '../../../directives/text-fit.directive';
 import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
 import {
+  IBaseRow,
+  ITableAction,
   ITableClickedAction,
   ITableConfig,
+  rowFields,
   TableRowId,
 } from '../../../interface/table.interface';
 import { CurrencySymbolPipe } from '../../../pipe/currency-symbol.pipe';
@@ -61,7 +64,7 @@ import { DeleteModal } from '../modal/delete-modal/delete-modal';
   styleUrl: './table.scss',
   providers: [TableStateService],
 })
-export class Table {
+export class Table<T extends IBaseRow = IBaseRow> {
   private document = inject<Document>(DOCUMENT);
   public localization = inject(LocalizationService);
 
@@ -96,7 +99,7 @@ export class Table {
 
   @Input() hasCheckbox: boolean = false;
 
-  readonly tableConfig = input<ITableConfig>(undefined);
+  readonly tableConfig = input<ITableConfig<T>>(undefined);
 
   readonly hasDuplicate = input<boolean>(false);
 
@@ -128,7 +131,7 @@ export class Table {
 
   readonly tableChanged = output<Params>();
 
-  readonly action = output<ITableClickedAction>();
+  readonly action = output<ITableClickedAction<T>>();
 
   readonly selectedItems = output<TableRowId[]>();
 
@@ -283,7 +286,7 @@ export class Table {
   //==== CAN SHOW ACTION
   //==================================================
 
-  public canShowAction(action: any): boolean {
+  public canShowAction(action: ITableAction): boolean {
     return this.checkPermission(action?.permission);
   }
 
@@ -303,7 +306,7 @@ export class Table {
   //==== HANDLE ROW ACTION
   //==================================================
 
-  public handleRowAction(action: any, rowData: any, event: Event): void {
+  public handleRowAction(action: ITableAction, rowData: T, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -339,18 +342,39 @@ export class Table {
   //==== ACTION CLICK
   //==================================================
 
-  onActionClicked(actionType: string, rowData: any, value?: number) {
+  onActionClicked(
+    actionType: string,
+    rowData: T | TableRowId[],
+    value?: number,
+  ) {
     this.document.body.classList.add('loader-none');
 
-    rowData[actionType] = value;
+    if (Array.isArray(rowData)) {
+      this.action.emit({ actionToPerform: actionType, ids: rowData });
+    } else {
+      rowFields(rowData)[actionType] = value;
 
-    this.action.emit({
-      actionToPerform: actionType,
+      this.action.emit({
+        actionToPerform: actionType,
 
-      data: rowData,
-    });
+        data: rowData,
+      });
+    }
 
     this.ConfirmationModal()?.closeModal();
+  }
+
+  /** A modal hands back what the table gave it: a row, or the selected ids. */
+  onModalAction(action: ITableClickedAction<unknown> | undefined) {
+    if (!action?.actionToPerform) {
+      return;
+    }
+
+    this.onActionClicked(
+      action.actionToPerform,
+      action.data as T | TableRowId[],
+      action.value as number | undefined,
+    );
   }
 
   //==================================================
@@ -358,7 +382,7 @@ export class Table {
   //==================================================
 
   checkUncheckAll(event: Event) {
-    this.tableConfig()?.data!.forEach((item: any) => {
+    this.tableConfig()?.data!.forEach((item) => {
       if (item.system_reserve != '1') {
         item.isChecked = (event?.target as HTMLInputElement)?.checked;
 
@@ -404,7 +428,7 @@ export class Table {
   get deleteButtonStatus() {
     let status = false;
 
-    this.tableConfig()?.data?.forEach((data: any) => {
+    this.tableConfig()?.data?.forEach((data) => {
       if (!this.selected.includes(data?.id)) {
         return;
       }
@@ -428,7 +452,7 @@ export class Table {
   get duplicateButtonStatus() {
     let status = false;
 
-    this.tableConfig()?.data?.forEach((data: any) => {
+    this.tableConfig()?.data?.forEach((data) => {
       if (!this.selected.includes(data?.id)) {
         return;
       }

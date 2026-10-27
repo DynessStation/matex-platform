@@ -13,7 +13,7 @@ export interface IProductModel extends IPaginateModel {
 }
 
 export interface IProduct {
-  id: any;
+  id: string;
   key?: string;
   product_type: string;
   product_kind?: string | null;
@@ -62,7 +62,7 @@ export interface IProduct {
   shipping_days: number;
   tax_id: number;
   tax: ITax;
-  status: any;
+  status: string;
   meta_title: string;
   meta_description: string;
   product_meta_image: IAttachment;
@@ -134,6 +134,29 @@ export interface IProduct {
   catalog_front?: boolean;
   front_total?: number;
   front_max?: number;
+}
+
+/** Columns of the product row that the API also returns as they are (read by the form). */
+export interface IProductRawColumns {
+  product_type?: string;
+  product_kind?: string | null;
+  product_unit?: string | null;
+  product_barcode?: string | null;
+  product_manufacturer_code?: string | null;
+  product_country_origin?: string | null;
+  product_origin_province?: string | null;
+  product_origin_city?: string | null;
+  product_hs_code?: string | null;
+  product_weight_grams?: number | null;
+  product_length_mm?: number | null;
+  product_width_mm?: number | null;
+  product_height_mm?: number | null;
+  product_min_order_qty?: number | null;
+  product_lead_time_days?: number | null;
+  product_manage_stock?: number | boolean | null;
+  product_stock_quantity?: number | null;
+  product_internal_commerce_enabled?: number | boolean | null;
+  product_galleries?: IAttachment[];
 }
 
 export type ProductCatalogStatus = 'draft' | 'published' | 'archived';
@@ -266,8 +289,8 @@ export interface IVariationOption {
 export interface IVariant {
   id: number | null;
   attribute_values: number[] | null;
-  options: any;
-  variant_option: any;
+  options: unknown;
+  variant_option: unknown;
 }
 
 export interface IVariationCombination {

@@ -50,13 +50,14 @@ export class LocationPicker implements AfterViewInit {
 
   public error = '';
 
-  private map: any = null;
+  private map: google.maps.Map | null = null;
 
-  private marker: any = null;
+  private marker: google.maps.marker.AdvancedMarkerElement | null = null;
 
-  private geocoder: any = null;
+  private geocoder: google.maps.Geocoder | null = null;
 
-  private autocomplete: any = null;
+  private autocomplete: google.maps.places.PlaceAutocompleteElement | null =
+    null;
 
   //==================================================
   //==== MAP STATE
@@ -110,7 +111,9 @@ export class LocationPicker implements AfterViewInit {
 
       await this.loader.load();
 
-      const googleMaps = (window as any).google?.maps;
+      // Loaded at run time by GoogleMapsLoaderService; types from @types/google.maps.
+      const googleMaps = (window as Window & { google?: typeof google }).google
+        ?.maps;
 
       if (!googleMaps) {
         throw new Error('Google Maps is not available');
@@ -232,9 +235,11 @@ export class LocationPicker implements AfterViewInit {
       this.autocomplete.addEventListener(
         'gmp-select',
 
-        async (event: any) => {
+        async (event: Event) => {
           try {
-            const prediction = event.placePrediction;
+            const prediction = (
+              event as google.maps.places.PlacePredictionSelectEvent
+            ).placePrediction;
 
             if (!prediction) {
               return;
@@ -329,7 +334,7 @@ export class LocationPicker implements AfterViewInit {
       this.map.addListener(
         'click',
 
-        async (event: any) => {
+        async (event: google.maps.MapMouseEvent) => {
           if (!event.latLng) {
             return;
           }
@@ -349,8 +354,10 @@ export class LocationPicker implements AfterViewInit {
       this.marker.addEventListener(
         'gmp-dragend',
 
-        async (event: any) => {
-          const position = event.target?.position ?? this.marker.position;
+        async (event: Event) => {
+          const target =
+            event.target as google.maps.marker.AdvancedMarkerElement | null;
+          const position = target?.position ?? this.marker?.position;
 
           if (!position) {
             return;
@@ -524,7 +531,9 @@ export class LocationPicker implements AfterViewInit {
   //==== NEW PLACE COMPONENTS
   //==================================================
 
-  private parsePlaceComponents(components: any[]) {
+  private parsePlaceComponents(
+    components: google.maps.places.AddressComponent[],
+  ) {
     const getLong = (type: string) =>
       components.find((item) => item.types?.includes(type))?.longText ?? null;
 
@@ -544,7 +553,9 @@ export class LocationPicker implements AfterViewInit {
   //==== LEGACY GEOCODER COMPONENTS
   //==================================================
 
-  private parseLegacyComponents(components: any[]) {
+  private parseLegacyComponents(
+    components: google.maps.GeocoderAddressComponent[],
+  ) {
     const getLong = (type: string) =>
       components.find((item) => item.types?.includes(type))?.long_name ?? null;
 

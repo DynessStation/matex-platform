@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { ProductAssistField, ProductFormLocale } from './form-product.model';
 import { assistFieldType } from './form-product.util';
 import { ProductFormService } from './product-form.service';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
@@ -67,7 +68,7 @@ export class ProductAssistantService {
 
   assistProductField(locale: ProductFormLocale, field: ProductAssistField) {
     if (this.assistingField) return;
-    const value = this.editor.form.getRawValue() as any;
+    const value = this.editor.form.getRawValue();
     const controlName = `${locale}_${field}`;
     this.assistingField = controlName;
     this.contentAssistant
@@ -108,7 +109,7 @@ export class ProductAssistantService {
 
   translateProductField(field: ProductAssistField) {
     if (this.assistingField) return;
-    const value = this.editor.form.getRawValue() as any;
+    const value = this.editor.form.getRawValue();
     const controlName = `en_${field}`;
     this.assistingField = controlName;
     this.contentAssistant
@@ -132,7 +133,7 @@ export class ProductAssistantService {
       });
   }
 
-  private showAssistantError(error: any) {
+  private showAssistantError(error: IApiErrorResponse) {
     const notConfigured =
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED';
     this.notification.showError(

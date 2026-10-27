@@ -87,7 +87,7 @@ export class AdminPermission {
   //==== TABLE CONFIG
   //==================================================
 
-  public tableConfig: ITableConfig = this.buildTableConfig();
+  public tableConfig: ITableConfig<IAdminPermission> = this.buildTableConfig();
 
   //==================================================
   //==== BUILD TABLE CONFIG
@@ -97,7 +97,7 @@ export class AdminPermission {
     data: IAdminPermission[] = [],
     total = 0,
     totalAll = total,
-  ): ITableConfig {
+  ): ITableConfig<IAdminPermission> {
     return {
       columns: [
         {
@@ -299,7 +299,7 @@ export class AdminPermission {
   //==== ACTION
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IAdminPermission>): void {
     switch (action.actionToPerform) {
       case 'edit':
         this.edit(action.data);
@@ -341,20 +341,19 @@ export class AdminPermission {
   //==== CONFIRMED
   //==================================================
 
-  onConfirmed(action: ITableClickedAction): void {
+  onConfirmed(action: ITableClickedAction<unknown>): void {
     switch (action.actionToPerform) {
       case 'activate':
       case 'deactivate':
         this.changeStatus(
-          action.data,
-
+          action.data as IAdminPermission,
           Number(action.value) === 1 ? 1 : 0,
         );
 
         break;
 
       case 'delete':
-        this.delete(action.data);
+        this.delete(action.data as IAdminPermission);
 
         break;
     }

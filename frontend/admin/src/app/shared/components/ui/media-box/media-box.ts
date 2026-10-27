@@ -42,6 +42,16 @@ import { Pagination } from '../pagination/pagination';
 export type MediaSelection =
   IAttachment | IAttachment[] | string | string[] | null;
 
+/** The attachments of a selection (URL text is not an attachment). */
+export const selectedAttachments = (value: MediaSelection): IAttachment[] =>
+  (Array.isArray(value) ? value : [value]).filter(
+    (item): item is IAttachment => !!item && typeof item !== 'string',
+  );
+
+/** The first attachment of a selection, or none. */
+export const selectedAttachment = (value: MediaSelection): IAttachment | null =>
+  selectedAttachments(value)[0] ?? null;
+
 //==================================================
 //==== COMPONENT
 //==================================================
@@ -596,11 +606,14 @@ export class MediaBox {
   onActionClicked(
     action: string,
 
-    data: IAttachment,
+    row: unknown,
   ): void {
     if (action !== 'delete') {
       return;
     }
+
+    // The delete modal hands back the attachment it was opened with.
+    const data = row as IAttachment;
 
     this.store
       .dispatch(new DeleteAttachmentAction(data.id_attachment))

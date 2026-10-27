@@ -36,6 +36,14 @@ import { LoaderState } from '../../../store/state/loader.state';
 // Query state of one list table (search, sort, paging, date range), the reload and reset
 // tools, the load timer, and the viewer's display settings. Provided by Table, so each
 // table has its own; the toolbar and footer components inject it.
+interface TableDateRange {
+  start_date?: string;
+  end_date?: string;
+}
+
+type TableChange =
+  ITableColumn | Event | TableDateRange | Params | number | string | null;
+
 @Injectable()
 export class TableStateService {
   private readonly document = inject<Document>(DOCUMENT);
@@ -238,20 +246,26 @@ export class TableStateService {
   //==== CHANGE TABLE
   //==================================================
 
-  onChangeTable(data: ITableColumn | any, type: string): void {
-    if (type === 'sort' && data && data.sortable !== false) {
-      const nextSort = data.sort_direction === 'asc' ? 'desc' : 'asc';
+  /**
+   * `data` by `type`: sort a column, paginate a select change event, page a number,
+   * search a text, daterange the dates (or null), reload nothing.
+   */
+  onChangeTable(data: TableChange, type: string): void {
+    const column = data as ITableColumn | null;
 
-      data.sort_direction = nextSort;
+    if (type === 'sort' && column && column.sortable !== false) {
+      const nextSort = column.sort_direction === 'asc' ? 'desc' : 'asc';
 
-      this.tableData['field'] = data.dataField!;
+      column.sort_direction = nextSort;
+
+      this.tableData['field'] = column.dataField!;
 
       this.tableData['sort'] = nextSort;
 
       this.tableData['page'] = 1;
     } else if (type === 'paginate') {
       this.tableData['paginate'] = Number(
-        (data.target as HTMLInputElement)?.value,
+        ((data as Event).target as HTMLInputElement)?.value,
       );
 
       this.tableData['page'] = 1;
@@ -262,14 +276,16 @@ export class TableStateService {
 
       this.tableData['page'] = 1;
     } else if (type === 'daterange') {
-      if (data?.start_date) {
-        this.tableData['start_date'] = data.start_date;
+      const range = data as TableDateRange | null;
+
+      if (range?.start_date) {
+        this.tableData['start_date'] = range.start_date;
       } else {
         delete this.tableData['start_date'];
       }
 
-      if (data?.end_date && !String(data.end_date).includes('undefined')) {
-        this.tableData['end_date'] = data.end_date;
+      if (range?.end_date && !String(range.end_date).includes('undefined')) {
+        this.tableData['end_date'] = range.end_date;
       } else {
         delete this.tableData['end_date'];
       }

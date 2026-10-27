@@ -23,7 +23,7 @@ export class TreeNode {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  readonly node = input<any>(undefined);
+  readonly node = input<ICategory>(undefined);
   readonly siblings = input<ICategory[]>([]);
   readonly reorderDisabled = input(false);
   readonly recursionKey = input<string>(undefined);
@@ -37,11 +37,26 @@ export class TreeNode {
   public dragOver = false;
   public savingOrder = false;
 
+  private field(key: string): unknown {
+    return (this.node() as unknown as Record<string, unknown>)[key];
+  }
+
+  get children(): ICategory[] {
+    const children = this.field(this.recursionKey());
+    return Array.isArray(children) ? (children as ICategory[]) : [];
+  }
+
+  get label(): string {
+    return String(this.field(this.displayKey()) || this.node()?.name || '');
+  }
+
   ngOnInit() {
     this.route.params.subscribe((params) => (this.id = params['id']));
   }
 
-  delete(actionType: string, data: ICategory) {
+  // The delete modal hands back the category it was opened with.
+  delete(actionType: string, row: unknown) {
+    const data = row as ICategory;
     this.store
       .dispatch(new DeleteCategoryAction(data.id!, data.type))
       .subscribe({

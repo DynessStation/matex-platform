@@ -102,7 +102,7 @@ export class ActivityLog implements AfterViewInit {
   //==== TABLE CONFIG
   //==================================================
 
-  public tableConfig: ITableConfig = {
+  public tableConfig: ITableConfig<IAuditLog> = {
     columns: [
       {
         title: 'audit_created',
@@ -738,7 +738,7 @@ export class ActivityLog implements AfterViewInit {
   //==== ACTION
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IAuditLog>): void {
     if (action.actionToPerform === 'view') {
       this.view(action.data as IAuditLog);
     }

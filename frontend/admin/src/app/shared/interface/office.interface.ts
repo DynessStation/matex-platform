@@ -5,7 +5,7 @@ import { IAttachment } from './attachment.interface';
 //==================================================
 
 export interface IOffice {
-  id: any;
+  id: string;
 
   id_office: string;
 

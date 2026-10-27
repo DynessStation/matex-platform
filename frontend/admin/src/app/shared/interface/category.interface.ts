@@ -14,8 +14,8 @@ export interface ICategoryTranslation {
   status: 0 | 1;
 }
 export interface ICategory {
-  id: any;
-  parent_id?: any;
+  id: string;
+  parent_id?: string | null;
   key: string;
   name: string;
   slug: string;

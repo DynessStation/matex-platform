@@ -27,12 +27,21 @@ import {
   specificationRows,
   uniqueGallery,
 } from './form-product.util';
+import {
+  MediaSelection,
+  selectedAttachment,
+  selectedAttachments,
+} from '../../../shared/components/ui/media-box/media-box';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import { ICategoryModel } from '../../../shared/interface/category.interface';
 import {
   IProduct,
+  IProductMarketplace,
   IProductPayload,
+  IProductPrice,
+  IProductRawColumns,
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
 import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
@@ -188,16 +197,16 @@ export class ProductFormService {
   setTab(tab: string) {
     this.activeTab = tab;
   }
-  selectCategories(ids: any[]) {
+  selectCategories(ids: Array<string | number> | null) {
     this.categoryIds = (ids ?? []).map(String);
     this.categoryError = this.categoryIds.length === 0;
   }
-  selectMedia(role: ProductMediaRole, value: any) {
-    if (role !== 'gallery' || !Array.isArray(value)) {
-      this.media[role] = value;
+  selectMedia(role: ProductMediaRole, value: MediaSelection) {
+    if (role !== 'gallery') {
+      this.media[role] = selectedAttachment(value);
       return;
     }
-    this.media.gallery = uniqueGallery(value);
+    this.media.gallery = uniqueGallery(selectedAttachments(value));
   }
 
   measurementHelper(controlName: ProductMeasurementControl) {
@@ -217,7 +226,10 @@ export class ProductFormService {
   specifications(locale: ProductFormLocale) {
     return this.form.get(`${locale}_specifications`) as FormArray;
   }
-  addSpecification(locale: ProductFormLocale, value: any = {}) {
+  addSpecification(
+    locale: ProductFormLocale,
+    value: Partial<ProductSpecificationRow> = {},
+  ) {
     this.specifications(locale).push(
       this.fb.group({
         label: [value.label ?? '', Validators.required],
@@ -234,7 +246,7 @@ export class ProductFormService {
       this.specifications(locale).getRawValue() as ProductSpecificationRow[],
     );
   }
-  addPrice(value: any = {}) {
+  addPrice(value: Partial<IProductPrice> = {}) {
     this.prices.push(
       this.fb.group({
         type: [value.type ?? 'end_user', Validators.required],
@@ -271,7 +283,7 @@ export class ProductFormService {
       is_active: true,
     });
   }
-  addMarketplace(value: any = {}) {
+  addMarketplace(value: Partial<IProductMarketplace> = {}) {
     const isFirst = this.marketplaces.length === 0;
     this.marketplaces.push(
       this.fb.group({
@@ -307,10 +319,10 @@ export class ProductFormService {
       this.prices
         .getRawValue()
         .filter(
-          (price: any) =>
+          (price: IProductPrice) =>
             price.type === 'end_user' && price.is_active && price.is_public,
         )
-        .map((price: any) => String(price.currency).toUpperCase()),
+        .map((price: IProductPrice) => String(price.currency).toUpperCase()),
     );
     this.pricePublicationError =
       this.form.controls.price_visibility.value === 'displayed' &&
@@ -342,22 +354,22 @@ export class ProductFormService {
     });
   }
   private payload(): IProductPayload {
-    const v: any = this.form.getRawValue(),
+    const v = this.form.getRawValue(),
       translation = (locale: 'id-ID' | 'en-US', p: ProductFormLocale) => ({
         locale,
-        slug: v[`${p}_slug`]!,
-        name: v[`${p}_name`]!,
-        short_description: v[`${p}_short_description`] || '',
-        description: v[`${p}_description`] || '',
+        slug: v[`${p}_slug` as const]!,
+        name: v[`${p}_name` as const]!,
+        short_description: v[`${p}_short_description` as const] || '',
+        description: v[`${p}_description` as const] || '',
         specifications: this.specificationPayload(p),
-        meta_title: v[`${p}_meta_title`] || '',
-        meta_description: v[`${p}_meta_description`] || '',
-        canonical_url: v[`${p}_canonical_url`] || '',
-        og_title: v[`${p}_og_title`] || '',
-        og_description: v[`${p}_og_description`] || '',
+        meta_title: v[`${p}_meta_title` as const] || '',
+        meta_description: v[`${p}_meta_description` as const] || '',
+        canonical_url: v[`${p}_canonical_url` as const] || '',
+        og_title: v[`${p}_og_title` as const] || '',
+        og_description: v[`${p}_og_description` as const] || '',
         status: 1 as const,
       });
-    const media: any[] = [];
+    const media: IProductPayload['media'] = [];
     for (const role of ['thumbnail', 'og'] as ProductMediaRole[]) {
       const item = this.media[role] as IAttachment | null;
       if (item?.id_attachment)
@@ -375,9 +387,9 @@ export class ProductFormService {
     return {
       key: v.key!,
       sku: v.sku!,
-      product_type: v.product_type as any,
+      product_type: v.product_type as IProductPayload['product_type'],
       product_kind: v.product_kind || null,
-      status: v.status as any,
+      status: v.status as IProductPayload['status'],
       unit: v.unit || null,
       barcode: v.barcode || null,
       manufacturer_code: v.manufacturer_code || null,
@@ -394,20 +406,21 @@ export class ProductFormService {
       manage_stock: v.manage_stock ? 1 : 0,
       stock_quantity: v.stock_quantity,
       stock_status: v.stock_status!,
-      price_visibility: v.price_visibility as any,
+      price_visibility:
+        v.price_visibility as IProductPayload['price_visibility'],
       internal_commerce_enabled: v.internal_commerce_enabled ? 1 : 0,
       is_featured: v.is_featured ? 1 : 0,
       catalog_front: v.catalog_front ? 1 : 0,
       category_ids: this.categoryIds,
       media,
-      prices: v.prices.map((x: any, i: number) => ({
+      prices: v.prices.map((x: IProductPrice, i: number) => ({
         ...x,
         currency: String(x.currency || 'IDR').toUpperCase(),
         is_public: x.type === 'end_user' ? Boolean(x.is_public) : false,
         label: x.label || null,
         sort_order: i,
       })),
-      marketplaces: v.marketplaces.map((x: any, i: number) => ({
+      marketplaces: v.marketplaces.map((x: IProductMarketplace, i: number) => ({
         ...x,
         label: x.label || null,
         sku: x.sku || null,
@@ -422,12 +435,12 @@ export class ProductFormService {
   //==================================================
 
   private patch(p: IProduct) {
-    const raw: any = p;
+    const raw: IProduct & IProductRawColumns = p;
     this.product = p;
     this.categoryIds = (p.categories ?? []).map((x) => String(x.id));
     const id = p.translations?.find((x) => x.locale === 'id-ID'),
       en = p.translations?.find((x) => x.locale === 'en-US');
-    const value: any = {
+    const value: Record<string, unknown> = {
       key: p.key,
       sku: p.sku,
       product_type: raw.product_type,
@@ -477,7 +490,7 @@ export class ProductFormService {
           this.addSpecification(prefix, row),
         );
       }
-    this.form.patchValue(value);
+    this.form.patchValue(value as Parameters<typeof this.form.patchValue>[0]);
     this.prices.clear();
     (p.prices ?? []).forEach((x) => this.addPrice(x));
     if (!this.prices.length) this.addPrice();
@@ -520,7 +533,7 @@ export class ProductFormService {
       : 'Masuk paling akhir di depan katalog setelah disimpan (maksimal 12 produk).';
   }
 
-  private handleSaveError(error: any): void {
+  private handleSaveError(error: IApiErrorResponse): void {
     const code = String(error?.error?.code || '');
     if (code === 'PRODUCT_FRONT_FULL') {
       this.activeTab = 'general';
@@ -559,7 +572,7 @@ export class ProductFormService {
       return;
     }
     if (code === 'PRODUCT_SLUG_EXISTS') {
-      const locale = String(error?.error?.data?.locale || 'id-ID');
+      const locale = String(error?.error?.data?.['locale'] || 'id-ID');
       this.activeTab = 'content';
       this.activeLocale = locale === 'en-US' ? 'en' : 'id';
       const control =

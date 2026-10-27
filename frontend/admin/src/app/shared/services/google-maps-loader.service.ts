@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 //==================================================
 
 interface GoogleMapsWindow extends Window {
-  google?: any;
+  google?: typeof google;
 
   __matexGoogleMapsReady?: () => void;
 }

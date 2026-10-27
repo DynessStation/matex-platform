@@ -9,7 +9,7 @@ export interface IAdminAccess {
   //==== TABLE COMPATIBILITY
   //==================================================
 
-  id: any;
+  id: string;
 
   id_admin_access: string;
 

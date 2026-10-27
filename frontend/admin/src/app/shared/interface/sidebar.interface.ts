@@ -51,7 +51,7 @@ export interface ISidebar {
 
   acl_permission?: string[];
 
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
 }
 
 //==================================================

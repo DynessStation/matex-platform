@@ -1,7 +1,7 @@
 <li
   class="cursor-pointer"
   [class.category-drag-over]="dragOver"
-  [class.inside-ul]="node()[recursionKey()] && node()[recursionKey()].length"
+  [class.inside-ul]="children.length"
   (dragover)="allowDrop($event)"
   (dragleave)="leaveDrop()"
   (drop)="dropBefore($event)"
@@ -18,7 +18,7 @@
     >
       <i class="ri-draggable"></i>
     </button>
-    @if (node()[recursionKey()] && node()[recursionKey()].length) {
+    @if (children.length) {
       <i
         class="ri-arrow-down-s-line"
         (click)="showChildrenNode = !showChildrenNode"
@@ -28,7 +28,7 @@
       class="category-node-name"
       [class.active]="node().id === id"
       [class.disabled]="node().status !== 'published'"
-      >{{ node()[displayKey()] || node()?.name }}</span
+      >{{ label }}</span
     >
     <span class="category-node-meta">
       @if (node().status === 'draft') {
@@ -64,14 +64,12 @@
     <i class="tree-icon file-icon" role="presentation"></i>
   </div>
 
-  @if (
-    node()[recursionKey()] && node()[recursionKey()].length && showChildrenNode
-  ) {
+  @if (children.length && showChildrenNode) {
     <ul>
-      @for (child of node()[recursionKey()]; track child.id) {
+      @for (child of children; track child.id) {
         <app-tree-node
           [node]="child"
-          [siblings]="node()[recursionKey()]"
+          [siblings]="children"
           [reorderDisabled]="reorderDisabled()"
           [displayKey]="displayKey()"
           [recursionKey]="recursionKey()"

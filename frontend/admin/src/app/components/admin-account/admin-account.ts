@@ -83,7 +83,7 @@ export class AdminAccount {
   //==== TABLE CONFIG
   //==================================================
 
-  public tableConfig: ITableConfig = this.buildTableConfig();
+  public tableConfig: ITableConfig<IAdminAccount> = this.buildTableConfig();
 
   //==================================================
   //==== BUILD TABLE CONFIG
@@ -93,7 +93,7 @@ export class AdminAccount {
     data: IAdminAccount[] = [],
     total = 0,
     totalAll = total,
-  ): ITableConfig {
+  ): ITableConfig<IAdminAccount> {
     return {
       columns: [
         {
@@ -321,7 +321,7 @@ export class AdminAccount {
   //==== ACTION CLICK
   //==================================================
 
-  onActionClicked(action: ITableClickedAction): void {
+  onActionClicked(action: ITableClickedAction<IAdminAccount>): void {
     switch (action.actionToPerform) {
       //==================================================
       //==== EDIT
@@ -379,7 +379,7 @@ export class AdminAccount {
   //==== CONFIRMED
   //==================================================
 
-  onConfirmed(action: ITableClickedAction): void {
+  onConfirmed(action: ITableClickedAction<unknown>): void {
     if (
       action.actionToPerform !== 'activate' &&
       action.actionToPerform !== 'deactivate'
@@ -389,7 +389,7 @@ export class AdminAccount {
 
     const status: 0 | 1 = Number(action.value) === 1 ? 1 : 0;
 
-    this.changeStatus(action.data, status);
+    this.changeStatus(action.data as IAdminAccount, status);
   }
 
   //==================================================

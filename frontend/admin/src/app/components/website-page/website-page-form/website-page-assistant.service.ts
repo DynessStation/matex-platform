@@ -4,6 +4,7 @@ import { finalize } from 'rxjs';
 
 import { WebsitePageEditorService } from './website-page-editor.service';
 import { WebsitePageEditorLocale } from './website-page-form.model';
+import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
@@ -152,7 +153,7 @@ export class WebsitePageAssistantService {
       });
   }
 
-  showContentAssistantError(error: any): void {
+  showContentAssistantError(error: IApiErrorResponse): void {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
         ? 'Fitur isi otomatis belum aktif. Periksa konfigurasi layanan konten.'

@@ -3,9 +3,12 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
-import { ICategory } from 'src/app/shared/interface/category.interface';
-import { IMenu } from 'src/app/shared/interface/menu.interface';
-
+import {
+  DropdownOption,
+  DropdownOptionId,
+  optionChildren,
+  optionLabel,
+} from './advance-dropdown.model';
 import { DropdownList } from './dropdown-list/dropdown-list';
 
 @Component({
@@ -22,24 +25,24 @@ export class AdvanceDropdown {
   readonly selectSingle = input<boolean>(false);
   readonly displayKey = input<string>('name');
   readonly subArrayKey = input<string>(undefined);
-  readonly options = input<any[]>(undefined);
-  readonly selectedOption = input<any[]>(undefined);
+  readonly options = input<DropdownOption[]>(undefined);
+  readonly selectedOption = input<DropdownOptionId[]>(undefined);
   readonly position = input<string>('bottom');
   readonly text = input<string>('select_option');
   readonly showImage = input<boolean>(true);
 
-  readonly selectedItem = output<any>();
+  readonly selectedItem = output<DropdownOptionId[]>();
 
   public isOpen = false;
-  public optionsData: any[] = [];
-  public selectedPills: any[] = [];
-  public selectedIds: any[] = [];
-  public breadCrumbValues: any[] = [];
+  public optionsData: DropdownOption[] = [];
+  public selectedPills: DropdownOption[] = [];
+  public selectedIds: DropdownOptionId[] = [];
+  public breadCrumbValues: DropdownOption[] = [];
   public term = new FormControl('');
-  public parent: any[] = [];
+  public parent: DropdownOptionId[] = [];
 
   constructor() {
-    this.term.valueChanges.subscribe((data: any) => {
+    this.term.valueChanges.subscribe((data) => {
       if (data) {
         this.optionsData = [];
         this.options().forEach((item) => {
@@ -62,56 +65,54 @@ export class AdvanceDropdown {
       this.selectedPills = [];
       this.selectedIds = [];
     }
-    this.optionsData.map((categories) => this.getParentIds(categories));
+    this.optionsData?.map((option) => this.getParentIds(option));
   }
 
-  getParentIds(data: ICategory) {
-    data.subcategories &&
-      data.subcategories.map((sub_data: ICategory) => {
-        let id = this.selectedIds.includes(sub_data.id) ? data.id : null;
-        id && this.parent.push(id);
-        this.getParentIds(sub_data);
-      });
+  label(option: DropdownOption): string {
+    return optionLabel(option, this.displayKey());
   }
 
-  getSelectedData(value: any) {
+  getParentIds(data: DropdownOption) {
+    optionChildren(data, this.subArrayKey()).map((child) => {
+      const id = this.selectedIds.includes(child.id) ? data.id : null;
+      id && this.parent.push(id);
+      this.getParentIds(child);
+    });
+  }
+
+  getSelectedData(value: DropdownOptionId[]) {
     this.options().forEach((item) => {
       this.recursiveSelected(item, value);
     });
   }
 
-  recursiveSelected(item: IMenu, value: any) {
+  recursiveSelected(item: DropdownOption, value: DropdownOptionId[]) {
     if (item.id && value.includes(item.id)) {
       this.onSelect(item);
     }
-    if (item[this.subArrayKey()]?.length) {
-      item[this.subArrayKey()].forEach((child: IMenu) => {
-        this.recursiveSelected(child, value);
-      });
-    }
+    optionChildren(item, this.subArrayKey()).forEach((child) => {
+      this.recursiveSelected(child, value);
+    });
   }
 
-  hasValue(item: IMenu) {
+  hasValue(item: DropdownOption) {
     let valueToReturn = false;
     if (
-      item[this.displayKey()]
-        .toLowerCase()
-        .includes(this.term?.value?.toLowerCase())
+      this.label(item).toLowerCase().includes(this.term?.value?.toLowerCase())
     ) {
       valueToReturn = true;
     }
-    item[this.subArrayKey()]?.length &&
-      item[this.subArrayKey()].forEach((child: IMenu) => {
-        if (this.hasValue(child)) {
-          valueToReturn = true;
-        }
-      });
+    optionChildren(item, this.subArrayKey()).forEach((child) => {
+      if (this.hasValue(child)) {
+        valueToReturn = true;
+      }
+    });
     return valueToReturn;
   }
 
   toggleDropdown(_event: Event) {
     this.isOpen = !this.isOpen;
-    let selector =
+    const selector =
       this.dropdownContainer().nativeElement.querySelector('.dropdown-open');
     if (this.position() == 'bottom') {
       selector.style.bottom = 'auto';
@@ -122,7 +123,7 @@ export class AdvanceDropdown {
     }
   }
 
-  onSelect(data: any) {
+  onSelect(data: DropdownOption) {
     if (this.selectSingle()) {
       this.selectedPills = [];
       this.selectedIds = [];
@@ -140,23 +141,24 @@ export class AdvanceDropdown {
     this.selectedItem.emit(this.selectedIds);
   }
 
-  removeItem(data: any) {
+  removeItem(data: DropdownOption) {
     this.selectedPills.splice(this.selectedPills.indexOf(data), 1);
     this.selectedIds.splice(this.selectedIds.indexOf(data.id), 1);
     this.selectedItem.emit(this.selectedIds);
   }
 
-  subItemClicked(data: any) {
+  subItemClicked(data: DropdownOption) {
     this.isOpen = true;
-    data[this.subArrayKey()]?.length && this.breadCrumbValues.push(data);
-    data[this.subArrayKey()]?.length &&
-      (this.optionsData = data[this.subArrayKey()]);
+    const children = optionChildren(data, this.subArrayKey());
+    if (children.length) {
+      this.breadCrumbValues.push(data);
+      this.optionsData = children;
+    }
   }
 
-  changeTo(data: any) {
-    const subArrayKey = this.subArrayKey();
-    if (subArrayKey) {
-      this.optionsData = data[subArrayKey];
+  changeTo(data: DropdownOption) {
+    if (this.subArrayKey()) {
+      this.optionsData = optionChildren(data, this.subArrayKey());
       this.breadCrumbValues.splice(
         this.breadCrumbValues.indexOf(data) + 1,
         this.breadCrumbValues.length - this.breadCrumbValues.indexOf(data),

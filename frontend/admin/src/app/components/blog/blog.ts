@@ -49,7 +49,7 @@ export class Blog {
 
   public url: string;
 
-  public tableConfig: ITableConfig = {
+  public tableConfig: ITableConfig<IBlog> = {
     columns: [
       {
         title: 'image',
@@ -112,11 +112,12 @@ export class Blog {
     this.store.dispatch(new GetBlogsAction(data)).subscribe();
   }
 
-  onActionClicked(action: ITableClickedAction) {
+  onActionClicked(action: ITableClickedAction<IBlog>) {
     if (action.actionToPerform == 'edit') this.edit(action.data);
     else if (action.actionToPerform == 'status') this.status(action.data);
     else if (action.actionToPerform == 'delete') this.delete(action.data);
-    else if (action.actionToPerform == 'deleteAll') this.deleteAll(action.data);
+    else if (action.actionToPerform == 'deleteAll')
+      this.deleteAll((action.ids ?? []).map(String));
     else if (action.actionToPerform == 'view') this.view(action.data);
   }
 

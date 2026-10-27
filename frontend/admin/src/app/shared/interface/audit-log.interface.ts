@@ -6,7 +6,7 @@ export interface IAuditLog {
   /**
    * Compatibility field untuk generic table template.
    */
-  id: any;
+  id: string;
 
   id_audit_log: string;
 

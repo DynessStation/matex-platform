@@ -24,7 +24,10 @@ import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';
 import { IOrderItem } from '../../shared/interface/order-list.interface';
-import { IProductModel } from '../../shared/interface/product.interface';
+import {
+  IProduct,
+  IProductModel,
+} from '../../shared/interface/product.interface';
 import {
   ITableClickedAction,
   ITableConfig,
@@ -66,6 +69,11 @@ export class Product implements AfterViewInit {
   orderMax: number | null = null;
   savingOrder = false;
   readonly table = viewChild(Table);
+
+  /** The category the list is filtered by ('' for all). */
+  get selectedCategory(): string {
+    return String(this.filter['category'] ?? '');
+  }
   private pendingTableState: Params | null = null;
   filter: Params = {
     search: '',
@@ -76,7 +84,7 @@ export class Product implements AfterViewInit {
     category: '',
   };
   product$: Observable<IProductModel> = this.store.select(ProductState.product);
-  tableConfig: ITableConfig = {
+  tableConfig: ITableConfig<IProduct> = {
     columns: [
       {
         title: 'image',
@@ -204,7 +212,7 @@ export class Product implements AfterViewInit {
     this.onTableChange({ category: id, page: 1 });
   }
 
-  onActionClicked(action: ITableClickedAction) {
+  onActionClicked(action: ITableClickedAction<IProduct>) {
     if (action.actionToPerform === 'edit')
       void this.router.navigateByUrl(`/product/edit/${action.data.id}`);
     if (action.actionToPerform === 'delete')

@@ -50,7 +50,7 @@ export class ConfirmationModal {
 
   public modalParams: Record<string, string> = {};
 
-  public userAction: ITableClickedAction | null = null;
+  public userAction: ITableClickedAction<unknown> | null = null;
 
   private modalRef: NgbModalRef | null = null;
 
@@ -65,13 +65,13 @@ export class ConfirmationModal {
   //==== OUTPUT
   //==================================================
 
-  readonly confirmed = output<ITableClickedAction>();
+  readonly confirmed = output<ITableClickedAction<unknown>>();
 
   //==================================================
   //==== OPEN MODAL
   //==================================================
 
-  openModal(action: string, data?: any, value?: any): void {
+  openModal(action: string, data?: unknown, value?: unknown): void {
     const template = this.confirmationModal();
 
     if (!template) {

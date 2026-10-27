@@ -20,8 +20,10 @@ export class CategoryService {
 
   getCategories(payload?: Params): Observable<ICategoryModel> {
     let params = new HttpParams();
-    if (payload?.['search']) params = params.set('search', payload['search']);
-    if (payload?.['locale']) params = params.set('locale', payload['locale']);
+    if (payload?.['search'])
+      params = params.set('search', String(payload['search']));
+    if (payload?.['locale'])
+      params = params.set('locale', String(payload['locale']));
     return this.http
       .get<IApiResponse<ICategoryModel>>(this.api, { params })
       .pipe(map((response) => response.data ?? { data: [], total: 0 }));

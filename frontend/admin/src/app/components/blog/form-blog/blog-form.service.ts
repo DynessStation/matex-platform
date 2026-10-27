@@ -15,8 +15,11 @@ import {
   dateToStruct,
   localDate,
 } from './form-blog.util';
+import {
+  MediaSelection,
+  selectedAttachment,
+} from '../../../shared/components/ui/media-box/media-box';
 import { mediaConfig } from '../../../shared/data/media-config';
-import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   ArticleStatus,
   IArticleDetail,
@@ -154,8 +157,10 @@ export class BlogFormService {
   //==== TABS AND MEDIA
   //==================================================
 
-  media(control: 'thumbnail_id' | 'og_image_id', data: IAttachment) {
-    this.form.controls[control].setValue(data?.id_attachment ?? '');
+  media(control: 'thumbnail_id' | 'og_image_id', value: MediaSelection) {
+    this.form.controls[control].setValue(
+      selectedAttachment(value)?.id_attachment ?? '',
+    );
     this.form.controls[control].markAsTouched();
   }
   setTab(tab: BlogFormTab) {
@@ -237,7 +242,7 @@ export class BlogFormService {
       this.formIssues.focusFirstInvalid();
       return;
     }
-    const v = this.form.getRawValue() as any;
+    const v = this.form.getRawValue();
     const payload: IArticlePayload = {
       key: v.key,
       status: v.status,
