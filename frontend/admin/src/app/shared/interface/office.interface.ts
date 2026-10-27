@@ -1,4 +1,5 @@
 import { IAttachment } from './attachment.interface';
+import { IListResponse } from './list.interface';
 
 //==================================================
 //==== OFFICE
@@ -68,31 +69,7 @@ export interface IOffice {
 //==== PAGINATION
 //==================================================
 
-export interface IOfficePagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  total_all?: number;
-
-  length: number;
-
-  pagerows: number;
-
-  total_pages: number;
-
-  has_more: boolean;
-}
-
-export interface IOfficeModel {
-  success: boolean;
-
-  data: IOffice[];
-
-  pagination: IOfficePagination;
-}
+export type IOfficeModel = IListResponse<IOffice>;
 
 //==================================================
 //==== OPERATING HOUR

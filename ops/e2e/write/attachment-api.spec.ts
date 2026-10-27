@@ -73,7 +73,7 @@ test('attachment endpoints require a session', async () => {
 
 test('upload validates collection, files, and types', async () => {
   owner = await login(admin.identity, admin.password);
-  totalBefore = Number((await expectCode(await owner.get(base), 200)).pagination?.total);
+  totalBefore = Number((await expectCode(await owner.get(base), 200)).meta?.total);
   await expectCode(await upload('nope', [png()]), 400, 'ATTACHMENT_COLLECTION_INVALID');
   await expectCode(await upload(undefined, [png()]), 400, 'ATTACHMENT_COLLECTION_INVALID');
   await expectCode(await upload('media_library', []), 400, 'ATTACHMENT_FILE_REQUIRED');
@@ -114,7 +114,7 @@ test('upload validates collection, files, and types', async () => {
   );
   // Nothing was stored by the refused uploads.
   const list = await expectCode(await owner.get(base), 200);
-  expect(list.pagination).toMatchObject({ total: totalBefore });
+  expect(list.meta).toMatchObject({ total: totalBefore });
 });
 
 test('upload stores images as webp', async () => {
@@ -178,13 +178,15 @@ test('upload stores images as webp', async () => {
 
 test('list, paging, sorting, and filters', async () => {
   const all = await expectCode(await owner.get(base), 200);
-  expect(all.pagination).toMatchObject({ page: 1, limit: 20, total: totalBefore + 3 });
+  expect(all.meta).toMatchObject({ page: 1, limit: 20, total: totalBefore + 3 });
   // Newest first by default.
   expect(all.data.slice(0, 3).map((item: any) => item.id_attachment)).toEqual(
     [...libraryIds].reverse(),
   );
   const list = await expectCode(await ownRows(), 200);
-  expect(list.pagination).toMatchObject({ total: 3, length: 3, has_more: false });
+  expect(list.meta).toMatchObject({ total: 3 });
+  expect(list.data).toHaveLength(3);
+  expect(list.meta.page < list.meta.total_pages).toBe(false);
   expect(list.data[0]).toMatchObject({ usage_total: 0, usage: [] });
   expect(list.data[0]).toMatchObject({ file_size: expect.any(Number), width: expect.any(Number) });
 
@@ -194,13 +196,14 @@ test('list, paging, sorting, and filters', async () => {
     await expectCode(await owner.get(base, { params: { sort } }), 200);
   }
   const paged = await expectCode(await ownRows({ limit: '2', page: '2' }), 200);
-  expect(paged.pagination).toMatchObject({ page: 2, limit: 2, length: 1, total_pages: 2 });
+  expect(paged.meta).toMatchObject({ page: 2, limit: 2, total_pages: 2 });
+  expect(paged.data).toHaveLength(1);
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
-  expect(capped.pagination).toMatchObject({ limit: 50 });
+  expect(capped.meta).toMatchObject({ limit: 50 });
   await expectCode(await owner.get(base, { params: { page: 'x', limit: '-1' } }), 200);
 
   const filtered = async (params: Record<string, string>) =>
-    (await expectCode(await ownRows(params), 200)).pagination?.total;
+    (await expectCode(await ownRows(params), 200)).meta?.total;
   expect(await filtered({ search: `dua-${runId}` })).toBe(1);
   expect(await filtered({ search: 'no-such-file' })).toBe(0);
   expect(await filtered({ collection: 'media_library' })).toBe(3);
@@ -290,7 +293,7 @@ test('delete refuses files in use and removes the rest', async () => {
     usage_total: 1,
     usage: [{ source: 'product_category.attachment', total: 1 }],
   });
-  expect(remaining.pagination).toMatchObject({ total: totalBefore + 2 });
+  expect(remaining.meta).toMatchObject({ total: totalBefore + 2 });
 });
 
 test('an account without attachment rights is refused', async () => {

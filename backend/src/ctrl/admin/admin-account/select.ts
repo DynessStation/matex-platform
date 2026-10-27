@@ -7,9 +7,9 @@ import { Response } from 'express';
 import db = require('../../../db');
 import keyhsid from '../../../hsid';
 import { AdminScope, getAdminScope } from '../../../helper/admin-scope.helper';
-import { sendError } from '../../../helper/api-response.helper';
+import { sendError, sendList } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
-import { parseListQuery } from '../../../helper/list-query.helper';
+import { pageMeta, parseListQuery } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 
 const { pool } = db;
@@ -77,11 +77,13 @@ const selectRoute = (name: string, byCompany: boolean, source: SelectSource) =>
       );
       const data = (rows as RowDataPacket[]).map(source.option);
 
-      return res.status(200).json({
-        success: true,
+      return sendList(
+        res,
+        'ADMIN_ACCOUNT_OPTIONS_LISTED',
+        'Options loaded',
         data,
-        pagination: { page, limit, total, has_more: offset + data.length < total },
-      });
+        pageMeta({ page, limit }, total),
+      );
     },
   );
 

@@ -273,9 +273,9 @@ export class AdminAccess {
 
           data: this.localizeRows(result.data),
 
-          total: result.pagination.total,
+          total: result.meta.total,
 
-          total_all: result.pagination.total_all ?? result.pagination.total,
+          total_all: result.meta.total_all ?? result.meta.total,
         };
       });
 

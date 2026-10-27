@@ -396,11 +396,12 @@ export class AdminAccountLookupService {
 
     const state = this.lookupState[type];
 
-    state.page = response.pagination.page;
+    state.page = response.meta.page ?? 1;
 
     state.search = search;
 
-    state.hasMore = response.pagination.has_more;
+    state.hasMore =
+      (response.meta.page ?? 1) < (response.meta.total_pages ?? 0);
 
     state.initialized = true;
   }

@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { IApiResponse } from '../interface/api-response.interface';
 import {
@@ -18,18 +19,9 @@ export class BlogService {
   private http = inject(HttpClient);
   private api = `${environment.API_URL}/api/v1/articles`;
   getBlogs(payload?: Params): Observable<IBlogModel> {
-    let params = new HttpParams();
-    if (payload?.['page']) params = params.set('page', String(payload['page']));
-    if (payload?.['paginate'])
-      params = params.set('limit', String(payload['paginate']));
-    if (payload?.['search'])
-      params = params.set('search', String(payload['search']));
-    if (payload?.['field'])
-      params = params.set('field', String(payload['field']));
-    if (payload?.['sort']) params = params.set('sort', String(payload['sort']));
-    return this.http
-      .get<IApiResponse<IBlogModel>>(this.api, { params })
-      .pipe(map((r) => r.data ?? { data: [], total: 0 }));
+    const params = listParams(payload);
+
+    return this.http.get<IBlogModel>(this.api, { params });
   }
   getBlog(id: string) {
     return this.http.get<IApiResponse<IArticleDetail>>(`${this.api}/${id}`);

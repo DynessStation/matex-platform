@@ -125,9 +125,9 @@ test('list tree, detail, and the public site', async () => {
     200,
     'PRODUCT_CATEGORIES_LISTED',
   );
-  expect(list.data.total).toBe(2);
-  expect(list.data.data).toHaveLength(1);
-  expect(list.data.data[0]).toMatchObject({
+  expect(list.meta.total).toBe(2);
+  expect(list.data).toHaveLength(1);
+  expect(list.data[0]).toMatchObject({
     id: parentId,
     key,
     name: 'Kategori Uji ID',
@@ -141,7 +141,7 @@ test('list tree, detail, and the public site', async () => {
     await owner.get(base, { params: { search: key, locale: 'en-US' } }),
     200,
   );
-  expect(english.data.data[0].name).toBe('Kategori Uji EN');
+  expect(english.data[0].name).toBe('Kategori Uji EN');
 
   const detail = await expectCode(
     await owner.get(`${base}/${parentId}`),
@@ -164,7 +164,7 @@ test('list tree, detail, and the public site', async () => {
   });
   await expectCode(await owner.get(`${base}/not-a-hash`), 404, 'PRODUCT_CATEGORY_NOT_FOUND');
 
-  const shown = flatten((await publicCategories()).data).map((item: any) => item.key);
+  const shown = flatten(await publicCategories()).map((item: any) => item.key);
   expect(shown).toEqual(expect.arrayContaining([key, `${key}-anak`]));
   await expectCode(await anonymous.get(`/api/public/product-categories/en-US/${key}-en`), 200);
   await expectCode(
@@ -218,7 +218,7 @@ test('update guards the parent tree', async () => {
     category_image: null,
     translations: [{ name: 'Kategori Ubah EN', status: 0 }, { name: 'Kategori Ubah ID' }],
   });
-  const shown = flatten((await publicCategories()).data).map((item: any) => item.key);
+  const shown = flatten(await publicCategories()).map((item: any) => item.key);
   expect(shown).not.toContain(key);
 });
 
@@ -302,7 +302,7 @@ test('categories that hold products', async () => {
 
   // The list shows how many products each category holds (D-2).
   const list = await expectCode(await owner.get(base, { params: { search: key } }), 200);
-  expect(list.data.data[0]).toMatchObject({
+  expect(list.data[0]).toMatchObject({
     id: parentId,
     product_count: 0,
     subcategories: [{ id: childId, product_count: 1 }],
@@ -363,7 +363,7 @@ test('delete', async () => {
   // A deleted category no longer holds its media, so the image can be deleted.
   await expectCode(await owner.delete(`/api/v1/attachment/${image}`), 200, 'ATTACHMENT_DELETED');
   const list = await expectCode(await owner.get(base, { params: { search: key } }), 200);
-  expect(list.data.total).toBe(0);
+  expect(list.meta.total).toBe(0);
   const audit = await expectCode(
     await owner.get('/api/v1/audit-log', {
       params: { module: 'product_category', event_code: 'product_category.deleted' },

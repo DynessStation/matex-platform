@@ -6,9 +6,9 @@ import { Response } from 'express';
 import db = require('../../../db');
 import keyhsid from '../../../hsid';
 import { getAdminScope } from '../../../helper/admin-scope.helper';
-import { sendError } from '../../../helper/api-response.helper';
+import { sendError, sendList } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
-import { parseListQuery, sortColumn, countOf } from '../../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
@@ -55,9 +55,16 @@ router.get(
     const scope = await getAdminScope(req);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-    const { page, limit, offset, searchValue } = parseListQuery(req.query, { defaultLimit: 10 });
-    const orderBy = sortColumn(SORTABLE, req.query.ord, 'aa.id_admin_acct');
-    const direction = req.query.srt === 'true' ? 'DESC' : 'ASC';
+    const {
+      page,
+      limit,
+      offset,
+      searchValue,
+      sort,
+      direction: requested,
+    } = parseListQuery(req.query, { defaultLimit: 10 });
+    const orderBy = sortColumn(SORTABLE, sort, 'aa.id_admin_acct');
+    const direction = requested ?? 'ASC';
     const params = [
       ...Array(7).fill(searchValue),
       scope.idMasterComp,
@@ -109,18 +116,13 @@ router.get(
       };
     });
 
-    return res.status(200).json({
-      success: true,
+    return sendList(
+      res,
+      'ADMIN_ACCOUNTS_LISTED',
+      'Admin accounts loaded',
       data,
-      pagination: {
-        total,
-        total_all: totalAll,
-        page,
-        limit,
-        length: data.length,
-        pagerows: Math.ceil(total / limit),
-      },
-    });
+      pageMeta({ page, limit }, total, totalAll),
+    );
   },
 );
 

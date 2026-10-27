@@ -50,7 +50,7 @@ test('list and permission matrix', async () => {
   owner = await login(admin.identity, admin.password);
   const list = await expectCode(await owner.get(base), 200);
   expect(list.data.length).toBeGreaterThan(0);
-  expect(list.pagination).toMatchObject({ page: 1 });
+  expect(list.meta).toMatchObject({ page: 1 });
 
   // /permission-matrix is registered before /:id; if that order breaks, it answers "invalid id".
   const matrix = await expectCode(await owner.get(`${base}/permission-matrix`), 200);
@@ -180,7 +180,8 @@ test('update refuses a name used by another profile; list paging and sorting', a
     await owner.get(base, { params: { ord: 'access_name', srt: 'true', limit: '1', page: '2' } }),
     200,
   );
-  expect(page.pagination).toMatchObject({ page: 2, limit: 1, length: 1 });
+  expect(page.meta).toMatchObject({ page: 2, limit: 1 });
+  expect(page.data).toHaveLength(1);
   await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
 });
 

@@ -7,11 +7,11 @@ import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import db = require('../../db');
 import keyhsid from '../../hsid';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -123,13 +123,16 @@ router.get(
   verifyToken,
   requirePermission('admin_permission.view'),
   async (req: AuthRequest, res: Response) => {
-    // The admin UI sends the page size as ?paginate=.
-    const { page, limit, offset, searchValue } = parseListQuery({
-      ...req.query,
-      limit: req.query.paginate ?? req.query.limit,
-    });
-    const orderBy = sortColumn(SORTABLE, req.query.field, 'ap.permission_group');
-    const direction = sortDirection(String(req.query.sort ?? '').toLowerCase(), 'ASC');
+    const {
+      page,
+      limit,
+      offset,
+      searchValue,
+      sort,
+      direction: requested,
+    } = parseListQuery(req.query);
+    const orderBy = sortColumn(SORTABLE, sort, 'ap.permission_group');
+    const direction = requested ?? 'ASC';
     const searchValues = [searchValue, searchValue, searchValue, searchValue];
 
     const [totalRows] = await pool.query(
@@ -162,18 +165,13 @@ router.get(
       updated: item.updated,
     }));
 
-    return res.status(200).json({
-      success: true,
+    return sendList(
+      res,
+      'ADMIN_PERMISSIONS_LISTED',
+      'Admin permissions loaded',
       data,
-      pagination: {
-        total,
-        total_all: totalAll,
-        page,
-        limit,
-        length: data.length,
-        pagerows: Math.ceil(total / limit),
-      },
-    });
+      pageMeta({ page, limit }, total, totalAll),
+    );
   },
 );
 

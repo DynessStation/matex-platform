@@ -3,7 +3,8 @@ import { RowDataPacket } from 'mysql2';
 import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
+import { pageMeta, parseListQuery } from '../../helper/list-query.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
@@ -37,10 +38,6 @@ const jsonValue = (value: unknown): unknown => {
   } catch {
     return value.trim() || null;
   }
-};
-const positiveInt = (value: unknown, fallback: number, maximum = 100) => {
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) && parsed > 0 ? Math.min(parsed, maximum) : fallback;
 };
 const currencyCode = (value: unknown) => {
   const code = String(value ?? 'IDR')
@@ -248,10 +245,10 @@ router.get(
       .filter((value) => Number.isSafeInteger(value) && value > 0)
       .slice(0, 100);
     const excludedId = Number(req.query.exclude_id);
-    const page = positiveInt(req.query.page, 1, 100000),
-      paginate = positiveInt(req.query.paginate, 100, 100),
-      preferredCurrency = currencyCode(req.query.currency);
-    const sortBy = String(req.query.sortBy ?? 'asc');
+    const { page, limit } = parseListQuery(req.query, { defaultLimit: 100, maxLimit: 100 });
+    const preferredCurrency = currencyCode(req.query.currency);
+    // `sort` names a catalog order (a-z, z-a, low-high, high-low, desc); `sortBy` is its older name.
+    const sortBy = String(req.query.sort ?? req.query.sortBy ?? 'asc');
     const needsCategoryJoin = categories.length > 0 || categoryIds.length > 0;
     const categoryJoin = needsCategoryJoin
       ? ` JOIN product_catalog_category pc_filter ON pc_filter.id_product=p.id_product JOIN product_category_i18n ci_filter ON ci_filter.id_product_category=pc_filter.id_product_category AND ci_filter.product_category_locale=i.product_locale`
@@ -306,14 +303,14 @@ router.get(
       );
     if (sortBy === 'low-high') data.sort((a, b) => a.sale_price - b.sale_price);
     if (sortBy === 'high-low') data.sort((a, b) => b.sale_price - a.sale_price);
-    const total = data.length,
-      start = (page - 1) * paginate;
-    return sendSuccess(res, 200, 'PRODUCTS_FOUND', 'Products loaded', {
-      data: data.slice(start, start + paginate),
-      total,
-      page,
-      paginate,
-    });
+    const start = (page - 1) * limit;
+    return sendList(
+      res,
+      'PRODUCTS_FOUND',
+      'Products loaded',
+      data.slice(start, start + limit),
+      pageMeta({ page, limit }, data.length),
+    );
   },
 );
 router.get(

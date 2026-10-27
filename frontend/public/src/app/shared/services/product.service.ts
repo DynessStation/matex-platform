@@ -8,7 +8,12 @@ import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Params } from '../interface/core.interface';
 import { Product, ProductModel } from '../interface/product.interface';
-import { PublicApiResponse } from '../interface/public-content.interface';
+import {
+  PublicApiResponse,
+  PublicListResponse,
+  toListModel,
+  toListQuery,
+} from '../interface/public-content.interface';
 import { SettingState } from '../store/state/setting.state';
 
 @Injectable({ providedIn: 'root' })
@@ -22,17 +27,14 @@ export class ProductService {
   public searchSkeleton = false;
   getProducts(payload?: Params) {
     let params = new HttpParams();
-    for (const [key, value] of Object.entries(payload ?? {}))
+    for (const [key, value] of Object.entries(toListQuery(payload)))
       if (value !== '' && value != null) params = params.set(key, String(value));
     if (!params.has('currency')) params = params.set('currency', this.currencyCode());
     return this.http
-      .get<PublicApiResponse<ProductModel>>(
-        `${environment.publicApiURL}/products/${this.locale()}`,
-        {
-          params,
-        },
-      )
-      .pipe(map((r) => r.data ?? { data: [], total: 0 }));
+      .get<PublicListResponse<Product>>(`${environment.publicApiURL}/products/${this.locale()}`, {
+        params,
+      })
+      .pipe(map((r): ProductModel => toListModel(r)));
   }
   getProductBySlug(slug: string, locale: 'id-ID' | 'en-US' = this.locale()) {
     return this.http

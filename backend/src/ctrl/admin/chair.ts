@@ -8,11 +8,11 @@ import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 import db = require('../../db');
 import keyhsid from '../../hsid';
 import { getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -126,9 +126,16 @@ router.get(
     const scope = await getAdminScope(req);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-    const { page, limit, offset, searchValue } = parseListQuery(req.query);
-    const orderBy = sortColumn(SORTABLE, req.query.ord, 'ch.id_chair');
-    const direction = sortDirection(req.query.srt, 'ASC');
+    const {
+      page,
+      limit,
+      offset,
+      searchValue,
+      sort,
+      direction: requested,
+    } = parseListQuery(req.query);
+    const orderBy = sortColumn(SORTABLE, sort, 'ch.id_chair');
+    const direction = requested ?? 'ASC';
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM chair ch
@@ -167,20 +174,13 @@ router.get(
       updated: item.updated,
     }));
 
-    return res.status(200).json({
-      success: true,
+    return sendList(
+      res,
+      'CHAIRS_LISTED',
+      'Positions loaded',
       data,
-      pagination: {
-        page,
-        limit,
-        total,
-        total_all: totalAll,
-        length: data.length,
-        pagerows: Math.ceil(total / limit),
-        total_pages: Math.ceil(total / limit),
-        has_more: offset + data.length < total,
-      },
-    });
+      pageMeta({ page, limit }, total, totalAll),
+    );
   },
 );
 

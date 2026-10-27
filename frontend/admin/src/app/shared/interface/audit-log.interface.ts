@@ -1,3 +1,5 @@
+import { IListResponse } from './list.interface';
+
 //==================================================
 //==== AUDIT LOG
 //==================================================
@@ -84,35 +86,11 @@ export interface IAuditLogHttp {
 //==== PAGINATION
 //==================================================
 
-export interface IAuditLogPagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  total_all?: number;
-
-  length: number;
-
-  pagerows: number;
-
-  total_pages: number;
-
-  has_more: boolean;
-}
-
 //==================================================
 //==== LIST MODEL
 //==================================================
 
-export interface IAuditLogModel {
-  success: boolean;
-
-  data: IAuditLog[];
-
-  pagination: IAuditLogPagination;
-}
+export type IAuditLogModel = IListResponse<IAuditLog>;
 
 //==================================================
 //==== DETAIL HTTP

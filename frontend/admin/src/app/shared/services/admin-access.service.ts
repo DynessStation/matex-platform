@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import {
   IAdminAccessDetailResponse,
@@ -33,33 +34,7 @@ export class AdminAccessService {
   //==================================================
 
   getAdminAccesses(payload?: Params): Observable<IAdminAccessModel> {
-    let params = new HttpParams();
-
-    if (payload) {
-      if (payload['page'] !== undefined) {
-        params = params.set('page', String(payload['page'] || 1));
-      }
-
-      if (payload['paginate'] !== undefined) {
-        params = params.set('limit', String(payload['paginate']));
-      }
-
-      if (payload['limit'] !== undefined) {
-        params = params.set('limit', String(payload['limit']));
-      }
-
-      if (payload['search']) {
-        params = params.set('search', String(payload['search']));
-      }
-
-      if (payload['field']) {
-        params = params.set('ord', String(payload['field']));
-      }
-
-      if (payload['sort']) {
-        params = params.set('srt', String(payload['sort']));
-      }
-    }
+    const params = listParams(payload);
 
     return this.http
       .get<IAdminAccessModel>(this.apiUrl, {

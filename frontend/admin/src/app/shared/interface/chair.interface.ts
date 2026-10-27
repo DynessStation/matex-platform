@@ -1,4 +1,5 @@
 import { IApiResponse } from './api-response.interface';
+import { IListResponse } from './list.interface';
 
 //==================================================
 //==== CHAIR / POSITION
@@ -31,35 +32,11 @@ export interface IChair {
 //==== PAGINATION
 //==================================================
 
-export interface IChairPagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  total_all?: number;
-
-  length: number;
-
-  pagerows: number;
-
-  total_pages: number;
-
-  has_more: boolean;
-}
-
 //==================================================
 //==== LIST
 //==================================================
 
-export interface IChairModel {
-  success: boolean;
-
-  data: IChair[];
-
-  pagination: IChairPagination;
-}
+export type IChairModel = IListResponse<IChair>;
 
 //==================================================
 //==== DETAIL

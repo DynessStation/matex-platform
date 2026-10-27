@@ -279,10 +279,9 @@ export class Office {
 
           data: this.localizeRows(result?.data ?? []),
 
-          total: result?.pagination.total ?? 0,
+          total: result?.meta.total ?? 0,
 
-          total_all:
-            result?.pagination.total_all ?? result?.pagination.total ?? 0,
+          total_all: result?.meta.total_all ?? result?.meta.total ?? 0,
         };
       });
 

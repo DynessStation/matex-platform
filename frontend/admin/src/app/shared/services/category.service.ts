@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { IApiResponse } from '../interface/api-response.interface';
 import {
@@ -19,14 +20,9 @@ export class CategoryService {
   private api = `${environment.API_URL}/api/v1/product-categories`;
 
   getCategories(payload?: Params): Observable<ICategoryModel> {
-    let params = new HttpParams();
-    if (payload?.['search'])
-      params = params.set('search', String(payload['search']));
-    if (payload?.['locale'])
-      params = params.set('locale', String(payload['locale']));
-    return this.http
-      .get<IApiResponse<ICategoryModel>>(this.api, { params })
-      .pipe(map((response) => response.data ?? { data: [], total: 0 }));
+    const params = listParams(payload);
+
+    return this.http.get<ICategoryModel>(this.api, { params });
   }
   getCategory(id: string) {
     return this.http.get<IApiResponse<ICategoryDetail>>(`${this.api}/${id}`);

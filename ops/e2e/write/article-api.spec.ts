@@ -52,7 +52,7 @@ const publicSlugs = async (locale = 'id-ID') =>
       await anonymous.get(`/api/public/articles/${locale}`, { params: { limit: '50' } }),
       200,
     )
-  ).data.data.map((item: any) => item.slug);
+  ).data.map((item: any) => item.slug);
 
 test.beforeAll(async () => {
   anonymous = await apiContext();
@@ -77,7 +77,7 @@ test('article endpoints require a session', async () => {
 test('list, paging, and sorting', async () => {
   owner = await login(admin.identity, admin.password);
   const list = await expectCode(await owner.get(base), 200, 'ARTICLES_LISTED');
-  expect(list.data).toMatchObject({ current_page: 1, per_page: 15 });
+  expect(list.meta).toMatchObject({ page: 1, limit: 15 });
   for (const params of [
     { field: 'title', sort: 'asc', limit: '2' },
     { field: 'created_at', paginate: '3', page: '2' },
@@ -86,7 +86,7 @@ test('list, paging, and sorting', async () => {
     await expectCode(await owner.get(base, { params }), 200);
   }
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
-  expect(capped.data.per_page).toBe(100);
+  expect(capped.meta.limit).toBe(100);
   // Unknown sort fields fall back to the default order (no 500).
   await expectCode(
     await owner.get(base, { params: { field: 'toString' } }),
@@ -159,8 +159,8 @@ test('detail, list entry, and the public site', async () => {
     ],
   });
   const found = await expectCode(await owner.get(base, { params: { search: key } }), 200);
-  expect(found.data.total).toBe(1);
-  expect(found.data.data[0]).toMatchObject({
+  expect(found.meta.total).toBe(1);
+  expect(found.data[0]).toMatchObject({
     key,
     title: 'Artikel Uji',
     blog_thumbnail: { id_attachment: thumbnail },
@@ -297,7 +297,7 @@ test('delete moves the article to the trash', async () => {
     'ARTICLE_NOT_FOUND',
   );
   const found = await expectCode(await owner.get(base, { params: { search: key } }), 200);
-  expect(found.data.total).toBe(0);
+  expect(found.meta.total).toBe(0);
   // Status changes and deletes are audited like every other change.
   const audit = await expectCode(
     await owner.get('/api/v1/audit-log', { params: { module: 'article', search: key } }),

@@ -103,8 +103,8 @@ export class Blog {
   ngOnInit() {
     this.blog$.subscribe((blog) => {
       this.tableConfig.data = blog ? blog?.data : [];
-      this.tableConfig.total = blog ? blog?.total : 0;
-      this.tableConfig.total_all = blog?.total_all;
+      this.tableConfig.total = blog?.meta.total ?? 0;
+      this.tableConfig.total_all = blog?.meta.total_all;
     });
   }
 

@@ -7,7 +7,11 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Category, CategoryModel } from '../interface/category.interface';
 import { Params } from '../interface/core.interface';
-import { PublicApiResponse } from '../interface/public-content.interface';
+import {
+  PublicApiResponse,
+  PublicListResponse,
+  toListModel,
+} from '../interface/public-content.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
@@ -17,10 +21,10 @@ export class CategoryService {
 
   getCategories(_payload?: Params): Observable<CategoryModel> {
     return this.http
-      .get<PublicApiResponse<CategoryModel>>(
+      .get<PublicListResponse<Category>>(
         `${environment.publicApiURL}/product-categories/${this.locale()}`,
       )
-      .pipe(map((response) => response.data ?? { data: [], total: 0 }));
+      .pipe(map((response): CategoryModel => toListModel(response)));
   }
   getCategoryBySlug(slug: string, locale: 'id-ID' | 'en-US' = this.locale()): Observable<Category> {
     return this.http

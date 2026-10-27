@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
 
+import { emptyList } from '../../interface/list.interface';
 import { IProduct, IProductModel } from '../../interface/product.interface';
 import { ApiMessageService } from '../../services/api-message.service';
 import { NotificationService } from '../../services/notification.service';
@@ -24,7 +25,7 @@ export interface ProductStateModel {
 @State<ProductStateModel>({
   name: 'product',
   defaults: {
-    product: { data: [], total: 0 },
+    product: emptyList(),
     selectedProduct: null,
     topSellingProducts: [],
   },

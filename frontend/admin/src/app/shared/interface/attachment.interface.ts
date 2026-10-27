@@ -1,5 +1,6 @@
 import { IApiResponse } from './api-response.interface';
 import { IPaginateModel } from './core.interface';
+import { IListResponse } from './list.interface';
 
 //==================================================
 //==== ATTACHMENT
@@ -73,36 +74,10 @@ export interface IAttachmentModel extends IPaginateModel {
 }
 
 //==================================================
-//==== ATTACHMENT API PAGINATION
-//==================================================
-
-export interface IAttachmentPagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  total_all?: number;
-
-  length: number;
-
-  total_pages: number;
-
-  has_more: boolean;
-}
-
-//==================================================
 //==== ATTACHMENT LIST RESPONSE
 //==================================================
 
-export interface IAttachmentListResponse {
-  success: boolean;
-
-  data: IAttachment[];
-
-  pagination: IAttachmentPagination;
-}
+export type IAttachmentListResponse = IListResponse<IAttachment>;
 
 //==================================================
 //==== CREATE ATTACHMENT PAYLOAD

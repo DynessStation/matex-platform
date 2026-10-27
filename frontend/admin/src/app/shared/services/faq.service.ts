@@ -1,10 +1,10 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
-import { IApiResponse } from '../interface/api-response.interface';
 import { Params } from '../interface/core.interface';
 import {
   IFaqDetailResponse,
@@ -25,27 +25,9 @@ export class FaqService {
   private readonly apiUrl = `${environment.API_URL}/api/v1/faq`;
 
   getFaqs(payload?: Params): Observable<IFaqModel> {
-    let params = new HttpParams();
-    if (payload?.['page'] !== undefined)
-      params = params.set('page', String(payload['page'] || 1));
-    if (payload?.['paginate'] !== undefined)
-      params = params.set('limit', String(payload['paginate']));
-    if (payload?.['limit'] !== undefined)
-      params = params.set('limit', String(payload['limit']));
-    if (payload?.['search'])
-      params = params.set('search', String(payload['search']));
-    if (payload?.['field'])
-      params = params.set('field', String(payload['field']));
-    if (payload?.['sort']) params = params.set('sort', String(payload['sort']));
-    return this.http.get<IApiResponse<IFaqModel>>(this.apiUrl, { params }).pipe(
-      map(
-        (response) =>
-          response.data ?? {
-            data: [],
-            pagination: { current_page: 1, per_page: 15, total: 0 },
-          },
-      ),
-    );
+    const params = listParams(payload);
+
+    return this.http.get<IFaqModel>(this.apiUrl, { params });
   }
 
   /** Every FAQ in its order, for "Atur urutan". */

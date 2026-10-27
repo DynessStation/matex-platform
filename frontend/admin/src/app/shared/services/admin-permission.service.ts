@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import {
   IAdminPermissionDetailResponse,
@@ -34,17 +35,7 @@ export class AdminPermissionService {
   //==================================================
 
   getAdminPermissions(payload?: Params): Observable<IAdminPermissionModel> {
-    let params = new HttpParams();
-
-    if (payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        if (value === undefined || value === null || value === '') {
-          return;
-        }
-
-        params = params.set(key, String(value));
-      });
-    }
+    const params = listParams(payload);
 
     return this.http
       .get<IAdminPermissionModel>(this.apiUrl, {

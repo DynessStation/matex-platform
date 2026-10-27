@@ -3,7 +3,7 @@ import { RowDataPacket } from 'mysql2';
 import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
@@ -114,8 +114,7 @@ router.get(
       [scope.company, scope.locale],
     );
     const data = await withLocalizedSlugs(rows, scope.company);
-    return sendSuccess(res, 200, 'PRODUCT_CATEGORIES_FOUND', 'Product categories loaded', {
-      data: tree(data),
+    return sendList(res, 'PRODUCT_CATEGORIES_FOUND', 'Product categories loaded', tree(data), {
       total: data.length,
     });
   },

@@ -4,6 +4,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { forkJoin, tap } from 'rxjs';
 
 import { IArticleDetail, IBlogModel } from '../../interface/blog.interface';
+import { emptyList } from '../../interface/list.interface';
 import { ApiMessageService } from '../../services/api-message.service';
 import { BlogService } from '../../services/blog.service';
 import { NotificationService } from '../../services/notification.service';
@@ -23,7 +24,7 @@ export interface BlogStateModel {
 }
 @State<BlogStateModel>({
   name: 'blog',
-  defaults: { blog: { data: [], total: 0 }, selectedBlog: null },
+  defaults: { blog: emptyList(), selectedBlog: null },
 })
 @Injectable()
 export class BlogState {

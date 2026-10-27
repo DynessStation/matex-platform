@@ -7,6 +7,7 @@ import {
   IAdminPermissionDetailResponse,
   IAdminPermissionModel,
 } from '../../interface/admin-permission.interface';
+import { emptyList } from '../../interface/list.interface';
 import { AdminPermissionService } from '../../services/admin-permission.service';
 import { ApiMessageService } from '../../services/api-message.service';
 import { NotificationService } from '../../services/notification.service';
@@ -37,23 +38,7 @@ export interface AdminPermissionStateModel {
   name: 'adminPermission',
 
   defaults: {
-    adminPermissions: {
-      success: false,
-
-      data: [],
-
-      pagination: {
-        total: 0,
-
-        page: 1,
-
-        limit: 15,
-
-        length: 0,
-
-        pagerows: 0,
-      },
-    },
+    adminPermissions: emptyList(),
 
     selectedAdminPermission: null,
   },

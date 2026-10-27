@@ -1,4 +1,5 @@
 import { IApiResponse } from './api-response.interface';
+import { IListResponse } from './list.interface';
 
 export type FaqLocale = 'id-ID' | 'en-US';
 
@@ -41,15 +42,7 @@ export interface IFaqPayload {
   translations: IFaqTranslation[];
 }
 
-export interface IFaqModel {
-  data: IFaq[];
-  pagination: {
-    current_page: number;
-    per_page: number;
-    total: number;
-    total_all?: number;
-  };
-}
+export type IFaqModel = IListResponse<IFaq>;
 
 export type IFaqDetailResponse = IApiResponse<IFaqDetail>;
 export type IFaqMutationResponse = IApiResponse<{ id: string } | null>;

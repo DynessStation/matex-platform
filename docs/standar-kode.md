@@ -68,7 +68,7 @@ Pola standar (semua modul generasi lama sudah dipindah di Fase 5C; contoh ringka
 2. Scope sesi lewat `getAdminScope(req)`. Di belakang `requirePermission`, scope sudah dititipkan di `req.adminScope`, jadi tidak ada query akun yang diulang. Jangan menulis query sesi sendiri.
 3. Input dibaca dan divalidasi dengan helper bersama, dan ditolak dengan kode yang jelas.
 4. Perubahan data memakai `withTransaction` dan menulis audit log (`writeAuditLog`).
-5. Respons memakai `sendSuccess` dan `sendError`, bukan `res.json` langsung.
+5. Respons memakai `sendSuccess` dan `sendError`, bukan `res.json` langsung. Daftar memakai `sendList` (lihat 2.4).
 6. Kegagalan yang diharapkan boleh `throw new HttpError(status, kode, pesan)` dari mana saja: penanganan error pusat (`middleware/error-handler.middleware.ts`) menjawabnya, dan `withTransaction` melakukan rollback dulu. Error tak terduga dijawab 500 oleh penanganan yang sama.
 
 Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi bantu):
@@ -78,12 +78,12 @@ Helper bersama di `backend/src/helper/` (cek dulu di sini sebelum menulis fungsi
 | `admin-scope.helper.ts` | `getAdminScope` (admin, perusahaan, kantor, profil akses, full-access) dan `adminHasPermission` |
 | `input.helper.ts` | `nullableString`, `trimTo`, `toFlag` / `parseFlag`, `slugFromText`, `contentSlug`, `isValidEmail`, `isValidHttpUrl` |
 | `id.helper.ts` | `decodeId(value, codec)` untuk ID hashids |
-| `list-query.helper.ts` | `parseListQuery` (page, limit, search), `sortColumn` (hanya kolom yang didaftarkan), dan `sortDirection` |
+| `list-query.helper.ts` | `parseListQuery` (page, limit, search, sort, direction, plus nama lama untuk satu rilis), `sortColumn` (hanya kolom yang didaftarkan), `pageMeta`, `countOf` |
 | `json.helper.ts` | `parseJsonValue` untuk kolom JSON |
 | `transaction.helper.ts` | `withTransaction` |
 | `http-error.helper.ts` | `HttpError` |
 | `middleware/error-handler.middleware.ts` | `onFailure(kode, pesan, { duplicate })`: kode 500/409 milik route, untuk modul yang API-nya punya kode gagal sendiri |
-| `api-response.helper.ts` | `sendSuccess`, `sendError` |
+| `api-response.helper.ts` | `sendSuccess`, `sendError`, `sendList` |
 | `audit-log.helper.ts` | `writeAuditLog` |
 | `attachment.helper.ts` | `storeAttachment` (validasi per koleksi, gambar jadi WebP, cek isi video), `buildAttachmentUrl`, `deleteStoredAttachment` |
 
@@ -114,7 +114,8 @@ Contoh lengkapnya modul `office` (3.115 → 1.327 baris, rekaman identik).
 - **ID di API** selalu disamarkan dengan hashids (`hsid.ts`). ID yang tidak valid dijawab 400 atau 404, tidak pernah 500.
 - **Query** selalu memakai parameter (`?`) dan selalu dibatasi perusahaan (`id_master_comp`).
 - **Nama lama yang dipertahankan**, karena mengganti nama API atau tabel berisiko tinggi tapi manfaatnya kecil: path `/api/v1/admin-acct`, tabel `admin_acct` dan `master_comp`, serta istilah `chair` (= jabatan).
-- **Belum seragam, diputuskan di Fase 5:** soft delete ada yang memakai status 99 (`office`, `admin_acct`, `admin_access`, `chair`) dan ada yang memakai kolom `*_deleted_at` (`web_navigation`, `faq`). Format pagination juga ada dua: `pagerows` dan `has_more`. Penyeragamannya mengubah perilaku, jadi dikerjakan bersama frontend.
+- **Daftar (A-2, 27 Okt):** semua daftar menjawab `{ success, code, message, data: [...item], meta }` lewat `sendList`. `meta` berisi `page`, `limit`, `total` (yang cocok dengan pencarian dan filter), `total_all` (sebelum pencarian, untuk "x dari y"), dan `total_pages`; daftar tanpa halaman (pohon kategori) cukup `total` (dan `total_all`). Request: `?page=&limit=&search=&sort=<kunci>&direction=asc|desc`, dibaca `parseListQuery`; kunci sort dipetakan `sortColumn`. Nama lama (`paginate`, `ord`/`srt`, `field`/`sort=asc|desc`, `sortBy` di katalog publik) masih dibaca selama satu rilis lalu dibuang. Frontend: admin membangun query dengan `listParams()` dan membaca `IListResponse<T>`; website publik menerjemahkan dengan `toListQuery`/`toListModel`. Test kontrak `list-totals-api.spec.ts` memeriksa bentuk ini di setiap daftar admin.
+- **Soft delete belum seragam:** ada yang memakai status 99 (`office`, `admin_acct`, `admin_access`, `admin_permission`, `chair`) dan ada yang memakai kolom `*_deleted_at`. Diseragamkan ke kolom `*_deleted_at` di A-3.
 
 ### 2.5 Gaya penulisan
 

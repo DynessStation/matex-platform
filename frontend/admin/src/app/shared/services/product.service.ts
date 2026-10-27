@@ -1,8 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { map } from 'rxjs';
-
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { IApiResponse } from '../interface/api-response.interface';
 import { Params } from '../interface/core.interface';
@@ -21,14 +20,9 @@ export class ProductService {
   private http = inject(HttpClient);
   private api = `${environment.API_URL}/api/v1/products`;
   getProducts(payload?: Params) {
-    let params = new HttpParams();
-    for (const [key, value] of Object.entries(payload ?? {})) {
-      if (value !== '' && value != null)
-        params = params.set(key, String(value));
-    }
-    return this.http
-      .get<IApiResponse<IProductModel>>(this.api, { params })
-      .pipe(map((r) => r.data ?? { data: [], total: 0 }));
+    const params = listParams(payload);
+
+    return this.http.get<IProductModel>(this.api, { params });
   }
   /** Products at the front of the catalog, in their order (at most `max`). */
   getFront() {

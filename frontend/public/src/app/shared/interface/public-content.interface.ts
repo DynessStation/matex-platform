@@ -59,6 +59,36 @@ export interface PublicApiResponse<T> {
   message: string;
   data?: T;
 }
+
+/** A public API list (A-2): the items in `data`, the paging and counts in `meta`. */
+export interface PublicListResponse<T> {
+  success: boolean;
+  code: string;
+  message: string;
+  data?: T[];
+  meta?: { page?: number; limit?: number; total: number; total_pages?: number };
+}
+
+/** The site's list models keep the items and the total. */
+export const toListModel = <T>(response: PublicListResponse<T>) => ({
+  data: response.data ?? [],
+  total: response.meta?.total ?? 0,
+});
+
+/** The API list query: the site's page size `paginate` is `limit`, its order `sortBy` is `sort`. */
+export const toListQuery = (payload?: Record<string, unknown>) => {
+  const query: Record<string, unknown> = { ...(payload ?? {}) };
+  for (const [from, to] of [
+    ['paginate', 'limit'],
+    ['sortBy', 'sort'],
+  ]) {
+    if (query[from] !== undefined) {
+      query[to] ??= query[from];
+      delete query[from];
+    }
+  }
+  return query;
+};
 export interface PublicContactInquiry {
   locale: string;
   topic_key: string;

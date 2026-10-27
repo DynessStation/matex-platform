@@ -91,7 +91,7 @@ test("the list shows the company's first office", async () => {
   owner = await login(admin.identity, admin.password);
   const list = await expectCode(await owner.get(base), 200);
   expect(list.data.length).toBeGreaterThan(0);
-  expect(list.pagination).toMatchObject({ page: 1 });
+  expect(list.meta).toMatchObject({ page: 1 });
   await expectCode(await owner.get(`${base}/not-a-hash`), 400, 'OFFICE_INVALID_ID');
 });
 
@@ -302,17 +302,19 @@ test('list paging and sorting', async () => {
     200,
   );
   expect(first.data).toHaveLength(1);
-  expect(first.pagination).toMatchObject({ page: 1, limit: 1, length: 1, has_more: true });
+  expect(first.meta).toMatchObject({ page: 1, limit: 1 });
+  expect(first.data).toHaveLength(1);
+  expect(first.meta.page < first.meta.total_pages).toBe(true);
   const second = await expectCode(
     await owner.get(base, { params: { ord: 'office_name', srt: 'true', limit: '1', page: '2' } }),
     200,
   );
-  expect(second.pagination).toMatchObject({ page: 2, limit: 1 });
+  expect(second.meta).toMatchObject({ page: 2, limit: 1 });
   expect(second.data[0].office_name < first.data[0].office_name).toBe(true);
   // Only known columns sort; built-in object keys such as toString fall back to the default.
   await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   await expectCode(await owner.get(base, { params: { ord: 'unknown', limit: '500' } }), 200).then(
-    (body) => expect(body.pagination).toMatchObject({ limit: 100 }),
+    (body) => expect(body.meta).toMatchObject({ limit: 100 }),
   );
 });
 

@@ -55,7 +55,7 @@ const publicSlugs = async (locale = 'id-ID') =>
       await anonymous.get(`/api/public/products/${locale}`, { params: { search: sku } }),
       200,
     )
-  ).data.data.map((item: any) => item.slug);
+  ).data.map((item: any) => item.slug);
 
 test.beforeAll(async () => {
   anonymous = await apiContext();
@@ -99,7 +99,7 @@ test('list, paging, and sorting', async () => {
   categoryId = category.data.id;
 
   const list = await expectCode(await owner.get(base), 200, 'PRODUCTS_LISTED');
-  expect(list.data).toMatchObject({ current_page: 1, per_page: 15 });
+  expect(list.meta).toMatchObject({ page: 1, limit: 15 });
   for (const params of [
     { field: 'name', sort: 'desc', paginate: '2' },
     { field: 'sku', page: '2' },
@@ -261,24 +261,24 @@ test('detail, list entry, and the public site', async () => {
     ],
   });
   const found = await expectCode(await owner.get(base, { params: { search: sku } }), 200);
-  expect(found.data.total).toBe(1);
-  expect(found.data.data[0]).toMatchObject({ key, name: 'Produk Uji ID', quantity: 0 });
+  expect(found.meta.total).toBe(1);
+  expect(found.data[0]).toMatchObject({ key, name: 'Produk Uji ID', quantity: 0 });
   await expectCode(await owner.get(`${base}/not-a-hash`), 404, 'PRODUCT_NOT_FOUND');
   // The list can be narrowed to one category (D-6).
   const inCategory = await expectCode(
     await owner.get(base, { params: { category: categoryId } }),
     200,
   );
-  expect(inCategory.data.data.map((item: any) => item.id)).toEqual([productId]);
-  expect(inCategory.data.total).toBe(1);
-  expect(inCategory.data.total_all).toBeGreaterThanOrEqual(1);
+  expect(inCategory.data.map((item: any) => item.id)).toEqual([productId]);
+  expect(inCategory.meta.total).toBe(1);
+  expect(inCategory.meta.total_all).toBeGreaterThanOrEqual(1);
   await expectCode(
     await owner.get(base, { params: { category: 'bad' } }),
     400,
     'PRODUCT_LIST_CATEGORY_INVALID',
   );
   const everything = await expectCode(await owner.get(base, { params: { category: '' } }), 200);
-  expect(everything.data.total).toBe(everything.data.total_all);
+  expect(everything.meta.total).toBe(everything.meta.total_all);
 
   expect(await publicSlugs()).toContain(`${key}-id`);
   const page = await expectCode(await anonymous.get(`/api/public/products/en-US/${key}-en`), 200);
@@ -384,7 +384,7 @@ test('the front of the catalog: checkbox, order list, and the public catalog', a
         }),
         200,
       )
-    ).data.data.map((item: any) => item.slug.split('-')[1]);
+    ).data.map((item: any) => item.slug.split('-')[1]);
 
   // New front products go last: b, then d; the rest newest first.
   const added = await front();

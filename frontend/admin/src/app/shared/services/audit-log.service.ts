@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import {
   IAuditLogDetailResponse,
@@ -27,41 +28,7 @@ export class AuditLogService {
   //==================================================
 
   getAuditLogs(payload?: Params): Observable<IAuditLogModel> {
-    let params = new HttpParams();
-
-    if (payload) {
-      Object.entries(payload).forEach(([key, value]) => {
-        if (value === undefined || value === null || value === '') {
-          return;
-        }
-
-        //==================================================
-        //==== LEGACY TEMPLATE PARAM MAPPING
-        //==================================================
-
-        switch (key) {
-          case 'paginate':
-            params = params.set('limit', String(value));
-
-            break;
-
-          case 'field':
-            params = params.set('ord', String(value));
-
-            break;
-
-          case 'sort':
-            params = params.set('srt', String(value));
-
-            break;
-
-          default:
-            params = params.set(key, String(value));
-
-            break;
-        }
-      });
-    }
+    const params = listParams(payload);
 
     return this.http
       .get<IAuditLogModel>(this.apiUrl, {

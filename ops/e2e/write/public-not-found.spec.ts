@@ -96,10 +96,13 @@ test('moving from a missing page to an existing one leaves the 404 view', async 
   await expect(page.locator('.page-error-box')).toBeVisible();
 
   // Client-side navigation through the Angular router (no new server render).
-  await page.evaluate((url) => {
-    history.pushState({}, '', url);
-    dispatchEvent(new PopStateEvent('popstate'));
-  }, `/produk/${slug('prd404')}`);
+  await page.evaluate(
+    (url) => {
+      history.pushState({}, '', url);
+      dispatchEvent(new PopStateEvent('popstate'));
+    },
+    `/produk/${slug('prd404')}`,
+  );
 
   await expect(page.locator('.page-error-box')).toHaveCount(0);
   await expect(page.locator('app-product-thumbnail')).toBeVisible();

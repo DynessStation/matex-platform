@@ -157,7 +157,10 @@ test('the password change is validated and checks the current password', async (
       { ...valid, password: 'onlyletters', password_confirmation: 'onlyletters' },
       'ADMIN_ACCOUNT_PASSWORD_INVALID',
     ],
-    [{ ...valid, password_confirmation: `${newPassword}x` }, 'ADMIN_PASSWORD_CONFIRMATION_MISMATCH'],
+    [
+      { ...valid, password_confirmation: `${newPassword}x` },
+      'ADMIN_PASSWORD_CONFIRMATION_MISMATCH',
+    ],
     [
       { ...valid, password: account.password, password_confirmation: account.password },
       'ADMIN_PASSWORD_UNCHANGED',

@@ -63,7 +63,8 @@ test('a list kept in memory comes back with its search and sort', async ({ page 
   await sortButton.click();
   const left = Object.fromEntries(await query);
   expect(left['search']).toBe(`kembali-${runId}`);
-  expect(left['sort']).toMatch(/^(asc|desc)$/);
+  // The API query names the column `sort` and the order `direction` (A-2).
+  expect(left['direction']).toMatch(/^(asc|desc)$/);
 
   // The form has the button in its header; it opens the list as it was left.
   await page.locator('.title-header a', { hasText: /Tambah/ }).click();
@@ -75,8 +76,8 @@ test('a list kept in memory comes back with its search and sort', async ({ page 
   await page.waitForURL(/\/faq(?:[?#]|$)/);
   expect(Object.fromEntries(await query)).toMatchObject({
     search: left['search'],
-    field: left['field'],
     sort: left['sort'],
+    direction: left['direction'],
   });
   await expect(table.locator('.product-search input')).toHaveValue(`kembali-${runId}`);
   await expect(table.locator('tbody tr')).toHaveCount(2);

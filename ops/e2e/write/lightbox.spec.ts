@@ -60,9 +60,7 @@ test.beforeAll(async () => {
   await owner.dispose();
 });
 
-test('the Media library previews its images as a set, without selecting them', async ({
-  page,
-}) => {
+test('the Media library previews its images as a set, without selecting them', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);

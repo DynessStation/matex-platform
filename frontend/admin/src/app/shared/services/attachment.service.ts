@@ -1,8 +1,9 @@
-import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 import {
@@ -31,37 +32,7 @@ export class AttachmentService {
   //==================================================
 
   getAttachments(payload?: Params): Observable<IAttachmentModel> {
-    let params = new HttpParams();
-
-    //==================================================
-    //==== PARAMS
-    //==================================================
-
-    if (payload) {
-      const mappedParams: Record<string, unknown> = {
-        page: payload['page'],
-
-        limit: payload['paginate'] ?? payload['limit'],
-
-        search: payload['search'],
-
-        collection: payload['collection'],
-
-        mime_type: payload['mime_type'],
-
-        sort: payload['sort'],
-      };
-
-      Object.entries(mappedParams).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          params = params.set(key, String(value));
-        }
-      });
-    }
-
-    //==================================================
-    //==== REQUEST
-    //==================================================
+    const params = listParams(payload);
 
     return this.http
       .get<IAttachmentListResponse>(
@@ -76,21 +47,21 @@ export class AttachmentService {
         map((response): IAttachmentModel => ({
           data: response.data.map((item) => this.normalizeAttachment(item)),
 
-          total: response.pagination.total,
+          total: response.meta.total,
 
-          current_page: response.pagination.page,
+          current_page: response.meta.page,
 
-          per_page: response.pagination.limit,
+          per_page: response.meta.limit,
 
-          last_page: response.pagination.total_pages,
+          last_page: response.meta.total_pages,
 
-          from: response.pagination.total
-            ? (response.pagination.page - 1) * response.pagination.limit + 1
+          from: response.meta.total
+            ? (response.meta.page - 1) * response.meta.limit + 1
             : 0,
 
-          to: response.pagination.total
-            ? (response.pagination.page - 1) * response.pagination.limit +
-              response.pagination.length
+          to: response.meta.total
+            ? (response.meta.page - 1) * response.meta.limit +
+              response.data.length
             : 0,
         })),
       );

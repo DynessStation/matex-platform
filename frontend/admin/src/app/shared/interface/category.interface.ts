@@ -1,4 +1,5 @@
 import { IAttachment } from './attachment.interface';
+import { IListResponse } from './list.interface';
 
 export type ProductCategoryStatus = 'draft' | 'published' | 'archived';
 export interface ICategoryTranslation {
@@ -39,11 +40,7 @@ export interface ICategoryDetail extends ICategory {
   position: number;
   position_total: number;
 }
-export interface ICategoryModel {
-  data: ICategory[];
-  total: number;
-  total_all?: number;
-}
+export type ICategoryModel = IListResponse<ICategory>;
 export interface ICategoryPayload {
   key: string;
   parent_id: string | null;

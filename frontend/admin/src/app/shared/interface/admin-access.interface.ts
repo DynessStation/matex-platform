@@ -1,4 +1,5 @@
 import { IApiResponse } from './api-response.interface';
+import { IListResponse } from './list.interface';
 
 //==================================================
 //==== ADMIN ACCESS
@@ -34,35 +35,11 @@ export interface IAdminAccess {
 //==== PAGINATION
 //==================================================
 
-export interface IAdminAccessPagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  total_all?: number;
-
-  length: number;
-
-  pagerows: number;
-
-  total_pages: number;
-
-  has_more: boolean;
-}
-
 //==================================================
 //==== MODEL
 //==================================================
 
-export interface IAdminAccessModel {
-  success: boolean;
-
-  data: IAdminAccess[];
-
-  pagination: IAdminAccessPagination;
-}
+export type IAdminAccessModel = IListResponse<IAdminAccess>;
 
 //==================================================
 //==== PERMISSION

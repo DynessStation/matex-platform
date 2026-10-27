@@ -1,4 +1,5 @@
 import { IAttachment } from './attachment.interface';
+import { IListResponse } from './list.interface';
 
 export type ArticleStatus = 'draft' | 'published' | 'scheduled' | 'archived';
 export interface IArticleTranslation {
@@ -36,13 +37,7 @@ export interface IArticleDetail extends IBlog {
   og_image: IAttachment | null;
   translations: IArticleTranslation[];
 }
-export interface IBlogModel {
-  data: IBlog[];
-  total: number;
-  total_all?: number;
-  current_page?: number;
-  per_page?: number;
-}
+export type IBlogModel = IListResponse<IBlog>;
 export interface IArticlePayload {
   key: string;
   status: ArticleStatus;

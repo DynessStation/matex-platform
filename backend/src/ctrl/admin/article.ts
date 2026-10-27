@@ -14,13 +14,13 @@ import {
   normalizePublicContentKey,
 } from '../../config/public-content.config';
 import { AdminScope, getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
 import { contentSlug } from '../../helper/input.helper';
-import { sortColumn, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -371,13 +371,12 @@ router.get(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 15));
+    const { page, limit, sort, direction: requested } = parseListQuery(req.query);
     const locale = isPublicContentLocale(req.query.locale) ? req.query.locale : 'id-ID';
     const search = text(req.query.search, 200);
     const like = `%${search}%`;
-    const sortField = sortColumn(SORTABLE, req.query.field, '');
-    const direction = String(req.query.sort ?? '').toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+    const sortField = sortColumn(SORTABLE, sort, '');
+    const direction = requested ?? 'DESC';
     const orderBy = sortField
       ? `${sortField} ${direction}, a.id_article DESC`
       : 'a.article_is_sticky DESC, COALESCE(a.article_published_at, a.created) DESC';
@@ -408,8 +407,17 @@ router.get(
       [locale, scope.idMasterComp, search, like, like, limit, (page - 1) * limit],
     );
 
-    return sendSuccess(res, 200, 'ARTICLES_LISTED', 'Articles loaded', {
-      data: rows.map((row) => ({
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM article
+       WHERE id_master_comp = ? AND article_deleted_at IS NULL`,
+      [scope.idMasterComp],
+    );
+    return sendList(
+      res,
+      'ARTICLES_LISTED',
+      'Articles loaded',
+      rows.map((row) => ({
         id: keyhsid.idArticle.encode(Number(row.id_article)),
         key: row.article_key,
         title: row.article_title ?? '',
@@ -428,16 +436,8 @@ router.get(
         updated_at: row.updated,
         blog_thumbnail: row.id_attachment ? mediaDto(row) : null,
       })),
-      total: Number(counts[0]?.total ?? 0),
-      total_all: await countOf(
-        pool,
-        `SELECT COUNT(*) AS total FROM article
-         WHERE id_master_comp = ? AND article_deleted_at IS NULL`,
-        [scope.idMasterComp],
-      ),
-      current_page: page,
-      per_page: limit,
-    });
+      pageMeta({ page, limit }, Number(counts[0]?.total ?? 0), totalAll),
+    );
   },
 );
 

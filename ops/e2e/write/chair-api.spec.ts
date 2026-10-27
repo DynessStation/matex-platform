@@ -44,13 +44,14 @@ test('list, paging, and sorting', async () => {
   const list = await expectCode(await owner.get(base), 200);
   expect(list.data.length).toBeGreaterThan(0);
   seededChairName = list.data[0].chair_name;
-  expect(list.pagination).toMatchObject({ page: 1, limit: 15 });
+  expect(list.meta).toMatchObject({ page: 1, limit: 15 });
 
   const sorted = await expectCode(
     await owner.get(base, { params: { ord: 'chair_name', srt: 'desc', limit: '1' } }),
     200,
   );
-  expect(sorted.pagination).toMatchObject({ limit: 1, length: 1 });
+  expect(sorted.meta).toMatchObject({ limit: 1 });
+  expect(sorted.data).toHaveLength(1);
   await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   await expectCode(await owner.get(`${base}/not-a-hash`), 400, 'CHAIR_INVALID_ID');
 });
@@ -90,7 +91,7 @@ test('create validates input and unique names', async () => {
     admin_count: 0,
   });
   const found = await expectCode(await owner.get(base, { params: { search: chairName } }), 200);
-  expect(found.pagination).toMatchObject({ total: 1 });
+  expect(found.meta).toMatchObject({ total: 1 });
 });
 
 test('update validates and changes the position', async () => {

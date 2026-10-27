@@ -7,6 +7,7 @@ import {
   IAdminAccountDetailResponse,
   IAdminAccountModel,
 } from '../../interface/admin-account.interface';
+import { emptyList } from '../../interface/list.interface';
 import { AdminAccountService } from '../../services/admin-account.service';
 import { ApiMessageService } from '../../services/api-message.service';
 import { NotificationService } from '../../services/notification.service';
@@ -37,23 +38,7 @@ export interface AdminAccountStateModel {
   name: 'adminAccount',
 
   defaults: {
-    adminAccounts: {
-      success: false,
-
-      data: [],
-
-      pagination: {
-        total: 0,
-
-        page: 1,
-
-        limit: 15,
-
-        length: 0,
-
-        pagerows: 0,
-      },
-    },
+    adminAccounts: emptyList(),
 
     selectedAdminAccount: null,
   },

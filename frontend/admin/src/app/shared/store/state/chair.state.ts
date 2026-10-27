@@ -4,6 +4,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
 
 import { IChairDetail, IChairModel } from '../../interface/chair.interface';
+import { emptyList } from '../../interface/list.interface';
 import { ApiMessageService } from '../../services/api-message.service';
 import { ChairService } from '../../services/chair.service';
 import { NotificationService } from '../../services/notification.service';
@@ -34,27 +35,7 @@ export interface ChairStateModel {
   name: 'chair',
 
   defaults: {
-    chairs: {
-      success: false,
-
-      data: [],
-
-      pagination: {
-        page: 1,
-
-        limit: 15,
-
-        total: 0,
-
-        length: 0,
-
-        pagerows: 0,
-
-        total_pages: 0,
-
-        has_more: false,
-      },
-    },
+    chairs: emptyList(),
 
     selectedChair: null,
   },

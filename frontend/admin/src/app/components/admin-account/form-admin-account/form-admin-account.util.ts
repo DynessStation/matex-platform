@@ -9,6 +9,7 @@ import {
   IAdminAccountSelectOption,
   IAdminAccountSelectResponse,
 } from '../../../shared/interface/admin-account.interface';
+import { emptyList } from '../../../shared/interface/list.interface';
 
 // Stateless helpers of the admin account form.
 
@@ -184,15 +185,7 @@ export function emptyLookupResponse(
   limit: number,
 ): IAdminAccountSelectResponse {
   return {
-    success: true,
-
-    data: [],
-
-    pagination: {
-      page: 1,
-      limit,
-      total: 0,
-      has_more: false,
-    },
+    ...emptyList<IAdminAccountSelectOption>(),
+    meta: { page: 1, limit, total: 0 },
   };
 }

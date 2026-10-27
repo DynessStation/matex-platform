@@ -233,7 +233,9 @@ test('every "?" on lists and forms points at an anchor in its guide', async ({ p
         await select.selectOption(key);
         await expect(drawer.locator('.help-section').first()).toBeVisible();
       }
-      await expect(drawer.locator(`[id="help-${anchor}"]`), `${path} ${key}#${anchor}`).toHaveCount(1);
+      await expect(drawer.locator(`[id="help-${anchor}"]`), `${path} ${key}#${anchor}`).toHaveCount(
+        1,
+      );
     }
     await drawer.locator('.help-drawer-close').click();
   }

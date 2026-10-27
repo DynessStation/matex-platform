@@ -51,7 +51,9 @@ test('changes leave entries that the list finds', async () => {
   );
 
   const company = await expectCode(await owner.get(base, { params: { search: chairName } }), 200);
-  expect(company.pagination).toMatchObject({ total: 1, length: 1, has_more: false });
+  expect(company.meta).toMatchObject({ total: 1 });
+  expect(company.data).toHaveLength(1);
+  expect(company.meta.page < company.meta.total_pages).toBe(false);
   expect(company.data[0]).toMatchObject({
     event_code: 'chair.created',
     category: 'data_change',
@@ -71,7 +73,7 @@ test('changes leave entries that the list finds', async () => {
     await owner.get(base, { params: { search: permissionKey } }),
     200,
   );
-  expect(global.pagination).toMatchObject({ total: 1 });
+  expect(global.meta).toMatchObject({ total: 1 });
   expect(global.data[0]).toMatchObject({
     event_code: 'admin_permission.created',
     id_master_comp: null,
@@ -80,10 +82,12 @@ test('changes leave entries that the list finds', async () => {
 
 test('paging and sorting', async () => {
   const list = await expectCode(await owner.get(base), 200);
-  expect(list.pagination).toMatchObject({ page: 1, limit: 20 });
+  expect(list.meta).toMatchObject({ page: 1, limit: 20 });
   const first = await expectCode(await owner.get(base, { params: { limit: '2' } }), 200);
-  expect(first.pagination).toMatchObject({ limit: 2, length: 2, has_more: true });
-  expect(list.pagination.total_pages).toBe(list.pagination.pagerows);
+  expect(first.meta).toMatchObject({ limit: 2 });
+  expect(first.data).toHaveLength(2);
+  expect(first.meta.page < first.meta.total_pages).toBe(true);
+  expect(list.meta.total_pages).toBe(Math.ceil(list.meta.total / list.meta.limit));
   // Newest first by default.
   expect(list.data[0].event_code).toBe('admin_permission.created');
 
@@ -91,9 +95,10 @@ test('paging and sorting', async () => {
     await owner.get(base, { params: { srt: 'asc', limit: '1', page: '2' } }),
     200,
   );
-  expect(oldest.pagination).toMatchObject({ page: 2, limit: 1, length: 1 });
+  expect(oldest.meta).toMatchObject({ page: 2, limit: 1 });
+  expect(oldest.data).toHaveLength(1);
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
-  expect(capped.pagination).toMatchObject({ limit: 100 });
+  expect(capped.meta).toMatchObject({ limit: 100 });
   await expectCode(await owner.get(base, { params: { page: 'x', limit: '0' } }), 200);
   await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   const byModule = await expectCode(
@@ -130,7 +135,7 @@ test('filters', async () => {
     await owner.get(base, { params: { category: 'nope', outcome: 'x', date_from: 'not-a-date' } }),
     200,
   );
-  expect(ignored.pagination.total).toBe(all.pagination.total);
+  expect(ignored.meta.total).toBe(all.meta.total);
   expect(await filtered({ module: 'no_such_module' })).toHaveLength(0);
   expect(await filtered({ date_from: '2999-01-01' })).toHaveLength(0);
   expect(await filtered({ date_to: '2000-01-01' })).toHaveLength(0);

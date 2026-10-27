@@ -17,7 +17,7 @@ import {
   normalizePublicContentKey,
 } from '../../config/public-content.config';
 import { AdminScope, getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
@@ -490,15 +490,16 @@ router.get(
       [locale, scope.idMasterComp, search, like, like],
     );
     const data = rows.map(listDto);
-    return sendSuccess(res, 200, 'PRODUCT_CATEGORIES_LISTED', 'Product categories loaded', {
-      data: makeTree(data),
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM product_category
+       WHERE id_master_comp = ? AND product_category_deleted_at IS NULL`,
+      [scope.idMasterComp],
+    );
+    // One tree, not paged: `total` counts every category in it.
+    return sendList(res, 'PRODUCT_CATEGORIES_LISTED', 'Product categories loaded', makeTree(data), {
       total: data.length,
-      total_all: await countOf(
-        pool,
-        `SELECT COUNT(*) AS total FROM product_category
-         WHERE id_master_comp = ? AND product_category_deleted_at IS NULL`,
-        [scope.idMasterComp],
-      ),
+      total_all: totalAll,
     });
   },
 );

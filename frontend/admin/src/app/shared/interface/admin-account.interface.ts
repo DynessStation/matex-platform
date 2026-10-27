@@ -1,5 +1,6 @@
 import { IApiResponse } from './api-response.interface';
 import { IAttachment } from './attachment.interface';
+import { IListResponse } from './list.interface';
 
 //==================================================
 //==== ADMIN ACCOUNT
@@ -66,30 +67,11 @@ export interface IAdminAccount {
 //==== PAGINATION
 //==================================================
 
-export interface IAdminAccountPagination {
-  total: number;
-  total_all?: number;
-
-  page: number;
-
-  limit: number;
-
-  length: number;
-
-  pagerows: number;
-}
-
 //==================================================
 //==== LIST
 //==================================================
 
-export interface IAdminAccountModel {
-  success: boolean;
-
-  data: IAdminAccount[];
-
-  pagination: IAdminAccountPagination;
-}
+export type IAdminAccountModel = IListResponse<IAdminAccount>;
 
 //==================================================
 //==== SELECT
@@ -103,23 +85,8 @@ export interface IAdminAccountSelectOption {
   data?: Record<string, unknown>;
 }
 
-export interface IAdminAccountSelectPagination {
-  page: number;
-
-  limit: number;
-
-  total: number;
-
-  has_more: boolean;
-}
-
-export interface IAdminAccountSelectResponse {
-  success: boolean;
-
-  data: IAdminAccountSelectOption[];
-
-  pagination: IAdminAccountSelectPagination;
-}
+export type IAdminAccountSelectResponse =
+  IListResponse<IAdminAccountSelectOption>;
 
 export interface IAdminAccountSelectParams {
   page?: number;

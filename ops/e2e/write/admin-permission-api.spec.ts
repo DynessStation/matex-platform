@@ -46,19 +46,20 @@ test('list, paging, and sorting', async () => {
   owner = await login(admin.identity, admin.password);
   const list = await expectCode(await owner.get(base), 200);
   expect(list.data.length).toBeGreaterThan(0);
-  expect(list.pagination).toMatchObject({ page: 1, limit: 15 });
+  expect(list.meta).toMatchObject({ page: 1, limit: 15 });
 
   const sorted = await expectCode(
     await owner.get(base, { params: { field: 'permission_key', sort: 'desc', paginate: '2' } }),
     200,
   );
-  expect(sorted.pagination).toMatchObject({ limit: 2, length: 2 });
+  expect(sorted.meta).toMatchObject({ limit: 2 });
+  expect(sorted.data).toHaveLength(2);
   expect(sorted.data[0].permission_key > sorted.data[1].permission_key).toBe(true);
 
   const page2 = await expectCode(await owner.get(base, { params: { limit: '3', page: '2' } }), 200);
-  expect(page2.pagination).toMatchObject({ page: 2, limit: 3 });
+  expect(page2.meta).toMatchObject({ page: 2, limit: 3 });
   const capped = await expectCode(await owner.get(base, { params: { paginate: '500' } }), 200);
-  expect(capped.pagination).toMatchObject({ limit: 100 });
+  expect(capped.meta).toMatchObject({ limit: 100 });
   await expectCode(await owner.get(base, { params: { field: 'toString' } }), 200);
   await expectCode(await owner.get(base, { params: { page: 'x', limit: '-4' } }), 200);
   await expectCode(await owner.get(`${base}/not-a-hash`), 400, 'ADMIN_PERMISSION_INVALID_ID');
@@ -132,7 +133,7 @@ test('create validates input and unique keys', async () => {
     access_count: 0,
   });
   const found = await expectCode(await owner.get(base, { params: { search: permissionKey } }), 200);
-  expect(found.pagination).toMatchObject({ total: 1 });
+  expect(found.meta).toMatchObject({ total: 1 });
   expect(found.data[0]).toMatchObject({ status_label: 'Active', access_count: 0 });
   await expectCode(await create(valid), 409, 'ADMIN_PERMISSION_KEY_EXISTS');
 });

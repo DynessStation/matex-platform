@@ -69,10 +69,10 @@ test('the FAQ table searches, sorts, pages, selects, and opens row actions', asy
     .locator('.table-sort-btn');
   query = nextList(page, path);
   await header.click();
-  expect(Object.fromEntries(await query)).toMatchObject({ field: 'key', sort: 'desc' });
+  expect(Object.fromEntries(await query)).toMatchObject({ sort: 'key', direction: 'desc' });
   query = nextList(page, path);
   await header.click();
-  expect(Object.fromEntries(await query)).toMatchObject({ field: 'key', sort: 'asc' });
+  expect(Object.fromEntries(await query)).toMatchObject({ sort: 'key', direction: 'asc' });
 
   // Page size (the FAQ service sends it as limit).
   query = nextList(page, path);
@@ -259,7 +259,9 @@ test('table text breaks only between words; cut text ends in "…" with a toolti
   await expect(row).toHaveCount(1);
 
   // No heading or cell is drawn with a word split over two lines ("Gamb / ar").
-  expect(await splitWords(page, 'app-table .table-heading-text, app-table .table-cell-content')).toEqual([]);
+  expect(
+    await splitWords(page, 'app-table .table-heading-text, app-table .table-cell-content'),
+  ).toEqual([]);
 
   // The SKU is one word wider than its column: one line with "…" and a tooltip.
   const skuCell = row.locator('.table-cell-content', { hasText: sku.slice(0, 12) });

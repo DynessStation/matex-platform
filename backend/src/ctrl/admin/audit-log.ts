@@ -8,11 +8,11 @@ import db = require('../../db');
 import keyhsid from '../../hsid';
 import { AuditCategory, AuditOutcome, AuditSource } from '../../interface/audit-log.interface';
 import { getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError } from '../../helper/api-response.helper';
+import { sendError, sendList } from '../../helper/api-response.helper';
 import { verifyAuditIntegrityHash } from '../../helper/audit-integrity.helper';
 import { decodeId } from '../../helper/id.helper';
 import { parseJsonValue } from '../../helper/json.helper';
-import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 
@@ -135,7 +135,14 @@ router.get(
     const scope = await getAdminScope(req);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-    const { page, limit, offset, searchValue } = parseListQuery(req.query, { defaultLimit: 20 });
+    const {
+      page,
+      limit,
+      offset,
+      searchValue,
+      sort,
+      direction: requested,
+    } = parseListQuery(req.query, { defaultLimit: 20 });
 
     const where = [COMPANY_SCOPE, SEARCH];
     const params: unknown[] = [
@@ -158,8 +165,8 @@ router.get(
     filter('al.created <= ?', queryDate(req.query.date_to, true));
     const whereSql = where.join(' AND ');
 
-    const orderBy = sortColumn(SORTABLE, req.query.ord, 'al.id_audit_log');
-    const direction = sortDirection(req.query.srt, 'DESC');
+    const orderBy = sortColumn(SORTABLE, sort, 'al.id_audit_log');
+    const direction = requested ?? 'DESC';
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM audit_log al WHERE ${whereSql}`,
@@ -197,20 +204,13 @@ router.get(
       created: item.created,
     }));
 
-    return res.status(200).json({
-      success: true,
+    return sendList(
+      res,
+      'AUDIT_LOGS_LISTED',
+      'Activity log loaded',
       data,
-      pagination: {
-        page,
-        limit,
-        total,
-        total_all: totalAll,
-        length: data.length,
-        pagerows: Math.ceil(total / limit),
-        total_pages: Math.ceil(total / limit),
-        has_more: offset + data.length < total,
-      },
-    });
+      pageMeta({ page, limit }, total, totalAll),
+    );
   },
 );
 

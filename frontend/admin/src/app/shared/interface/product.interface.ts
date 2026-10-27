@@ -2,15 +2,13 @@ import { IAttachment } from './attachment.interface';
 import { IAttribute, IAttributeValue } from './attribute.interface';
 import { IBrand } from './brand.interface';
 import { ICategory } from './category.interface';
-import { IPaginateModel } from './core.interface';
 import { ILicenseKey } from './license-key.interface';
+import { IListResponse } from './list.interface';
 import { IStores } from './store.interface';
 import { ITag } from './tag.interface';
 import { ITax } from './tax.interface';
 
-export interface IProductModel extends IPaginateModel {
-  data: IProduct[];
-}
+export type IProductModel = IListResponse<IProduct>;
 
 export interface IProduct {
   id: string;

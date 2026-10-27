@@ -3,7 +3,8 @@ import { RowDataPacket } from 'mysql2';
 import { isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
+import { pageMeta, parseListQuery } from '../../helper/list-query.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
@@ -60,24 +61,31 @@ router.get(
     res.setHeader('Cache-Control', 'no-store');
     const s = scope(req.params.locale);
     if (!s) return sendError(res, 404, 'ARTICLES_NOT_FOUND', 'Articles not found');
-    const page = Math.max(1, Number(req.query.page) || 1),
-      limit = Math.min(50, Math.max(1, Number(req.query.limit ?? req.query.paginate) || 12)),
-      search = String(req.query.search ?? '').trim(),
-      like = `%${search}%`;
+    const {
+      page,
+      limit,
+      offset,
+      search,
+      searchValue: like,
+    } = parseListQuery(req.query, {
+      defaultLimit: 12,
+      maxLimit: 50,
+    });
     const [counts] = await pool.query<RowDataPacket[]>(
       `SELECT COUNT(*) total FROM article a JOIN article_i18n i ON i.id_article=a.id_article AND i.id_master_comp=a.id_master_comp WHERE ${publicWhere} AND (?='' OR i.article_title LIKE ? OR i.article_excerpt LIKE ?)`,
       [s.company, s.locale, search, like, like],
     );
     const [rows] = await pool.query<RowDataPacket[]>(
       `${baseSelect} WHERE ${publicWhere} AND (?='' OR i.article_title LIKE ? OR i.article_excerpt LIKE ?) ORDER BY a.article_is_sticky DESC,COALESCE(a.article_published_at,a.created) DESC LIMIT ? OFFSET ?`,
-      [s.company, s.locale, search, like, like, limit, (page - 1) * limit],
+      [s.company, s.locale, search, like, like, limit, offset],
     );
-    return sendSuccess(res, 200, 'ARTICLES_FOUND', 'Articles loaded', {
-      data: rows.map((r) => dto(r)),
-      total: Number(counts[0]?.total ?? 0),
-      current_page: page,
-      per_page: limit,
-    });
+    return sendList(
+      res,
+      'ARTICLES_FOUND',
+      'Articles loaded',
+      rows.map((r) => dto(r)),
+      pageMeta({ page, limit }, Number(counts[0]?.total ?? 0)),
+    );
   },
 );
 router.get(

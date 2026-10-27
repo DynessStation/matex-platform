@@ -19,7 +19,7 @@ import {
   trimTo,
 } from '../src/helper/input.helper';
 import { parseJsonValue } from '../src/helper/json.helper';
-import { parseListQuery, sortColumn, sortDirection } from '../src/helper/list-query.helper';
+import { pageMeta, parseListQuery, sortColumn } from '../src/helper/list-query.helper';
 import { withTransaction } from '../src/helper/transaction.helper';
 import { errorHandler, onFailure } from '../src/middleware/error-handler.middleware';
 
@@ -73,6 +73,8 @@ test('list query: paging and search', () => {
     offset: 0,
     search: '',
     searchValue: '%%',
+    sort: '',
+    direction: null,
   });
   assert.deepEqual(parseListQuery({ page: '3', limit: '10', search: ' kantor ' }), {
     page: 3,
@@ -80,6 +82,8 @@ test('list query: paging and search', () => {
     offset: 20,
     search: 'kantor',
     searchValue: '%kantor%',
+    sort: '',
+    direction: null,
   });
   assert.equal(parseListQuery({ limit: '500' }).limit, 100);
   assert.equal(parseListQuery({ limit: '500' }, { maxLimit: 50 }).limit, 50);
@@ -97,13 +101,43 @@ test('list query: sort column (audit BE-007)', () => {
   }
 });
 
-test('list query: sort direction', () => {
-  assert.equal(sortDirection('desc', 'ASC'), 'DESC');
-  assert.equal(sortDirection('true', 'ASC'), 'DESC');
-  assert.equal(sortDirection('asc', 'DESC'), 'ASC');
-  assert.equal(sortDirection('false', 'DESC'), 'ASC');
-  assert.equal(sortDirection(undefined, 'DESC'), 'DESC');
-  assert.equal(sortDirection('random', 'ASC'), 'ASC');
+test('list query: sort and direction, with the older names for one release (A-2)', () => {
+  const sortOf = (query: Record<string, unknown>) => {
+    const { sort, direction } = parseListQuery(query);
+    return { sort, direction };
+  };
+  assert.deepEqual(sortOf({ sort: 'name', direction: 'desc' }), {
+    sort: 'name',
+    direction: 'DESC',
+  });
+  assert.deepEqual(sortOf({ sort: 'name', direction: 'ASC' }), { sort: 'name', direction: 'ASC' });
+  assert.deepEqual(sortOf({ sort: 'name', direction: 'sideways' }), {
+    sort: 'name',
+    direction: null,
+  });
+  // Older admin pages: ord/srt and field/sort=asc|desc, page size as paginate.
+  assert.deepEqual(sortOf({ ord: 'name', srt: 'true' }), { sort: 'name', direction: 'DESC' });
+  assert.deepEqual(sortOf({ ord: 'name', srt: 'false' }), { sort: 'name', direction: 'ASC' });
+  assert.deepEqual(sortOf({ field: 'name', sort: 'desc' }), { sort: 'name', direction: 'DESC' });
+  assert.deepEqual(sortOf({ sort: 'asc' }), { sort: '', direction: 'ASC' });
+  assert.equal(parseListQuery({ paginate: '25' }).limit, 25);
+  assert.equal(parseListQuery({ paginate: '25', limit: '10' }).limit, 10);
+});
+
+test('list meta', () => {
+  assert.deepEqual(pageMeta({ page: 2, limit: 10 }, 25, 40), {
+    page: 2,
+    limit: 10,
+    total: 25,
+    total_all: 40,
+    total_pages: 3,
+  });
+  assert.deepEqual(pageMeta({ page: 1, limit: 10 }, 0), {
+    page: 1,
+    limit: 10,
+    total: 0,
+    total_pages: 0,
+  });
 });
 
 test('json: parseJsonValue', () => {

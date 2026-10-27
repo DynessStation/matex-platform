@@ -3,7 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
 
-import { ICategory, ICategoryDetail } from '../../interface/category.interface';
+import {
+  ICategory,
+  ICategoryDetail,
+  ICategoryModel,
+} from '../../interface/category.interface';
+import { emptyList } from '../../interface/list.interface';
 import { ApiMessageService } from '../../services/api-message.service';
 import { CategoryService } from '../../services/category.service';
 import { NotificationService } from '../../services/notification.service';
@@ -17,12 +22,12 @@ import {
 } from '../action/category.action';
 
 export interface CategoryStateModel {
-  category: { data: ICategory[]; total: number };
+  category: ICategoryModel;
   selectedCategory: ICategoryDetail | null;
 }
 @State<CategoryStateModel>({
   name: 'category',
-  defaults: { category: { data: [], total: 0 }, selectedCategory: null },
+  defaults: { category: emptyList(), selectedCategory: null },
 })
 @Injectable()
 export class CategoryState {

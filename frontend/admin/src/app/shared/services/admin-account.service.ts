@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
+import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 import {
@@ -31,34 +32,7 @@ export class AdminAccountService {
   //==================================================
 
   getAdminAccounts(payload?: Params): Observable<IAdminAccountModel> {
-    let params = new HttpParams();
-
-    if (payload) {
-      const sortValue =
-        payload['sort'] === 'desc' ||
-        payload['sort'] === true ||
-        payload['sort'] === 'true'
-          ? 'true'
-          : 'false';
-
-      const mappedParams: Record<string, unknown> = {
-        page: payload['page'],
-
-        limit: payload['paginate'],
-
-        search: payload['search'],
-
-        ord: payload['field'],
-
-        srt: payload['field'] ? sortValue : undefined,
-      };
-
-      Object.entries(mappedParams).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          params = params.set(key, String(value));
-        }
-      });
-    }
+    const params = listParams(payload);
 
     return this.http.get<IAdminAccountModel>(
       `${environment.API_URL}/api/v1/admin-acct`,

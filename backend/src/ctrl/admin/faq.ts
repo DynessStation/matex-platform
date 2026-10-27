@@ -15,11 +15,11 @@ import {
   normalizePublicContentKey,
 } from '../../config/public-content.config';
 import { AdminScope, getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { sortColumn, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import {
   assertSameItems,
   lockGroup,
@@ -162,14 +162,12 @@ router.get(
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-    const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
-    const limit = Math.min(100, Math.max(1, Math.floor(Number(req.query.limit) || 15)));
-    const offset = (page - 1) * limit;
+    const { page, limit, offset, sort, direction: requested } = parseListQuery(req.query);
     const search = String(req.query.search ?? '').trim();
     const locale = isPublicContentLocale(req.query.locale) ? req.query.locale : 'id-ID';
     const like = `%${search}%`;
-    const sortField = sortColumn(SORTABLE, req.query.field, '');
-    const direction = String(req.query.sort ?? '').toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+    const sortField = sortColumn(SORTABLE, sort, '');
+    const direction = requested ?? 'ASC';
     const orderBy = sortField
       ? `${sortField} ${direction}, f.id_faq ASC`
       : 'f.faq_sort_order ASC, f.id_faq ASC';
@@ -200,8 +198,16 @@ router.get(
       [locale, scope.idMasterComp, search, like, like, limit, offset],
     );
 
-    return sendSuccess(res, 200, 'FAQ_LISTED', 'FAQ loaded', {
-      data: rows.map((row) => ({
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM faq WHERE id_master_comp = ? AND faq_deleted_at IS NULL`,
+      [scope.idMasterComp],
+    );
+    return sendList(
+      res,
+      'FAQ_LISTED',
+      'FAQ loaded',
+      rows.map((row) => ({
         id: keyhsid.idFaq.encode(Number(row.id_faq)),
         key: row.faq_key,
         question: row.faq_question ?? '',
@@ -213,17 +219,8 @@ router.get(
         created: row.created,
         updated: row.updated,
       })),
-      pagination: {
-        current_page: page,
-        per_page: limit,
-        total: Number(countRows[0]?.total ?? 0),
-        total_all: await countOf(
-          pool,
-          `SELECT COUNT(*) AS total FROM faq WHERE id_master_comp = ? AND faq_deleted_at IS NULL`,
-          [scope.idMasterComp],
-        ),
-      },
-    });
+      pageMeta({ page, limit }, Number(countRows[0]?.total ?? 0), totalAll),
+    );
   },
 );
 

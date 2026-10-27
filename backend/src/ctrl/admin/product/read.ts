@@ -7,10 +7,10 @@ import db = require('../../../db');
 import keyhsid from '../../../hsid';
 import { isPublicContentLocale } from '../../../config/public-content.config';
 import { getAdminScope } from '../../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { trimTo } from '../../../helper/input.helper';
-import { sortColumn, countOf } from '../../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 import { onFailure } from '../../../middleware/error-handler.middleware';
@@ -43,16 +43,14 @@ router.get(
     const locale = isPublicContentLocale(req.query.locale) ? String(req.query.locale) : 'id-ID';
     const search = trimTo(req.query.search, 200);
     const like = `%${search}%`;
-    const page = Math.max(1, Math.floor(Number(req.query.page) || 1));
-    const paginate = Math.min(100, Math.max(1, Math.floor(Number(req.query.paginate) || 15)));
-    const offset = (page - 1) * paginate;
+    const { page, limit, offset, sort, direction: requested } = parseListQuery(req.query);
     const categoryParam = typeof req.query.category === 'string' ? req.query.category.trim() : '';
     const idCategory = categoryParam ? decodeId(categoryParam, keyhsid.idProductCategory) : null;
     if (categoryParam && !idCategory) {
       return sendError(res, 400, 'PRODUCT_LIST_CATEGORY_INVALID', 'Invalid category filter');
     }
-    const sortField = sortColumn(SORTABLE, req.query.field, '');
-    const direction = req.query.sort === 'desc' ? 'DESC' : 'ASC';
+    const sortField = sortColumn(SORTABLE, sort, '');
+    const direction = requested ?? 'ASC';
     const orderBy = sortField
       ? `${sortField} ${direction}, p.id_product ASC`
       : // The front of the catalog in its order first, then the rest by name.
@@ -70,32 +68,22 @@ router.get(
        WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY}
        ORDER BY ${orderBy}
        LIMIT ? OFFSET ?`,
-      [
-        locale,
-        scope.idMasterComp,
-        search,
-        like,
-        like,
-        like,
-        idCategory,
-        idCategory,
-        paginate,
-        offset,
-      ],
+      [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory, limit, offset],
     );
 
-    return sendSuccess(res, 200, 'PRODUCTS_LISTED', 'Products loaded', {
-      data: await hydrate(rows, scope.idMasterComp, locale),
-      total: Number(countRows[0]?.total ?? 0),
-      total_all: await countOf(
-        pool,
-        `SELECT COUNT(*) AS total FROM product_catalog
-         WHERE id_master_comp = ? AND product_deleted_at IS NULL`,
-        [scope.idMasterComp],
-      ),
-      current_page: page,
-      per_page: paginate,
-    });
+    const totalAll = await countOf(
+      pool,
+      `SELECT COUNT(*) AS total FROM product_catalog
+       WHERE id_master_comp = ? AND product_deleted_at IS NULL`,
+      [scope.idMasterComp],
+    );
+    return sendList(
+      res,
+      'PRODUCTS_LISTED',
+      'Products loaded',
+      await hydrate(rows, scope.idMasterComp, locale),
+      pageMeta({ page, limit }, Number(countRows[0]?.total ?? 0), totalAll),
+    );
   },
 );
 

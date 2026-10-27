@@ -16,7 +16,7 @@ import {
   getAttachmentCollectionConfig,
 } from '../../config/attachment.config';
 import { AdminScope, getAdminScope } from '../../helper/admin-scope.helper';
-import { sendError, sendSuccess } from '../../helper/api-response.helper';
+import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import {
   StoredAttachment,
   buildAttachmentUrl,
@@ -26,7 +26,7 @@ import {
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
-import { parseListQuery, sortColumn, countOf } from '../../helper/list-query.helper';
+import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
@@ -218,7 +218,7 @@ router.get(
     const scope = await getAdminScope(req);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
 
-    const { page, limit, offset, search, searchValue } = parseListQuery(req.query, {
+    const { page, limit, offset, search, searchValue, sort } = parseListQuery(req.query, {
       defaultLimit: 20,
       maxLimit: 50,
     });
@@ -244,8 +244,7 @@ router.get(
       params.push(`${mimeType}%`);
     }
     const whereSql = where.join(' AND ');
-    const sort = typeof req.query.sort === 'string' ? req.query.sort.trim().toLowerCase() : '';
-    const orderBy = sortColumn(SORTS, sort, SORTS.newest);
+    const orderBy = sortColumn(SORTS, sort.toLowerCase(), SORTS.newest);
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM attachment a WHERE ${whereSql}`,
@@ -304,19 +303,13 @@ router.get(
       updated: item.updated,
     }));
 
-    return res.status(200).json({
-      success: true,
+    return sendList(
+      res,
+      'ATTACHMENTS_LISTED',
+      'Attachments loaded',
       data,
-      pagination: {
-        page,
-        limit,
-        total,
-        total_all: totalAll,
-        length: data.length,
-        total_pages: Math.ceil(total / limit),
-        has_more: offset + data.length < total,
-      },
-    });
+      pageMeta({ page, limit }, total, totalAll),
+    );
   },
 );
 

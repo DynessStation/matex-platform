@@ -123,8 +123,8 @@ export class Faq {
           ? 'Indonesia + English'
           : 'Belum lengkap',
       }));
-      this.tableConfig.total = faq?.pagination.total ?? 0;
-      this.tableConfig.total_all = faq?.pagination.total_all;
+      this.tableConfig.total = faq?.meta.total ?? 0;
+      this.tableConfig.total_all = faq?.meta.total_all;
     });
   }
 

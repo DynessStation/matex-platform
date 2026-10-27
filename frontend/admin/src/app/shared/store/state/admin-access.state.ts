@@ -8,6 +8,7 @@ import {
   IAdminAccessModel,
   IAdminAccessPermissionGroup,
 } from '../../interface/admin-access.interface';
+import { emptyList } from '../../interface/list.interface';
 import { AdminAccessService } from '../../services/admin-access.service';
 import { ApiMessageService } from '../../services/api-message.service';
 import { NotificationService } from '../../services/notification.service';
@@ -41,27 +42,7 @@ export interface AdminAccessStateModel {
   name: 'adminAccess',
 
   defaults: {
-    adminAccesses: {
-      success: false,
-
-      data: [],
-
-      pagination: {
-        page: 1,
-
-        limit: 15,
-
-        total: 0,
-
-        length: 0,
-
-        pagerows: 0,
-
-        total_pages: 0,
-
-        has_more: false,
-      },
-    },
+    adminAccesses: emptyList(),
 
     selectedAdminAccess: null,
 

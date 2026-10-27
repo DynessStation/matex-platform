@@ -148,8 +148,8 @@ export class Product implements AfterViewInit {
         this.tableConfig = {
           ...this.tableConfig,
           data,
-          total: model?.total ?? 0,
-          total_all: model?.total_all,
+          total: model?.meta.total ?? 0,
+          total_all: model?.meta.total_all,
         };
       });
     this.route.queryParamMap

@@ -98,7 +98,8 @@ test('select endpoints list the references a new account needs', async () => {
       200,
     );
     expect(body.data.length).toBeGreaterThan(0);
-    expect(body.pagination).toMatchObject({ page: 1, has_more: false });
+    expect(body.meta).toMatchObject({ page: 1 });
+    expect(body.meta.page < body.meta.total_pages).toBe(false);
     return body.data[0].value as string;
   };
   reference = {
@@ -151,7 +152,8 @@ test('create, then list and read the new account', async () => {
     await owner.get(base, { params: { search: newAccount.alias } }),
     200,
   );
-  expect(list.pagination).toMatchObject({ total: 1, page: 1, length: 1 });
+  expect(list.meta).toMatchObject({ total: 1, page: 1 });
+  expect(list.data).toHaveLength(1);
   // Built-in object keys are not sort columns (audit BE-007).
   await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
   expect(list.data[0]).toMatchObject({
@@ -249,7 +251,7 @@ test('status and delete enforce their safety rules', async () => {
     await owner.get(base, { params: { search: newAccount.alias } }),
     200,
   );
-  expect(list.pagination).toMatchObject({ total: 0 });
+  expect(list.meta).toMatchObject({ total: 0 });
 });
 
 let otherOfficeId = '';
@@ -329,7 +331,7 @@ test('references, profile photos, and duplicates are checked', async () => {
     }),
     200,
   );
-  expect(offices.pagination).toMatchObject({ limit: 50 });
+  expect(offices.meta).toMatchObject({ limit: 50 });
 });
 
 test('a full-access admin sees accounts of every office (audit BE-008)', async () => {
@@ -355,7 +357,7 @@ test('a full-access admin sees accounts of every office (audit BE-008)', async (
     await owner.get(base, { params: { search: `Cabang${runId}`.slice(0, 15) } }),
     200,
   );
-  expect(list.pagination).toMatchObject({ total: 1 });
+  expect(list.meta).toMatchObject({ total: 1 });
   await expectCode(await owner.get(`${base}/${otherOfficeAccount.id}`), 200);
 });
 

@@ -6,7 +6,11 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { IBlog, IBlogModel } from '../interface/blog.interface';
 import { Params } from '../interface/core.interface';
-import { PublicApiResponse } from '../interface/public-content.interface';
+import {
+  PublicApiResponse,
+  PublicListResponse,
+  toListModel,
+} from '../interface/public-content.interface';
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
@@ -18,10 +22,10 @@ export class BlogService {
     if (payload?.['paginate']) params = params.set('limit', String(payload['paginate']));
     if (payload?.['search']) params = params.set('search', String(payload['search']));
     return this.http
-      .get<PublicApiResponse<IBlogModel>>(`${environment.publicApiURL}/articles/${locale}`, {
+      .get<PublicListResponse<IBlog>>(`${environment.publicApiURL}/articles/${locale}`, {
         params,
       })
-      .pipe(map((r) => r.data ?? { data: [], total: 0 }));
+      .pipe(map((r): IBlogModel => toListModel(r)));
   }
   getBlogBySlug(locale: string, slug: string): Observable<IBlog> {
     return this.http

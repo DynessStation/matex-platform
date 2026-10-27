@@ -1,6 +1,9 @@
 import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 
-// Paging, search, and sort direction from list query strings (?page=&limit=&search=).
+// One list query for every list endpoint (A-2):
+//   ?page=&limit=&search=&sort=<key>&direction=asc|desc
+// Older names are still read for one release, so an admin page loaded before a deploy keeps
+// working: `paginate` for limit; `ord`/`srt` and `field`/`sort=asc|desc` for sort and direction.
 
 export interface ListQuery {
   page: number;
@@ -9,6 +12,10 @@ export interface ListQuery {
   search: string;
   /** `search` wrapped for SQL LIKE: %search% */
   searchValue: string;
+  /** The requested sort key ('' when none); map it with sortColumn(). */
+  sort: string;
+  /** The requested direction, or null to use the list's own default. */
+  direction: 'ASC' | 'DESC' | null;
 }
 
 const positive = (value: unknown, fallback: number): number => {
@@ -16,13 +23,30 @@ const positive = (value: unknown, fallback: number): number => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
 
+const text = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+/** 'desc' or 'true' -> DESC, 'asc' or 'false' -> ASC, anything else -> null. */
+const directionOf = (value: unknown): 'ASC' | 'DESC' | null => {
+  const normalized = text(value).toLowerCase();
+  if (normalized === 'desc' || normalized === 'true') return 'DESC';
+  if (normalized === 'asc' || normalized === 'false') return 'ASC';
+  return null;
+};
+
 export const parseListQuery = (
   query: Record<string, unknown>,
   { defaultLimit = 15, maxLimit = 100 }: { defaultLimit?: number; maxLimit?: number } = {},
 ): ListQuery => {
   const page = positive(query.page, 1);
-  const limit = Math.min(positive(query.limit, defaultLimit), maxLimit);
-  const search = typeof query.search === 'string' ? query.search.trim() : '';
+  const limit = Math.min(positive(query.limit ?? query.paginate, defaultLimit), maxLimit);
+  const search = text(query.search);
+
+  // `sort` holds a key, except in the older field/sort pair where it held the direction.
+  const sortText = text(query.sort);
+  const legacyDirection = directionOf(sortText) ? sortText : '';
+  const sort = (legacyDirection ? '' : sortText) || text(query.field) || text(query.ord);
+  const direction =
+    directionOf(query.direction) ?? directionOf(legacyDirection) ?? directionOf(query.srt);
 
   return {
     page,
@@ -30,6 +54,8 @@ export const parseListQuery = (
     offset: (page - 1) * limit,
     search,
     searchValue: `%${search}%`,
+    sort,
+    direction,
   };
 };
 
@@ -53,9 +79,25 @@ export const countOf = async (
   return Number(rows[0]?.total ?? 0);
 };
 
-/** 'desc' or 'true' -> DESC, 'asc' or 'false' -> ASC, anything else -> `fallback`. */
-export const sortDirection = (value: unknown, fallback: 'ASC' | 'DESC'): 'ASC' | 'DESC' => {
-  if (value === 'desc' || value === 'true') return 'DESC';
-  if (value === 'asc' || value === 'false') return 'ASC';
-  return fallback;
-};
+/** The `meta` of a paged list: the page asked for, its size, and the counts. */
+export interface ListMeta {
+  page?: number;
+  limit?: number;
+  /** Rows matching the search and filters. */
+  total: number;
+  /** Rows before search and filters. */
+  total_all?: number;
+  total_pages?: number;
+}
+
+export const pageMeta = (
+  { page, limit }: { page: number; limit: number },
+  total: number,
+  totalAll?: number,
+): ListMeta => ({
+  page,
+  limit,
+  total,
+  ...(totalAll === undefined ? {} : { total_all: totalAll }),
+  total_pages: Math.ceil(total / limit),
+});

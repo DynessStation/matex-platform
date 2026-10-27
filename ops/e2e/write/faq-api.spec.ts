@@ -56,20 +56,20 @@ test('FAQ endpoints require a session', async () => {
 test('list, paging, and sorting', async () => {
   owner = await login(admin.identity, admin.password);
   const list = await expectCode(await owner.get(base), 200, 'FAQ_LISTED');
-  expect(list.data.data.length).toBeGreaterThan(0);
-  expect(list.data.pagination).toMatchObject({ current_page: 1, per_page: 15 });
-  expect(list.data.data[0]).toMatchObject({ translation_complete: expect.any(Boolean) });
+  expect(list.data.length).toBeGreaterThan(0);
+  expect(list.meta).toMatchObject({ page: 1, limit: 15 });
+  expect(list.data[0]).toMatchObject({ translation_complete: expect.any(Boolean) });
 
   const sorted = await expectCode(
     await owner.get(base, { params: { field: 'key', sort: 'desc', limit: '2', page: '1' } }),
     200,
   );
-  expect(sorted.data.data).toHaveLength(2);
-  expect(sorted.data.data[0].key > sorted.data.data[1].key).toBe(true);
+  expect(sorted.data).toHaveLength(2);
+  expect(sorted.data[0].key > sorted.data[1].key).toBe(true);
   const english = await expectCode(await owner.get(base, { params: { locale: 'en-US' } }), 200);
-  expect(english.data.data[0].question).toBeTruthy();
+  expect(english.data[0].question).toBeTruthy();
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
-  expect(capped.data.pagination).toMatchObject({ per_page: 100 });
+  expect(capped.meta).toMatchObject({ limit: 100 });
   await expectCode(await owner.get(base, { params: { page: 'x', locale: 'fr-FR' } }), 200);
   // Unknown sort fields fall back to the default order (no 500).
   await expectCode(await owner.get(base, { params: { field: 'toString' } }), 200, 'FAQ_LISTED');
@@ -120,8 +120,8 @@ test('create validates input and unique keys', async () => {
     ],
   });
   const found = await expectCode(await owner.get(base, { params: { search: key } }), 200);
-  expect(found.data.pagination).toMatchObject({ total: 1 });
-  expect(found.data.data[0]).toMatchObject({ key, translation_complete: true, locale_status: 1 });
+  expect(found.meta).toMatchObject({ total: 1 });
+  expect(found.data[0]).toMatchObject({ key, translation_complete: true, locale_status: 1 });
   expect(await publicKeys()).toContain(key);
   await expectCode(await owner.get(`${base}/not-a-hash`), 404, 'FAQ_NOT_FOUND');
 });
@@ -135,7 +135,7 @@ test('update changes the FAQ and its translations', async () => {
     'FAQ_NOT_FOUND',
   );
   const other = await expectCode(await owner.get(base, { params: { field: 'key' } }), 200);
-  const otherKey = other.data.data.find((item: any) => item.key !== key).key;
+  const otherKey = other.data.find((item: any) => item.key !== key).key;
   await expectCode(
     await update({ key: otherKey, translations: translations() }),
     409,
@@ -190,7 +190,7 @@ test('order: one list numbered 1..n, saved only as a whole', async () => {
   const detail = await expectCode(await owner.get(`${base}/${faqId}`), 200);
   expect(detail.data).toMatchObject({ position: 1, sort_order: 1, position_total: ids.length });
   const listed = await expectCode(await owner.get(base, { params: { limit: '100' } }), 200);
-  expect(listed.data.data[0].id).toBe(faqId);
+  expect(listed.data[0].id).toBe(faqId);
 
   // Back to the order before, so other specs see the seeded order.
   await expectCode(await save(ids), 200, 'FAQ_ORDER_SAVED');
