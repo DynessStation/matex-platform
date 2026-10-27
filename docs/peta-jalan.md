@@ -71,9 +71,11 @@ Hasil survei 6A (21 Oktober), dasar standar `standar-kode.md` bagian 4:
 | 6E Lint dan test | Peringatan lint 0 (urutan import, tipe `any`); test browser untuk halaman yang disentuh | Lint admin dan public 0 peringatan. **Kemajuan 27 Okt (live di `663ec33`):** E-1 sampai E-5 selesai. Lint admin 1 error + 494 peringatan → **0**; public 74 peringatan → **0**. Tabel bersama jadi generik per tipe baris halaman (aksi massal membawa `ids`, modal mengembalikan data apa adanya); tipe `@types/google.maps` untuk pemilih lokasi; satu bug lama ketemu saat mengetik ulang (bilah urut koleksi publik mengirim sinyal `filter`, bukan nilainya, ke sidebar off-canvas). FE-012 selesai (resolver tidak lagi redirect berstatus 404; halaman menampilkan 404 di tempat, test `public-not-found.spec.ts`). `AccountState` Kartify dan service/action/interface akun lama dibuang; tabel membaca izin dari `AuthState` saja; kolom `canAllow` per role (tak pernah dipakai) ikut dibuang. Suite penuh 200 lolos. Sisa: E-6 (tipe `any` backend) ditunda atas keputusan pemilik |
 | 6F Penyeragaman API | A-1: tipe `any` backend 0 (E-6). A-2: satu format daftar (`data` + `meta`, `sort`/`direction`). A-3: satu cara soft delete (`*_deleted_at`, migration 026) | **Selesai, live 27 Okt sore di `3e22d89`:** A-1 `12dfb2b` (Oxlint 188 → 0, rekaman API identik), A-2 `a94c295` (semua daftar lewat `sendList`, nama parameter lama masih dibaca satu rilis), A-3 `67eb8b7` (status 99 diganti kolom waktu hapus; di production 50 baris akan dipindah). Full suite 208 lolos. Migration 026 diuji 27 Okt pada salinan backup production `matex-20261027T052549Z` di database drill `miadrill`: 50 baris dipindah sesuai harapan, data lain tidak berubah (catatan di runbook bagian 6). Deploy: build ketiga aplikasi dulu, lalu migration 026 dan restart langsung (jeda skema lama/baru beberapa detik); di production 50 baris dipindah, status 99 = 0. Sisa: nama parameter lama dibuang di rilis berikutnya; sisa drill (`miadrill`, `~/tmp/drill.env`, `~/tmp/a3-drill`, `~/storage-restore-drill`) dihapus setelah deploy ini (keputusan pemilik) |
 
-## Ujung sementara: "MATEX v1.1, Fondasi Rapi"
+## Ujung sementara: "MATEX v1.1, Fondasi Rapi" — selesai sebagai v1.1.10 (27 Oktober 2026)
 
-Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
+**Ditutup pemilik 27 Okt:** intro, audit, dan perapian dianggap selesai dengan label versi **1.1.10**. Versi yang berjalan tampil di kaki halaman admin (`frontend/admin/src/app/shared/data/app-version.ts`) dan menautkan ke halaman Catatan Perubahan `internal.matexindo.com/changelog` (bisa dibuka tanpa login, untuk dibagikan ke tim; isinya di `shared/data/changelog.ts`). Keputusan pemilik saat penutupan: kontras warna merek (putih/oranye 1.9:1) ditunda; test unit frontend tidak diperlukan, test browser dan kontrak di `ops/e2e` dianggap cukup (TEST-001 ditutup); DB-003 (foreign key) ditunda. Butir di bawah yang belum dicentang tidak diaudit ulang satu per satu.
+
+Daftar target awal:
 
 - [ ] Semua modul backend memakai satu pola dan punya test kontrak API.
 - [ ] Backend: format dan lint seragam, tanpa peringatan; tidak ada fungsi bantu kembar.
@@ -99,11 +101,11 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 | SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | ✅ 27 Okt, live di `3e22d89` |
 | Catatan produk | Kategori yang dihapus tetap terhubung ke produknya dan tetap "memakai" gambarnya; navigasi "primary" bisa dihapus | Diputuskan pemilik 20 Okt: dikerjakan di 5D (D-1, D-3) |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
-| DB-003 | Beberapa relasi belum dikunci foreign key | Bersama migration 5D |
+| DB-003 | Beberapa relasi belum dikunci foreign key | Ditunda (keputusan pemilik 27 Okt) |
 | DB-004 | Daftar izin global, belum per perusahaan | Diputuskan saat multi-perusahaan benar-benar dipakai |
 | V-6 | User database production boleh login dari host mana saja | Diterima: dikelola CloudPanel, port database tertutup firewall |
 | FE-004, DOC-001 | Port default public, dokumen lama | ✅ 27 Okt, live di `3e22d89` |
-| TEST-001 | Test frontend: kini 200 test browser dan kontrak di `ops/e2e`; test unit frontend belum ada | Diputuskan pemilik |
+| TEST-001 | Test frontend: kini 200+ test browser dan kontrak di `ops/e2e`; test unit frontend belum ada | ✅ Ditutup pemilik 27 Okt: test browser dan kontrak dianggap cukup |
 
 ## Rutinitas
 

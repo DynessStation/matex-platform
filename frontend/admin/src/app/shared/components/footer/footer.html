@@ -8,6 +8,12 @@
               ? (setting$ | async)?.general?.copyright
               : 'Copyright © MATEX'
           }}
+          <a
+            class="footer-version"
+            routerLink="/changelog"
+            title="Lihat perubahan di versi ini"
+            >v{{ version }}</a
+          >
         </p>
       </div>
 

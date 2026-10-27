@@ -1,0 +1,129 @@
+/**==========================
+    Changelog (/changelog, components/changelog): one readable column, open without signing in.
+==========================**/
+.changelog-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 16px 64px;
+  color: #222;
+  font-size: 15px;
+  line-height: 1.65;
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  h3 {
+    margin: 24px 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  // The theme resets lists and sets a small paragraph size; this page reads as plain text.
+  p {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style: disc;
+  }
+
+  li {
+    display: list-item;
+    margin-bottom: 8px;
+    font-size: inherit;
+  }
+}
+
+.changelog-page__eyebrow {
+  margin: 0 0 4px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.changelog-page__header {
+  margin-bottom: 32px;
+}
+
+.changelog-page__current {
+  margin: 0;
+  color: #555;
+}
+
+.changelog-entry {
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.changelog-entry__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.changelog-entry__date {
+  color: #555;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.changelog-entry__summary {
+  margin: 12px 0 0;
+}
+
+.changelog-page__footer {
+  color: #555;
+  font-size: 14px;
+
+  p {
+    margin-bottom: 8px;
+  }
+
+  a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
+body.dark-only {
+  .changelog-page {
+    color: var(--admin-dark-text);
+
+    h1,
+    h2,
+    h3 {
+      color: var(--admin-dark-text);
+    }
+  }
+
+  .changelog-page__current,
+  .changelog-entry__date,
+  .changelog-page__footer {
+    color: var(--admin-dark-text-muted);
+  }
+
+  .changelog-entry {
+    border-color: var(--admin-dark-border);
+    background: var(--admin-dark-surface);
+  }
+}

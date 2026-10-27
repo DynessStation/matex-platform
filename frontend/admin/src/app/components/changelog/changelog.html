@@ -1,0 +1,38 @@
+<main class="changelog-page">
+  <header class="changelog-page__header">
+    <p class="changelog-page__eyebrow">MATEX</p>
+    <h1>Catatan Perubahan</h1>
+    <p class="changelog-page__current">
+      Versi yang sedang berjalan: <strong>v{{ version }}</strong>
+    </p>
+  </header>
+
+  @for (entry of entries; track entry.version) {
+    <article class="changelog-entry" [id]="'v' + entry.version">
+      <div class="changelog-entry__head">
+        <h2>Versi {{ entry.version }}</h2>
+        <span class="changelog-entry__date">{{ entry.date }}</span>
+      </div>
+      <p class="changelog-entry__summary">{{ entry.summary }}</p>
+
+      @for (section of entry.sections; track section.title) {
+        <section class="changelog-entry__section">
+          <h3>{{ section.title }}</h3>
+          <ul>
+            @for (item of section.items; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </article>
+  }
+
+  <footer class="changelog-page__footer">
+    <p>
+      Tampilan admin terasa aneh setelah pembaruan? Muat ulang halamannya
+      (Ctrl+F5, atau tarik ke bawah di ponsel).
+    </p>
+    <a routerLink="/auth/login">Masuk ke admin MATEX</a>
+  </footer>
+</main>

@@ -207,6 +207,20 @@ app-footer,
   }
 }
 
+// The running version, linked to its changelog (shared/data/app-version.ts).
+.footer .footer-version {
+  margin-left: 8px;
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-style: solid;
+  }
+}
+
 //==================================================
 //==== NGX TOASTR
 //==================================================
