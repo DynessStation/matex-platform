@@ -223,9 +223,9 @@ export class ProductState {
           });
 
           let products = result.data.filter((product: Product) =>
-            product?.categories_ids?.includes(action.payload!['category_id']),
+            product?.categories_ids?.includes(Number(action.payload!['category_id'])),
           );
-          products.splice(action.payload!['paginate']);
+          products.splice(Number(action.payload!['paginate']));
 
           ctx.patchState({
             ...state,
@@ -292,7 +292,9 @@ export class ProductState {
           let products;
           if (action?.payload?.['search']) {
             products = result.data.filter((product: Product) =>
-              product.name.toLowerCase().includes(action?.payload?.['search'].toLowerCase()),
+              product.name
+                .toLowerCase()
+                .includes(String(action?.payload?.['search']).toLowerCase()),
             );
           } else {
             products = result.data;
@@ -324,8 +326,8 @@ export class ProductState {
           });
 
           let filteredProducts = result.data;
-          const page = action.payload!['page']; // e.g., 1 for the first page
-          const itemsPerPage = action.payload!['paginate']; // e.g., 4 items per page
+          const page = Number(action.payload!['page']); // e.g., 1 for the first page
+          const itemsPerPage = Number(action.payload!['paginate']); // e.g., 4 items per page
 
           const startIndex = (page - 1) * itemsPerPage;
           const endIndex = startIndex + itemsPerPage;

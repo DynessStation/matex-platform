@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 
 import { catchError, forkJoin, map, of } from 'rxjs';
 
-import { PublicSearchResults } from '../interface/public-search.interface';
 import { BlogService } from './blog.service';
 import { ProductService } from './product.service';
+import { PublicSearchResults } from '../interface/public-search.interface';
 
 @Injectable({ providedIn: 'root' })
 export class PublicSearchService {

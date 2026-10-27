@@ -4,7 +4,7 @@ import { Attachment } from './attachment.interface';
 import { BannerLink } from './theme.interface';
 
 export interface ThemeOptionStateModel {
-  theme_option: any;
+  theme_option: Option | null;
   exit: boolean;
   cookies: boolean;
   newsletter: boolean;

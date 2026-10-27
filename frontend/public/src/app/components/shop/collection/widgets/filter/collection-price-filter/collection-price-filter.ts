@@ -1,6 +1,8 @@
 import { Component, inject, input } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+
 import { Store } from '@ngxs/store';
+
 import { SettingState } from '../../../../../../shared/store/state/setting.state';
 
 @Component({

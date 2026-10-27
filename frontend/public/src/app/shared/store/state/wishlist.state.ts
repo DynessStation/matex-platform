@@ -54,7 +54,7 @@ export class WishlistState {
   @Action(AddToWishlist)
   add(ctx: StateContext<WishlistStateModel>, action: AddToWishlist) {
     const state = ctx.getState();
-    const product = action.payload['product'];
+    const product = action.payload['product'] as Product | undefined;
 
     if (!product || (state.wishlistIds || []).includes(product.id)) {
       return;

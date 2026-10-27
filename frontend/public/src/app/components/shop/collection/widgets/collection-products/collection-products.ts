@@ -8,8 +8,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
-import { ProductBox } from '../../../../../shared/components/product-box/product-box';
 import { Loader } from '../../../../../shared/components/loader/loader';
+import { ProductBox } from '../../../../../shared/components/product-box/product-box';
 import { Params } from '../../../../../shared/interface/core.interface';
 import { Product, ProductModel } from '../../../../../shared/interface/product.interface';
 import { ProductService } from '../../../../../shared/services/product.service';
@@ -87,10 +87,18 @@ export class CollectionProducts implements OnInit {
     }
   }
 
-  setPage() {
+  get currentPage(): number {
+    return Number(this.filter()?.['page'] ?? 1);
+  }
+
+  get pageSize(): number {
+    return Number(this.filter()?.['paginate'] ?? 0);
+  }
+
+  setPage(page: number) {
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { page: this.filter()!['page'] },
+      queryParams: { page },
       queryParamsHandling: 'merge',
     });
   }

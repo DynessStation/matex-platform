@@ -1,6 +1,6 @@
 @if (view$ | async; as view) {
   @if (view.homePage?.slug === 'gadget-store') {
-    <app-gadget [data]="view.homePage" [slug]="view.theme"></app-gadget>
+    <app-gadget [data]="view.homePage ?? undefined" [slug]="view.theme"></app-gadget>
   }
 
   @if (!view.homePage && state() !== 'loading') {

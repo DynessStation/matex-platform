@@ -7,6 +7,16 @@ import { Observable } from 'rxjs';
 import { Product } from '../../interface/product.interface';
 import { ProductState } from '../../store/state/product.state';
 
+/** A link button from page content: where it goes and its text. */
+export interface ButtonLinkData {
+  button_text?: string;
+  product_slug?: string;
+  redirect_link?: {
+    link_type?: 'external_url' | 'collection' | 'product' | string;
+    link?: string | number;
+  };
+}
+
 @Component({
   selector: 'app-button',
   standalone: true,
@@ -22,7 +32,7 @@ export class Button {
   type = input<string>('submit');
   spinner = input<boolean>(true);
   disabled = input<boolean>(false);
-  data = input<any>();
+  data = input<ButtonLinkData>();
   buttonText = input<string | null>(null);
   buttonLink = input<string | null>(null);
 
@@ -43,7 +53,7 @@ export class Button {
       this.product$.subscribe((res) => {
         res.map((product) => {
           if (product.id === change['data']?.currentValue?.redirect_link?.link) {
-            this.data()['product_slug'] = product!.slug;
+            this.data()!.product_slug = product!.slug;
           }
         });
       });

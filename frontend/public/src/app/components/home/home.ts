@@ -8,6 +8,7 @@ import { Store } from '@ngxs/store';
 import { catchError, finalize, map, of, startWith, switchMap, tap } from 'rxjs';
 
 import { Gadget } from './gadget/gadget';
+import { GadgetTheme } from '../../shared/interface/theme.interface';
 import { LayoutService } from '../../shared/services/layout.service';
 import { ThemeOptionService } from '../../shared/services/theme-option.service';
 import { WebsitePageSeoService } from '../../shared/services/website-page-seo.service';
@@ -46,7 +47,7 @@ export class Home {
       this.store.dispatch(new GetHomePage(theme, this.locale)).pipe(
         map(() => ({
           theme,
-          homePage: this.store.selectSnapshot(ThemeState.homePage) as any,
+          homePage: this.store.selectSnapshot(ThemeState.homePage) as GadgetTheme | null,
         })),
         tap(({ homePage }) => {
           if (homePage?.website_page) {

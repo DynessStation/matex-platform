@@ -3,6 +3,7 @@ import { Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { THEME_OPTIONS } from '../data/theme-options';
+import { ThemeOption } from '../interface/theme-option.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class ThemeOptionService {
   public productBox: string;
 
   // Site options ship with the app (shared/data); a copy keeps the constant unchanged.
-  getThemeOption(): Observable<any> {
-    return of(structuredClone(THEME_OPTIONS));
+  getThemeOption(): Observable<ThemeOption> {
+    return of(structuredClone(THEME_OPTIONS) as unknown as ThemeOption);
   }
 }

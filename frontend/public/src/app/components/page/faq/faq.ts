@@ -7,8 +7,8 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { catchError, map, of, startWith, tap, timeout } from 'rxjs';
 
-import { NoData } from '../../../shared/components/no-data/no-data';
 import { Loader } from '../../../shared/components/loader/loader';
+import { NoData } from '../../../shared/components/no-data/no-data';
 import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';

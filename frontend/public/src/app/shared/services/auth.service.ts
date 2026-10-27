@@ -25,7 +25,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  register(payload: RegisterModal): Observable<any> {
+  register(payload: RegisterModal): Observable<unknown> {
     return this.http.post(`${environment.URL}/register`, payload);
   }
 

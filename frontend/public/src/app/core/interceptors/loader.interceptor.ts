@@ -4,19 +4,19 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { finalize, Observable } from 'rxjs';
 
+import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 import {
   HideButtonSpinnerAction,
   HideLoaderAction,
   ShowButtonSpinnerAction,
   ShowLoaderAction,
 } from '../../shared/store/action/loader.action';
-import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {
   constructor(private store: Store) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (req.context.get(SKIP_PUBLIC_UI_INTERCEPTORS)) {
       return next.handle(req);
     }

@@ -63,13 +63,13 @@
       <nav>
         <ngb-pagination
           [collectionSize]="total"
-          [(page)]="filter()!['page']"
-          [pageSize]="filter()!['paginate']"
+          [page]="currentPage"
+          [pageSize]="pageSize"
           [maxSize]="5"
           [rotate]="true"
           [boundaryLinks]="true"
           [ellipses]="false"
-          (pageChange)="setPage()"
+          (pageChange)="setPage($event)"
         >
         </ngb-pagination>
       </nav>

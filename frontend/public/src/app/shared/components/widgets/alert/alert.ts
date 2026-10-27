@@ -30,7 +30,7 @@ export class Alert {
   public showAlert = false;
   public alertTitle = '';
   public alertClass = '';
-  public timeoutId: any;
+  public timeoutId: ReturnType<typeof setTimeout> | undefined;
   private isHovering = false;
 
   public alert: AlertPayload = {

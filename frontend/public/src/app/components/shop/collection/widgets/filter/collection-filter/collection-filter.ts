@@ -70,7 +70,9 @@ export class CollectionFilterComponent {
   }
 
   private splitFilter(filterKey: keyof Params): string[] {
-    return this.filter && this.filter()![filterKey] ? this.filter()![filterKey].split(',') : [];
+    return this.filter && this.filter()![filterKey]
+      ? String(this.filter()![filterKey]).split(',')
+      : [];
   }
 
   private mergeFilters(): string[] {

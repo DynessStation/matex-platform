@@ -1,6 +1,6 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';

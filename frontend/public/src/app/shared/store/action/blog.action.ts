@@ -1,4 +1,5 @@
 import { Params } from '../../interface/core.interface';
+
 export class GetBlogsAction {
   static readonly type = '[Blog] Get';
   constructor(

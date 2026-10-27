@@ -63,7 +63,7 @@ export class PublicAnalyticsService {
       this.listenForOutboundClicks();
       this.listenForWebVitals();
     } catch (error) {
-      if (isDevMode()) console.debug('[Analytics] Config unavailable', error);
+      if (isDevMode()) console.warn('[Analytics] Config unavailable', error);
     }
   }
 
@@ -101,7 +101,7 @@ export class PublicAnalyticsService {
       body: JSON.stringify(payload),
       keepalive: true,
     }).catch((error) => {
-      if (isDevMode()) console.debug('[Analytics] Event unavailable', error);
+      if (isDevMode()) console.warn('[Analytics] Event unavailable', error);
     });
   }
 
@@ -146,7 +146,7 @@ export class PublicAnalyticsService {
         onLCP(report);
       })
       .catch((error) => {
-        if (isDevMode()) console.debug('[Analytics] Web Vitals unavailable', error);
+        if (isDevMode()) console.warn('[Analytics] Web Vitals unavailable', error);
       });
   }
 

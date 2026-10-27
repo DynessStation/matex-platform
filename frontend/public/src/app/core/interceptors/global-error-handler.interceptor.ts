@@ -1,12 +1,18 @@
-import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable, catchError, throwError } from 'rxjs';
 
+import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 import { ErrorService } from '../../shared/services/error.service';
 import { LoggingService } from '../../shared/services/logging.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 
 @Injectable()
 export class GlobalErrorHandlerInterceptor implements HttpInterceptor {
@@ -16,7 +22,7 @@ export class GlobalErrorHandlerInterceptor implements HttpInterceptor {
     private notifier: NotificationService,
   ) {}
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (request.context.get(SKIP_PUBLIC_UI_INTERCEPTORS)) {
       return next.handle(request);
     }

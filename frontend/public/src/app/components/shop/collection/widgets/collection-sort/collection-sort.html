@@ -31,9 +31,9 @@
         </button>
       </div>
 
-      @if (offCanvasLayouts.includes(filter()!['layout'])) {
+      @if (offCanvasLayouts.includes(queryText('layout'))) {
         <div class="left-box left-box-2" [class.show]="layoutService.offCanvasFilterMenu">
-          <app-collection-sidebar [filter]="filter"></app-collection-sidebar>
+          <app-collection-sidebar [filter]="filter()"></app-collection-sidebar>
         </div>
       }
 
@@ -46,7 +46,7 @@
                 class="custom-select"
                 [displaySearchStatus]="'hidden'"
                 [placeholder]="isEnglish ? 'Sort' : 'Urutkan'"
-                [value]="filter()!['sortBy']"
+                [value]="queryText('sortBy')"
                 [data]="sorting ? sorting : []"
                 (update)="sortByFilter($event)"
               >
@@ -56,7 +56,7 @@
               <select2
                 class="custom-select"
                 [displaySearchStatus]="'hidden'"
-                [value]="filter()!['paginate']"
+                [value]="queryText('paginate')"
                 [placeholder]="isEnglish ? 'Items per page' : 'Produk per halaman'"
                 [data]="sortingItem ? sortingItem : []"
                 (update)="sortProductsLength($event)"

@@ -1,13 +1,13 @@
-import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { inject, Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
+import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 import { Values } from '../../shared/interface/setting.interface';
 import { SettingState } from '../../shared/store/state/setting.state';
-import { SKIP_PUBLIC_UI_INTERCEPTORS } from './public-request-context';
 
 // Sends visitors to the maintenance page while maintenance mode is on. The public site has no
 // sign-in, so the Kartify token and 401 handling were removed in 6B.
@@ -27,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
     });
   }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (req.context.get(SKIP_PUBLIC_UI_INTERCEPTORS)) {
       return next.handle(req);
     }

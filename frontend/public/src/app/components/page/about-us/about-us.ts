@@ -20,8 +20,8 @@ import SwiperCore, { Swiper } from 'swiper';
 import { EffectCards, Navigation } from 'swiper/modules';
 import { SwiperOptions } from 'swiper/types';
 
-import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { Loader } from '../../../shared/components/loader/loader';
+import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { IAboutUs } from '../../../shared/interface/theme-option.interface';
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';

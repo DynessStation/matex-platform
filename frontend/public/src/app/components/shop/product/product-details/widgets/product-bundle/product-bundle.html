@@ -76,7 +76,7 @@
                 <input
                   class="form-check-input checkbox_animated"
                   type="checkbox"
-                  [checked]="isChecked(crossSellProduct?.id)"
+                  [checked]="isChecked(crossSellProduct?.id!)"
                   id="crosssell-{{ crossSellProduct?.id }}"
                   value="{{
                     selectedVariation &&

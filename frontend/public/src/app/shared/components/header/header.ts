@@ -31,6 +31,6 @@ export class Header {
     this.bodyService.addClass('base-bg-color');
     this.themeOption$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((option) => (this.sticky = option?.header?.sticky_header_enable ?? true));
+      .subscribe((option) => (this.sticky = Boolean(option?.header?.sticky_header_enable ?? true)));
   }
 }

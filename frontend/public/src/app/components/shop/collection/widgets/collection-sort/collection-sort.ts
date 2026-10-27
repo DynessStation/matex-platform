@@ -181,6 +181,11 @@ export class CollectionSort {
   }
 
   // SortBy Filter
+  /** A query value as text ('' when missing). */
+  queryText(key: string): string {
+    return String(this.filter()?.[key] ?? '');
+  }
+
   sortByFilter(data: Select2UpdateEvent) {
     this.filter()!['sortBy'] = data?.value ? String(data.value) : 'asc';
     this.filter()!['page'] = 1;

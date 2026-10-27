@@ -215,7 +215,9 @@ export class CategoryState {
           let categories;
           if (action?.payload?.['search']) {
             categories = result.data.filter((category) =>
-              category.name.toLowerCase().includes(action?.payload?.['search'].toLowerCase()),
+              category.name
+                .toLowerCase()
+                .includes(String(action?.payload?.['search']).toLowerCase()),
             );
           } else {
             categories = result.data;

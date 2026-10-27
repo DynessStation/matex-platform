@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { tap } from 'rxjs';
 
-import { ThemeOptionStateModel } from '../../interface/theme-option.interface';
+import { Option, ThemeOptionStateModel } from '../../interface/theme-option.interface';
 import { ThemeOptionService } from '../../services/theme-option.service';
 import { ThemeOptions, UpdateProductBox, UpdateSession } from '../action/theme-option.action';
 
@@ -23,7 +23,8 @@ export class ThemeOptionState {
 
   @Selector()
   static themeOptions(state: ThemeOptionStateModel) {
-    return state.theme_option;
+    // Null until the options load; readers use optional access.
+    return state.theme_option as Option;
   }
 
   @Selector()
@@ -50,7 +51,7 @@ export class ThemeOptionState {
   getThemeOptions(ctx: StateContext<ThemeOptionStateModel>) {
     return this.themeOptionService.getThemeOption().pipe(
       tap({
-        next: (result: any) => {
+        next: (result) => {
           const state = ctx.getState();
           ctx.setState({
             ...state,

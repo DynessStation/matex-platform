@@ -4,16 +4,14 @@ import { Component, HostListener, inject, input, PLATFORM_ID } from '@angular/co
 import { Option } from '../../../interface/theme-option.interface';
 import { LayoutService } from '../../../services/layout.service';
 import { MenuService } from '../../../services/menu.service';
+import { PublicNavigationContextService } from '../../../services/public-navigation-context.service';
+import { Currency } from '../widgets/currency/currency';
 import { HeaderCatalog } from '../widgets/header-catalog/header-catalog';
 import { Language } from '../widgets/language/language';
 import { Logo } from '../widgets/logo/logo';
 import { MainMenu } from '../widgets/main-menu/main-menu';
-import { Search } from '../widgets/search/search';
-import { PublicNavigationContextService } from '../../../services/public-navigation-context.service';
 import { MarketPreview } from '../widgets/market-preview/market-preview';
-
-//by me
-import { Currency } from '../widgets/currency/currency';
+import { Search } from '../widgets/search/search';
 import { SocialMedia } from '../widgets/social-media/social-media';
 
 @Component({

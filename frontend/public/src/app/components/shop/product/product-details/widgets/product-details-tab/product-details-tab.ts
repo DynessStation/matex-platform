@@ -3,6 +3,7 @@ import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { Product } from '../../../../../../shared/interface/product.interface';
 
 @Component({
@@ -34,14 +35,14 @@ export class ProductDetailsTab {
   private normalizeSpecifications(value: unknown): Record<string, string> {
     if (Array.isArray(value)) {
       return Object.fromEntries(
-        value
-          .map((item: any, index) => [
+        (value as Array<Record<string, unknown> | null>)
+          .map((item, index) => [
             String(
-              item?.label ??
-                item?.key ??
+              item?.['label'] ??
+                item?.['key'] ??
                 `${this.isEnglish ? 'Specification' : 'Spesifikasi'} ${index + 1}`,
             ),
-            String(item?.value ?? item?.text ?? ''),
+            String(item?.['value'] ?? item?.['text'] ?? ''),
           ])
           .filter(([, itemValue]) => itemValue),
       );

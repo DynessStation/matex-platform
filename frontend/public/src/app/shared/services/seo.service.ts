@@ -40,7 +40,7 @@ export class SeoService {
   ) as Observable<ICategory>;
 
   public path: string;
-  public timeoutId: any;
+  public timeoutId: ReturnType<typeof setTimeout> | undefined;
   private currentMessageIndex = 0;
   private messages: string[];
   private currentMessage: string;
@@ -50,7 +50,7 @@ export class SeoService {
   public blog: IBlog;
   public category: ICategory;
   public themeOption: Option;
-  public scoContent: any = {};
+  public scoContent: Record<string, string> = {};
   public setting: Values;
   public isBrowser: boolean;
 
@@ -60,7 +60,7 @@ export class SeoService {
     if (this.isBrowser) {
       this.router.events
         .pipe(filter((event) => event instanceof NavigationEnd))
-        .subscribe((event: any) => {
+        .subscribe((event: NavigationEnd) => {
           this.path = event.url;
           document.addEventListener('visibilitychange', () => {
             this.messages = this.themeOption.general.taglines;

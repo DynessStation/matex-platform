@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { Observable, map } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import { Category, CategoryModel } from '../interface/category.interface';
-import { PublicApiResponse } from '../interface/public-content.interface';
 import { Params } from '../interface/core.interface';
+import { PublicApiResponse } from '../interface/public-content.interface';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {

@@ -7,8 +7,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { catchError, finalize, map, of, shareReplay, tap, timeout } from 'rxjs';
 
-import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { Loader } from '../../../shared/components/loader/loader';
+import { Breadcrumb } from '../../../shared/components/widgets/breadcrumb/breadcrumb';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import {
   PublicContactChannel,
@@ -17,8 +17,8 @@ import {
 } from '../../../shared/interface/public-content.interface';
 import { IPublicWebsitePage } from '../../../shared/interface/website-page.interface';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { PublicContentService } from '../../../shared/services/public-content.service';
 import { PublicAnalyticsService } from '../../../shared/services/public-analytics.service';
+import { PublicContentService } from '../../../shared/services/public-content.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { WebsitePageSeoService } from '../../../shared/services/website-page-seo.service';
 import { WebsitePageService } from '../../../shared/services/website-page.service';

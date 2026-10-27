@@ -1,5 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { Product, Variation } from '../../../../../../shared/interface/product.interface';
 import { Option } from '../../../../../../shared/interface/theme-option.interface';
 import { ProductBuyButton } from '../product-buy-button/product-buy-button';

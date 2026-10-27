@@ -5,10 +5,10 @@ import { Router, RouterLink } from '@angular/router';
 
 import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs';
 
-import { Loader } from '../../../loader/loader';
 import { MenuService } from '../../../../services/menu.service';
 import { PublicNavigationContextService } from '../../../../services/public-navigation-context.service';
 import { PublicSearchService } from '../../../../services/public-search.service';
+import { Loader } from '../../../loader/loader';
 
 @Component({
   selector: 'app-search',

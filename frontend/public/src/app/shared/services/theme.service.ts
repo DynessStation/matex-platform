@@ -24,8 +24,8 @@ export class ThemeService {
 
   constructor(private websitePageService: WebsitePageService) {}
 
-  getHomePage(slug?: string, locale: 'id-ID' | 'en-US' = 'id-ID'): Observable<any> {
-    const template$ = of(structuredClone(HOME_LAYOUT) as unknown);
+  getHomePage(slug?: string, locale: 'id-ID' | 'en-US' = 'id-ID'): Observable<object> {
+    const template$ = of(structuredClone(HOME_LAYOUT) as object);
 
     if (slug !== 'gadget-store') return template$;
 

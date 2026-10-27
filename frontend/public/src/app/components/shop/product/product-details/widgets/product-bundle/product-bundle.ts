@@ -40,7 +40,7 @@ export class ProductBundle {
 
   public crossSellProducts: Product[] = [];
   public crossSellProductsIds: number[] = [];
-  public selectedProduct: any[] = [];
+  public selectedProduct: Product[] = [];
   public selectedProductIds: number[] = [];
   public selectedVariation: Variation;
 
@@ -74,7 +74,8 @@ export class ProductBundle {
     this.crossSellProduct$.pipe(take(1)).subscribe((products) => {
       const dataProducts = [...products];
       if (this.selectedVariation) {
-        dataProducts.push(this.selectedVariation as any);
+        // The chosen variation joins the bundle as a product row.
+        dataProducts.push(this.selectedVariation as unknown as Product);
       }
       this.selectedProduct = dataProducts.filter((product) =>
         this.selectedProductIds?.includes(product?.id!),
@@ -92,7 +93,7 @@ export class ProductBundle {
     );
   }
 
-  isChecked(productId: any): boolean {
+  isChecked(productId: number): boolean {
     return this.selectedProductIds.includes(productId);
   }
 

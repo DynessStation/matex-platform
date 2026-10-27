@@ -39,11 +39,9 @@ export class CollectionCategoryFilter {
     this.store.dispatch(new GetCategories());
   }
 
-  ngOnInit() {}
-
   ngOnChanges() {
     this.selectedCategories = this.filter()!['category']
-      ? this.filter()!['category'].split(',')
+      ? String(this.filter()!['category']).split(',')
       : [];
   }
 
