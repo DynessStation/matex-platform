@@ -78,7 +78,7 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 - [ ] Backend: format dan lint seragam, tanpa peringatan; tidak ada fungsi bantu kembar.
 - [ ] Website publik tanpa sisa fitur toko v2; admin tanpa komponen raksasa.
 - [ ] Temuan UI/UX admin 20 Oktober (`rencana-ui-admin.md`) selesai.
-- [ ] Lint frontend 0 peringatan.
+- [x] Lint frontend 0 peringatan (6E, live 27 Okt).
 - [ ] Satu format pagination dan satu cara soft delete di seluruh API.
 - [ ] Semua test (unit, kontrak API, browser) lulus, dan semuanya sudah di production.
 - [ ] `standar-kode.md` dan peta jalan ini mutakhir.
@@ -95,13 +95,14 @@ Target sementara yang sedang dikejar. Tercapai bila semua ini benar:
 | --- | --- | --- |
 | FE-012 | Halaman produk/kategori/artikel yang tidak ada menjawab 500 di build e2e (production benar 404) | 6E ✅ (27 Okt, live di `663ec33`) |
 | FE-013 | Halaman "My account" admin tidak menyimpan apa pun (aksi profil, kata sandi, dan detail toko masih kosong dari Kartify) | 6D, U-16 ✅ (26 Okt) |
-| SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | Fase 6, bersama perapian frontend |
+| SEC-007 (sisa) | Server SSR public dan admin (Angular) masih mengirim `X-Powered-By: Express` | ✅ 27 Okt (lokal) |
 | Catatan produk | Kategori yang dihapus tetap terhubung ke produknya dan tetap "memakai" gambarnya; navigasi "primary" bisa dihapus | Diputuskan pemilik 20 Okt: dikerjakan di 5D (D-1, D-3) |
 | DB-002 | Migration 013 gagal di MariaDB | Tidak relevan selama lokal dan production memakai MySQL 8.4 |
 | DB-003 | Beberapa relasi belum dikunci foreign key | Bersama migration 5D |
 | DB-004 | Daftar izin global, belum per perusahaan | Diputuskan saat multi-perusahaan benar-benar dipakai |
 | V-6 | User database production boleh login dari host mana saja | Diterima: dikelola CloudPanel, port database tertutup firewall |
-| FE-004, DOC-001, TEST-001 | Port default public, dokumen lama, test frontend | Fase 6 |
+| FE-004, DOC-001 | Port default public, dokumen lama | ✅ 27 Okt (lokal) |
+| TEST-001 | Test frontend: kini 200 test browser dan kontrak di `ops/e2e`; test unit frontend belum ada | Diputuskan pemilik |
 
 ## Rutinitas
 

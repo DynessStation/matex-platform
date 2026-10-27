@@ -116,7 +116,7 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 
 **SEC-007 — API memberi tahu bahwa servernya Express** · Info · **Selesai (Fase 5C, 19 Oktober 2026)**
 - `app.ts` mematikan header `X-Powered-By`, tapi setiap modul route yang dibuat sebagai sub-app `express()` memasangnya lagi, dan sub-app pertama yang di-load melewati semua request. Production menjawab semua API dengan `X-Powered-By: Express` (dicek 19 Oktober). Hanya membocorkan teknologi server, tidak membuka akses apa pun.
-- Perbaikan: semua modul route memakai `express.Router()`. Setiap respons di test kontrak dicek tidak membawa header itu. Sisa: server SSR Angular (public dan admin) masih mengirim header ini; dikerjakan di Fase 6.
+- Perbaikan: semua modul route memakai `express.Router()`. Setiap respons di test kontrak dicek tidak membawa header itu. Sisa: server SSR Angular (public dan admin) masih mengirim header ini; dikerjakan di Fase 6. **Sisa selesai 27 Okt:** `server.ts` admin dan public mematikan header itu; test `public-site-api.spec.ts` memeriksa halaman publik, halaman 404, dan login admin.
 
 ### Database
 
@@ -252,8 +252,9 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Saat dijalankan lokal, SSR admin/public diarahkan ke port production (9200), sehingga muncul "fetch failed".
 - Diperbaiki di commit `d3905ab` (sudah di GitHub). Perilaku production tidak berubah.
 
-**FE-004 — Public `ng serve` default ke port 4200** · P3 · Terbukti
+**FE-004 — Public `ng serve` default ke port 4200** · P3 · **Selesai**
 - Padahal konfigurasi dev public mengharapkan port 4201. Sementara ini sudah dicatat di README (`npm start -- --port 4201`).
+- Perbaikan (27 Okt): `angular.json` public memasang port 4201 untuk `ng serve`, jadi `npm start` cukup; README disesuaikan.
 
 *Temuan FE-005 sampai FE-008 ditemukan saat membangun test otomatis (Fase 2).*
 
@@ -313,8 +314,9 @@ Browser admin ───────► internal.matexindo.com (admin, Angular SS
 - Latihan restore 19 Oktober 2026: backup otomatis `matex-20261018T191501Z` diunduh dari VPS, checksum-nya diverifikasi, lalu dipulihkan dengan `backup:restore` ke database terpisah `mia_restore_drill` di MySQL 8.4 lokal (versi sama dengan production) dalam 40 detik. Hasil: migration `current` 25/25, 47 dari 48 tabel identik dengan production (selisih 1 baris analitik yang tercatat setelah jam backup), 91 dari 91 file lampiran ada, dan API yang membaca data hasil restore melayani halaman, menu, 53 produk, artikel, FAQ, kontak, sitemap, dan gambar. Database dan file drill dihapus setelahnya.
 - Catatan untuk restore di Windows: `tar` bawaan Git Bash membaca `D:\...` sebagai alamat server remote. Jalankan dengan `C:\Windows\System32` (tar bawaan Windows) dan folder `bin` MySQL di urutan pertama PATH.
 
-**DOC-001 — README dan memori lama sudah ketinggalan** · P3 · Terbukti
+**DOC-001 — README dan memori lama sudah ketinggalan** · P3 · **Selesai**
 - README masih menyebut "Phase 4.8". Catatan Codex menyebut `product.ts` masih kosong, padahal sekarang sudah 899 baris.
+- Perbaikan (27 Okt): README menunjuk ke `docs/peta-jalan.md` untuk status, cara menjalankan, lint frontend (0 sejak 6E), dan isi suite browser diperbarui.
 
 ### Server production (VPS) — diaudit 18 Oktober 2026 lewat SSH
 
