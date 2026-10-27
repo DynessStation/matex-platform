@@ -22,7 +22,7 @@ Production runs on Percona Server 8.4, so use a MySQL 8.4 database locally. Run 
 
 1. `backend`: `npm start` (API on `http://127.0.0.1:3000`, reads `backend/.env`).
 2. `frontend/admin`: `npm start` (`http://localhost:4200`).
-3. `frontend/public`: `npm start -- --port 4201` (`http://localhost:4201`).
+3. `frontend/public`: `npm start` (`http://localhost:4201`).
 
 Do not use `npm run build` plus `serve:ssr` for local testing: production builds call the production domains.
 
@@ -65,9 +65,11 @@ Kartify is a visual reference; its demo data and fixtures are not MATEX business
 
 ## Code Formatting
 
-One Prettier config at the repo root (`.prettierrc.json`) is the standard; the backend and `ops` already use it, and the frontends follow in Phase 6. In `backend`: `npm run format`, `npm run format:check`, and `npm run lint` (Oxlint, errors must stay at 0).
+One Prettier config at the repo root (`.prettierrc.json`) is the standard for the backend and `ops`. In `backend`: `npm run format`, `npm run format:check`, and `npm run lint` (Oxlint, errors must stay at 0).
 
 Both frontends are formatted with Prettier. Run `npm run format` in `frontend/admin` or `frontend/public` before committing; it formats `src` only, so the vendor Kartify styles under `public/assets` stay as shipped. Keep formatting-only changes in their own commit.
+
+Both frontends are linted with ESLint (`npm run lint`, `npm run lint:fix` in `frontend/admin` or `frontend/public`). Both are at 0 errors and 0 warnings since Phase 6E; keep them there (no `any`, import order as the config sorts it).
 
 Formatting-only commits are listed in `.git-blame-ignore-revs`. GitHub skips it automatically; for local `git blame`, run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once.
 
@@ -76,7 +78,7 @@ Formatting-only commits are listed in `.git-blame-ignore-revs`. GitHub skips it 
 `ops/e2e` has two Playwright suites:
 
 - `npm test`: read-only release checks against a deployed stack (defaults to the production loopback ports).
-- `npm run test:write`: admin write flows (login, media upload, publishing a product and an article and checking them on the public site) plus the API contracts in `write/*-api.spec.ts` (admin session and accounts, offices, access profiles, website navigation), on an isolated local stack. It rebuilds the `matex_e2e` database from migrations, starts the API on 3100 and production-style SSR builds of admin (4300) and public (4301), runs the tests, then removes the temporary uploads. Your dev database, storage, and dev servers are not touched, and it refuses to run against a non-local address or a database whose name does not end in `_e2e`.
+- `npm run test:write`: the API contract of every admin and public module (`write/*-api.spec.ts`) plus browser tests of the admin pages and forms and of the public site (`write/*.spec.ts`, about 40 files and 200 tests, roughly 14 minutes), on an isolated local stack. It rebuilds the `matex_e2e` database from migrations, starts the API on 3100 and production-style SSR builds of admin (4300) and public (4301), runs the tests, then removes the temporary uploads. Your dev database, storage, and dev servers are not touched, and it refuses to run against a non-local address or a database whose name does not end in `_e2e`.
 
 One-time local setup for the write suite: the database user in `backend/.env` needs `ALL PRIVILEGES ON matex_e2e.*`.
 

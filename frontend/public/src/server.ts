@@ -15,6 +15,8 @@ import { environment } from './environments/environment';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+// Do not tell visitors which server runs the site (SEC-007).
+app.disable('x-powered-by');
 const angularApp = new AngularNodeAppEngine({
   allowedHosts: ['localhost', '127.0.0.1', 'matexindo.com', 'www.matexindo.com'],
   trustProxyHeaders: [

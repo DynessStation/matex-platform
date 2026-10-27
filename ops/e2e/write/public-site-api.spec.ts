@@ -12,6 +12,7 @@ import {
   login,
   saveRecording,
 } from './api-contract';
+import { stack } from './stack.mjs';
 
 // API contract for the public site endpoints without a module spec of their own: fixed pages
 // (backend/src/ctrl/public/website-page.ts), robots.txt and the sitemap (public/seo.ts), the
@@ -161,5 +162,22 @@ test('the admin analytics overview', async () => {
     );
   } finally {
     await limited.dispose();
+  }
+});
+
+test('the SSR servers do not announce Express (SEC-007)', async () => {
+  const pages = await apiContext();
+  try {
+    for (const url of [
+      `${stack.publicOrigin}/`,
+      `${stack.publicOrigin}/produk/tidak-ada-sec-007`,
+      `${stack.adminOrigin}/auth/login`,
+    ]) {
+      const response = await pages.get(url);
+      expect(response.status(), url).toBeLessThan(500);
+      expect(response.headers()['x-powered-by'], url).toBeUndefined();
+    }
+  } finally {
+    await pages.dispose();
   }
 });

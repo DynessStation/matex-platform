@@ -93,6 +93,9 @@
               "buildTarget": "matex-public:build:e2e"
             }
           },
+          "options": {
+            "port": 4201
+          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
