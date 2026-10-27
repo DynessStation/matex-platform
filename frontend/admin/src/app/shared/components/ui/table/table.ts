@@ -28,8 +28,6 @@ import {
 } from './table.util';
 import { ImagePreviewDirective } from '../../../directives/image-preview.directive';
 import { TextFitDirective } from '../../../directives/text-fit.directive';
-import { IAccountUser } from '../../../interface/account.interface';
-import { IPermission } from '../../../interface/role.interface';
 import {
   IBaseRow,
   ITableAction,
@@ -40,7 +38,6 @@ import {
 } from '../../../interface/table.interface';
 import { CurrencySymbolPipe } from '../../../pipe/currency-symbol.pipe';
 import { LocalizationService } from '../../../services/localization.service';
-import { AccountState } from '../../../store/state/account.state';
 import { AuthState } from '../../../store/state/auth.state';
 import { LoaderState } from '../../../store/state/loader.state';
 import { ConfirmationModal } from '../modal/confirmation-modal/confirmation-modal';
@@ -79,10 +76,6 @@ export class Table<T extends IBaseRow = IBaseRow> {
     LoaderState.status,
   ) as Observable<boolean>;
 
-  permissions$: Observable<IPermission[]> = inject(Store).select(
-    AccountState.permissions,
-  );
-
   authPermissions$: Observable<string[]> = inject(Store).select(
     AuthState.permissions,
   );
@@ -90,8 +83,6 @@ export class Table<T extends IBaseRow = IBaseRow> {
   isAllAccess$: Observable<boolean> = inject(Store).select(
     AuthState.isAllAccess,
   );
-
-  user$: Observable<IAccountUser> = inject(Store).select(AccountState.user);
 
   //==================================================
   //==== INPUT
@@ -146,13 +137,9 @@ export class Table<T extends IBaseRow = IBaseRow> {
 
   public selected: TableRowId[] = [];
 
-  public permissions: string[] = [];
-
   public authPermissions: string[] = [];
 
   public isAllAccess = false;
-
-  public role: string;
 
   //==================================================
   //==== CONSTRUCTOR
@@ -178,12 +165,8 @@ export class Table<T extends IBaseRow = IBaseRow> {
     this.state.init(this.emitInitialChange());
 
     //==================================================
-    //==== LEGACY TEMPLATE PERMISSIONS
+    //==== PERMISSIONS
     //==================================================
-
-    this.permissions$.subscribe((permission) => {
-      this.permissions = permission?.map((value) => value?.name) ?? [];
-    });
 
     this.authPermissions$.subscribe((permissions) => {
       this.authPermissions = permissions ?? [];
@@ -202,14 +185,6 @@ export class Table<T extends IBaseRow = IBaseRow> {
         this.selected = [];
       }
     });
-
-    //==================================================
-    //==== USER ROLE
-    //==================================================
-
-    this.user$.subscribe((user) => {
-      this.role = user?.role?.name;
-    });
   }
 
   //==================================================
@@ -218,11 +193,7 @@ export class Table<T extends IBaseRow = IBaseRow> {
 
   private getCurrentPermissions(): string[] {
     return Array.from(
-      new Set([
-        ...this.permissions,
-        ...this.authPermissions,
-        ...(this.externalPermissions() ?? []),
-      ]),
+      new Set([...this.authPermissions, ...(this.externalPermissions() ?? [])]),
     );
   }
 
@@ -242,17 +213,9 @@ export class Table<T extends IBaseRow = IBaseRow> {
   //==== VISIBLE COLUMNS
   //==================================================
 
-  /** Columns shown to this admin (some are limited to roles). */
+  /** Columns of the table. */
   visibleColumnCount(): number {
-    return (
-      this.tableConfig()?.columns?.filter(
-        (column) =>
-          !column.canAllow ||
-          (column.canAllow.length &&
-            this.role &&
-            column.canAllow.includes(this.role)),
-      ).length ?? 0
-    );
+    return this.tableConfig()?.columns?.length ?? 0;
   }
 
   //==================================================

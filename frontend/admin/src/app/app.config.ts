@@ -32,7 +32,6 @@ import { GlobalErrorHandlerInterceptor } from './core/interceptors/globle-error-
 import { LoaderInterceptor } from './core/interceptors/loader.interceptor';
 import { AppTitleService } from './core/services/app-title.service';
 import { LocalizationService } from './shared/services/localization.service';
-import { AccountState } from './shared/store/state/account.state';
 import { AdminAccessState } from './shared/store/state/admin-access.state';
 import { AdminAccountState } from './shared/store/state/admin-account.state';
 import { AdminPermissionState } from './shared/store/state/admin-permission.state';
@@ -118,7 +117,6 @@ export const appConfig: ApplicationConfig = {
       }),
 
       NgxsModule.forRoot([
-        AccountState,
         AdminAccountState,
         AdminPermissionState,
         AdminAccessState,
@@ -139,7 +137,7 @@ export const appConfig: ApplicationConfig = {
       NgxsModule.forFeature([AuthState]),
 
       NgxsStoragePluginModule.forRoot({
-        keys: ['account', 'country', 'state', 'setting'],
+        keys: ['setting'],
       }),
     ),
 

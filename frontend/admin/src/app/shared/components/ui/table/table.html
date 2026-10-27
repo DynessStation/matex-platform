@@ -46,53 +46,46 @@
             </th>
           }
           @for (columnHead of tableConfig()?.columns; track columnHead) {
-            @if (
-              !columnHead?.canAllow ||
-              (columnHead?.canAllow?.length &&
-                role &&
-                columnHead?.canAllow?.includes(role))
-            ) {
-              <th
-                [ngClass]="{
-                  'sm-width':
-                    columnHead?.type === 'no' || columnHead?.type === 'image',
-                }"
-              >
-                <div class="table-head">
-                  <span appTextFit class="table-heading-text">
-                    {{ columnHead?.title | translate }}
-                  </span>
-                  @if (columnHead?.sortable) {
-                    <button
-                      type="button"
-                      class="table-sort-btn"
-                      [class.active]="state.isSortedBy(columnHead)"
-                      [attr.aria-label]="
-                        ('table_sort_by' | translate) +
-                        ' ' +
-                        (columnHead?.title | translate)
+            <th
+              [ngClass]="{
+                'sm-width':
+                  columnHead?.type === 'no' || columnHead?.type === 'image',
+              }"
+            >
+              <div class="table-head">
+                <span appTextFit class="table-heading-text">
+                  {{ columnHead?.title | translate }}
+                </span>
+                @if (columnHead?.sortable) {
+                  <button
+                    type="button"
+                    class="table-sort-btn"
+                    [class.active]="state.isSortedBy(columnHead)"
+                    [attr.aria-label]="
+                      ('table_sort_by' | translate) +
+                      ' ' +
+                      (columnHead?.title | translate)
+                    "
+                    [title]="
+                      ('table_sort_by' | translate) +
+                      ' ' +
+                      (columnHead?.title | translate)
+                    "
+                    (click)="state.onChangeTable(columnHead, 'sort')"
+                  >
+                    <i
+                      [class]="
+                        !state.isSortedBy(columnHead)
+                          ? 'ri-arrow-up-down-line'
+                          : columnHead?.sort_direction === 'desc'
+                            ? 'ri-sort-desc'
+                            : 'ri-sort-asc'
                       "
-                      [title]="
-                        ('table_sort_by' | translate) +
-                        ' ' +
-                        (columnHead?.title | translate)
-                      "
-                      (click)="state.onChangeTable(columnHead, 'sort')"
-                    >
-                      <i
-                        [class]="
-                          !state.isSortedBy(columnHead)
-                            ? 'ri-arrow-up-down-line'
-                            : columnHead?.sort_direction === 'desc'
-                              ? 'ri-sort-desc'
-                              : 'ri-sort-asc'
-                        "
-                      ></i>
-                    </button>
-                  }
-                </div>
-              </th>
-            }
+                    ></i>
+                  </button>
+                }
+              </div>
+            </th>
           }
           <th class="action-column sticky-action-column">
             <div
@@ -166,168 +159,161 @@
               </td>
             }
             @for (columnHead of tableConfig()?.columns; track columnHead) {
-              @if (
-                !columnHead?.canAllow ||
-                (columnHead?.canAllow?.length &&
-                  role &&
-                  columnHead?.canAllow?.includes(role))
-              ) {
-                <td
-                  [ngClass]="{
-                    'sm-width':
-                      columnHead?.type === 'no' || columnHead?.type === 'image',
-                  }"
-                >
-                  @if (columnHead?.type && columnHead?.type === 'no') {
+              <td
+                [ngClass]="{
+                  'sm-width':
+                    columnHead?.type === 'no' || columnHead?.type === 'image',
+                }"
+              >
+                @if (columnHead?.type && columnHead?.type === 'no') {
+                  <span
+                    appTextFit
+                    class="table-cell-content table-cell-content--compact"
+                  >
+                    {{
+                      i +
+                        1 +
+                        (state.tableData['page'] - 1) *
+                          state.tableData['paginate']
+                    }}
+                  </span>
+                } @else if (
+                  columnHead?.type && columnHead?.type === 'image'
+                ) {
+                  @if (columnData[columnHead?.dataField.toString()]) {
                     <span
-                      appTextFit
-                      class="table-cell-content table-cell-content--compact"
+                      class="image-preview-inline image-preview-sm"
+                      [appImagePreview]="
+                        columnData[columnHead?.dataField.toString()].asset_url
+                      "
+                      [previewAlt]="
+                        columnData[columnHead?.dataField.toString()]
+                          .original_name
+                      "
                     >
-                      {{
-                        i +
-                          1 +
-                          (state.tableData['page'] - 1) *
-                            state.tableData['paginate']
-                      }}
-                    </span>
-                  } @else if (
-                    columnHead?.type && columnHead?.type === 'image'
-                  ) {
-                    @if (columnData[columnHead?.dataField.toString()]) {
-                      <span
-                        class="image-preview-inline image-preview-sm"
-                        [appImagePreview]="
-                          columnData[columnHead?.dataField.toString()].asset_url
-                        "
-                        [previewAlt]="
-                          columnData[columnHead?.dataField.toString()]
-                            .original_name
-                        "
-                      >
-                        <img
-                          [class]="columnHead?.class"
-                          [src]="
-                            columnData[columnHead?.dataField.toString()]
-                              .asset_url
-                          "
-                          alt="image"
-                        />
-                      </span>
-                    } @else if (columnHead?.placeholder) {
                       <img
                         [class]="columnHead?.class"
-                        [src]="columnHead?.placeholder"
-                        alt="placeholder"
+                        [src]="
+                          columnData[columnHead?.dataField.toString()]
+                            .asset_url
+                        "
+                        alt="image"
                       />
-                    } @else {
-                      <div class="user-round">
-                        <h4>
-                          {{
-                            columnData?.[
-                              columnHead?.key
-                                ? columnHead?.key?.toString()
-                                : 'name'
-                            ]
-                              .charAt(0)
-                              .toString()
-                              .toUpperCase() || 'F'
-                          }}
-                        </h4>
-                      </div>
-                    }
-                  } @else if (
-                    columnHead?.type && columnHead?.type === 'switch'
-                  ) {
-                    <div class="form-check form-switch ps-0 status-switch-cell">
-                      <label class="switch switch-sm">
-                        <input
-                          type="checkbox"
-                          id="status-{{ i }}"
-                          [disabled]="
-                            columnData['system_reserve'] === '1' ||
-                            !hasPermission(['edit'])
-                          "
-                          [value]="
+                    </span>
+                  } @else if (columnHead?.placeholder) {
+                    <img
+                      [class]="columnHead?.class"
+                      [src]="columnHead?.placeholder"
+                      alt="placeholder"
+                    />
+                  } @else {
+                    <div class="user-round">
+                      <h4>
+                        {{
+                          columnData?.[
+                            columnHead?.key
+                              ? columnHead?.key?.toString()
+                              : 'name'
+                          ]
+                            .charAt(0)
+                            .toString()
+                            .toUpperCase() || 'F'
+                        }}
+                      </h4>
+                    </div>
+                  }
+                } @else if (
+                  columnHead?.type && columnHead?.type === 'switch'
+                ) {
+                  <div class="form-check form-switch ps-0 status-switch-cell">
+                    <label class="switch switch-sm">
+                      <input
+                        type="checkbox"
+                        id="status-{{ i }}"
+                        [disabled]="
+                          columnData['system_reserve'] === '1' ||
+                          !hasPermission(['edit'])
+                        "
+                        [value]="
+                          nextSwitchValue(
+                            columnData[columnHead?.dataField.toString()]
+                          )
+                        "
+                        [checked]="
+                          isSwitchActive(
+                            columnData[columnHead?.dataField.toString()]
+                          )
+                        "
+                        (click)="
+                          ConfirmationModal().openModal(
+                            columnHead?.dataField.toString(),
+                            columnData,
                             nextSwitchValue(
                               columnData[columnHead?.dataField.toString()]
                             )
-                          "
-                          [checked]="
-                            isSwitchActive(
-                              columnData[columnHead?.dataField.toString()]
-                            )
-                          "
-                          (click)="
-                            ConfirmationModal().openModal(
-                              columnHead?.dataField.toString(),
-                              columnData,
-                              nextSwitchValue(
-                                columnData[columnHead?.dataField.toString()]
-                              )
-                            );
-                            $event.preventDefault();
-                            $event.stopPropagation()
-                          "
-                        />
-                        <span
-                          class="switch-state"
-                          [class.disabled]="
-                            columnData['system_reserve'] === '1' ||
-                            !hasPermission(['edit'])
-                          "
-                        ></span>
-                      </label>
-                      @if (columnHead.activeLabel || columnHead.inactiveLabel) {
-                        <span class="status-switch-label">
-                          {{
-                            isSwitchActive(
-                              columnData[columnHead?.dataField.toString()]
-                            )
-                              ? columnHead.activeLabel
-                              : columnHead.inactiveLabel
-                          }}
-                        </span>
-                      }
-                    </div>
-                  } @else if (
-                    columnHead?.type && columnHead?.type === 'price'
-                  ) {
-                    <span appTextFit class="table-cell-content">
-                      {{ columnData[columnHead?.dataField] | currencySymbol }}
-                    </span>
-                  } @else if (columnHead?.type && columnHead?.type === 'date') {
-                    <span appTextFit class="table-cell-content">
-                      {{
-                        columnData[columnHead?.dataField.toString()]
-                          | date
-                            : (columnHead?.date_format
-                                ? columnHead?.date_format
-                                : localization.dateTimeFormat())
-                            : undefined
-                            : localization.locale()
-                      }}
-                    </span>
-                  } @else if (
-                    columnHead?.type && columnHead?.type === 'rating'
-                  ) {
-                    <ngb-rating
-                      class="rating-sec"
-                      [rate]="columnData[columnHead?.dataField]"
-                    />
-                  } @else {
-                    <div
-                      appTextFit
-                      class="table-cell-content"
-                      [innerHtml]="
-                        getNestedPropertyValue(
-                          columnHead?.dataField.toString(),
-                          columnData
-                        )
-                      "
-                    ></div>
-                  }
-                </td>
-              }
+                          );
+                          $event.preventDefault();
+                          $event.stopPropagation()
+                        "
+                      />
+                      <span
+                        class="switch-state"
+                        [class.disabled]="
+                          columnData['system_reserve'] === '1' ||
+                          !hasPermission(['edit'])
+                        "
+                      ></span>
+                    </label>
+                    @if (columnHead.activeLabel || columnHead.inactiveLabel) {
+                      <span class="status-switch-label">
+                        {{
+                          isSwitchActive(
+                            columnData[columnHead?.dataField.toString()]
+                          )
+                            ? columnHead.activeLabel
+                            : columnHead.inactiveLabel
+                        }}
+                      </span>
+                    }
+                  </div>
+                } @else if (
+                  columnHead?.type && columnHead?.type === 'price'
+                ) {
+                  <span appTextFit class="table-cell-content">
+                    {{ columnData[columnHead?.dataField] | currencySymbol }}
+                  </span>
+                } @else if (columnHead?.type && columnHead?.type === 'date') {
+                  <span appTextFit class="table-cell-content">
+                    {{
+                      columnData[columnHead?.dataField.toString()]
+                        | date
+                          : (columnHead?.date_format
+                              ? columnHead?.date_format
+                              : localization.dateTimeFormat())
+                          : undefined
+                          : localization.locale()
+                    }}
+                  </span>
+                } @else if (
+                  columnHead?.type && columnHead?.type === 'rating'
+                ) {
+                  <ngb-rating
+                    class="rating-sec"
+                    [rate]="columnData[columnHead?.dataField]"
+                  />
+                } @else {
+                  <div
+                    appTextFit
+                    class="table-cell-content"
+                    [innerHtml]="
+                      getNestedPropertyValue(
+                        columnHead?.dataField.toString(),
+                        columnData
+                      )
+                    "
+                  ></div>
+                }
+              </td>
             }
             <td
               class="action-column sticky-action-column"

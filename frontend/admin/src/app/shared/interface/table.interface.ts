@@ -29,7 +29,6 @@ export interface ITableColumn {
   sortable?: boolean;
   sort_direction?: string;
   type?: string;
-  canAllow?: string[];
   date_format?: string;
   class?: string;
   placeholder?: string;

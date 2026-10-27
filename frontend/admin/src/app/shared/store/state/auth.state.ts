@@ -8,7 +8,6 @@ import { IAuthAdminUser, IAuthResponse } from '../../interface/auth.interface';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { SessionService } from '../../services/session.service';
-import { AccountClearAction } from '../action/account.action';
 import {
   AuthClearAction,
   CheckAuthAction,
@@ -307,11 +306,5 @@ export class AuthState {
         expires_at: null,
       },
     });
-
-    //==================================================
-    //==== CLEAR LEGACY ACCOUNT STATE
-    //==================================================
-
-    this.store.dispatch(new AccountClearAction());
   }
 }
