@@ -85,6 +85,11 @@ h6,
   --bs-badge-font-size: 10px;
 }
 
+// Bootstrap's white badge text is unreadable on yellow (1.6:1); dark text in both modes.
+.badge.bg-warning {
+  color: #3a2a00 !important;
+}
+
 // Headings inside the rich text editor, kept in proportion with the form around them.
 .NgxEditor__Content {
   h1 {
@@ -471,6 +476,12 @@ body.dark-only {
     border-color: #505765;
     background: #30353f;
     color: #c3c9d3;
+  }
+
+  // The dark theme paints the selected text's box darker than the select itself (a box inside
+  // the box, e.g. Perusahaan in the admin account form); keep it transparent.
+  .page-body-wrapper .custom-select .select2-selection__rendered {
+    background-color: transparent !important;
   }
 
   .page-body-wrapper
@@ -984,6 +995,11 @@ body.dark-only {
   --admin-dark-text: #f2f4f7;
   --admin-dark-text-muted: #aeb6c2;
   --admin-dark-text-soft: #858f9e;
+
+  // Bootstrap paints plain text (labels, dt/dd, .fw-semibold blocks) with --bs-body-color,
+  // which the theme never switched: dark #212529 on the dark surfaces. Light text instead.
+  --bs-body-color: var(--admin-dark-text);
+  --bs-body-color-rgb: 242, 244, 247;
 
   color-scheme: dark;
 

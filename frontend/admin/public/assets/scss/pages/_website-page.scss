@@ -388,6 +388,14 @@
   }
 
   body.dark-only & {
+    .home-tags-editor__head {
+      color: #aeb6c2;
+    }
+
+    .home-tags-editor__position {
+      color: #ffb44d;
+    }
+
     .website-page-media-item,
     .website-page-media-empty {
       border-color: #404040;
