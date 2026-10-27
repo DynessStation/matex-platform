@@ -61,7 +61,7 @@ router.put(
       const [officeRows] = await connection.query(
         `SELECT id_office, ${OFFICE_COLUMNS.join(', ')}, status
          FROM office
-         WHERE id_office = ? AND id_master_comp = ? AND status IN (0, 1)
+         WHERE id_office = ? AND id_master_comp = ? AND deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
@@ -213,7 +213,7 @@ router.patch(
       const [officeRows] = await connection.query(
         `SELECT id_office, office_name, status
          FROM office
-         WHERE id_office = ? AND id_master_comp = ? AND status IN (0, 1)
+         WHERE id_office = ? AND id_master_comp = ? AND deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
@@ -224,7 +224,7 @@ router.patch(
 
       const [accountRows] = await connection.query(
         `SELECT COUNT(*) AS total FROM admin_acct
-         WHERE id_master_comp = ? AND id_office = ? AND admin_acct_status IN (0, 1)`,
+         WHERE id_master_comp = ? AND id_office = ? AND admin_acct_deleted_at IS NULL`,
         [scope.idMasterComp, idOffice],
       );
       const affectedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);

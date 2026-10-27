@@ -76,7 +76,7 @@ const lockPermission = async (connection: PoolConnection, idPermission: number) 
     `SELECT id_admin_permission, permission_key, permission_name, permission_group,
        permission_description, permission_status
      FROM admin_permission
-     WHERE id_admin_permission = ? AND permission_status IN (0, 1)
+     WHERE id_admin_permission = ? AND permission_deleted_at IS NULL
      LIMIT 1
      FOR UPDATE`,
     [idPermission],
@@ -137,20 +137,20 @@ router.get(
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM admin_permission ap
-       WHERE ap.permission_status IN (0, 1) AND ${SEARCH}`,
+       WHERE ap.permission_deleted_at IS NULL AND ${SEARCH}`,
       searchValues,
     );
     const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
-      `SELECT COUNT(*) AS total FROM admin_permission WHERE permission_status IN (0, 1)`,
+      `SELECT COUNT(*) AS total FROM admin_permission WHERE permission_deleted_at IS NULL`,
       [],
     );
 
     const [rows] = await pool.query(
       `${PERMISSION_SELECT}
-       WHERE ap.permission_status IN (0, 1) AND ${SEARCH}
+       WHERE ap.permission_deleted_at IS NULL AND ${SEARCH}
        GROUP BY ap.id_admin_permission
        ORDER BY ${orderBy} ${direction}, ap.permission_name ASC
        LIMIT ? OFFSET ?`,
@@ -238,7 +238,7 @@ router.get(
 
     const [rows] = await pool.query(
       `${PERMISSION_SELECT}
-       WHERE ap.id_admin_permission = ? AND ap.permission_status IN (0, 1)
+       WHERE ap.id_admin_permission = ? AND ap.permission_deleted_at IS NULL
        GROUP BY ap.id_admin_permission
        LIMIT 1`,
       [idPermission],
@@ -377,7 +377,7 @@ router.patch(
 );
 
 // Only an inactive permission that no access profile holds can be deleted; the row is kept
-// with status 99.
+// with a deletion time.
 router.delete(
   '/api/v1/admin-permission/:id',
   verifyToken,
@@ -412,7 +412,7 @@ router.delete(
 
       const before = permissionAudit(permission);
       await connection.query(
-        `UPDATE admin_permission SET permission_status = 99, updated = NOW()
+        `UPDATE admin_permission SET permission_status = 0, permission_deleted_at = NOW(), updated = NOW()
          WHERE id_admin_permission = ?`,
         [idPermission],
       );
@@ -422,7 +422,7 @@ router.delete(
         action: 'delete',
         entityLabel: permission.permission_key,
         before,
-        after: { ...before, permission_status: 99 },
+        after: { ...before, permission_status: 0, deleted_at: 'set' },
         metadata: { delete_type: 'soft_delete' },
         httpStatus: 200,
       });
@@ -434,7 +434,7 @@ router.delete(
       'ADMIN_PERMISSION_DELETED',
       'Admin permission deleted successfully',
       {
-        id_admin_permission: keyhsid.idAdminPermission.encode(idPermission),
+        id: keyhsid.idAdminPermission.encode(idPermission),
       },
     );
   },

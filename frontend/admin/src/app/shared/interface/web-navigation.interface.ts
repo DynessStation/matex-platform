@@ -173,6 +173,7 @@ export interface IWebNavigationMutationResponse {
 
     item_count?: number;
 
-    deleted_item_count?: number;
+    // A delete answers the id it removed.
+    id?: string;
   };
 }

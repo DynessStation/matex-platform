@@ -21,7 +21,7 @@ const { pool } = db;
 const router = express.Router();
 
 // Only an inactive profile without assigned admins can be deleted. Its permissions are removed;
-// the profile row is kept with status 99.
+// the profile row is kept with a deletion time.
 router.delete(
   '/api/v1/admin-access/:id',
   verifyToken,
@@ -39,7 +39,7 @@ router.delete(
       const [accessRows] = await connection.query(
         `SELECT id_admin_access, access_name, access_description, admin_access_status
          FROM admin_access
-         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_status IN (0, 1)
+         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
@@ -56,7 +56,7 @@ router.delete(
 
       const [accountRows] = await connection.query(
         `SELECT COUNT(*) AS total FROM admin_acct
-         WHERE id_master_comp = ? AND id_access = ? AND admin_acct_status IN (0, 1)`,
+         WHERE id_master_comp = ? AND id_access = ? AND admin_acct_deleted_at IS NULL`,
         [scope.idMasterComp, idAccess],
       );
       const assignedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
@@ -79,7 +79,7 @@ router.delete(
 
       await replaceAccessPermissions(connection, idAccess, []);
       await connection.query(
-        `UPDATE admin_access SET admin_access_status = 99, updated = NOW()
+        `UPDATE admin_access SET admin_access_status = 0, admin_access_deleted_at = NOW(), updated = NOW()
          WHERE id_admin_access = ? AND id_master_comp = ?`,
         [idAccess, scope.idMasterComp],
       );
@@ -100,14 +100,14 @@ router.delete(
         entityId: idAccess,
         entityLabel: access.access_name,
         before,
-        after: { ...before, permissions: [], admin_access_status: 99 },
+        after: { ...before, permissions: [], admin_access_status: 0, deleted_at: 'set' },
         metadata: { delete_type: 'soft_delete', removed_permissions: permissions },
         httpStatus: 200,
       });
     });
 
     return sendSuccess(res, 200, 'ADMIN_ACCESS_DELETED', 'Admin access deleted successfully', {
-      id_admin_access: keyhsid.idAdminAccess.encode(idAccess),
+      id: keyhsid.idAdminAccess.encode(idAccess),
     });
   },
 );

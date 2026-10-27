@@ -480,7 +480,9 @@ router.delete(
       });
     });
 
-    return sendSuccess(res, 200, 'FAQ_DELETED', 'FAQ deleted successfully', null);
+    return sendSuccess(res, 200, 'FAQ_DELETED', 'FAQ deleted successfully', {
+      id: keyhsid.idFaq.encode(idFaq),
+    });
   },
 );
 

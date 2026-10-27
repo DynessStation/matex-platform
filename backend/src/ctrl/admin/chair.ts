@@ -57,7 +57,7 @@ const assertChairNameUnique = async (
   const [rows] = await connection.query(
     `SELECT id_chair FROM chair
      WHERE id_master_comp = ? AND LOWER(chair_name) = LOWER(?)
-       ${excludeIdChair ? 'AND id_chair != ?' : ''} AND chair_status IN (0, 1)
+       ${excludeIdChair ? 'AND id_chair != ?' : ''} AND chair_deleted_at IS NULL
      LIMIT 1`,
     excludeIdChair ? [idMasterComp, name, excludeIdChair] : [idMasterComp, name],
   );
@@ -70,7 +70,7 @@ const lockChair = async (connection: PoolConnection, idChair: number, idMasterCo
   const [rows] = await connection.query(
     `SELECT id_chair, chair_name, chair_description, chair_status
      FROM chair
-     WHERE id_chair = ? AND id_master_comp = ? AND chair_status IN (0, 1)
+     WHERE id_chair = ? AND id_master_comp = ? AND chair_deleted_at IS NULL
      LIMIT 1
      FOR UPDATE`,
     [idChair, idMasterComp],
@@ -87,7 +87,7 @@ const countAssignedAccounts = async (
 ) => {
   const [rows] = await connection.query(
     `SELECT COUNT(*) AS total FROM admin_acct
-     WHERE id_master_comp = ? AND id_chair = ? AND admin_acct_status IN (0, 1)`,
+     WHERE id_master_comp = ? AND id_chair = ? AND admin_acct_deleted_at IS NULL`,
     [idMasterComp, idChair],
   );
   return Number((rows as RowDataPacket[])[0]?.total ?? 0);
@@ -139,14 +139,14 @@ router.get(
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM chair ch
-       WHERE ch.id_master_comp = ? AND ch.chair_status IN (0, 1) AND ${SEARCH}`,
+       WHERE ch.id_master_comp = ? AND ch.chair_deleted_at IS NULL AND ${SEARCH}`,
       [scope.idMasterComp, searchValue, searchValue],
     );
     const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
-      `SELECT COUNT(*) AS total FROM chair WHERE id_master_comp = ? AND chair_status IN (0, 1)`,
+      `SELECT COUNT(*) AS total FROM chair WHERE id_master_comp = ? AND chair_deleted_at IS NULL`,
       [scope.idMasterComp],
     );
 
@@ -154,8 +154,8 @@ router.get(
       `SELECT ch.id_chair, ch.chair_name, ch.chair_description, ch.chair_status, ch.created,
          ch.updated, COUNT(DISTINCT aa.id_admin_acct) AS admin_count
        FROM chair ch
-       LEFT JOIN admin_acct aa ON ch.id_chair = aa.id_chair AND aa.admin_acct_status IN (0, 1)
-       WHERE ch.id_master_comp = ? AND ch.chair_status IN (0, 1) AND ${SEARCH}
+       LEFT JOIN admin_acct aa ON ch.id_chair = aa.id_chair AND aa.admin_acct_deleted_at IS NULL
+       WHERE ch.id_master_comp = ? AND ch.chair_deleted_at IS NULL AND ${SEARCH}
        GROUP BY ch.id_chair, ch.chair_name, ch.chair_description, ch.chair_status, ch.created,
          ch.updated
        ORDER BY ${orderBy} ${direction}
@@ -234,9 +234,9 @@ router.get(
       `SELECT ch.id_chair, ch.chair_name, ch.chair_description, ch.chair_status, ch.created,
          ch.updated,
          (SELECT COUNT(*) FROM admin_acct aa
-          WHERE aa.id_chair = ch.id_chair AND aa.admin_acct_status IN (0, 1)) AS admin_count
+          WHERE aa.id_chair = ch.id_chair AND aa.admin_acct_deleted_at IS NULL) AS admin_count
        FROM chair ch
-       WHERE ch.id_chair = ? AND ch.id_master_comp = ? AND ch.chair_status IN (0, 1)
+       WHERE ch.id_chair = ? AND ch.id_master_comp = ? AND ch.chair_deleted_at IS NULL
        LIMIT 1`,
       [idChair, scope.idMasterComp],
     );
@@ -376,7 +376,7 @@ router.patch(
   },
 );
 
-// Only an inactive position without assigned admins can be deleted; the row is kept with status 99.
+// Only an inactive position without assigned admins can be deleted; the row is kept with a deletion time.
 router.delete(
   '/api/v1/chair/:id',
   verifyToken,
@@ -409,7 +409,8 @@ router.delete(
 
       const before = chairAudit(chair);
       await connection.query(
-        `UPDATE chair SET chair_status = 99, updated = NOW() WHERE id_chair = ? AND id_master_comp = ?`,
+        `UPDATE chair SET chair_status = 0, chair_deleted_at = NOW(), updated = NOW()
+         WHERE id_chair = ? AND id_master_comp = ?`,
         [idChair, scope.idMasterComp],
       );
       await writeAuditLog({
@@ -418,14 +419,14 @@ router.delete(
         action: 'delete',
         entityLabel: chair.chair_name,
         before,
-        after: { ...before, chair_status: 99 },
+        after: { ...before, chair_status: 0, deleted_at: 'set' },
         metadata: { delete_type: 'soft_delete' },
         httpStatus: 200,
       });
     });
 
     return sendSuccess(res, 200, 'CHAIR_DELETED', 'Position deleted successfully', {
-      id_chair: keyhsid.idChair.encode(idChair),
+      id: keyhsid.idChair.encode(idChair),
     });
   },
 );

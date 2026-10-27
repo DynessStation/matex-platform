@@ -328,9 +328,7 @@ router.delete(
       200,
       'WEB_NAVIGATION_ITEM_DELETED',
       'Navigation item deleted successfully',
-      {
-        deleted_item_count: 1,
-      },
+      { id: req.params.itemId },
     );
   },
 );

@@ -57,14 +57,14 @@ router.get(
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM office o
-       WHERE o.id_master_comp = ? AND o.status IN (0, 1) AND ${SEARCH}`,
+       WHERE o.id_master_comp = ? AND o.deleted_at IS NULL AND ${SEARCH}`,
       [scope.idMasterComp, ...searchParams],
     );
     const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
-      `SELECT COUNT(*) AS total FROM office WHERE id_master_comp = ? AND status IN (0, 1)`,
+      `SELECT COUNT(*) AS total FROM office WHERE id_master_comp = ? AND deleted_at IS NULL`,
       [scope.idMasterComp],
     );
 
@@ -76,9 +76,9 @@ router.get(
          COUNT(DISTINCT aa.id_admin_acct) AS admin_count,
          COUNT(DISTINCT oa.id_office_attachment) AS media_count
        FROM office o
-       LEFT JOIN admin_acct aa ON o.id_office = aa.id_office AND aa.admin_acct_status IN (0, 1)
+       LEFT JOIN admin_acct aa ON o.id_office = aa.id_office AND aa.admin_acct_deleted_at IS NULL
        LEFT JOIN office_attachment oa ON o.id_office = oa.id_office
-       WHERE o.id_master_comp = ? AND o.status IN (0, 1) AND ${SEARCH}
+       WHERE o.id_master_comp = ? AND o.deleted_at IS NULL AND ${SEARCH}
        GROUP BY o.id_office, o.office_code, o.office_name, o.office_description, o.address,
          o.city, o.province, o.postal_code, o.email, o.phone, o.lat, o.lng, o.attendance_enabled,
          o.attendance_radius_meter, o.website_url, o.is_public, o.public_slug, o.public_sort_order,
@@ -143,9 +143,9 @@ router.get(
     const [officeRows] = await pool.query(
       `SELECT o.*,
          (SELECT COUNT(*) FROM admin_acct aa
-          WHERE aa.id_office = o.id_office AND aa.admin_acct_status IN (0, 1)) AS admin_count
+          WHERE aa.id_office = o.id_office AND aa.admin_acct_deleted_at IS NULL) AS admin_count
        FROM office o
-       WHERE o.id_office = ? AND o.id_master_comp = ? AND o.status IN (0, 1)
+       WHERE o.id_office = ? AND o.id_master_comp = ? AND o.deleted_at IS NULL
        LIMIT 1`,
       [idOffice, scope.idMasterComp],
     );
@@ -156,7 +156,7 @@ router.get(
     const [placeRows] = await pool.query(
       `SELECT COUNT(*) AS total,
          SUM(public_sort_order < ? OR (public_sort_order = ? AND id_office <= ?)) AS position
-       FROM office WHERE id_master_comp = ? AND is_public = 1 AND status IN (0, 1)`,
+       FROM office WHERE id_master_comp = ? AND is_public = 1 AND deleted_at IS NULL`,
       [office.public_sort_order, office.public_sort_order, idOffice, scope.idMasterComp],
     );
     const place = (placeRows as RowDataPacket[])[0];

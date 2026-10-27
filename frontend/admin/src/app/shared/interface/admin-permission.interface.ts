@@ -142,7 +142,7 @@ export type IUpdateAdminPermissionStatusResponse =
 //==================================================
 
 export interface IDeleteAdminPermissionData {
-  id_admin_permission: string;
+  id: string;
 }
 
 export type IDeleteAdminPermissionResponse =

@@ -329,7 +329,7 @@ export const assertOfficeUnique = async (
 
   const [duplicates] = await connection.query(
     `SELECT id_office FROM office
-     WHERE id_master_comp = ? ${exclude} AND status IN (0, 1)
+     WHERE id_master_comp = ? ${exclude} AND deleted_at IS NULL
        AND (UPPER(COALESCE(office_code, '')) = UPPER(?) OR LOWER(office_name) = LOWER(?))
      LIMIT 1`,
     [idMasterComp, ...excludeParams, input.code, input.name],
@@ -345,7 +345,7 @@ export const assertOfficeUnique = async (
   if (!input.publicSlug) return;
   const [slugs] = await connection.query(
     `SELECT id_office FROM office
-     WHERE id_master_comp = ? ${exclude} AND public_slug = ? AND status IN (0, 1)
+     WHERE id_master_comp = ? ${exclude} AND public_slug = ? AND deleted_at IS NULL
      LIMIT 1`,
     [idMasterComp, ...excludeParams, input.publicSlug],
   );

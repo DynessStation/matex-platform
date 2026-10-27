@@ -58,7 +58,7 @@ router.delete(
       });
     });
     return found
-      ? sendSuccess(res, 200, 'PRODUCT_DELETED', 'Product archived', null)
+      ? sendSuccess(res, 200, 'PRODUCT_DELETED', 'Product archived', { id: req.params.id })
       : productNotFound(res);
   },
 );

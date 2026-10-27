@@ -170,7 +170,7 @@ const softDelete = async (
 ) => {
   const ids = attachments.map((item) => Number(item.id_attachment));
   await connection.query(
-    `UPDATE attachment SET attachment_status = 99, deleted_at = NOW(), updated = NOW()
+    `UPDATE attachment SET attachment_status = 0, deleted_at = NOW(), updated = NOW()
      WHERE id_attachment IN (${ids.map(() => '?').join(',')})
        AND attachment_status = 1 AND deleted_at IS NULL`,
     ids,
@@ -184,7 +184,7 @@ const softDelete = async (
       entityId: Number(attachment.id_attachment),
       entityLabel: attachment.original_name,
       before,
-      after: { ...before, attachment_status: 99 },
+      after: { ...before, attachment_status: 0, deleted_at: 'set' },
       metadata: {
         delete_type: 'soft_delete',
         ...metadata,
@@ -471,7 +471,7 @@ router.delete(
     await removeFiles(attachments);
 
     return sendSuccess(res, 200, 'ATTACHMENT_DELETED', 'Attachment deleted successfully', {
-      id_attachment: keyhsid.idAttachment.encode(idAttachment),
+      id: keyhsid.idAttachment.encode(idAttachment),
     });
   },
 );

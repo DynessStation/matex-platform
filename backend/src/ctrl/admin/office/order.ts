@@ -30,7 +30,7 @@ export const publicOfficeGroup = (idMasterComp: number): SortGroup => ({
   table: 'office',
   id: 'id_office',
   column: 'public_sort_order',
-  where: 'id_master_comp = ? AND is_public = 1 AND status IN (0, 1)',
+  where: 'id_master_comp = ? AND is_public = 1 AND deleted_at IS NULL',
   params: [idMasterComp],
 });
 
@@ -45,7 +45,7 @@ router.get(
 
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT id_office, office_code, office_name, city, status FROM office
-       WHERE id_master_comp = ? AND is_public = 1 AND status IN (0, 1)
+       WHERE id_master_comp = ? AND is_public = 1 AND deleted_at IS NULL
        ORDER BY public_sort_order, id_office`,
       [scope.idMasterComp],
     );

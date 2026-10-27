@@ -100,7 +100,7 @@ export type ICreateAttachmentResponse = IApiResponse<IAttachment[]>;
 //==================================================
 
 export interface IDeleteAttachmentData {
-  id_attachment: string;
+  id: string;
 }
 
 export type IDeleteAttachmentResponse = IApiResponse<IDeleteAttachmentData>;

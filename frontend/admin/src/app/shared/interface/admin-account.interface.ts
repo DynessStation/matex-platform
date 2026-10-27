@@ -258,7 +258,7 @@ export type IUpdateAdminAccountStatusResponse =
 //==================================================
 
 export interface IDeleteAdminAccountData {
-  id_admin_acct: string;
+  id: string;
 }
 
 export type IDeleteAdminAccountResponse = IApiResponse<IDeleteAdminAccountData>;

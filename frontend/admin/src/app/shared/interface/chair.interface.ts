@@ -105,7 +105,7 @@ export type IUpdateChairStatusResponse = IApiResponse<IUpdateChairStatusData>;
 //==================================================
 
 export interface IDeleteChairData {
-  id_chair: string;
+  id: string;
 }
 
 export type IDeleteChairResponse = IApiResponse<IDeleteChairData>;

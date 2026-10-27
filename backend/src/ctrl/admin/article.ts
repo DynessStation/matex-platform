@@ -597,7 +597,9 @@ router.delete(
       return true;
     });
     if (!found) return articleNotFound(res);
-    return sendSuccess(res, 200, 'ARTICLE_DELETED', 'Article moved to trash', null);
+    return sendSuccess(res, 200, 'ARTICLE_DELETED', 'Article moved to trash', {
+      id: keyhsid.idArticle.encode(id),
+    });
   },
 );
 

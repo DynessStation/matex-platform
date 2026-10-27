@@ -727,13 +727,9 @@ router.delete(
       return true;
     });
     if (!found) return categoryNotFound(res);
-    return sendSuccess(
-      res,
-      200,
-      'PRODUCT_CATEGORY_DELETED',
-      'Product category moved to trash',
-      null,
-    );
+    return sendSuccess(res, 200, 'PRODUCT_CATEGORY_DELETED', 'Product category moved to trash', {
+      id: keyhsid.idProductCategory.encode(id),
+    });
   },
 );
 

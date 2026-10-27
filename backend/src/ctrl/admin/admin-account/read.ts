@@ -39,7 +39,7 @@ const SORTABLE: Record<string, string> = {
 // Full-access admins see every office of the company; others only their own office.
 const WHERE = `(aa.name LIKE ? OR aa.email_1 LIKE ? OR aa.email_2 LIKE ? OR aa.phone_1 LIKE ?
     OR aa.phone_2 LIKE ? OR aa.alias LIKE ? OR aa.uuid LIKE ?)
-  AND aa.id_master_comp = ? AND (? = 1 OR aa.id_office = ?) AND aa.admin_acct_status IN (0, 1)`;
+  AND aa.id_master_comp = ? AND (? = 1 OR aa.id_office = ?) AND aa.admin_acct_deleted_at IS NULL`;
 
 const JOINS = `INNER JOIN master_comp mc ON aa.id_master_comp = mc.id_master_comp
   INNER JOIN office o ON aa.id_office = o.id_office
@@ -81,7 +81,7 @@ router.get(
     const totalAll = await countOf(
       pool,
       `SELECT COUNT(*) AS total FROM admin_acct aa
-       WHERE aa.id_master_comp = ? AND (? = 1 OR aa.id_office = ?) AND aa.admin_acct_status IN (0, 1)`,
+       WHERE aa.id_master_comp = ? AND (? = 1 OR aa.id_office = ?) AND aa.admin_acct_deleted_at IS NULL`,
       [scope.idMasterComp, scope.isAllAccess, scope.idOffice],
     );
 
@@ -144,7 +144,7 @@ router.get(
          aa.admin_acct_status
        FROM admin_acct aa
        ${JOINS}
-       WHERE aa.id_admin_acct = ? AND aa.admin_acct_status IN (0, 1)
+       WHERE aa.id_admin_acct = ? AND aa.admin_acct_deleted_at IS NULL
        LIMIT 1`,
       [idAdminAcct],
     );

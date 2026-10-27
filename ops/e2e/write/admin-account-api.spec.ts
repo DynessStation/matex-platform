@@ -5,6 +5,7 @@ import {
   apiContext,
   createAccessProfile,
   createAdminAccount,
+  e2eRow,
   expectCode,
   login,
   runId,
@@ -245,8 +246,27 @@ test('status and delete enforce their safety rules', async () => {
     'AUTH_ACCOUNT_INACTIVE',
   );
 
-  await expectCode(await owner.delete(`${base}/${createdId}`), 200, 'ADMIN_ACCOUNT_DELETED');
+  const deleted = await expectCode(
+    await owner.delete(`${base}/${createdId}`),
+    200,
+    'ADMIN_ACCOUNT_DELETED',
+  );
+  expect(deleted.data).toEqual({ id: createdId });
   await expectCode(await owner.get(`${base}/${createdId}`), 404, 'ADMIN_ACCOUNT_NOT_FOUND');
+  // Soft delete (A-3): the row stays, inactive, with a deletion time.
+  expect(
+    await e2eRow(
+      'SELECT admin_acct_status, admin_acct_deleted_at IS NOT NULL AS deleted FROM admin_acct WHERE alias = ?',
+      [newAccount.alias],
+    ),
+  ).toEqual({ admin_acct_status: 0, deleted: 1 });
+  await expectCode(
+    await anonymous.post(`${base}/login`, {
+      data: { identity: newAccount.email_1, password: newAccount.password },
+    }),
+    403,
+    'AUTH_ACCOUNT_INACTIVE',
+  );
   const list = await expectCode(
     await owner.get(base, { params: { search: newAccount.alias } }),
     200,

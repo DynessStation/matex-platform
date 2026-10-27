@@ -29,7 +29,7 @@ const { pool } = db;
 const router = express.Router();
 
 // Only an inactive office without assigned admins can be deleted. Its photos and hours are
-// removed; the office row is kept with status 99.
+// removed; the office row is kept with a deletion time.
 router.delete(
   '/api/v1/office/:id',
   verifyToken,
@@ -45,7 +45,7 @@ router.delete(
       const [officeRows] = await connection.query(
         `SELECT id_office, ${OFFICE_COLUMNS.join(', ')}, status
          FROM office
-         WHERE id_office = ? AND id_master_comp = ? AND status IN (0, 1)
+         WHERE id_office = ? AND id_master_comp = ? AND deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
@@ -62,7 +62,7 @@ router.delete(
 
       const [accountRows] = await connection.query(
         `SELECT COUNT(*) AS total FROM admin_acct
-         WHERE id_master_comp = ? AND id_office = ? AND admin_acct_status IN (0, 1)`,
+         WHERE id_master_comp = ? AND id_office = ? AND admin_acct_deleted_at IS NULL`,
         [scope.idMasterComp, idOffice],
       );
       const assignedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
@@ -107,7 +107,8 @@ router.delete(
       await connection.query('DELETE FROM office_attachment WHERE id_office = ?', [idOffice]);
       await connection.query('DELETE FROM office_operating_hour WHERE id_office = ?', [idOffice]);
       await connection.query(
-        'UPDATE office SET status = 99, updated = NOW() WHERE id_office = ? AND id_master_comp = ?',
+        `UPDATE office SET status = 0, deleted_at = NOW(), updated = NOW()
+         WHERE id_office = ? AND id_master_comp = ?`,
         [idOffice, scope.idMasterComp],
       );
       if (Number(office.is_public) === 1) {
@@ -130,7 +131,7 @@ router.delete(
         entityId: idOffice,
         entityLabel: office.office_name,
         before,
-        after: { ...before, operating_hours: [], attachments: [], status: 99 },
+        after: { ...before, operating_hours: [], attachments: [], status: 0, deleted_at: 'set' },
         metadata: {
           delete_type: 'soft_delete',
           removed_operating_hours: hours.length,
@@ -141,7 +142,7 @@ router.delete(
     });
 
     return sendSuccess(res, 200, 'OFFICE_DELETED', 'Office deleted successfully', {
-      id_office: keyhsid.idOffice.encode(idOffice),
+      id: keyhsid.idOffice.encode(idOffice),
     });
   },
 );

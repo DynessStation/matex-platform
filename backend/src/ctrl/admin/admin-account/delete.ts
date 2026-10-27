@@ -19,7 +19,7 @@ const { pool } = db;
 
 const router = express.Router();
 
-// Only an inactive account other than your own can be deleted; the row is kept with status 99.
+// Only an inactive account other than your own can be deleted; the row is kept with a deletion time.
 router.delete(
   '/api/v1/admin-acct/:id',
   verifyToken,
@@ -61,7 +61,8 @@ router.delete(
       }
 
       await connection.query(
-        'UPDATE admin_acct SET admin_acct_status = 99, updated = NOW() WHERE id_admin_acct = ?',
+        `UPDATE admin_acct SET admin_acct_status = 0, admin_acct_deleted_at = NOW(), updated = NOW()
+         WHERE id_admin_acct = ?`,
         [idAdminAcct],
       );
 
@@ -81,14 +82,14 @@ router.delete(
         entityId: idAdminAcct,
         entityLabel: target.name,
         before,
-        after: { ...before, admin_acct_status: 99 },
+        after: { ...before, admin_acct_status: 0, deleted_at: 'set' },
         metadata: { delete_type: 'soft_delete' },
         httpStatus: 200,
       });
     });
 
     return sendSuccess(res, 200, 'ADMIN_ACCOUNT_DELETED', 'Admin account deleted successfully', {
-      id_admin_acct: keyhsid.idAdmin.encode(idAdminAcct),
+      id: keyhsid.idAdmin.encode(idAdminAcct),
     });
   },
 );

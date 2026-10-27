@@ -29,7 +29,7 @@ export const lockAccount = async (
 ): Promise<AccountRow> => {
   const [rows] = await connection.query(
     `SELECT ${ACCOUNT_COLUMNS} FROM admin_acct
-     WHERE id_admin_acct = ? AND admin_acct_status IN (0, 1)
+     WHERE id_admin_acct = ? AND admin_acct_deleted_at IS NULL
      LIMIT 1
      FOR UPDATE`,
     [idAdminAcct],

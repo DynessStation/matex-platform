@@ -40,7 +40,7 @@ export const assertAccessNameUnique = async (
     `SELECT id_admin_access FROM admin_access
      WHERE id_master_comp = ? AND LOWER(access_name) = LOWER(?)
        ${excludeIdAccess ? 'AND id_admin_access != ?' : ''}
-       AND admin_access_status IN (0, 1)
+       AND admin_access_deleted_at IS NULL
      LIMIT 1`,
     excludeIdAccess ? [idMasterComp, name, excludeIdAccess] : [idMasterComp, name],
   );

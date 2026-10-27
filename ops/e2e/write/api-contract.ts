@@ -196,18 +196,34 @@ export async function uploadSample(
   return body.data[0].id_attachment as string;
 }
 
-/** Writes the recording for this spec, including the current rows of `tables`. No-op unless recording. */
-export async function saveRecording(spec: string, tables: string[]): Promise<void> {
-  if (!recordDir) return;
+/** A connection to the e2e database (never the dev or production database). */
+async function e2eDatabase() {
   const backendRequire = createRequire(path.join(backendRoot, 'package.json'));
   const env = backendRequire('dotenv').parse(fs.readFileSync(path.join(backendRoot, '.env')));
-  const connection = await backendRequire('mysql2/promise').createConnection({
+  return backendRequire('mysql2/promise').createConnection({
     host: env.DB_HOST,
     port: Number(env.DB_PORT) || 3306,
     user: env.DB_USER,
     password: env.DB_PASS || '',
     database: stack.databaseName,
   });
+}
+
+/** The first row a read-only query answers on the e2e database, or undefined. */
+export async function e2eRow(sql: string, params: unknown[]): Promise<Record<string, unknown>> {
+  const connection = await e2eDatabase();
+  try {
+    const [rows] = await connection.query(sql, params);
+    return rows[0];
+  } finally {
+    await connection.end();
+  }
+}
+
+/** Writes the recording for this spec, including the current rows of `tables`. No-op unless recording. */
+export async function saveRecording(spec: string, tables: string[]): Promise<void> {
+  if (!recordDir) return;
+  const connection = await e2eDatabase();
   const rows: Record<string, unknown> = {};
   try {
     for (const table of tables) {

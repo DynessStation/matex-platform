@@ -170,7 +170,7 @@ export type IUpdateAdminAccessStatusResponse =
 //==================================================
 
 export interface IDeleteAdminAccessData {
-  id_admin_access: string;
+  id: string;
 }
 
 export type IDeleteAdminAccessResponse = IApiResponse<IDeleteAdminAccessData>;

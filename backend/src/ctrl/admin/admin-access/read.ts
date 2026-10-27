@@ -57,14 +57,14 @@ router.get(
 
     const [totalRows] = await pool.query(
       `SELECT COUNT(*) AS total FROM admin_access aa
-       WHERE aa.id_master_comp = ? AND aa.admin_access_status IN (0, 1) AND ${SEARCH}`,
+       WHERE aa.id_master_comp = ? AND aa.admin_access_deleted_at IS NULL AND ${SEARCH}`,
       [scope.idMasterComp, searchValue, searchValue],
     );
     const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
-      `SELECT COUNT(*) AS total FROM admin_access WHERE id_master_comp = ? AND admin_access_status IN (0, 1)`,
+      `SELECT COUNT(*) AS total FROM admin_access WHERE id_master_comp = ? AND admin_access_deleted_at IS NULL`,
       [scope.idMasterComp],
     );
 
@@ -78,8 +78,8 @@ router.get(
        LEFT JOIN admin_permission ap ON aap.id_admin_permission = ap.id_admin_permission
          AND ap.permission_status = 1
        LEFT JOIN admin_acct acct ON aa.id_admin_access = acct.id_access
-         AND acct.admin_acct_status IN (0, 1)
-       WHERE aa.id_master_comp = ? AND aa.admin_access_status IN (0, 1) AND ${SEARCH}
+         AND acct.admin_acct_deleted_at IS NULL
+       WHERE aa.id_master_comp = ? AND aa.admin_access_deleted_at IS NULL AND ${SEARCH}
        GROUP BY aa.id_admin_access, aa.access_name, aa.access_description,
          aa.admin_access_status, aa.created, aa.updated
        ORDER BY ${orderBy} ${direction}
@@ -164,9 +164,9 @@ router.get(
       `SELECT aa.id_admin_access, aa.access_name, aa.access_description, aa.admin_access_status,
          aa.created, aa.updated,
          (SELECT COUNT(*) FROM admin_acct acct
-          WHERE acct.id_access = aa.id_admin_access AND acct.admin_acct_status IN (0, 1)) AS admin_count
+          WHERE acct.id_access = aa.id_admin_access AND acct.admin_acct_deleted_at IS NULL) AS admin_count
        FROM admin_access aa
-       WHERE aa.id_admin_access = ? AND aa.id_master_comp = ? AND aa.admin_access_status IN (0, 1)
+       WHERE aa.id_admin_access = ? AND aa.id_master_comp = ? AND aa.admin_access_deleted_at IS NULL
        LIMIT 1`,
       [idAccess, scope.idMasterComp],
     );

@@ -106,7 +106,9 @@ router.delete(
       });
     });
 
-    return sendSuccess(res, 200, 'WEB_NAVIGATION_DELETED', 'Web navigation deleted successfully');
+    return sendSuccess(res, 200, 'WEB_NAVIGATION_DELETED', 'Web navigation deleted successfully', {
+      id: req.params.id,
+    });
   },
 );
 

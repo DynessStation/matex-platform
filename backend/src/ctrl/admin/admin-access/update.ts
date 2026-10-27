@@ -48,7 +48,7 @@ router.put(
       const [accessRows] = await connection.query(
         `SELECT id_admin_access, access_name, access_description, admin_access_status
          FROM admin_access
-         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_status IN (0, 1)
+         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
@@ -137,7 +137,7 @@ router.patch(
       const [accessRows] = await connection.query(
         `SELECT id_admin_access, access_name, admin_access_status
          FROM admin_access
-         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_status IN (0, 1)
+         WHERE id_admin_access = ? AND id_master_comp = ? AND admin_access_deleted_at IS NULL
          LIMIT 1
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
