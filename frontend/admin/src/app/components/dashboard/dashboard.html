@@ -12,31 +12,50 @@
           tampilan.
         </p>
       </div>
-      <div class="dashboard-actions" aria-label="Rentang data dashboard">
-        @for (days of rangeOptions; track days) {
-          <button
-            type="button"
-            class="range-button"
-            [class.active]="selectedDays() === days"
-            [disabled]="loading()"
-            (click)="selectRange(days)"
-          >
-            {{ days }} hari
-          </button>
-        }
-        <app-refresh-button
-          key="dashboard"
-          [cooldownSeconds]="120"
-          [loading]="loading()"
-          (refresh)="load()"
-        />
-        <app-help-tip page="dashboard" section="rentang-waktu-dan-tombol" />
-        <a class="analytics-link" routerLink="/public-analytics">
-          Analitik lengkap
-          <i class="ri-arrow-right-line" aria-hidden="true"></i>
-        </a>
-      </div>
+      @if (canView()) {
+        <div class="dashboard-actions" aria-label="Rentang data dashboard">
+          @for (days of rangeOptions; track days) {
+            <button
+              type="button"
+              class="range-button"
+              [class.active]="selectedDays() === days"
+              [disabled]="loading()"
+              (click)="selectRange(days)"
+            >
+              {{ days }} hari
+            </button>
+          }
+          <app-refresh-button
+            key="dashboard"
+            [cooldownSeconds]="120"
+            [loading]="loading()"
+            (refresh)="load()"
+          />
+          <app-help-tip page="dashboard" section="rentang-waktu-dan-tombol" />
+          <a class="analytics-link" routerLink="/public-analytics">
+            Analitik lengkap
+            <i class="ri-arrow-right-line" aria-hidden="true"></i>
+          </a>
+        </div>
+      }
     </header>
+
+    @if (!canView()) {
+      <div
+        class="dashboard-message dashboard-message-info"
+        id="dashboard_no_access"
+        role="status"
+      >
+        <i class="ri-information-line" aria-hidden="true"></i>
+        <div>
+          <strong>Selamat datang di MATEX Internal</strong>
+          <span>
+            Ringkasan kunjungan website hanya untuk akun dengan izin Dasbor.
+            Buka halaman kerja Anda lewat menu di samping.
+          </span>
+        </div>
+      </div>
+    }
 
     @if (error()) {
       <div class="dashboard-message dashboard-message-error" role="alert">

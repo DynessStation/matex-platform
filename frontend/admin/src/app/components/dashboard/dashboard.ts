@@ -10,7 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
-import { finalize } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { combineLatest, finalize } from 'rxjs';
 
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
 import { RefreshButton } from '../../shared/components/ui/refresh-button/refresh-button';
@@ -20,6 +21,8 @@ import {
   IAnalyticsOverview,
 } from '../../shared/interface/analytics.interface';
 import { AnalyticsService } from '../../shared/services/analytics.service';
+import { AuthState } from '../../shared/store/state/auth.state';
+import { hasPermissionAccess } from '../../shared/utils/permission.util';
 
 interface DashboardChartPoint extends IAnalyticsDailyPoint {
   label: string;
@@ -37,6 +40,13 @@ export class Dashboard {
   private analytics = inject(AnalyticsService);
   private destroyRef = inject(DestroyRef);
   private platformId = inject(PLATFORM_ID);
+  private store = inject(Store);
+
+  /**
+   * Every account lands here after login, but the figures need dashboard.view. Without it the
+   * page shows a note instead of asking the API (which would answer 403).
+   */
+  readonly canView = signal(false);
 
   readonly rangeOptions = [7, 30, 90] as const;
   readonly selectedDays = signal<7 | 30 | 90>(30);
@@ -88,11 +98,29 @@ export class Dashboard {
   });
 
   constructor() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.load();
-      this.refreshTimer = setInterval(() => this.load(true), 30_000);
-      this.destroyRef.onDestroy(() => clearInterval(this.refreshTimer));
-    }
+    if (!isPlatformBrowser(this.platformId)) return;
+    combineLatest([
+      this.store.select(AuthState.permissions),
+      this.store.select(AuthState.isAllAccess),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([permissions, isAllAccess]) => {
+        const allowed = hasPermissionAccess(
+          'dashboard.view',
+          permissions ?? [],
+          isAllAccess === true,
+        );
+        this.canView.set(allowed);
+        if (allowed && !this.refreshTimer) {
+          this.load();
+          this.refreshTimer = setInterval(() => this.load(true), 30_000);
+        } else if (!allowed) {
+          clearInterval(this.refreshTimer);
+          this.refreshTimer = undefined;
+          this.loading.set(false);
+        }
+      });
+    this.destroyRef.onDestroy(() => clearInterval(this.refreshTimer));
   }
 
   selectRange(days: 7 | 30 | 90): void {
