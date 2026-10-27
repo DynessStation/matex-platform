@@ -1,7 +1,5 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-
 import { isPlatformBrowser } from '@angular/common';
-
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import {
   CanActivate,
   CanActivateChild,
@@ -10,11 +8,9 @@ import {
 } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-
 import { Observable, catchError, map, of, take } from 'rxjs';
 
 import { CheckAuthAction } from '../../shared/store/action/auth.action';
-
 import { AuthState } from '../../shared/store/state/auth.state';
 
 @Injectable({

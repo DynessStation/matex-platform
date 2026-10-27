@@ -16,8 +16,8 @@ import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-
 import { Button } from '../../../shared/components/ui/button/button';
 import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
-import { mediaConfig } from '../../../shared/data/media-config';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
+import { mediaConfig } from '../../../shared/data/media-config';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
 import {
   ICategory,

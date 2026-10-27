@@ -1,5 +1,4 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-
 import {
   Injectable,
   PLATFORM_ID,
@@ -9,7 +8,6 @@ import {
 } from '@angular/core';
 
 import { TranslateService } from '@ngx-translate/core';
-
 import { firstValueFrom } from 'rxjs';
 
 import {

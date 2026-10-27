@@ -1,52 +1,34 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject, viewChild } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { Router, RouterModule } from '@angular/router';
 
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import { ConfirmationModal } from '../../shared/components/ui/modal/confirmation-modal/confirmation-modal';
-
 import { OrderList } from '../../shared/components/ui/order-list/order-list';
-
 import { Table } from '../../shared/components/ui/table/table';
-
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-
-import { IOffice, IOfficeModel } from '../../shared/interface/office.interface';
-
 import { Params } from '../../shared/interface/core.interface';
-
+import { IOffice, IOfficeModel } from '../../shared/interface/office.interface';
 import { IOrderItem } from '../../shared/interface/order-list.interface';
-
-import { ApiMessageService } from '../../shared/services/api-message.service';
-
-import { NotificationService } from '../../shared/services/notification.service';
-
-import { OfficeService } from '../../shared/services/office.service';
-
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
-
+import { ApiMessageService } from '../../shared/services/api-message.service';
+import { NotificationService } from '../../shared/services/notification.service';
+import { OfficeService } from '../../shared/services/office.service';
 import {
   DeleteOfficeAction,
   GetOfficesAction,
   UpdateOfficeStatusAction,
 } from '../../shared/store/action/office.action';
-
 import { AuthState } from '../../shared/store/state/auth.state';
-
 import { OfficeState } from '../../shared/store/state/office.state';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 //==================================================
 //==== COMPONENT

@@ -4,21 +4,18 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-
 import { Observable, finalize } from 'rxjs';
 
+import { SKIP_GLOBAL_LOADER } from './loader-context';
 import {
   HideButtonSpinnerAction,
   HideLoaderAction,
   ShowButtonSpinnerAction,
   ShowLoaderAction,
 } from '../../shared/store/action/loader.action';
-
-import { SKIP_GLOBAL_LOADER } from './loader-context';
 
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {

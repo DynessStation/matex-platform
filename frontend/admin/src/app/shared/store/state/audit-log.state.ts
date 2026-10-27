@@ -1,14 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-
 import { tap } from 'rxjs';
 
 import {
   IAuditLogDetail,
   IAuditLogModel,
 } from '../../interface/audit-log.interface';
-
 import { AuditLogService } from '../../services/audit-log.service';
 import {
   ClearAuditLogDetailAction,

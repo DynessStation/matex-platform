@@ -6,8 +6,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { finalize } from 'rxjs';
 
-import { Button } from '../../../shared/components/ui/button/button';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
+import { Button } from '../../../shared/components/ui/button/button';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import {

@@ -1,13 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
-
 import { inject, PLATFORM_ID } from '@angular/core';
-
 import { CanActivateFn, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 
 import { AuthState } from '../../shared/store/state/auth.state';
-
 import {
   hasPermissionAccess,
   PermissionMode,

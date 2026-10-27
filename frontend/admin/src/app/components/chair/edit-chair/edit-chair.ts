@@ -1,36 +1,25 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { EMPTY, Observable, catchError, switchMap, tap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
+import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import {
   IChairDetail,
   IChairPayload,
 } from '../../../shared/interface/chair.interface';
-
 import {
   GetChairDetailAction,
   UpdateChairAction,
 } from '../../../shared/store/action/chair.action';
-
 import { ChairState } from '../../../shared/store/state/chair.state';
-
-import { ChairFormValue, FormChair } from '../form-chair/form-chair';
-
-import { TranslateModule } from '@ngx-translate/core';
-
-import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
-
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
+import { ChairFormValue, FormChair } from '../form-chair/form-chair';
 
 //==================================================
 //==== COMPONENT

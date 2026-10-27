@@ -1,13 +1,10 @@
 import { Component, effect, inject, input, output } from '@angular/core';
-
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 
 import { Button } from '../../../shared/components/ui/button/button';
-
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
-
 import { IChairDetail } from '../../../shared/interface/chair.interface';
 
 //==================================================

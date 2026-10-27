@@ -11,13 +11,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { IOfficeLocationValue } from '../../../interface/office.interface';
-
-import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
-
-import { environment } from '../../../../../environments/environment';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+import { environment } from '../../../../../environments/environment';
+import { IOfficeLocationValue } from '../../../interface/office.interface';
+import { GoogleMapsLoaderService } from '../../../services/google-maps-loader.service';
 
 //==================================================
 //==== COMPONENT

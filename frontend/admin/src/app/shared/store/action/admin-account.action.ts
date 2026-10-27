@@ -1,10 +1,9 @@
-import { Params } from '../../interface/core.interface';
-
 import {
   ICreateAdminAccount,
   IUpdateAdminAccount,
   IUpdateAdminAccountStatus,
 } from '../../interface/admin-account.interface';
+import { Params } from '../../interface/core.interface';
 
 //==================================================
 //==== GET ADMIN ACCOUNTS

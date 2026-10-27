@@ -1,5 +1,5 @@
-import { IPaginateModel } from './core.interface';
 import { IApiResponse } from './api-response.interface';
+import { IPaginateModel } from './core.interface';
 
 //==================================================
 //==== ATTACHMENT

@@ -1,11 +1,10 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-
+import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 import {
   IAttachment,
   IAttachmentListResponse,
@@ -15,10 +14,7 @@ import {
   IDeleteAllAttachmentResponse,
   IDeleteAttachmentResponse,
 } from '../interface/attachment.interface';
-
 import { Params } from '../interface/core.interface';
-
-import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 
 //==================================================
 //==== SERVICE

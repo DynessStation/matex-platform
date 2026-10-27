@@ -4,6 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { IApiResponse } from '../interface/api-response.interface';
 import { Params } from '../interface/core.interface';
 import {
   IFaqDetailResponse,
@@ -11,7 +12,6 @@ import {
   IFaqMutationResponse,
   IFaqPayload,
 } from '../interface/faq.interface';
-import { IApiResponse } from '../interface/api-response.interface';
 import {
   IOrderListResponse,
   IOrderSaveResponse,

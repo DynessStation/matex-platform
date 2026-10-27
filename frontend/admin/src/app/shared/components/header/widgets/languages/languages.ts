@@ -4,9 +4,7 @@ import {
   APP_LANGUAGES,
   IAppLanguage,
 } from '../../../../config/localization.config';
-
 import { LocalizationService } from '../../../../services/localization.service';
-
 import { Button } from '../../../ui/button/button';
 
 //==================================================

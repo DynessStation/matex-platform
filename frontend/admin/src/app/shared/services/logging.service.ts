@@ -7,6 +7,6 @@ export class LoggingService {
   constructor() {}
 
   logError(message: string) {
-    console.log('LoggingService: ' + message);
+    console.error('LoggingService: ' + message);
   }
 }

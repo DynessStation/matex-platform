@@ -1,42 +1,28 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject, viewChild } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { Router, RouterModule } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import { ConfirmationModal } from '../../shared/components/ui/modal/confirmation-modal/confirmation-modal';
-
 import { Table } from '../../shared/components/ui/table/table';
-
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-
 import { IChair, IChairModel } from '../../shared/interface/chair.interface';
-
 import { Params } from '../../shared/interface/core.interface';
-
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
-
 import {
   DeleteChairAction,
   GetChairsAction,
   UpdateChairStatusAction,
 } from '../../shared/store/action/chair.action';
-
 import { AuthState } from '../../shared/store/state/auth.state';
-
 import { ChairState } from '../../shared/store/state/chair.state';
 
 //==================================================

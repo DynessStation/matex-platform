@@ -1,45 +1,31 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject, viewChild } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { Router, RouterModule } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import { ConfirmationModal } from '../../shared/components/ui/modal/confirmation-modal/confirmation-modal';
-
 import { Table } from '../../shared/components/ui/table/table';
-
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-
 import {
   IAdminAccount,
   IAdminAccountModel,
 } from '../../shared/interface/admin-account.interface';
-
 import { Params } from '../../shared/interface/core.interface';
-
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
-
 import {
   DeleteAdminAccountAction,
   GetAdminAccountsAction,
   UpdateAdminAccountStatusAction,
 } from '../../shared/store/action/admin-account.action';
-
 import { AdminAccountState } from '../../shared/store/state/admin-account.state';
-
 import { AuthState } from '../../shared/store/state/auth.state';
 
 @Component({

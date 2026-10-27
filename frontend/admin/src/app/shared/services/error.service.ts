@@ -1,7 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-
 import { HttpErrorResponse } from '@angular/common/http';
-
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 
 import { ApiMessageService } from './api-message.service';

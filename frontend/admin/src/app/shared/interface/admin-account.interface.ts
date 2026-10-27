@@ -1,5 +1,4 @@
 import { IApiResponse } from './api-response.interface';
-
 import { IAttachment } from './attachment.interface';
 
 //==================================================

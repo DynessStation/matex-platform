@@ -1,16 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-
 import {
   IAuditLogDetailResponse,
   IAuditLogModel,
 } from '../interface/audit-log.interface';
-
 import { Params } from '../interface/core.interface';
 
 //==================================================

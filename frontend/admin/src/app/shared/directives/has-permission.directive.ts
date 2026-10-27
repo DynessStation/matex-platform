@@ -7,15 +7,12 @@ import {
   inject,
   input,
 } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { Store } from '@ngxs/store';
-
 import { combineLatest } from 'rxjs';
 
 import { AuthState } from '../store/state/auth.state';
-
 import { hasPermissionAccess, PermissionMode } from '../utils/permission.util';
 
 //==================================================

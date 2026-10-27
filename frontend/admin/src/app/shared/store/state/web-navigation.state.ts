@@ -1,20 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-
 import { forkJoin, switchMap, tap } from 'rxjs';
 
 import {
   IWebNavigationDetail,
   IWebNavigationSummary,
 } from '../../interface/web-navigation.interface';
-
 import { ApiMessageService } from '../../services/api-message.service';
-
 import { NotificationService } from '../../services/notification.service';
-
 import { WebNavigationService } from '../../services/web-navigation.service';
-
 import {
   ClearWebNavigationDetailAction,
   CreateWebNavigationAction,

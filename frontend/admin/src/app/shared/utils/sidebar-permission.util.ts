@@ -1,5 +1,5 @@
-import { ISidebar } from '../interface/sidebar.interface';
 import { hasPermissionAccess } from './permission.util';
+import { ISidebar } from '../interface/sidebar.interface';
 
 //==================================================
 //==== CHECK PERMISSION

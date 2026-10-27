@@ -11,11 +11,9 @@ import {
   NgbModal,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
-
 import { TranslateModule } from '@ngx-translate/core';
 
 import { ITableClickedAction } from '../../../../interface/table.interface';
-
 import { Button } from '../../button/button';
 
 @Component({

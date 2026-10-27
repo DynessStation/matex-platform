@@ -1,32 +1,21 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-
 import { Component, DestroyRef, inject } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { ActivatedRoute } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { EMPTY, Observable, catchError, switchMap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
+import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import { IAuditLogDetail } from '../../../shared/interface/audit-log.interface';
-
+import { LocalizationService } from '../../../shared/services/localization.service';
 import {
   ClearAuditLogDetailAction,
   GetAuditLogDetailAction,
 } from '../../../shared/store/action/audit-log.action';
-
 import { AuditLogState } from '../../../shared/store/state/audit-log.state';
-
-import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
-
-import { LocalizationService } from '../../../shared/services/localization.service';
-
 import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 
 //==================================================

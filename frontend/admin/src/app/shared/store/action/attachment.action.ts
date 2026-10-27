@@ -1,6 +1,5 @@
-import { Params } from '../../interface/core.interface';
-
 import { ICreateAttachmentPayload } from '../../interface/attachment.interface';
+import { Params } from '../../interface/core.interface';
 
 //==================================================
 //==== GET ATTACHMENTS

@@ -1,17 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-
 import { tap } from 'rxjs';
 
 import { IChairDetail, IChairModel } from '../../interface/chair.interface';
-
-import { ChairService } from '../../services/chair.service';
-
-import { NotificationService } from '../../services/notification.service';
-
 import { ApiMessageService } from '../../services/api-message.service';
-
+import { ChairService } from '../../services/chair.service';
+import { NotificationService } from '../../services/notification.service';
 import {
   CreateChairAction,
   DeleteChairAction,

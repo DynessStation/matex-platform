@@ -1,9 +1,8 @@
-import { Params } from '../../interface/core.interface';
-
 import {
   IAdminAccessPayload,
   IUpdateAdminAccessStatus,
 } from '../../interface/admin-access.interface';
+import { Params } from '../../interface/core.interface';
 
 //==================================================
 //==== GET LIST

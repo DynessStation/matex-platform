@@ -1,11 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-
 import { Title } from '@angular/platform-browser';
-
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 
 import { TranslateService } from '@ngx-translate/core';
-
 import { filter, merge } from 'rxjs';
 
 //==================================================

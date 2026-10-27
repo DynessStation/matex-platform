@@ -32,8 +32,6 @@ import { IAccountUser } from '../../../interface/account.interface';
 import { IPermission } from '../../../interface/role.interface';
 import {
   ITableClickedAction,
-  ITableColumn,
-  IBaseRow,
   ITableConfig,
   TableRowId,
 } from '../../../interface/table.interface';

@@ -1,24 +1,17 @@
 import { Component, inject, viewChild } from '@angular/core';
 
 import { TranslateModule } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import {
   MediaBox,
   MediaSelection,
 } from '../../shared/components/ui/media-box/media-box';
-
 import { DeleteModal } from '../../shared/components/ui/modal/delete-modal/delete-modal';
-
 import { MediaModal } from '../../shared/components/ui/modal/media-modal/media-modal';
-
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
-
 import { IAttachment } from '../../shared/interface/attachment.interface';
-
 import { DeleteAllAttachmentAction } from '../../shared/store/action/attachment.action';
 
 //==================================================

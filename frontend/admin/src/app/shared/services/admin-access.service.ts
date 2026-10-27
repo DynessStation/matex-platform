@@ -1,11 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-
 import {
   IAdminAccessDetailResponse,
   IAdminAccessModel,
@@ -16,7 +14,6 @@ import {
   IUpdateAdminAccessStatus,
   IUpdateAdminAccessStatusResponse,
 } from '../interface/admin-access.interface';
-
 import { Params } from '../interface/core.interface';
 
 //==================================================

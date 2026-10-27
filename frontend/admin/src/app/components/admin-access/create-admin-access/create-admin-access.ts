@@ -1,17 +1,12 @@
 import { Component, inject } from '@angular/core';
-
 import { Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
 import { IAdminAccessPayload } from '../../../shared/interface/admin-access.interface';
-
 import { CreateAdminAccessAction } from '../../../shared/store/action/admin-access.action';
-
-import { TranslateModule } from '@ngx-translate/core';
-
 import {
   AdminAccessFormValue,
   FormAdminAccess,

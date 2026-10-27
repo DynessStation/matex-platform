@@ -5,15 +5,12 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Observable, catchError, throwError } from 'rxjs';
 
 import { ErrorService } from '../../shared/services/error.service';
-
 import { LoggingService } from '../../shared/services/logging.service';
-
 import { NotificationService } from '../../shared/services/notification.service';
 
 @Injectable()

@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { forkJoin, tap } from 'rxjs';
+
 import { IArticleDetail, IBlogModel } from '../../interface/blog.interface';
 import { ApiMessageService } from '../../services/api-message.service';
 import { BlogService } from '../../services/blog.service';
@@ -14,6 +16,7 @@ import {
   UpdateBlogAction,
   UpdateBlogStatusAction,
 } from '../action/blog.action';
+
 export interface BlogStateModel {
   blog: IBlogModel;
   selectedBlog: IArticleDetail | null;

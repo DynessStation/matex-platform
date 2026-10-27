@@ -1,11 +1,10 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-
+import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 import {
   IAdminAccountDetailResponse,
   IAdminAccountModel,
@@ -19,10 +18,7 @@ import {
   IUpdateAdminAccountStatus,
   IUpdateAdminAccountStatusResponse,
 } from '../interface/admin-account.interface';
-
 import { Params } from '../interface/core.interface';
-
-import { SKIP_GLOBAL_LOADER } from '../../core/interceptors/loader-context';
 
 @Injectable({
   providedIn: 'root',

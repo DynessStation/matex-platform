@@ -1,17 +1,13 @@
 import { Component, inject } from '@angular/core';
-
 import { Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
 import { IChairPayload } from '../../../shared/interface/chair.interface';
-
 import { CreateChairAction } from '../../../shared/store/action/chair.action';
-
 import { ChairFormValue, FormChair } from '../form-chair/form-chair';
-import { TranslateModule } from '@ngx-translate/core';
 
 //==================================================
 //==== COMPONENT

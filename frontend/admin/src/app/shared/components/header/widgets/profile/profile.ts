@@ -1,21 +1,14 @@
 import { CommonModule } from '@angular/common';
-
 import { Component, inject, viewChild } from '@angular/core';
-
 import { RouterModule } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { Observable } from 'rxjs';
 
 import { IAuthAdminUser } from '../../../../interface/auth.interface';
-
 import { LogoutAction } from '../../../../store/action/auth.action';
-
 import { AuthState } from '../../../../store/state/auth.state';
-
 import { ConfirmationModal } from '../../../ui/modal/confirmation-modal/confirmation-modal';
 
 //==================================================

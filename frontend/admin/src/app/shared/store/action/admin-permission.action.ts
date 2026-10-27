@@ -3,7 +3,6 @@ import {
   IUpdateAdminPermission,
   IUpdateAdminPermissionStatus,
 } from '../../interface/admin-permission.interface';
-
 import { Params } from '../../interface/core.interface';
 
 //==================================================

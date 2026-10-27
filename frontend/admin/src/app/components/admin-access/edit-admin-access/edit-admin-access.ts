@@ -1,39 +1,28 @@
 import { AsyncPipe } from '@angular/common';
-
 import { Component, DestroyRef, inject } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { EMPTY, Observable, catchError, switchMap, tap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
-import { TranslateModule } from '@ngx-translate/core';
-
+import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import {
   IAdminAccessDetail,
   IAdminAccessPayload,
 } from '../../../shared/interface/admin-access.interface';
-
 import {
   GetAdminAccessDetailAction,
   UpdateAdminAccessAction,
 } from '../../../shared/store/action/admin-access.action';
-
 import { AdminAccessState } from '../../../shared/store/state/admin-access.state';
-
+import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 import {
   AdminAccessFormValue,
   FormAdminAccess,
 } from '../form-admin-access/form-admin-access';
-
-import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
-
-import { resolveDetailErrorStatus } from '../../../shared/utils/detail-error.util';
 
 //==================================================
 //==== COMPONENT

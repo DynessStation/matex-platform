@@ -1,20 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-
 import { tap } from 'rxjs';
 
 import {
   IAdminAccountDetailResponse,
   IAdminAccountModel,
 } from '../../interface/admin-account.interface';
-
 import { AdminAccountService } from '../../services/admin-account.service';
-
 import { ApiMessageService } from '../../services/api-message.service';
-
 import { NotificationService } from '../../services/notification.service';
-
 import {
   CreateAdminAccountAction,
   DeleteAdminAccountAction,

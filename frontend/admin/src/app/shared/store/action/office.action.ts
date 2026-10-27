@@ -1,5 +1,4 @@
 import { Params } from '../../interface/core.interface';
-
 import {
   IOfficePayload,
   IUpdateOfficeStatus,

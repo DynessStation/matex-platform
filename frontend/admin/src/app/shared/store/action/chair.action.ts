@@ -1,9 +1,8 @@
-import { Params } from '../../interface/core.interface';
-
 import {
   IChairPayload,
   IUpdateChairStatus,
 } from '../../interface/chair.interface';
+import { Params } from '../../interface/core.interface';
 
 //==================================================
 //==== GET LIST

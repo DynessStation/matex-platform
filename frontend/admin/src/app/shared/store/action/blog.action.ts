@@ -1,5 +1,6 @@
 import { ArticleStatus, IArticlePayload } from '../../interface/blog.interface';
 import { Params } from '../../interface/core.interface';
+
 export class GetBlogsAction {
   static readonly type = '[Article] Get';
   constructor(public payload?: Params) {}

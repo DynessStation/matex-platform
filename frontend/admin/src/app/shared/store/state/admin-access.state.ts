@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-
 import { tap } from 'rxjs';
 
 import {
@@ -9,13 +8,9 @@ import {
   IAdminAccessModel,
   IAdminAccessPermissionGroup,
 } from '../../interface/admin-access.interface';
-
 import { AdminAccessService } from '../../services/admin-access.service';
-
-import { NotificationService } from '../../services/notification.service';
-
 import { ApiMessageService } from '../../services/api-message.service';
-
+import { NotificationService } from '../../services/notification.service';
 import {
   CreateAdminAccessAction,
   DeleteAdminAccessAction,

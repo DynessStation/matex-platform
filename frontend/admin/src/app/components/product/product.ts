@@ -12,12 +12,14 @@ import {
   Router,
   RouterModule,
 } from '@angular/router';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+
+import { ProductCategoryFilter } from './product-category-filter/product-category-filter';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { OrderList } from '../../shared/components/ui/order-list/order-list';
-import { ProductCategoryFilter } from './product-category-filter/product-category-filter';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { Params } from '../../shared/interface/core.interface';

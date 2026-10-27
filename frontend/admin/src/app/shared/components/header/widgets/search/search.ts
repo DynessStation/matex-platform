@@ -8,27 +8,18 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormsModule } from '@angular/forms';
-
 import { RouterModule } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { combineLatest } from 'rxjs';
 
 import { menu } from '../../../../data/menu';
-
 import { ISidebar } from '../../../../interface/sidebar.interface';
-
 import { NavService } from '../../../../services/nav.service';
-
 import { AuthState } from '../../../../store/state/auth.state';
-
 import { filterSidebarByPermission } from '../../../../utils/sidebar-permission.util';
 
 //==================================================

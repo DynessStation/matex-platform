@@ -1,31 +1,19 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-
 import { Component, PLATFORM_ID, inject, input } from '@angular/core';
-
 import { RouterModule } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
 import { combineLatest, Observable } from 'rxjs';
 
 import { IValues } from '../../interface/setting.interface';
-
 import { ISidebar, ISidebarModel } from '../../interface/sidebar.interface';
-
 import { NavService } from '../../services/nav.service';
-
 import { GetSidebarAction } from '../../store/action/sidebar.action';
-
 import { AuthState } from '../../store/state/auth.state';
-
 import { SettingState } from '../../store/state/setting.state';
-
 import { SidebarState } from '../../store/state/sidebar.state';
-
 import { filterSidebarByPermission } from '../../utils/sidebar-permission.util';
-
 import { Search } from '../header/widgets/search/search';
 
 //==================================================

@@ -5,13 +5,10 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
-
 import { Injectable, inject } from '@angular/core';
-
 import { Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-
 import { Observable, catchError, throwError } from 'rxjs';
 
 import { AuthClearAction } from '../../shared/store/action/auth.action';

@@ -1,5 +1,4 @@
 import { isPlatformBrowser, AsyncPipe } from '@angular/common';
-
 import {
   AfterViewInit,
   Component,
@@ -8,41 +7,28 @@ import {
   PLATFORM_ID,
   viewChild,
 } from '@angular/core';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 
-import { Select2Data, Select2Module } from 'ng-select2-component';
-
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
 import { Store } from '@ngxs/store';
-
+import { Select2Data, Select2Module } from 'ng-select2-component';
 import { Observable } from 'rxjs';
 
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
-
 import { Table } from '../../shared/components/ui/table/table';
-
 import {
   IAuditLog,
   IAuditLogModel,
 } from '../../shared/interface/audit-log.interface';
-
 import { Params } from '../../shared/interface/core.interface';
-
 import {
   ITableClickedAction,
   ITableConfig,
 } from '../../shared/interface/table.interface';
-
 import { GetAuditLogsAction } from '../../shared/store/action/audit-log.action';
-
 import { AuditLogState } from '../../shared/store/state/audit-log.state';
-
 import { AuthState } from '../../shared/store/state/auth.state';
 
 //==================================================

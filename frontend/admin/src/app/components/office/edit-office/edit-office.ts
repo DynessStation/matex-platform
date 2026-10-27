@@ -1,34 +1,25 @@
 import { AsyncPipe } from '@angular/common';
-
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject } from '@angular/core';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-
 import { EMPTY, Observable, catchError, switchMap, tap } from 'rxjs';
 
 import { PageWrapper } from '../../../shared/components/page-wrapper/page-wrapper';
-
+import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 import {
   IOfficeDetail,
   IOfficePayload,
 } from '../../../shared/interface/office.interface';
-
 import {
   GetOfficeDetailAction,
   UpdateOfficeAction,
 } from '../../../shared/store/action/office.action';
-
 import { OfficeState } from '../../../shared/store/state/office.state';
-
 import { FormOffice } from '../form-office/form-office';
-import { TranslateModule } from '@ngx-translate/core';
-
-import { HttpErrorResponse } from '@angular/common/http';
-import { DetailErrorState } from '../../../shared/components/ui/detail-error-state/detail-error-state';
 
 @Component({
   selector: 'app-edit-office',

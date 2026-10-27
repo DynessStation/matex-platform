@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { IValues } from '../../interface/setting.interface';
-import { SettingState } from '../../store/state/setting.state';
 import { SessionService } from '../../services/session.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { SettingState } from '../../store/state/setting.state';
 
 @Component({
   selector: 'app-footer',

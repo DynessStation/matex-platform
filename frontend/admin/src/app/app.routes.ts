@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 import { AuthGuard } from './core/guard/auth.guard';
-
 import { fullRoutes } from './shared/routes/full.routes';
 import { content } from './shared/routes/routes';
 
