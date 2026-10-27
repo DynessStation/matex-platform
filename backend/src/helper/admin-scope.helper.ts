@@ -1,4 +1,4 @@
-import { Pool } from 'mysql2/promise';
+import { Pool, RowDataPacket } from 'mysql2/promise';
 
 import db = require('../db');
 
@@ -97,7 +97,7 @@ export const getAdminScope = async (
     [idAdminAcct],
   );
 
-  const account = (rows as any[])[0];
+  const account = (rows as RowDataPacket[])[0];
 
   if (!account || Number(account.admin_acct_status) !== 1) {
     return {

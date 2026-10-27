@@ -28,6 +28,7 @@ import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import type { RequestBody } from '../../helper/input.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -67,7 +68,7 @@ const readTranslations = (value: unknown) => {
 };
 
 /** The save body, or null when anything is missing or invalid. */
-const payloadOf = (body: any) => {
+const payloadOf = (body: RequestBody) => {
   const key = normalizePublicContentKey(body?.key);
   const status = String(body?.status ?? 'draft');
   const parentId = body?.parent_id ? decodeId(body.parent_id, keyhsid.idProductCategory) : null;
@@ -101,7 +102,7 @@ const payloadOf = (body: any) => {
 
 type CategoryPayload = NonNullable<ReturnType<typeof payloadOf>>;
 
-const mediaDto = (media: any) =>
+const mediaDto = (media: RowDataPacket | undefined) =>
   media?.id_attachment
     ? {
         id_attachment: keyhsid.idAttachment.encode(Number(media.id_attachment)),
@@ -115,7 +116,7 @@ const mediaDto = (media: any) =>
     : null;
 
 // The list row carries image and icon columns under a prefix (image_*, icon_*).
-const prefixedMedia = (row: any, prefix: string) =>
+const prefixedMedia = (row: RowDataPacket, prefix: string) =>
   mediaDto({
     id_attachment: row[`${prefix}_id`],
     storage_path: row[`${prefix}_path`],
@@ -123,7 +124,7 @@ const prefixedMedia = (row: any, prefix: string) =>
     width: row[`${prefix}_width`],
     height: row[`${prefix}_height`],
     mime_type: row[`${prefix}_mime`],
-  });
+  } as RowDataPacket);
 
 const LIST_SELECT = `SELECT c.id_product_category, c.id_parent_product_category,
     c.product_category_key, c.product_category_status, c.product_category_is_featured,
@@ -148,7 +149,7 @@ const LIST_SELECT = `SELECT c.id_product_category, c.id_parent_product_category,
     AND ac.product_category_attachment_sort_order = 0
   LEFT JOIN attachment ico ON ico.id_attachment = ac.id_attachment`;
 
-const listDto = (row: any) => ({
+const listDto = (row: RowDataPacket) => ({
   id: keyhsid.idProductCategory.encode(Number(row.id_product_category)),
   parent_id: row.id_parent_product_category
     ? keyhsid.idProductCategory.encode(Number(row.id_parent_product_category))
@@ -166,13 +167,13 @@ const listDto = (row: any) => ({
   category_icon: prefixedMedia(row, 'icon'),
   created_at: row.created,
   updated_at: row.updated,
-  subcategories: [] as any[],
+  subcategories: [] as unknown[],
 });
 
 // Categories whose parent is not in the list become roots.
 const makeTree = (items: ReturnType<typeof listDto>[]) => {
   const byId = new Map(items.map((item) => [item.id, item]));
-  const roots = [];
+  const roots: ReturnType<typeof listDto>[] = [];
   for (const item of items) {
     const parent = item.parent_id ? byId.get(item.parent_id) : undefined;
     if (parent) parent.subcategories.push(item);
@@ -518,15 +519,19 @@ router.patch(
     // The items are one level in the order given by sort_order (ties keep the list order);
     // they are saved as positions 1..n.
     const items = rawItems
-      .map((item: any, index: number) => ({
+      .map((item: RequestBody | null, index: number) => ({
         id: decodeId(item?.id, keyhsid.idProductCategory),
         sortOrder: Math.max(0, Math.floor(Number(item?.sort_order) || 0)),
         index,
       }))
-      .sort((a: any, b: any) => a.sortOrder - b.sortOrder || a.index - b.index)
-      .map((item: any, index: number) => ({ id: item.id, sortOrder: index + 1 }));
-    if (items.some((item: any) => !item.id)) return orderInvalid();
-    if (new Set(items.map((item: any) => item.id)).size !== items.length) {
+      .sort(
+        (a: { sortOrder: number; index: number }, b: { sortOrder: number; index: number }) =>
+          a.sortOrder - b.sortOrder || a.index - b.index,
+      )
+      .map((item: { id: number | null }, index: number) => ({ id: item.id, sortOrder: index + 1 }));
+    if (items.some((item: { id: number | null }) => !item.id)) return orderInvalid();
+    const ids = items.map((item: { id: number | null }) => item.id as number);
+    if (new Set(ids).size !== items.length) {
       return sendError(
         res,
         400,
@@ -541,7 +546,7 @@ router.patch(
          WHERE id_master_comp = ? AND product_category_deleted_at IS NULL
            AND id_product_category IN (${items.map(() => '?').join(',')})
          FOR UPDATE`,
-        [scope.idMasterComp, ...items.map((item: any) => item.id)],
+        [scope.idMasterComp, ...ids],
       );
       if (existing.length !== items.length) {
         throw new HttpError(
@@ -550,11 +555,7 @@ router.patch(
           'One or more categories were not found',
         );
       }
-      await writeOrder(
-        connection,
-        siblingGroup(scope.idMasterComp, null),
-        items.map((item: any) => item.id),
-      );
+      await writeOrder(connection, siblingGroup(scope.idMasterComp, null), ids);
       await writeAuditLog({
         ...auditBase(req, connection, scope),
         eventCode: 'product_category.reordered',

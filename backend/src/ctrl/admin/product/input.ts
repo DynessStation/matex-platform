@@ -8,6 +8,7 @@ import {
 import { decodeId } from '../../../helper/id.helper';
 import { trimTo } from '../../../helper/input.helper';
 import { normalizeProductMediaSortOrder } from '../../../helper/product-media.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 export const PRODUCT_STATUSES = new Set(['draft', 'published', 'archived']);
 
@@ -60,7 +61,7 @@ const readTranslations = (value: unknown) => {
 // One thumbnail and one share image at most, up to ten gallery items, and no two items of a
 // role on the same position.
 const readMedia = (value: unknown) => {
-  const media = (Array.isArray(value) ? value : []).map((item: any, index: number) => ({
+  const media = (Array.isArray(value) ? value : []).map((item: RequestBody, index: number) => ({
     id: decodeId(item?.id, keyhsid.idAttachment),
     role: String(item?.role ?? 'gallery'),
     // Zero is a valid first position. Using `|| index` here made the first gallery item
@@ -84,7 +85,7 @@ const readMedia = (value: unknown) => {
 // Public end-user prices: one per currency; a "displayed" price needs an active one in both
 // currencies. Only end-user prices can be public.
 const readPrices = (value: unknown, priceVisibility: string) => {
-  const prices = (Array.isArray(value) ? value : []).map((item: any, index: number) => ({
+  const prices = (Array.isArray(value) ? value : []).map((item: RequestBody, index: number) => ({
     type: trimTo(item?.type, 40),
     label: trimTo(item?.label, 120) || null,
     currency: trimTo(item?.currency || 'IDR', 3).toUpperCase(),
@@ -129,17 +130,19 @@ const readPrices = (value: unknown, priceVisibility: string) => {
 
 // At most one primary among the active marketplaces; the first active one becomes primary.
 const readMarketplaces = (value: unknown) => {
-  const marketplaces = (Array.isArray(value) ? value : []).map((item: any, index: number) => ({
-    provider: trimTo(item?.provider, 50),
-    label: trimTo(item?.label, 120) || null,
-    url: trimTo(item?.url, 1000),
-    sku: trimTo(item?.sku, 120) || null,
-    price: numberOrNull(item?.price),
-    currency: trimTo(item?.currency || 'IDR', 3).toUpperCase(),
-    isPrimary: item?.is_primary ? 1 : 0,
-    isActive: item?.is_active === false ? 0 : 1,
-    sortOrder: Math.max(0, Number(item?.sort_order) || index),
-  }));
+  const marketplaces = (Array.isArray(value) ? value : []).map(
+    (item: RequestBody, index: number) => ({
+      provider: trimTo(item?.provider, 50),
+      label: trimTo(item?.label, 120) || null,
+      url: trimTo(item?.url, 1000),
+      sku: trimTo(item?.sku, 120) || null,
+      price: numberOrNull(item?.price),
+      currency: trimTo(item?.currency || 'IDR', 3).toUpperCase(),
+      isPrimary: item?.is_primary ? 1 : 0,
+      isActive: item?.is_active === false ? 0 : 1,
+      sortOrder: Math.max(0, Number(item?.sort_order) || index),
+    }),
+  );
   if (
     marketplaces.some(
       (item) =>
@@ -161,7 +164,7 @@ const readMarketplaces = (value: unknown) => {
 };
 
 /** The whole product body, or null when anything is missing or invalid. */
-export const parsePayload = (body: any) => {
+export const parsePayload = (body: RequestBody) => {
   const key = normalizePublicContentKey(body?.key);
   const sku = trimTo(body?.sku, 120);
   const status = String(body?.status ?? 'draft');

@@ -29,7 +29,7 @@ export const BASE_SELECT = `SELECT p.*, i.product_slug, i.product_name,
 export const productNotFound = (res: Response) =>
   sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
 
-const mediaDto = (row: any) => ({
+const mediaDto = (row: RowDataPacket) => ({
   id_attachment: keyhsid.idAttachment.encode(Number(row.id_attachment)),
   asset_url: buildAttachmentUrl(row.storage_path),
   original_url: buildAttachmentUrl(row.storage_path),
@@ -41,7 +41,7 @@ const mediaDto = (row: any) => ({
   sort_order: Number(row.product_attachment_sort_order),
 });
 
-const priceDto = (item: any) => ({
+const priceDto = (item: RowDataPacket) => ({
   id: Number(item.id_product_price),
   type: item.product_price_type,
   label: item.product_price_label,
@@ -57,7 +57,7 @@ const priceDto = (item: any) => ({
   sort_order: Number(item.product_price_sort_order),
 });
 
-const marketplaceDto = (item: any) => ({
+const marketplaceDto = (item: RowDataPacket) => ({
   id: Number(item.id_product_marketplace),
   provider: item.product_marketplace_provider,
   label: item.product_marketplace_label,

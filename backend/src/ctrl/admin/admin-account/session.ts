@@ -11,7 +11,12 @@ import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 
-import { readPermissionKeys, SESSION_ACCOUNT_SELECT, sessionAccountDto } from './records';
+import {
+  AccountRow,
+  readPermissionKeys,
+  SESSION_ACCOUNT_SELECT,
+  sessionAccountDto,
+} from './records';
 import { issueAccessToken } from './token';
 
 const { pool } = db;
@@ -29,7 +34,7 @@ const maskLoginIdentity = (value: unknown): string | null => {
   return clean.length <= 4 ? '***' : `***${clean.slice(-4)}`;
 };
 
-const securityAudit = (req: Request, user: any, extra: Record<string, unknown>) =>
+const securityAudit = (req: Request, user: AccountRow, extra: Record<string, unknown>) =>
   writeAuditLog({
     req,
     writeMode: 'best_effort',
@@ -60,7 +65,7 @@ router.post('/api/v1/admin-acct/login', multer().none(), async (req: Request, re
     `${SESSION_ACCOUNT_SELECT} WHERE (aa.email_1 = ? OR aa.phone_1 = ?) LIMIT 1`,
     [identity, identity],
   );
-  const user = (rows as any[])[0];
+  const user = (rows as AccountRow[])[0];
   const invalidCredentials = () =>
     sendError(res, 401, 'AUTH_INVALID_CREDENTIALS', 'Invalid email/phone or password');
 
@@ -173,7 +178,7 @@ router.post('/api/v1/admin-acct/logout', async (req: AuthRequest, res: Response)
         'SELECT id_admin_acct, id_master_comp, alias FROM admin_acct WHERE id_admin_acct = ? LIMIT 1',
         [idAdminAcct],
       );
-      const user = (rows as any[])[0];
+      const user = (rows as AccountRow[])[0];
       if (user) {
         await writeAuditLog({
           req,
@@ -230,7 +235,7 @@ router.get('/api/v1/admin-acct/me', verifyToken, async (req: AuthRequest, res: R
   const [rows] = await pool.query(`${SESSION_ACCOUNT_SELECT} WHERE aa.id_admin_acct = ? LIMIT 1`, [
     idAdminAcct,
   ]);
-  const user = (rows as any[])[0];
+  const user = (rows as AccountRow[])[0];
   if (!user) {
     await sessionDenied(idAdminAcct, 'account_not_found');
     return sendError(res, 401, 'AUTH_SESSION_INVALID', 'Invalid session');

@@ -1,5 +1,5 @@
 // Office photos and operating hours: shared database reads and writes, validation, and audit views.
-import { Pool, PoolConnection } from 'mysql2/promise';
+import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import keyhsid from '../../../hsid';
 import { HttpError } from '../../../helper/http-error.helper';
@@ -107,7 +107,7 @@ export const readOfficeHours = async (executor: Executor, idOffice: number) => {
      ORDER BY day_of_week ASC, sequence ASC`,
     [idOffice],
   );
-  return rows as any[];
+  return rows as RowDataPacket[];
 };
 
 /** Photo links of an office, cover first. */
@@ -120,7 +120,7 @@ export const readOfficeAttachmentLinks = async (executor: Executor, idOffice: nu
        sort_order ASC, id_attachment ASC`,
     [idOffice],
   );
-  return rows as any[];
+  return rows as RowDataPacket[];
 };
 
 export const insertOperatingHours = async (
@@ -167,8 +167,13 @@ export const insertOfficeAttachments = async (
   );
 };
 
-export const toAuditOperatingHours = (items: any[]) =>
-  items
+/** Rows or normalized input, read by field name. */
+type AuditRows = ReadonlyArray<object>;
+const fields = (item: object) => item as Record<string, unknown>;
+
+export const toAuditOperatingHours = (rows: AuditRows) =>
+  rows
+    .map(fields)
     .map((item) => ({
       day_of_week: Number(item.day_of_week),
       sequence: Number(item.sequence),
@@ -179,8 +184,9 @@ export const toAuditOperatingHours = (items: any[]) =>
     .sort((a, b) => a.day_of_week - b.day_of_week || a.sequence - b.sequence);
 
 /** Accepts normalized input (camelCase) or database rows (snake_case). */
-export const toAuditOfficeAttachments = (items: any[]) =>
-  items
+export const toAuditOfficeAttachments = (rows: AuditRows) =>
+  rows
+    .map(fields)
     .map((item) => ({
       id_attachment: Number(item.idAttachment ?? item.id_attachment),
       attachment_role: String(item.attachmentRole ?? item.attachment_role),
@@ -199,15 +205,12 @@ export const toAuditOfficeAttachments = (items: any[]) =>
 export const isSameAuditValue = (before: unknown, after: unknown): boolean =>
   JSON.stringify(before) === JSON.stringify(after);
 
-export const getOfficeAttachmentDiff = (before: any[], after: any[]) => {
-  const beforeIds = new Set(before.map((item) => Number(item.id_attachment)));
-  const afterIds = new Set(after.map((item) => Number(item.id_attachment)));
+export const getOfficeAttachmentDiff = (before: AuditRows, after: AuditRows) => {
+  const id = (item: object) => Number(fields(item).id_attachment);
+  const beforeIds = new Set(before.map(id));
+  const afterIds = new Set(after.map(id));
   return {
-    added: after
-      .filter((item) => !beforeIds.has(Number(item.id_attachment)))
-      .map((item) => Number(item.id_attachment)),
-    removed: before
-      .filter((item) => !afterIds.has(Number(item.id_attachment)))
-      .map((item) => Number(item.id_attachment)),
+    added: after.filter((item) => !beforeIds.has(id(item))).map(id),
+    removed: before.filter((item) => !afterIds.has(id(item))).map(id),
   };
 };

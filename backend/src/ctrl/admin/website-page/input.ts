@@ -2,6 +2,7 @@
 import keyhsid from '../../../hsid';
 import { HttpError } from '../../../helper/http-error.helper';
 import { decodeId } from '../../../helper/id.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 export const FIXED_PAGE_KEYS = new Set(['home', 'about', 'contact', 'faq', 'terms', 'career']);
 
@@ -228,14 +229,14 @@ const readTranslations = (pageKey: string, value: unknown) => {
   const translationInvalid = (message: string) =>
     invalid('WEBSITE_PAGE_TRANSLATIONS_INVALID', message);
   const seenLocales = new Set<string>();
-  return value.map((item: any) => {
+  return value.map((item: RequestBody) => {
     const locale = readLocale(item?.locale, seenLocales);
     if (!locale) throw translationInvalid('Each supported language must appear exactly once');
     const title = typeof item?.title === 'string' ? item.title.trim() : '';
     if (!title || title.length > 255 || typeof item?.is_published !== 'boolean') {
       throw translationInvalid('Each language needs a valid title and publication status');
     }
-    const seo = item?.seo ?? {};
+    const seo = (item?.seo ?? {}) as RequestBody;
     const canonicalUrl = optionalString(seo.canonical_url, 'Canonical URL', 500);
     if (canonicalUrl && !/^https?:\/\/[^\s]+$/i.test(canonicalUrl)) {
       throw translationInvalid('Canonical URL must be an absolute HTTP or HTTPS URL');
@@ -274,7 +275,7 @@ const readMedia = (pageKey: string, value: unknown) => {
   }
   const seenSlots = new Set<string>();
   const seenAttachments = new Set<number>();
-  return value.map((item: any, index: number) => {
+  return value.map((item: RequestBody, index: number) => {
     const idAttachment = decodeId(item?.id_attachment, keyhsid.idAttachment);
     const slot = String(item?.slot ?? '');
     if (
@@ -304,7 +305,7 @@ const readMedia = (pageKey: string, value: unknown) => {
       isVisible: item.is_visible ? 1 : 0,
       clickAction,
       clickTarget,
-      translations: texts.map((text: any) => {
+      translations: texts.map((text: RequestBody) => {
         const locale = readLocale(text?.locale, textLocales);
         if (!locale) throw mediaInvalid('Media languages must be unique and supported');
         return {
@@ -318,7 +319,7 @@ const readMedia = (pageKey: string, value: unknown) => {
 };
 
 /** The save body of a fixed page, validated. Rejections are HttpErrors (400). */
-export const readSavePayload = (pageKey: string, body: any) => {
+export const readSavePayload = (pageKey: string, body: RequestBody) => {
   if (!isRecord(body)) throw payloadInvalid('Website page data is incomplete');
   if (typeof body.is_published !== 'boolean')
     throw payloadInvalid('Publication status is required');

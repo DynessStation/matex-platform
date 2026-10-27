@@ -3,8 +3,22 @@ import { test } from 'node:test';
 
 import { readNavigationItemInput } from '../src/ctrl/admin/web-navigation/input';
 import { HttpError } from '../src/helper/http-error.helper';
+import type { RequestBody } from '../src/helper/input.helper';
 
-const validInput = (): any => ({
+type TranslationInput = {
+  locale: string;
+  label: string;
+  path: string;
+  url: string | null;
+  status: number;
+};
+
+const validInput = (): {
+  web_navigation_item_key: string;
+  web_navigation_item_sort_order: number;
+  web_navigation_item_status: number;
+  translations: TranslationInput[];
+} => ({
   web_navigation_item_key: 'about',
   web_navigation_item_sort_order: 1,
   web_navigation_item_status: 1,
@@ -28,7 +42,7 @@ const validInput = (): any => ({
 
 const rejectsWith = (input: unknown, code: string) =>
   assert.throws(
-    () => readNavigationItemInput(input, 'id-ID'),
+    () => readNavigationItemInput(input as RequestBody, 'id-ID'),
     (error: unknown) => error instanceof HttpError && error.status === 400 && error.code === code,
   );
 

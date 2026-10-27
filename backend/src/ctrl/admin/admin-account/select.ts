@@ -1,6 +1,7 @@
 // Option lists for the admin-account form: company, office, chair, and access profile.
 // They need a session but no permission: the form uses them for whoever may open it.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -21,7 +22,7 @@ interface SelectSource {
   params: (idMasterComp: number, scope: AdminScope, searchValue: string) => unknown[];
   columns: string;
   orderBy: string;
-  option: (row: any) => { value: string; label: string; data: Record<string, unknown> };
+  option: (row: RowDataPacket) => { value: string; label: string; data: Record<string, unknown> };
 }
 
 /**
@@ -69,12 +70,12 @@ const selectRoute = (name: string, byCompany: boolean, source: SelectSource) =>
       const params = source.params(idMasterComp, scope, searchValue);
 
       const [totalRows] = await pool.query(`SELECT COUNT(*) AS total ${source.from}`, params);
-      const total = Number((totalRows as any[])[0]?.total ?? 0);
+      const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
       const [rows] = await pool.query(
         `SELECT ${source.columns} ${source.from} ORDER BY ${source.orderBy} LIMIT ? OFFSET ?`,
         [...params, limit, offset],
       );
-      const data = (rows as any[]).map(source.option);
+      const data = (rows as RowDataPacket[]).map(source.option);
 
       return res.status(200).json({
         success: true,

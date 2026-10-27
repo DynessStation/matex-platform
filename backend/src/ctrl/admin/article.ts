@@ -25,6 +25,7 @@ import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import type { RequestBody } from '../../helper/input.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -112,7 +113,7 @@ const effectiveStatus = (status: string, ahead: unknown, hasPublishTime: boolean
 };
 
 /** The save body, or null when anything is missing or invalid. */
-const payloadOf = (body: any) => {
+const payloadOf = (body: RequestBody) => {
   const key = normalizePublicContentKey(body?.key);
   const status = String(body?.status ?? 'draft');
   const publishedAt = dateOrNull(body?.published_at);
@@ -149,7 +150,7 @@ const payloadOf = (body: any) => {
 
 type ArticlePayload = NonNullable<ReturnType<typeof payloadOf>>;
 
-const mediaDto = (media: any) =>
+const mediaDto = (media: RowDataPacket | undefined) =>
   media
     ? {
         id_attachment: keyhsid.idAttachment.encode(Number(media.id_attachment)),

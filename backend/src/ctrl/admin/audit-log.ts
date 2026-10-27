@@ -1,6 +1,7 @@
 // Audit log (read only), under /api/v1/audit-log.
 // Contract: ops/e2e/write/audit-log-api.spec.ts.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../db');
@@ -111,7 +112,7 @@ const companyId = (value: unknown) =>
   value === null ? null : keyhsid.idMasterCompany.encode(value as number);
 
 /** Fields shared by the list and the detail. */
-const entryDto = (item: any) => ({
+const entryDto = (item: RowDataPacket) => ({
   id_audit_log: keyhsid.idAuditLog.encode(item.id_audit_log),
   id_master_comp: companyId(item.id_master_comp),
   request_id: item.request_id,
@@ -164,7 +165,7 @@ router.get(
       `SELECT COUNT(*) AS total FROM audit_log al WHERE ${whereSql}`,
       params,
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -182,7 +183,7 @@ router.get(
       [...params, limit, offset],
     );
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       ...entryDto(item),
       http: {
         method: item.http_method,
@@ -236,7 +237,7 @@ router.get(
        LIMIT 1`,
       [idAuditLog, scope.idMasterComp, scope.idMasterComp],
     );
-    const item = (rows as any[])[0];
+    const item = (rows as RowDataPacket[])[0];
     if (!item) return sendError(res, 404, 'AUDIT_LOG_NOT_FOUND', 'Audit log not found');
 
     const beforeData = parseJsonValue(item.before_data, { onInvalid: 'raw' });

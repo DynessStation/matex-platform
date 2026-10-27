@@ -5,6 +5,12 @@ import { AddressInfo } from 'node:net';
 
 import { pool } from '../src/db';
 
+/** The public navigation answer, as far as the tests read it. */
+type NavigationBody = {
+  code: string;
+  data: { items: { key: string; label: string; path: string }[] };
+};
+
 const router = require('../src/ctrl/public/navigation').default;
 const originalQuery = pool.query;
 const originalCompany = process.env.PUBLIC_COMPANY_ID;
@@ -14,7 +20,7 @@ const server = app.listen(0, '127.0.0.1');
 
 let base = '';
 let calls: { sql: string; params: unknown[] }[] = [];
-let rows: any[][] = [];
+let rows: Record<string, unknown>[][] = [];
 
 before(async () => {
   if (!server.listening) {
@@ -26,7 +32,7 @@ before(async () => {
   pool.query = (async (sql: string, params: unknown[]) => {
     calls.push({ sql, params });
     return [rows.shift() || [], []];
-  }) as any;
+  }) as unknown as typeof pool.query;
 });
 
 after(async () => {
@@ -65,7 +71,7 @@ test('missing tenant fails closed before querying', async () => {
   assert.equal(response.status, 503);
   assert.equal(calls.length, 0);
   assert.equal(response.headers.get('cache-control'), 'no-store');
-  assert.equal(((await response.json()) as any).code, 'NAVIGATION_UNAVAILABLE');
+  assert.equal(((await response.json()) as NavigationBody).code, 'NAVIGATION_UNAVAILABLE');
 });
 
 test('only the fixed primary navigation and supported locales are accepted', async () => {
@@ -86,7 +92,7 @@ test('missing or inactive navigation is a generic 404', async () => {
 
   assert.equal(response.status, 404);
   assert.equal(calls.length, 1);
-  assert.equal(((await response.json()) as any).code, 'NAVIGATION_NOT_FOUND');
+  assert.equal(((await response.json()) as NavigationBody).code, 'NAVIGATION_NOT_FOUND');
   assert.deepEqual(calls[0].params, [7, 'primary']);
 
   for (const clause of [
@@ -154,11 +160,11 @@ test('fixed items keep database order and localized labels', async () => {
   ];
 
   const response = await fetch(`${base}/primary/id-ID`);
-  const body = (await response.json()) as any;
+  const body = (await response.json()) as NavigationBody;
 
   assert.equal(response.status, 200);
   assert.deepEqual(
-    body.data.items.map((item: any) => [item.key, item.label, item.path]),
+    body.data.items.map((item) => [item.key, item.label, item.path]),
     [
       ['home', 'Beranda', '/'],
       ['about', 'Tentang MATEX', '/tentang-matex'],
@@ -202,12 +208,12 @@ test('English uses stable localized paths', async () => {
   ];
 
   const response = await fetch(`${base}/primary/en-US`);
-  const body = (await response.json()) as any;
+  const body = (await response.json()) as NavigationBody;
 
   assert.equal(response.status, 200);
   assert.deepEqual(calls[1].params, ['en-US', 'id-ID', 14, 7]);
   assert.deepEqual(
-    body.data.items.map((item: any) => item.path),
+    body.data.items.map((item) => item.path),
     ['/en', '/en/about-matex', '/en/contact-us'],
   );
 });
@@ -245,7 +251,7 @@ test('unknown, duplicate and legacy alias items cannot extend the fixed header',
   ];
 
   const response = await fetch(`${base}/primary/en-US`);
-  const body = (await response.json()) as any;
+  const body = (await response.json()) as NavigationBody;
 
   assert.equal(response.status, 200);
   assert.deepEqual(body.data.items, [

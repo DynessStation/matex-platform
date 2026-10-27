@@ -81,7 +81,11 @@ router.get(
       [page.id_website_page, scope.idMasterComp],
     );
 
-    const mediaByRelation = new Map<number, any>();
+    type MediaTranslation = { locale: string; caption: unknown; alt_text: unknown };
+    const mediaByRelation = new Map<
+      number,
+      Record<string, unknown> & { translations: MediaTranslation[] }
+    >();
     for (const row of mediaRows) {
       const relationId = Number(row.id_website_page_media);
       let media = mediaByRelation.get(relationId);

@@ -1,6 +1,7 @@
 // Access-profile list, permission matrix, and detail. /permission-matrix is registered before
 // /:id: Express matches in registration order, and /:id would otherwise answer it as an id.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -32,7 +33,7 @@ const SORTABLE: Record<string, string> = {
 
 const SEARCH = `(aa.access_name LIKE ? OR COALESCE(aa.access_description, '') LIKE ?)`;
 
-const permissionDto = (item: any) => ({
+const permissionDto = (item: RowDataPacket) => ({
   id_admin_permission: keyhsid.idAdminPermission.encode(item.id_admin_permission),
   permission_key: item.permission_key,
   permission_name: item.permission_name,
@@ -57,7 +58,7 @@ router.get(
        WHERE aa.id_master_comp = ? AND aa.admin_access_status IN (0, 1) AND ${SEARCH}`,
       [scope.idMasterComp, searchValue, searchValue],
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -84,7 +85,7 @@ router.get(
       [scope.idMasterComp, searchValue, searchValue, limit, offset],
     );
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       id_admin_access: keyhsid.idAdminAccess.encode(item.id_admin_access),
       access_name: item.access_name,
       access_description: item.access_description,
@@ -130,7 +131,7 @@ router.get(
     );
 
     const grouped = new Map<string, unknown[]>();
-    for (const item of rows as any[]) {
+    for (const item of rows as RowDataPacket[]) {
       const group = item.permission_group ? String(item.permission_group).trim() : 'Other';
       if (!grouped.has(group)) grouped.set(group, []);
       grouped.get(group)!.push({
@@ -174,7 +175,7 @@ router.get(
        LIMIT 1`,
       [idAccess, scope.idMasterComp],
     );
-    const access = (accessRows as any[])[0];
+    const access = (accessRows as RowDataPacket[])[0];
     if (!access) return sendError(res, 404, 'ADMIN_ACCESS_NOT_FOUND', 'Admin access not found');
 
     const [permissionRows] = await pool.query(
@@ -186,7 +187,7 @@ router.get(
        ORDER BY COALESCE(ap.permission_group, 'Other') ASC, ap.permission_key ASC`,
       [idAccess],
     );
-    const permissions = (permissionRows as any[]).map(permissionDto);
+    const permissions = (permissionRows as RowDataPacket[]).map(permissionDto);
 
     return res.status(200).json({
       success: true,

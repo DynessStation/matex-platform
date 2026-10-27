@@ -51,7 +51,7 @@ before(async () => {
       ],
       [],
     ];
-  }) as any;
+  }) as unknown as typeof pool.query;
 });
 
 after(async () => {

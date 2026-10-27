@@ -15,6 +15,6 @@ export const pool = mysql.createPool({
 });
 
 // Log pool-level errors instead of letting an unhandled 'error' event crash the process.
-pool.on('error' as any, (err) => {
+(pool as unknown as NodeJS.EventEmitter).on('error', (err: unknown) => {
   console.error(err);
 });

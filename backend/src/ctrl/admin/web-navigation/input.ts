@@ -9,6 +9,7 @@ import {
 } from '../../../config/web-navigation.config';
 import { HttpError } from '../../../helper/http-error.helper';
 import { parseFlag } from '../../../helper/input.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 const invalid = (code: string, message: string) => new HttpError(400, code, message);
 
@@ -32,7 +33,7 @@ export interface NavigationMetadata {
   settings: Record<string, unknown> | null;
 }
 
-export const readNavigationMetadata = (body: any): NavigationMetadata => {
+export const readNavigationMetadata = (body: RequestBody): NavigationMetadata => {
   const name = String(body?.web_navigation_name ?? '').trim();
   if (!name || name.length > 255) {
     throw invalid(
@@ -105,7 +106,10 @@ export interface NavigationItemInput {
  * come from that config, never from the request. Both Indonesian and English labels are required,
  * and the navigation's default locale must have an active one.
  */
-export const readNavigationItemInput = (body: any, defaultLocale: string): NavigationItemInput => {
+export const readNavigationItemInput = (
+  body: RequestBody,
+  defaultLocale: string,
+): NavigationItemInput => {
   const key = String(body?.web_navigation_item_key ?? '')
     .trim()
     .toLowerCase();

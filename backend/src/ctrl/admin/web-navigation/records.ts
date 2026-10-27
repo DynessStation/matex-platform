@@ -1,5 +1,5 @@
 // Navigation records: shared database reads and writes for the navigation and its menu items.
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import { HttpError } from '../../../helper/http-error.helper';
 
@@ -24,7 +24,7 @@ export const lockNavigation = async (
   idNavigation: number,
   idMasterComp: number,
   columns: string,
-): Promise<any> => {
+): Promise<RowDataPacket> => {
   const [rows] = await connection.query(
     `SELECT ${columns} FROM web_navigation
      WHERE id_web_navigation = ? AND id_master_comp = ? AND web_navigation_deleted_at IS NULL
@@ -32,7 +32,7 @@ export const lockNavigation = async (
      FOR UPDATE`,
     [idNavigation, idMasterComp],
   );
-  const navigation = (rows as any[])[0];
+  const navigation = (rows as RowDataPacket[])[0];
   if (!navigation) {
     throw new HttpError(404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
   }
@@ -44,7 +44,7 @@ export const lockActiveItems = async (
   connection: PoolConnection,
   idNavigation: number,
   idMasterComp: number,
-): Promise<any[]> => {
+): Promise<RowDataPacket[]> => {
   const [rows] = await connection.query(
     `SELECT id_web_navigation_item, web_navigation_item_key, web_navigation_item_sort_order,
        web_navigation_item_status
@@ -53,7 +53,7 @@ export const lockActiveItems = async (
      FOR UPDATE`,
     [idNavigation, idMasterComp],
   );
-  return rows as any[];
+  return rows as RowDataPacket[];
 };
 
 /**
@@ -115,7 +115,7 @@ export const readItemTranslations = async (
      ORDER BY web_navigation_item_locale`,
     [idItem, idMasterComp],
   );
-  return (rows as any[]).map((row) => ({
+  return (rows as RowDataPacket[]).map((row) => ({
     locale: row.web_navigation_item_locale,
     label: row.web_navigation_item_label,
     path: row.web_navigation_item_path,

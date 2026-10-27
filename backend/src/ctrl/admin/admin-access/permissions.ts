@@ -1,5 +1,5 @@
 // Permissions of an access profile: validation with dependencies, storage, key lookups, and audit diffs.
-import { Pool, PoolConnection } from 'mysql2/promise';
+import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import keyhsid from '../../../hsid';
 import { HttpError } from '../../../helper/http-error.helper';
@@ -47,7 +47,7 @@ export const resolvePermissionIds = async (
      WHERE id_admin_permission IN (${[...ids].map(() => '?').join(', ')}) AND permission_status = 1`,
     [...ids],
   );
-  const permissions = rows as any[];
+  const permissions = rows as RowDataPacket[];
   if (permissions.length !== ids.size) {
     throw new HttpError(
       400,
@@ -100,7 +100,7 @@ export const getPermissionKeysByIds = async (
      ORDER BY permission_key ASC`,
     ids,
   );
-  return (rows as any[]).map((item) => String(item.permission_key));
+  return (rows as RowDataPacket[]).map((item) => String(item.permission_key));
 };
 
 export const getAccessPermissionKeys = async (
@@ -115,7 +115,7 @@ export const getAccessPermissionKeys = async (
      ORDER BY ap.permission_key ASC`,
     [idAccess],
   );
-  return (rows as any[]).map((item) => String(item.permission_key));
+  return (rows as RowDataPacket[]).map((item) => String(item.permission_key));
 };
 
 export const getPermissionDiff = (before: string[], after: string[]) => {

@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2/promise';
 import { NextFunction, Response } from 'express';
 
 import db = require('../db');
@@ -60,7 +61,7 @@ export const requirePermission =
           ? req.adminAccount
             ? [req.adminAccount]
             : []
-          : ((await pool.query(ACCOUNT_ACCESS_QUERY, [idAdminAcct]))[0] as any[]);
+          : ((await pool.query(ACCOUNT_ACCESS_QUERY, [idAdminAcct]))[0] as RowDataPacket[]);
 
       // Account not found
 
@@ -238,7 +239,7 @@ export const requirePermission =
         [idAccess, permissionKey],
       );
 
-      const permissions = permissionRows as any[];
+      const permissions = permissionRows as RowDataPacket[];
 
       // Permission denied
 

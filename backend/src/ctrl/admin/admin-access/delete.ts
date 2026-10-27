@@ -1,5 +1,6 @@
 // Delete (soft delete) an access profile.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -43,7 +44,7 @@ router.delete(
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
       );
-      const access = (accessRows as any[])[0];
+      const access = (accessRows as RowDataPacket[])[0];
       if (!access) throw new HttpError(404, 'ADMIN_ACCESS_NOT_FOUND', 'Admin access not found');
       if (Number(access.admin_access_status) !== 0) {
         throw new HttpError(
@@ -58,7 +59,7 @@ router.delete(
          WHERE id_master_comp = ? AND id_access = ? AND admin_acct_status IN (0, 1)`,
         [scope.idMasterComp, idAccess],
       );
-      const assignedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
+      const assignedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
       if (assignedAccounts > 0) {
         throw new HttpError(
           409,

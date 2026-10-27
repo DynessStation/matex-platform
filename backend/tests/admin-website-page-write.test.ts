@@ -22,7 +22,7 @@ app.use(router);
 app.use(errorHandler);
 const server = app.listen(0, '127.0.0.1');
 let base = '';
-let poolRows: any[][] = [];
+let poolRows: Record<string, unknown>[][] = [];
 let poolCalls: { sql: string; params: unknown[] }[] = [];
 let connectionCalls: { sql: string; params: unknown[] }[] = [];
 let began = 0;
@@ -82,11 +82,11 @@ before(async () => {
   pool.query = (async (sql: string, params: unknown[]) => {
     poolCalls.push({ sql, params });
     return [poolRows.shift() || [], []];
-  }) as any;
+  }) as unknown as typeof pool.query;
   pool.getConnection = (async () => {
     connectionRequested += 1;
     return connection;
-  }) as any;
+  }) as unknown as typeof pool.getConnection;
 });
 
 after(async () => {
@@ -268,7 +268,7 @@ test('home saves only its current section contract and clears unused HTML', asyn
     categories: { status: true },
     products: { status: true },
     articles: { status: true },
-    tags: { status: false, title: 'Popular tags' },
+    tags: { status: false, items: [] }, // P-2 keeps only the status and the shortcuts
     newsletter: { status: false },
     advertisement: {
       status: true,
@@ -426,7 +426,7 @@ test('unavailable media rolls back before existing relations are replaced', asyn
     }
     if (sql.includes('FROM attachment')) return [[], []];
     return [{ affectedRows: 1 }, []];
-  }) as any;
+  }) as unknown as typeof connection.query;
 
   const response = await request('about', {
     is_published: true,

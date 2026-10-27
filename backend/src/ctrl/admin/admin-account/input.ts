@@ -1,11 +1,12 @@
 // Admin-account input rules (create and update), reference and uniqueness checks, and profile
 // photo validation. Invalid input throws HttpError.
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import keyhsid from '../../../hsid';
 import { HttpError } from '../../../helper/http-error.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { isValidEmail } from '../../../helper/input.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 export interface AccountInput {
   name: string;
@@ -45,7 +46,7 @@ export const isValidAccountPassword = (password: string): boolean =>
 
 /** Reads and validates the account fields; `withPassword` on create. */
 export const readAccountInput = (
-  body: any,
+  body: RequestBody,
   { withPassword }: { withPassword: boolean },
 ): AccountInput => {
   const required = [
@@ -256,7 +257,7 @@ const resolveProfilePhoto = async (
      LIMIT 1`,
     [idAttachment],
   );
-  const attachment = (rows as any[])[0];
+  const attachment = (rows as RowDataPacket[])[0];
   if (!attachment) {
     throw invalid('ADMIN_ACCOUNT_PROFILE_PHOTO_NOT_AVAILABLE', 'Profile photo is not available');
   }

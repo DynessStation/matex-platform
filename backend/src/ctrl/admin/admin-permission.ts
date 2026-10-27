@@ -3,7 +3,7 @@
 import express = require('express');
 import { Response } from 'express';
 import { ResultSetHeader } from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import db = require('../../db');
 import keyhsid from '../../hsid';
@@ -15,6 +15,7 @@ import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import type { RequestBody } from '../../helper/input.helper';
 
 const { pool } = db;
 
@@ -47,7 +48,7 @@ const invalid = (code: string, message: string) =>
   new HttpError(400, `ADMIN_PERMISSION_${code}`, message);
 
 /** Name, group, and description; with `withKey` also the key (create only: keys never change). */
-const readPermissionInput = (body: any, { withKey }: { withKey: boolean }) => {
+const readPermissionInput = (body: RequestBody, { withKey }: { withKey: boolean }) => {
   const key = String(body?.permission_key ?? '')
     .trim()
     .toLowerCase();
@@ -80,14 +81,14 @@ const lockPermission = async (connection: PoolConnection, idPermission: number) 
      FOR UPDATE`,
     [idPermission],
   );
-  const permission = (rows as any[])[0];
+  const permission = (rows as RowDataPacket[])[0];
   if (!permission) {
     throw new HttpError(404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
   }
   return permission;
 };
 
-const permissionAudit = (permission: any) => ({
+const permissionAudit = (permission: RowDataPacket) => ({
   permission_key: permission.permission_key,
   permission_name: permission.permission_name,
   permission_group: permission.permission_group ?? null,
@@ -108,7 +109,7 @@ const auditBase = (req: AuthRequest, connection: PoolConnection, idPermission: n
   entityId: idPermission,
 });
 
-const permissionDto = (item: any) => ({
+const permissionDto = (item: RowDataPacket) => ({
   id_admin_permission: keyhsid.idAdminPermission.encode(item.id_admin_permission),
   permission_key: item.permission_key,
   permission_name: item.permission_name,
@@ -136,7 +137,7 @@ router.get(
        WHERE ap.permission_status IN (0, 1) AND ${SEARCH}`,
       searchValues,
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -153,7 +154,7 @@ router.get(
       [...searchValues, limit, offset],
     );
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       ...permissionDto(item),
       status_label: Number(item.permission_status) === 1 ? 'Active' : 'Inactive',
       access_count: Number(item.access_count ?? 0),
@@ -244,7 +245,7 @@ router.get(
        LIMIT 1`,
       [idPermission],
     );
-    const item = (rows as any[])[0];
+    const item = (rows as RowDataPacket[])[0];
     if (!item)
       return sendError(res, 404, 'ADMIN_PERMISSION_NOT_FOUND', 'Admin permission not found');
 
@@ -355,7 +356,7 @@ router.patch(
         after: { permission_status: newStatus },
         metadata: {
           transition: newStatus === 1 ? 'activated' : 'deactivated',
-          affected_access_roles: Number((roleRows as any[])[0]?.total ?? 0),
+          affected_access_roles: Number((roleRows as RowDataPacket[])[0]?.total ?? 0),
         },
         httpStatus: 200,
       });
@@ -401,7 +402,7 @@ router.delete(
         `SELECT COUNT(*) AS total FROM admin_access_permission WHERE id_admin_permission = ?`,
         [idPermission],
       );
-      const accessRoles = Number((referenceRows as any[])[0]?.total ?? 0);
+      const accessRoles = Number((referenceRows as RowDataPacket[])[0]?.total ?? 0);
       if (accessRoles > 0) {
         throw new HttpError(
           409,

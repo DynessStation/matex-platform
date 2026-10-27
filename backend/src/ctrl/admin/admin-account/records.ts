@@ -1,5 +1,5 @@
 // Admin-account records: shared database steps, scope checks, and response/audit views.
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import db = require('../../../db');
 import keyhsid from '../../../hsid';
@@ -12,11 +12,21 @@ const { pool } = db;
 const ACCOUNT_COLUMNS = `id_admin_acct, id_master_comp, id_office, name, alias, email_1, email_2,
   phone_1, phone_2, id_profile_photo, id_chair, id_access, is_all_access, admin_acct_status`;
 
+/** An admin_acct row (ACCOUNT_COLUMNS and the session columns). */
+export interface AccountRow extends RowDataPacket {
+  id_admin_acct: number;
+  id_master_comp: number;
+  id_office: number;
+  alias: string;
+  id_access: number;
+  token_version?: number;
+}
+
 /** Locks an active or inactive account (not deleted), or throws 404. */
 export const lockAccount = async (
   connection: PoolConnection,
   idAdminAcct: number,
-): Promise<any> => {
+): Promise<AccountRow> => {
   const [rows] = await connection.query(
     `SELECT ${ACCOUNT_COLUMNS} FROM admin_acct
      WHERE id_admin_acct = ? AND admin_acct_status IN (0, 1)
@@ -24,7 +34,7 @@ export const lockAccount = async (
      FOR UPDATE`,
     [idAdminAcct],
   );
-  const account = (rows as any[])[0];
+  const account = (rows as AccountRow[])[0];
   if (!account) throw new HttpError(404, 'ADMIN_ACCOUNT_NOT_FOUND', 'Admin account not found');
   return account;
 };
@@ -62,7 +72,7 @@ export const assertAnotherFullAccess = async (
        AND id_admin_acct != ?`,
     [idMasterComp, idAdminAcct],
   );
-  if (Number((rows as any[])[0]?.total ?? 0) === 0) {
+  if (Number((rows as RowDataPacket[])[0]?.total ?? 0) === 0) {
     throw new HttpError(
       409,
       'ADMIN_ACCOUNT_LAST_FULL_ACCESS_REQUIRED',
@@ -72,7 +82,7 @@ export const assertAnotherFullAccess = async (
 };
 
 /** Audit view of an account row. */
-export const accountAudit = (account: any) => ({
+export const accountAudit = (account: AccountRow) => ({
   id_master_comp: Number(account.id_master_comp),
   id_office: Number(account.id_office),
   name: account.name,
@@ -99,7 +109,7 @@ export const PROFILE_PHOTO_COLUMNS = `pa.id_attachment AS profile_attachment_id,
 export const PROFILE_PHOTO_JOIN = `LEFT JOIN attachment pa ON aa.id_profile_photo = pa.id_attachment
   AND pa.collection_name = 'admin_profile' AND pa.attachment_status = 1 AND pa.deleted_at IS NULL`;
 
-export const profilePhotoDto = (row: any) =>
+export const profilePhotoDto = (row: RowDataPacket) =>
   row.profile_attachment_id
     ? {
         id_attachment: keyhsid.idAttachment.encode(row.profile_attachment_id),
@@ -142,11 +152,11 @@ export const readPermissionKeys = async (idAccess: number): Promise<string[]> =>
      ORDER BY ap.id_admin_permission ASC`,
     [idAccess],
   );
-  return (rows as any[]).map((item) => item.permission_key);
+  return (rows as RowDataPacket[]).map((item) => item.permission_key);
 };
 
 /** The session payload returned by login and /me. */
-export const sessionAccountDto = (user: any, permissions: string[]) => {
+export const sessionAccountDto = (user: AccountRow, permissions: string[]) => {
   const profilePhoto = profilePhotoDto(user);
   return {
     id_admin_acct: keyhsid.idAdmin.encode(user.id_admin_acct),

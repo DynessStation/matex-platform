@@ -120,7 +120,13 @@ const normalizeFieldValue = (value: string, type: FieldType) => {
   return stripMarkup(value, false);
 };
 
-const extractOutputText = (response: any) => {
+/** The text of an OpenAI Responses API answer (`output_text`, or the output_text parts). */
+type AssistantResponse = {
+  output_text?: unknown;
+  output?: Array<{ content?: Array<{ type?: string; text?: unknown }> }>;
+};
+
+const extractOutputText = (response: AssistantResponse | null | undefined): string => {
   if (typeof response?.output_text === 'string') return response.output_text;
   for (const item of Array.isArray(response?.output) ? response.output : []) {
     for (const content of Array.isArray(item?.content) ? item.content : []) {

@@ -7,6 +7,7 @@ import { onFailure } from '../../middleware/error-handler.middleware';
 import { parseJsonValue } from '../../helper/json.helper';
 import { decodeId } from '../../helper/id.helper';
 import keyhsid from '../../hsid';
+import type { RequestBody } from '../../helper/input.helper';
 
 const router = Router();
 
@@ -25,7 +26,7 @@ const PUBLIC_MEDIA_SLOTS = [
   'og',
 ] as const;
 
-const isRecord = (value: unknown): value is Record<string, any> =>
+const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
@@ -35,7 +36,8 @@ const isRecord = (value: unknown): value is Record<string, any> =>
  */
 const resolveHomeTags = async (content: unknown, company: number, locale: string) => {
   if (!isRecord(content) || !isRecord(content['tags'])) return content;
-  const items: any[] = Array.isArray(content['tags']['items']) ? content['tags']['items'] : [];
+  const tags = content['tags'];
+  const items: RequestBody[] = Array.isArray(tags['items']) ? tags['items'].filter(isRecord) : [];
   const english = locale === 'en-US';
   const ids = items
     .filter((item) => item?.type === 'category')

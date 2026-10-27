@@ -1,5 +1,6 @@
 // Delete (soft delete) a navigation and its menu items.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -52,7 +53,7 @@ router.delete(
          FOR UPDATE`,
         [idNavigation, scope.idMasterComp],
       );
-      const navigation = (rows as any[])[0];
+      const navigation = (rows as RowDataPacket[])[0];
       if (!navigation) {
         throw new HttpError(404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
       }

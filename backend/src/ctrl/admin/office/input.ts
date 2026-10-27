@@ -10,6 +10,7 @@ import {
   slugFromText,
   toFlag,
 } from '../../../helper/input.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 export interface NormalizedOfficeOperatingHour {
   day_of_week: number;
@@ -51,7 +52,7 @@ const invalid = (code: string, message: string) => new HttpError(400, code, mess
 const optionalNumber = (value: unknown): number | null =>
   value === null || value === undefined || value === '' ? null : Number(value);
 
-export const readOfficeInput = (body: any): OfficeInput => {
+export const readOfficeInput = (body: RequestBody): OfficeInput => {
   const code = String(body?.office_code ?? '')
     .trim()
     .toUpperCase();
@@ -199,7 +200,7 @@ export const officeCoreAudit = (input: OfficeInput) => ({
   google_business_url: input.googleBusinessUrl,
 });
 
-export const officeCoreAuditFromRow = (row: any) => ({
+export const officeCoreAuditFromRow = (row: RequestBody) => ({
   office_code: row.office_code,
   office_name: row.office_name,
   office_description: row.office_description ?? null,
@@ -227,7 +228,7 @@ export const officePublicationAudit = (input: OfficeInput) => ({
   public_sort_order: input.publicSortOrder,
 });
 
-export const officePublicationAuditFromRow = (row: any) => ({
+export const officePublicationAuditFromRow = (row: RequestBody) => ({
   website_url: row.website_url ?? null,
   is_public: Number(row.is_public),
   public_slug: row.public_slug ?? null,

@@ -1,5 +1,6 @@
 // Navigation list and detail.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -46,7 +47,7 @@ router.get(
       [scope.idMasterComp],
     );
 
-    const navigations = (rows as any[]).map((row) => ({
+    const navigations = (rows as RowDataPacket[]).map((row) => ({
       id_web_navigation: keyhsid.idWebNavigation.encode(Number(row.id_web_navigation)),
       key: row.web_navigation_key,
       name: row.web_navigation_name,
@@ -88,7 +89,7 @@ router.get(
        LIMIT 1`,
       [idNavigation, scope.idMasterComp],
     );
-    const navigation = (navigationRows as any[])[0];
+    const navigation = (navigationRows as RowDataPacket[])[0];
     if (!navigation) {
       return sendError(res, 404, 'WEB_NAVIGATION_NOT_FOUND', 'Web navigation not found');
     }
@@ -117,7 +118,7 @@ router.get(
     );
 
     const translationsByItem = new Map<number, unknown[]>();
-    for (const row of translationRows as any[]) {
+    for (const row of translationRows as RowDataPacket[]) {
       const itemId = Number(row.id_web_navigation_item);
       const translations = translationsByItem.get(itemId) ?? [];
       translations.push({
@@ -138,7 +139,7 @@ router.get(
       default_locale: navigation.web_navigation_default_locale,
       status: Number(navigation.web_navigation_status),
       settings: parseJsonValue(navigation.web_navigation_settings_json),
-      items: (itemRows as any[]).map((item) => {
+      items: (itemRows as RowDataPacket[]).map((item) => {
         const itemId = Number(item.id_web_navigation_item);
         return {
           id_web_navigation_item: keyhsid.idWebNavigationItem.encode(itemId),

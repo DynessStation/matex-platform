@@ -138,7 +138,10 @@ const normalizeTopics = (value: unknown) => {
 };
 
 const groupTranslations = (rows: RowDataPacket[], idColumn: string) => {
-  const map = new Map<number, any[]>();
+  const map = new Map<
+    number,
+    { locale: unknown; label: unknown; description: unknown; status: number }[]
+  >();
   for (const row of rows) {
     const id = Number(row[idColumn]);
     const values = map.get(id) ?? [];

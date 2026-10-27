@@ -3,6 +3,9 @@ import { normalizePublicContentKey } from '../config/public-content.config';
 // Normalizers and validators for request input, shared by the route modules.
 
 /** Trimmed string, or null when the value is not a string or is blank. */
+/** A request body before validation: field names to values not yet checked. */
+export type RequestBody = Record<string, unknown>;
+
 export const nullableString = (value: unknown): string | null => {
   if (typeof value !== 'string') {
     return null;

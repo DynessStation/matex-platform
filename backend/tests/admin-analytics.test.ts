@@ -18,7 +18,7 @@ app.use(router);
 const server = app.listen(0, '127.0.0.1');
 let base = '';
 let calls: { sql: string; params: unknown[] }[] = [];
-let rows: any[][] = [];
+let rows: Record<string, unknown>[][] = [];
 
 const token = jwt.sign({ id_admin_acct: 9, alias: 'Analytics Tester' }, process.env.JWT_SECRET);
 
@@ -30,7 +30,7 @@ before(async () => {
   pool.query = (async (sql: string, params: unknown[]) => {
     calls.push({ sql, params });
     return [rows.shift() || [], []];
-  }) as any;
+  }) as unknown as typeof pool.query;
 });
 
 after(async () => {

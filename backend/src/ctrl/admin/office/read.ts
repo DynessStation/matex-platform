@@ -1,5 +1,6 @@
 // Office list and detail.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -57,7 +58,7 @@ router.get(
        WHERE o.id_master_comp = ? AND o.status IN (0, 1) AND ${SEARCH}`,
       [scope.idMasterComp, ...searchParams],
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -85,7 +86,7 @@ router.get(
       [scope.idMasterComp, ...searchParams, limit, offset],
     );
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       id_office: keyhsid.idOffice.encode(item.id_office),
       office_code: item.office_code,
       office_name: item.office_name,
@@ -153,7 +154,7 @@ router.get(
        LIMIT 1`,
       [idOffice, scope.idMasterComp],
     );
-    const office = (officeRows as any[])[0];
+    const office = (officeRows as RowDataPacket[])[0];
     if (!office) return sendError(res, 404, 'OFFICE_NOT_FOUND', 'Office not found');
 
     // Place in the public order ("Posisi 2 dari 3"), shown read-only in the form.
@@ -163,7 +164,7 @@ router.get(
        FROM office WHERE id_master_comp = ? AND is_public = 1 AND status IN (0, 1)`,
       [office.public_sort_order, office.public_sort_order, idOffice, scope.idMasterComp],
     );
-    const place = (placeRows as any[])[0];
+    const place = (placeRows as RowDataPacket[])[0];
 
     const [hourRows] = await pool.query(
       `SELECT id_office_operating_hour, day_of_week, sequence, open_time, close_time, is_closed
@@ -215,7 +216,7 @@ router.get(
         status: Number(office.status),
         status_label: Number(office.status) === 1 ? 'Active' : 'Inactive',
         admin_count: Number(office.admin_count ?? 0),
-        operating_hours: (hourRows as any[]).map((item) => ({
+        operating_hours: (hourRows as RowDataPacket[]).map((item) => ({
           id_office_operating_hour: item.id_office_operating_hour,
           day_of_week: Number(item.day_of_week),
           sequence: Number(item.sequence),
@@ -223,7 +224,7 @@ router.get(
           close_time: item.close_time,
           is_closed: Number(item.is_closed),
         })),
-        attachments: (attachmentRows as any[]).map((item) => ({
+        attachments: (attachmentRows as RowDataPacket[]).map((item) => ({
           id_office_attachment: item.id_office_attachment,
           attachment_role: item.attachment_role,
           caption: item.caption,

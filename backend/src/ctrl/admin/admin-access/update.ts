@@ -1,5 +1,6 @@
 // Update an access profile and change its status.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -52,7 +53,7 @@ router.put(
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
       );
-      const current = (accessRows as any[])[0];
+      const current = (accessRows as RowDataPacket[])[0];
       if (!current) throw accessNotFound();
 
       const permissionsBefore = await getAccessPermissionKeys(connection, idAccess);
@@ -141,7 +142,7 @@ router.patch(
          FOR UPDATE`,
         [idAccess, scope.idMasterComp],
       );
-      const access = (accessRows as any[])[0];
+      const access = (accessRows as RowDataPacket[])[0];
       if (!access) throw accessNotFound();
 
       // Admins without full access cannot lock themselves out by deactivating their own profile.
@@ -161,7 +162,7 @@ router.patch(
          WHERE id_master_comp = ? AND id_access = ? AND is_all_access != 1 AND admin_acct_status = 1`,
         [scope.idMasterComp, idAccess],
       );
-      const affectedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
+      const affectedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
 
       await connection.query(
         `UPDATE admin_access SET admin_access_status = ?, updated = NOW()

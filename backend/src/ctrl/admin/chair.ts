@@ -3,7 +3,7 @@
 import express = require('express');
 import { Response } from 'express';
 import { ResultSetHeader } from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import db = require('../../db');
 import keyhsid from '../../hsid';
@@ -16,6 +16,7 @@ import { parseListQuery, sortColumn, sortDirection, countOf } from '../../helper
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
+import type { RequestBody } from '../../helper/input.helper';
 
 const { pool } = db;
 
@@ -35,7 +36,7 @@ const invalidId = (res: Response) =>
   sendError(res, 400, 'CHAIR_INVALID_ID', 'Invalid position identifier');
 const chairNotFound = () => new HttpError(404, 'CHAIR_NOT_FOUND', 'Position not found');
 
-const readChairInput = (body: any) => {
+const readChairInput = (body: RequestBody) => {
   const name = typeof body?.chair_name === 'string' ? body.chair_name.trim() : '';
   const description =
     typeof body?.chair_description === 'string' && body.chair_description.trim()
@@ -74,7 +75,7 @@ const lockChair = async (connection: PoolConnection, idChair: number, idMasterCo
      FOR UPDATE`,
     [idChair, idMasterComp],
   );
-  const chair = (rows as any[])[0];
+  const chair = (rows as RowDataPacket[])[0];
   if (!chair) throw chairNotFound();
   return chair;
 };
@@ -89,16 +90,21 @@ const countAssignedAccounts = async (
      WHERE id_master_comp = ? AND id_chair = ? AND admin_acct_status IN (0, 1)`,
     [idMasterComp, idChair],
   );
-  return Number((rows as any[])[0]?.total ?? 0);
+  return Number((rows as RowDataPacket[])[0]?.total ?? 0);
 };
 
-const chairAudit = (chair: any) => ({
+const chairAudit = (chair: RowDataPacket) => ({
   chair_name: chair.chair_name,
   chair_description: chair.chair_description ?? null,
   chair_status: Number(chair.chair_status),
 });
 
-const auditBase = (req: AuthRequest, connection: PoolConnection, scope: any, idChair: number) => ({
+const auditBase = (
+  req: AuthRequest,
+  connection: PoolConnection,
+  scope: { idMasterComp: number; idAdminAcct: number },
+  idChair: number,
+) => ({
   req,
   connection,
   writeMode: 'strict' as const,
@@ -129,7 +135,7 @@ router.get(
        WHERE ch.id_master_comp = ? AND ch.chair_status IN (0, 1) AND ${SEARCH}`,
       [scope.idMasterComp, searchValue, searchValue],
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -150,7 +156,7 @@ router.get(
       [scope.idMasterComp, searchValue, searchValue, limit, offset],
     );
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       id_chair: keyhsid.idChair.encode(item.id_chair),
       chair_name: item.chair_name,
       chair_description: item.chair_description,
@@ -234,7 +240,7 @@ router.get(
        LIMIT 1`,
       [idChair, scope.idMasterComp],
     );
-    const chair = (rows as any[])[0];
+    const chair = (rows as RowDataPacket[])[0];
     if (!chair) return sendError(res, 404, 'CHAIR_NOT_FOUND', 'Position not found');
 
     return res.status(200).json({

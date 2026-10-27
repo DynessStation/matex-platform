@@ -13,7 +13,7 @@ const publicScope = (locale: unknown) => {
     ? { company, locale: String(locale) }
     : null;
 };
-const image = (row: any, prefix: string) =>
+const image = (row: RowDataPacket, prefix: string) =>
   row?.[`${prefix}_path`]
     ? {
         asset_url: buildAttachmentUrl(row[`${prefix}_path`]),
@@ -36,7 +36,7 @@ const select = `SELECT c.id_product_category,c.id_parent_product_category,c.prod
   LEFT JOIN product_category_attachment cao ON cao.id_product_category=c.id_product_category AND cao.product_category_attachment_role='og' AND cao.product_category_attachment_is_public=1
   LEFT JOIN attachment og ON og.id_attachment=cao.id_attachment AND og.attachment_status=1 AND og.deleted_at IS NULL`;
 const where = `c.id_master_comp=? AND i.product_category_locale=? AND c.product_category_status='published' AND i.product_category_i18n_status=1 AND c.product_category_deleted_at IS NULL`;
-const dto = (row: any) => ({
+const dto = (row: RowDataPacket) => ({
   id: Number(row.id_product_category),
   parent_id: row.id_parent_product_category == null ? null : Number(row.id_parent_product_category),
   key: row.product_category_key,
@@ -61,14 +61,16 @@ const dto = (row: any) => ({
   category_image: image(row, 'image'),
   category_icon: image(row, 'icon'),
   category_meta_image: image(row, 'og') ?? image(row, 'image'),
-  subcategories: [] as any[],
+  subcategories: [] as unknown[],
 });
-const tree = (items: any[]) => {
+const tree = <T extends { id: number; parent_id: number | null; subcategories: unknown[] }>(
+  items: T[],
+) => {
   const byId = new Map(items.map((item) => [item.id, item]));
-  const roots: any[] = [];
+  const roots: T[] = [];
   for (const item of items) {
-    if (item.parent_id && byId.has(item.parent_id))
-      byId.get(item.parent_id).subcategories.push(item);
+    const parent = item.parent_id ? byId.get(item.parent_id) : undefined;
+    if (parent) parent.subcategories.push(item);
     else roots.push(item);
   }
   return roots;

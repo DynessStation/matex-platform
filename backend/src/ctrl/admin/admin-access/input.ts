@@ -2,6 +2,7 @@
 import { PoolConnection } from 'mysql2/promise';
 
 import { HttpError } from '../../../helper/http-error.helper';
+import type { RequestBody } from '../../../helper/input.helper';
 
 export interface AccessInput {
   name: string;
@@ -10,7 +11,7 @@ export interface AccessInput {
   permissions: unknown;
 }
 
-export const readAccessInput = (body: any): AccessInput => {
+export const readAccessInput = (body: RequestBody): AccessInput => {
   const name = typeof body?.access_name === 'string' ? body.access_name.trim() : '';
   const description =
     typeof body?.access_description === 'string' && body.access_description.trim()

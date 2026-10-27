@@ -61,8 +61,8 @@ export const getAttachmentAbsolutePath = (storagePath: string): string => {
 export const deleteStoredAttachment = async (storagePath: string): Promise<void> => {
   try {
     await fs.unlink(getAttachmentAbsolutePath(storagePath));
-  } catch (error: any) {
-    if (error?.code !== 'ENOENT') throw error;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code !== 'ENOENT') throw error;
   }
 };
 
@@ -165,11 +165,11 @@ export const storeAttachment = async (
       })
       .webp({ quality: image.quality })
       .toFile(absolutePath);
-  } catch (error: any) {
+  } catch (error) {
     await deleteStoredAttachment(storagePath).catch(() => undefined);
     // Content sharp cannot read as an image (its messages name the image format).
     if (
-      String(error?.message ?? '')
+      String((error as Error)?.message ?? '')
         .toLowerCase()
         .includes('image')
     ) {

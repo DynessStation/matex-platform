@@ -33,6 +33,7 @@ import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import type { RequestBody } from '../../helper/input.helper';
 
 const router = express.Router();
 const { pool } = db;
@@ -92,7 +93,7 @@ const faqGroup = (idMasterComp: number): SortGroup => ({
 });
 
 // A sort_order in the body is ignored: positions come from the order list.
-const getPayload = (body: any) => {
+const getPayload = (body: RequestBody) => {
   const key = normalizePublicContentKey(body?.key);
   const status = Number(body?.status) === 0 ? 0 : 1;
   const translations = normalizeTranslations(body?.translations);

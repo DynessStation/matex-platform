@@ -1,5 +1,6 @@
 // Delete (soft delete) an office.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -49,7 +50,7 @@ router.delete(
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
       );
-      const office = (officeRows as any[])[0];
+      const office = (officeRows as RowDataPacket[])[0];
       if (!office) throw new HttpError(404, 'OFFICE_NOT_FOUND', 'Office not found');
       if (Number(office.status) !== 0) {
         throw new HttpError(
@@ -64,7 +65,7 @@ router.delete(
          WHERE id_master_comp = ? AND id_office = ? AND admin_acct_status IN (0, 1)`,
         [scope.idMasterComp, idOffice],
       );
-      const assignedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
+      const assignedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
       if (assignedAccounts > 0) {
         throw new HttpError(
           409,

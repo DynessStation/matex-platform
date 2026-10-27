@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import type { Pool } from 'mysql2/promise';
 import { AddressInfo } from 'node:net';
 import test from 'node:test';
 
@@ -124,7 +125,7 @@ const fakePool = () => {
     rollback: async () => void calls.push('rollback'),
     release: () => void calls.push('release'),
   };
-  return { calls, pool: { getConnection: async () => connection } as any };
+  return { calls, pool: { getConnection: async () => connection } as unknown as Pool };
 };
 
 test('transaction: commits on success', async () => {

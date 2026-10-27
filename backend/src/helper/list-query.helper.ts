@@ -1,3 +1,5 @@
+import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
+
 // Paging, search, and sort direction from list query strings (?page=&limit=&search=).
 
 export interface ListQuery {
@@ -43,11 +45,11 @@ export const sortColumn = (
 
 /** The `total` column of a COUNT query. */
 export const countOf = async (
-  executor: { query: (sql: string, values: unknown[]) => Promise<any> },
+  executor: Pool | PoolConnection,
   sql: string,
   params: unknown[],
 ): Promise<number> => {
-  const [rows] = await executor.query(sql, params);
+  const [rows] = await executor.query<RowDataPacket[]>(sql, params);
   return Number(rows[0]?.total ?? 0);
 };
 

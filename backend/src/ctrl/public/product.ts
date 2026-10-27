@@ -19,7 +19,7 @@ const base = `SELECT p.*,i.product_slug,i.product_name,i.product_short_descripti
  JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.id_master_comp=p.id_master_comp`;
 const where = `p.id_master_comp=? AND i.product_locale=? AND p.product_status='published'
  AND i.product_i18n_status=1 AND p.product_deleted_at IS NULL`;
-const image = (row: any) => ({
+const image = (row: RowDataPacket) => ({
   id: Number(row.id_attachment),
   asset_url: buildAttachmentUrl(row.storage_path),
   original_url: buildAttachmentUrl(row.storage_path),
@@ -257,7 +257,7 @@ router.get(
       ? ` JOIN product_catalog_category pc_filter ON pc_filter.id_product=p.id_product JOIN product_category_i18n ci_filter ON ci_filter.id_product_category=pc_filter.id_product_category AND ci_filter.product_category_locale=i.product_locale`
       : '';
     const clauses = [where, `(?='' OR i.product_name LIKE ? OR p.product_sku LIKE ?)`];
-    const params: any[] = [scope.company, scope.locale, search, like, like];
+    const params: unknown[] = [scope.company, scope.locale, search, like, like];
     if (categories.length) {
       clauses.push(`ci_filter.product_category_slug IN (${categories.map(() => '?').join(',')})`);
       params.push(...categories);

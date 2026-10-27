@@ -1,5 +1,6 @@
 // Admin-account list and detail.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -12,6 +13,7 @@ import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middlewar
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
 
 import {
+  AccountRow,
   assertAccountInScope,
   PROFILE_PHOTO_COLUMNS,
   PROFILE_PHOTO_JOIN,
@@ -67,7 +69,7 @@ router.get(
       `SELECT COUNT(*) AS total FROM admin_acct aa WHERE ${WHERE}`,
       params,
     );
-    const total = Number((totalRows as any[])[0].total);
+    const total = Number((totalRows as RowDataPacket[])[0].total);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -92,7 +94,7 @@ router.get(
 
     // The rows are spread into the response as they are (including raw columns) to keep the
     // current response shape; see the response-format decision in docs/peta-jalan.md (5D).
-    const data = (rows as any[]).map((item) => {
+    const data = (rows as RowDataPacket[]).map((item) => {
       const profilePhoto = profilePhotoDto(item);
       return {
         ...item,
@@ -144,7 +146,7 @@ router.get(
        LIMIT 1`,
       [idAdminAcct],
     );
-    const account = (rows as any[])[0];
+    const account = (rows as AccountRow[])[0];
     if (!account) return sendError(res, 404, 'ADMIN_ACCOUNT_NOT_FOUND', 'Admin account not found');
 
     const scope = await getAdminScope(req);

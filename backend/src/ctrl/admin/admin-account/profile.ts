@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 import fs from 'fs/promises';
 import multer from 'multer';
 import { ResultSetHeader } from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 import os from 'os';
 import path from 'path';
 
@@ -32,7 +32,12 @@ import {
   isValidAccountPassword,
   isValidAccountPhone,
 } from './input';
-import { readPermissionKeys, SESSION_ACCOUNT_SELECT, sessionAccountDto } from './records';
+import {
+  AccountRow,
+  readPermissionKeys,
+  SESSION_ACCOUNT_SELECT,
+  sessionAccountDto,
+} from './records';
 import { issueAccessToken } from './token';
 
 const { pool } = db;
@@ -68,12 +73,12 @@ const lockOwnAccount = async (connection: PoolConnection, idAdminAcct: number) =
      WHERE id_admin_acct = ? AND admin_acct_status = 1 LIMIT 1 FOR UPDATE`,
     [idAdminAcct],
   );
-  const account = (rows as any[])[0];
+  const account = (rows as RowDataPacket[])[0];
   if (!account) throw new HttpError(401, 'AUTH_SESSION_INVALID', 'Invalid session');
   return account;
 };
 
-const profileView = (account: any) => ({
+const profileView = (account: RowDataPacket) => ({
   name: account.name,
   email_2: account.email_2 ?? null,
   phone_2: account.phone_2 ?? null,
@@ -85,14 +90,14 @@ const sessionAccount = async (idAdminAcct: number) => {
   const [rows] = await pool.query(`${SESSION_ACCOUNT_SELECT} WHERE aa.id_admin_acct = ? LIMIT 1`, [
     idAdminAcct,
   ]);
-  const user = (rows as any[])[0];
+  const user = (rows as AccountRow[])[0];
   return sessionAccountDto(user, await readPermissionKeys(user.id_access));
 };
 
 const profileAudit = (
   req: AuthRequest,
   connection: PoolConnection,
-  account: any,
+  account: RowDataPacket,
   extra: Record<string, unknown>,
 ) =>
   writeAuditLog({

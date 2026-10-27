@@ -1,5 +1,6 @@
 // Update an office and change its status.
 import express = require('express');
+import { RowDataPacket } from 'mysql2/promise';
 import { Response } from 'express';
 
 import db = require('../../../db');
@@ -65,7 +66,7 @@ router.put(
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
       );
-      const current = (officeRows as any[])[0];
+      const current = (officeRows as RowDataPacket[])[0];
       if (!current) throw officeNotFound();
 
       const currentHours = await readOfficeHours(connection, idOffice);
@@ -217,7 +218,7 @@ router.patch(
          FOR UPDATE`,
         [idOffice, scope.idMasterComp],
       );
-      const office = (officeRows as any[])[0];
+      const office = (officeRows as RowDataPacket[])[0];
       if (!office) throw officeNotFound();
       if (Number(office.status) === newStatus) return { unchanged: true, affectedAccounts: 0 };
 
@@ -226,7 +227,7 @@ router.patch(
          WHERE id_master_comp = ? AND id_office = ? AND admin_acct_status IN (0, 1)`,
         [scope.idMasterComp, idOffice],
       );
-      const affectedAccounts = Number((accountRows as any[])[0]?.total ?? 0);
+      const affectedAccounts = Number((accountRows as RowDataPacket[])[0]?.total ?? 0);
 
       await connection.query(
         'UPDATE office SET status = ?, updated = NOW() WHERE id_office = ? AND id_master_comp = ?',

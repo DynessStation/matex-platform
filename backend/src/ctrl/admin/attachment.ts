@@ -5,7 +5,7 @@ import { NextFunction, Response } from 'express';
 import fs from 'fs/promises';
 import multer from 'multer';
 import { ResultSetHeader } from 'mysql2';
-import { PoolConnection } from 'mysql2/promise';
+import { PoolConnection, RowDataPacket } from 'mysql2/promise';
 import os from 'os';
 import path from 'path';
 
@@ -92,7 +92,8 @@ const uploadAttachmentFiles = (req: AuthRequest, res: Response, next: NextFuncti
   });
 };
 
-type QueryExecutor = { query: (sql: string, values: unknown[]) => Promise<any> };
+/** A pool or connection (tests pass a stand-in with the same `query`). */
+type QueryExecutor = { query: (sql: string, values: unknown[]) => Promise<unknown[]> };
 
 /** Which of `ids` are still referenced, and where. */
 export const getAttachmentReferences = async (ids: number[], executor: QueryExecutor = pool) => {
@@ -104,7 +105,7 @@ export const getAttachmentReferences = async (ids: number[], executor: QueryExec
        WHERE ${column} IN (${placeholders}) GROUP BY ${column}`,
       ids,
     );
-    for (const row of rows as any[]) {
+    for (const row of rows as RowDataPacket[]) {
       references.push({
         idAttachment: Number(row.id_attachment),
         source,
@@ -125,10 +126,10 @@ const lockAttachments = async (connection: PoolConnection, ids: number[], scope:
      FOR UPDATE`,
     officeOnly ? [...ids, scope.idMasterComp, scope.idOffice] : [...ids, scope.idMasterComp],
   );
-  return rows as any[];
+  return rows as RowDataPacket[];
 };
 
-const attachmentAudit = (row: any) => ({
+const attachmentAudit = (row: RowDataPacket) => ({
   collection_name: row.collection_name,
   name: row.name,
   original_name: row.original_name,
@@ -164,7 +165,7 @@ const softDelete = async (
   req: AuthRequest,
   connection: PoolConnection,
   scope: AdminScope,
-  attachments: any[],
+  attachments: RowDataPacket[],
   metadata: Record<string, unknown>,
 ) => {
   const ids = attachments.map((item) => Number(item.id_attachment));
@@ -196,7 +197,7 @@ const softDelete = async (
 
 // Called after commit: the rows are already deleted, so a failed file removal is only logged
 // (the file can be cleaned up later).
-const removeFiles = async (attachments: any[]) => {
+const removeFiles = async (attachments: RowDataPacket[]) => {
   const results = await Promise.allSettled(
     attachments
       .filter((item) => item.disk === 'local')
@@ -250,7 +251,7 @@ router.get(
       `SELECT COUNT(*) AS total FROM attachment a WHERE ${whereSql}`,
       params,
     );
-    const total = Number((totalRows as any[])[0]?.total ?? 0);
+    const total = Number((totalRows as RowDataPacket[])[0]?.total ?? 0);
     // Rows before search and filters, for "x of y" in the admin table.
     const totalAll = await countOf(
       pool,
@@ -272,7 +273,7 @@ router.get(
     );
 
     // Where each file on this page is used (D-5), from the same tables the delete check reads.
-    const ids = (rows as any[]).map((item) => Number(item.id_attachment));
+    const ids = (rows as RowDataPacket[]).map((item) => Number(item.id_attachment));
     const usageById = new Map<number, { source: string; total: number }[]>();
     for (const reference of ids.length ? await getAttachmentReferences(ids) : []) {
       const usage = usageById.get(reference.idAttachment) ?? [];
@@ -280,7 +281,7 @@ router.get(
       usageById.set(reference.idAttachment, usage);
     }
 
-    const data = (rows as any[]).map((item) => ({
+    const data = (rows as RowDataPacket[]).map((item) => ({
       id_attachment: keyhsid.idAttachment.encode(item.id_attachment),
       collection_name: item.collection_name,
       name: item.name,

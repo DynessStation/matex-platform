@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 import { pool } from '../src/db';
 import { writeAuditLog } from '../src/helper/audit-log.helper';
@@ -144,7 +144,7 @@ const main = async () => {
 
     const categoryIds = new Map<string, number>();
     for (const category of seed.categories) {
-      const [result] = await connection.query<any>(
+      const [result] = await connection.query<ResultSetHeader>(
         `INSERT INTO product_category
           (id_master_comp, product_category_key, product_category_status,
            product_category_is_featured, product_category_sort_order,
@@ -173,7 +173,7 @@ const main = async () => {
     }
 
     for (const product of seed.products) {
-      const [result] = await connection.query<any>(
+      const [result] = await connection.query<ResultSetHeader>(
         `INSERT INTO product_catalog
           (id_master_comp, product_key, product_sku, product_type, product_kind,
            product_status, product_unit, product_barcode,
