@@ -254,6 +254,21 @@ npm run backup:restore -- \
 
 Setelah restore, jalankan pemeriksaan jumlah tabel/record penting pada `mia_restore_drill`, cek beberapa file media dan checksum, lalu arahkan instance API sementara ke database dan storage drill untuk smoke test baca. Hapus target drill hanya setelah hasilnya dicatat. Script menolak target database/file aktif secara bawaan; opsi live hanya untuk prosedur pemulihan insiden yang sudah mematikan proses aplikasi dan memiliki persetujuan operasional terpisah.
 
+**Catatan dari drill 27 Oktober 2026 (uji migration 026 sebelum deploy):**
+
+- CloudPanel menolak nama `mia_restore_drill` (nama user database maksimal 16 karakter). Dipakai `miadrill` untuk database dan usernya.
+- CloudPanel selalu membuat user baru per database; user aplikasi (`matexapp`) tidak punya akses ke database drill. Pemilik menyalin `backend/.env` ke `~/tmp/drill.env` (`chmod 600`) dan mengganti `DB_NAME`, `DB_USER`, `DB_PASS` ke user drill. Asisten tidak membaca atau menampilkan password itu.
+- Script restore membandingkan `--target-db` dengan `DB_NAME` dari env-file. Dengan `drill.env`, jalankan dengan `DB_NAME=mia` di depan perintah (variabel shell menang atas env-file) agar pengaman "jangan timpa database live" tetap menunjuk ke production, tanpa `--allow-live-target`:
+
+```bash
+DB_NAME=mia node scripts/ops/restore-production.cjs --backup "$LATEST_BACKUP" \
+  --env-file ~/tmp/drill.env --execute --target-db miadrill \
+  --target-files /home/matexindo/storage-restore-drill/files --confirm RESTORE:miadrill
+```
+
+- Migration yang belum di-push diuji dari folder sementara `~/tmp/a3-drill` (salinan `scripts/migrate.cjs` dan `database/migrations`, `.env` berupa symlink ke `drill.env`, `NODE_PATH` ke `backend/node_modules`), sehingga repo production tidak berubah.
+- Hasil: salinan sama dengan production (48 tabel, jumlah baris sama, migration terakhir 025). Migration 026 berjalan ±1 detik; 50 baris berstatus 99 (izin 7, akun 7, jabatan 5, kantor 9, profil akses 7, media 15) menjadi status 0 dengan waktu hapus sama dengan `updated` lamanya; baris lain dan kolom `updated` tidak berubah; production tetap di 025. Smoke test API baca terhadap database drill belum dilakukan (kode A-3 belum di VPS).
+
 Jadwalkan backup harian setelah satu backup manual dan restore drill lulus. Salin backup ke lokasi lain di luar VPS dengan enkripsi dan uji pemulihan dari salinan tersebut; backup yang hanya berada di VPS tidak melindungi dari kehilangan seluruh server.
 
 ## 7. TLS dan pengamanan jaringan
