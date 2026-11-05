@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { isPublicContentLocale } from '../../config/public-content.config';
+import { PUBLIC_WHERE, isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
+import { movedSlug, notFoundData } from '../../helper/slug-redirect.helper';
 import { pageMeta, parseListQuery } from '../../helper/list-query.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 
@@ -18,8 +19,7 @@ const base = `SELECT p.*,i.product_slug,i.product_name,i.product_short_descripti
  i.product_specifications_json,i.product_meta_title,i.product_meta_description,i.product_canonical_url,
  i.product_og_title,i.product_og_description FROM product_catalog p
  JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.id_master_comp=p.id_master_comp`;
-const where = `p.id_master_comp=? AND i.product_locale=? AND p.product_status='published'
- AND i.product_i18n_status=1 AND p.product_deleted_at IS NULL`;
+const where = PUBLIC_WHERE.product;
 const image = (row: RowDataPacket) => ({
   id: Number(row.id_attachment),
   asset_url: buildAttachmentUrl(row.storage_path),
@@ -324,7 +324,16 @@ router.get(
       `${base} WHERE ${where} AND i.product_slug=? LIMIT 1`,
       [scope.company, scope.locale, req.params.slug],
     );
-    if (!rows.length) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
+    if (!rows.length) {
+      const moved = await movedSlug(
+        pool,
+        'product',
+        scope.company,
+        scope.locale,
+        String(req.params.slug),
+      );
+      return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found', notFoundData(moved));
+    }
     const [product] = await hydrate(
       rows,
       scope.company,

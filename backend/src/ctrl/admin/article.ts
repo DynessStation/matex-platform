@@ -19,7 +19,9 @@ import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
+import { resolveAutoKey } from '../../helper/auto-key.helper';
 import { contentSlug } from '../../helper/input.helper';
+import { recordSlugChanges } from '../../helper/slug-redirect.helper';
 import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
@@ -121,7 +123,6 @@ const payloadOf = (body: RequestBody) => {
   const thumbnailId = body?.thumbnail_id ? decodeId(body.thumbnail_id, keyhsid.idAttachment) : null;
   const ogImageId = body?.og_image_id ? decodeId(body.og_image_id, keyhsid.idAttachment) : null;
   if (
-    !key ||
     key.length > 120 ||
     !STATUSES.has(status) ||
     (body?.thumbnail_id && !thumbnailId) ||
@@ -298,6 +299,15 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   }
 
   const idArticle = await withTransaction(pool, async (connection) => {
+    payload.key = await resolveAutoKey(
+      connection,
+      'article',
+      id,
+      scope.idMasterComp,
+      payload.key,
+      payload.translations,
+    );
+    await recordSlugChanges(connection, 'article', id, scope.idMasterComp, payload.translations);
     let articleId: number;
     if (id) {
       if (!(await lockArticle(connection, id, scope.idMasterComp))) {

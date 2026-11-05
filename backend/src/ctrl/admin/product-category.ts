@@ -22,7 +22,9 @@ import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { writeAuditLog } from '../../helper/audit-log.helper';
 import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
+import { resolveAutoKey } from '../../helper/auto-key.helper';
 import { contentSlug, trimTo } from '../../helper/input.helper';
+import { recordSlugChanges } from '../../helper/slug-redirect.helper';
 import { nextPosition, renumber, SortGroup, writeOrder } from '../../helper/sort-order.helper';
 import { withTransaction } from '../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
@@ -78,7 +80,6 @@ const payloadOf = (body: RequestBody) => {
     og: body?.og_image_id ? decodeId(body.og_image_id, keyhsid.idAttachment) : null,
   };
   if (
-    !key ||
     key.length > 120 ||
     !STATUSES.has(status) ||
     (body?.parent_id && !parentId) ||
@@ -389,6 +390,21 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
   }
 
   const categoryId = await withTransaction(pool, async (connection) => {
+    payload.key = await resolveAutoKey(
+      connection,
+      'product_category',
+      id,
+      scope.idMasterComp,
+      payload.key,
+      payload.translations,
+    );
+    await recordSlugChanges(
+      connection,
+      'product_category',
+      id,
+      scope.idMasterComp,
+      payload.translations,
+    );
     if (payload.parentId) {
       await assertParentAllowed(connection, payload.parentId, id, scope.idMasterComp);
     }

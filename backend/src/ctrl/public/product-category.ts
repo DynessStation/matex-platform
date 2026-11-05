@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { isPublicContentLocale } from '../../config/public-content.config';
+import { PUBLIC_WHERE, isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
+import { movedSlug, notFoundData } from '../../helper/slug-redirect.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
 
 const router = Router();
@@ -35,7 +36,7 @@ const select = `SELECT c.id_product_category,c.id_parent_product_category,c.prod
   LEFT JOIN attachment ico ON ico.id_attachment=cac.id_attachment AND ico.attachment_status=1 AND ico.deleted_at IS NULL
   LEFT JOIN product_category_attachment cao ON cao.id_product_category=c.id_product_category AND cao.product_category_attachment_role='og' AND cao.product_category_attachment_is_public=1
   LEFT JOIN attachment og ON og.id_attachment=cao.id_attachment AND og.attachment_status=1 AND og.deleted_at IS NULL`;
-const where = `c.id_master_comp=? AND i.product_category_locale=? AND c.product_category_status='published' AND i.product_category_i18n_status=1 AND c.product_category_deleted_at IS NULL`;
+const where = PUBLIC_WHERE.product_category;
 const dto = (row: RowDataPacket) => ({
   id: Number(row.id_product_category),
   parent_id: row.id_parent_product_category == null ? null : Number(row.id_parent_product_category),
@@ -132,8 +133,22 @@ router.get(
       `${select} WHERE ${where} AND i.product_category_slug=? LIMIT 1`,
       [scope.company, scope.locale, req.params.slug],
     );
-    if (!rows.length)
-      return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');
+    if (!rows.length) {
+      const moved = await movedSlug(
+        pool,
+        'product_category',
+        scope.company,
+        scope.locale,
+        String(req.params.slug),
+      );
+      return sendError(
+        res,
+        404,
+        'PRODUCT_CATEGORY_NOT_FOUND',
+        'Product category not found',
+        notFoundData(moved),
+      );
+    }
     const [category] = await withLocalizedSlugs(rows, scope.company);
     return sendSuccess(res, 200, 'PRODUCT_CATEGORY_FOUND', 'Product category loaded', category);
   },

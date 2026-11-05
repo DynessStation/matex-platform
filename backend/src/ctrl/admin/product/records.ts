@@ -10,7 +10,9 @@ import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
+import { resolveAutoKey } from '../../../helper/auto-key.helper';
 import { HttpError } from '../../../helper/http-error.helper';
+import { recordSlugChanges } from '../../../helper/slug-redirect.helper';
 import { nextPosition, renumber } from '../../../helper/sort-order.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest } from '../../../middleware/auth-jwt.middleware';
@@ -407,7 +409,16 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
   }
 
   const productId = await withTransaction(pool, async (connection) => {
+    payload.key = await resolveAutoKey(
+      connection,
+      'product',
+      id,
+      scope.idMasterComp,
+      payload.key,
+      payload.translations,
+    );
     await assertUnique(connection, scope.idMasterComp, id, payload);
+    await recordSlugChanges(connection, 'product', id, scope.idMasterComp, payload.translations);
     let savedId: number;
     let frontBefore = 0;
     if (id) {

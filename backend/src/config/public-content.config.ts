@@ -28,3 +28,12 @@ export const normalizePublicContentKey = (value: unknown): string =>
         .replace(/[^a-z0-9_-]+/g, '-')
         .replace(/^-+|-+$/g, '')
     : '';
+
+// What makes a record public, for a query with the record as a/p/c and its translation as i.
+// Parameters, in order: company, locale.
+export const PUBLIC_WHERE = {
+  article: `a.id_master_comp=? AND i.article_locale=? AND i.article_i18n_status=1 AND (a.article_status='published' OR (a.article_status='scheduled' AND a.article_published_at IS NOT NULL)) AND a.article_deleted_at IS NULL AND (a.article_published_at IS NULL OR a.article_published_at<=UTC_TIMESTAMP()) AND (a.article_unpublished_at IS NULL OR a.article_unpublished_at>UTC_TIMESTAMP())`,
+  product: `p.id_master_comp=? AND i.product_locale=? AND p.product_status='published'
+ AND i.product_i18n_status=1 AND p.product_deleted_at IS NULL`,
+  product_category: `c.id_master_comp=? AND i.product_category_locale=? AND c.product_category_status='published' AND i.product_category_i18n_status=1 AND c.product_category_deleted_at IS NULL`,
+} as const;

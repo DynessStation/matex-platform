@@ -1,14 +1,16 @@
 import { inject } from '@angular/core';
-import { ResolveFn } from '@angular/router';
+import { RedirectCommand, ResolveFn } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { firstValueFrom } from 'rxjs';
 
+import { movedSlugHandler } from './moved-slug';
 import { GetProductBySlug } from '../store/action/product.action';
 
-export const ProductResolver: ResolveFn<boolean> = async (route) => {
+export const ProductResolver: ResolveFn<boolean | RedirectCommand> = async (route) => {
   // false: nothing found; the page shows the 404 view in place (resolved-missing.ts).
   const store = inject(Store);
+  const onMissing = movedSlugHandler(route);
   const slug = route.paramMap.get('slug');
 
   if (!slug) {
@@ -22,7 +24,7 @@ export const ProductResolver: ResolveFn<boolean> = async (route) => {
       ),
     );
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    return onMissing(error);
   }
 };

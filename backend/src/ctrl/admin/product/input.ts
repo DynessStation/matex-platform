@@ -172,7 +172,7 @@ export const parsePayload = (body: RequestBody) => {
   const stockStatus = String(body?.stock_status ?? 'in_stock');
   const priceVisibility = String(body?.price_visibility ?? 'contact');
   if (
-    !key ||
+    key.length > 120 ||
     !sku ||
     !PRODUCT_STATUSES.has(status) ||
     !TYPES.has(productType) ||
