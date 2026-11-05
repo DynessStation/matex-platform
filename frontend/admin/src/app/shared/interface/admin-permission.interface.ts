@@ -1,149 +1,48 @@
 import { IApiResponse } from './api-response.interface';
-import { IListResponse } from './list.interface';
-
-//==================================================
-//==== ADMIN PERMISSION
-//==================================================
 
 export interface IAdminPermission {
-  /**
-   * Internal numeric ID khusus compatibility
-   * dengan generic Table.
-   *
-   * BUKAN ID database / API.
-   */
-  id: number;
-
-  /**
-   * Actual identifier dari API (Hashids).
-   */
   id_admin_permission: string;
-
   permission_key: string;
-
   permission_name: string;
-
   permission_group: string | null;
-
   permission_description: string | null;
-
-  permission_status: 0 | 1;
-
-  status_label: string;
-
+  /** 1 active, 0 inactive. */
+  permission_status: number;
+  /** How many access profiles hold it. */
   access_count: number;
-
-  created: string;
-
-  updated: string;
 }
 
-//==================================================
-//==== PAGINATION
-//==================================================
-
-//==================================================
-//==== LIST
-//==================================================
-
-export type IAdminPermissionModel = IListResponse<IAdminPermission>;
-
-//==================================================
-//==== MUTATION DATA
-//==================================================
-
-export interface IAdminPermissionMutationData {
-  id_admin_permission: string;
+export interface IAdminPermissionGroup {
+  /** null for permissions without a group, listed under "Other". */
+  id_admin_permission_group: string | null;
+  name: string;
+  permissions: IAdminPermission[];
 }
 
-//==================================================
-//==== CREATE
-//==================================================
+export type IAdminPermissionGroupsResponse = IApiResponse<
+  IAdminPermissionGroup[]
+>;
+
+export interface IAdminPermissionGroupMutation {
+  id_admin_permission_group: string;
+  name: string;
+}
 
 export interface ICreateAdminPermission {
   permission_key: string;
-
   permission_name: string;
-
   permission_group: string | null;
-
   permission_description: string | null;
+  permission_status: 0 | 1;
 }
-
-export type ICreateAdminPermissionResponse =
-  IApiResponse<IAdminPermissionMutationData>;
-
-//==================================================
-//==== DETAIL
-//==================================================
-
-export interface IAdminPermissionDetailResponse {
-  success: boolean;
-
-  data: {
-    id_admin_permission: string;
-
-    permission_key: string;
-
-    permission_name: string;
-
-    permission_group: string | null;
-
-    permission_description: string | null;
-
-    permission_status: 0 | 1;
-
-    access_count: number;
-
-    created: string;
-
-    updated: string;
-  };
-}
-
-//==================================================
-//==== UPDATE
-//==================================================
 
 export interface IUpdateAdminPermission {
-  /**
-   * permission_key intentionally not included.
-   * Key is immutable after creation.
-   */
   permission_name: string;
-
   permission_group: string | null;
-
   permission_description: string | null;
 }
 
-export type IUpdateAdminPermissionResponse =
-  IApiResponse<IAdminPermissionMutationData>;
-
-//==================================================
-//==== STATUS
-//==================================================
-
-export interface IUpdateAdminPermissionStatus {
-  permission_status: 0 | 1;
-}
-
-export interface IUpdateAdminPermissionStatusData {
-  id_admin_permission: string;
-
-  permission_status: 0 | 1;
-}
-
-export type IUpdateAdminPermissionStatusResponse =
-  IApiResponse<IUpdateAdminPermissionStatusData>;
-
-//==================================================
-//==== DELETE
-//==================================================
-
-export interface IDeleteAdminPermissionData {
-  id: string;
-}
-
-export type IDeleteAdminPermissionResponse =
-  IApiResponse<IDeleteAdminPermissionData>;
+export type IAdminPermissionMutationResponse = IApiResponse<{
+  id_admin_permission?: string;
+  id?: string;
+}>;

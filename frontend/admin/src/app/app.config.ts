@@ -34,7 +34,6 @@ import { AppTitleService } from './core/services/app-title.service';
 import { LocalizationService } from './shared/services/localization.service';
 import { AdminAccessState } from './shared/store/state/admin-access.state';
 import { AdminAccountState } from './shared/store/state/admin-account.state';
-import { AdminPermissionState } from './shared/store/state/admin-permission.state';
 import { AttachmentState } from './shared/store/state/attachment.state';
 import { AuditLogState } from './shared/store/state/audit-log.state';
 import { AuthState } from './shared/store/state/auth.state';
@@ -118,7 +117,6 @@ export const appConfig: ApplicationConfig = {
 
       NgxsModule.forRoot([
         AdminAccountState,
-        AdminPermissionState,
         AdminAccessState,
         ChairState,
         OfficeState,

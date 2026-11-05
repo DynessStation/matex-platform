@@ -7,13 +7,19 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { combineLatest, finalize } from 'rxjs';
 
+import { ComingSoon } from '../../shared/components/ui/coming-soon/coming-soon';
 import { HelpTip } from '../../shared/components/ui/help/help-tip/help-tip';
+import {
+  PageTab,
+  PageTabs,
+  activeTabKey,
+} from '../../shared/components/ui/page-tabs/page-tabs';
 import { RefreshButton } from '../../shared/components/ui/refresh-button/refresh-button';
 import { TextFitDirective } from '../../shared/directives/text-fit.directive';
 import {
@@ -32,7 +38,15 @@ interface DashboardChartPoint extends IAnalyticsDailyPoint {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink, HelpTip, RefreshButton, TextFitDirective],
+  imports: [
+    CommonModule,
+    RouterLink,
+    ComingSoon,
+    HelpTip,
+    PageTabs,
+    RefreshButton,
+    TextFitDirective,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -41,6 +55,11 @@ export class Dashboard {
   private destroyRef = inject(DestroyRef);
   private platformId = inject(PLATFORM_ID);
   private store = inject(Store);
+  private route = inject(ActivatedRoute);
+
+  private readonly query = toSignal(this.route.queryParamMap, {
+    requireSync: true,
+  });
 
   /**
    * Every account lands here after login, but the figures need dashboard.view. Without it the
@@ -54,6 +73,26 @@ export class Dashboard {
   readonly error = signal('');
   readonly overview = signal<IAnalyticsOverview | null>(null);
   private refreshTimer?: ReturnType<typeof setInterval>;
+
+  /** Website is the only tab built so far; its dot says messages or articles wait for someone. */
+  readonly tabs = computed<PageTab[]>(() => {
+    const content = this.overview()?.content;
+    return [
+      {
+        key: 'website',
+        labelKey: 'dashboard_tabs.website',
+        alert:
+          !!content && content.inquiries_today + content.articles_pending > 0,
+        alertKey: 'dashboard_tabs.website_alert',
+      },
+      { key: 'inventory', labelKey: 'dashboard_tabs.inventory', soon: true },
+      { key: 'crm', labelKey: 'dashboard_tabs.crm', soon: true },
+      { key: 'finance', labelKey: 'dashboard_tabs.finance', soon: true },
+    ];
+  });
+  readonly activeTab = computed(() =>
+    activeTabKey(this.tabs(), this.query().get('tab')),
+  );
 
   readonly chartPoints = computed<DashboardChartPoint[]>(() => {
     const overview = this.overview();

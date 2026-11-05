@@ -1,4 +1,11 @@
 {
+  "dashboard_tabs": {
+    "website": "Website",
+    "inventory": "Inventory",
+    "crm": "CRM & CLV",
+    "finance": "Finance",
+    "website_alert": "Something needs a look"
+  },
   "form_kit": {
     "untitled": "Untitled",
     "save": "Save",
@@ -1699,6 +1706,35 @@
     "update": "Update Position"
   },
   "admin_permission": {
+    "search_permission": "Search permissions",
+    "search_group": "Search groups...",
+    "reload": "Reload",
+    "groups": "Permission Groups",
+    "group_name": "Permission group name",
+    "add_group": "Add and Save",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit_group": "Rename group",
+    "delete_group": "Delete group",
+    "group_saved": "Group saved.",
+    "no_groups": "No groups yet.",
+    "no_permissions": "This group has no permissions yet.",
+    "no_match": "Nothing matches the search.",
+    "edit_in_group": "Edit {{name}}",
+    "add_in_group": "New permission in group {{group}}",
+    "key_start": "Key start",
+    "key_taken": "This key already exists in this group.",
+    "key_existing": "Already used",
+    "optional": "Optional",
+    "add_short": "Add",
+    "select_all": "Select all",
+    "selected_of": "{{count}} of {{total}} selected",
+    "selected_count": "{{count}} selected permissions",
+    "delete_selected": "Delete selected",
+    "profile_count": "Profiles",
+    "created": "Permission saved.",
+    "updated": "Permission updated.",
+    "deleted": "Deleted.",
     "title": "Admin Permissions",
     "add": "Add Permission",
 
@@ -1708,7 +1744,6 @@
     "description": "Description",
     "access_count": "Access Count",
     "status": "Status",
-    "created": "Created",
 
     "edit": "Edit",
     "activate": "Activate",
@@ -1721,7 +1756,7 @@
     "edit_title": "Edit Admin Permission",
 
     "permission_key_placeholder": "Example: product.view",
-    "permission_name_placeholder": "View Admin Account",
+    "permission_name_placeholder": "Example: View Admin Access",
     "group_placeholder": "Admin Account",
     "description_placeholder": "Permission description",
 

@@ -30,6 +30,8 @@ Kunci internal otomatis: server membuat dari judul atau nama saat data dibuat, m
 
 ## Tahap 1: Dasbor dan Hak Akses
 
+**Selesai 6 November (lokal).** Migration 028 (tabel grup). Test `admin-permission-page.spec.ts` dan `admin-permission-group-api.spec.ts`. Store NGXS hak akses dibuang: halaman memakai service langsung, dan datanya satu endpoint `/api/v1/admin-permission-group` (grup beserta hak aksesnya). Tambahan di luar PDF: grup kosong bisa dihapus; satu grup bisa punya beberapa awal kunci (Catalog punya `product.` dan `product_category.`), jadi awal kunci jadi pilihan kalau lebih dari satu. Kotak centang dan Pilih Semua dibaca sebagai hapus massal untuk baris yang boleh dihapus.
+
 **Dasbor** (`/dashboard`)
 
 - Tab Website, Inventaris (SOON), CRM & CLV (SOON), Finance (SOON). Tab aktif tersimpan di URL (`?tab=`).

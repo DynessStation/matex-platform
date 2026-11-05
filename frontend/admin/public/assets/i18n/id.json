@@ -1,4 +1,11 @@
 {
+  "dashboard_tabs": {
+    "website": "Website",
+    "inventory": "Inventaris",
+    "crm": "CRM & CLV",
+    "finance": "Finance",
+    "website_alert": "Ada yang perlu diperhatikan"
+  },
   "form_kit": {
     "untitled": "Tanpa Judul",
     "save": "Simpan",
@@ -1699,6 +1706,35 @@
     "update": "Perbarui Jabatan / Posisi"
   },
   "admin_permission": {
+    "search_permission": "Cari hak akses",
+    "search_group": "Cari grup...",
+    "reload": "Muat ulang",
+    "groups": "Grup Hak Akses",
+    "group_name": "Nama Grup Hak Akses",
+    "add_group": "Tambah dan Simpan",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "edit_group": "Ubah nama grup",
+    "delete_group": "Hapus grup",
+    "group_saved": "Grup tersimpan.",
+    "no_groups": "Belum ada grup.",
+    "no_permissions": "Belum ada hak akses di grup ini.",
+    "no_match": "Tidak ada yang cocok dengan pencarian.",
+    "edit_in_group": "Ubah {{name}}",
+    "add_in_group": "Buat akses baru dalam grup {{group}}",
+    "key_start": "Awal kunci",
+    "key_taken": "Kunci ini sudah ada di grup ini.",
+    "key_existing": "Yang sudah ada",
+    "optional": "Opsional",
+    "add_short": "Tambah",
+    "select_all": "Pilih semua",
+    "selected_of": "{{count}} dari {{total}} dipilih",
+    "selected_count": "{{count}} hak akses terpilih",
+    "delete_selected": "Hapus yang dipilih",
+    "profile_count": "Jumlah Profil",
+    "created": "Hak akses tersimpan.",
+    "updated": "Hak akses diperbarui.",
+    "deleted": "Berhasil dihapus.",
     "title": "Hak Akses Admin",
     "add": "Tambah Hak Akses",
 
@@ -1708,20 +1744,19 @@
     "description": "Deskripsi",
     "access_count": "Jumlah Profil Akses",
     "status": "Status",
-    "created": "Dibuat",
 
     "edit": "Edit",
     "activate": "Aktifkan",
     "deactivate": "Nonaktifkan",
     "delete": "Hapus",
     "active": "Aktif",
-    "inactive": "Nonaktif",
+    "inactive": "Tidak Aktif",
 
     "create_title": "Buat Hak Akses Admin",
     "edit_title": "Edit Hak Akses Admin",
 
     "permission_key_placeholder": "Contoh: product.view",
-    "permission_name_placeholder": "Lihat Akun Admin",
+    "permission_name_placeholder": "Contoh: Lihat Admin Akses",
     "group_placeholder": "Admin Account",
     "description_placeholder": "Deskripsi hak akses",
 

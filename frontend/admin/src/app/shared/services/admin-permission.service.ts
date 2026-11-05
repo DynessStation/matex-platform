@@ -1,123 +1,82 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import {
-  IAdminPermissionDetailResponse,
-  IAdminPermissionModel,
+  IAdminPermissionGroupMutation,
+  IAdminPermissionGroupsResponse,
+  IAdminPermissionMutationResponse,
   ICreateAdminPermission,
-  ICreateAdminPermissionResponse,
-  IDeleteAdminPermissionResponse,
   IUpdateAdminPermission,
-  IUpdateAdminPermissionResponse,
-  IUpdateAdminPermissionStatus,
-  IUpdateAdminPermissionStatusResponse,
 } from '../interface/admin-permission.interface';
-import { Params } from '../interface/core.interface';
+import { IApiResponse } from '../interface/api-response.interface';
 
-//==================================================
-//==== SERVICE
-//==================================================
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AdminPermissionService {
   private http = inject(HttpClient);
-
   private readonly apiUrl = `${environment.API_URL}/api/v1/admin-permission`;
+  private readonly groupUrl = `${this.apiUrl}-group`;
 
-  //==================================================
-  //==== GET LIST
-  //==================================================
-
-  getAdminPermissions(payload?: Params): Observable<IAdminPermissionModel> {
-    const params = listParams(payload);
-
-    return this.http
-      .get<IAdminPermissionModel>(this.apiUrl, {
-        params,
-      })
-      .pipe(
-        map((response) => ({
-          ...response,
-
-          data: response.data.map((item, index) => ({
-            ...item,
-
-            //==================================================
-            //==== GENERIC TABLE INTERNAL ID
-            //==================================================
-
-            id: index + 1,
-          })),
-        })),
-      );
+  getGroups(): Observable<IAdminPermissionGroupsResponse> {
+    return this.http.get<IAdminPermissionGroupsResponse>(this.groupUrl);
   }
 
-  //==================================================
-  //==== CREATE
-  //==================================================
+  createGroup(
+    name: string,
+  ): Observable<IApiResponse<IAdminPermissionGroupMutation>> {
+    return this.http.post<IApiResponse<IAdminPermissionGroupMutation>>(
+      this.groupUrl,
+      { name },
+    );
+  }
 
-  createAdminPermission(
+  renameGroup(
+    id: string,
+    name: string,
+  ): Observable<IApiResponse<IAdminPermissionGroupMutation>> {
+    return this.http.put<IApiResponse<IAdminPermissionGroupMutation>>(
+      `${this.groupUrl}/${id}`,
+      { name },
+    );
+  }
+
+  deleteGroup(id: string): Observable<IApiResponse<unknown>> {
+    return this.http.delete<IApiResponse<unknown>>(`${this.groupUrl}/${id}`);
+  }
+
+  create(
     payload: ICreateAdminPermission,
-  ): Observable<ICreateAdminPermissionResponse> {
-    return this.http.post<ICreateAdminPermissionResponse>(this.apiUrl, payload);
-  }
-
-  //==================================================
-  //==== DETAIL
-  //==================================================
-
-  getAdminPermissionDetail(
-    id: string,
-  ): Observable<IAdminPermissionDetailResponse> {
-    return this.http.get<IAdminPermissionDetailResponse>(
-      `${this.apiUrl}/${id}`,
+  ): Observable<IAdminPermissionMutationResponse> {
+    return this.http.post<IAdminPermissionMutationResponse>(
+      this.apiUrl,
+      payload,
     );
   }
 
-  //==================================================
-  //==== UPDATE
-  //==================================================
-
-  updateAdminPermission(
+  update(
     id: string,
-
     payload: IUpdateAdminPermission,
-  ): Observable<IUpdateAdminPermissionResponse> {
-    return this.http.put<IUpdateAdminPermissionResponse>(
+  ): Observable<IAdminPermissionMutationResponse> {
+    return this.http.put<IAdminPermissionMutationResponse>(
       `${this.apiUrl}/${id}`,
       payload,
     );
   }
 
-  //==================================================
-  //==== STATUS
-  //==================================================
-
-  updateAdminPermissionStatus(
+  setStatus(
     id: string,
-
-    payload: IUpdateAdminPermissionStatus,
-  ): Observable<IUpdateAdminPermissionStatusResponse> {
-    return this.http.patch<IUpdateAdminPermissionStatusResponse>(
+    status: 0 | 1,
+  ): Observable<IAdminPermissionMutationResponse> {
+    return this.http.patch<IAdminPermissionMutationResponse>(
       `${this.apiUrl}/${id}/status`,
-      payload,
+      { permission_status: status },
     );
   }
 
-  //==================================================
-  //==== DELETE
-  //==================================================
-
-  deleteAdminPermission(
-    id: string,
-  ): Observable<IDeleteAdminPermissionResponse> {
-    return this.http.delete<IDeleteAdminPermissionResponse>(
+  delete(id: string): Observable<IAdminPermissionMutationResponse> {
+    return this.http.delete<IAdminPermissionMutationResponse>(
       `${this.apiUrl}/${id}`,
     );
   }

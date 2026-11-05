@@ -88,6 +88,15 @@ const lockPermission = async (connection: PoolConnection, idPermission: number) 
   return permission;
 };
 
+/** A group named on a permission is in the group list too (admin-permission-group.ts). */
+const ensureGroup = async (connection: PoolConnection, name: string | null) => {
+  if (!name) return;
+  await connection.query(
+    `INSERT IGNORE INTO admin_permission_group (permission_group_name) VALUES (?)`,
+    [name],
+  );
+};
+
 const permissionAudit = (permission: RowDataPacket) => ({
   permission_key: permission.permission_key,
   permission_name: permission.permission_name,
@@ -181,6 +190,8 @@ router.post(
   requirePermission('admin_permission.create'),
   async (req: AuthRequest, res: Response) => {
     const input = readPermissionInput(req.body, { withKey: true });
+    // Active unless the form says otherwise.
+    const status = req.body?.permission_status === 0 ? 0 : 1;
 
     const idPermission = await withTransaction(pool, async (connection) => {
       // Deleted permissions keep their key reserved.
@@ -192,11 +203,12 @@ router.post(
         throw new HttpError(409, 'ADMIN_PERMISSION_KEY_EXISTS', 'Permission key already exists');
       }
 
+      await ensureGroup(connection, input.group);
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO admin_permission (permission_key, permission_name, permission_group,
            permission_description, permission_status, created, updated)
-         VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
-        [input.key, input.name, input.group, input.description],
+         VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+        [input.key, input.name, input.group, input.description, status],
       );
       const id = Number(insert.insertId);
       await writeAuditLog({
@@ -209,7 +221,7 @@ router.post(
           permission_name: input.name,
           permission_group: input.group,
           permission_description: input.description,
-          permission_status: 1,
+          permission_status: status,
         },
         httpStatus: 201,
       });
@@ -280,6 +292,7 @@ router.put(
         permission_description: input.description,
       };
 
+      await ensureGroup(connection, input.group);
       await connection.query(
         `UPDATE admin_permission
          SET permission_name = ?, permission_group = ?, permission_description = ?, updated = NOW()

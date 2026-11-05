@@ -2,41 +2,441 @@
   [gridClass]="'col-sm-12'"
   [title]="'admin_permission.title' | translate"
 >
-  <!--==================================================
-  ==== CREATE BUTTON
-  ==================================================-->
-
-  <div
-    button
-    class="d-flex flex-wrap gap-2"
-    *hasPermission="'admin_permission.create'"
-  >
-    <a
-      [routerLink]="['/admin-permission/create']"
-      class="align-items-center btn btn-theme"
+  <div class="permission-board-bar">
+    <div class="permission-board-search">
+      <i class="ri-search-line" aria-hidden="true"></i>
+      <input
+        id="search_permission"
+        type="search"
+        class="form-control"
+        [placeholder]="'admin_permission.search_permission' | translate"
+        [value]="searchPermission()"
+        (input)="onSearchPermission($any($event.target).value)"
+      />
+    </div>
+    <button
+      type="button"
+      class="btn permission-board-refresh"
+      [disabled]="loading()"
+      [title]="'admin_permission.reload' | translate"
+      [attr.aria-label]="'admin_permission.reload' | translate"
+      (click)="load()"
     >
-      <i class="ri-add-line"></i>
-
-      {{ 'admin_permission.add' | translate }}
-    </a>
+      <i class="ri-refresh-line" aria-hidden="true"></i>
+    </button>
   </div>
 
-  <!--==================================================
-  ==== TABLE
-  ==================================================-->
+  <div class="permission-board">
+    <!-- Groups -->
+    <aside class="permission-board-groups">
+      <h6>
+        {{ 'admin_permission.groups' | translate }}
+        <app-help-tip section="grup-hak-akses" />
+      </h6>
+      <div class="permission-board-search">
+        <i class="ri-search-line" aria-hidden="true"></i>
+        <input
+          id="search_group"
+          type="search"
+          class="form-control"
+          [placeholder]="'admin_permission.search_group' | translate"
+          [value]="searchGroup()"
+          (input)="onSearchGroup($any($event.target).value)"
+        />
+      </div>
 
-  <app-table
-    [tableConfig]="tableConfig"
-    [hasCheckbox]="false"
-    [externalPermissions]="(authPermissions$ | async) ?? []"
-    [externalAllAccess]="(isAllAccess$ | async) ?? false"
-    (tableChanged)="onTableChange($event)"
-    (action)="onActionClicked($event)"
-  />
+      <div
+        class="permission-board-group-form"
+        *hasPermission="
+          ['admin_permission.create', 'admin_permission.update'];
+          mode: 'any'
+        "
+      >
+        <label class="form-label" for="group_name">
+          {{ 'admin_permission.group_name' | translate }}
+        </label>
+        <input
+          id="group_name"
+          class="form-control"
+          maxlength="100"
+          [formControl]="groupName"
+          [class.is-invalid]="groupName.touched && groupName.invalid"
+          (keydown.enter)="$event.preventDefault(); saveGroup()"
+          (keydown.escape)="cancelGroup()"
+        />
+        <div class="permission-board-group-actions">
+          @if (editingGroup()) {
+            <button
+              type="button"
+              class="btn btn-outline"
+              (click)="cancelGroup()"
+            >
+              {{ 'admin_permission.cancel' | translate }}
+            </button>
+          }
+          <button
+            type="button"
+            id="group_save"
+            class="btn btn-theme"
+            [disabled]="saving()"
+            (click)="saveGroup()"
+          >
+            {{
+              (editingGroup()
+                ? 'admin_permission.save'
+                : 'admin_permission.add_group'
+              ) | translate
+            }}
+          </button>
+        </div>
+      </div>
+
+      <div class="permission-board-group-list" data-testid="permission-groups">
+        @for (group of visible(); track group.name) {
+          <div
+            class="permission-board-group"
+            [class.active]="active()?.name === group.name"
+            data-testid="permission-group"
+          >
+            <button
+              type="button"
+              class="permission-board-group-open"
+              (click)="selectGroup(group)"
+            >
+              <span appTextFit>{{ group.name }}</span>
+            </button>
+            @if (group.id_admin_permission_group) {
+              <ng-container *hasPermission="'admin_permission.update'">
+                <button
+                  type="button"
+                  class="permission-board-icon"
+                  [attr.aria-label]="'admin_permission.edit_group' | translate"
+                  data-testid="group-edit"
+                  (click)="editGroup(group, $event)"
+                >
+                  <i class="ri-pencil-line" aria-hidden="true"></i>
+                </button>
+              </ng-container>
+              @if (group.permissions.length === 0) {
+                <ng-container *hasPermission="'admin_permission.delete'">
+                  <button
+                    type="button"
+                    class="permission-board-icon permission-board-danger"
+                    [attr.aria-label]="
+                      'admin_permission.delete_group' | translate
+                    "
+                    data-testid="group-delete"
+                    (click)="askDeleteGroup(group, $event)"
+                  >
+                    <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                  </button>
+                </ng-container>
+              }
+            }
+            <span class="permission-board-count" data-testid="group-count">{{
+              group.shown.length
+            }}</span>
+          </div>
+        } @empty {
+          @if (!loading()) {
+            <p class="permission-board-empty">
+              {{ 'admin_permission.no_groups' | translate }}
+            </p>
+          }
+        }
+      </div>
+    </aside>
+
+    <!-- Permissions of the chosen group -->
+    <section class="permission-board-main">
+      @if (active(); as group) {
+        <h6 data-testid="permission-active-group">{{ group.name }}</h6>
+
+        <ng-template #permissionForm>
+          <form
+            class="permission-board-form"
+            [formGroup]="form"
+            data-testid="permission-form"
+            (ngSubmit)="submit()"
+          >
+            <p class="permission-board-form-title">
+              @if (editing(); as item) {
+                {{
+                  'admin_permission.edit_in_group'
+                    | translate: { name: item.permission_name }
+                }}
+              } @else {
+                {{
+                  'admin_permission.add_in_group'
+                    | translate: { group: group.name }
+                }}
+              }
+            </p>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label" for="permission_name">
+                  {{ 'admin_permission.permission_name' | translate }}
+                  <span>*</span>
+                  <app-help-tip section="formulir-hak-akses--nama-hak-akses" />
+                </label>
+                <input
+                  id="permission_name"
+                  class="form-control"
+                  formControlName="name"
+                  [placeholder]="
+                    'admin_permission.permission_name_placeholder' | translate
+                  "
+                  [class.is-invalid]="
+                    form.controls.name.touched && form.controls.name.invalid
+                  "
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="permission_action">
+                  {{ 'admin_permission.permission_key' | translate }}
+                  <span>*</span>
+                  <app-help-tip section="formulir-hak-akses--kunci-hak-akses" />
+                </label>
+                <div class="input-group flex-nowrap">
+                  @if (prefixes().length > 1 && !editing()) {
+                    <select
+                      id="permission_prefix"
+                      class="form-select permission-board-prefix"
+                      formControlName="prefix"
+                      [attr.aria-label]="
+                        'admin_permission.key_start' | translate
+                      "
+                    >
+                      @for (prefix of prefixes(); track prefix) {
+                        <option [value]="prefix">{{ prefix }}.</option>
+                      }
+                    </select>
+                  } @else {
+                    <span class="input-group-text" data-testid="key-prefix">
+                      {{ form.controls.prefix.value }}.
+                    </span>
+                  }
+                  <input
+                    id="permission_action"
+                    class="form-control"
+                    formControlName="action"
+                    [class.is-invalid]="
+                      (form.controls.action.touched &&
+                        form.controls.action.invalid) ||
+                      actionTaken
+                    "
+                  />
+                </div>
+                @if (actionTaken) {
+                  <div class="form-kit-error" data-testid="key-taken">
+                    {{ 'admin_permission.key_taken' | translate }}
+                  </div>
+                } @else if (!editing() && existingActions().length) {
+                  <div class="form-kit-note" data-testid="key-existing">
+                    {{ 'admin_permission.key_existing' | translate }}:
+                    {{ existingActions().join(', ') }}
+                  </div>
+                } @else if (editing()) {
+                  <div class="form-kit-note">
+                    {{
+                      'admin_permission.permission_key_immutable' | translate
+                    }}
+                  </div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="permission_description">
+                  {{ 'admin_permission.description' | translate }}
+                  <app-help-tip section="formulir-hak-akses--deskripsi" />
+                </label>
+                <input
+                  id="permission_description"
+                  class="form-control"
+                  formControlName="description"
+                  [placeholder]="'admin_permission.optional' | translate"
+                />
+              </div>
+              <div class="col-md-3 col-6">
+                <label class="form-label" for="permission_active">
+                  {{ 'admin_permission.status' | translate }}
+                  <app-help-tip section="formulir-hak-akses--status" />
+                </label>
+                <div class="form-check form-switch permission-board-switch">
+                  <input
+                    id="permission_active"
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="active"
+                  />
+                  <span>{{
+                    (form.controls.active.value
+                      ? 'admin_permission.active'
+                      : 'admin_permission.inactive'
+                    ) | translate
+                  }}</span>
+                </div>
+              </div>
+              <div class="col-md-3 col-6 permission-board-submit">
+                @if (editing()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    data-testid="permission-cancel"
+                    (click)="cancelEdit()"
+                  >
+                    {{ 'admin_permission.cancel' | translate }}
+                  </button>
+                }
+                <button
+                  type="submit"
+                  class="btn btn-theme"
+                  data-testid="permission-submit"
+                  [disabled]="saving()"
+                >
+                  {{
+                    (editing()
+                      ? 'admin_permission.save'
+                      : 'admin_permission.add_short'
+                    ) | translate
+                  }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </ng-template>
+
+        @if (editing()) {
+          <ng-container *hasPermission="'admin_permission.update'">
+            <ng-container [ngTemplateOutlet]="permissionForm" />
+          </ng-container>
+        } @else {
+          <ng-container *hasPermission="'admin_permission.create'">
+            <ng-container [ngTemplateOutlet]="permissionForm" />
+          </ng-container>
+        }
+
+        <ng-container *hasPermission="'admin_permission.delete'">
+          @if (selectable().length) {
+            <div class="permission-board-select-bar">
+              <label class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  data-testid="permission-select-all"
+                  [checked]="allSelected()"
+                  (change)="toggleAll()"
+                />
+                {{ 'admin_permission.select_all' | translate }}
+              </label>
+              <span data-testid="permission-selected">{{
+                'admin_permission.selected_of'
+                  | translate
+                    : { count: selected().size, total: selectable().length }
+              }}</span>
+              @if (selected().size) {
+                <button
+                  type="button"
+                  class="btn btn-outline permission-board-danger"
+                  data-testid="permission-delete-selected"
+                  (click)="askDeleteSelected()"
+                >
+                  {{ 'admin_permission.delete_selected' | translate }}
+                </button>
+              }
+            </div>
+          }
+        </ng-container>
+
+        <ul class="permission-board-list">
+          @for (item of group.shown; track item.id_admin_permission) {
+            <li
+              data-testid="permission-row"
+              [class.editing]="
+                editing()?.id_admin_permission === item.id_admin_permission
+              "
+            >
+              <div class="permission-board-check">
+                @if (isDeletable(item)) {
+                  <ng-container *hasPermission="'admin_permission.delete'">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [attr.aria-label]="item.permission_name"
+                      [checked]="selected().has(item.id_admin_permission)"
+                      (change)="toggleSelected(item.id_admin_permission)"
+                    />
+                  </ng-container>
+                }
+              </div>
+              <div class="permission-board-text">
+                <strong>{{ item.permission_name }}</strong>
+                <span
+                  class="permission-board-status"
+                  [class.inactive]="item.permission_status !== 1"
+                  data-testid="permission-status"
+                >
+                  {{
+                    (item.permission_status === 1
+                      ? 'admin_permission.active'
+                      : 'admin_permission.inactive'
+                    ) | translate
+                  }}
+                </span>
+                <span class="permission-board-key">{{
+                  item.permission_key
+                }}</span>
+                @if (item.permission_description) {
+                  <small>{{ item.permission_description }}</small>
+                }
+              </div>
+              <div
+                class="permission-board-usage"
+                data-testid="permission-usage"
+              >
+                {{ 'admin_permission.profile_count' | translate }}:
+                {{ item.access_count }}
+              </div>
+              <div class="permission-board-row-actions">
+                <ng-container *hasPermission="'admin_permission.update'">
+                  <button
+                    type="button"
+                    class="permission-board-icon"
+                    [attr.aria-label]="'admin_permission.edit' | translate"
+                    data-testid="permission-edit"
+                    (click)="edit(item)"
+                  >
+                    <i class="ri-pencil-line" aria-hidden="true"></i>
+                  </button>
+                </ng-container>
+                @if (isDeletable(item)) {
+                  <ng-container *hasPermission="'admin_permission.delete'">
+                    <button
+                      type="button"
+                      class="permission-board-icon permission-board-danger"
+                      [attr.aria-label]="'admin_permission.delete' | translate"
+                      data-testid="permission-delete"
+                      (click)="askDelete(item)"
+                    >
+                      <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                    </button>
+                  </ng-container>
+                }
+              </div>
+            </li>
+          } @empty {
+            <li class="permission-board-empty">
+              {{ 'admin_permission.no_permissions' | translate }}
+            </li>
+          }
+        </ul>
+      } @else if (!loading()) {
+        <p class="permission-board-empty">
+          {{ 'admin_permission.no_match' | translate }}
+        </p>
+      }
+    </section>
+  </div>
 </app-page-wrapper>
-
-<!--==================================================
-==== CONFIRMATION
-==================================================-->
 
 <app-confirmation-modal #confirmationModal (confirmed)="onConfirmed($event)" />

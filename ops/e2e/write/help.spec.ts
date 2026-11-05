@@ -188,7 +188,7 @@ test('every "?" on lists and forms points at an anchor in its guide', async ({ p
   for (const path of [
     '/admin-account/create',
     '/admin-access/create',
-    '/admin-permission/create',
+    '/admin-permission',
     '/chair/create',
     '/office/create',
     '/product',

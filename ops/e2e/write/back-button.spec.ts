@@ -124,7 +124,6 @@ test('every form page has the button, pointing at its list', async ({ page }) =>
   for (const list of [
     'admin-account',
     'admin-access',
-    'admin-permission',
     'chair',
     'office',
     'blog',

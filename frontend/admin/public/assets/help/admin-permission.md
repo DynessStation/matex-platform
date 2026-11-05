@@ -14,63 +14,45 @@ Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/admin-permission
 
-## Daftar Hak Akses
+## Grup Hak Akses
 
-Kotak **Cari** mencari di kunci, nama, grup, dan deskripsi. Deskripsi izin tidak tampil di tabel; buka Edit untuk membacanya.
+Panel kiri berisi grup; angka di sampingnya jumlah hak akses di grup itu. Klik grup untuk melihat hak aksesnya di panel kanan. Grup menentukan pengelompokan izin di formulir Profil Akses.
 
-### Kunci hak akses
-
-Kode unik izin dengan pola modul.aksi, misalnya admin_access.create. Kode inilah yang diperiksa server.
-
-### Grup
-
-Kelompok modul izin, misalnya Catalog atau Website Content. Grup menentukan pengelompokan izin di formulir Profil Akses.
-
-### Profil akses
-
-Jumlah profil akses (aktif maupun nonaktif) yang memakai izin ini. Periksa angka ini sebelum menonaktifkan atau menghapus izin.
-
-### Status
-
-Izin Nonaktif dianggap tidak dimiliki semua profil: fitur yang dilindunginya langsung ditolak bagi semua akun selain Akses Sistem Penuh.
+Isi **Nama Grup Hak Akses** lalu **Tambah dan Simpan** untuk grup baru. Ikon pensil mengganti nama grup, dan nama itu ikut berganti di semua hak aksesnya. Grup yang sudah kosong bisa dihapus lewat ikon tempat sampah. Hak akses tanpa grup tampil di "Other".
 
 ## Formulir Hak Akses
 
-Formulir dibuka dari tombol **+ Tambah Hak Akses** atau menu aksi **Edit**.
-
-### Kunci hak akses
-
-Kode izin dengan pola modul.aksi: hanya huruf kecil, angka, dan garis bawah, minimal dua bagian dipisah titik, paling banyak 100 karakter (contoh: product.view, web_navigation.publish).
-
-Kunci harus unik dan tidak bisa diubah setelah disimpan; bila salah, buat izin baru lalu nonaktifkan yang lama.
+Formulir ada di atas daftar hak akses dan berlaku untuk grup yang sedang dibuka. Ikon pensil pada baris hak akses membuka baris itu di formulir yang sama.
 
 ### Nama hak akses
 
-Nama yang mudah dipahami untuk izin ini, wajib, misalnya "Buat produk". Nama inilah yang tampil di formulir Profil Akses.
+Nama yang mudah dipahami, wajib, misalnya "Buat produk". Nama inilah yang tampil di formulir Profil Akses.
 
-### Grup
+### Kunci hak akses
 
-Nama kelompok modul, opsional, teks bebas paling banyak 100 karakter. Tulis persis sama dengan grup yang sudah ada (misalnya Catalog) agar tidak terbentuk grup ganda; bila kosong, izin masuk grup "Other".
+Kode yang diperiksa server. Bagian awalnya mengikuti grup (misalnya product.), sisanya diketik: huruf kecil, angka, dan garis bawah (misalnya create). Di bawah isian ada daftar kunci yang sudah ada.
+
+Kunci harus unik dan tidak bisa diubah setelah disimpan; bila salah, buat hak akses baru lalu nonaktifkan yang lama.
 
 ### Deskripsi
 
-Penjelasan singkat apa yang diizinkan, opsional. Tampil di bawah nama izin pada formulir Profil Akses sehingga membantu admin memilih izin yang tepat.
+Penjelasan singkat apa yang diizinkan, opsional. Tampil di bawah nama izin pada formulir Profil Akses.
 
-## Mengubah Status dan Menghapus
+### Status
 
-Tindakan ini ada di menu tiga titik pada baris izin.
+Hak akses baru dimulai Tidak Aktif. Tidak Aktif berarti izin dianggap tidak dimiliki semua profil: fitur yang dilindunginya langsung ditolak bagi semua akun selain Akses Sistem Penuh. Mengaktifkan mengembalikannya.
 
-### Edit
+## Daftar dan Pencarian
 
-Mengubah nama, grup, atau deskripsi. Kolom kunci terkunci.
+Kotak **Cari hak akses** di kanan atas mencari di kunci, nama, dan deskripsi semua grup; grup tanpa hasil disembunyikan dan angka grup menjadi jumlah hasil. Kotak **Cari grup** menyaring daftar grup.
 
-### Nonaktifkan dan aktifkan
+Pencarian, grup yang dibuka, dan hak akses yang diedit tersimpan di alamat halaman (misalnya ?searchgroup=office&searchpermission=creat), jadi tampilannya bisa dibagikan.
 
-Nonaktifkan langsung mencabut izin dari semua profil yang memakainya (kecuali akun Akses Sistem Penuh); Aktifkan mengembalikannya. Sistem meminta konfirmasi.
+**Jumlah Profil** adalah jumlah profil akses yang memakai izin ini. Periksa angka ini sebelum menonaktifkan.
 
-### Hapus
+## Menghapus
 
-Menghapus izin dari daftar; tidak bisa dibatalkan dari panel. Hanya untuk izin Nonaktif yang sudah tidak terpasang di profil mana pun ("Hak akses admin masih digunakan oleh satu atau beberapa profil akses").
+Hanya hak akses Tidak Aktif dengan Jumlah Profil 0 yang bisa dihapus: baris seperti itu punya kotak centang dan ikon tempat sampah. **Pilih semua** lalu **Hapus yang dipilih** menghapus beberapa sekaligus. Tidak bisa dibatalkan dari panel.
 
 ## Aturan Penting
 

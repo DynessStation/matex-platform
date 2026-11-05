@@ -12,6 +12,12 @@ Data diperbarui otomatis setiap 30 detik di latar belakang tanpa tanda memuat. U
 
 URL: https://internal.matexindo.com/dashboard
 
+## Tab
+
+Tab **Website** berisi semua yang dijelaskan di panduan ini. Titik merah di tab itu muncul bila ada pesan hari ini atau artikel yang perlu ditinjau. Tab **Inventaris**, **CRM & CLV**, dan **Finance** bertanda SOON: fiturnya masih dalam pengembangan.
+
+Tab yang dibuka tersimpan di alamat halaman (misalnya ?tab=finance), jadi tetap sama saat halaman dimuat ulang.
+
 ## Rentang Waktu dan Tombol
 
 Tombol di kanan atas mengatur periode data dan memuat ulang halaman.

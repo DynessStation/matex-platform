@@ -1,363 +1,378 @@
 <section class="matex-dashboard">
   <div class="container-fluid">
-    <header class="dashboard-heading">
-      <div>
-        <span class="dashboard-kicker">Ringkasan MATEX</span>
-        <h1>
-          Dasbor operasional
-          <app-help-tip page="dashboard" />
-        </h1>
-        <p>
-          Trafik publik, minat pengunjung, dan kesiapan konten dalam satu
-          tampilan.
-        </p>
-      </div>
-      @if (canView()) {
-        <div class="dashboard-actions" aria-label="Rentang data dashboard">
-          @for (days of rangeOptions; track days) {
-            <button
-              type="button"
-              class="range-button"
-              [class.active]="selectedDays() === days"
-              [disabled]="loading()"
-              (click)="selectRange(days)"
-            >
-              {{ days }} hari
-            </button>
-          }
-          <app-refresh-button
-            key="dashboard"
-            [cooldownSeconds]="120"
-            [loading]="loading()"
-            (refresh)="load()"
-          />
-          <app-help-tip page="dashboard" section="rentang-waktu-dan-tombol" />
-          <a class="analytics-link" routerLink="/public-analytics">
-            Analitik lengkap
-            <i class="ri-arrow-right-line" aria-hidden="true"></i>
-          </a>
-        </div>
-      }
-    </header>
-
-    @if (!canView()) {
-      <div
-        class="dashboard-message dashboard-message-info"
-        id="dashboard_no_access"
-        role="status"
-      >
-        <i class="ri-information-line" aria-hidden="true"></i>
+    <app-page-tabs [tabs]="tabs()" />
+    @if (activeTab() !== 'website') {
+      <app-coming-soon />
+    } @else {
+      <header class="dashboard-heading">
         <div>
-          <strong>Selamat datang di MATEX Internal</strong>
-          <span>
-            Ringkasan kunjungan website hanya untuk akun dengan izin Dasbor.
-            Buka halaman kerja Anda lewat menu di samping.
-          </span>
+          <span class="dashboard-kicker">Ringkasan MATEX</span>
+          <h1>
+            Dasbor operasional
+            <app-help-tip page="dashboard" />
+          </h1>
+          <p>
+            Trafik publik, minat pengunjung, dan kesiapan konten dalam satu
+            tampilan.
+          </p>
         </div>
-      </div>
-    }
+        @if (canView()) {
+          <div class="dashboard-actions" aria-label="Rentang data dashboard">
+            @for (days of rangeOptions; track days) {
+              <button
+                type="button"
+                class="range-button"
+                [class.active]="selectedDays() === days"
+                [disabled]="loading()"
+                (click)="selectRange(days)"
+              >
+                {{ days }} hari
+              </button>
+            }
+            <app-refresh-button
+              key="dashboard"
+              [cooldownSeconds]="120"
+              [loading]="loading()"
+              (refresh)="load()"
+            />
+            <app-help-tip page="dashboard" section="rentang-waktu-dan-tombol" />
+            <a class="analytics-link" routerLink="/public-analytics">
+              Analitik lengkap
+              <i class="ri-arrow-right-line" aria-hidden="true"></i>
+            </a>
+          </div>
+        }
+      </header>
 
-    @if (error()) {
-      <div class="dashboard-message dashboard-message-error" role="alert">
-        <i class="ri-error-warning-line" aria-hidden="true"></i>
-        <div>
-          <strong>Data belum termuat</strong>
-          <span>{{ error() }}</span>
-        </div>
-        <button type="button" (click)="load()">Coba lagi</button>
-      </div>
-    } @else if (loading() && !overview()) {
-      <div class="dashboard-loading" role="status" aria-live="polite">
-        <span class="dashboard-spinner" aria-hidden="true"></span>
-        <div>
-          <strong>Menyiapkan ringkasan MATEX</strong>
-          <span>Mengambil trafik dan status konten terbaru.</span>
-        </div>
-      </div>
-    }
-
-    @if (overview(); as data) {
-      @if (!data.collection_enabled) {
-        <div class="dashboard-message dashboard-message-info">
+      @if (!canView()) {
+        <div
+          class="dashboard-message dashboard-message-info"
+          id="dashboard_no_access"
+          role="status"
+        >
           <i class="ri-information-line" aria-hidden="true"></i>
           <div>
-            <strong>Pencatatan pengunjung belum diaktifkan</strong>
+            <strong>Selamat datang di MATEX Internal</strong>
             <span>
-              Tampilan sudah siap, tetapi event publik masih dimatikan sampai
-              pengaturan privasi produksi selesai.
+              Ringkasan kunjungan website hanya untuk akun dengan izin Dasbor.
+              Buka halaman kerja Anda lewat menu di samping.
             </span>
           </div>
         </div>
       }
 
-      <div class="metric-grid">
-        <article class="metric-card metric-card-live">
-          <div class="metric-icon">
-            <i class="ri-pulse-line" aria-hidden="true"></i>
-          </div>
+      @if (error()) {
+        <div class="dashboard-message dashboard-message-error" role="alert">
+          <i class="ri-error-warning-line" aria-hidden="true"></i>
           <div>
-            <span>
-              Aktif sekarang
-              <app-help-tip
-                page="dashboard"
-                section="kartu-ringkasan--aktif-sekarang"
-              />
-            </span>
-            <strong>{{ data.totals.active_visitors | number: '1.0-0' }}</strong>
-            <small>Terlihat dalam 5 menit terakhir</small>
+            <strong>Data belum termuat</strong>
+            <span>{{ error() }}</span>
           </div>
-        </article>
-        <article class="metric-card metric-card-primary">
-          <div class="metric-icon">
-            <i class="ri-user-3-line" aria-hidden="true"></i>
-          </div>
+          <button type="button" (click)="load()">Coba lagi</button>
+        </div>
+      } @else if (loading() && !overview()) {
+        <div class="dashboard-loading" role="status" aria-live="polite">
+          <span class="dashboard-spinner" aria-hidden="true"></span>
           <div>
-            <span>
-              Pengunjung
-              <app-help-tip
-                page="dashboard"
-                section="kartu-ringkasan--pengunjung"
-              />
-            </span>
-            <strong>{{ data.totals.visitors | number: '1.0-0' }}</strong>
-            <small>Sesi anonim pada rentang terpilih</small>
+            <strong>Menyiapkan ringkasan MATEX</strong>
+            <span>Mengambil trafik dan status konten terbaru.</span>
           </div>
-        </article>
-        <article class="metric-card">
-          <div class="metric-icon">
-            <i class="ri-eye-line" aria-hidden="true"></i>
-          </div>
-          <div>
-            <span>
-              Page view
-              <app-help-tip
-                page="dashboard"
-                section="kartu-ringkasan--page-view"
-              />
-            </span>
-            <strong>{{ data.totals.page_views | number: '1.0-0' }}</strong>
-            <small>Total halaman yang dibuka</small>
-          </div>
-        </article>
-        <article class="metric-card">
-          <div class="metric-icon">
-            <i class="ri-cursor-line" aria-hidden="true"></i>
-          </div>
-          <div>
-            <span>
-              Klik keluar
-              <app-help-tip
-                page="dashboard"
-                section="kartu-ringkasan--klik-keluar"
-              />
-            </span>
-            <strong>{{ data.totals.outbound_clicks | number: '1.0-0' }}</strong>
-            <small>Marketplace dan tautan eksternal</small>
-          </div>
-        </article>
-        <article class="metric-card">
-          <div class="metric-icon">
-            <i class="ri-mail-send-line" aria-hidden="true"></i>
-          </div>
-          <div>
-            <span>
-              Pesan terkirim
-              <app-help-tip
-                page="dashboard"
-                section="kartu-ringkasan--pesan-terkirim"
-              />
-            </span>
-            <strong>{{
-              data.totals.contact_submissions | number: '1.0-0'
-            }}</strong>
-            <small>{{ contactConversion() }}% dari form yang mulai diisi</small>
-          </div>
-        </article>
-      </div>
+        </div>
+      }
 
-      <div class="dashboard-grid dashboard-grid-main">
-        <article class="dashboard-panel traffic-panel">
-          <header class="panel-heading">
+      @if (overview(); as data) {
+        @if (!data.collection_enabled) {
+          <div class="dashboard-message dashboard-message-info">
+            <i class="ri-information-line" aria-hidden="true"></i>
             <div>
-              <span>Trafik publik</span>
-              <h2>
-                Pengunjung dan page view
+              <strong>Pencatatan pengunjung belum diaktifkan</strong>
+              <span>
+                Tampilan sudah siap, tetapi event publik masih dimatikan sampai
+                pengaturan privasi produksi selesai.
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="metric-grid">
+          <article class="metric-card metric-card-live">
+            <div class="metric-icon">
+              <i class="ri-pulse-line" aria-hidden="true"></i>
+            </div>
+            <div>
+              <span>
+                Aktif sekarang
                 <app-help-tip
                   page="dashboard"
-                  section="grafik-pengunjung-dan-page-view"
+                  section="kartu-ringkasan--aktif-sekarang"
                 />
-              </h2>
+              </span>
+              <strong>{{
+                data.totals.active_visitors | number: '1.0-0'
+              }}</strong>
+              <small>Terlihat dalam 5 menit terakhir</small>
             </div>
-            <div class="chart-legend">
-              <span><i class="legend-page"></i> Page view</span>
-              <span><i class="legend-visitor"></i> Pengunjung</span>
+          </article>
+          <article class="metric-card metric-card-primary">
+            <div class="metric-icon">
+              <i class="ri-user-3-line" aria-hidden="true"></i>
             </div>
-          </header>
-          <div
-            class="traffic-chart"
-            role="img"
-            [attr.aria-label]="'Grafik trafik ' + data.range.days + ' hari'"
-          >
-            @for (point of chartPoints(); track trackDate($index, point)) {
-              <div
-                class="chart-column"
-                [title]="point.label + ': ' + point.page_views + ' page view'"
+            <div>
+              <span>
+                Pengunjung
+                <app-help-tip
+                  page="dashboard"
+                  section="kartu-ringkasan--pengunjung"
+                />
+              </span>
+              <strong>{{ data.totals.visitors | number: '1.0-0' }}</strong>
+              <small>Sesi anonim pada rentang terpilih</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">
+              <i class="ri-eye-line" aria-hidden="true"></i>
+            </div>
+            <div>
+              <span>
+                Page view
+                <app-help-tip
+                  page="dashboard"
+                  section="kartu-ringkasan--page-view"
+                />
+              </span>
+              <strong>{{ data.totals.page_views | number: '1.0-0' }}</strong>
+              <small>Total halaman yang dibuka</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">
+              <i class="ri-cursor-line" aria-hidden="true"></i>
+            </div>
+            <div>
+              <span>
+                Klik keluar
+                <app-help-tip
+                  page="dashboard"
+                  section="kartu-ringkasan--klik-keluar"
+                />
+              </span>
+              <strong>{{
+                data.totals.outbound_clicks | number: '1.0-0'
+              }}</strong>
+              <small>Marketplace dan tautan eksternal</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">
+              <i class="ri-mail-send-line" aria-hidden="true"></i>
+            </div>
+            <div>
+              <span>
+                Pesan terkirim
+                <app-help-tip
+                  page="dashboard"
+                  section="kartu-ringkasan--pesan-terkirim"
+                />
+              </span>
+              <strong>{{
+                data.totals.contact_submissions | number: '1.0-0'
+              }}</strong>
+              <small
+                >{{ contactConversion() }}% dari form yang mulai diisi</small
               >
-                <div class="chart-bars">
-                  <span
-                    class="chart-bar page-view"
-                    [style.height.%]="point.pageViewHeight"
-                  ></span>
-                  <span
-                    class="chart-bar visitor"
-                    [style.height.%]="point.visitorHeight"
-                  ></span>
-                </div>
-                <small>{{ point.label }}</small>
+            </div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid dashboard-grid-main">
+          <article class="dashboard-panel traffic-panel">
+            <header class="panel-heading">
+              <div>
+                <span>Trafik publik</span>
+                <h2>
+                  Pengunjung dan page view
+                  <app-help-tip
+                    page="dashboard"
+                    section="grafik-pengunjung-dan-page-view"
+                  />
+                </h2>
               </div>
-            }
-          </div>
-          <footer class="panel-footer">
-            <span>Otomatis diperbarui setiap 30 detik</span>
-            <span>
-              Terakhir masuk:
-              {{
-                data.updated_at
-                  ? (data.updated_at | date: 'dd MMM yyyy, HH:mm')
-                  : 'belum ada event'
-              }}
-            </span>
-          </footer>
-        </article>
-
-        <article class="dashboard-panel content-panel">
-          <header class="panel-heading">
-            <div>
-              <span>Kesiapan konten</span>
-              <h2>
-                Yang perlu diperhatikan
-                <app-help-tip page="dashboard" section="kesiapan-konten" />
-              </h2>
-            </div>
-          </header>
-          <div class="content-summary-list">
-            <a routerLink="/product" class="content-summary-row">
-              <span class="summary-icon"><i class="ri-box-3-line"></i></span>
-              <span>
-                <strong>Produk</strong>
-                <small
-                  >{{ data.content.products_published }} terbit ·
-                  {{ data.content.products_draft }} draft</small
+              <div class="chart-legend">
+                <span><i class="legend-page"></i> Page view</span>
+                <span><i class="legend-visitor"></i> Pengunjung</span>
+              </div>
+            </header>
+            <div
+              class="traffic-chart"
+              role="img"
+              [attr.aria-label]="'Grafik trafik ' + data.range.days + ' hari'"
+            >
+              @for (point of chartPoints(); track trackDate($index, point)) {
+                <div
+                  class="chart-column"
+                  [title]="point.label + ': ' + point.page_views + ' page view'"
                 >
-              </span>
-              <b>{{ data.content.products_total }}</b>
-            </a>
-            <a routerLink="/blog" class="content-summary-row">
-              <span class="summary-icon"><i class="ri-article-line"></i></span>
-              <span>
-                <strong>Artikel</strong>
-                <small
-                  >{{ data.content.articles_published }} terbit ·
-                  {{ data.content.articles_pending }} perlu ditinjau</small
-                >
-              </span>
-              <b>{{ data.content.articles_total }}</b>
-            </a>
-            <a routerLink="/faq" class="content-summary-row">
-              <span class="summary-icon"
-                ><i class="ri-question-answer-line"></i
-              ></span>
-              <span>
-                <strong>FAQ aktif</strong>
-                <small>Tampil untuk membantu pengunjung</small>
-              </span>
-              <b>{{ data.content.faq_active }}</b>
-            </a>
-            <a routerLink="/public-contact" class="content-summary-row">
-              <span class="summary-icon"
-                ><i class="ri-customer-service-2-line"></i
-              ></span>
-              <span>
-                <strong>Pesan hari ini</strong>
-                <small>Form kontak publik yang diterima</small>
-              </span>
-              <b>{{ data.content.inquiries_today }}</b>
-            </a>
-          </div>
-        </article>
-      </div>
-
-      <div class="dashboard-grid dashboard-grid-tables">
-        <article class="dashboard-panel">
-          <header class="panel-heading">
-            <div>
-              <span>Minat pengunjung</span>
-              <h2>
-                Halaman teratas
-                <app-help-tip page="dashboard" section="halaman-teratas" />
-              </h2>
-            </div>
-          </header>
-          @if (data.top_pages.length) {
-            <div class="table-responsive">
-              <table class="table dashboard-table">
-                <thead>
-                  <tr>
-                    <th>Halaman</th>
-                    <th>Pengunjung</th>
-                    <th>View</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (page of data.top_pages; track page.path) {
-                    <tr>
-                      <td>
-                        <span appTextFit class="path-label">{{
-                          page.path
-                        }}</span>
-                      </td>
-                      <td>{{ page.visitors | number: '1.0-0' }}</td>
-                      <td>{{ page.page_views | number: '1.0-0' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          } @else {
-            <div class="panel-empty">
-              <i class="ri-line-chart-line"></i
-              ><span>Belum ada trafik pada rentang ini.</span>
-            </div>
-          }
-        </article>
-
-        <article class="dashboard-panel">
-          <header class="panel-heading">
-            <div>
-              <span>Akuisisi</span>
-              <h2>
-                Sumber trafik
-                <app-help-tip page="dashboard" section="sumber-trafik" />
-              </h2>
-            </div>
-          </header>
-          @if (data.sources.length) {
-            <div class="source-list">
-              @for (source of data.sources; track source.source) {
-                <div class="source-row">
-                  <span><i class="ri-global-line"></i>{{ source.source }}</span>
-                  <strong>{{ source.page_views | number: '1.0-0' }}</strong>
+                  <div class="chart-bars">
+                    <span
+                      class="chart-bar page-view"
+                      [style.height.%]="point.pageViewHeight"
+                    ></span>
+                    <span
+                      class="chart-bar visitor"
+                      [style.height.%]="point.visitorHeight"
+                    ></span>
+                  </div>
+                  <small>{{ point.label }}</small>
                 </div>
               }
             </div>
-          } @else {
-            <div class="panel-empty">
-              <i class="ri-compass-3-line"></i>
-              <span>Sumber trafik akan tampil setelah pencatatan aktif.</span>
+            <footer class="panel-footer">
+              <span>Otomatis diperbarui setiap 30 detik</span>
+              <span>
+                Terakhir masuk:
+                {{
+                  data.updated_at
+                    ? (data.updated_at | date: 'dd MMM yyyy, HH:mm')
+                    : 'belum ada event'
+                }}
+              </span>
+            </footer>
+          </article>
+
+          <article class="dashboard-panel content-panel">
+            <header class="panel-heading">
+              <div>
+                <span>Kesiapan konten</span>
+                <h2>
+                  Yang perlu diperhatikan
+                  <app-help-tip page="dashboard" section="kesiapan-konten" />
+                </h2>
+              </div>
+            </header>
+            <div class="content-summary-list">
+              <a routerLink="/product" class="content-summary-row">
+                <span class="summary-icon"><i class="ri-box-3-line"></i></span>
+                <span>
+                  <strong>Produk</strong>
+                  <small
+                    >{{ data.content.products_published }} terbit ·
+                    {{ data.content.products_draft }} draft</small
+                  >
+                </span>
+                <b>{{ data.content.products_total }}</b>
+              </a>
+              <a routerLink="/blog" class="content-summary-row">
+                <span class="summary-icon"
+                  ><i class="ri-article-line"></i
+                ></span>
+                <span>
+                  <strong>Artikel</strong>
+                  <small
+                    >{{ data.content.articles_published }} terbit ·
+                    {{ data.content.articles_pending }} perlu ditinjau</small
+                  >
+                </span>
+                <b>{{ data.content.articles_total }}</b>
+              </a>
+              <a routerLink="/faq" class="content-summary-row">
+                <span class="summary-icon"
+                  ><i class="ri-question-answer-line"></i
+                ></span>
+                <span>
+                  <strong>FAQ aktif</strong>
+                  <small>Tampil untuk membantu pengunjung</small>
+                </span>
+                <b>{{ data.content.faq_active }}</b>
+              </a>
+              <a routerLink="/public-contact" class="content-summary-row">
+                <span class="summary-icon"
+                  ><i class="ri-customer-service-2-line"></i
+                ></span>
+                <span>
+                  <strong>Pesan hari ini</strong>
+                  <small>Form kontak publik yang diterima</small>
+                </span>
+                <b>{{ data.content.inquiries_today }}</b>
+              </a>
             </div>
-          }
-        </article>
-      </div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid dashboard-grid-tables">
+          <article class="dashboard-panel">
+            <header class="panel-heading">
+              <div>
+                <span>Minat pengunjung</span>
+                <h2>
+                  Halaman teratas
+                  <app-help-tip page="dashboard" section="halaman-teratas" />
+                </h2>
+              </div>
+            </header>
+            @if (data.top_pages.length) {
+              <div class="table-responsive">
+                <table class="table dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Halaman</th>
+                      <th>Pengunjung</th>
+                      <th>View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (page of data.top_pages; track page.path) {
+                      <tr>
+                        <td>
+                          <span appTextFit class="path-label">{{
+                            page.path
+                          }}</span>
+                        </td>
+                        <td>{{ page.visitors | number: '1.0-0' }}</td>
+                        <td>{{ page.page_views | number: '1.0-0' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <div class="panel-empty">
+                <i class="ri-line-chart-line"></i
+                ><span>Belum ada trafik pada rentang ini.</span>
+              </div>
+            }
+          </article>
+
+          <article class="dashboard-panel">
+            <header class="panel-heading">
+              <div>
+                <span>Akuisisi</span>
+                <h2>
+                  Sumber trafik
+                  <app-help-tip page="dashboard" section="sumber-trafik" />
+                </h2>
+              </div>
+            </header>
+            @if (data.sources.length) {
+              <div class="source-list">
+                @for (source of data.sources; track source.source) {
+                  <div class="source-row">
+                    <span
+                      ><i class="ri-global-line"></i>{{ source.source }}</span
+                    >
+                    <strong>{{ source.page_views | number: '1.0-0' }}</strong>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="panel-empty">
+                <i class="ri-compass-3-line"></i>
+                <span>Sumber trafik akan tampil setelah pencatatan aktif.</span>
+              </div>
+            }
+          </article>
+        </div>
+      }
     }
   </div>
 </section>

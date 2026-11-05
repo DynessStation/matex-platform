@@ -33,6 +33,8 @@ const idAdminAccess = new SafeHashids('key_adminAccess123', 8);
 
 const idAdminPermission = new SafeHashids('key_adminPermission123', 8);
 
+const idAdminPermissionGroup = new SafeHashids('key_adminPermissionGroup123', 8);
+
 const idAuditLog = new SafeHashids('key_auditLog123', 8);
 
 const idWebNavigation = new SafeHashids('key_webNavigation123', 8);
@@ -60,6 +62,7 @@ export default {
   idChair,
   idAdminAccess,
   idAdminPermission,
+  idAdminPermissionGroup,
   idAuditLog,
   idWebNavigation,
   idWebNavigationItem,
