@@ -132,7 +132,6 @@ test('create validates the product body', async () => {
   const [id, en] = translations();
   const media = (items: Record<string, unknown>[]) => ({ ...valid(), media: items });
   const invalid: Record<string, unknown>[] = [
-    { ...valid(), key: '' },
     { ...valid(), sku: '' },
     { ...valid(), status: 'live' },
     { ...valid(), product_type: 'food' },

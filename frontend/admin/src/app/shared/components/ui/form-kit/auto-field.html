@@ -1,0 +1,56 @@
+<div class="input-group auto-field" [class.auto-field-editing]="editing()">
+  @if (prefix()) {
+    <span class="input-group-text auto-field-prefix">{{ prefix() }}</span>
+  }
+  @if (editing()) {
+    <input
+      class="form-control"
+      [id]="fieldId()"
+      [formControl]="control()"
+      [class.is-invalid]="invalid()"
+      [placeholder]="autoValue()"
+      (keydown.enter)="$event.preventDefault(); close()"
+      (keydown.escape)="cancel()"
+    />
+    @if (hasAuto()) {
+      <button
+        type="button"
+        class="btn auto-field-button"
+        [title]="'form_kit.use_auto' | translate"
+        [attr.aria-label]="'form_kit.use_auto' | translate"
+        data-testid="auto-field-reset"
+        (click)="reset()"
+      >
+        <i class="ri-refresh-line" aria-hidden="true"></i>
+      </button>
+    }
+    <button
+      type="button"
+      class="btn auto-field-button auto-field-confirm"
+      [title]="'form_kit.confirm' | translate"
+      [attr.aria-label]="'form_kit.confirm' | translate"
+      data-testid="auto-field-confirm"
+      (click)="close()"
+    >
+      <i class="ri-check-line" aria-hidden="true"></i>
+    </button>
+  } @else {
+    <input
+      class="form-control auto-field-value"
+      [id]="fieldId()"
+      [value]="shown()"
+      [class.is-invalid]="invalid()"
+      readonly
+    />
+    <button
+      type="button"
+      class="btn auto-field-button"
+      [title]="'form_kit.customize' | translate"
+      [attr.aria-label]="'form_kit.customize' | translate"
+      data-testid="auto-field-edit"
+      (click)="open()"
+    >
+      <i class="ri-pencil-line" aria-hidden="true"></i>
+    </button>
+  }
+</div>

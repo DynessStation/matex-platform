@@ -13,6 +13,8 @@ Status: **disetujui pemilik 6 November 2026, sedang dikerjakan.** Termasuk defau
 
 ## Tahap 0: Komponen bersama
 
+**Selesai 6 November (lokal).** Contohnya di `/ui-kit` (hanya build non-production), test `form-kit.spec.ts` dan `slug-redirect-api.spec.ts`. Komponen belum terpasang di halaman: dipasang mulai Tahap 1. G-2 baru punya aturan per form saat formnya dikerjakan.
+
 | ID | Isi | Dipakai di |
 | --- | --- | --- |
 | G-1 | Kerangka form: judul data tampil di atas tab pada tab mana pun, `(<!> Tanpa Judul)` kalau kosong, tooltip kalau panjang; tombol simpan di bawah daftar tab beserta pesan "Periksa kembali" | Artikel, Produk, Kategori (menyesuaikan tab atas) |

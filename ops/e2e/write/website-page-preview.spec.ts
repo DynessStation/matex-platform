@@ -31,10 +31,13 @@ const VIEWPORTS: Array<[string, string]> = [
 
 async function login(page: Page): Promise<void> {
   await page.goto(`${stack.adminOrigin}/auth/login`);
-  await page.locator('#identity').fill(admin.identity);
-  await page.locator('#password').fill(admin.password);
-  await page.locator('#login_btn').click();
-  await page.waitForURL(/\/dashboard(?:[/?#]|$)/);
+  // Retries the form: on a busy machine hydration can clear a field typed too early.
+  await expect(async () => {
+    await page.locator('#identity').fill(admin.identity);
+    await page.locator('#password').fill(admin.password);
+    await page.locator('#login_btn').click();
+    await page.waitForURL(/\/dashboard(?:[/?#]|$)/, { timeout: 10_000 });
+  }).toPass({ timeout: 60_000 });
 }
 
 async function openPreview(page: Page, key: string): Promise<void> {

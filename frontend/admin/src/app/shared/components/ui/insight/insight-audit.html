@@ -1,0 +1,52 @@
+<div class="insight-audit" data-testid="insight-audit">
+  <div class="insight-audit-total">
+    <span appTextFit>{{ totalLabel() }}</span>
+    <strong data-testid="insight-total">{{ sum() }}</strong>
+  </div>
+  <div class="insight-audit-bar" role="img" [attr.aria-label]="totalLabel()">
+    @for (item of segments(); track item.label) {
+      @if (item.value > 0) {
+        <span
+          [class]="'insight-tone-' + item.tone"
+          [style.width.%]="percent(item.value)"
+          [ngbTooltip]="item.label + ' ' + item.value"
+        >
+          @if (percent(item.value) >= 8) {
+            {{ percent(item.value) }}%
+          }
+        </span>
+      }
+    }
+  </div>
+  <div class="insight-audit-legend">
+    @for (item of segments(); track item.label) {
+      <span>
+        <i [class]="'insight-tone-' + item.tone" aria-hidden="true"></i>
+        {{ item.label }} <strong>{{ item.value }}</strong>
+      </span>
+    }
+  </div>
+  <ul class="insight-audit-checks">
+    @for (check of checks(); track check.text) {
+      <li
+        [class]="'insight-check-' + check.state"
+        [attr.data-state]="check.state"
+      >
+        <i
+          [class]="
+            check.state === 'ok'
+              ? 'ri-checkbox-circle-line'
+              : 'ri-error-warning-line'
+          "
+          aria-hidden="true"
+        ></i>
+        <span appTextFit>{{ check.text }}</span>
+        @if (check.link) {
+          <a [routerLink]="check.link" [queryParams]="check.queryParams">
+            {{ check.actionLabel || ('form_kit.fix' | translate) }}
+          </a>
+        }
+      </li>
+    }
+  </ul>
+</div>

@@ -1,0 +1,253 @@
+<div class="inline-table-wrap">
+  <table class="inline-table" data-testid="inline-table">
+    <thead>
+      <tr>
+        <th class="inline-table-no">{{ 'form_kit.table_no' | translate }}</th>
+        @for (column of columns(); track column.key) {
+          <th [style.width]="column.width">{{ column.label | translate }}</th>
+        }
+        @if (orderable()) {
+          <th class="inline-table-order" colspan="2">
+            {{ 'form_kit.table_order' | translate }}
+          </th>
+        }
+        <th class="inline-table-action">
+          @if (canAdd()) {
+            <button
+              type="button"
+              class="inline-table-add"
+              [disabled]="editingIndex() !== null"
+              [title]="'form_kit.table_add' | translate"
+              [attr.aria-label]="'form_kit.table_add' | translate"
+              data-testid="inline-add"
+              (click)="add()"
+            >
+              <i class="ri-add-line" aria-hidden="true"></i>
+            </button>
+          }
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of shown(); track $index; let index = $index, last = $last) {
+        @let editing = isEditing(index);
+        @let row = rowOf(item, index);
+        <tr [class.inline-table-editing]="editing" data-testid="inline-row">
+          <td class="inline-table-no">
+            @if (editing && (isNew() || canRemove()(row))) {
+              <button
+                type="button"
+                class="inline-table-icon inline-table-remove"
+                [disabled]="busy()"
+                [title]="'form_kit.table_remove' | translate"
+                [attr.aria-label]="'form_kit.table_remove' | translate"
+                data-testid="inline-remove"
+                (click)="remove(index)"
+              >
+                <i class="ri-delete-bin-line" aria-hidden="true"></i>
+              </button>
+            } @else {
+              {{ index + 1 }}
+            }
+          </td>
+          @for (column of columns(); track column.key) {
+            <td [attr.data-column]="column.key">
+              @if (editing && column.type === 'select') {
+                <div
+                  ngbDropdown
+                  container="body"
+                  class="inline-table-select"
+                  [class.is-invalid]="errors()[column.key]"
+                >
+                  <button
+                    type="button"
+                    ngbDropdownToggle
+                    class="inline-table-toggle"
+                  >
+                    <ng-container
+                      [ngTemplateOutlet]="optionView"
+                      [ngTemplateOutletContext]="{
+                        $implicit: option(row, column),
+                      }"
+                    />
+                  </button>
+                  <div ngbDropdownMenu class="inline-table-menu">
+                    @for (choice of column.options; track choice.value) {
+                      <button
+                        type="button"
+                        ngbDropdownItem
+                        [class.active]="choice.value === row[column.key]"
+                        (click)="setValue(column.key, choice.value)"
+                      >
+                        <ng-container
+                          [ngTemplateOutlet]="optionView"
+                          [ngTemplateOutletContext]="{ $implicit: choice }"
+                        />
+                      </button>
+                    }
+                  </div>
+                </div>
+              } @else if (editing && column.type !== 'computed') {
+                <input
+                  class="form-control"
+                  [class.is-invalid]="errors()[column.key]"
+                  [ngModel]="value(row, column)"
+                  [ngModelOptions]="{ standalone: true }"
+                  [placeholder]="column.placeholder ?? ''"
+                  (ngModelChange)="setValue(column.key, $event)"
+                  (keydown.enter)="$event.preventDefault(); save()"
+                  (keydown.escape)="cancel()"
+                />
+              } @else if (column.type === 'select') {
+                <ng-container
+                  [ngTemplateOutlet]="optionView"
+                  [ngTemplateOutletContext]="{ $implicit: option(row, column) }"
+                />
+              } @else if (column.link && text(row, column)) {
+                <a
+                  class="inline-table-link"
+                  [href]="text(row, column)"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <span appTextFit>{{ text(row, column) }}</span>
+                  <i class="ri-external-link-line" aria-hidden="true"></i>
+                </a>
+              } @else {
+                <span class="inline-table-text" appTextFit>{{
+                  text(row, column)
+                }}</span>
+              }
+              @if (errors()[column.key]) {
+                <div class="form-kit-error">
+                  {{ errors()[column.key] | translate }}
+                </div>
+              }
+            </td>
+          }
+          @if (orderable()) {
+            <td class="inline-table-order">
+              <button
+                type="button"
+                class="inline-table-icon"
+                [disabled]="index === 0 || editingIndex() !== null"
+                [attr.aria-label]="'form_kit.table_up' | translate"
+                data-testid="inline-up"
+                (click)="move(index, -1)"
+              >
+                <i class="ri-arrow-up-line" aria-hidden="true"></i>
+              </button>
+            </td>
+            <td class="inline-table-order">
+              <button
+                type="button"
+                class="inline-table-icon"
+                [disabled]="last || editingIndex() !== null"
+                [attr.aria-label]="'form_kit.table_down' | translate"
+                data-testid="inline-down"
+                (click)="move(index, 1)"
+              >
+                <i class="ri-arrow-down-line" aria-hidden="true"></i>
+              </button>
+            </td>
+          }
+          <td class="inline-table-action">
+            @if (editing) {
+              <button
+                type="button"
+                class="inline-table-icon inline-table-save"
+                [disabled]="busy()"
+                [title]="'form_kit.confirm' | translate"
+                [attr.aria-label]="'form_kit.confirm' | translate"
+                data-testid="inline-save"
+                (click)="save()"
+              >
+                <i class="ri-check-line" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                class="inline-table-icon"
+                [disabled]="busy()"
+                [title]="'form_kit.cancel' | translate"
+                [attr.aria-label]="'form_kit.cancel' | translate"
+                data-testid="inline-cancel"
+                (click)="cancel()"
+              >
+                <i class="ri-close-line" aria-hidden="true"></i>
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="inline-table-icon inline-table-edit"
+                [disabled]="editingIndex() !== null"
+                [title]="'form_kit.table_edit' | translate"
+                [attr.aria-label]="'form_kit.table_edit' | translate"
+                data-testid="inline-edit"
+                (click)="edit(index)"
+              >
+                <i class="ri-pencil-line" aria-hidden="true"></i>
+              </button>
+            }
+          </td>
+        </tr>
+        @if (detail(); as template) {
+          <tr class="inline-table-detail" data-testid="inline-detail">
+            <td class="inline-table-no">
+              @if (!editing) {
+                <button
+                  type="button"
+                  class="inline-table-icon"
+                  [attr.aria-expanded]="!isFolded(index)"
+                  [attr.aria-label]="'form_kit.table_fold' | translate"
+                  data-testid="inline-fold"
+                  (click)="toggleFold(index)"
+                >
+                  <i
+                    [class]="
+                      isFolded(index)
+                        ? 'ri-arrow-right-s-fill'
+                        : 'ri-arrow-down-s-fill'
+                    "
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              }
+            </td>
+            <td [attr.colspan]="detailSpan()">
+              <ng-container
+                [ngTemplateOutlet]="template"
+                [ngTemplateOutletContext]="detailContext(row, index)"
+              />
+            </td>
+            <td></td>
+          </tr>
+        }
+      } @empty {
+        <tr>
+          <td
+            class="inline-table-empty"
+            [attr.colspan]="detailSpan() + 2"
+            data-testid="inline-empty"
+          >
+            {{ emptyKey() | translate }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<ng-template #optionView let-option>
+  @if (option) {
+    <span [class]="optionClass(option)">
+      @if (option.icon) {
+        <i [class]="option.icon" aria-hidden="true"></i>
+      }
+      {{ option.label | translate }}
+    </span>
+  } @else {
+    <span class="inline-table-option text-muted">{{
+      'form_kit.table_choose' | translate
+    }}</span>
+  }
+</ng-template>

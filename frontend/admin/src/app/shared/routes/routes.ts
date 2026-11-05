@@ -2,7 +2,20 @@ import { Routes } from '@angular/router';
 
 import { AuthGuard } from 'src/app/core/guard/auth.guard';
 
+import { environment } from '../../../environments/environment';
+
 export const content: Routes = [
+  // Sample page of the shared parts: never in a production build.
+  ...(environment.production
+    ? []
+    : [
+        {
+          path: 'ui-kit',
+          canActivate: [AuthGuard],
+          loadComponent: () =>
+            import('../../components/ui-kit/ui-kit').then((m) => m.UiKit),
+        },
+      ]),
   {
     path: 'dashboard',
     canActivate: [AuthGuard],

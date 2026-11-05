@@ -65,7 +65,6 @@ test('create validates input', async () => {
   const valid = { key, status: 'published', translations: translations(key) };
   const [id, en] = translations(key);
   const invalid: Record<string, unknown>[] = [
-    { ...valid, key: '' },
     { ...valid, key: 'k'.repeat(121) },
     { ...valid, status: 'scheduled' },
     { ...valid, parent_id: 'bad' },

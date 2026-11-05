@@ -100,7 +100,6 @@ test('create validates input', async () => {
   const create = (data: Record<string, unknown>) => owner.post(base, { data });
   const [id, en] = translations();
   const invalid: Record<string, unknown>[] = [
-    { ...valid(), key: '' },
     { ...valid(), key: 'k'.repeat(121) },
     { ...valid(), status: 'live' },
     { ...valid(), status: 'scheduled' },

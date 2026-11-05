@@ -205,6 +205,15 @@ Pola yang sudah punya komponen wajib memakainya, tidak dibuat ulang per halaman:
 
 Ditambah di 6D (lihat `rencana-ui-admin.md`): kotak bantuan "?" dan drawer panduan, tombol perbarui berjeda, tombol kembali, dan pratinjau gambar (lightbox).
 
+Komponen bersama V1.2 (`shared/components/ui`, contohnya bisa dilihat di `/ui-kit` pada build non-production):
+
+- `form-kit`: `app-form-heading` (nama data di atas tab), `app-tab-status` + `tabState()` (titik status tab), `app-form-submit` (tombol simpan di bawah tab), `app-title-slug` (judul dan alamat), `app-auto-field` (nilai otomatis dengan pensil, juga untuk canonical).
+- `inline-table`: tabel yang diedit di barisnya; halaman menyimpan lewat `saveRow` dan menjawab dengan `done()`.
+- `insight`: `app-insight-toggle`, `app-insight-panel`, `app-insight-column`, `app-insight-rank`, `app-insight-audit`.
+- `coming-soon`: tampilan bagian yang belum dibangun.
+
+Alamat dan kunci di backend: `helper/slug-redirect.helper.ts` (slug lama menjawab 301, `recordSlugChanges` dipanggil sebelum menyimpan terjemahan) dan `helper/auto-key.helper.ts` (kunci kosong dibuat dari slug Indonesia). Gaya bersama ada di `src/styles/_form-kit.scss`.
+
 ### 4.5 Ukuran
 
 - Komponen (TypeScript) paling banyak sekitar 800 baris, template sekitar 600 baris. Form besar dipecah per tab atau per bagian menjadi komponen anak.

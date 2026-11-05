@@ -1,0 +1,48 @@
+<div class="row g-3 title-slug">
+  <div class="col-md-6">
+    <label class="form-label" [attr.for]="fieldPrefix() + 'title'">
+      {{ titleLabelKey() | translate }} <span>*</span>
+      @if (titleHelp()) {
+        <app-help-tip [section]="titleHelp()" />
+      }
+    </label>
+    <input
+      class="form-control"
+      [id]="fieldPrefix() + 'title'"
+      [formControl]="titleControl()"
+      [class.is-invalid]="titleControl().touched && titleControl().invalid"
+      (input)="onTitleInput()"
+    />
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" [attr.for]="fieldPrefix() + 'slug'">
+      {{ slugLabelKey() | translate }} <span>*</span>
+      @if (slugHelp()) {
+        <app-help-tip [section]="slugHelp()" />
+      }
+    </label>
+    <app-auto-field
+      [control]="slugControl()"
+      [fieldId]="fieldPrefix() + 'slug'"
+      [prefix]="prefix()"
+      [invalid]="slugInvalid"
+      [normalize]="slugify"
+      (opened)="onSlugOpened()"
+      (closed)="onSlugClosed($event)"
+    />
+    @if (slugControl().errors?.['duplicate']) {
+      <div class="form-kit-error" data-testid="slug-duplicate">
+        {{ 'form_kit.slug_taken' | translate }}
+      </div>
+    } @else if (moved()) {
+      <div class="form-kit-note" data-testid="slug-moved">
+        {{ 'form_kit.slug_moved' | translate }}
+      </div>
+    }
+    @if (internalKey()) {
+      <div class="form-kit-note" data-testid="internal-key">
+        {{ 'form_kit.internal_key' | translate }}: {{ internalKey() }}
+      </div>
+    }
+  </div>
+</div>

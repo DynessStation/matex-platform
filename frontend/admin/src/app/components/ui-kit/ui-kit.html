@@ -1,0 +1,137 @@
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">Contoh komponen V1.2 (hanya non-production)</h5>
+        <app-insight-toggle storageKey="ui-kit" [(open)]="insightOpen" />
+      </div>
+
+      @if (insightOpen()) {
+        <app-insight-panel>
+          <app-insight-column headingKey="form_kit.sample_top">
+            <app-insight-rank [items]="rankItems" />
+          </app-insight-column>
+          <app-insight-column headingKey="form_kit.sample_empty">
+            <app-insight-rank [items]="[]" />
+          </app-insight-column>
+          <app-insight-column
+            headingKey="form_kit.sample_audit"
+            [showRange]="false"
+          >
+            <app-insight-audit
+              totalLabel="Total Artikel"
+              [segments]="segments"
+              [checks]="checks"
+            />
+          </app-insight-column>
+        </app-insight-panel>
+      }
+
+      <form
+        class="theme-form theme-form-2 mega-form"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+      >
+        <div class="row g-4 mb-4">
+          <div class="col-lg-3">
+            <app-form-heading [title]="form.controls.title.value" />
+            <div class="d-flex align-items-center">
+              Tab contoh
+              <app-tab-status [state]="mainState()" />
+            </div>
+            <app-form-submit [issue]="tried() && form.invalid" />
+          </div>
+          <div class="col-lg-9">
+            <app-title-slug
+              fieldPrefix="new_"
+              prefix="/artikel/"
+              entity="article"
+              [titleControl]="form.controls.title"
+              [slugControl]="form.controls.slug"
+            />
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="form-label" for="excerpt">Ringkasan</label>
+                <input
+                  id="excerpt"
+                  class="form-control"
+                  formControlName="excerpt"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="canonical">Canonical</label>
+                <app-auto-field
+                  fieldId="canonical"
+                  autoValue="https://matexindo.com/artikel/alamat-otomatis"
+                  [control]="form.controls.canonical"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div
+        class="theme-form theme-form-2 mega-form mb-4"
+        data-testid="saved-form"
+      >
+        <app-title-slug
+          fieldPrefix="saved_"
+          prefix="/artikel/"
+          internalKey="judul-tersimpan"
+          [follow]="false"
+          [titleControl]="savedForm.controls.title"
+          [slugControl]="savedForm.controls.slug"
+        />
+      </div>
+
+      <div class="form-check mb-2">
+        <input
+          id="fail-next"
+          class="form-check-input"
+          type="checkbox"
+          [checked]="failNext()"
+          (change)="failNext.set(!failNext())"
+        />
+        <label class="form-check-label" for="fail-next">
+          Simpan berikutnya gagal
+        </label>
+      </div>
+
+      <app-inline-table
+        [columns]="columns"
+        [(rows)]="rows"
+        [blank]="blank"
+        [orderable]="true"
+        [canRemove]="canRemove"
+        [canAdd]="rows().length < 5"
+        (saveRow)="onSave($event)"
+        (removeRow)="onRemove($event)"
+      >
+        <ng-template
+          #rowDetail
+          let-row
+          let-editing="editing"
+          let-folded="folded"
+          let-set="set"
+        >
+          @if (editing) {
+            <input
+              class="form-control"
+              aria-label="Keterangan"
+              data-testid="detail-input"
+              [value]="row['note'] ?? ''"
+              (input)="set('note', $any($event.target).value)"
+            />
+          } @else if (folded) {
+            <span data-testid="detail-summary">Keterangan terlipat</span>
+          } @else {
+            <span data-testid="detail-open">{{ row['note'] || '-' }}</span>
+          }
+        </ng-template>
+      </app-inline-table>
+
+      <app-coming-soon />
+    </div>
+  </div>
+</div>

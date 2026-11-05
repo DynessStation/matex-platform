@@ -63,10 +63,7 @@ test.afterAll(async () => {
 });
 
 test('a key left out comes from the Indonesian slug, numbered when taken', async () => {
-  const first = await create(
-    '/api/v1/articles',
-    articleBody(slug('kunci'), `${slug('kunci')}-en`),
-  );
+  const first = await create('/api/v1/articles', articleBody(slug('kunci'), `${slug('kunci')}-en`));
   expect((await detail('/api/v1/articles', first)).key).toBe(slug('kunci'));
 
   // The same key is taken already, so this one gets a number.
@@ -188,10 +185,7 @@ test('a changed category and product slug move too', async () => {
 });
 
 test('a live page wins over a redirect with the same slug', async () => {
-  const first = await create(
-    '/api/v1/articles',
-    articleBody(slug('rebut'), `${slug('rebut')}-en`),
-  );
+  const first = await create('/api/v1/articles', articleBody(slug('rebut'), `${slug('rebut')}-en`));
   await owner.put(`/api/v1/articles/${first}`, {
     data: articleBody(slug('rebut-pindah'), `${slug('rebut')}-en`),
   });

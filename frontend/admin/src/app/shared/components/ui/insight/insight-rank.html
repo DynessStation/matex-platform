@@ -1,0 +1,46 @@
+<ul class="insight-rank" data-testid="insight-rank">
+  @if (loading()) {
+    @for (line of [1, 2, 3]; track line) {
+      <li class="insight-rank-loading placeholder-glow">
+        <span class="placeholder col-12"></span>
+      </li>
+    }
+  } @else {
+    @for (item of items(); track $index) {
+      <li>
+        @if (item.image) {
+          <img class="insight-rank-picture" [src]="item.image" alt="" />
+        } @else {
+          <span class="insight-rank-icon">
+            <i [class]="item.icon || 'ri-image-line'" aria-hidden="true"></i>
+          </span>
+        }
+        <div class="insight-rank-body">
+          <div class="insight-rank-title" appTextFit>{{ item.title }}</div>
+          @if (item.sub) {
+            <div class="insight-rank-sub" appTextFit>{{ item.sub }}</div>
+          }
+        </div>
+        <div class="insight-rank-value">
+          {{ item.value }}
+          @if (item.valueLabel) {
+            <span>{{ item.valueLabel }}</span>
+          }
+        </div>
+        @if (item.href) {
+          <a
+            class="insight-rank-open"
+            [href]="item.href"
+            target="_blank"
+            rel="noopener"
+            [attr.aria-label]="'form_kit.open_new_tab' | translate"
+          >
+            <i class="ri-external-link-line" aria-hidden="true"></i>
+          </a>
+        }
+      </li>
+    } @empty {
+      <li class="insight-rank-empty">{{ emptyKey() | translate }}</li>
+    }
+  }
+</ul>

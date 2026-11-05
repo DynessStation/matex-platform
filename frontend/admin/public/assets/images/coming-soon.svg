@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-hidden="true">
+  <!-- Blocks being stacked: MATEX's own drawing for "still being built". -->
+  <ellipse cx="160" cy="214" rx="130" ry="16" fill="#9aa6b5" fill-opacity="0.25"/>
+  <path d="M60 150l50-26 50 26-50 26z" fill="#ffc166"/>
+  <path d="M60 150v38l50 26v-38z" fill="#ff9f1a"/>
+  <path d="M160 150v38l-50 26v-38z" fill="#e88a00"/>
+  <path d="M160 150l50-26 50 26-50 26z" fill="#d5dbe3"/>
+  <path d="M160 150v38l50 26v-38z" fill="#9aa6b5"/>
+  <path d="M260 150v38l-50 26v-38z" fill="#7d8a9a"/>
+  <path d="M110 98l50-26 50 26-50 26z" fill="#3e5569"/>
+  <path d="M110 98v38l50 26v-38z" fill="#1f2f3f"/>
+  <path d="M210 98v38l-50 26v-38z" fill="#16222e"/>
+  <path d="M250 24v96" stroke="#7d8a9a" stroke-width="4"/>
+  <path d="M250 28h-74" stroke="#7d8a9a" stroke-width="4"/>
+  <path d="M182 28v18" stroke="#7d8a9a" stroke-width="2"/>
+  <path d="M182 46l16 8-16 8-16-8z" fill="#ffc166"/>
+  <path d="M166 54v12l16 8V62z" fill="#ff9f1a"/>
+  <path d="M198 54v12l-16 8V62z" fill="#e88a00"/>
+  <path d="M240 120h20l6 8h-32z" fill="#7d8a9a"/>
+</svg>
