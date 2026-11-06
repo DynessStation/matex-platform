@@ -15,6 +15,63 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.2.11A',
+    date: '6 November 2026',
+    summary:
+      'Menu Email baru di admin, form yang lebih ringkas, dan panel ringkasan di halaman Artikel, Produk, Kategori, dan Kontak.',
+    sections: [
+      {
+        title: 'Email',
+        items: [
+          'Menu Email: baca, cari, balas, teruskan, dan tulis email langsung dari admin. Emailnya tetap tersimpan di Hostinger.',
+          'Membuka pesan menandainya sudah dibaca, dan ini juga terlihat di webmail. Tombol "Tandai belum dibaca" mengembalikannya.',
+          'Gambar dari luar diblokir sampai "Tampilkan gambar" ditekan. Lampiran selalu terunduh, jadi periksa dulu sebelum membuka file dari pengirim yang tidak dikenal.',
+          'Yang belum bisa: mengirim email dengan lampiran, dan menghapus permanen dari admin.',
+          'Akses diatur dengan tiga izin di Hak Akses: Lihat Email, Kirim Email, dan Kelola Email.',
+        ],
+      },
+      {
+        title: 'Dasbor dan Hak Akses',
+        items: [
+          'Dasbor punya tab. Isi yang lama ada di tab Website; Inventaris, CRM & CLV, dan Finance menyusul.',
+          'Hak Akses sekarang satu halaman: grup di kiri, hak akses grup itu di kanan, tanpa pindah halaman untuk menambah atau mengubah.',
+        ],
+      },
+      {
+        title: 'Artikel',
+        items: [
+          'Tab Umum dihapus. Unggulan dan Sematkan pindah ke tab Publikasi, dan kunci internal terisi otomatis.',
+          'Artikel bisa diberi Tag, dan tiap tag punya halaman sendiri di website. "Kelola Tag" untuk menambah dan mengganti nama.',
+          'Isian Penulis untuk nama yang tampil di artikel.',
+          'Panel ringkasan: artikel teratas, tag teratas, dan daftar yang perlu dibenahi. Pembaca website juga bisa membagikan artikel lewat WhatsApp, Facebook, X, atau salin tautan.',
+        ],
+      },
+      {
+        title: 'Pengaturan Kontak',
+        items: [
+          'Sosial Media punya tabel sendiri, paling banyak 3 akun per platform, dengan pengikut dan jumlah konten yang boleh diisi manual. Tautan sosial media di header website sekarang mengikuti data ini.',
+          'Kanal Kontak dan Topik Pesan jadi tabel ringkas yang disunting langsung di barisnya.',
+          'Panel ringkasan: klik per akun dan kanal, serta jumlah pesan di mailbox yang dibaca, dibalas, dan belum dibaca.',
+        ],
+      },
+      {
+        title: 'Produk dan Kategori',
+        items: [
+          'Form lebih ringkas: nama di atas tab, Simpan di bawah, dan tiap tab menunjukkan statusnya.',
+          'Spesifikasi, harga Rupiah dan Dollar, serta kanal marketplace jadi tabel ringkas. Baris yang masih terbuka perlu diselesaikan sebelum Simpan.',
+          'Panel ringkasan: produk paling dilihat, klik per marketplace, dan daftar yang perlu dibenahi.',
+        ],
+      },
+      {
+        title: 'Website dan alamat halaman',
+        items: [
+          'Slug artikel, produk, atau kategori yang diganti tetap membawa pengunjung ke alamat barunya, jadi tautan lama tidak mati.',
+          'Kunci internal dibuat otomatis oleh sistem.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.1.10',
     date: '27 Oktober 2026',
     summary:

@@ -247,8 +247,8 @@ router.get(
     const excludedId = Number(req.query.exclude_id);
     const { page, limit } = parseListQuery(req.query, { defaultLimit: 100, maxLimit: 100 });
     const preferredCurrency = currencyCode(req.query.currency);
-    // `sort` names a catalog order (a-z, z-a, low-high, high-low, desc); `sortBy` is its older name.
-    const sortBy = String(req.query.sort ?? req.query.sortBy ?? 'asc');
+    // `sort` names a catalog order (a-z, z-a, low-high, high-low, desc).
+    const sortBy = String(req.query.sort ?? 'asc');
     const needsCategoryJoin = categories.length > 0 || categoryIds.length > 0;
     const categoryJoin = needsCategoryJoin
       ? ` JOIN product_catalog_category pc_filter ON pc_filter.id_product=p.id_product JOIN product_category_i18n ci_filter ON ci_filter.id_product_category=pc_filter.id_product_category AND ci_filter.product_category_locale=i.product_locale`

@@ -298,7 +298,9 @@ test('update validates like create (audit BE-006)', async () => {
 
 test('list paging and sorting', async () => {
   const first = await expectCode(
-    await owner.get(base, { params: { ord: 'office_name', srt: 'true', limit: '1', page: '1' } }),
+    await owner.get(base, {
+      params: { sort: 'office_name', direction: 'desc', limit: '1', page: '1' },
+    }),
     200,
   );
   expect(first.data).toHaveLength(1);
@@ -306,14 +308,16 @@ test('list paging and sorting', async () => {
   expect(first.data).toHaveLength(1);
   expect(first.meta.page < first.meta.total_pages).toBe(true);
   const second = await expectCode(
-    await owner.get(base, { params: { ord: 'office_name', srt: 'true', limit: '1', page: '2' } }),
+    await owner.get(base, {
+      params: { sort: 'office_name', direction: 'desc', limit: '1', page: '2' },
+    }),
     200,
   );
   expect(second.meta).toMatchObject({ page: 2, limit: 1 });
   expect(second.data[0].office_name < first.data[0].office_name).toBe(true);
   // Only known columns sort; built-in object keys such as toString fall back to the default.
-  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
-  await expectCode(await owner.get(base, { params: { ord: 'unknown', limit: '500' } }), 200).then(
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200);
+  await expectCode(await owner.get(base, { params: { sort: 'unknown', limit: '500' } }), 200).then(
     (body) => expect(body.meta).toMatchObject({ limit: 100 }),
   );
 });

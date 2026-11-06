@@ -61,7 +61,7 @@ test('list, paging, and sorting', async () => {
   expect(list.data[0]).toMatchObject({ translation_complete: expect.any(Boolean) });
 
   const sorted = await expectCode(
-    await owner.get(base, { params: { field: 'key', sort: 'desc', limit: '2', page: '1' } }),
+    await owner.get(base, { params: { sort: 'key', direction: 'desc', limit: '2', page: '1' } }),
     200,
   );
   expect(sorted.data).toHaveLength(2);
@@ -72,7 +72,7 @@ test('list, paging, and sorting', async () => {
   expect(capped.meta).toMatchObject({ limit: 100 });
   await expectCode(await owner.get(base, { params: { page: 'x', locale: 'fr-FR' } }), 200);
   // Unknown sort fields fall back to the default order (no 500).
-  await expectCode(await owner.get(base, { params: { field: 'toString' } }), 200, 'FAQ_LISTED');
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200, 'FAQ_LISTED');
 });
 
 test('create validates input and unique keys', async () => {
@@ -134,7 +134,7 @@ test('update changes the FAQ and its translations', async () => {
     404,
     'FAQ_NOT_FOUND',
   );
-  const other = await expectCode(await owner.get(base, { params: { field: 'key' } }), 200);
+  const other = await expectCode(await owner.get(base, { params: { sort: 'key' } }), 200);
   const otherKey = other.data.find((item: any) => item.key !== key).key;
   await expectCode(
     await update({ key: otherKey, translations: translations() }),

@@ -101,18 +101,14 @@ test('list, paging, and sorting', async () => {
   const list = await expectCode(await owner.get(base), 200, 'PRODUCTS_LISTED');
   expect(list.meta).toMatchObject({ page: 1, limit: 15 });
   for (const params of [
-    { field: 'name', sort: 'desc', paginate: '2' },
-    { field: 'sku', page: '2' },
-    { locale: 'en-US', page: 'x', paginate: '500' },
+    { sort: 'name', direction: 'desc', limit: '2' },
+    { sort: 'sku', page: '2' },
+    { locale: 'en-US', page: 'x', limit: '500' },
   ]) {
     await expectCode(await owner.get(base, { params }), 200);
   }
   // Unknown sort fields fall back to the default order (no 500).
-  await expectCode(
-    await owner.get(base, { params: { field: 'toString' } }),
-    200,
-    'PRODUCTS_LISTED',
-  );
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200, 'PRODUCTS_LISTED');
 });
 
 test('create validates the product body', async () => {

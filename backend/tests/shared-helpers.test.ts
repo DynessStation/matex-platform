@@ -115,13 +115,10 @@ test('list query: sort and direction, with the older names for one release (A-2)
     sort: 'name',
     direction: null,
   });
-  // Older admin pages: ord/srt and field/sort=asc|desc, page size as paginate.
-  assert.deepEqual(sortOf({ ord: 'name', srt: 'true' }), { sort: 'name', direction: 'DESC' });
-  assert.deepEqual(sortOf({ ord: 'name', srt: 'false' }), { sort: 'name', direction: 'ASC' });
-  assert.deepEqual(sortOf({ field: 'name', sort: 'desc' }), { sort: 'name', direction: 'DESC' });
-  assert.deepEqual(sortOf({ sort: 'asc' }), { sort: '', direction: 'ASC' });
-  assert.equal(parseListQuery({ paginate: '25' }).limit, 25);
-  assert.equal(parseListQuery({ paginate: '25', limit: '10' }).limit, 10);
+  // The names from before A-2 are gone.
+  assert.deepEqual(sortOf({ ord: 'name', srt: 'true' }), { sort: '', direction: null });
+  assert.deepEqual(sortOf({ field: 'name' }), { sort: '', direction: null });
+  assert.equal(parseListQuery({ paginate: '25' }).limit, 15);
 });
 
 test('list meta', () => {

@@ -47,12 +47,12 @@ test('list, paging, and sorting', async () => {
   expect(list.meta).toMatchObject({ page: 1, limit: 15 });
 
   const sorted = await expectCode(
-    await owner.get(base, { params: { ord: 'chair_name', srt: 'desc', limit: '1' } }),
+    await owner.get(base, { params: { sort: 'chair_name', direction: 'desc', limit: '1' } }),
     200,
   );
   expect(sorted.meta).toMatchObject({ limit: 1 });
   expect(sorted.data).toHaveLength(1);
-  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200);
   await expectCode(await owner.get(`${base}/not-a-hash`), 400, 'CHAIR_INVALID_ID');
 });
 

@@ -92,7 +92,7 @@ test('paging and sorting', async () => {
   expect(list.data[0].event_code).toBe('admin_permission.created');
 
   const oldest = await expectCode(
-    await owner.get(base, { params: { srt: 'asc', limit: '1', page: '2' } }),
+    await owner.get(base, { params: { direction: 'asc', limit: '1', page: '2' } }),
     200,
   );
   expect(oldest.meta).toMatchObject({ page: 2, limit: 1 });
@@ -100,9 +100,9 @@ test('paging and sorting', async () => {
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
   expect(capped.meta).toMatchObject({ limit: 100 });
   await expectCode(await owner.get(base, { params: { page: 'x', limit: '0' } }), 200);
-  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200);
   const byModule = await expectCode(
-    await owner.get(base, { params: { ord: 'module', srt: 'false', limit: '1' } }),
+    await owner.get(base, { params: { sort: 'module', direction: 'asc', limit: '1' } }),
     200,
   );
   expect(byModule.data).toHaveLength(1);

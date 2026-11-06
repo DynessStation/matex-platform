@@ -2,8 +2,6 @@ import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 // One list query for every list endpoint (A-2):
 //   ?page=&limit=&search=&sort=<key>&direction=asc|desc
-// Older names are still read for one release, so an admin page loaded before a deploy keeps
-// working: `paginate` for limit; `ord`/`srt` and `field`/`sort=asc|desc` for sort and direction.
 
 export interface ListQuery {
   page: number;
@@ -25,11 +23,11 @@ const positive = (value: unknown, fallback: number): number => {
 
 const text = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
-/** 'desc' or 'true' -> DESC, 'asc' or 'false' -> ASC, anything else -> null. */
+/** 'desc' -> DESC, 'asc' -> ASC, anything else -> null. */
 const directionOf = (value: unknown): 'ASC' | 'DESC' | null => {
   const normalized = text(value).toLowerCase();
-  if (normalized === 'desc' || normalized === 'true') return 'DESC';
-  if (normalized === 'asc' || normalized === 'false') return 'ASC';
+  if (normalized === 'desc') return 'DESC';
+  if (normalized === 'asc') return 'ASC';
   return null;
 };
 
@@ -38,15 +36,8 @@ export const parseListQuery = (
   { defaultLimit = 15, maxLimit = 100 }: { defaultLimit?: number; maxLimit?: number } = {},
 ): ListQuery => {
   const page = positive(query.page, 1);
-  const limit = Math.min(positive(query.limit ?? query.paginate, defaultLimit), maxLimit);
+  const limit = Math.min(positive(query.limit, defaultLimit), maxLimit);
   const search = text(query.search);
-
-  // `sort` holds a key, except in the older field/sort pair where it held the direction.
-  const sortText = text(query.sort);
-  const legacyDirection = directionOf(sortText) ? sortText : '';
-  const sort = (legacyDirection ? '' : sortText) || text(query.field) || text(query.ord);
-  const direction =
-    directionOf(query.direction) ?? directionOf(legacyDirection) ?? directionOf(query.srt);
 
   return {
     page,
@@ -54,8 +45,8 @@ export const parseListQuery = (
     offset: (page - 1) * limit,
     search,
     searchValue: `%${search}%`,
-    sort,
-    direction,
+    sort: text(query.sort),
+    direction: directionOf(query.direction),
   };
 };
 

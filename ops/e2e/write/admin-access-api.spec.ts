@@ -177,12 +177,14 @@ test('update refuses a name used by another profile; list paging and sorting', a
   );
 
   const page = await expectCode(
-    await owner.get(base, { params: { ord: 'access_name', srt: 'true', limit: '1', page: '2' } }),
+    await owner.get(base, {
+      params: { sort: 'access_name', direction: 'desc', limit: '1', page: '2' },
+    }),
     200,
   );
   expect(page.meta).toMatchObject({ page: 2, limit: 1 });
   expect(page.data).toHaveLength(1);
-  await expectCode(await owner.get(base, { params: { ord: 'toString' } }), 200);
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200);
 });
 
 test('granted permissions take effect for an account with the profile', async () => {

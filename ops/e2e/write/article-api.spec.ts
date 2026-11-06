@@ -79,8 +79,8 @@ test('list, paging, and sorting', async () => {
   const list = await expectCode(await owner.get(base), 200, 'ARTICLES_LISTED');
   expect(list.meta).toMatchObject({ page: 1, limit: 15 });
   for (const params of [
-    { field: 'title', sort: 'asc', limit: '2' },
-    { field: 'created_at', paginate: '3', page: '2' },
+    { sort: 'title', direction: 'asc', limit: '2' },
+    { sort: 'created_at', limit: '3', page: '2' },
     { locale: 'en-US', page: 'x', limit: '500' },
   ]) {
     await expectCode(await owner.get(base, { params }), 200);
@@ -88,11 +88,7 @@ test('list, paging, and sorting', async () => {
   const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
   expect(capped.meta.limit).toBe(100);
   // Unknown sort fields fall back to the default order (no 500).
-  await expectCode(
-    await owner.get(base, { params: { field: 'toString' } }),
-    200,
-    'ARTICLES_LISTED',
-  );
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200, 'ARTICLES_LISTED');
 });
 
 test('create validates input', async () => {

@@ -162,7 +162,11 @@ Yang belum pasti: fitur masih berlabel Beta di hPanel, batas rate dan batas kiri
 - Buang nama parameter list lama (`paginate`, `ord/srt`, `field/sort`, `sortBy`), sesuai catatan rilis lalu.
 - Perbarui panduan bantuan, `APP_VERSION`, `changelog.ts`, dan peta jalan.
 - Latihan migration pada salinan backup production, karena ada beberapa migration (pengalihan slug, tag dan author, sosial media, grup hak akses, event analitik).
-- Deploy API, admin, dan website sekaligus atas izin pemilik. `96fef45` ikut terbawa kalau memang belum sampai production.
+- Deploy API, admin, dan website sekaligus atas izin pemilik. `96fef45` ternyata sudah live (dicek 6 November).
+
+Hasil persiapan 6 November: nama parameter lama dibuang dari API, lalu satu putaran test penuh mencatat apakah masih ada yang mengirimnya; latihan migration lolos (catatan di `cloudpanel-production-runbook.md` bagian 6).
+
+Setelah deploy, pemilik perlu: mengisi `HOSTINGER_MAIL_API_TOKEN` di `.env` VPS, mencentang izin Email di profil akses yang bukan akses penuh, dan mengisi akun di tabel Sosial Media. Production tidak punya kanal sosial yang bisa dipindah, jadi widget sosial di header website kosong sampai tabel itu diisi.
 
 ## Ancang-ancang: Part 2 Produk, HPP, dan internal (belum dikerjakan)
 

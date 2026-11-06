@@ -73,7 +73,9 @@ test('sort and direction order a list; unknown keys fall back', async () => {
   expect([...descending].sort().reverse()).toEqual(descending);
   expect(ascending[0] < descending[0]).toBe(true);
   // The older names still work for one release.
-  expect(await names({ field: 'permission_key', sort: 'desc', paginate: '5' })).toEqual(descending);
+  expect(await names({ sort: 'permission_key', direction: 'desc', limit: '5' })).toEqual(
+    descending,
+  );
   await expectCode(
     await owner.get('/api/v1/admin-permission', { params: { sort: 'toString' } }),
     200,

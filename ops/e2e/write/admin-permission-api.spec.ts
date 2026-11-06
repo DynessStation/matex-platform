@@ -49,7 +49,7 @@ test('list, paging, and sorting', async () => {
   expect(list.meta).toMatchObject({ page: 1, limit: 15 });
 
   const sorted = await expectCode(
-    await owner.get(base, { params: { field: 'permission_key', sort: 'desc', paginate: '2' } }),
+    await owner.get(base, { params: { sort: 'permission_key', direction: 'desc', limit: '2' } }),
     200,
   );
   expect(sorted.meta).toMatchObject({ limit: 2 });
@@ -58,9 +58,9 @@ test('list, paging, and sorting', async () => {
 
   const page2 = await expectCode(await owner.get(base, { params: { limit: '3', page: '2' } }), 200);
   expect(page2.meta).toMatchObject({ page: 2, limit: 3 });
-  const capped = await expectCode(await owner.get(base, { params: { paginate: '500' } }), 200);
+  const capped = await expectCode(await owner.get(base, { params: { limit: '500' } }), 200);
   expect(capped.meta).toMatchObject({ limit: 100 });
-  await expectCode(await owner.get(base, { params: { field: 'toString' } }), 200);
+  await expectCode(await owner.get(base, { params: { sort: 'toString' } }), 200);
   await expectCode(await owner.get(base, { params: { page: 'x', limit: '-4' } }), 200);
   await expectCode(await owner.get(`${base}/not-a-hash`), 400, 'ADMIN_PERMISSION_INVALID_ID');
 });
