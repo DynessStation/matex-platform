@@ -105,7 +105,7 @@ Aturan validator:
 
 ## Tahap 1: Katalog siap berkembang
 
-**Modal Detail Produk selesai 7 November (lokal).** Kategori dan atribut fleksibel belum dikerjakan.
+**Modal Detail Produk live 7 November di `563da71`.** Kategori dan atribut fleksibel belum dikerjakan.
 
 **Kategori.** 9 kategori utama dan subkategorinya mengikuti Excel. Empat kategori yang sudah ada dipakai ulang, sehingga alamatnya tidak berubah. Yang belum punya produk berstatus draf, jadi tidak muncul di website.
 
@@ -136,7 +136,7 @@ Atribut baru cukup ditambah dari admin, dan form produk menampilkannya sendiri. 
 
 ## Tahap 2: HPP
 
-**Selesai 7 November (lokal).** Test: `pricing.test.ts`, `costing-api.spec.ts`, `costing-page.spec.ts`. File Excel asli diimpor ke database uji: 83 dari 83 item cocok dengan Excel untuk HPP, Net, dan Affiliate, dan E-commerce berbeda paling jauh pembulatan rupiah.
+**Live 7 November di `563da71`** (versi 1.2.11B, migration 032, backup `matex-20261106T184018Z`). Tabelnya masih kosong di production sampai pemilik mengimpor Excel lewat admin. Test: `pricing.test.ts`, `costing-api.spec.ts`, `costing-page.spec.ts`. File Excel asli diimpor ke database uji: 83 dari 83 item cocok dengan Excel untuk HPP, Net, dan Affiliate, dan E-commerce berbeda paling jauh pembulatan rupiah.
 
 Bedanya dari rancangan awal: tabel utama bernama `cost_item`, supaya 30 item Excel yang belum punya produk tetap bisa dihitung, lalu dihubungkan lewat SKU kalau produknya sudah dibuat. `product_cost_snapshot` belum dibuat, karena riwayat harga bahan dan versi resep sudah cukup untuk menelusuri, dan baru diperlukan saat ada grafik HPP.
 
@@ -160,7 +160,7 @@ Semua tabel berada di domain sendiri, dengan izin sendiri (`cost.view`, `cost.ma
 
 ## Tahap 3: Harga, kanal, pajak, kalkulator
 
-**Selesai 7 November (lokal).** Bedanya dari rancangan awal: tarif berlaku umum lalu per item (tanpa tingkat kategori, karena Excel menyimpannya per item), dan pajak baru berupa isian persen di kalkulator sampai legalitas perusahaan jelas. Biaya kanal bisa dibatasi per kategori di API, tetapi halamannya belum menampilkan pilihan kategori.
+**Live 7 November di `563da71`.** Bedanya dari rancangan awal: tarif berlaku umum lalu per item (tanpa tingkat kategori, karena Excel menyimpannya per item), dan pajak baru berupa isian persen di kalkulator sampai legalitas perusahaan jelas. Biaya kanal bisa dibatasi per kategori di API, tetapi halamannya belum menampilkan pilihan kategori.
 
 **Tingkat harga sebagai data.** `pricing_tier` menyimpan Net, Affiliate, Aplikasi, Grosir, dan kurs USD beserta persentasenya. Nilai berlaku bertingkat: umum → kategori → produk. Jadi 20% untuk semua, tetapi 8% untuk jok tertentu, tetap bisa.
 

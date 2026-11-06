@@ -88,7 +88,7 @@ Daftar target awal:
 
 ## Setelah itu
 
-0. **V1.2 Part 1 (versi 1.2.11A)**, dari dokumen pemilik 6 November 2026: lihat `rencana-v1.2-part1.md`. **Live 6 November 2026.** Tersisa: tombol "Cek ejaan" per artikel dan kirim email dengan lampiran; Part 2 (produk, HPP, harga, kalkulator): lihat `rencana-v1.2-part2.md`, menunggu persetujuan pemilik.
+0. **V1.2 Part 1 (versi 1.2.11A)**, dari dokumen pemilik 6 November 2026: lihat `rencana-v1.2-part1.md`. **Live 6 November 2026.** Tersisa: tombol "Cek ejaan" per artikel dan kirim email dengan lampiran; Part 2 (produk, HPP, harga, kalkulator): lihat `rencana-v1.2-part2.md`; versi 1.2.11B live 7 November di `563da71`, tersisa kategori dan atribut, forecast, serta API marketplace.
 1. **Fitur lanjutan v1**, dari roadmap bisnis (`production-v1-readiness-audit.md` dan `public-content-roadmap.md`).
 2. **v2: commerce** (keranjang, pesanan, pembayaran). Desainnya diambil dari tag `kartify-reference-v1`, logikanya ditulis baru mengikuti standar.
 3. Aplikasi mobile, dan keputusan soal semi-open-source.
