@@ -68,7 +68,7 @@ Importer akan menampilkan ini sebagai laporan, bukan memperbaikinya diam-diam.
 
 ## Tahap 0: Bug dan aturan visual
 
-**Selesai 6 November (lokal).** Test: `part2-stage0.spec.ts`. Tidak mengubah database, dan bisa live paling dulu.
+**Live 7 November di `deb357b`** (backup `matex-20261106T165521Z`, tanpa migration). Test: `part2-stage0.spec.ts`. Tidak mengubah database, dan bisa live paling dulu.
 
 Keputusan saat pengerjaan: tab Umum dan Pratinjau di Halaman Website tetap ada, karena Umum menampilkan identitas halaman tetap dan Pratinjau masih berfungsi. Yang diubah di sana: judul di atas tab, titik status, dan keterangan di bawah tombol simpan dihapus. Input waktu jadi satu baris tanpa panah naik-turun.
 
@@ -219,7 +219,7 @@ Syarat NIB untuk tiap portal belum terkonfirmasi. Pemilik menyebut NIB kemungkin
 
 ## Keamanan API publik (dikerjakan bersama Tahap 0)
 
-**Selesai 6 November (lokal).** Pemeriksaan production hanya baca: `.env`, `.git`, source map, dan daftar folder `/files/` tidak bisa diakses. API admin menolak tanpa login. Tabel penerima pesan kontak tidak ikut terkirim, dan harga grosir tersembunyi tidak ikut keluar. Yang ditemukan dan diperbaiki:
+**Live 7 November di `deb357b`.** Pemeriksaan production setelah deploy: tidak ada ID angka atau field internal di respons yang terbaca. Pemeriksaan sebelumnya, hanya baca: `.env`, `.git`, source map, dan daftar folder `/files/` tidak bisa diakses. API admin menolak tanpa login. Tabel penerima pesan kontak tidak ikut terkirim, dan harga grosir tersembunyi tidak ikut keluar. Yang ditemukan dan diperbaiki:
 
 | Temuan | Perbaikan |
 | --- | --- |
@@ -228,6 +228,8 @@ Syarat NIB untuk tiap portal belum terkonfirmasi. Pemilik menyebut NIB kemungkin
 | HS code, kode manufaktur, lead time, jumlah stok, `manage_stock`, nama file, SKU marketplace, kunci dan urutan kategori ikut terkirim | Dibuang dari respons publik |
 | Tiap halaman mengambil data dua kali: di server, lalu lagi di browser | `no-store` diganti `public, max-age=0, must-revalidate`, sehingga data halaman pertama ikut bersama HTML dan browser tidak meminta ulang. Data tetap selalu segar |
 | Halaman website belum mengirim beberapa header keamanan | `nosniff`, HSTS, dan `Permissions-Policy` ditambahkan di server SSR |
+
+**Temuan setelah deploy:** data halaman pertama sudah ikut bersama HTML, tetapi browser tetap memintanya lagi. Kunci cache di server memakai alamat internal (`127.0.0.1:9200`), sedangkan browser memakai `matexindo.com`, jadi tidak pernah cocok. Stack test tidak menangkapnya karena kedua alamatnya sama. Perbaikan: `HTTP_TRANSFER_CACHE_ORIGIN_MAP` di `app.config.server.ts`, dan stack test sekarang memakai alamat internal yang berbeda seperti production. Perbaikan ini belum live.
 
 **Yang tidak mungkin, dan perlu jujur:** permintaan browser ke API tidak bisa disembunyikan sepenuhnya. Saat pengunjung berpindah halaman, browser tetap meminta data, dan data yang tampil di layar pasti bisa dilihat pemilik browser itu. Proxy hanya mengganti alamatnya, tidak menghilangkan permintaannya, jadi tidak dipasang. Perlindungan yang nyata adalah yang di atas: mengirim seperlunya saja, batas laju permintaan (sudah ada, 600 per 15 menit per IP, dan batas khusus form kontak), serta validasi di server.
 

@@ -70,7 +70,13 @@ export const publicServer = {
   command: `${npx} ng build --configuration e2e && node dist/matex-public-e2e/server/server.mjs`,
   cwd: `${repoRoot}/frontend/public`,
   url: `${stack.publicOrigin}/`,
-  env: { ...(process.env as Record<string, string>), PORT: '4301' },
+  env: {
+    ...(process.env as Record<string, string>),
+    PORT: '4301',
+    // As in production: the server reaches the API at another address than the browser does.
+    MATEX_API_INTERNAL_URL: 'http://127.0.0.1:3100',
+    MATEX_PUBLIC_INTERNAL_URL: 'http://127.0.0.1:4301',
+  },
   reuseExistingServer,
   timeout: 300_000,
 };
