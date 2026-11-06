@@ -12,7 +12,7 @@
           </th>
         }
         <th class="inline-table-action">
-          @if (canAdd()) {
+          @if (canAdd() && !readonly()) {
             <button
               type="button"
               class="inline-table-add"
@@ -130,7 +130,9 @@
               <button
                 type="button"
                 class="inline-table-icon"
-                [disabled]="index === 0 || editingIndex() !== null"
+                [disabled]="
+                  index === 0 || editingIndex() !== null || readonly()
+                "
                 [attr.aria-label]="'form_kit.table_up' | translate"
                 data-testid="inline-up"
                 (click)="move(index, -1)"
@@ -142,7 +144,7 @@
               <button
                 type="button"
                 class="inline-table-icon"
-                [disabled]="last || editingIndex() !== null"
+                [disabled]="last || editingIndex() !== null || readonly()"
                 [attr.aria-label]="'form_kit.table_down' | translate"
                 data-testid="inline-down"
                 (click)="move(index, 1)"
@@ -175,7 +177,7 @@
               >
                 <i class="ri-close-line" aria-hidden="true"></i>
               </button>
-            } @else {
+            } @else if (!readonly()) {
               <button
                 type="button"
                 class="inline-table-icon inline-table-edit"

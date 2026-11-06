@@ -86,6 +86,10 @@ test('settings and the public contact page', async () => {
 });
 
 test('save validates channels and topics', async () => {
+  // A seeded topic without an address does not stop the list being saved as it is.
+  expect(original.topics.some((item: any) => !item.recipient_email)).toBe(true);
+  await expectCode(await owner.put(base, { data: { topics: original.topics } }), 200);
+
   const valid = payloadFrom(original);
   const channel = (changes: Record<string, unknown>) => ({
     ...valid,
@@ -105,19 +109,18 @@ test('save validates channels and topics', async () => {
     { ...valid, topics: 'x' },
     { ...valid, channels: Array(31).fill(valid.channels[0]) },
     { ...valid, channels: [valid.channels[0], valid.channels[0]] },
-    channel({ key: '' }),
     channel({ key: 'k'.repeat(101) }),
     channel({ type: 'fax' }),
     channel({ value: ' ' }),
     channel({ value: 'v'.repeat(501) }),
     channel({ url: 'javascript:alert(1)' }),
     channel({ url: 'not a url' }),
-    channel({ type: 'whatsapp', value: '08123456789' }),
+    channel({ type: 'whatsapp', value: 'bukan nomor' }),
     channel({ translations: texts('Uji').slice(1) }),
     channel({ translations: [{ ...texts('Uji')[0], label: '' }, texts('Uji')[1]] }),
     topic({ recipient_email: null }),
     topic({ recipient_email: 'not-an-email' }),
-    topic({ key: '***' }),
+    topic({ key: 'k'.repeat(101) }),
     { ...valid, topics: [valid.topics[0], valid.topics[0]] },
   ];
   for (const data of invalid) {
@@ -204,18 +207,89 @@ test('save replaces channels and topics', async () => {
   expect(keys).not.toContain(`instagram-${runId}`);
   expect(page.topics.map((item: any) => item.key)).toContain(`topik-${runId}`);
 
-  // Leaving entries out removes channels and switches topics off.
+  // Leaving entries out removes channels and topics.
   await expectCode(await owner.put(base, { data: valid }), 200, 'PUBLIC_CONTACT_UPDATED');
   const after = (await expectCode(await owner.get(base), 200)).data;
   expect(after.channels.map((item: any) => item.key)).toEqual(
     original.channels.map((item: any) => item.key),
   );
-  expect(after.topics.find((item: any) => item.key === `topik-${runId}`)).toMatchObject({
-    status: 0,
-  });
+  expect(after.topics.find((item: any) => item.key === `topik-${runId}`)).toBeUndefined();
   expect((await publicContact()).topics.map((item: any) => item.key)).not.toContain(
     `topik-${runId}`,
   );
+});
+
+test('a list left out stays, keys are made, and WhatsApp numbers are tidied', async () => {
+  const before = (await expectCode(await owner.get(base), 200)).data;
+  const saved = await expectCode(
+    await owner.put(base, {
+      data: {
+        channels: [
+          ...before.channels,
+          { type: 'whatsapp', value: '0812 3456-789', translations: texts('Nomor') },
+          { type: 'whatsapp', value: '0812 3456-789', translations: texts('Nomor Dua') },
+        ],
+      },
+    }),
+    200,
+  );
+  const added = saved.data.channels.slice(before.channels.length);
+  expect(added[0]).toMatchObject({ key: 'whatsapp-0812-3456-789', value: '+628123456789' });
+  expect(added[1].key).toBe('whatsapp-0812-3456-789-2');
+  expect(saved.data.topics).toEqual(before.topics);
+  expect(saved.data.socials).toEqual(before.socials);
+
+  await expectCode(await owner.put(base, { data: { channels: before.channels } }), 200);
+});
+
+test('social accounts: three per platform, inactive is hidden, only inactive can go', async () => {
+  const account = (changes: Record<string, unknown>) => ({
+    platform: 'tiktok',
+    name: `@uji${runId}`,
+    url: 'https://www.tiktok.com/@uji',
+    ...changes,
+  });
+  const save = (socials: unknown[]) => owner.put(base, { data: { socials } });
+  for (const invalid of [
+    [account({ platform: 'myspace' })],
+    [account({ name: ' ' })],
+    [account({ url: 'javascript:alert(1)' })],
+    [account({ url: 'mailto:a@b.c' })],
+    [account({ followers: -1 })],
+    [account({ content_count: 'banyak' })],
+    [account({}), account({}), account({}), account({})],
+  ]) {
+    await expectCode(await save(invalid), 400, 'PUBLIC_CONTACT_PAYLOAD_INVALID');
+  }
+
+  const saved = await expectCode(
+    await save([
+      account({ followers: 450, content_count: 13 }),
+      account({ name: 'Disimpan Saja', is_active: 0, is_public: 1 }),
+    ]),
+    200,
+  );
+  const [first, second] = saved.data.socials;
+  expect(first).toMatchObject({ is_active: 1, is_public: 1, followers: 450, content_count: 13 });
+  expect(first.stats_updated_at).toBeTruthy();
+  // An inactive account is never shown, whatever was sent.
+  expect(second).toMatchObject({ is_active: 0, is_public: 0, followers: null });
+
+  const page = await publicContact();
+  expect(page.socials.map((item: any) => item.key)).toEqual([first.key]);
+  expect(page.socials[0]).toEqual({
+    key: first.key,
+    platform: 'tiktok',
+    name: first.name,
+    url: first.url,
+  });
+
+  await expectCode(await save([second]), 409, 'PUBLIC_SOCIAL_ACTIVE');
+  await expectCode(await save([first]), 200);
+  await expectCode(await save([{ ...first, is_active: 0 }]), 200);
+  const empty = await expectCode(await save([]), 200);
+  expect(empty.data.socials).toEqual([]);
+  expect((await publicContact()).socials).toEqual([]);
 });
 
 test('the public inquiry form', async () => {

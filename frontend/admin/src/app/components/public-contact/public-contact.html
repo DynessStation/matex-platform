@@ -2,6 +2,9 @@
   [gridClass]="'col-sm-12'"
   [title]="'public_contact.title' | translate"
 >
+  <div button>
+    <app-insight-toggle storageKey="public-contact" [(open)]="insightOpen" />
+  </div>
   <div *hasPermission="'website_page.update'" button>
     <a
       routerLink="/website-page/contact"
@@ -12,401 +15,224 @@
     </a>
   </div>
 
-  @if (loading) {
+  @if (insightOpen()) {
+    <app-contact-insight [version]="insightVersion()" />
+  }
+
+  @if (loading()) {
     <p>{{ 'loading' | translate }}...</p>
   } @else {
-    <form [formGroup]="form" (ngSubmit)="submit()" class="contact-settings">
-      <div class="settings-intro">
-        <div>
-          <h4>{{ 'public_contact.channels' | translate }}</h4>
-          <p>{{ 'public_contact.channels_help' | translate }}</p>
-        </div>
-        <button
-          type="button"
-          class="btn btn-outline-theme"
-          (click)="addChannel()"
-          *hasPermission="'public_contact.update'"
+    <section class="contact-section" data-testid="socials">
+      <h5>
+        {{ 'public_contact.socials' | translate }}
+        <app-help-tip section="sosial-media" />
+      </h5>
+      <p>{{ 'public_contact.socials_help' | translate }}</p>
+      <app-inline-table
+        [columns]="socialColumns"
+        [blank]="socialBlank"
+        [readonly]="!canEdit()"
+        [foldedByDefault]="true"
+        [canRemove]="canRemoveSocial"
+        [validateRow]="validateSocial"
+        [(rows)]="socials"
+        (saveRow)="saveSocial($event)"
+        (removeRow)="removeSocial($event)"
+      >
+        <ng-template
+          #rowDetail
+          let-row
+          let-editing="editing"
+          let-folded="folded"
+          let-set="set"
         >
-          <i class="ri-add-line"></i>
-          {{ 'public_contact.add_channel' | translate }}
-        </button>
-      </div>
-
-      <div formArrayName="channels" class="settings-list">
-        @for (channel of channels.controls; track channel; let index = $index) {
-          <div class="card settings-card" [formGroupName]="index">
-            <div class="card-body">
-              <div class="card-heading">
-                <strong
-                  >{{ 'public_contact.channel' | translate }}
-                  {{ index + 1 }}
-                  <app-help-tip section="kanal-kontak--urutan"
-                /></strong>
-                <span class="card-heading__actions">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light-bg"
-                    title="Naikkan"
-                    [attr.aria-label]="'Naikkan kanal ' + (index + 1)"
-                    [disabled]="index === 0"
-                    (click)="move(channels, index, -1)"
-                  >
-                    <i class="ri-arrow-up-line"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light-bg"
-                    title="Turunkan"
-                    [attr.aria-label]="'Turunkan kanal ' + (index + 1)"
-                    [disabled]="index === channels.length - 1"
-                    (click)="move(channels, index, 1)"
-                  >
-                    <i class="ri-arrow-down-line"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="channels.removeAt(index)"
-                  >
-                    <i class="ri-delete-bin-line"></i>
-                  </button>
-                </span>
+          @if (editing) {
+            <div class="row g-2">
+              <div class="col-md-3 col-6">
+                <label class="form-label">{{
+                  'public_contact.followers' | translate
+                }}</label>
+                <input
+                  class="form-control"
+                  type="number"
+                  min="0"
+                  data-testid="social-followers"
+                  [value]="row['followers']"
+                  (input)="set('followers', $any($event.target).value)"
+                />
               </div>
-              <div class="row g-3">
-                <div class="col-lg-4">
-                  <label
-                    >{{ 'public_contact.key' | translate }}
-                    <app-help-tip
-                      section="kanal-kontak--nama-internal" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="key"
-                    placeholder="whatsapp-sales"
-                  />
-                  <small class="field-help"
-                    >Tidak tampil ke pengunjung. Gunakan huruf kecil dan tanda
-                    hubung, misalnya whatsapp-sales.</small
-                  >
-                  @if (
-                    channel.get('key')?.touched && channel.get('key')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      {{
-                        channel.get('key')?.hasError('duplicate')
-                          ? 'Kunci kanal tidak boleh sama.'
-                          : 'Kunci kanal wajib diisi dengan huruf kecil, angka, atau tanda hubung.'
-                      }}
-                    </div>
-                  }
-                </div>
-                <div class="col-lg-4">
-                  <label
-                    >{{ 'public_contact.type' | translate }}
-                    <app-help-tip section="kanal-kontak--jenis"
-                  /></label>
-                  @if (isBrowser) {
-                    <select2
-                      class="custom-select d-block"
-                      [data]="channelTypeOptions"
-                      formControlName="type"
-                      noResultMessage="Tidak ada pilihan"
-                    />
-                  }
-                </div>
-                <div class="col-lg-4">
-                  <label
-                    >{{ 'public_contact.value' | translate }}
-                    <app-help-tip section="kanal-kontak--nilai" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="value"
-                    placeholder="+6285814180370"
-                  />
-                  @if (
-                    channel.get('value')?.touched &&
-                    channel.get('value')?.invalid
-                  ) {
-                    <div class="invalid-feedback">Nilai kanal wajib diisi.</div>
-                  }
-                </div>
-                <div class="col-lg-8">
-                  <label
-                    >{{ 'public_contact.url' | translate }}
-                    <app-help-tip section="kanal-kontak--tautan" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="url"
-                    placeholder="https://... (opsional)"
-                    [readonly]="isDerivedChannel(channel.get('type')?.value)"
-                  /><small class="text-muted">
-                    @if (isDerivedChannel(channel.get('type')?.value)) {
-                      Tautan dibuat otomatis dari nilai kanal.
-                    }
-                  </small>
-                </div>
-                <div class="col-lg-4 checks checks--inline">
-                  <label class="app-check app-check-card"
-                    ><input type="checkbox" formControlName="is_primary" />
-                    <span
-                      ><strong>{{
-                        'public_contact.primary' | translate
-                      }}</strong
-                      ><small>Kanal utama untuk jenis kontak ini.</small></span
-                    ></label
-                  ><label class="app-check app-check-card"
-                    ><input type="checkbox" formControlName="is_public" />
-                    <span
-                      ><strong>{{ 'public_contact.public' | translate }}</strong
-                      ><small
-                        >Tampilkan kanal ini kepada pengunjung.</small
-                      ></span
-                    ></label
-                  >
-                </div>
+              <div class="col-md-3 col-6">
+                <label class="form-label">{{
+                  'public_contact.content_count' | translate
+                }}</label>
+                <input
+                  class="form-control"
+                  type="number"
+                  min="0"
+                  data-testid="social-content"
+                  [value]="row['content_count']"
+                  (input)="set('content_count', $any($event.target).value)"
+                />
               </div>
-              <div formGroupName="translations" class="row g-3 language-row">
-                <div class="col-lg-6">
-                  <div
-                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
-                  >
-                    <label class="mb-0"
-                      >Label — Bahasa Indonesia
-                      <app-help-tip
-                        section="kanal-kontak--label-dan-keterangan"
-                    /></label>
-                  </div>
-                  <input class="form-control" formControlName="id_label" />
-                  @if (
-                    channel.get('translations.id_label')?.touched &&
-                    channel.get('translations.id_label')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      Label Bahasa Indonesia wajib diisi.
-                    </div>
-                  }
-                  <div class="contact-description-heading">
-                    <label>Keterangan — Bahasa Indonesia</label>
-                    <app-ai-field-action
-                      label="Isi ini otomatis"
-                      [loading]="assistingKey === 'channel-' + index + '-id'"
-                      [disabled]="assistingKey !== null"
-                      (requested)="generateChannelDescription(index, 'id')"
-                    />
-                  </div>
-                  <textarea
-                    class="form-control mt-2"
-                    rows="2"
-                    formControlName="id_description"
-                    placeholder="Keterangan opsional"
-                  ></textarea>
-                </div>
-                <div class="col-lg-6">
-                  <div
-                    class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1"
-                  >
-                    <label class="mb-0">Label — English</label>
-                  </div>
-                  <input class="form-control" formControlName="en_label" />
-                  @if (
-                    channel.get('translations.en_label')?.touched &&
-                    channel.get('translations.en_label')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      English label is required.
-                    </div>
-                  }
-                  <div class="contact-description-heading">
-                    <label>Description — English</label>
-                    <app-ai-field-action
-                      label="Translate from Indonesian"
-                      icon="ri-translate-2"
-                      [loading]="
-                        assistingKey === 'channel-' + index + '-translate'
-                      "
-                      [disabled]="assistingKey !== null"
-                      (requested)="copyTranslationToEnglish('channel', index)"
-                    />
-                  </div>
-                  <textarea
-                    class="form-control mt-2"
-                    rows="2"
-                    formControlName="en_description"
-                    placeholder="Optional description"
-                  ></textarea>
-                </div>
+              <div class="col-md-6 form-kit-note align-self-end">
+                {{ 'public_contact.stats_hint' | translate }}
               </div>
             </div>
-          </div>
-        }
-      </div>
+          } @else {
+            <span data-testid="social-stats">
+              {{ row['followers'] === '' ? '-' : row['followers'] }}
+              {{ 'public_contact.followers' | translate }} |
+              {{ row['content_count'] === '' ? '-' : row['content_count'] }}
+              {{ 'public_contact.content_count' | translate }}
+            </span>
+          }
+        </ng-template>
+      </app-inline-table>
+    </section>
 
-      <div class="settings-intro section-gap">
-        <div>
-          <h4>{{ 'public_contact.topics' | translate }}</h4>
-          <p>{{ 'public_contact.topics_help' | translate }}</p>
-        </div>
-        <button
-          type="button"
-          class="btn btn-outline-theme"
-          (click)="addTopic()"
-          *hasPermission="'public_contact.update'"
+    <section class="contact-section" data-testid="channels">
+      <h5>
+        {{ 'public_contact.channels' | translate }}
+        <app-help-tip section="kanal-kontak" />
+      </h5>
+      <p>{{ 'public_contact.channels_help' | translate }}</p>
+      <app-inline-table
+        [columns]="channelColumns"
+        [blank]="channelBlank"
+        [orderable]="true"
+        [readonly]="!canEdit()"
+        [foldedByDefault]="true"
+        [validateRow]="validateLabels"
+        [(rows)]="channels"
+        (saveRow)="saveChannel($event)"
+        (removeRow)="removeChannel($event)"
+        (reordered)="reorderChannels($event)"
+      >
+        <ng-template
+          #rowDetail
+          let-row
+          let-editing="editing"
+          let-folded="folded"
+          let-set="set"
+          let-errors="errors"
         >
-          <i class="ri-add-line"></i>
-          {{ 'public_contact.add_topic' | translate }}
-        </button>
-      </div>
-      <div formArrayName="topics" class="settings-list">
-        @if (!topics.length) {
-          <div class="alert alert-warning">
-            Tambahkan minimal satu topik agar formulir kontak publik dapat
-            dikirim.
-          </div>
-        }
-        @for (topic of topics.controls; track topic; let index = $index) {
-          <div class="card settings-card" [formGroupName]="index">
-            <div class="card-body">
-              <div class="card-heading">
-                <strong
-                  >{{ 'public_contact.topic' | translate }}
-                  {{ index + 1 }}
-                  <app-help-tip section="topik-pesan--urutan-dan-aktif"
-                /></strong>
-                <span class="card-heading__actions">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light-bg"
-                    title="Naikkan"
-                    [attr.aria-label]="'Naikkan topik ' + (index + 1)"
-                    [disabled]="index === 0"
-                    (click)="move(topics, index, -1)"
-                  >
-                    <i class="ri-arrow-up-line"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-light-bg"
-                    title="Turunkan"
-                    [attr.aria-label]="'Turunkan topik ' + (index + 1)"
-                    [disabled]="index === topics.length - 1"
-                    (click)="move(topics, index, 1)"
-                  >
-                    <i class="ri-arrow-down-line"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="topics.removeAt(index)"
-                  >
-                    <i class="ri-delete-bin-line"></i>
-                  </button>
-                </span>
+          @if (editing) {
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label">Label - ID *</label>
+                <input
+                  class="form-control"
+                  data-testid="channel-id-label"
+                  [class.is-invalid]="errors['id_label']"
+                  [value]="row['id_label'] ?? ''"
+                  (input)="set('id_label', $any($event.target).value)"
+                />
+                @if (errors['id_label']) {
+                  <div class="form-kit-error">
+                    {{ errors['id_label'] | translate }}
+                  </div>
+                }
               </div>
-              <div class="row g-3">
-                <div class="col-lg-4">
-                  <label
-                    >{{ 'public_contact.key' | translate }}
-                    <app-help-tip section="topik-pesan--nama-internal" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="key"
-                    placeholder="general-inquiry"
-                  />
-                  @if (topic.get('key')?.touched && topic.get('key')?.invalid) {
-                    <div class="invalid-feedback">
-                      {{
-                        topic.get('key')?.hasError('duplicate')
-                          ? 'Kunci topik tidak boleh sama.'
-                          : 'Kunci topik wajib diisi dengan huruf kecil, angka, atau tanda hubung.'
-                      }}
-                    </div>
-                  }
-                </div>
-                <div class="col-lg-4">
-                  <label
-                    >{{ 'public_contact.recipient' | translate }} *
-                    <app-help-tip
-                      section="topik-pesan--email-penerima" /></label
-                  ><input
-                    class="form-control"
-                    type="email"
-                    formControlName="recipient_email"
-                  />
-                  <small class="form-text text-muted"
-                    >Notifikasi pesan untuk topik ini dikirim ke alamat
-                    tersebut.</small
-                  >
-                  @if (
-                    topic.get('recipient_email')?.touched &&
-                    topic.get('recipient_email')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      Masukkan alamat email penerima yang valid.
-                    </div>
-                  }
-                </div>
-                <div class="col-lg-4 checks checks--compact">
-                  <label class="app-check app-check-card"
-                    ><input type="checkbox" formControlName="status" />
-                    <span
-                      ><strong>{{ 'public_contact.active' | translate }}</strong
-                      ><small
-                        >Tampilkan sebagai pilihan di formulir publik.</small
-                      ></span
-                    ></label
-                  >
-                </div>
+              <div class="col-md-6">
+                <label class="form-label">Label - EN *</label>
+                <input
+                  class="form-control"
+                  data-testid="channel-en-label"
+                  [class.is-invalid]="errors['en_label']"
+                  [value]="row['en_label'] ?? ''"
+                  (input)="set('en_label', $any($event.target).value)"
+                />
+                @if (errors['en_label']) {
+                  <div class="form-kit-error">
+                    {{ errors['en_label'] | translate }}
+                  </div>
+                }
               </div>
-              <div formGroupName="translations" class="row g-3 language-row">
-                <div class="col-lg-6">
-                  <label
-                    >Topik — Bahasa Indonesia
-                    <app-help-tip section="topik-pesan--topik" /></label
-                  ><input class="form-control" formControlName="id_label" />
-                  @if (
-                    topic.get('translations.id_label')?.touched &&
-                    topic.get('translations.id_label')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      Topik Bahasa Indonesia wajib diisi.
-                    </div>
-                  }
+              <div class="col-md-6">
+                <div class="contact-field-heading">
+                  <label class="form-label">Keterangan - ID</label>
+                  <app-ai-field-action
+                    label="Isi otomatis"
+                    [loading]="assisting() === 'id-generate'"
+                    [disabled]="!!assisting()"
+                    (requested)="describe(row, set, 'id')"
+                  />
                 </div>
-                <div class="col-lg-6">
-                  <label>Topic — English</label>
-                  <input class="form-control" formControlName="en_label" />
-                  @if (
-                    topic.get('translations.en_label')?.touched &&
-                    topic.get('translations.en_label')?.invalid
-                  ) {
-                    <div class="invalid-feedback">
-                      English topic is required.
-                    </div>
-                  }
+                <textarea
+                  class="form-control"
+                  rows="2"
+                  [value]="row['id_description'] ?? ''"
+                  (input)="set('id_description', $any($event.target).value)"
+                ></textarea>
+              </div>
+              <div class="col-md-6">
+                <div class="contact-field-heading">
+                  <label class="form-label">Keterangan - EN</label>
+                  <app-ai-field-action
+                    label="Terjemahkan"
+                    icon="ri-translate-2"
+                    [loading]="assisting() === 'translate'"
+                    [disabled]="!!assisting() || !row['id_description']"
+                    (requested)="translateDescription(row, set)"
+                  />
                 </div>
+                <textarea
+                  class="form-control"
+                  rows="2"
+                  [value]="row['en_description'] ?? ''"
+                  (input)="set('en_description', $any($event.target).value)"
+                ></textarea>
               </div>
             </div>
-          </div>
-        }
-      </div>
+          } @else if (folded) {
+            <div class="contact-labels" data-testid="channel-summary">
+              <span><b>Label - ID :</b> {{ row['id_label'] }}</span>
+              <span><b>Label - EN :</b> {{ row['en_label'] }}</span>
+            </div>
+          } @else {
+            <div class="contact-labels contact-labels-open">
+              <span>
+                <b>Label - ID :</b> {{ row['id_label'] }}
+                <small>{{ row['id_description'] }}</small>
+              </span>
+              <span>
+                <b>Label - EN :</b> {{ row['en_label'] }}
+                <small>{{ row['en_description'] }}</small>
+              </span>
+            </div>
+          }
+        </ng-template>
+      </app-inline-table>
+    </section>
 
-      <div class="office-note">
-        <div class="office-note__icon"><i class="ri-map-pin-line"></i></div>
-        <div class="office-note__content">
-          <strong>{{ 'public_contact.locations' | translate }}</strong>
-          <p>{{ 'public_contact.locations_help' | translate }}</p>
-        </div>
-        <a
-          class="btn btn-outline-theme office-note__action"
-          routerLink="/office"
-          >{{ 'public_contact.manage_offices' | translate }}
-          <i class="ri-arrow-right-line"></i
-        ></a>
+    <section class="contact-section" data-testid="topics">
+      <h5>
+        {{ 'public_contact.topics' | translate }}
+        <app-help-tip section="topik-pesan" />
+      </h5>
+      <p>{{ 'public_contact.topics_help' | translate }}</p>
+      <app-inline-table
+        [columns]="topicColumns"
+        [blank]="topicBlank"
+        [orderable]="true"
+        [readonly]="!canEdit()"
+        [(rows)]="topics"
+        (saveRow)="saveTopic($event)"
+        (removeRow)="removeTopic($event)"
+        (reordered)="reorderTopics($event)"
+      />
+    </section>
+
+    <div class="office-note">
+      <div class="office-note__icon"><i class="ri-map-pin-line"></i></div>
+      <div class="office-note__content">
+        <strong>{{ 'public_contact.locations' | translate }}</strong>
+        <p>{{ 'public_contact.locations_help' | translate }}</p>
       </div>
-      <div class="contact-save" *hasPermission="'public_contact.update'">
-        <app-button [id]="'public_contact_save'">{{
-          'public_contact.save' | translate
-        }}</app-button>
-      </div>
-    </form>
+      <a class="btn btn-outline-theme office-note__action" routerLink="/office"
+        >{{ 'public_contact.manage_offices' | translate }}
+        <i class="ri-arrow-right-line"></i
+      ></a>
+    </div>
   }
 </app-page-wrapper>

@@ -80,6 +80,16 @@ Yang disesuaikan dari PDF:
 
 ## Tahap 3: Pengaturan Kontak (`/public-contact`)
 
+**Selesai 6 November (lokal).** Migration 030. Test `public-contact-page.spec.ts`, kontrak di `public-contact-api.spec.ts`. Catatan hasil:
+
+- Widget sosial media di header website ternyata berisi tautan mati (`facebook.com/`, dan ikon TikTok mengarah ke `twitter.com/`). Sekarang mengambil dari data; kalau belum ada akun, widget kosong.
+- Migration memindah kanal jenis "social" yang alamatnya dikenali ke tabel akun baru. Setelah deploy, data ini perlu dicek di halaman Kontak.
+- Satu simpan mengirim satu daftar saja (`socials`, `channels`, atau `topics`), jadi masalah di tabel lain tidak menghalangi. Topik bawaan tanpa email penerima tidak menghalangi topik lain tersimpan.
+- Topik yang dihapus sekarang benar-benar hilang dari daftar (kolom `contact_inquiry_topic_deleted_at`); sebelumnya hanya dinonaktifkan. Pesan lama tetap menunjuk ke topiknya.
+- Penghapusan akun dan kanal memakai tombol di baris yang sudah dibuka tanpa dialog konfirmasi, sesuai mockup. Datanya soft delete.
+- Tipe Media sosial tidak lagi ditawarkan di Kanal Kontak.
+- Audit Funnel sementara memakai status pengiriman email form (Terkirim, Gagal, Lainnya). Dibaca, Dibalas, Unread, dan tautan "Buka email" menyusul di Tahap 5 karena butuh Mail API.
+
 - **Sosial Media** (baru): Platform, Nama Akun, URL, Status, Publikasi, maksimal 3 per platform. Inaktif memaksa Hidden, dan hapus hanya untuk yang Inaktif. Dipakai di header, footer, kontak, dan `sameAs` SEO.
 - **Kanal Kontak:** tabel compact dengan label ID/EN yang bisa dilipat, tautan otomatis dari nilai, Utama/Biasa, Displayed/Hidden, naik/turun. Nomor WhatsApp boleh tanpa `+`, server yang merapikan (validasi sekarang mewajibkan `+`).
 - **Topik Pesan:** tabel compact dengan validasi email di baris. Alamat penerima tetap hanya di database, tidak masuk seed atau repo.

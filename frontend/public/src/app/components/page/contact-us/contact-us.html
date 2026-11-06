@@ -21,6 +21,7 @@
                         @if (channel.url) {
                           <a
                             [href]="channel.url"
+                            [attr.data-track]="'channel:' + channel.key"
                             [target]="
                               channel.type === 'email' || channel.type === 'phone'
                                 ? '_self'
@@ -330,6 +331,7 @@
       <a
         class="floating-whatsapp"
         [href]="channel.url"
+        [attr.data-track]="'channel:' + channel.key"
         target="_blank"
         rel="noopener"
         [attr.aria-label]="channel.label"

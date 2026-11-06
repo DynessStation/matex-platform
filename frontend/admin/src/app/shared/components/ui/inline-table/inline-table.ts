@@ -49,6 +49,14 @@ export class InlineTable {
   /** A new row starts with these values. */
   readonly blank = input<InlineRow>({});
   readonly emptyKey = input('form_kit.table_empty');
+  /** Show only: no add, edit, delete, or moving. */
+  readonly readonly = input(false);
+  /** Rows start with their extra part folded. */
+  readonly foldedByDefault = input(false);
+  /** Checks across fields or rows: messages by field, on top of each column's validate. */
+  readonly validateRow = input<
+    ((row: InlineRow, index: number) => Record<string, string>) | null
+  >(null);
 
   readonly saveRow = output<InlineChange>();
   readonly removeRow = output<InlineChange>();
@@ -121,6 +129,7 @@ export class InlineTable {
       const message = column.validate?.(row[column.key], row);
       if (message) errors[column.key] = message;
     }
+    Object.assign(errors, this.validateRow()?.(row, index));
     this.errors.set(errors);
     if (Object.keys(errors).length) return;
     const isNew = this.isNew();
@@ -173,7 +182,10 @@ export class InlineTable {
   }
 
   isFolded(index: number): boolean {
-    return !this.isEditing(index) && this.folded().has(index);
+    return (
+      !this.isEditing(index) &&
+      this.folded().has(index) !== this.foldedByDefault()
+    );
   }
 
   toggleFold(index: number): void {
@@ -204,6 +216,7 @@ export class InlineTable {
       editing: this.isEditing(index),
       folded: this.isFolded(index),
       set: this.setValue,
+      errors: this.errors(),
     };
   }
 

@@ -38,4 +38,6 @@ export interface InlineDetailContext {
   editing: boolean;
   folded: boolean;
   set: (key: string, value: unknown) => void;
+  /** Messages from validateRow for the fields in this part. */
+  errors: Record<string, string>;
 }

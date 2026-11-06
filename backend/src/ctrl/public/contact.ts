@@ -73,8 +73,18 @@ router.get(
         AND t.contact_inquiry_topic_locale = ?
         AND t.contact_inquiry_topic_i18n_status = 1
        WHERE q.id_master_comp = ? AND q.contact_inquiry_topic_status = 1
+        AND q.contact_inquiry_topic_deleted_at IS NULL
        ORDER BY q.contact_inquiry_topic_sort_order, q.id_contact_inquiry_topic`,
       [locale, company],
+    );
+    const [socials] = await pool.query<RowDataPacket[]>(
+      `SELECT public_social_account_key AS social_key, public_social_account_platform AS platform,
+        public_social_account_name AS name, public_social_account_url AS url
+       FROM public_social_account
+       WHERE id_master_comp = ? AND public_social_account_is_public = 1
+        AND public_social_account_is_active = 1 AND public_social_account_deleted_at IS NULL
+       ORDER BY public_social_account_sort_order, id_public_social_account`,
+      [company],
     );
     const [offices] = await pool.query<RowDataPacket[]>(
       `SELECT id_office, office_code AS code, office_name AS name, office_description AS description,
@@ -106,6 +116,12 @@ router.get(
 
     return sendSuccess(res, 200, 'CONTACT_FOUND', 'Contact loaded', {
       locale,
+      socials: socials.map((item) => ({
+        key: item.social_key,
+        platform: item.platform,
+        name: item.name,
+        url: item.url,
+      })),
       channels: channels.map((item) => ({
         key: item.channel_key,
         type: item.type,

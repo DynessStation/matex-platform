@@ -128,11 +128,13 @@ export class PublicAnalyticsService {
         ) {
           return;
         }
+        // Links of contact channels and social accounts say which one they are.
         this.track(
           'outbound_click',
-          url.protocol === 'http:' || url.protocol === 'https:'
-            ? url.hostname
-            : url.protocol.replace(':', ''),
+          target?.getAttribute('data-track') ||
+            (url.protocol === 'http:' || url.protocol === 'https:'
+              ? url.hostname
+              : url.protocol.replace(':', '')),
         );
       } catch {
         return;

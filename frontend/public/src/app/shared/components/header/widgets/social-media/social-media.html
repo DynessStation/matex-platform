@@ -1,27 +1,19 @@
-<ul class="social-list">
-  <li>
-    <a
-      href="https://www.facebook.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Facebook"
-    >
-      <i class="ri-facebook-fill"></i>
-    </a>
-  </li>
-  <li>
-    <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-      <i class="ri-tiktok-line"></i>
-    </a>
-  </li>
-  <li>
-    <a
-      href="https://www.instagram.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Instagram"
-    >
-      <i class="ri-instagram-line"></i>
-    </a>
-  </li>
-</ul>
+@if (socials$ | async; as socials) {
+  @if (socials.length) {
+    <ul class="social-list" data-testid="header-socials">
+      @for (social of socials; track social.key) {
+        <li>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            [href]="social.url"
+            [attr.aria-label]="social.name"
+            [attr.data-track]="'social:' + social.key"
+          >
+            <i [class]="icon(social.platform)"></i>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+}

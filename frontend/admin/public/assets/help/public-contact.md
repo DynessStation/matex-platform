@@ -6,65 +6,27 @@
 
 ## Gambaran Umum
 
-Halaman ini mengatur informasi kontak di halaman kontak website dan pilihan topik di formulir kontak. Semua pengaturan disimpan sekaligus dengan **Simpan Pengaturan Kontak**. Alamat, peta, dan jam operasional diatur di halaman Kantor.
+Halaman ini mengatur akun sosial media, kanal kontak, dan pilihan topik di formulir kontak. Ketiganya tabel yang diedit di baris: ikon pensil membuka satu baris, ceklis langsung menyimpan baris itu, tanda silang atau Esc membatalkan, dan kolom nomor menjadi tombol hapus. Tidak ada tombol simpan lain. Nama internal dibuat otomatis.
+
+Tombol ikon grafik di kanan atas membuka ringkasan: kunjungan per akun, klik per kanal, dan keadaan pesan formulir kontak. Klik dihitung per akun dan kanal sejak fitur ini aktif; data lama tidak bisa dipisah. Angka dibaca dan dibalas menyusul bersama menu Email.
 
 URL: https://internal.matexindo.com/public-contact
 
+## Sosial Media
+
+Akun yang tampil di header, footer, dan halaman kontak website, maksimal 3 per platform. **Status** Aktif berarti akun masih dipakai; **Publikasi** Published berarti tampil di website. Akun Inaktif tidak pernah tampil, dan hanya akun Inaktif yang bisa dihapus.
+
+Follower dan jumlah konten ada di bagian lipat baris, diisi manual dan opsional.
+
 ## Kanal Kontak
 
-Nomor, email, dan tautan yang tampil di website. Klik **Tambah Kanal** untuk menambah kanal (paling banyak 30). Kanal yang dihapus dari daftar disembunyikan dari website setelah pengaturan disimpan.
+Nomor, email, dan tautan yang tampil di website. Tautan dibuat otomatis dari nilai. Nomor WhatsApp boleh ditulis 0812... atau 62812..., dan server yang merapikan. **Utama** menjadikan kanal itu pilihan pertama untuk jenisnya: satu jenis hanya punya satu kanal utama. Tombol panah mengatur urutan tampil dan langsung tersimpan.
 
-### Nama internal
-
-Kode pembeda kanal untuk sistem, wajib dan unik, misalnya whatsapp-sales. Hanya huruf kecil, angka, dan tanda hubung; tidak tampil ke pengunjung.
-
-### Jenis
-
-WhatsApp, Email, Telepon, Media sosial, Website, atau Lainnya, wajib. Jenis menentukan ikon dan cara tautan dibuat.
-
-### Nilai
-
-Isi kanal yang ditampilkan, wajib, misalnya nomor atau alamat email. Nomor WhatsApp ditulis dengan tanda plus dan kode negara, misalnya +6281234567890.
-
-### Tautan
-
-Untuk WhatsApp, Email, dan Telepon dibuat otomatis dari nilai. Untuk jenis lain, isi alamat yang diawali http, https, mailto, atau tel.
-
-### Urutan
-
-Kanal tampil di website sesuai urutan kartu di halaman ini. Pakai tombol panah naik dan turun di kepala kartu untuk memindahkan, lalu simpan pengaturan. Kanal baru masuk paling akhir.
-
-### Utama
-
-Menandai kanal utama untuk jenisnya, misalnya nomor WhatsApp yang dipakai tombol chat utama.
-
-### Publik
-
-Bila dimatikan, kanal tetap tersimpan tetapi tidak tampil di website.
-
-### Label dan keterangan
-
-Nama kanal dan penjelasan singkat untuk pengunjung, dalam Bahasa Indonesia dan English. Kedua label wajib; tombol bantuan menulis bisa membuat draf keterangan atau terjemahannya.
+Label dan keterangan per bahasa ada di bagian lipat baris. Label wajib untuk kedua bahasa.
 
 ## Topik Pesan
 
-Pilihan topik di formulir kontak website dan email yang menerima pesan untuk tiap topik. Klik **Tambah Topik** untuk menambah. Minimal satu topik harus aktif agar formulir bisa dikirim; topik yang dihapus dari daftar hanya dinonaktifkan.
-
-### Nama internal
-
-Kode pembeda topik untuk sistem, wajib dan unik, misalnya general-inquiry, dengan aturan penulisan yang sama seperti kanal.
-
-### Email penerima
-
-Alamat email yang menerima pesan untuk topik ini, wajib. Pastikan alamatnya aktif dan dipantau.
-
-### Urutan dan aktif
-
-Topik ditawarkan di formulir website sesuai urutan kartu; pakai tombol panah naik dan turun di kepala kartu, lalu simpan pengaturan. Centang **Aktif** menentukan apakah topik ditawarkan ke pengunjung.
-
-### Topik
-
-Teks topik yang dipilih pengunjung, wajib dalam Bahasa Indonesia dan English, misalnya Informasi Produk.
+Pilihan topik di formulir kontak beserta email penerimanya. Email ini tidak tampil ke pengunjung. Topik Hidden tidak muncul di formulir. Formulir butuh minimal satu topik, dan pesan lama tetap tersimpan walau topiknya dihapus.
 
 ## Alur Pesan dari Pengunjung
 

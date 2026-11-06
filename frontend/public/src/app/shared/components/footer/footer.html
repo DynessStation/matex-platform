@@ -44,7 +44,7 @@
               </p>
             }
 
-            @if (contact.channels.length) {
+            @if (contact.channels.length || contact.socials.length) {
               <ul class="public-channel-list">
                 @for (channel of contact.channels; track channel.key) {
                   @if (channel.url) {
@@ -54,10 +54,24 @@
                         target="_blank"
                         rel="noopener"
                         [attr.aria-label]="channel.label"
+                        [attr.data-track]="'channel:' + channel.key"
                         ><i [class]="channelIcon(channel.type)"></i
                       ></a>
                     </li>
                   }
+                }
+                @for (social of contact.socials; track social.key) {
+                  <li>
+                    <a
+                      data-testid="footer-social"
+                      [href]="social.url"
+                      target="_blank"
+                      rel="noopener"
+                      [attr.aria-label]="social.name"
+                      [attr.data-track]="'social:' + social.key"
+                      ><i [class]="socialIcon(social.platform)"></i
+                    ></a>
+                  </li>
                 }
               </ul>
             }
@@ -115,6 +129,7 @@
                   [href]="whatsapp.url"
                   target="_blank"
                   rel="noopener"
+                  [attr.data-track]="'channel:' + whatsapp.key"
                   ><i class="ri-whatsapp-line"></i> {{ whatsapp.label }}</a
                 >
               } @else {

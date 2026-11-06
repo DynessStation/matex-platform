@@ -47,8 +47,15 @@ export interface PublicOffice {
   google_business_url: string | null;
   operating_hours: PublicOfficeOperatingHour[];
 }
+export interface PublicSocialAccount {
+  key: string;
+  platform: string;
+  name: string;
+  url: string;
+}
 export interface PublicContactData {
   locale: string;
+  socials: PublicSocialAccount[];
   channels: PublicContactChannel[];
   topics: PublicContactTopic[];
   offices: PublicOffice[];

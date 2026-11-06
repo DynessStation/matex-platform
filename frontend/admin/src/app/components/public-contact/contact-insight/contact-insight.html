@@ -1,0 +1,41 @@
+<app-insight-panel>
+  <app-insight-column
+    headingKey="public_contact.socials"
+    [range]="socialRange()"
+    (rangeChange)="socialRange.set($event)"
+  >
+    <app-insight-rank [items]="socialItems()" />
+    @for (platform of missingPlatforms(); track platform.key) {
+      <div
+        class="insight-check-warn insight-note"
+        data-testid="missing-platform"
+      >
+        <i class="ri-error-warning-line" aria-hidden="true"></i>
+        {{
+          'public_contact.insight_no_account'
+            | translate: { platform: platform.name }
+        }}
+      </div>
+    }
+  </app-insight-column>
+
+  <app-insight-column
+    headingKey="public_contact.channels"
+    [range]="channelRange()"
+    (rangeChange)="channelRange.set($event)"
+  >
+    <app-insight-rank [items]="channelItems()" />
+  </app-insight-column>
+
+  <app-insight-column
+    headingKey="public_contact.insight_funnel"
+    [showRange]="false"
+  >
+    <app-insight-audit
+      [totalLabel]="'public_contact.insight_total' | translate"
+      [total]="audit()?.total ?? 0"
+      [segments]="segments()"
+      [checks]="checks()"
+    />
+  </app-insight-column>
+</app-insight-panel>

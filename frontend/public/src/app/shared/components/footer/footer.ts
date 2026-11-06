@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { catchError, map, of, switchMap } from 'rxjs';
 
+import { socialIcon } from '../../data/social-platforms';
 import {
   PublicContactChannel,
   PublicContactData,
@@ -21,6 +22,7 @@ import { PublicNavigationContextService } from '../../services/public-navigation
 })
 export class Footer {
   private content = inject(PublicContentService);
+  readonly socialIcon = socialIcon;
   public navigation = inject(PublicNavigationContextService);
 
   readonly logo = input<string>();
@@ -112,6 +114,6 @@ export class Footer {
   }
 
   private emptyContact(locale: string): PublicContactData {
-    return { locale, channels: [], topics: [], offices: [] };
+    return { locale, socials: [], channels: [], topics: [], offices: [] };
   }
 }
