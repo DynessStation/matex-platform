@@ -27,12 +27,23 @@ const apiEnvironment: Record<string, string> = {
   // Empty values stop dotenv from loading real third-party keys from backend/.env.
   OPENAI_API_KEY: '',
   SMTP_HOST: '',
+  // The stand-in of the mail provider, never the real service.
+  HOSTINGER_MAIL_API_TOKEN: 'e2e-mail-token',
+  MAIL_API_URL: 'http://127.0.0.1:3199',
+  MAIL_INSIGHT_ADDRESS: '',
   SMTP_USER: '',
   SMTP_PASS: '',
   GOOGLE_SEARCH_CONSOLE_SITE_URL: '',
   GOOGLE_SERVICE_ACCOUNT_EMAIL: '',
   GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY: '',
   GOOGLE_PAGESPEED_API_KEY: '',
+};
+
+export const mailServer = {
+  command: 'node write/fake-mail-server.mjs',
+  url: 'http://127.0.0.1:3199/health',
+  reuseExistingServer,
+  timeout: 15_000,
 };
 
 export const apiServer = {

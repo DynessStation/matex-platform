@@ -8,7 +8,7 @@
 
 Halaman ini mengatur akun sosial media, kanal kontak, dan pilihan topik di formulir kontak. Ketiganya tabel yang diedit di baris: ikon pensil membuka satu baris, ceklis langsung menyimpan baris itu, tanda silang atau Esc membatalkan, dan kolom nomor menjadi tombol hapus. Tidak ada tombol simpan lain. Nama internal dibuat otomatis.
 
-Tombol ikon grafik di kanan atas membuka ringkasan: kunjungan per akun, klik per kanal, dan keadaan pesan formulir kontak. Klik dihitung per akun dan kanal sejak fitur ini aktif; data lama tidak bisa dipisah. Angka dibaca dan dibalas menyusul bersama menu Email.
+Tombol ikon grafik di kanan atas membuka ringkasan: kunjungan per akun, klik per kanal, dan keadaan pesan formulir kontak. Klik dihitung per akun dan kanal sejak fitur ini aktif; data lama tidak bisa dipisah. Setelah token email dipasang, Audit Funnel menghitung kotak masuk mailbox (Dibaca, Dibalas, Unread) dengan tautan ke menu Email; sebelum itu ia memakai status pengiriman email formulir.
 
 URL: https://internal.matexindo.com/public-contact
 

@@ -302,4 +302,26 @@ export const menu: ISidebar[] = [
 
     permission: 'attachment.view',
   },
+
+  //==================================================
+  //==== EMAIL
+  //==================================================
+
+  {
+    id: 30,
+
+    title: 'email',
+
+    path: '/email',
+
+    active: false,
+
+    icon: 'ri-mail-line',
+
+    type: 'sub',
+
+    level: 1,
+
+    permission: 'email.view',
+  },
 ];

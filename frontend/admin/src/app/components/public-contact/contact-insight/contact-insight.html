@@ -32,8 +32,8 @@
     [showRange]="false"
   >
     <app-insight-audit
-      [totalLabel]="'public_contact.insight_total' | translate"
-      [total]="audit()?.total ?? 0"
+      [totalLabel]="totalLabel()"
+      [total]="total()"
       [segments]="segments()"
       [checks]="checks()"
     />

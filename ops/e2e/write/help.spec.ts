@@ -162,7 +162,7 @@ test('the header button opens the page guide; sections, other guides, and naviga
   const keys = await select
     .locator('option')
     .evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value));
-  expect(keys.length).toBe(22);
+  expect(keys.length).toBe(23);
   for (const key of keys) {
     await select.selectOption(key);
     await expect(drawer.locator('.help-section').first(), key).toBeVisible();

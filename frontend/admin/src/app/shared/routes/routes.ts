@@ -122,6 +122,14 @@ export const content: Routes = [
       ),
   },
   {
+    path: 'email',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../components/email/email.routes').then(
+        (routes) => routes.emailRoutes,
+      ),
+  },
+  {
     path: 'media',
     canActivate: [AuthGuard],
     loadChildren: () =>

@@ -11,6 +11,12 @@ import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { AuthRequest, verifyToken } from '../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../middleware/auth-permission.middleware';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import {
+  isMailConfigured,
+  listFolders,
+  listMailboxes,
+  searchMessages,
+} from '../../service/mail-provider.service';
 
 const router = express.Router();
 const { pool } = db;
@@ -155,6 +161,51 @@ router.get(
       // Without mail settings the messages are kept but nobody gets told.
       mail_configured: Boolean(process.env.SMTP_HOST && process.env.SMTP_FROM_EMAIL),
     });
+  },
+);
+
+// The mailbox behind "Audit Funnel": read, answered, unread. Only numbers, so public_contact.view
+// is enough. A mail service that is down must not break the contact page.
+router.get(
+  '/api/v1/public-contact/insight/mail',
+  verifyToken,
+  requirePermission('public_contact.view'),
+  async (_req: AuthRequest, res: Response) => {
+    const none = { configured: false };
+    if (!isMailConfigured()) {
+      return sendSuccess(res, 200, 'PUBLIC_CONTACT_INSIGHT_MAIL', 'Mailbox numbers', none);
+    }
+    try {
+      const mailboxes = await listMailboxes();
+      const wanted = (process.env.MAIL_INSIGHT_ADDRESS || '').trim().toLowerCase();
+      const mailbox =
+        mailboxes.find((item) => item.address.toLowerCase() === wanted) ?? mailboxes[0];
+      if (!mailbox) {
+        return sendSuccess(res, 200, 'PUBLIC_CONTACT_INSIGHT_MAIL', 'Mailbox numbers', none);
+      }
+      const folders = await listFolders(mailbox.resourceId);
+      const inbox = folders.find((item) => item.path === 'INBOX');
+      const answered = await searchMessages(
+        mailbox.resourceId,
+        'INBOX',
+        { flags: ['\\Answered'] },
+        1,
+        1,
+      );
+      const total = inbox?.messageCount ?? 0;
+      const unread = inbox?.unreadCount ?? 0;
+      const replied = answered.pagination.total;
+      return sendSuccess(res, 200, 'PUBLIC_CONTACT_INSIGHT_MAIL', 'Mailbox numbers', {
+        configured: true,
+        address: mailbox.address,
+        total,
+        unread,
+        answered: replied,
+        read: Math.max(0, total - unread - replied),
+      });
+    } catch {
+      return sendSuccess(res, 200, 'PUBLIC_CONTACT_INSIGHT_MAIL', 'Mailbox numbers', none);
+    }
   },
 );
 

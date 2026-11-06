@@ -1,0 +1,318 @@
+<app-page-wrapper
+  [gridClass]="'col-sm-12'"
+  [title]="'email_page.title' | translate"
+>
+  @if (state()?.configured && state()?.mailboxes?.length) {
+    <div button class="d-flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        data-testid="email-refresh"
+        (click)="refresh()"
+      >
+        <i class="ri-refresh-line" aria-hidden="true"></i>
+        {{ 'email_page.reload' | translate }}
+      </button>
+      <button
+        *hasPermission="'email.send'"
+        type="button"
+        class="btn btn-theme"
+        data-testid="email-new"
+        (click)="compose('new')"
+      >
+        <i class="ri-edit-line" aria-hidden="true"></i>
+        {{ 'email_page.compose' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (failed()) {
+    <div class="email-notice" role="alert" data-testid="email-failed">
+      <i class="ri-error-warning-line" aria-hidden="true"></i>
+      {{ 'email_page.failed' | translate }}
+    </div>
+  } @else if (state(); as current) {
+    @if (!current.configured) {
+      <div class="email-notice" data-testid="email-not-configured">
+        <i class="ri-mail-settings-line" aria-hidden="true"></i>
+        {{ 'email_page.not_configured' | translate }}
+      </div>
+    } @else {
+      <div class="email-board" data-testid="email-board">
+        <!-- Mailboxes and folders -->
+        <aside class="email-folders">
+          @if (current.mailboxes.length > 1) {
+            <select
+              class="form-select mb-2"
+              [attr.aria-label]="'email_page.mailbox' | translate"
+              [value]="mailbox()"
+              (change)="selectMailbox($any($event.target).value)"
+            >
+              @for (box of current.mailboxes; track box.id) {
+                <option [value]="box.id">{{ box.address }}</option>
+              }
+            </select>
+          } @else {
+            <div class="email-address" data-testid="email-address">
+              {{ current.mailboxes[0]?.address }}
+            </div>
+          }
+          <ul>
+            @for (item of folders(); track item.path) {
+              <li>
+                <button
+                  type="button"
+                  data-testid="email-folder"
+                  [class.active]="item.path === folder()"
+                  (click)="selectFolder(item.path)"
+                >
+                  <span>{{ item.name }}</span>
+                  @if (item.unread) {
+                    <b data-testid="email-unread">{{ item.unread }}</b>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+        </aside>
+
+        <!-- The list -->
+        <section class="email-list">
+          <input
+            type="search"
+            class="form-control"
+            data-testid="email-search"
+            [placeholder]="'email_page.search' | translate"
+            [value]="search()"
+            (keydown.enter)="onSearch($any($event.target).value)"
+            (search)="onSearch($any($event.target).value)"
+          />
+          <ul>
+            @for (item of messages(); track item.uid) {
+              <li>
+                <button
+                  type="button"
+                  data-testid="email-row"
+                  [class.active]="item.uid === uid()"
+                  [class.unseen]="item.unseen"
+                  (click)="selectMessage(item.uid)"
+                >
+                  <span class="email-list-top">
+                    <span class="email-from">{{ addressText(item.from) }}</span>
+                    <small>{{ item.date | date: 'dd MMM HH:mm' }}</small>
+                  </span>
+                  <span class="email-subject">
+                    @if (item.answered) {
+                      <i class="ri-reply-line" aria-hidden="true"></i>
+                    }
+                    @if (item.attachments.length) {
+                      <i class="ri-attachment-2" aria-hidden="true"></i>
+                    }
+                    {{ item.subject || ('email_page.no_subject' | translate) }}
+                  </span>
+                </button>
+              </li>
+            } @empty {
+              @if (!loadingList()) {
+                <li class="email-empty">
+                  {{ 'email_page.empty' | translate }}
+                </li>
+              }
+            }
+          </ul>
+          @if (totalPages() > 1) {
+            <div class="email-pages">
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                data-testid="email-prev"
+                [disabled]="page() <= 1"
+                (click)="goToPage(page() - 1)"
+              >
+                <i class="ri-arrow-left-s-line" aria-hidden="true"></i>
+              </button>
+              <span>{{ page() }} / {{ totalPages() }}</span>
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                data-testid="email-next"
+                [disabled]="page() >= totalPages()"
+                (click)="goToPage(page() + 1)"
+              >
+                <i class="ri-arrow-right-s-line" aria-hidden="true"></i>
+              </button>
+            </div>
+          }
+        </section>
+
+        <!-- The open message, or the writing form -->
+        <section class="email-reader">
+          @if (composing(); as mode) {
+            <form
+              class="theme-form theme-form-2 mega-form email-compose"
+              data-testid="email-compose"
+              [formGroup]="draft"
+              (ngSubmit)="send()"
+            >
+              <h6>{{ 'email_page.mode_' + mode | translate }}</h6>
+              <label class="form-label" for="email_to"
+                >{{ 'email_page.to' | translate }} <span>*</span></label
+              >
+              <input
+                id="email_to"
+                class="form-control"
+                formControlName="to"
+                [class.is-invalid]="
+                  draft.controls.to.touched && draft.controls.to.invalid
+                "
+              />
+              <label class="form-label" for="email_cc">{{
+                'email_page.cc' | translate
+              }}</label>
+              <input id="email_cc" class="form-control" formControlName="cc" />
+              <label class="form-label" for="email_subject"
+                >{{ 'email_page.subject' | translate }} <span>*</span></label
+              >
+              <input
+                id="email_subject"
+                class="form-control"
+                formControlName="subject"
+                [class.is-invalid]="
+                  draft.controls.subject.touched &&
+                  draft.controls.subject.invalid
+                "
+              />
+              <label class="form-label" for="email_text"
+                >{{ 'email_page.body' | translate }} <span>*</span></label
+              >
+              <textarea
+                id="email_text"
+                class="form-control"
+                rows="10"
+                formControlName="text"
+                [class.is-invalid]="
+                  draft.controls.text.touched && draft.controls.text.invalid
+                "
+              ></textarea>
+              <div class="email-actions mt-2">
+                <button
+                  type="submit"
+                  class="btn btn-theme"
+                  data-testid="email-send"
+                  [disabled]="sending()"
+                >
+                  <i class="ri-send-plane-line" aria-hidden="true"></i>
+                  {{ 'email_page.send' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  data-testid="email-discard"
+                  (click)="closeCompose()"
+                >
+                  {{ 'email_page.discard' | translate }}
+                </button>
+              </div>
+            </form>
+          } @else if (message(); as open) {
+            <article data-testid="email-message">
+              <h5 data-testid="email-open-subject">
+                {{ open.subject || ('email_page.no_subject' | translate) }}
+              </h5>
+              <dl class="email-meta">
+                <dt>{{ 'email_page.from' | translate }}</dt>
+                <dd>{{ addressText(open.from) }}</dd>
+                <dt>{{ 'email_page.to' | translate }}</dt>
+                <dd>{{ addressText(open.to) }}</dd>
+                <dt>{{ 'email_page.date' | translate }}</dt>
+                <dd>{{ open.date | date: 'dd MMM yyyy HH:mm' }}</dd>
+              </dl>
+              <div class="email-actions">
+                <ng-container *hasPermission="'email.send'">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    data-testid="email-reply"
+                    (click)="compose('reply')"
+                  >
+                    <i class="ri-reply-line" aria-hidden="true"></i>
+                    {{ 'email_page.reply' | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm"
+                    data-testid="email-forward"
+                    (click)="compose('forward')"
+                  >
+                    <i class="ri-share-forward-line" aria-hidden="true"></i>
+                    {{ 'email_page.forward' | translate }}
+                  </button>
+                </ng-container>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm"
+                  data-testid="email-mark-unread"
+                  (click)="markUnread()"
+                >
+                  <i class="ri-mail-unread-line" aria-hidden="true"></i>
+                  {{ 'email_page.mark_unread' | translate }}
+                </button>
+                @if (!inTrash()) {
+                  <ng-container *hasPermission="'email.manage'">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      data-testid="email-trash"
+                      (click)="moveToTrash()"
+                    >
+                      <i class="ri-delete-bin-line" aria-hidden="true"></i>
+                      {{ 'email_page.trash' | translate }}
+                    </button>
+                  </ng-container>
+                }
+              </div>
+              @if (open.attachments.length) {
+                <ul class="email-files">
+                  @for (file of open.attachments; track file.id) {
+                    <li>
+                      <button
+                        type="button"
+                        data-testid="email-attachment"
+                        (click)="download(file)"
+                      >
+                        <i class="ri-attachment-2" aria-hidden="true"></i>
+                        {{ file.filename }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+              @if (showImagesOffer()) {
+                <div class="email-images" data-testid="email-images">
+                  {{ 'email_page.images_blocked' | translate }}
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm"
+                    (click)="allowImages.set(true)"
+                  >
+                    {{ 'email_page.show_images' | translate }}
+                  </button>
+                </div>
+              }
+              <!-- No allow-scripts and no allow-same-origin: a mail's HTML cannot run or reach this page. -->
+              <iframe
+                class="email-frame"
+                data-testid="email-frame"
+                sandbox="allow-popups allow-popups-to-escape-sandbox"
+                [attr.title]="open.subject"
+                [srcdoc]="frame()"
+              ></iframe>
+            </article>
+          } @else if (!loadingMessage()) {
+            <p class="email-empty">{{ 'email_page.choose' | translate }}</p>
+          }
+        </section>
+      </div>
+    }
+  }
+</app-page-wrapper>

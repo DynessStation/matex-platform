@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 import { assertSafeStack } from './write/stack.mjs';
-import { adminServer, apiServer, publicServer } from './write/servers';
+import { adminServer, apiServer, mailServer, publicServer } from './write/servers';
 
 // Write-flow suite: runs against an isolated local stack only (see write/stack.mjs).
 // Start it with `npm run test:write`, which rebuilds the e2e database first.
@@ -27,5 +27,5 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
   },
-  webServer: [apiServer, adminServer, publicServer],
+  webServer: [mailServer, apiServer, adminServer, publicServer],
 });

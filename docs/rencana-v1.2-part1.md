@@ -124,6 +124,12 @@ Yang disesuaikan dari PDF:
 
 ## Tahap 5: Menu Email
 
+**Selesai 6 November (lokal), diuji dengan server tiruan** (`ops/e2e/write/fake-mail-server.mjs`, mengikuti OpenAPI Hostinger versi 1.3.0). Migration 031 (izin `email.view`, `email.send`, `email.manage`). Test `email-api.spec.ts` dan `email-page.spec.ts`. Catatan hasil:
+
+- Tidak memakai SDK `hostinger-mail-api-sdk`: `fetch` Node sudah cukup untuk API ini, jadi tidak menambah dependensi (`axios`). Semua panggilan tetap lewat satu file, `service/mail-provider.service.ts`.
+- Token saat ini hanya mencakup satu mailbox. Audit Funnel menghitung mailbox itu, bukan alamat pengirim form seperti di mockup; `MAIL_INSIGHT_ADDRESS` bisa menunjuk alamat lain kalau cakupan token ditambah.
+- Menulis pesan dengan lampiran dan webhook belum dibuat.
+
 **Integrasi:** Hostinger Mail API resmi (`api.mail.hostinger.com`, SDK `hostinger-mail-api-sdk`) dipanggil dari backend saja.
 
 Yang sudah dipastikan dari dokumentasi Hostinger: folder, daftar, cari, baca, lampiran, flag, pindah, hapus, kirim, balas, dan terusan. Token dibuat di Agentic Mail > Akses API, bisa dibatasi per mailbox, dan token API hPanel biasa tidak berlaku.

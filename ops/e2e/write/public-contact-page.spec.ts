@@ -270,7 +270,8 @@ test('the insight band counts per account and per channel', async ({ page, reque
   await expect(socials.getByTestId('missing-platform')).not.toContainText(['TikTok']);
   const channels = panel.getByTestId('insight-column').nth(1);
   await expect(channels.getByTestId('insight-rank').locator('li').first()).toContainText('1');
-  await expect(panel.getByTestId('insight-audit')).toContainText('Total Pesan Form Kontak');
+  // The mailbox numbers have their own test in email-page.spec.ts.
+  await expect(panel.getByTestId('insight-audit')).toContainText('Total Pesan');
   if (screenshots) {
     await page.setViewportSize({ width: 1440, height: 1400 });
     await page.reload();

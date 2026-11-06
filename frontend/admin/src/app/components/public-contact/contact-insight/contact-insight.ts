@@ -24,6 +24,7 @@ import {
 import {
   IContactInsightAudit,
   IContactInsightChannel,
+  IContactInsightMail,
   IContactInsightSocial,
 } from '../../../shared/interface/public-contact.interface';
 import { PublicContactService } from '../../../shared/services/public-contact.service';
@@ -74,6 +75,7 @@ export class ContactInsight {
   readonly socials = signal<IContactInsightSocial[]>([]);
   readonly channels = signal<IContactInsightChannel[]>([]);
   readonly audit = signal<IContactInsightAudit | null>(null);
+  readonly mail = signal<IContactInsightMail | null>(null);
 
   private readonly visits = computed(() =>
     this.translate.instant('public_contact.insight_visits'),
@@ -115,10 +117,33 @@ export class ContactInsight {
     ),
   );
 
+  /** With the mail service on, the funnel counts the mailbox; otherwise the form's deliveries. */
+  readonly totalLabel = computed(() => {
+    const mail = this.mail();
+    return mail?.configured
+      ? this.translate.instant('public_contact.insight_mail_total', {
+          address: mail.address,
+        })
+      : this.translate.instant('public_contact.insight_total');
+  });
+
+  readonly total = computed(() => {
+    const mail = this.mail();
+    return mail?.configured ? (mail.total ?? 0) : (this.audit()?.total ?? 0);
+  });
+
   readonly segments = computed<InsightSegment[]>(() => {
     const audit = this.audit();
+    const mail = this.mail();
     const name = (key: string) =>
       this.translate.instant(`public_contact.insight_${key}`);
+    if (mail?.configured) {
+      return [
+        { label: name('read'), value: mail.read ?? 0, tone: 'success' },
+        { label: name('answered'), value: mail.answered ?? 0, tone: 'info' },
+        { label: name('unread'), value: mail.unread ?? 0, tone: 'warning' },
+      ];
+    }
     return [
       { label: name('sent'), value: audit?.sent ?? 0, tone: 'success' },
       { label: name('failed'), value: audit?.failed ?? 0, tone: 'danger' },
@@ -147,6 +172,7 @@ export class ContactInsight {
         ? { state: 'ok', text: text('no_failed') }
         : { state: 'warn', text: text('has_failed', { count: audit.failed }) },
       { state: 'ok', text: text('today', { count: audit.today }) },
+      ...this.mailChecks(),
     ];
   });
 
@@ -163,12 +189,31 @@ export class ContactInsight {
         .insightChannels(DAYS[this.channelRange()])
         .subscribe((response) => this.channels.set(response.data ?? []));
     });
+    this.service
+      .insightMail()
+      .subscribe((response) => this.mail.set(response.data ?? null));
     effect(() => {
       this.version();
       this.service
         .insightAudit()
         .subscribe((response) => this.audit.set(response.data ?? null));
     });
+  }
+
+  private mailChecks(): InsightCheck[] {
+    const mail = this.mail();
+    if (!mail?.configured) return [];
+    const unread = mail.unread ?? 0;
+    return [
+      {
+        state: unread > 0 ? 'warn' : 'ok',
+        text: this.translate.instant('public_contact.insight_waiting', {
+          count: unread,
+        }),
+        link: '/email',
+        actionLabel: this.translate.instant('public_contact.insight_open_mail'),
+      },
+    ];
   }
 
   private stats(item: IContactInsightSocial): string {

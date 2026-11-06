@@ -67,6 +67,14 @@ export interface IContactInsightAudit {
   topics_without_recipient: number;
   mail_configured: boolean;
 }
+export interface IContactInsightMail {
+  configured: boolean;
+  address?: string;
+  total?: number;
+  unread?: number;
+  answered?: number;
+  read?: number;
+}
 export interface IPublicContactSettings {
   socials?: IPublicSocialAccount[];
   channels: IPublicContactChannel[];

@@ -66,6 +66,7 @@ export const HELP_GUIDES: HelpGuideEntry[] = [
   { key: 'category', title: 'product_categories', path: '/category' },
   { key: 'product', title: 'products', path: '/product' },
   { key: 'media', title: 'media', path: '/media' },
+  { key: 'email', title: 'email', path: '/email' },
   { key: 'account', title: 'my_account', path: '/account' },
 ];
 

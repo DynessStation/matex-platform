@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 import { assertSafeStack } from './write/stack.mjs';
-import { apiServer } from './write/servers';
+import { apiServer, mailServer } from './write/servers';
 
 // API contract specs (write/*-api.spec.ts) against the isolated e2e API only, without
 // building the frontends. Start it with `npm run test:api`, which rebuilds the e2e database
@@ -18,5 +18,5 @@ export default defineConfig({
   timeout: 60_000,
   reporter: [['list']],
   outputDir: 'test-results-api',
-  webServer: [apiServer],
+  webServer: [mailServer, apiServer],
 });

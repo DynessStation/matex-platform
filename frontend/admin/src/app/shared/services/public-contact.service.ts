@@ -8,6 +8,7 @@ import { IApiResponse } from '../interface/api-response.interface';
 import {
   IContactInsightAudit,
   IContactInsightChannel,
+  IContactInsightMail,
   IContactInsightSocial,
   IPublicContactResponse,
   IPublicContactSettings,
@@ -35,6 +36,11 @@ export class PublicContactService {
     return this.http.get<IApiResponse<IContactInsightChannel[]>>(
       `${this.apiUrl}/insight/channels`,
       { params: { days } },
+    );
+  }
+  insightMail() {
+    return this.http.get<IApiResponse<IContactInsightMail>>(
+      `${this.apiUrl}/insight/mail`,
     );
   }
   insightAudit() {
