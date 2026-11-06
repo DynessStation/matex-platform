@@ -8,9 +8,15 @@
 
 Artikel adalah tulisan edukatif di halaman artikel website matexindo.com, misalnya pengetahuan tentang lateks. Setiap artikel ditulis dalam Bahasa Indonesia dan English, dilengkapi SEO, gambar, dan pengaturan tayang.
 
-Formulir terdiri atas lima tab: Umum, Konten & Bahasa, SEO, Media, dan Publikasi. Tombol **Lanjut ke …** dan **Kembali ke …** di bawah tiap tab membantu berpindah; simpan dengan **Simpan Artikel**. Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
+Formulir terdiri atas empat tab: Konten & Bahasa, SEO, Media, dan Publikasi. Judul artikel selalu tampil di atas tab, titik di tiap tab menunjukkan statusnya (hijau lengkap, oranye perlu dilihat, merah wajib diperbaiki), dan tombol simpan ada di bawah daftar tab. Tombol **Lanjut ke …** dan **Kembali ke …** di bawah tiap tab membantu berpindah; simpan dengan **Simpan Artikel**. Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/blog
+
+## Ringkasan di Atas Daftar
+
+Tombol ikon grafik di kanan atas membuka atau menutup ringkasan. Pilihan 1H, 7H, dan 1B mengatur rentang tiap kolom (1 hari, 7 hari, 30 hari). **Lihat tag teratas** membuka Kelola Tag.
+
+Skor konsistensi adalah persentase dari 8 minggu terakhir yang ada artikel terbit, dengan perubahannya dibanding 8 minggu sebelumnya. Jangkauan adalah pengunjung unik halaman artikel. Dibagikan dihitung dari tombol bagikan di halaman artikel. Audit menghitung semua artikel, dan **Perbaiki** menyaring daftar ke artikel yang bermasalah.
 
 ## Daftar Artikel
 
@@ -20,25 +26,13 @@ Kotak **Cari** mencari di kunci internal dan judul. Menu aksi berisi Edit, Hapus
 
 draft (belum tampil), published (tampil), scheduled (terjadwal, tampil otomatis saat waktunya tiba), atau archived (disembunyikan dari website).
 
-## Tab Umum
-
-Identitas internal dan penanda artikel.
-
-### Kunci internal
-
-Kode tetap artikel untuk sistem, wajib dan unik, paling banyak 120 karakter, misalnya manfaat-lateks-alami. Hanya huruf kecil, angka, dan tanda hubung; tidak tampil sebagai judul.
-
-### Penanda artikel
-
-**Unggulan** mendahulukan artikel di bagian artikel beranda website (3 artikel). **Sematkan** menaruh artikel paling atas di halaman daftar artikel website, sebelum artikel terbaru.
-
 ## Tab Konten & Bahasa
 
 Isi artikel, diisi untuk Bahasa Indonesia dan English (pilih bahasa dengan tombol di atas tab).
 
 ### Slug URL
 
-Bagian alamat artikel di website, wajib per bahasa, misalnya mengenal-lateks-alam. Ditulis manual dengan huruf kecil, angka, dan tanda hubung; tidak dibuat otomatis dari judul. Harus unik.
+Alamat artikel. Pada artikel baru dibuat otomatis dari judul; ikon pensil membukanya untuk diisi sendiri. Bila alamat artikel yang sudah ada diubah, alamat lama otomatis dialihkan ke alamat baru.
 
 ### Judul
 
@@ -51,6 +45,16 @@ Satu atau dua kalimat yang tampil di kartu dan daftar artikel, opsional, paling 
 ### Isi artikel
 
 Isi tulisan dengan editor teks, wajib per bahasa. Gunakan Heading 2 untuk bagian utama dan Heading 3 untuk subbagian; tulis teks tautan yang menjelaskan tujuannya. Kode skrip di dalam isi ditolak sistem.
+
+### Tag
+
+Pilih tag yang sudah ada atau tulis yang baru (Enter untuk menambah), lalu tag baru dibuat saat artikel disimpan. Daftar pilihan menunjukkan berapa artikel yang memakai tiap tag.
+
+Tag punya halaman sendiri di website yang berisi artikel dengan tag itu, dan halamannya masuk mesin pencari setelah punya minimal 2 artikel. **Kelola tag** mengatur nama per bahasa dan menghapus tag yang tidak dipakai; tag baru memakai nama yang sama untuk kedua bahasa sampai diterjemahkan di sana.
+
+### Penulis
+
+Nama yang tampil ke pembaca. Awalnya nama akun Anda, dan boleh diganti nama pena. Sistem tetap mencatat akun yang membuat artikel. Bila dikosongkan, pembaca melihat MATEX.
 
 ### Bantuan menulis
 
@@ -70,7 +74,7 @@ Teks di bawah judul pada hasil pencarian Google; idealnya sekitar 155 karakter.
 
 ### Canonical URL
 
-Alamat utama artikel bila isinya juga ada di alamat lain. Biarkan kosong kecuali developer meminta.
+Otomatis memakai alamat artikel itu sendiri, dan biasanya tidak perlu diubah. Ikon pensil membuka isian untuk alamat lain di website yang sama; ikon putar mengembalikannya ke otomatis.
 
 ### Judul dan deskripsi saat dibagikan
 
@@ -91,6 +95,10 @@ Gambar opsional saat tautan artikel dibagikan; bila kosong, gambar utama dipakai
 ## Tab Publikasi
 
 Pilih salah satu status lalu simpan.
+
+### Penanda artikel
+
+**Unggulan** mendahulukan artikel di bagian artikel beranda website (3 artikel). **Sematkan** menaruh artikel paling atas pada daftar artikel.
 
 ### Simpan sebagai draf
 

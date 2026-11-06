@@ -7,7 +7,12 @@ import { distinctUntilChanged, filter, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 type PublicEventName =
-  'page_view' | 'outbound_click' | 'contact_start' | 'contact_submit' | 'web_vital';
+  | 'page_view'
+  | 'outbound_click'
+  | 'contact_start'
+  | 'contact_submit'
+  | 'web_vital'
+  | 'article_share';
 
 interface AnalyticsConfigResponse {
   data?: { enabled?: boolean };
@@ -36,6 +41,10 @@ export class PublicAnalyticsService {
 
   contactSubmitted(): void {
     this.track('contact_submit', 'contact-form');
+  }
+
+  articleShared(channel: string): void {
+    this.track('article_share', channel);
   }
 
   private async loadConfig(): Promise<void> {
@@ -109,7 +118,8 @@ export class PublicAnalyticsService {
     const listener = (event: Event) => {
       const target = event.target instanceof Element ? event.target.closest('a[href]') : null;
       const href = target?.getAttribute('href');
-      if (!href) return;
+      // Share links count as shares (articleShared), not as visitors leaving.
+      if (!href || target?.hasAttribute('data-share')) return;
       try {
         const url = new URL(href, this.document.location.href);
         if (

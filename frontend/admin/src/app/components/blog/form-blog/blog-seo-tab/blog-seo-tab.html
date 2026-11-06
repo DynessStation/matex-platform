@@ -37,10 +37,9 @@
         <label class="form-label"
           >Canonical URL
           <app-help-tip section="tab-seo--canonical-url" /></label
-        ><input
-          class="form-control"
-          formControlName="id_canonical_url"
-          placeholder="https://..."
+        ><app-auto-field
+          [control]="form.controls.id_canonical_url"
+          [autoValue]="'/artikel/' + (form.controls.id_slug.value ?? '')"
         />
       </div>
       <div class="col-12">
@@ -100,10 +99,9 @@
         <label class="form-label"
           >Canonical URL
           <app-help-tip section="tab-seo--canonical-url" /></label
-        ><input
-          class="form-control"
-          formControlName="en_canonical_url"
-          placeholder="https://..."
+        ><app-auto-field
+          [control]="form.controls.en_canonical_url"
+          [autoValue]="'/en/article/' + (form.controls.en_slug.value ?? '')"
         />
       </div>
       <div class="col-12">

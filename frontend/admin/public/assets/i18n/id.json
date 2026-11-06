@@ -1,4 +1,50 @@
 {
+  "article_form": {
+    "create": "Simpan Artikel",
+    "update": "Perbarui Artikel",
+    "title": "Judul",
+    "slug": "Alamat URL",
+    "title_en": "Title",
+    "slug_en": "URL address"
+  },
+  "article_tags": {
+    "title": "Kelola Tag",
+    "hint": "Nama tag per bahasa dan jumlah artikel yang memakainya. Tag yang tidak dipakai bisa dihapus.",
+    "name_id": "Nama (Indonesia)",
+    "name_en": "Nama (English)",
+    "count": "Artikel",
+    "saved": "Tag tersimpan.",
+    "deleted": "Tag dihapus."
+  },
+  "article_insight": {
+    "top": "5 Artikel Teratas",
+    "top_tags": "Lihat tag teratas",
+    "chart": "Grafik Publikasi dan Trafik",
+    "published_new": "Publikasi baru",
+    "views": "View artikel",
+    "shares": "Dibagikan",
+    "reach": "Jangkauan",
+    "score": "Skor konsistensi",
+    "score_good": "Baik",
+    "score_fair": "Cukup",
+    "score_low": "Perlu ditingkatkan",
+    "audit": "Audit Data Artikel",
+    "total": "Total Artikel",
+    "published": "Terbit",
+    "scheduled": "Terjadwal",
+    "draft": "Draf",
+    "archived": "Arsip",
+    "check_no_tag": "{{count}} artikel tanpa tag",
+    "check_untranslated": "{{count}} artikel belum diterjemahkan",
+    "check_no_image": "{{count}} artikel tanpa gambar utama",
+    "check_long_meta": "{{count}} artikel judul atau deskripsi SEO kepanjangan",
+    "check_no_excerpt": "{{count}} artikel tanpa ringkasan",
+    "filter_no_tag": "Artikel tanpa tag",
+    "filter_untranslated": "Artikel belum diterjemahkan",
+    "filter_no_image": "Artikel tanpa gambar utama",
+    "filter_long_meta": "Artikel dengan SEO kepanjangan",
+    "filter_no_excerpt": "Artikel tanpa ringkasan"
+  },
   "dashboard_tabs": {
     "website": "Website",
     "inventory": "Inventaris",
@@ -7,6 +53,11 @@
     "website_alert": "Ada yang perlu diperhatikan"
   },
   "form_kit": {
+    "tag_new": "baru",
+    "tag_placeholder": "Pilih atau tulis tag...",
+    "tag_create": "Tambah tag \"{{name}}\"",
+    "tag_count": "{{count}} artikel",
+    "tag_manage": "Kelola tag",
     "untitled": "Tanpa Judul",
     "save": "Simpan",
     "check_again": "Periksa kembali: ada hal yang belum lengkap",

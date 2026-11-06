@@ -156,15 +156,13 @@ test('admin can publish an article that appears on the public site', async ({ pa
 
   await login(page);
   await page.goto(`${stack.adminOrigin}/blog/create`);
-  await page.locator('#key').fill(`e2e-article-${run}`);
 
   await openTab(page, 'Konten & Bahasa');
-  await page.locator('#id_slug').fill(slug);
-  await page.locator('#id_title').fill(title);
+  await page.locator('#id_title').pressSequentially(title);
+  await expect(page.locator('#id_slug')).toHaveValue(slug.replace('e2e-artikel', 'artikel-uji'));
   await typeInEditor(page, 0, 'Isi artikel uji otomatis.');
   await page.getByRole('button', { name: /EN\s*English/ }).click();
-  await page.locator('input[formcontrolname=en_slug]').fill(`${slug}-en`);
-  await page.locator('input[formcontrolname=en_title]').fill(`Test Article ${run}`);
+  await page.locator('#en_title').pressSequentially(`Test Article ${run}`);
   await typeInEditor(page, 0, 'Automated test article body.');
 
   // Upload a new thumbnail from inside the picker (audit FE-007/FE-008), then insert it.
@@ -188,7 +186,9 @@ test('admin can publish an article that appears on the public site', async ({ pa
   await page.waitForURL(/\/blog(?:[?#]|$)/);
   await expect(page.locator('body')).toContainText(title);
 
-  const response = await page.goto(`${stack.publicOrigin}/artikel/${slug}`);
+  const response = await page.goto(
+    `${stack.publicOrigin}/artikel/${slug.replace('e2e-artikel', 'artikel-uji')}`,
+  );
   expect(response?.status()).toBe(200);
   await expect(page.locator('body')).toContainText(title);
 });

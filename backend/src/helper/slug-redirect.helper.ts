@@ -5,9 +5,9 @@ import { Pool, PoolConnection } from 'mysql2/promise';
 
 import { PUBLIC_WHERE } from '../config/public-content.config';
 
-export type SlugEntity = 'article' | 'product' | 'product_category';
+export type SlugEntity = 'article' | 'product' | 'product_category' | 'article_tag';
 
-// The aliases match PUBLIC_WHERE: a/p/c for the record, i for its translation.
+// The aliases match PUBLIC_WHERE: a/p/c/t for the record, i for its translation.
 const ENTITIES: Record<
   SlugEntity,
   { id: string; from: string; alias: string; locale: string; slug: string; i18n: string }
@@ -20,6 +20,15 @@ const ENTITIES: Record<
     locale: 'article_locale',
     slug: 'article_slug',
     i18n: 'article_i18n',
+  },
+  article_tag: {
+    id: 'id_article_tag',
+    from: `article_tag t JOIN article_tag_i18n i
+      ON i.id_article_tag = t.id_article_tag AND i.id_master_comp = t.id_master_comp`,
+    alias: 't',
+    locale: 'article_tag_locale',
+    slug: 'article_tag_slug',
+    i18n: 'article_tag_i18n',
   },
   product: {
     id: 'id_product',

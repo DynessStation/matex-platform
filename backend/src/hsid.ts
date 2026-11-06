@@ -49,6 +49,8 @@ const idContactInquiryTopic = new SafeHashids('key_contactInquiryTopic123', 8);
 
 const idArticle = new SafeHashids('key_article123', 8);
 
+const idArticleTag = new SafeHashids('key_articleTag123', 8);
+
 const idProductCategory = new SafeHashids('key_productCategory123', 8);
 
 export default {
@@ -70,5 +72,6 @@ export default {
   idPublicContactChannel,
   idContactInquiryTopic,
   idArticle,
+  idArticleTag,
   idProductCategory,
 };

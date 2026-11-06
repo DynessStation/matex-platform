@@ -155,6 +155,27 @@
       </div>
     </div>
   </div>
+  <div class="mt-4">
+    <label class="form-label"
+      >Penanda artikel <app-help-tip section="tab-publikasi--penanda-artikel"
+    /></label>
+    <div class="article-checks">
+      <label class="app-check app-check-card"
+        ><input type="checkbox" formControlName="is_featured" />
+        <span
+          ><strong>Unggulan</strong
+          ><small>Tonjolkan pada blok artikel pilihan.</small></span
+        ></label
+      >
+      <label class="app-check app-check-card"
+        ><input type="checkbox" formControlName="is_sticky" />
+        <span
+          ><strong>Sematkan</strong
+          ><small>Prioritaskan pada urutan daftar artikel.</small></span
+        ></label
+      >
+    </div>
+  </div>
   <div class="article-actions">
     <button
       type="button"
@@ -162,8 +183,6 @@
       (click)="editor.setTab('media')"
     >
       <i class="ri-arrow-left-line"></i> Kembali ke Media</button
-    ><app-button id="article_save">{{
-      editor.type() === 'create' ? 'Simpan Artikel' : 'Perbarui Artikel'
-    }}</app-button>
+    ><span></span>
   </div>
 </section>

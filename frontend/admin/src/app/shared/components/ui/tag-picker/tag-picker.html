@@ -1,0 +1,70 @@
+<div class="tag-picker" data-testid="tag-picker">
+  <div class="tag-picker-box form-control">
+    @for (item of list(); track item.name) {
+      <span class="tag-picker-chip" data-testid="tag-chip">
+        {{ item.name }}
+        @if (!item.id) {
+          <small>{{ 'form_kit.tag_new' | translate }}</small>
+        }
+        <button
+          type="button"
+          [attr.aria-label]="'form_kit.table_remove' | translate"
+          (click)="remove(item)"
+        >
+          <i class="ri-close-line" aria-hidden="true"></i>
+        </button>
+      </span>
+    }
+    <input
+      autocomplete="off"
+      [id]="inputId()"
+      [attr.maxlength]="maxLength()"
+      [placeholder]="'form_kit.tag_placeholder' | translate"
+      [value]="term()"
+      (focus)="open.set(true)"
+      (blur)="close()"
+      (input)="term.set($any($event.target).value); open.set(true)"
+      (keydown.enter)="onEnter($event)"
+      (keydown.backspace)="onBackspace()"
+      (keydown.escape)="open.set(false)"
+    />
+  </div>
+  @if (open() && (matches().length || canCreate())) {
+    <ul class="tag-picker-menu" data-testid="tag-menu">
+      @if (canCreate()) {
+        <li>
+          <button
+            type="button"
+            data-testid="tag-create"
+            (mousedown)="addWritten()"
+          >
+            <i class="ri-add-line" aria-hidden="true"></i>
+            {{ 'form_kit.tag_create' | translate: { name: clean() } }}
+          </button>
+        </li>
+      }
+      @for (option of matches(); track option.id) {
+        <li>
+          <button
+            type="button"
+            data-testid="tag-option"
+            (mousedown)="add({ id: option.id, name: option.name })"
+          >
+            <span>{{ option.name }}</span>
+            <small>{{
+              'form_kit.tag_count' | translate: { count: option.count }
+            }}</small>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+  <button
+    type="button"
+    class="tag-picker-manage"
+    data-testid="tag-manage"
+    (click)="manage.emit()"
+  >
+    {{ 'form_kit.tag_manage' | translate }}
+  </button>
+</div>

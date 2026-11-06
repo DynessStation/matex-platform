@@ -1,4 +1,7 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'blog'">
+  <div button>
+    <app-insight-toggle storageKey="blog" [(open)]="insightOpen" />
+  </div>
   <div *hasPermission="'article.create'" button>
     <a
       [routerLink]="['/blog/create']"
@@ -7,6 +10,21 @@
       <i class="ri-add-line"></i> Tambah Artikel
     </a>
   </div>
+  @if (insightOpen()) {
+    <app-blog-insight />
+  }
+  @if (audit(); as key) {
+    <div class="audit-filter" data-testid="audit-filter">
+      {{ 'article_insight.filter_' + key | translate }}
+      <button
+        type="button"
+        [attr.aria-label]="'form_kit.cancel' | translate"
+        (click)="clearAudit()"
+      >
+        <i class="ri-close-line" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
   <app-table
     [tableConfig]="tableConfig"
     [hasCheckbox]="true"

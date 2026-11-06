@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { BlogTagResolver } from '../../shared/resolver/blog-tag.resolver';
 import { BlogResolver } from '../../shared/resolver/blog.resolver';
 
 export const blog: Routes = [
@@ -10,6 +11,16 @@ export const blog: Routes = [
   {
     path: 'en/articles',
     loadComponent: () => import('./blog').then((m) => m.Blog),
+  },
+  {
+    path: 'artikel/tag/:slug',
+    loadComponent: () => import('./blog').then((m) => m.Blog),
+    resolve: { data: BlogTagResolver },
+  },
+  {
+    path: 'en/articles/tag/:slug',
+    loadComponent: () => import('./blog').then((m) => m.Blog),
+    resolve: { data: BlogTagResolver },
   },
   {
     path: 'blogs',

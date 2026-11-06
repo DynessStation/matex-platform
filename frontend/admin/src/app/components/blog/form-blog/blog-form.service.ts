@@ -3,7 +3,11 @@ import { Injectable, PLATFORM_ID, Signal, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDateStruct,
+  NgbModal,
+  NgbTimeStruct,
+} from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { Editor } from 'ngx-editor';
 
@@ -16,15 +20,24 @@ import {
   localDate,
 } from './form-blog.util';
 import {
+  TabState,
+  tabState,
+} from '../../../shared/components/ui/form-kit/form-kit.util';
+import {
   MediaSelection,
   selectedAttachment,
 } from '../../../shared/components/ui/media-box/media-box';
+import {
+  TagChoice,
+  TagOption,
+} from '../../../shared/components/ui/tag-picker/tag-picker.model';
 import { mediaConfig } from '../../../shared/data/media-config';
 import {
   ArticleStatus,
   IArticleDetail,
   IArticlePayload,
 } from '../../../shared/interface/blog.interface';
+import { BlogService } from '../../../shared/services/blog.service';
 import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import {
@@ -32,7 +45,9 @@ import {
   EditBlogAction,
   UpdateBlogAction,
 } from '../../../shared/store/action/blog.action';
+import { AuthState } from '../../../shared/store/state/auth.state';
 import { BlogState } from '../../../shared/store/state/blog.state';
+import { ArticleTagsModal } from '../article-tags-modal/article-tags-modal';
 
 // Shared state of the article form and its tabs: the reactive form, the editors, the
 // publication schedule, loading the edited article, and saving with its validation.
@@ -45,6 +60,8 @@ export class BlogFormService {
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   private formIssues = inject(FormIssueNavigatorService);
+  private blog = inject(BlogService);
+  private modal = inject(NgbModal);
 
   // Bound to the form's input in connect().
   type: Signal<'create' | 'edit'> = signal('create');
@@ -60,17 +77,18 @@ export class BlogFormService {
   article: IArticleDetail | null = null;
   idEditor?: Editor;
   enEditor?: Editor;
-  activeTab: BlogFormTab = 'general';
+  activeTab: BlogFormTab = 'content';
+  readonly saving = signal(false);
+  readonly tried = signal(false);
+  readonly tagOptions = signal<TagOption[]>([]);
   activeLocale: BlogFormLocale = 'id';
   publishDate: NgbDateStruct | null = null;
   publishTime: NgbTimeStruct | null = null;
   unpublishDate: NgbDateStruct | null = null;
   unpublishTime: NgbTimeStruct | null = null;
   readonly form = this.fb.group({
-    key: [
-      '',
-      [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)],
-    ],
+    tags: [[] as TagChoice[]],
+    author_name: ['', Validators.maxLength(120)],
     status: ['draft' as ArticleStatus, Validators.required],
     is_featured: [false],
     is_sticky: [false],
@@ -108,6 +126,13 @@ export class BlogFormService {
       this.enEditor = new Editor();
     }
     this.id = this.route.snapshot.paramMap.get('id');
+    this.loadTags();
+    // A new article starts under its writer's name; a pen name can replace it.
+    if (!this.id) {
+      this.form.controls.author_name.setValue(
+        this.store.selectSnapshot(AuthState.user)?.name ?? '',
+      );
+    }
     if (this.id)
       this.store.dispatch(new EditBlogAction(this.id)).subscribe(() => {
         const a = this.store.selectSnapshot(BlogState.selectedBlog);
@@ -116,7 +141,8 @@ export class BlogFormService {
         const id = a.translations.find((t) => t.locale === 'id-ID'),
           en = a.translations.find((t) => t.locale === 'en-US');
         this.form.patchValue({
-          key: a.key,
+          tags: a.tags,
+          author_name: a.author_name,
           status: a.status,
           is_featured: a.is_featured,
           is_sticky: a.is_sticky,
@@ -156,6 +182,60 @@ export class BlogFormService {
   //==================================================
   //==== TABS AND MEDIA
   //==================================================
+
+  private loadTags() {
+    this.blog.getTags().subscribe((response) => {
+      this.tagOptions.set(
+        (response.data ?? []).map((tag) => ({
+          id: tag.id,
+          name: tag.name_id,
+          count: tag.article_count,
+        })),
+      );
+    });
+  }
+  /** Kelola tag; the list is read again afterwards, names may have changed. */
+  manageTags() {
+    const refresh = () => this.loadTags();
+    this.modal
+      .open(ArticleTagsModal, { size: 'lg', centered: true })
+      .result.then(refresh, refresh);
+  }
+
+  //==================================================
+  //==== TAB STATE
+  //==================================================
+
+  tabStates(): Record<BlogFormTab, TabState> {
+    const c = this.form.controls;
+    return {
+      content: tabState({
+        required: [
+          c.id_title,
+          c.id_slug,
+          c.id_body,
+          c.en_title,
+          c.en_slug,
+          c.en_body,
+        ],
+        recommended: [c.id_excerpt, c.en_excerpt, c.tags, c.author_name],
+      }),
+      seo: tabState({
+        recommended: [c.id_meta_description, c.en_meta_description],
+      }),
+      media: tabState({
+        required: [c.thumbnail_id],
+        recommended: [c.og_image_id],
+      }),
+      publication: this.scheduledDateInvalid
+        ? 'error'
+        : tabState({ required: [c.status] }),
+    };
+  }
+  /** After a save was tried: something still stops it. */
+  get showIssue(): boolean {
+    return this.tried() && (this.form.invalid || this.scheduledDateInvalid);
+  }
 
   media(control: 'thumbnail_id' | 'og_image_id', value: MediaSelection) {
     this.form.controls[control].setValue(
@@ -231,6 +311,7 @@ export class BlogFormService {
 
   submit() {
     this.syncSchedule();
+    this.tried.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid || this.scheduledDateInvalid) {
       this.activeTab = this.firstInvalidTab();
@@ -244,7 +325,8 @@ export class BlogFormService {
     }
     const v = this.form.getRawValue();
     const payload: IArticlePayload = {
-      key: v.key,
+      tags: v.tags ?? [],
+      author_name: v.author_name ?? '',
       status: v.status,
       is_featured: v.is_featured ? 1 : 0,
       is_sticky: v.is_sticky ? 1 : 0,
@@ -260,21 +342,23 @@ export class BlogFormService {
     const action = this.id
       ? new UpdateBlogAction(payload, this.id)
       : new CreateBlogAction(payload);
+    this.saving.set(true);
     this.store.dispatch(action).subscribe({
       complete: () => void this.router.navigateByUrl('/blog'),
       error: (error) => {
+        this.saving.set(false);
         if (error?.error?.code !== 'ARTICLE_CONFLICT') return;
-        this.activeTab = 'general';
-        this.form.controls.key.setErrors({
-          ...(this.form.controls.key.errors ?? {}),
+        // The server found the address taken after the form's own check said free.
+        this.activeTab = 'content';
+        this.form.controls.id_slug.setErrors({
+          ...(this.form.controls.id_slug.errors ?? {}),
           duplicate: true,
         });
-        this.formIssues.focusFirstInvalid('key');
+        this.formIssues.focusFirstInvalid('id_slug');
       },
     });
   }
   private firstInvalidTab(): BlogFormTab {
-    if (this.form.controls.key.invalid) return 'general';
     if (
       this.form.controls.id_slug.invalid ||
       this.form.controls.id_title.invalid ||

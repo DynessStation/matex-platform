@@ -11,7 +11,7 @@ import { stack } from './stack.mjs';
 // tab (6C).
 test.describe.configure({ mode: 'serial' });
 
-const TABS = ['Umum', 'Konten & Bahasa', 'SEO', 'Media', 'Publikasi'];
+const TABS = ['Konten & Bahasa', 'SEO', 'Media', 'Publikasi'];
 let articleId = '';
 
 async function login(page: Page): Promise<void> {
@@ -82,24 +82,17 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await expect(form(page).locator('.nav-link')).toHaveCount(TABS.length);
   for (const tab of TABS) await openTab(page, tab);
 
-  // An empty save sends the admin back to General.
+  // An empty save goes to the first tab with a problem, and says so.
   await page.locator('button#article_save').click();
   await expect(
     page.getByText('Form artikel belum lengkap', { exact: false }).first(),
   ).toBeVisible();
-  await expect(form(page).locator('.nav-link.active')).toContainText('Umum');
-
-  // General: key and flags, then the step button to Content.
-  await control(page, 'key').fill(`form-artikel-${runId}`);
-  await control(page, 'is_featured').check();
-  await panel(page)
-    .getByRole('button', { name: /Lanjut/ })
-    .click();
   await expect(form(page).locator('.nav-link.active')).toContainText('Konten & Bahasa');
+  await expect(page.getByTestId('form-submit-note')).toBeVisible();
 
   // Content: both languages and the writing help (not configured in e2e).
-  await control(page, 'id_slug').fill(`form-artikel-${runId}`);
-  await control(page, 'id_title').fill(`Artikel Form ${runId}`);
+  await panel(page).locator('#id_title').pressSequentially(`Artikel Form ${runId}`);
+  await expect(panel(page).locator('#id_slug')).toHaveValue(`artikel-form-${runId}`);
   await control(page, 'id_excerpt').fill('Ringkasan artikel uji form.');
   await typeBody(page, 'Isi artikel uji form.');
   await panel(page).getByRole('button', { name: 'Isi ringkasan otomatis' }).click();
@@ -107,8 +100,7 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
     page.getByText(/Fitur isi otomatis belum aktif|Bantuan konten belum berhasil/).first(),
   ).toBeVisible();
   await language(page, 'EN');
-  await control(page, 'en_slug').fill(`form-article-${runId}`);
-  await control(page, 'en_title').fill(`Form Article ${runId}`);
+  await panel(page).locator('#en_title').pressSequentially(`Form Article ${runId}`);
   await typeBody(page, 'Form test article body.');
 
   // SEO follows the language chosen in Content.
@@ -132,6 +124,7 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   );
   await expect(panel(page).locator('ngb-timepicker').first()).toBeVisible();
   await panel(page).getByText('Publikasikan Sekarang').click();
+  await control(page, 'is_featured').check();
 
   const created = await save(page, 'POST');
   articleId = created.data.id ?? created.data.id_article;
@@ -144,15 +137,15 @@ test('edit shows the stored article and saves it unchanged', async ({ page }) =>
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);
   await page.goto(`${stack.adminOrigin}/blog/edit/${articleId}`);
-  await expect(control(page, 'key')).toHaveValue(`form-artikel-${runId}`);
-  await expect(control(page, 'is_featured')).toBeChecked();
-  await openTab(page, 'Konten & Bahasa');
-  await expect(control(page, 'id_title')).toHaveValue(`Artikel Form ${runId}`);
+  await expect(panel(page).getByTestId('internal-key')).toContainText(`artikel-form-${runId}`);
+  await expect(panel(page).locator('#id_title')).toHaveValue(`Artikel Form ${runId}`);
   await expect(panel(page).locator('.NgxEditor__Content')).toContainText('Isi artikel uji form.');
   await openTab(page, 'SEO');
   await expect(control(page, 'id_meta_title')).toHaveValue('Artikel Form | MATEX');
   await openTab(page, 'Media');
   await expect(panel(page).locator('.image-select-list img').nth(1)).toBeVisible();
+  await openTab(page, 'Publikasi');
+  await expect(control(page, 'is_featured')).toBeChecked();
 
   await save(page, 'PUT');
   await saveRecording('blog-form', ['article', 'article_i18n', 'article_attachment']);

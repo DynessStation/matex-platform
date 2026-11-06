@@ -9,6 +9,10 @@ import { IApiResponse } from '../interface/api-response.interface';
 import {
   ArticleStatus,
   IArticleDetail,
+  IArticleInsightAudit,
+  IArticleInsightChart,
+  IArticleInsightTop,
+  IArticleTag,
   IArticlePayload,
   IBlogModel,
 } from '../interface/blog.interface';
@@ -18,6 +22,7 @@ import { Params } from '../interface/core.interface';
 export class BlogService {
   private http = inject(HttpClient);
   private api = `${environment.API_URL}/api/v1/articles`;
+  private tagApi = `${environment.API_URL}/api/v1/article-tags`;
   getBlogs(payload?: Params): Observable<IBlogModel> {
     const params = listParams(payload);
 
@@ -42,5 +47,33 @@ export class BlogService {
   }
   delete(id: string) {
     return this.http.delete<IApiResponse<null>>(`${this.api}/${id}`);
+  }
+
+  getTags() {
+    return this.http.get<IApiResponse<IArticleTag[]>>(this.tagApi);
+  }
+  updateTag(id: string, names: { name_id: string; name_en: string }) {
+    return this.http.put<IApiResponse<unknown>>(`${this.tagApi}/${id}`, names);
+  }
+  deleteTag(id: string) {
+    return this.http.delete<IApiResponse<unknown>>(`${this.tagApi}/${id}`);
+  }
+
+  insightTop(days: number) {
+    return this.http.get<IApiResponse<IArticleInsightTop[]>>(
+      `${this.api}/insight/top`,
+      { params: { days } },
+    );
+  }
+  insightChart(days: number) {
+    return this.http.get<IApiResponse<IArticleInsightChart>>(
+      `${this.api}/insight/chart`,
+      { params: { days } },
+    );
+  }
+  insightAudit() {
+    return this.http.get<IApiResponse<IArticleInsightAudit>>(
+      `${this.api}/insight/audit`,
+    );
   }
 }

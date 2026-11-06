@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ 'article_tags.title' | translate }}</h5>
+  <button
+    type="button"
+    class="btn-close"
+    [attr.aria-label]="'form_kit.cancel' | translate"
+    (click)="modal.close()"
+  ></button>
+</div>
+<div class="modal-body" data-testid="article-tags-modal">
+  <p class="form-kit-note mb-2">{{ 'article_tags.hint' | translate }}</p>
+  <app-inline-table
+    [columns]="columns"
+    [canAdd]="false"
+    [canRemove]="canRemove"
+    [(rows)]="rows"
+    (saveRow)="save($event)"
+    (removeRow)="remove($event)"
+  />
+</div>

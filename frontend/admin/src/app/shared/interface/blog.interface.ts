@@ -33,13 +33,16 @@ export interface IBlog {
   blog_thumbnail: IAttachment | null;
 }
 export interface IArticleDetail extends IBlog {
+  author_name: string;
+  tags: { id: string; name: string }[];
   thumbnail: IAttachment | null;
   og_image: IAttachment | null;
   translations: IArticleTranslation[];
 }
 export type IBlogModel = IListResponse<IBlog>;
 export interface IArticlePayload {
-  key: string;
+  author_name: string;
+  tags: { id?: string; name: string }[];
   status: ArticleStatus;
   is_featured: 0 | 1;
   is_sticky: 0 | 1;
@@ -48,4 +51,46 @@ export interface IArticlePayload {
   thumbnail_id: string | null;
   og_image_id: string | null;
   translations: IArticleTranslation[];
+}
+
+export interface IArticleTag {
+  id: string;
+  key: string;
+  name_id: string;
+  name_en: string;
+  article_count: number;
+}
+
+export interface IArticleInsightTop {
+  id: string;
+  title: string;
+  slug: string;
+  published_at: string;
+  thumbnail: string | null;
+  views: number;
+}
+
+export interface IArticleInsightChart {
+  labels: string[];
+  published: number[];
+  views: number[];
+  shares: number[];
+  reach: number[];
+}
+
+export interface IArticleInsightAudit {
+  total: number;
+  published: number;
+  scheduled: number;
+  draft: number;
+  archived: number;
+  checks: {
+    no_tag: number;
+    untranslated: number;
+    no_image: number;
+    long_meta: number;
+    no_excerpt: number;
+  };
+  score: number;
+  score_change: number;
 }

@@ -24,34 +24,21 @@
   </div>
   @if (editor.activeLocale === 'id') {
     <div class="row g-4">
-      <div class="col-md-5">
-        <label class="form-label" for="id_slug"
-          >Slug URL <span>*</span>
-          <app-help-tip section="tab-konten-bahasa--slug-url"
-        /></label>
-        <div class="input-group">
-          <span class="input-group-text">/artikel/</span
-          ><input
-            id="id_slug"
-            class="form-control"
-            formControlName="id_slug"
-            [class.is-invalid]="
-              form.controls.id_slug.touched && form.controls.id_slug.invalid
-            "
-          />
-        </div>
-      </div>
-      <div class="col-md-7">
-        <label class="form-label" for="id_title"
-          >Judul <span>*</span>
-          <app-help-tip section="tab-konten-bahasa--judul" /></label
-        ><input
-          id="id_title"
-          class="form-control"
-          formControlName="id_title"
-          [class.is-invalid]="
-            form.controls.id_title.touched && form.controls.id_title.invalid
-          "
+      <div class="col-12">
+        <app-title-slug
+          fieldPrefix="id_"
+          prefix="/artikel/"
+          entity="article"
+          locale="id-ID"
+          titleLabelKey="article_form.title"
+          slugLabelKey="article_form.slug"
+          titleHelp="tab-konten-bahasa--judul"
+          slugHelp="tab-konten-bahasa--slug-url"
+          [internalKey]="editor.article?.key ?? ''"
+          [follow]="!editor.id"
+          [recordId]="editor.id"
+          [titleControl]="form.controls.id_title"
+          [slugControl]="form.controls.id_slug"
         />
       </div>
       <div class="col-12">
@@ -113,34 +100,20 @@
     </div>
   } @else {
     <div class="row g-4">
-      <div class="col-md-5">
-        <label class="form-label" for="en_slug"
-          >URL slug <span>*</span>
-          <app-help-tip section="tab-konten-bahasa--slug-url"
-        /></label>
-        <div class="input-group">
-          <span class="input-group-text">/en/article/</span
-          ><input
-            id="en_slug"
-            class="form-control"
-            formControlName="en_slug"
-            [class.is-invalid]="
-              form.controls.en_slug.touched && form.controls.en_slug.invalid
-            "
-          />
-        </div>
-      </div>
-      <div class="col-md-7">
-        <label class="form-label" for="en_title"
-          >Title <span>*</span>
-          <app-help-tip section="tab-konten-bahasa--judul" /></label
-        ><input
-          id="en_title"
-          class="form-control"
-          formControlName="en_title"
-          [class.is-invalid]="
-            form.controls.en_title.touched && form.controls.en_title.invalid
-          "
+      <div class="col-12">
+        <app-title-slug
+          fieldPrefix="en_"
+          prefix="/en/article/"
+          entity="article"
+          locale="en-US"
+          titleLabelKey="article_form.title_en"
+          slugLabelKey="article_form.slug_en"
+          titleHelp="tab-konten-bahasa--judul"
+          slugHelp="tab-konten-bahasa--slug-url"
+          [follow]="!editor.id"
+          [recordId]="editor.id"
+          [titleControl]="form.controls.en_title"
+          [slugControl]="form.controls.en_slug"
         />
       </div>
       <div class="col-12">
@@ -206,13 +179,33 @@
       </div>
     </div>
   }
+  <div class="row g-4 mt-1">
+    <div class="col-md-8">
+      <label class="form-label" for="article_tags"
+        >Tag <app-help-tip section="tab-konten-bahasa--tag"
+      /></label>
+      <app-tag-picker
+        inputId="article_tags"
+        [control]="form.controls.tags"
+        [options]="editor.tagOptions()"
+        (manage)="editor.manageTags()"
+      />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label" for="article_author"
+        >Penulis <app-help-tip section="tab-konten-bahasa--penulis"
+      /></label>
+      <input
+        id="article_author"
+        class="form-control"
+        maxlength="120"
+        formControlName="author_name"
+        placeholder="MATEX"
+      />
+    </div>
+  </div>
   <div class="article-actions">
-    <button
-      type="button"
-      class="btn btn-light"
-      (click)="editor.setTab('general')"
-    >
-      <i class="ri-arrow-left-line"></i> Kembali ke Umum</button
+    <span></span
     ><button
       type="button"
       class="btn btn-primary"

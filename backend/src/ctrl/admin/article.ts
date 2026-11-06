@@ -21,6 +21,8 @@ import { HttpError } from '../../helper/http-error.helper';
 import { decodeId } from '../../helper/id.helper';
 import { resolveAutoKey } from '../../helper/auto-key.helper';
 import { contentSlug } from '../../helper/input.helper';
+import { ARTICLE_AUDITS, isArticleAudit } from '../../helper/article-audit.helper';
+import { readArticleTags, saveArticleTags, tagsOfArticle } from '../../helper/article-tag.helper';
 import { recordSlugChanges } from '../../helper/slug-redirect.helper';
 import { countOf, pageMeta, parseListQuery, sortColumn } from '../../helper/list-query.helper';
 import { withTransaction } from '../../helper/transaction.helper';
@@ -146,6 +148,9 @@ const payloadOf = (body: RequestBody) => {
     isFeatured: body?.is_featured ? 1 : 0,
     isSticky: body?.is_sticky ? 1 : 0,
     translations,
+    tags: readArticleTags(body?.tags),
+    // Left out: an update keeps the name. Empty: readers see MATEX.
+    authorName: body?.author_name === undefined ? undefined : text(body.author_name, 120) || null,
   };
 };
 
@@ -316,7 +321,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       await connection.query(
         `UPDATE article SET article_key = ?, article_status = ?, article_is_featured = ?,
            article_is_sticky = ?, article_published_at = ?, article_unpublished_at = ?,
-           id_updated_by = ?
+           article_author_name = IF(?, ?, article_author_name), id_updated_by = ?
          WHERE id_article = ?`,
         [
           payload.key,
@@ -325,6 +330,8 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           payload.isSticky,
           payload.publishedAt,
           payload.unpublishedAt,
+          payload.authorName !== undefined,
+          payload.authorName ?? null,
           scope.idAdminAcct,
           id,
         ],
@@ -334,8 +341,8 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO article (id_master_comp, article_key, article_status, article_is_featured,
            article_is_sticky, article_published_at, article_unpublished_at, id_author,
-           id_created_by, id_updated_by)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           article_author_name, id_created_by, id_updated_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           scope.idMasterComp,
           payload.key,
@@ -345,6 +352,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
           payload.publishedAt,
           payload.unpublishedAt,
           scope.idAdminAcct,
+          payload.authorName ?? null,
           scope.idAdminAcct,
           scope.idAdminAcct,
         ],
@@ -353,6 +361,7 @@ const save = async (req: AuthRequest, res: Response, id: number | null) => {
     }
     await saveTranslations(connection, articleId, scope.idMasterComp, payload.translations);
     await saveMedia(connection, articleId, scope.idMasterComp, payload);
+    await saveArticleTags(connection, articleId, scope.idMasterComp, payload.tags);
     await writeAuditLog({
       ...auditBase(req, connection, scope, articleId),
       eventCode: id ? 'article.updated' : 'article.created',
@@ -385,6 +394,8 @@ router.get(
     const locale = isPublicContentLocale(req.query.locale) ? req.query.locale : 'id-ID';
     const search = text(req.query.search, 200);
     const like = `%${search}%`;
+    // "Perbaiki" in the insight band: only the articles with this problem.
+    const audit = isArticleAudit(req.query.audit) ? `AND ${ARTICLE_AUDITS[req.query.audit]}` : '';
     const sortField = sortColumn(SORTABLE, sort, '');
     const direction = requested ?? 'DESC';
     const orderBy = sortField
@@ -396,7 +407,7 @@ router.get(
        FROM article a
        LEFT JOIN article_i18n i ON i.id_article = a.id_article
        WHERE a.id_master_comp = ? AND a.article_deleted_at IS NULL
-         AND (? = '' OR a.article_key LIKE ? OR i.article_title LIKE ?)`,
+         AND (? = '' OR a.article_key LIKE ? OR i.article_title LIKE ?) ${audit}`,
       [scope.idMasterComp, search, like, like],
     );
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -411,7 +422,7 @@ router.get(
          AND aa.article_attachment_role = 'thumbnail' AND aa.article_attachment_sort_order = 0
        LEFT JOIN attachment th ON th.id_attachment = aa.id_attachment
        WHERE a.id_master_comp = ? AND a.article_deleted_at IS NULL
-         AND (? = '' OR a.article_key LIKE ? OR i.article_title LIKE ?)
+         AND (? = '' OR a.article_key LIKE ? OR i.article_title LIKE ?) ${audit}
        ORDER BY ${orderBy}
        LIMIT ? OFFSET ?`,
       [locale, scope.idMasterComp, search, like, like, limit, (page - 1) * limit],
@@ -463,7 +474,7 @@ router.get(
 
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT article_key, article_status, article_is_featured, article_is_sticky,
-         article_published_at, article_unpublished_at,
+         article_published_at, article_unpublished_at, article_author_name,
          (article_published_at > UTC_TIMESTAMP()) AS publish_ahead
        FROM article WHERE id_article = ? AND id_master_comp = ? AND article_deleted_at IS NULL`,
       [id, scope.idMasterComp],
@@ -496,6 +507,8 @@ router.get(
       is_sticky: Boolean(row.article_is_sticky),
       published_at: row.article_published_at,
       unpublished_at: row.article_unpublished_at,
+      author_name: row.article_author_name ?? '',
+      tags: await tagsOfArticle(pool, id),
       thumbnail: mediaDto(byRole.get('thumbnail')),
       og_image: mediaDto(byRole.get('og')),
       translations: translations.map((item) => ({

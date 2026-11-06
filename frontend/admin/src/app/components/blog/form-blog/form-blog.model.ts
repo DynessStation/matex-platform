@@ -1,5 +1,4 @@
-export type BlogFormTab =
-  'general' | 'content' | 'seo' | 'media' | 'publication';
+export type BlogFormTab = 'content' | 'seo' | 'media' | 'publication';
 
 export type BlogFormLocale = 'id' | 'en';
 

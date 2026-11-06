@@ -1,7 +1,7 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { AsyncPipe, DatePipe, isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, inject, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { combineLatest, Observable } from 'rxjs';
@@ -11,6 +11,7 @@ import { IBlog } from '../../../shared/interface/blog.interface';
 import { breadcrumb } from '../../../shared/interface/breadcrumb.interface';
 import { Option } from '../../../shared/interface/theme-option.interface';
 import { resolvedMissing } from '../../../shared/resolver/resolved-missing';
+import { PublicAnalyticsService } from '../../../shared/services/public-analytics.service';
 import { PublicNavigationContextService } from '../../../shared/services/public-navigation-context.service';
 import { PublicSeoAlternate, PublicSeoService } from '../../../shared/services/public-seo.service';
 import { BlogState } from '../../../shared/store/state/blog.state';
@@ -21,7 +22,7 @@ import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-blog-details',
-  imports: [Sidebar, HomeNewsletter, Breadcrumb, AsyncPipe, DatePipe, Error404],
+  imports: [Sidebar, HomeNewsletter, Breadcrumb, AsyncPipe, DatePipe, Error404, RouterLink],
   templateUrl: './blog-details.html',
   styleUrl: './blog-details.scss',
 })
@@ -33,6 +34,10 @@ export class BlogDetails {
   private navigation = inject(PublicNavigationContextService);
   private seo = inject(PublicSeoService);
   private destroyRef = inject(DestroyRef);
+  private analytics = inject(PublicAnalyticsService);
+  private browser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  readonly copied = signal(false);
 
   blog$: Observable<IBlog> = inject(Store).select(BlogState.selectedBlog) as Observable<IBlog>;
   themeOption$: Observable<Option> = inject(Store).select(
@@ -45,6 +50,53 @@ export class BlogDetails {
 
   get locale(): string {
     return this.navigation.locale();
+  }
+
+  get tagBase(): string {
+    return this.locale === 'en-US' ? '/en/articles/tag' : '/artikel/tag';
+  }
+
+  private articleUrl(blog: IBlog): string {
+    const base = this.locale === 'en-US' ? '/en/article/' : '/artikel/';
+    return this.seo.publicUrl(`${base}${encodeURIComponent(blog.slug)}`);
+  }
+
+  shareLinks(blog: IBlog) {
+    const url = encodeURIComponent(this.articleUrl(blog));
+    const text = encodeURIComponent(blog.title);
+    return [
+      {
+        channel: 'whatsapp',
+        label: 'WhatsApp',
+        icon: 'ri-whatsapp-line',
+        url: `https://wa.me/?text=${text}%20${url}`,
+      },
+      {
+        channel: 'facebook',
+        label: 'Facebook',
+        icon: 'ri-facebook-fill',
+        url: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      },
+      {
+        channel: 'x',
+        label: 'X',
+        icon: 'ri-twitter-x-line',
+        url: `https://x.com/intent/post?url=${url}&text=${text}`,
+      },
+    ];
+  }
+
+  shared(channel: string): void {
+    this.analytics.articleShared(channel);
+  }
+
+  copyLink(blog: IBlog): void {
+    if (!this.browser) return;
+    void navigator.clipboard?.writeText(this.articleUrl(blog)).then(() => {
+      this.copied.set(true);
+      this.shared('copy');
+      setTimeout(() => this.copied.set(false), 2000);
+    });
   }
 
   get articleLabel(): string {
@@ -118,7 +170,10 @@ export class BlogDetails {
         image: image || undefined,
         datePublished: blog.created_at,
         dateModified: blog.updated_at || blog.created_at,
-        author: { '@type': 'Organization', name: blog.created_by?.name || 'MATEX' },
+        author: blog.has_author
+          ? { '@type': 'Person', name: blog.created_by.name }
+          : { '@type': 'Organization', name: 'MATEX' },
+        keywords: blog.tags.length ? blog.tags.map((tag) => tag.name).join(', ') : undefined,
         mainEntityOfPage: canonical,
       } as Record<string, unknown>);
 

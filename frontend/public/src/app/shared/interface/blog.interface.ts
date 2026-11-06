@@ -31,8 +31,20 @@ export interface IBlog {
   is_featured: boolean;
   is_sticky: boolean | number;
   created_by: User;
+  /** A writer's name was set; otherwise created_by says MATEX. */
+  has_author?: boolean;
   created_by_id: number;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;
+}
+
+/** What a tag page knows about its tag. */
+export interface IBlogTagPage {
+  name: string;
+  slug: string;
+  localized_slugs: Record<string, string>;
+  article_count: number;
+  /** Enough articles for search engines. */
+  indexable: boolean;
 }

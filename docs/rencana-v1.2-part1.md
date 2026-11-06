@@ -50,6 +50,16 @@ Kunci internal otomatis: server membuat dari judul atau nama saat data dibuat, m
 
 ## Tahap 2: Artikel (`/blog`)
 
+**Selesai 6 November (lokal).** Migration 029. Test `article-page.spec.ts` dan `article-tag-api.spec.ts`. Catatan hasil:
+
+- Artikel lama tetap menampilkan MATEX sebagai penulis (nama tampil baru tersimpan untuk artikel yang disimpan dengan isian Penulis), supaya nama akun tidak tiba-tiba muncul ke pembaca.
+- Kelola Tag **(tambahan)**: tag baru memakai nama sama untuk dua bahasa sampai diterjemahkan di sana; mengganti nama memindah halamannya dengan 301. Dibuka dari "Lihat tag teratas" dan dari isian Tag.
+- Halaman tag masuk sitemap mulai 2 artikel; di bawah itu `noindex, follow`.
+- Tombol bagikan **(tambahan, dibutuhkan angka Dibagikan)**: WhatsApp, Facebook, X, salin tautan. Tidak dihitung sebagai klik keluar.
+- Audit "belum diterjemahkan" memeriksa judul atau isi EN yang sama persis dengan ID, karena kedua bahasa wajib diisi untuk menyimpan. Audit lain: tanpa tag, tanpa gambar utama, tanpa ringkasan, SEO kepanjangan.
+- Artikel yang diterbitkan tanpa waktu punya `article_published_at` kosong; grafik dan skor memakai waktu dibuatnya, sama seperti urutan di website.
+- Tombol "Cek ejaan" per artikel belum dibuat: tombol itu butuh OPENAI di lingkungan yang aktif, dan dikerjakan terpisah bila pemilik masih menginginkannya.
+
 - Tab Umum dibuang. Penanda Unggulan dan Sematkan pindah ke Publikasi. Kunci internal otomatis.
 - Pakai G-1, G-2, G-3, G-8.
 - **Tag** (baru, tabel `article_tag` sudah ada sejak migration 004 tapi belum dipakai): multi-select dengan tambah tag baru langsung, jumlah artikel per tag terlihat di daftar, nama tag ID dan EN.

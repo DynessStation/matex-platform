@@ -39,6 +39,8 @@ export const serverRoutes: ServerRoute[] = [
     'blog/:slug',
     'en/article/:slug',
     'artikel/:slug',
+    'artikel/tag/:slug',
+    'en/articles/tag/:slug',
     'search',
     'en/search',
     'faq',

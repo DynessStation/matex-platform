@@ -1,12 +1,15 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID } from '@angular/core';
-import { Params, Router, RouterModule } from '@angular/router';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, map, skip } from 'rxjs';
 
+import { BlogInsight } from './blog-insight/blog-insight';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { InsightToggle } from '../../shared/components/ui/insight/insight-toggle';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
@@ -32,6 +35,8 @@ import { SettingState } from '../../shared/store/state/setting.state';
     HasPermissionDirective,
     PageWrapper,
     Table,
+    BlogInsight,
+    InsightToggle,
   ],
   templateUrl: './blog.html',
   styleUrl: './blog.scss',
@@ -39,6 +44,15 @@ import { SettingState } from '../../shared/store/state/setting.state';
 export class Blog {
   private store = inject(Store);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  readonly insightOpen = signal(true);
+  /** The insight band's "Perbaiki" lands here with ?audit=. */
+  private readonly audit$ = this.route.queryParamMap.pipe(
+    map((params) => params.get('audit') ?? ''),
+  );
+  readonly audit = toSignal(this.audit$, { initialValue: '' });
+  private tableParams: Params = {};
   private platformId = inject(PLATFORM_ID);
 
   blog$: Observable<IBlogModel> = inject(Store).select(BlogState.blog);
@@ -101,6 +115,8 @@ export class Blog {
   }
 
   ngOnInit() {
+    // A "Perbaiki" link clicked, or the filter cleared: the table itself does not change.
+    this.audit$.pipe(skip(1)).subscribe(() => this.loadList());
     this.blog$.subscribe((blog) => {
       this.tableConfig.data = blog ? blog?.data : [];
       this.tableConfig.total = blog?.meta.total ?? 0;
@@ -109,7 +125,28 @@ export class Blog {
   }
 
   onTableChange(data?: Params) {
-    this.store.dispatch(new GetBlogsAction(data)).subscribe();
+    this.tableParams = data ?? {};
+    this.loadList();
+  }
+
+  private loadList() {
+    const audit = this.audit();
+    this.store
+      .dispatch(
+        new GetBlogsAction({
+          ...this.tableParams,
+          audit: audit || undefined,
+        }),
+      )
+      .subscribe();
+  }
+
+  clearAudit() {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { audit: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   onActionClicked(action: ITableClickedAction<IBlog>) {

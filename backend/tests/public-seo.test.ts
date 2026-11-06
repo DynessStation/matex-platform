@@ -112,6 +112,14 @@ test('sitemap contains only public v1 routes with localized content paths', asyn
         last_modified: '2026-10-09T00:00:00.000Z',
       },
     ],
+    [
+      {
+        content_type: 'article_tag',
+        locale: 'id-ID',
+        slug_or_path: 'tidur-sehat',
+        last_modified: '2026-10-08T00:00:00.000Z',
+      },
+    ],
   ];
 
   const response = await fetch(`${base}/sitemap.xml`);
@@ -126,13 +134,15 @@ test('sitemap contains only public v1 routes with localized content paths', asyn
   assert.match(xml, /<loc>https:\/\/matexindo\.com\/en\/article\/natural-latex<\/loc>/);
   assert.doesNotMatch(xml, /\/cart|\/wishlist|\/checkout/);
   assert.match(xml, /<lastmod>2026-10-13<\/lastmod>/);
-  assert.equal(calls.length, 4);
+  assert.match(xml, /<loc>https:\/\/matexindo\.com\/artikel\/tag\/tidur-sehat<\/loc>/);
+  assert.equal(calls.length, 5);
   assert.deepEqual(
     calls.map((call) => call.params),
-    [[7], [7], [7], [7]],
+    [[7], [7], [7], [7], [7, 2]],
   );
   assert.match(calls[0].sql, /NOT LIKE '%noindex%'/);
   assert.match(calls[0].sql, /website_page_is_published = 1/);
   assert.match(calls[1].sql, /product_status = 'published'/);
   assert.match(calls[3].sql, /article_status = 'published'/);
+  assert.match(calls[4].sql, /HAVING COUNT\(DISTINCT a\.id_article\) >= \?/);
 });

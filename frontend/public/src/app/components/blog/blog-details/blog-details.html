@@ -45,6 +45,52 @@
               </header>
 
               <div class="blog-detail-contain article-content" [innerHTML]="blog.content"></div>
+
+              <footer class="article-footer">
+                @if (blog.tags.length) {
+                  <ul class="article-tags" aria-label="Tag">
+                    @for (tag of blog.tags; track tag.slug) {
+                      <li>
+                        <a [routerLink]="[tagBase, tag.slug]">{{ tag.name }}</a>
+                      </li>
+                    }
+                  </ul>
+                }
+                <div class="article-share" data-testid="article-share">
+                  <span>{{ locale === 'en-US' ? 'Share' : 'Bagikan' }}</span>
+                  @for (link of shareLinks(blog); track link.channel) {
+                    <a
+                      data-share
+                      target="_blank"
+                      rel="noopener nofollow"
+                      [href]="link.url"
+                      [attr.aria-label]="link.label"
+                      [title]="link.label"
+                      [attr.data-channel]="link.channel"
+                      (click)="shared(link.channel)"
+                    >
+                      <i [class]="link.icon" aria-hidden="true"></i>
+                    </a>
+                  }
+                  <button
+                    type="button"
+                    data-channel="copy"
+                    [attr.aria-label]="locale === 'en-US' ? 'Copy link' : 'Salin tautan'"
+                    [title]="
+                      copied()
+                        ? locale === 'en-US'
+                          ? 'Copied'
+                          : 'Tersalin'
+                        : locale === 'en-US'
+                          ? 'Copy link'
+                          : 'Salin tautan'
+                    "
+                    (click)="copyLink(blog)"
+                  >
+                    <i [class]="copied() ? 'ri-check-line' : 'ri-link'" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </footer>
             </article>
           </div>
         </div>

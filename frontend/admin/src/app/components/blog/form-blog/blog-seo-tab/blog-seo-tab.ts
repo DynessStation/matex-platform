@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { AutoField } from '../../../../shared/components/ui/form-kit/auto-field';
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { BlogAssistantService } from '../blog-assistant.service';
 import { BlogFormService } from '../blog-form.service';
@@ -11,7 +12,7 @@ import { BlogFormService } from '../blog-form.service';
 @Component({
   selector: 'app-blog-seo-tab',
 
-  imports: [HelpTip, ReactiveFormsModule, AiFieldAction],
+  imports: [AutoField, HelpTip, ReactiveFormsModule, AiFieldAction],
 
   templateUrl: './blog-seo-tab.html',
 

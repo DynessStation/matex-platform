@@ -4,7 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { IBlog, IBlogModel } from '../interface/blog.interface';
+import { IBlog, IBlogModel, IBlogTagPage } from '../interface/blog.interface';
 import { Params } from '../interface/core.interface';
 import {
   PublicApiResponse,
@@ -21,11 +21,19 @@ export class BlogService {
     if (payload?.['page']) params = params.set('page', String(payload['page']));
     if (payload?.['paginate']) params = params.set('limit', String(payload['paginate']));
     if (payload?.['search']) params = params.set('search', String(payload['search']));
+    if (payload?.['tag']) params = params.set('tag', String(payload['tag']));
     return this.http
       .get<PublicListResponse<IBlog>>(`${environment.publicApiURL}/articles/${locale}`, {
         params,
       })
       .pipe(map((r): IBlogModel => toListModel(r)));
+  }
+  getTag(locale: string, slug: string): Observable<IBlogTagPage> {
+    return this.http
+      .get<PublicApiResponse<IBlogTagPage>>(
+        `${environment.publicApiURL}/article-tags/${locale}/${encodeURIComponent(slug)}`,
+      )
+      .pipe(map((r) => r.data!));
   }
   getBlogBySlug(locale: string, slug: string): Observable<IBlog> {
     return this.http

@@ -13,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
         type="submit"
         class="btn btn-theme w-100"
         [disabled]="loading()"
+        [attr.id]="buttonId() || null"
         data-testid="form-submit"
       >
         @if (loading()) {
@@ -38,6 +39,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class FormSubmit {
   readonly labelKey = input('form_kit.save');
+  readonly buttonId = input('');
   readonly loading = input(false);
   /** Whether to show the note (usually: some tab is not "ok"). */
   readonly issue = input(false);

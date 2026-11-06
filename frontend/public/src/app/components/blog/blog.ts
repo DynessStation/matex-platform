@@ -13,15 +13,16 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
-import { finalize, map, Observable } from 'rxjs';
+import { combineLatest, finalize, map, Observable } from 'rxjs';
 
 import { Sidebar } from './sidebar/sidebar';
 import { Loader } from '../../shared/components/loader/loader';
 import { NoData } from '../../shared/components/no-data/no-data';
 import { Breadcrumb } from '../../shared/components/widgets/breadcrumb/breadcrumb';
-import { IBlog, IBlogModel } from '../../shared/interface/blog.interface';
+import { IBlog, IBlogModel, IBlogTagPage } from '../../shared/interface/blog.interface';
 import { breadcrumb } from '../../shared/interface/breadcrumb.interface';
 import { Option } from '../../shared/interface/theme-option.interface';
+import { resolvedMissing } from '../../shared/resolver/resolved-missing';
 import { BlogService } from '../../shared/services/blog.service';
 import { PublicNavigationContextService } from '../../shared/services/public-navigation-context.service';
 import { PublicSeoService } from '../../shared/services/public-seo.service';
@@ -29,6 +30,7 @@ import { GetBlogsAction } from '../../shared/store/action/blog.action';
 import { BlogState } from '../../shared/store/state/blog.state';
 import { ThemeOptionState } from '../../shared/store/state/theme-option.state';
 import { HomeNewsletter } from '../home/widgets/home-newsletter/home-newsletter';
+import { Error404 } from '../page/error-404/error-404';
 
 @Component({
   selector: 'app-blog',
@@ -36,6 +38,7 @@ import { HomeNewsletter } from '../home/widgets/home-newsletter/home-newsletter'
     Sidebar,
     RouterModule,
     NgbPagination,
+    Error404,
     HomeNewsletter,
     Breadcrumb,
     DatePipe,
@@ -100,8 +103,21 @@ export class Blog {
 
   public totalItems$: Observable<number> = this.blog$.pipe(map((blog) => blog?.total || 0));
 
+  // Nothing found by the tag resolver: show the 404 view (status 404) instead.
+  readonly missing = resolvedMissing();
+  /** Set on a tag page. */
+  private tag: IBlogTagPage | null = null;
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.destroyRef.onDestroy(() => {
+      this.seo.clear();
+      this.document.documentElement.lang = this.originalLang;
+    });
+  }
+
+  private applySeo(): void {
     const locale: 'id-ID' | 'en-US' = this.navigation.locale() === 'en-US' ? 'en-US' : 'id-ID';
+    if (this.tag) return this.applyTagSeo(this.tag, locale);
     this.seo.apply({
       locale,
       title: locale === 'en-US' ? 'Articles | MATEX' : 'Artikel | MATEX',
@@ -123,9 +139,36 @@ export class Blog {
         inLanguage: locale,
       },
     });
-    this.destroyRef.onDestroy(() => {
-      this.seo.clear();
-      this.document.documentElement.lang = this.originalLang;
+  }
+
+  private applyTagSeo(tag: IBlogTagPage, locale: 'id-ID' | 'en-US'): void {
+    const path = (value: 'id-ID' | 'en-US') =>
+      `${value === 'en-US' ? '/en/articles/tag/' : '/artikel/tag/'}${encodeURIComponent(
+        tag.localized_slugs[value] || tag.slug,
+      )}`;
+    const title =
+      locale === 'en-US' ? `${tag.name} Articles | MATEX` : `Artikel ${tag.name} | MATEX`;
+    this.seo.apply({
+      locale,
+      title,
+      description:
+        locale === 'en-US'
+          ? `MATEX articles about ${tag.name}.`
+          : `Kumpulan artikel MATEX tentang ${tag.name}.`,
+      canonicalPath: path(locale),
+      alternates: [
+        { locale: 'id-ID', path: path('id-ID') },
+        { locale: 'en-US', path: path('en-US') },
+      ],
+      type: 'website',
+      robots: tag.indexable ? undefined : 'noindex, follow',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: tag.name,
+        url: this.seo.publicUrl(path(locale)),
+        inLanguage: locale,
+      },
     });
   }
 
@@ -141,27 +184,35 @@ export class Blog {
       }
     });
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      this.filter.category = params['category'] ? params['category'] : '';
-      this.filter.tag = params['tag'] ? params['tag'] : '';
-      this.filter.page = params['page'] ? Number(params['page']) : 1;
+    combineLatest([this.route.data, this.route.queryParams])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([data, params]) => {
+        if (data['data'] === false) {
+          this.loading.set(false);
+          return;
+        }
+        this.tag = (data['data'] as IBlogTagPage | undefined) ?? null;
+        this.applySeo();
+        this.filter.category = params['category'] ? params['category'] : '';
+        this.filter.tag = this.tag?.slug ?? (params['tag'] ? params['tag'] : '');
+        this.filter.page = params['page'] ? Number(params['page']) : 1;
 
-      this.loading.set(true);
-      this.store
-        .dispatch(new GetBlogsAction(this.filter, this.navigation.locale()))
-        .pipe(finalize(() => this.loading.set(false)))
-        .subscribe({ error: () => undefined });
+        this.loading.set(true);
+        this.store
+          .dispatch(new GetBlogsAction(this.filter, this.navigation.locale()))
+          .pipe(finalize(() => this.loading.set(false)))
+          .subscribe({ error: () => undefined });
 
-      if (params['style']) {
-        this.style = params['style'];
-      }
+        if (params['style']) {
+          this.style = params['style'];
+        }
 
-      if (params['sidebar']) {
-        this.sidebar = params['sidebar'];
-      }
+        if (params['sidebar']) {
+          this.sidebar = params['sidebar'];
+        }
 
-      this.setBreadcrumb();
-    });
+        this.setBreadcrumb();
+      });
   }
 
   filterOpen() {
@@ -186,6 +237,18 @@ export class Blog {
 
   setBreadcrumb() {
     const title = this.navigation.locale() === 'en-US' ? 'Articles' : 'Artikel';
+    if (this.tag) {
+      this.breadcrumb.title = `${title}: ${this.tag.name}`;
+      this.breadcrumb.items = [
+        {
+          label: title,
+          url: this.navigation.locale() === 'en-US' ? '/en/articles' : '/artikel',
+          active: false,
+        },
+        { label: this.tag.name, active: true },
+      ];
+      return;
+    }
     this.breadcrumb.title = title;
     this.breadcrumb.items = [{ label: title, active: true }];
   }

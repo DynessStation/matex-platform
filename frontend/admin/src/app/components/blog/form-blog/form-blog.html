@@ -6,58 +6,66 @@
   <div class="vertical-tabs article-form">
     <div class="row g-4">
       <div class="col-xl-3 col-lg-4">
-        <ul
-          ngbNav
-          #nav="ngbNav"
-          [(activeId)]="editor.activeTab"
-          class="nav-pills"
-          orientation="vertical"
-        >
-          <li [ngbNavItem]="'general'">
-            <button ngbNavLink type="button">
-              <i class="ri-settings-3-line"></i> Umum
-            </button>
-            <ng-template ngbNavContent>
-              <app-blog-general-tab />
-            </ng-template>
-          </li>
+        <div class="form-kit-sidebar">
+          <app-form-heading [title]="editor.form.controls.id_title.value" />
+          <ul
+            ngbNav
+            #nav="ngbNav"
+            [(activeId)]="editor.activeTab"
+            class="nav-pills"
+            orientation="vertical"
+          >
+            <li [ngbNavItem]="'content'">
+              <button ngbNavLink type="button">
+                <i class="ri-translate-2"></i> Konten & Bahasa
+                <app-tab-status [state]="editor.tabStates().content" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-blog-content-tab />
+              </ng-template>
+            </li>
 
-          <li [ngbNavItem]="'content'">
-            <button ngbNavLink type="button">
-              <i class="ri-translate-2"></i> Konten & Bahasa
-            </button>
-            <ng-template ngbNavContent>
-              <app-blog-content-tab />
-            </ng-template>
-          </li>
+            <li [ngbNavItem]="'seo'">
+              <button ngbNavLink type="button">
+                <i class="ri-search-eye-line"></i> SEO
+                <app-tab-status [state]="editor.tabStates().seo" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-blog-seo-tab />
+              </ng-template>
+            </li>
 
-          <li [ngbNavItem]="'seo'">
-            <button ngbNavLink type="button">
-              <i class="ri-search-eye-line"></i> SEO
-            </button>
-            <ng-template ngbNavContent>
-              <app-blog-seo-tab />
-            </ng-template>
-          </li>
+            <li [ngbNavItem]="'media'">
+              <button ngbNavLink type="button">
+                <i class="ri-image-line"></i> Media
+                <app-tab-status [state]="editor.tabStates().media" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-blog-media-tab />
+              </ng-template>
+            </li>
 
-          <li [ngbNavItem]="'media'">
-            <button ngbNavLink type="button">
-              <i class="ri-image-line"></i> Media
-            </button>
-            <ng-template ngbNavContent>
-              <app-blog-media-tab />
-            </ng-template>
-          </li>
-
-          <li [ngbNavItem]="'publication'">
-            <button ngbNavLink type="button">
-              <i class="ri-send-plane-line"></i> Publikasi
-            </button>
-            <ng-template ngbNavContent>
-              <app-blog-publication-tab />
-            </ng-template>
-          </li>
-        </ul>
+            <li [ngbNavItem]="'publication'">
+              <button ngbNavLink type="button">
+                <i class="ri-send-plane-line"></i> Publikasi
+                <app-tab-status [state]="editor.tabStates().publication" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-blog-publication-tab />
+              </ng-template>
+            </li>
+          </ul>
+          <app-form-submit
+            buttonId="article_save"
+            [labelKey]="
+              editor.type() === 'create'
+                ? 'article_form.create'
+                : 'article_form.update'
+            "
+            [loading]="editor.saving()"
+            [issue]="editor.showIssue"
+          />
+        </div>
       </div>
       <div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
     </div>

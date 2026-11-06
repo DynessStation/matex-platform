@@ -1,4 +1,50 @@
 {
+  "article_form": {
+    "create": "Save Article",
+    "update": "Update Article",
+    "title": "Title (Indonesian)",
+    "slug": "URL address (Indonesian)",
+    "title_en": "Title",
+    "slug_en": "URL address"
+  },
+  "article_tags": {
+    "title": "Manage Tags",
+    "hint": "Tag names per language and how many articles use them. Unused tags can be deleted.",
+    "name_id": "Name (Indonesian)",
+    "name_en": "Name (English)",
+    "count": "Articles",
+    "saved": "Tag saved.",
+    "deleted": "Tag deleted."
+  },
+  "article_insight": {
+    "top": "Top 5 Articles",
+    "top_tags": "See top tags",
+    "chart": "Publishing and Traffic",
+    "published_new": "New articles",
+    "views": "Article views",
+    "shares": "Shares",
+    "reach": "Reach",
+    "score": "Consistency score",
+    "score_good": "Good",
+    "score_fair": "Fair",
+    "score_low": "Needs work",
+    "audit": "Article Data Audit",
+    "total": "Total Articles",
+    "published": "Published",
+    "scheduled": "Scheduled",
+    "draft": "Draft",
+    "archived": "Archived",
+    "check_no_tag": "{{count}} articles without tags",
+    "check_untranslated": "{{count}} articles not translated",
+    "check_no_image": "{{count}} articles without a main image",
+    "check_long_meta": "{{count}} articles with SEO text too long",
+    "check_no_excerpt": "{{count}} articles without a summary",
+    "filter_no_tag": "Articles without tags",
+    "filter_untranslated": "Articles not translated",
+    "filter_no_image": "Articles without a main image",
+    "filter_long_meta": "Articles with SEO text too long",
+    "filter_no_excerpt": "Articles without a summary"
+  },
   "dashboard_tabs": {
     "website": "Website",
     "inventory": "Inventory",
@@ -7,6 +53,11 @@
     "website_alert": "Something needs a look"
   },
   "form_kit": {
+    "tag_new": "new",
+    "tag_placeholder": "Choose or write a tag...",
+    "tag_create": "Add tag \"{{name}}\"",
+    "tag_count": "{{count}} articles",
+    "tag_manage": "Manage tags",
     "untitled": "Untitled",
     "save": "Save",
     "check_again": "Check again: something is not complete yet",

@@ -6,17 +6,21 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BlogAssistantService } from './blog-assistant.service';
 import { BlogContentTab } from './blog-content-tab/blog-content-tab';
 import { BlogFormService } from './blog-form.service';
-import { BlogGeneralTab } from './blog-general-tab/blog-general-tab';
 import { BlogMediaTab } from './blog-media-tab/blog-media-tab';
 import { BlogPublicationTab } from './blog-publication-tab/blog-publication-tab';
 import { BlogSeoTab } from './blog-seo-tab/blog-seo-tab';
+import { FormHeading } from '../../../shared/components/ui/form-kit/form-heading';
+import { FormSubmit } from '../../../shared/components/ui/form-kit/form-submit';
+import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
 
 @Component({
   selector: 'app-form-blog',
   imports: [
     ReactiveFormsModule,
     NgbModule,
-    BlogGeneralTab,
+    FormHeading,
+    FormSubmit,
+    TabStatus,
     BlogContentTab,
     BlogSeoTab,
     BlogMediaTab,

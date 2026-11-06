@@ -1,3 +1,4 @@
+import { TAG_PAGE_MIN_ARTICLES } from '../../config/public-content.config';
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
 
@@ -47,6 +48,8 @@ const pagePath = (row: RowDataPacket): string => {
       return localizedPath(locale, `/kategori/${path}`, `/en/category/${path}`);
     case 'article':
       return localizedPath(locale, `/artikel/${path}`, `/en/article/${path}`);
+    case 'article_tag':
+      return localizedPath(locale, `/artikel/tag/${path}`, `/en/articles/tag/${path}`);
     default:
       return localizedPath(locale, `/${path}`, `/en/${path}`);
   }
@@ -166,6 +169,28 @@ const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]>
         AND (article.article_unpublished_at IS NULL OR article.article_unpublished_at > UTC_TIMESTAMP())`,
     [idMasterComp],
   );
+  // Tag pages with enough public articles (the others say noindex).
+  const [tags] = await pool.query<RowDataPacket[]>(
+    `SELECT 'article_tag' AS content_type,
+            i.article_tag_locale AS locale,
+            i.article_tag_slug AS slug_or_path,
+            MAX(GREATEST(a.updated, i.updated)) AS last_modified
+       FROM article_tag t
+       INNER JOIN article_tag_i18n i ON i.id_article_tag = t.id_article_tag
+       INNER JOIN article_tag_map m ON m.id_article_tag = t.id_article_tag
+       INNER JOIN article a ON a.id_article = m.id_article
+      WHERE t.id_master_comp = ?
+        AND t.article_tag_status = 1
+        AND t.article_tag_deleted_at IS NULL
+        AND (a.article_status = 'published'
+          OR (a.article_status = 'scheduled' AND a.article_published_at IS NOT NULL))
+        AND a.article_deleted_at IS NULL
+        AND (a.article_published_at IS NULL OR a.article_published_at <= UTC_TIMESTAMP())
+        AND (a.article_unpublished_at IS NULL OR a.article_unpublished_at > UTC_TIMESTAMP())
+      GROUP BY t.id_article_tag, i.article_tag_locale, i.article_tag_slug
+     HAVING COUNT(DISTINCT a.id_article) >= ?`,
+    [idMasterComp, TAG_PAGE_MIN_ARTICLES],
+  );
 
   const indexPages: SitemapEntry[] = [
     { location: '/katalog' },
@@ -176,7 +201,7 @@ const loadSitemapEntries = async (idMasterComp: number): Promise<SitemapEntry[]>
 
   return [
     ...indexPages,
-    ...[...pages, ...products, ...categories, ...articles].map((row) => ({
+    ...[...pages, ...products, ...categories, ...articles, ...tags].map((row) => ({
       location: pagePath(row),
       lastModified: row.last_modified,
     })),

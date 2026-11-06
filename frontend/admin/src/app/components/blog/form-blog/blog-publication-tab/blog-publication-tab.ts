@@ -7,7 +7,6 @@ import {
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { Button } from '../../../../shared/components/ui/button/button';
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { BlogFormService } from '../blog-form.service';
 
@@ -16,7 +15,7 @@ import { BlogFormService } from '../blog-form.service';
 @Component({
   selector: 'app-blog-publication-tab',
 
-  imports: [HelpTip, FormsModule, ReactiveFormsModule, NgbModule, Button],
+  imports: [HelpTip, FormsModule, ReactiveFormsModule, NgbModule],
 
   templateUrl: './blog-publication-tab.html',
 

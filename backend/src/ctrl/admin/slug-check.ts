@@ -18,14 +18,21 @@ import { onFailure } from '../../middleware/error-handler.middleware';
 const router = express.Router();
 const { pool } = db;
 
-const ENTITIES: Record<SlugEntity, { permission: string; hsid: Parameters<typeof decodeId>[1] }> = {
+type CheckedEntity = Exclude<SlugEntity, 'article_tag'>;
+
+const ENTITIES: Record<
+  CheckedEntity,
+  { permission: string; hsid: Parameters<typeof decodeId>[1] }
+> = {
   article: { permission: 'article.view', hsid: keyhsid.idArticle },
   product: { permission: 'product.view', hsid: keyhsid.idProduct },
   product_category: { permission: 'product_category.view', hsid: keyhsid.idProductCategory },
 };
 
-const entityOf = (value: unknown): SlugEntity | null =>
-  typeof value === 'string' && Object.keys(ENTITIES).includes(value) ? (value as SlugEntity) : null;
+const entityOf = (value: unknown): CheckedEntity | null =>
+  typeof value === 'string' && Object.keys(ENTITIES).includes(value)
+    ? (value as CheckedEntity)
+    : null;
 
 /** Whoever can read the record type can ask about its slugs. */
 const requireEntityView = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -42,7 +49,7 @@ router.get(
   async (req: AuthRequest, res: Response) => {
     const scope = await getAdminScope(req, pool);
     if (!scope.success) return sendError(res, scope.status, scope.code, scope.message);
-    const entity = entityOf(req.query.entity) as SlugEntity;
+    const entity = entityOf(req.query.entity) as CheckedEntity;
     const locale = String(req.query.locale ?? '');
     const slug = contentSlug(req.query.slug);
     const sentId = req.query.id ? String(req.query.id) : '';

@@ -8,6 +8,7 @@ export const PUBLIC_ANALYTICS_EVENTS = [
   'contact_start',
   'contact_submit',
   'web_vital',
+  'article_share',
 ] as const;
 
 export type PublicAnalyticsEventName = (typeof PUBLIC_ANALYTICS_EVENTS)[number];

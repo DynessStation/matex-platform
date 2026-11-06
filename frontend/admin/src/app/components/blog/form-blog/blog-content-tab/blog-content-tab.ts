@@ -4,16 +4,25 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { NgxEditorModule } from 'ngx-editor';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { TitleSlug } from '../../../../shared/components/ui/form-kit/title-slug';
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
+import { TagPicker } from '../../../../shared/components/ui/tag-picker/tag-picker';
 import { BlogAssistantService } from '../blog-assistant.service';
 import { BlogFormService } from '../blog-form.service';
 
-// Content tab (slug, title, excerpt, body per language) of the article form.
+// Content tab (title, address, excerpt, body per language; tags and writer) of the article form.
 // Shared state lives in BlogFormService.
 @Component({
   selector: 'app-blog-content-tab',
 
-  imports: [HelpTip, ReactiveFormsModule, NgxEditorModule, AiFieldAction],
+  imports: [
+    HelpTip,
+    ReactiveFormsModule,
+    NgxEditorModule,
+    AiFieldAction,
+    TitleSlug,
+    TagPicker,
+  ],
 
   templateUrl: './blog-content-tab.html',
 
