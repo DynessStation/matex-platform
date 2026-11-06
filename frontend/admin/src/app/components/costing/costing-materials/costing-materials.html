@@ -1,0 +1,48 @@
+<p class="costing-help">
+  Harga bahan bertanggal, jadi riwayatnya tersimpan. Harga baru dengan tanggal
+  ke depan baru berlaku saat tanggalnya tiba.
+</p>
+<div data-testid="materials">
+  <app-inline-table
+    [columns]="columns"
+    [blank]="blank"
+    [(rows)]="rows"
+    (saveRow)="save($event)"
+    (removeRow)="remove($event)"
+  >
+    <ng-template #rowDetail let-row let-editing="editing">
+      @if (editing && row['id']) {
+        <button
+          type="button"
+          class="costing-text-link"
+          data-testid="material-impact"
+          (click)="showImpact(row)"
+        >
+          <i class="ri-line-chart-line"></i> Lihat dampak harga ini ke HPP
+        </button>
+      }
+    </ng-template>
+  </app-inline-table>
+</div>
+
+@if (impact(); as result) {
+  <div class="costing-confirm" data-testid="material-impact-result">
+    <strong
+      >Dampak harga {{ result.name }}: {{ result.items.length }} item</strong
+    >
+    <ul class="costing-impact">
+      @for (item of result.items; track item.id) {
+        <li>
+          <span
+            >{{ item.name }} {{ item.sku ? '(' + item.sku + ')' : '' }}</span
+          >
+          <span>
+            {{ rupiah(item.hpp) }} menjadi {{ rupiah(item.hpp + item.change) }}
+          </span>
+        </li>
+      } @empty {
+        <li>Tidak ada HPP yang berubah.</li>
+      }
+    </ul>
+  </div>
+}

@@ -1,0 +1,33 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'hpp_price'">
+  <ul
+    ngbNav
+    #nav="ngbNav"
+    class="nav-tabs costing-nav"
+    [activeId]="tab()"
+    (activeIdChange)="setTab($event)"
+  >
+    <li ngbNavItem="items">
+      <button ngbNavLink type="button">HPP & Harga</button>
+      <ng-template ngbNavContent><app-costing-items /></ng-template>
+    </li>
+    <li ngbNavItem="materials">
+      <button ngbNavLink type="button">Bahan</button>
+      <ng-template ngbNavContent><app-costing-materials /></ng-template>
+    </li>
+    <li ngbNavItem="channels">
+      <button ngbNavLink type="button">Tarif & Kanal</button>
+      <ng-template ngbNavContent><app-costing-channels /></ng-template>
+    </li>
+    <li ngbNavItem="calculator">
+      <button ngbNavLink type="button">Kalkulator</button>
+      <ng-template ngbNavContent>
+        <app-costing-calculator [itemId]="itemId()" />
+      </ng-template>
+    </li>
+    <li *hasPermission="'cost.manage'" ngbNavItem="import">
+      <button ngbNavLink type="button">Impor Excel</button>
+      <ng-template ngbNavContent><app-costing-import /></ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="costing-content"></div>
+</app-page-wrapper>

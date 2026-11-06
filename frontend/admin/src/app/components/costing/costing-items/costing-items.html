@@ -1,0 +1,168 @@
+<div class="costing-toolbar">
+  <input
+    class="form-control costing-search"
+    placeholder="Cari nama atau SKU"
+    data-testid="costing-search"
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+  />
+  <select
+    class="form-select costing-group"
+    data-testid="costing-group"
+    [ngModel]="group()"
+    (ngModelChange)="group.set($event)"
+  >
+    <option value="">Semua kelompok</option>
+    @for (name of groups(); track name) {
+      <option [value]="name">{{ name }}</option>
+    }
+  </select>
+  <label class="form-check costing-check">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      data-testid="costing-different"
+      [ngModel]="onlyDifferent()"
+      (ngModelChange)="onlyDifferent.set($event)"
+    />
+    <span class="form-check-label">
+      Harga website beda ({{ differentCount() }})
+    </span>
+  </label>
+  <div class="costing-toolbar-end">
+    <button
+      *hasPermission="'cost.manage'"
+      type="button"
+      class="btn btn-outline-primary"
+      data-testid="costing-add"
+      (click)="open(null)"
+    >
+      <i class="ri-add-line"></i> Tambah item
+    </button>
+    <button
+      *hasPermission="'price.apply'"
+      type="button"
+      class="btn btn-theme"
+      data-testid="costing-apply"
+      [disabled]="!chosen().length"
+      (click)="confirming.set(true)"
+    >
+      Terapkan harga ({{ chosen().length }})
+    </button>
+  </div>
+</div>
+
+@if (confirming()) {
+  <div class="costing-confirm" data-testid="costing-confirm">
+    <strong>
+      Harga {{ chosen().length }} produk di website dan admin akan diganti.
+    </strong>
+    <p>
+      Harga konsumen dan grosir, Rupiah dan Dollar, mengikuti hasil hitungan di
+      bawah. Perubahan tercatat di Log Aktivitas.
+    </p>
+    <div class="costing-confirm-actions">
+      <button
+        type="button"
+        class="btn btn-theme"
+        data-testid="costing-apply-yes"
+        [disabled]="applying()"
+        (click)="apply()"
+      >
+        Ya, terapkan
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="confirming.set(false)"
+      >
+        Batal
+      </button>
+    </div>
+  </div>
+}
+
+@if (loading()) {
+  <p class="costing-empty">Memuat...</p>
+} @else if (!items().length) {
+  <div class="costing-empty" data-testid="costing-empty">
+    Belum ada data HPP. Isi lewat tab Impor Excel atau tombol Tambah item.
+  </div>
+} @else {
+  <div class="costing-table-wrap">
+    <table class="costing-table" data-testid="costing-table">
+      <thead>
+        <tr>
+          <th class="costing-tick">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              aria-label="Pilih semua"
+              [checked]="allShownSelected"
+              (change)="toggleAll()"
+            />
+          </th>
+          <th class="text-start">Item</th>
+          <th>SKU</th>
+          <th>Ukuran (cm)</th>
+          <th class="text-end">HPP</th>
+          <th class="text-end">GPM</th>
+          <th class="text-end">Net MIA</th>
+          <th class="text-end">Affiliate</th>
+          <th class="text-end">E-commerce</th>
+          <th class="text-end">Harga website</th>
+          <th class="text-end">Beda</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of shown(); track item.id) {
+          <tr data-testid="costing-row" [attr.data-sku]="item.sku">
+            <td class="costing-tick">
+              @if (canApply(item)) {
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [attr.aria-label]="'Pilih ' + item.name"
+                  [checked]="selected().has(item.id)"
+                  (change)="toggle(item)"
+                />
+              }
+            </td>
+            <td class="text-start">
+              <button
+                type="button"
+                class="costing-link"
+                data-testid="costing-open"
+                (click)="open(item)"
+              >
+                <span appTextFit>{{ item.name }}</span>
+              </button>
+              <small>{{ item.group }}</small>
+            </td>
+            <td>
+              @if (item.sku) {
+                {{ item.sku }}
+              } @else {
+                <span class="costing-muted">Belum ada produk</span>
+              }
+            </td>
+            <td>{{ costSize(item) }}</td>
+            <td class="text-end">{{ rupiah(item.hpp) }}</td>
+            <td class="text-end">{{ percent(item.rates.gpm) }}</td>
+            <td class="text-end">{{ rupiah(item.net) }}</td>
+            <td class="text-end">{{ rupiah(item.affiliate_price) }}</td>
+            <td class="text-end costing-strong">{{ rupiah(item.commerce) }}</td>
+            <td class="text-end">{{ rupiah(item.live.idr) }}</td>
+            <td class="text-end" [class.costing-diff]="isDifferent(item)">
+              {{ isDifferent(item) ? percent(difference(item)) : '-' }}
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="11" class="costing-empty">Tidak ada yang cocok.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

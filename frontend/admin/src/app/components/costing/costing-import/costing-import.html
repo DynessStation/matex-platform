@@ -1,0 +1,121 @@
+<p class="costing-help">
+  Pilih file Excel KATEGORI PRODUCT. Sistem membaca dan melaporkannya dulu;
+  belum ada yang tersimpan sampai tombol Simpan ditekan. Harga website tidak
+  ikut berubah, itu lewat tombol Terapkan harga. File tidak disimpan di server.
+</p>
+<div class="costing-toolbar">
+  <input
+    type="file"
+    class="form-control costing-file"
+    accept=".xlsx"
+    data-testid="import-file"
+    (change)="choose($event)"
+  />
+  <button
+    type="button"
+    class="btn btn-outline-primary"
+    data-testid="import-read"
+    [disabled]="!file() || busy()"
+    (click)="run(false)"
+  >
+    Baca file
+  </button>
+  @if (report(); as current) {
+    @if (!current.saved) {
+      <button
+        type="button"
+        class="btn btn-theme"
+        data-testid="import-save"
+        [disabled]="busy()"
+        (click)="run(true)"
+      >
+        Simpan ke sistem
+      </button>
+    }
+  }
+</div>
+
+@if (report(); as current) {
+  @if (current.saved) {
+    <div class="costing-confirm" data-testid="import-saved">
+      <strong>Tersimpan: {{ current.recipes }} resep baru.</strong>
+      <p>Lanjutkan di tab HPP & Harga untuk memeriksa dan menerapkan harga.</p>
+    </div>
+  }
+  <div class="costing-summary" data-testid="import-summary">
+    <div>
+      <span>Item</span><strong>{{ current.summary.items }}</strong>
+    </div>
+    <div>
+      <span>Terhubung ke produk</span>
+      <strong>{{ current.summary.with_product }}</strong>
+    </div>
+    <div>
+      <span>Belum punya produk</span>
+      <strong>{{ current.summary.without_product.length }}</strong>
+    </div>
+    <div>
+      <span>Item baru</span><strong>{{ current.summary.new_items }}</strong>
+    </div>
+    <div>
+      <span>Bahan</span><strong>{{ current.summary.materials }}</strong>
+    </div>
+    <div>
+      <span>Harga beda</span>
+      <strong>{{ current.summary.price_changes.length }}</strong>
+    </div>
+  </div>
+
+  @if (current.summary.unknown_skus.length) {
+    <h6>SKU di Excel yang tidak ada di katalog</h6>
+    <p class="costing-help">{{ current.summary.unknown_skus.join(', ') }}</p>
+  }
+
+  @if (issueGroups().length) {
+    <h6>Yang perlu dicek tim</h6>
+    @for (group of issueGroups(); track group.kind) {
+      <details class="costing-issues" data-testid="import-issue">
+        <summary>{{ group.label }} ({{ group.issues.length }})</summary>
+        <ul>
+          @for (issue of group.issues; track $index) {
+            <li>
+              <strong>{{ issue.item }}</strong>
+              @if (issue.row) {
+                (baris {{ issue.row }})
+              }
+              : {{ issue.detail }}
+            </li>
+          }
+        </ul>
+      </details>
+    }
+  }
+
+  @if (current.summary.price_changes.length) {
+    <h6>Harga website yang beda dari Excel</h6>
+    <div class="costing-table-wrap">
+      <table class="costing-table">
+        <thead>
+          <tr>
+            <th class="text-start">Produk</th>
+            <th>SKU</th>
+            <th>Status</th>
+            <th class="text-end">Sekarang</th>
+            <th class="text-end">Excel</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (change of current.summary.price_changes; track change.sku) {
+            <tr>
+              <td class="text-start">{{ change.name }}</td>
+              <td>{{ change.sku }}</td>
+              <td>{{ change.status }}</td>
+              <td class="text-end">{{ rupiah(change.live) }}</td>
+              <td class="text-end">{{ rupiah(change.excel) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

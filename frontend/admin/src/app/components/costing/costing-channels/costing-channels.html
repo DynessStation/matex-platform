@@ -1,0 +1,88 @@
+<h6>Tarif umum</h6>
+<p class="costing-help">
+  Dipakai item yang tidak punya tarif sendiri. Rumusnya mengikuti Excel: Net =
+  HPP / (1 - GPM), Affiliate = Net / (1 - %), E-commerce = Affiliate / (1 -
+  Aplikasi).
+</p>
+<div class="row g-3 costing-rates">
+  <div class="col-md-2 col-6">
+    <label class="form-label">GPM (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      data-testid="rate-gpm"
+      [(ngModel)]="rates['gpm']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Affiliate (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="rates['affiliate']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Aplikasi (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="rates['app']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Diskon grosir (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="rates['wholesale_discount']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Kurs USD</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="rates['usd_rate']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Bulatkan ke (Rp)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="rates['round_idr']"
+    />
+  </div>
+</div>
+<div *hasPermission="'cost.manage'" class="costing-row-end">
+  <button
+    type="button"
+    class="btn btn-theme"
+    data-testid="rates-save"
+    [disabled]="savingRates()"
+    (click)="saveRates()"
+  >
+    Simpan tarif umum
+  </button>
+</div>
+
+<h6>Biaya per kanal</h6>
+<p class="costing-help">
+  Isi dari Seller Center masing-masing. Saat tarif berubah, beri tanggal
+  "Sampai" pada baris lama dan tambah baris baru, supaya hitungan lama tetap
+  bisa ditelusuri.
+</p>
+@for (entry of channels(); track entry.channel.id) {
+  <section class="costing-channel" [attr.data-channel]="entry.channel.name">
+    <strong class="costing-channel-name">{{ entry.channel.name }}</strong>
+    <app-inline-table
+      [columns]="columns"
+      [blank]="blank"
+      [rows]="entry.rows"
+      (rowsChange)="entry.rows = $event"
+      (saveRow)="saveFee(entry.channel.id, $event)"
+      (removeRow)="removeFee($event)"
+    />
+  </section>
+}

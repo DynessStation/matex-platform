@@ -122,7 +122,7 @@ const saveItem = async (
     lines.push({
       material: await materialOf(line.label, line.price),
       label: line.label.slice(0, 150),
-      qty: Math.round(line.qty * 1e6) / 1e6,
+      qty: Math.round(line.qty * 1e12) / 1e12,
       formula: null,
       ownPrice: line.unitPrice,
     });
@@ -142,7 +142,7 @@ const saveItem = async (
     return (
       row.material === line.material &&
       row.label === line.label &&
-      Math.abs(Number(row.qty) - line.qty) < 1e-6 &&
+      Math.abs(Number(row.qty) - line.qty) < 1e-9 &&
       (own === line.ownPrice ||
         (own != null && line.ownPrice != null && Math.abs(own - line.ownPrice) < 1e-4))
     );
@@ -242,14 +242,14 @@ router.post(
            WHERE id_cost_material = ? ORDER BY cost_material_price_from DESC LIMIT 1`,
           [id],
         );
-        if (!latest.length || Math.abs(Number(latest[0].amount) - price) >= 0.005) {
+        if (!latest.length || Math.abs(Number(latest[0].amount) - price) >= 1e-6) {
           await connection.query(
             `INSERT INTO cost_material_price
                (id_cost_material, id_master_comp, cost_material_price_amount, cost_material_price_from,
                 cost_material_price_note, id_created_by)
              VALUES (?, ?, ?, ?, 'Impor Excel', ?)
              ON DUPLICATE KEY UPDATE cost_material_price_amount = VALUES(cost_material_price_amount)`,
-            [id, scope.idMasterComp, Math.round(price * 100) / 100, date, scope.idAdminAcct],
+            [id, scope.idMasterComp, Math.round(price * 1e10) / 1e10, date, scope.idAdminAcct],
           );
         }
         materials.set(name, id);

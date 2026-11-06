@@ -369,6 +369,11 @@ test('channels: dated charges and the calculator', async () => {
   await expectCode(await owner.delete(`/api/v1/costing/fees/${categoryFee.data.id}`), 200);
   await expectCode(await owner.delete(`/api/v1/costing/fees/${fee.data.id}`), 200);
   await expectCode(await owner.delete('/api/v1/costing/fees/tidak-ada'), 404);
+  // Leave the shared channel as it was found, for the other specs.
+  const left = await expectCode(await owner.get('/api/v1/costing/channels'), 200);
+  for (const item of left.data.find((channel: any) => channel.id === shopee.id).fees) {
+    await expectCode(await owner.delete(`/api/v1/costing/fees/${item.id}`), 200);
+  }
 });
 
 test('applying prices copies them to the catalog, only when asked', async () => {

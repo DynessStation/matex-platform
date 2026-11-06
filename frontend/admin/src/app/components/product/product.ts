@@ -14,11 +14,13 @@ import {
   RouterModule,
 } from '@angular/router';
 
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { ProductCategoryFilter } from './product-category-filter/product-category-filter';
+import { ProductDetailModal } from './product-detail/product-detail-modal';
 import { ProductInsight } from './product-insight/product-insight';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { InsightToggle } from '../../shared/components/ui/insight/insight-toggle';
@@ -62,6 +64,7 @@ import { ProductState } from '../../shared/store/state/product.state';
 })
 export class Product implements AfterViewInit {
   private store = inject(Store);
+  private modal = inject(NgbModal);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
@@ -132,6 +135,11 @@ export class Product implements AfterViewInit {
         permission: 'product.delete',
       },
       { label: 'View', actionToPerform: 'view', icon: 'ri-eye-line' },
+      {
+        label: 'Detail',
+        actionToPerform: 'detail',
+        icon: 'ri-file-list-3-line',
+      },
     ],
     data: [],
     total: 0,
@@ -238,6 +246,13 @@ export class Product implements AfterViewInit {
         .subscribe(() =>
           this.store.dispatch(new GetProductsAction(this.filter)),
         );
+    if (action.actionToPerform === 'detail') {
+      const detail = this.modal.open(ProductDetailModal, {
+        size: 'lg',
+        scrollable: true,
+      });
+      (detail.componentInstance as ProductDetailModal).load(action.data.id);
+    }
     if (action.actionToPerform === 'view')
       window.open(`/product/${action.data.slug}`, '_blank');
   }

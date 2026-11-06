@@ -1,0 +1,166 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ item()?.name || 'Item HPP baru' }}</h5>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Tutup"
+    (click)="modal.close()"
+  ></button>
+</div>
+<div class="modal-body costing-modal" data-testid="costing-modal">
+  @if (item(); as current) {
+    <div class="costing-ladder" data-testid="costing-ladder">
+      <div>
+        <span>HPP</span><strong>{{ rupiah(current.hpp) }}</strong>
+      </div>
+      <div>
+        <span>Net MIA ({{ percent(current.rates.gpm) }})</span>
+        <strong>{{ rupiah(current.net) }}</strong>
+      </div>
+      <div>
+        <span>Affiliate ({{ percent(current.rates.affiliate) }})</span>
+        <strong>{{ rupiah(current.affiliate_price) }}</strong>
+      </div>
+      <div>
+        <span>E-commerce ({{ percent(current.rates.app) }})</span>
+        <strong>{{ rupiah(current.commerce) }}</strong>
+      </div>
+      <div>
+        <span>Grosir</span><strong>{{ rupiah(current.wholesale) }}</strong>
+      </div>
+      <div>
+        <span>Dollar</span><strong>${{ current.usd }}</strong>
+      </div>
+    </div>
+    <a
+      class="costing-text-link"
+      routerLink="/costing"
+      [queryParams]="{ tab: 'calculator', item: current.id }"
+      (click)="modal.close()"
+    >
+      <i class="ri-calculator-line"></i> Hitung di kalkulator
+    </a>
+  }
+
+  <h6>Identitas dan tarif</h6>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Nama</label>
+      <input
+        class="form-control"
+        data-testid="item-name"
+        [(ngModel)]="form['name']"
+      />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Kelompok</label>
+      <input class="form-control" [(ngModel)]="form['group']" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">SKU produk</label>
+      <input
+        class="form-control"
+        data-testid="item-sku"
+        [(ngModel)]="form['sku']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">L (cm)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        [(ngModel)]="form['width']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">P (cm)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        [(ngModel)]="form['length']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">T (cm)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        [(ngModel)]="form['height']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">GPM (%)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        placeholder="Umum"
+        data-testid="item-gpm"
+        [(ngModel)]="form['gpm']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">Affiliate (%)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        placeholder="Umum"
+        [(ngModel)]="form['affiliate']"
+      />
+    </div>
+    <div class="col-md-2 col-4">
+      <label class="form-label">Aplikasi (%)</label>
+      <input
+        class="form-control"
+        inputmode="decimal"
+        placeholder="Umum"
+        [(ngModel)]="form['app']"
+      />
+    </div>
+  </div>
+  <div *hasPermission="'cost.manage'" class="costing-row-end">
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      data-testid="item-save"
+      [disabled]="saving()"
+      (click)="saveIdentity()"
+    >
+      Simpan identitas dan tarif
+    </button>
+  </div>
+
+  @if (itemId()) {
+    <h6>
+      Resep
+      @if (item()?.version) {
+        <small>versi {{ item()?.version }}</small>
+      }
+    </h6>
+    <app-inline-table
+      data-testid="recipe"
+      [columns]="columns()"
+      [blank]="blank"
+      [orderable]="true"
+      [(rows)]="lines"
+      (saveRow)="keepLine($event)"
+      (removeRow)="keepLine($event)"
+      (reordered)="recipeChanged.set(true)"
+      (editingChange)="rowOpen.set($event)"
+    />
+    <div class="costing-recipe-foot">
+      <strong data-testid="recipe-total">Total {{ rupiah(total()) }}</strong>
+      <button
+        *hasPermission="'cost.manage'"
+        type="button"
+        class="btn btn-theme"
+        data-testid="recipe-save"
+        [disabled]="saving() || rowOpen() || !recipeChanged()"
+        (click)="saveRecipe()"
+      >
+        Simpan resep
+      </button>
+    </div>
+  } @else {
+    <p class="costing-muted">Simpan item dulu, lalu isi resepnya.</p>
+  }
+</div>

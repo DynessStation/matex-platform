@@ -1,0 +1,168 @@
+<div class="row g-3 costing-calculator-form" (input)="changed()">
+  <div class="col-md-6">
+    <label class="form-label">Produk</label>
+    <select
+      class="form-select"
+      data-testid="calc-item"
+      [(ngModel)]="form['item']"
+      (ngModelChange)="chooseItem()"
+    >
+      <option value="">Isi HPP sendiri</option>
+      @for (item of items(); track item.id) {
+        <option [value]="item.id">
+          {{ item.name }} {{ item.sku ? '(' + item.sku + ')' : '' }}
+        </option>
+      }
+    </select>
+  </div>
+  <div class="col-md-3 col-6">
+    <label class="form-label">HPP per item</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      data-testid="calc-hpp"
+      [placeholder]="result() ? rupiah(result()!.hpp) : ''"
+      [(ngModel)]="form['hpp']"
+    />
+  </div>
+  <div class="col-md-3 col-6">
+    <label class="form-label">Harga jual per item</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      data-testid="calc-price"
+      [placeholder]="result() ? rupiah(result()!.price) : ''"
+      [(ngModel)]="form['price']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Jumlah</label>
+    <input
+      class="form-control"
+      inputmode="numeric"
+      data-testid="calc-qty"
+      [(ngModel)]="form['qty']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Diskon per item</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="form['discount']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Voucher toko</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="form['voucher']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Iklan (%)</label>
+    <input class="form-control" inputmode="decimal" [(ngModel)]="form['ads']" />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Ongkir ditanggung</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="form['shipping']"
+    />
+  </div>
+  <div class="col-md-2 col-6">
+    <label class="form-label">Pajak (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      placeholder="Belum diatur"
+      [(ngModel)]="form['tax']"
+    />
+  </div>
+  <div class="col-md-3 col-6">
+    <label class="form-label">Target margin (%)</label>
+    <input
+      class="form-control"
+      inputmode="decimal"
+      placeholder="Untuk harga minimum"
+      data-testid="calc-target"
+      [(ngModel)]="form['target']"
+    />
+  </div>
+</div>
+
+@if (result(); as calculation) {
+  <div class="costing-table-wrap costing-result">
+    <table class="costing-table" data-testid="calc-table">
+      <thead>
+        <tr>
+          <th class="text-start">Kanal</th>
+          <th class="text-end">Dibayar pembeli</th>
+          <th class="text-end">Potongan</th>
+          <th class="text-end">Diterima</th>
+          <th class="text-end">HPP</th>
+          <th class="text-end">Laba</th>
+          <th class="text-end">Margin</th>
+          <th class="text-end">Harga minimum</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (channel of calculation.channels; track channel.id) {
+          <tr data-testid="calc-row" [attr.data-channel]="channel.name">
+            <td class="text-start">
+              <button
+                type="button"
+                class="costing-link"
+                (click)="open.set(open() === channel.id ? null : channel.id)"
+              >
+                {{ channel.name }}
+              </button>
+              @if (!channel.has_rules && channel.name !== 'Website') {
+                <small class="costing-warn">Biaya belum diisi</small>
+              }
+            </td>
+            <td class="text-end">{{ rupiah(channel.revenue) }}</td>
+            <td class="text-end">
+              {{ rupiah(channel.revenue - channel.received) }}
+            </td>
+            <td class="text-end">{{ rupiah(channel.received) }}</td>
+            <td class="text-end">{{ rupiah(channel.cost) }}</td>
+            <td
+              class="text-end costing-strong"
+              [class.costing-loss]="channel.profit < 0"
+            >
+              {{ rupiah(channel.profit) }}
+            </td>
+            <td class="text-end" [class.costing-loss]="channel.profit < 0">
+              {{ percent(channel.margin) }}
+            </td>
+            <td class="text-end">
+              {{
+                channel.minimum_price === null
+                  ? '-'
+                  : rupiah(channel.minimum_price)
+              }}
+            </td>
+          </tr>
+          @if (open() === channel.id) {
+            <tr class="costing-fees">
+              <td colspan="8">
+                @for (fee of channel.fees; track fee.name) {
+                  <span>{{ fee.name }}: {{ rupiah(fee.amount) }}</span>
+                } @empty {
+                  <span>Tidak ada potongan.</span>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="costing-help">
+    Ini estimasi dari tarif yang diisi di tab Tarif & Kanal, dan tidak mengubah
+    harga apa pun. Pajak belum diatur sampai legalitas perusahaan jelas.
+  </p>
+}

@@ -278,6 +278,14 @@ export const menu: ISidebar[] = [
         level: 2,
         permission: 'product.view',
       },
+      {
+        parent_id: 5,
+        title: 'hpp_price',
+        path: '/costing',
+        type: 'link',
+        level: 2,
+        permission: 'cost.view',
+      },
     ],
   },
 

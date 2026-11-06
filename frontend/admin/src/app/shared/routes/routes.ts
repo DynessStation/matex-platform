@@ -122,6 +122,14 @@ export const content: Routes = [
       ),
   },
   {
+    path: 'costing',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../components/costing/costing.routes').then(
+        (routes) => routes.costingRoutes,
+      ),
+  },
+  {
     path: 'email',
     canActivate: [AuthGuard],
     loadChildren: () =>

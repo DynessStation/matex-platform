@@ -15,6 +15,43 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.2.11B',
+    date: '7 November 2026',
+    summary:
+      'Menu HPP & Harga baru: bahan, resep, tarif, biaya per kanal, kalkulator, dan impor Excel. Ditambah popup Detail Produk dan API publik yang lebih rapat.',
+    sections: [
+      {
+        title: 'HPP & Harga',
+        items: [
+          'Daftar 83 item Excel beserta HPP, GPM, Net MIA, Affiliate, E-commerce, dan bedanya dengan harga website.',
+          'Harga bahan bertanggal, resep berversi, dan dampak harga baru bisa dilihat sebelum disimpan.',
+          'Biaya tiap kanal diisi manual dan bertanggal, jadi perubahan tarif tidak perlu mengubah aplikasi.',
+          'Kalkulator menghitung uang diterima, laba, margin, dan harga minimum di semua kanal sekaligus.',
+          'Impor Excel menampilkan laporan dulu, termasuk data yang perlu dicek tim, dan menyimpan setelah diminta.',
+          'Harga website hanya berubah lewat tombol Terapkan harga, dan tercatat di Log Aktivitas.',
+          'Akses diatur dengan izin Lihat HPP & Harga, Kelola HPP & Harga, dan Terapkan Harga.',
+        ],
+      },
+      {
+        title: 'Produk',
+        items: [
+          'Menu baris produk punya Detail: semua data produk di satu layar, dan biaya bagi yang punya izin.',
+          'Barcode, HS code, asal produk, ukuran, dan stok sekarang diperiksa formatnya saat disimpan.',
+          'Harga grosir di atas harga konsumen memunculkan peringatan.',
+        ],
+      },
+      {
+        title: 'Website dan tampilan',
+        items: [
+          'Footer di HP bisa dibuka, dan Produk Unggulan tampil dua kolom.',
+          'ID database tidak lagi tampil di respons publik, dan data internal dibuang dari sana.',
+          'Halaman pertama lebih ringan karena datanya ikut bersama halaman.',
+          'Tab Halaman Website dan Kantor punya titik status, input waktu satu baris, dan tombol Isi otomatis jadi teks.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.11A',
     date: '6 November 2026',
     summary:

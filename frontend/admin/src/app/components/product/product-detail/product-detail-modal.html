@@ -1,0 +1,244 @@
+@if (product(); as item) {
+  <div class="product-detail-header" data-testid="product-detail-header">
+    <div class="product-detail-title">
+      <strong>
+        {{ item.name }}
+        <button
+          type="button"
+          class="product-detail-copy"
+          aria-label="Salin nama"
+          (click)="copy(item.name)"
+        >
+          <i class="ri-file-copy-line" aria-hidden="true"></i>
+        </button>
+      </strong>
+      <span>
+        <span class="product-detail-status" [class]="item.status">{{
+          item.status
+        }}</span>
+        <button
+          type="button"
+          class="btn-close ms-2"
+          aria-label="Tutup"
+          (click)="modal.close()"
+        ></button>
+      </span>
+    </div>
+    <div class="product-detail-sub">
+      <span>
+        {{ item.sku }}
+        <button
+          type="button"
+          class="product-detail-copy"
+          aria-label="Salin SKU"
+          (click)="copy(item.sku)"
+        >
+          <i class="ri-file-copy-line" aria-hidden="true"></i>
+        </button>
+      </span>
+      <span data-testid="product-detail-since">Diperbarui {{ since() }}</span>
+    </div>
+  </div>
+
+  <div class="modal-body" data-testid="product-detail">
+    <div class="product-detail-media">
+      @if (item.product_thumbnail; as image) {
+        <figure>
+          <img [src]="image.asset_url" [alt]="item.name" loading="lazy" />
+          <figcaption>Gambar utama</figcaption>
+        </figure>
+      }
+      @if (socialImage(); as image) {
+        <figure>
+          <img [src]="image.asset_url" alt="Gambar sosial" loading="lazy" />
+          <figcaption>Gambar sosial</figcaption>
+        </figure>
+      }
+      @for (image of gallery(); track image.id_attachment) {
+        <img
+          class="small"
+          [src]="image.asset_url"
+          alt="Galeri produk"
+          loading="lazy"
+        />
+      }
+    </div>
+
+    <div class="product-detail-grid">
+      <div class="product-detail-cell tone-identity">
+        <span>Kategori</span>
+        <strong>
+          @for (
+            category of item.categories;
+            track category.id;
+            let last = $last
+          ) {
+            {{ category.name }}{{ last ? '' : ', ' }}
+          } @empty {
+            -
+          }
+        </strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>Barcode / GTIN</span>
+        <strong>{{ text(item.product_barcode ?? item.barcode) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>Kode manufaktur</span>
+        <strong>{{ text(item.product_manufacturer_code) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>HS code</span>
+        <strong>{{ text(item.product_hs_code) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>Negara asal</span>
+        <strong>{{ text(item.product_country_origin) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>Provinsi asal</span>
+        <strong>{{ text(item.product_origin_province) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-identity">
+        <span>Kota / kabupaten</span>
+        <strong>{{ text(item.product_origin_city) }}</strong>
+      </div>
+    </div>
+
+    <div class="product-detail-grid">
+      <div class="product-detail-cell tone-size">
+        <span>Berat (gram)</span>
+        <strong>{{ text(item.product_weight_grams) }}</strong>
+        <small>{{ converted(item.product_weight_grams, 1000, 'kg') }}</small>
+      </div>
+      <div class="product-detail-cell tone-size">
+        <span>Panjang (mm)</span>
+        <strong>{{ text(item.product_length_mm) }}</strong>
+        <small>{{ converted(item.product_length_mm, 10, 'cm') }}</small>
+      </div>
+      <div class="product-detail-cell tone-size">
+        <span>Lebar (mm)</span>
+        <strong>{{ text(item.product_width_mm) }}</strong>
+        <small>{{ converted(item.product_width_mm, 10, 'cm') }}</small>
+      </div>
+      <div class="product-detail-cell tone-size">
+        <span>Tinggi (mm)</span>
+        <strong>{{ text(item.product_height_mm) }}</strong>
+        <small>{{ converted(item.product_height_mm, 10, 'cm') }}</small>
+      </div>
+    </div>
+
+    <div class="product-detail-grid">
+      <div class="product-detail-cell tone-stock">
+        <span>Minimum pesanan</span>
+        <strong>{{ text(item.product_min_order_qty) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-stock">
+        <span>Lead time (hari)</span>
+        <strong>{{ text(item.product_lead_time_days) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-stock">
+        <span>Status stok</span>
+        <strong>{{ text(item.stock_status) }}</strong>
+      </div>
+      <div class="product-detail-cell tone-stock">
+        <span>Jumlah stok</span>
+        <strong>{{ text(item.product_stock_quantity) }}</strong>
+      </div>
+    </div>
+
+    @if (canSeeCost()) {
+      @if (cost(); as money) {
+        <div class="product-detail-grid" data-testid="product-detail-cost">
+          <div class="product-detail-cell tone-cost">
+            <span>HPP</span><strong>{{ rupiah(money.hpp) }}</strong>
+          </div>
+          <div class="product-detail-cell tone-cost">
+            <span>GPM {{ percent(money.rates.gpm) }}</span>
+            <strong>{{ rupiah(money.net) }}</strong>
+          </div>
+          <div class="product-detail-cell tone-cost">
+            <span>Affiliate {{ percent(money.rates.affiliate) }}</span>
+            <strong>{{ rupiah(money.affiliate_price) }}</strong>
+          </div>
+          <div class="product-detail-cell tone-cost">
+            <span>Aplikasi {{ percent(money.rates.app) }}</span>
+            <strong>{{ rupiah(money.commerce) }}</strong>
+          </div>
+          <div class="product-detail-cell tone-cost">
+            <span>Harga website</span>
+            <strong>{{ rupiah(money.live.idr) }}</strong>
+          </div>
+        </div>
+        @if (channels().length) {
+          <div class="costing-table-wrap" data-testid="product-detail-channels">
+            <table class="costing-table">
+              <thead>
+                <tr>
+                  <th class="text-start">Kanal</th>
+                  <th class="text-end">Diterima</th>
+                  <th class="text-end">Laba</th>
+                  <th class="text-end">Margin</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (channel of channels(); track channel.id) {
+                  <tr>
+                    <td class="text-start">
+                      {{ channel.name }}
+                      @if (!channel.has_rules && channel.name !== 'Website') {
+                        <small class="costing-warn">Biaya belum diisi</small>
+                      }
+                    </td>
+                    <td class="text-end">{{ rupiah(channel.received) }}</td>
+                    <td
+                      class="text-end"
+                      [class.costing-loss]="channel.profit < 0"
+                    >
+                      {{ rupiah(channel.profit) }}
+                    </td>
+                    <td
+                      class="text-end"
+                      [class.costing-loss]="channel.profit < 0"
+                    >
+                      {{ percent(channel.margin) }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        <a
+          class="costing-text-link mt-2"
+          routerLink="/costing"
+          [queryParams]="{ tab: 'calculator', item: money.id }"
+          (click)="modal.close()"
+        >
+          <i class="ri-calculator-line"></i> Hitung di kalkulator
+        </a>
+      } @else {
+        <p class="costing-muted">Produk ini belum punya data HPP.</p>
+      }
+    }
+
+    <div class="product-detail-grid">
+      @for (entry of seo(); track entry.locale) {
+        <div class="product-detail-cell tone-seo">
+          <span>Judul SEO {{ entry.locale }}</span>
+          <strong>{{ text(entry.title) }}</strong>
+        </div>
+        <div class="product-detail-cell tone-seo">
+          <span>Deskripsi SEO {{ entry.locale }}</span>
+          <strong>{{ text(entry.description) }}</strong>
+        </div>
+        <div class="product-detail-cell tone-seo">
+          <span>Alamat {{ entry.locale }}</span>
+          <strong>{{ text(entry.slug) }}</strong>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="modal-body costing-empty">Memuat...</div>
+}
