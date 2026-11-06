@@ -129,6 +129,7 @@ Yang disesuaikan dari PDF:
 - Tidak memakai SDK `hostinger-mail-api-sdk`: `fetch` Node sudah cukup untuk API ini, jadi tidak menambah dependensi (`axios`). Semua panggilan tetap lewat satu file, `service/mail-provider.service.ts`.
 - Token saat ini hanya mencakup satu mailbox. Audit Funnel menghitung mailbox itu, bukan alamat pengirim form seperti di mockup; `MAIL_INSIGHT_ADDRESS` bisa menunjuk alamat lain kalau cakupan token ditambah.
 - Menulis pesan dengan lampiran dan webhook belum dibuat.
+- Diuji di akun asli 6 November lewat `mail-provider.service.ts`, satu email tes ke `info@matexindo.com` sendiri: kirim, salinan di INBOX dan Sent, baca isi tanpa mengubah status, tandai dibaca dan belum dibaca, pindah ke Trash. Belum diuji di akun asli: balas, teruskan, unduh lampiran, pencarian teks, kirim ke alamat luar, dan halaman Email di browser.
 
 **Integrasi:** Hostinger Mail API resmi (`api.mail.hostinger.com`, SDK `hostinger-mail-api-sdk`) dipanggil dari backend saja.
 
