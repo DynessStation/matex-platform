@@ -83,6 +83,12 @@ test('mailboxes, folders, and messages with search', async () => {
   expect(list.data[0]).toMatchObject({ unseen: true, subject: 'Tanya harga kasur' });
   expect(list.data[0].text).toBeUndefined();
   expect(list.data[1].answered).toBe(true);
+  // The service sends one sender or none; the page always gets a list.
+  expect(list.data[0].from).toEqual([{ name: 'Budi Pelanggan', address: 'budi@example.invalid' }]);
+  expect(list.data[1].reply_to).toEqual([
+    { name: 'Sari Kantor', address: 'sari.kantor@example.invalid' },
+  ]);
+  expect(list.data[2].from).toEqual([]);
 
   const found = await expectCode(
     await owner.get(`${base}/${box}/messages`, { params: { search: 'distributor' } }),

@@ -75,6 +75,11 @@ export const listFolders = async (mailbox: string) =>
     }>(`${box(mailbox)}/folders?perPage=100`)
   ).data;
 
+export interface MailAddress {
+  name?: string;
+  address?: string;
+}
+
 export interface MailSummary {
   uid: number;
   date: string;
@@ -82,9 +87,11 @@ export interface MailSummary {
   unseen: boolean;
   size: number;
   subject?: string;
-  from?: { name?: string; address?: string }[];
-  to?: { name?: string; address?: string }[];
-  cc?: { name?: string; address?: string }[];
+  // One sender, or none, unlike the lists after it.
+  from?: MailAddress | null;
+  to?: MailAddress[];
+  cc?: MailAddress[];
+  replyTo?: MailAddress[];
   attachments?: {
     id: string;
     contentType: string;

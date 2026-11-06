@@ -15,7 +15,8 @@ const seed = () => [
     unseen: true,
     size: 2000,
     subject: 'Tanya harga kasur',
-    from: [{ name: 'Budi Pelanggan', address: 'budi@example.invalid' }],
+    from: { name: 'Budi Pelanggan', address: 'budi@example.invalid' },
+    replyTo: [],
     to: [{ address: 'info@example.invalid' }],
     cc: [],
     attachments: [
@@ -38,7 +39,8 @@ const seed = () => [
     unseen: false,
     size: 800,
     subject: 'Kerja sama distributor',
-    from: [{ name: 'Sari', address: 'sari@example.invalid' }],
+    from: { name: 'Sari', address: 'sari@example.invalid' },
+    replyTo: [{ name: 'Sari Kantor', address: 'sari.kantor@example.invalid' }],
     to: [{ address: 'info@example.invalid' }],
     cc: [],
     attachments: [],
@@ -53,7 +55,9 @@ const seed = () => [
     unseen: false,
     size: 600,
     subject: 'Sudah dibaca',
-    from: [{ address: 'lama@example.invalid' }],
+    // The real service can answer with no sender at all.
+    from: null,
+    replyTo: [],
     to: [{ address: 'info@example.invalid' }],
     cc: [],
     attachments: [],
@@ -150,7 +154,7 @@ const server = createServer(async (req, res) => {
         inside.filter(
           (item) =>
             flagged(item) &&
-            `${item.subject} ${item.text} ${item.from[0].address}`.toLowerCase().includes(text),
+            `${item.subject} ${item.text} ${item.from?.address ?? ''}`.toLowerCase().includes(text),
         ),
         url,
       ),

@@ -27,6 +27,7 @@ export interface IEmailSummary {
   from: IEmailAddress[];
   to: IEmailAddress[];
   cc: IEmailAddress[];
+  reply_to: IEmailAddress[];
   attachments: {
     id: string;
     filename: string;

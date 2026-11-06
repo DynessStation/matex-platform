@@ -294,7 +294,9 @@ export class Email {
     if (mode === 'reply' && message && ref) {
       this.reference = { in_reply_to: ref };
       this.draft.reset({
-        to: addressList(message.from),
+        to: addressList(
+          message.reply_to.length ? message.reply_to : message.from,
+        ),
         cc: '',
         subject: replySubject(message.subject),
         text: quotedBody(message),

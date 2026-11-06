@@ -115,7 +115,7 @@ test('a reply points at its message and quotes it; a new message is checked', as
   await open(page);
   await page.getByTestId('email-row').nth(1).click();
   await page.getByTestId('email-reply').click();
-  await expect(page.locator('#email_to')).toHaveValue('sari@example.invalid');
+  await expect(page.locator('#email_to')).toHaveValue('sari.kantor@example.invalid');
   await expect(page.locator('#email_subject')).toHaveValue('Re: Kerja sama distributor');
   await expect(page.locator('#email_text')).toHaveValue(/Kami tertarik bekerja sama/);
   await page.locator('#email_text').fill('Terima kasih, kami hubungi segera.');
@@ -124,7 +124,7 @@ test('a reply points at its message and quotes it; a new message is checked', as
 
   const sent = await (await (await provider()).get('/__sent')).json();
   expect(sent[0]).toMatchObject({
-    to: ['sari@example.invalid'],
+    to: ['sari.kantor@example.invalid'],
     subject: 'Re: Kerja sama distributor',
     inReplyTo: { uid: 2, folder: 'INBOX' },
   });

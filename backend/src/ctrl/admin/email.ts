@@ -74,9 +74,10 @@ const summary = (item: Awaited<ReturnType<typeof getMessage>>) => ({
   answered: (item.flags ?? []).includes('\\Answered'),
   size: item.size,
   subject: item.subject ?? '',
-  from: item.from ?? [],
+  from: item.from ? [item.from] : [],
   to: item.to ?? [],
   cc: item.cc ?? [],
+  reply_to: item.replyTo ?? [],
   attachments: (item.attachments ?? [])
     .filter((file) => !file.inline)
     .map((file) => ({
