@@ -50,7 +50,7 @@ test('missing deployment company fails closed before querying', async () => {
   const response = await fetch(`${base}/id-ID/tentang-matex`);
   assert.equal(response.status, 503);
   assert.equal(calls.length, 0);
-  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.equal(response.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
 });
 
 test('unsupported locale and malformed paths do not query', async () => {

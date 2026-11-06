@@ -521,3 +521,46 @@
     min-height: 0;
   }
 }
+
+// Two product cards per row on a phone (owner's Part 2 document, page 5).
+@media (max-width: 575.98px) {
+  .product-card {
+    .product-copy {
+      padding: 10px 12px 12px;
+
+      > span {
+        font-size: 10px;
+      }
+
+      h3 {
+        display: -webkit-box;
+        font-size: 13px;
+        line-height: 1.35;
+        margin: 4px 0 8px;
+        min-height: 35px;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      p {
+        display: none;
+      }
+    }
+
+    .product-meta {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 2px;
+      padding-top: 8px;
+
+      strong {
+        font-size: 14px;
+      }
+
+      small {
+        font-size: 10px;
+      }
+    }
+  }
+}

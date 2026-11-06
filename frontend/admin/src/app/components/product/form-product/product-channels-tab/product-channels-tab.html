@@ -26,7 +26,7 @@
         ><input type="checkbox" formControlName="internal_commerce_enabled" />
         Aktifkan commerce internal
         <app-help-tip section="tab-harga-kanal--commerce-internal" />
-        <small>(belum untuk v1)</small></label
+        <small>(belum aktif)</small></label
       >
     </div>
   </div>
@@ -67,6 +67,12 @@
         />
       </ng-template>
     </app-inline-table>
+    @if (wholesaleAboveConsumer(editor.idrRows())) {
+      <small class="form-kit-warning" data-testid="wholesale-warning"
+        >Harga grosir lebih tinggi dari harga konsumen. Periksa lagi
+        angkanya.</small
+      >
+    }
   </div>
 
   <div class="mb-4" data-testid="prices-usd">
@@ -88,6 +94,12 @@
         />
       </ng-template>
     </app-inline-table>
+    @if (wholesaleAboveConsumer(editor.usdRows())) {
+      <small class="form-kit-warning" data-testid="wholesale-warning"
+        >Harga grosir lebih tinggi dari harga konsumen. Periksa lagi
+        angkanya.</small
+      >
+    }
   </div>
 
   <ng-template #wholesale let-row="row" let-set="set">
@@ -101,7 +113,7 @@
         <input
           class="form-control"
           inputmode="numeric"
-          [value]="row['min_qty']"
+          [value]="row['min_qty'] ?? ''"
           (input)="set('min_qty', $any($event.target).value)"
         />
       </div>
@@ -111,7 +123,7 @@
           class="form-control"
           inputmode="numeric"
           placeholder="Opsional"
-          [value]="row['max_qty']"
+          [value]="row['max_qty'] ?? ''"
           (input)="set('max_qty', $any($event.target).value)"
         />
       </div>
@@ -144,7 +156,7 @@
             <input
               class="form-control"
               placeholder="Opsional jika berbeda dari SKU internal"
-              [value]="row['sku']"
+              [value]="row['sku'] ?? ''"
               (input)="set('sku', $any($event.target).value)"
             />
           </div>
@@ -154,7 +166,7 @@
               class="form-control"
               inputmode="decimal"
               placeholder="Opsional"
-              [value]="row['price']"
+              [value]="row['price'] ?? ''"
               (input)="set('price', $any($event.target).value)"
             />
           </div>
@@ -163,7 +175,7 @@
             <input
               class="form-control text-uppercase"
               maxlength="3"
-              [value]="row['currency']"
+              [value]="row['currency'] ?? ''"
               (input)="set('currency', $any($event.target).value)"
             />
           </div>

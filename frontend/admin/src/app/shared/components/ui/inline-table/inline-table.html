@@ -118,7 +118,7 @@
                   text(row, column)
                 }}</span>
               }
-              @if (errors()[column.key]) {
+              @if (editing && errors()[column.key]) {
                 <div class="form-kit-error">
                   {{ errors()[column.key] | translate }}
                 </div>

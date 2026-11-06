@@ -44,7 +44,8 @@
 }
 
 .status-switch-cell {
-  display: inline-flex;
+  // The template's table rule sets .form-switch to block, which broke this line.
+  display: inline-flex !important;
   align-items: center;
   gap: 9px;
   margin: 0;

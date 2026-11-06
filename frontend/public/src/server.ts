@@ -40,6 +40,14 @@ const internalPublicOrigin = resolveInternalOrigin(
   environment.publicSiteURL,
 );
 
+app.disable('x-powered-by');
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), payment=(), usb=()');
+  next();
+});
+
 app.get('/health/ssr', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.status(200).json({

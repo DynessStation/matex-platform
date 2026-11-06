@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
 
-import { isPublicContentLocale } from '../../config/public-content.config';
+import { PUBLIC_READ_CACHE, isPublicContentLocale } from '../../config/public-content.config';
 import {
   getFixedWebNavigationPath,
   isFixedWebNavigationKey,
@@ -29,7 +29,7 @@ router.get(
   '/api/public/navigation/:key/:locale',
   onFailure('NAVIGATION_UNAVAILABLE', 'Unable to load navigation'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
 
     const company = Number(process.env.PUBLIC_COMPANY_ID);
 

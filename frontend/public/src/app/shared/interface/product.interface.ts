@@ -12,7 +12,7 @@ export interface ProductModel extends PaginateModel {
 export type TProduct = Product;
 
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   localized_slugs?: Record<string, string>;
@@ -27,9 +27,9 @@ export interface Product {
   brand: Brand;
   categories: Category[];
   store: IStores;
-  related_products?: number[];
-  cross_sell_products?: number[];
-  categories_ids?: number[];
+  related_products?: string[];
+  cross_sell_products?: string[];
+  categories_ids?: string[];
   short_description?: string;
   description?: string;
   quantity: number;
@@ -109,7 +109,7 @@ export interface ProductMarketplace {
 
 export interface PivotProduct {
   order_id: number;
-  product_id: number;
+  product_id: string;
   quantity: number;
   shipping_cost: number;
   single_price: number;
@@ -125,7 +125,7 @@ export interface Variation {
   price: number;
   sale_price: number;
   stock_status: string;
-  product_id: number;
+  product_id: string;
   sku: string;
   discount: number;
   quantity: number;

@@ -14,11 +14,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 7px 12px;
-  border: 1px solid #b76600;
-  background: #fff8ed;
+  gap: 6px;
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
   color: #8a4c00;
   font-size: 11px;
   font-weight: 700;
@@ -27,14 +27,13 @@
 
 .ai-field-action__button:hover:not(:disabled),
 .ai-field-action__button:focus-visible {
-  border-color: var(--theme-color);
-  background: var(--theme-color);
-  color: #fff;
+  background: transparent;
+  color: var(--theme-color);
+  text-decoration: underline;
 }
 
 .ai-field-action.is-loading .ai-field-action__button {
-  border-color: var(--theme-color);
-  background: #fff1dc;
+  background: transparent;
   color: #713f00;
 }
 

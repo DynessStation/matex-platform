@@ -8,8 +8,8 @@ export interface CategoryModel extends PaginateModel {
 export type ICategory = Category;
 
 export interface Category {
-  id: number;
-  parent_id?: number | null;
+  id: string;
+  parent_id?: string | null;
   key?: string;
   name: string;
   slug: string;

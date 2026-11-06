@@ -39,9 +39,9 @@ export class ProductBundle {
   public cartItem: Cart | null;
 
   public crossSellProducts: Product[] = [];
-  public crossSellProductsIds: number[] = [];
+  public crossSellProductsIds: string[] = [];
   public selectedProduct: Product[] = [];
-  public selectedProductIds: number[] = [];
+  public selectedProductIds: string[] = [];
   public selectedVariation: Variation;
 
   public total: number = 0;
@@ -60,7 +60,7 @@ export class ProductBundle {
     }
   }
 
-  select(event: Event, productId: number) {
+  select(event: Event, productId: string) {
     const isChecked = (<HTMLInputElement>event.target).checked;
     if (isChecked) {
       this.selectedProductIds.push(productId);
@@ -93,7 +93,7 @@ export class ProductBundle {
     );
   }
 
-  isChecked(productId: number): boolean {
+  isChecked(productId: string): boolean {
     return this.selectedProductIds.includes(productId);
   }
 

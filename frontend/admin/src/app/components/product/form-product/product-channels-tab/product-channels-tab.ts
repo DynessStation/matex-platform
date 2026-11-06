@@ -59,15 +59,38 @@ export class ProductChannelsTab {
 
   readonly priceBlank: InlineRow = {
     type: 'end_user',
+    label: '',
+    amount: '',
+    compare_at: '',
+    min_qty: '',
+    max_qty: '',
     status: 'active',
     shown: 'shown',
   };
   readonly marketplaceBlank: InlineRow = {
     provider: 'shopee',
+    label: '',
+    url: '',
+    sku: '',
+    price: '',
     currency: 'IDR',
     rank: 'normal',
     shown: 'shown',
   };
+
+  /** A wholesale price above the consumer price is allowed, but usually a typo. */
+  wholesaleAboveConsumer(rows: InlineRow[]): boolean {
+    const amounts = (type: string) =>
+      rows
+        .filter((row) => row['type'] === type)
+        .map((row) => Number(row['amount']))
+        .filter((amount) => Number.isFinite(amount) && amount > 0);
+    const consumer = amounts('end_user');
+    return (
+      consumer.length > 0 &&
+      amounts('wholesale').some((amount) => amount > Math.max(...consumer))
+    );
+  }
 
   /** Minimum and maximum belong to a wholesale price only. */
   readonly wholesaleOnly = (row: InlineRow, editing: boolean) =>

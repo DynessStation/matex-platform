@@ -10,7 +10,7 @@ export class WishlistStateModel {
     data: [] as Product[],
     total: 0,
   };
-  wishlistIds: number[];
+  wishlistIds: string[];
 }
 
 @State<WishlistStateModel>({

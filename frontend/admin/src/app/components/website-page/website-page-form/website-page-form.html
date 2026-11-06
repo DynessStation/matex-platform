@@ -11,6 +11,7 @@
       <div class="col-xl-3 col-lg-4">
         <!-- Tabs and the save button stay in view while the content scrolls (U-11). -->
         <div class="website-page-sidebar">
+          <app-form-heading [title]="pageTitle" />
           <ul
             ngbNav
             #nav="ngbNav"
@@ -26,6 +27,7 @@
                 <i class="ri-settings-3-line"></i>
 
                 {{ 'website_page.form_general' | translate }}
+                <app-tab-status [state]="tabStates().general" />
               </button>
 
               <ng-template ngbNavContent>
@@ -40,6 +42,7 @@
                 <i class="ri-translate-2"></i>
 
                 {{ 'website_page.content_languages' | translate }}
+                <app-tab-status [state]="tabStates().content" />
               </button>
 
               <ng-template ngbNavContent>
@@ -54,6 +57,7 @@
                 <i class="ri-search-eye-line"></i>
 
                 SEO
+                <app-tab-status [state]="tabStates().seo" />
               </button>
 
               <ng-template ngbNavContent>
@@ -69,6 +73,7 @@
                   <i class="ri-image-line"></i>
 
                   {{ 'website_page.media' | translate }}
+                  <app-tab-status [state]="tabStates().media" />
                 </button>
 
                 <ng-template ngbNavContent>
@@ -84,6 +89,7 @@
                 <i class="ri-send-plane-line"></i>
 
                 {{ 'website_page.publication' | translate }}
+                <app-tab-status [state]="tabStates().publication" />
               </button>
 
               <ng-template ngbNavContent>
@@ -124,7 +130,6 @@
                 {{ 'website_page.save_changes' | translate }}
               }
             </button>
-            <small>Simpan tanpa harus membuka tab Pratinjau.</small>
           </div>
         </div>
       </div>

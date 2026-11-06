@@ -1,12 +1,18 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { PUBLIC_WHERE, isPublicContentLocale } from '../../config/public-content.config';
+import {
+  PUBLIC_READ_CACHE,
+  PUBLIC_WHERE,
+  isPublicContentLocale,
+} from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { movedSlug, notFoundData } from '../../helper/slug-redirect.helper';
 import { pageMeta, parseListQuery } from '../../helper/list-query.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import keyhsid from '../../hsid';
+import { decodeId } from '../../helper/id.helper';
 
 const router = Router();
 const scopeOf = (locale: unknown) => {
@@ -21,11 +27,9 @@ const base = `SELECT p.*,i.product_slug,i.product_name,i.product_short_descripti
  JOIN product_catalog_i18n i ON i.id_product=p.id_product AND i.id_master_comp=p.id_master_comp`;
 const where = PUBLIC_WHERE.product;
 const image = (row: RowDataPacket) => ({
-  id: Number(row.id_attachment),
   asset_url: buildAttachmentUrl(row.storage_path),
   original_url: buildAttachmentUrl(row.storage_path),
   name: row.name ?? '',
-  file_name: row.file_name ?? row.name ?? '',
   width: row.width == null ? null : Number(row.width),
   height: row.height == null ? null : Number(row.height),
   mime_type: row.mime_type ?? '',
@@ -99,7 +103,7 @@ const hydrate = async (
     if (normalizedMarkets.length && !primaryAssigned)
       normalizedMarkets[0].normalized_is_primary = true;
     return {
-      id,
+      id: keyhsid.idProduct.encode(id),
       name: row.product_name,
       slug: row.product_slug,
       sku: row.product_sku,
@@ -115,22 +119,16 @@ const hydrate = async (
       specifications: jsonValue(row.product_specifications_json),
       unit: row.product_unit ?? '',
       weight: row.product_weight_grams == null ? null : Number(row.product_weight_grams),
-      manufacturer_code: row.product_manufacturer_code ?? null,
       country_origin: row.product_country_origin ?? null,
       origin_province: row.product_origin_province ?? null,
       origin_city: row.product_origin_city ?? null,
-      hs_code: row.product_hs_code ?? null,
       min_order_qty: Number(row.product_min_order_qty ?? 1),
-      lead_time_days:
-        row.product_lead_time_days == null ? null : Number(row.product_lead_time_days),
       dimensions: {
         length_mm: row.product_length_mm == null ? null : Number(row.product_length_mm),
         width_mm: row.product_width_mm == null ? null : Number(row.product_width_mm),
         height_mm: row.product_height_mm == null ? null : Number(row.product_height_mm),
       },
       stock_status: row.product_stock_status,
-      quantity: row.product_manage_stock ? Number(row.product_stock_quantity ?? 0) : 0,
-      manage_stock: Boolean(row.product_manage_stock),
       price_visibility: row.product_price_visibility,
       price:
         row.product_price_visibility === 'displayed' && publicPrice
@@ -169,7 +167,7 @@ const hydrate = async (
       categories: categories
         .filter((x) => Number(x.id_product) === id)
         .map((x) => ({
-          id: Number(x.id_product_category),
+          id: keyhsid.idProductCategory.encode(Number(x.id_product_category)),
           name: x.product_category_name,
           slug: x.product_category_slug,
         })),
@@ -177,7 +175,6 @@ const hydrate = async (
         provider: x.product_marketplace_provider,
         label: x.product_marketplace_label,
         url: x.product_marketplace_url,
-        sku: x.product_marketplace_sku,
         price: x.product_marketplace_price == null ? null : Number(x.product_marketplace_price),
         currency: x.product_marketplace_currency,
         is_primary: x.normalized_is_primary,
@@ -222,7 +219,7 @@ router.get(
   '/api/public/products/:locale',
   onFailure('PRODUCTS_UNAVAILABLE', 'Unable to load products'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const scope = scopeOf(req.params.locale);
     if (!scope) return sendError(res, 404, 'PRODUCTS_NOT_FOUND', 'Products not found');
     const search = String(req.query.search ?? '')
@@ -234,17 +231,24 @@ router.get(
       .map((x) => x.trim())
       .filter(Boolean)
       .slice(0, 20);
-    const categoryIds = String(req.query.category_ids ?? '')
-      .split(',')
-      .map(Number)
-      .filter((value) => Number.isSafeInteger(value) && value > 0)
-      .slice(0, 50);
-    const ids = String(req.query.ids ?? '')
-      .split(',')
-      .map(Number)
-      .filter((value) => Number.isSafeInteger(value) && value > 0)
-      .slice(0, 100);
-    const excludedId = Number(req.query.exclude_id);
+    // Public ids are hashes; a raw number or a tampered hash matches nothing.
+    const hashes = (value: unknown, encoder: Parameters<typeof decodeId>[1], max: number) =>
+      String(value ?? '')
+        .split(',')
+        .map((item) => decodeId(item.trim(), encoder))
+        .filter((id): id is number => id != null)
+        .slice(0, max);
+    const categoryIds = hashes(req.query.category_ids, keyhsid.idProductCategory, 50);
+    const ids = hashes(req.query.ids, keyhsid.idProduct, 100);
+    const excludedId = decodeId(String(req.query.exclude_id ?? ''), keyhsid.idProduct);
+    if ((req.query.ids && !ids.length) || (req.query.category_ids && !categoryIds.length))
+      return sendList(
+        res,
+        'PRODUCTS_FOUND',
+        'Products loaded',
+        [],
+        pageMeta({ page: 1, limit: 1 }, 0),
+      );
     const { page, limit } = parseListQuery(req.query, { defaultLimit: 100, maxLimit: 100 });
     const preferredCurrency = currencyCode(req.query.currency);
     // `sort` names a catalog order (a-z, z-a, low-high, high-low, desc).
@@ -267,7 +271,7 @@ router.get(
       clauses.push(`p.id_product IN (${ids.map(() => '?').join(',')})`);
       params.push(...ids);
     }
-    if (Number.isSafeInteger(excludedId) && excludedId > 0) {
+    if (excludedId != null) {
       clauses.push(`p.id_product<>?`);
       params.push(excludedId);
     }
@@ -317,7 +321,7 @@ router.get(
   '/api/public/products/:locale/:slug',
   onFailure('PRODUCT_UNAVAILABLE', 'Unable to load product'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const scope = scopeOf(req.params.locale);
     if (!scope) return sendError(res, 404, 'PRODUCT_NOT_FOUND', 'Product not found');
     const [rows] = await pool.query<RowDataPacket[]>(

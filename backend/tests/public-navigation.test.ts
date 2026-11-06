@@ -70,7 +70,7 @@ test('missing tenant fails closed before querying', async () => {
 
   assert.equal(response.status, 503);
   assert.equal(calls.length, 0);
-  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.equal(response.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
   assert.equal(((await response.json()) as NavigationBody).code, 'NAVIGATION_UNAVAILABLE');
 });
 

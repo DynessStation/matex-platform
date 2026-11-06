@@ -12,6 +12,7 @@
     <li [ngbNavItem]="'general'">
       <button ngbNavLink type="button">
         {{ 'office.general' | translate }}
+        <app-tab-status [state]="tabStates().general" />
       </button>
 
       <ng-template ngbNavContent>
@@ -22,6 +23,7 @@
     <li [ngbNavItem]="'location'">
       <button ngbNavLink type="button">
         {{ 'office.location' | translate }}
+        <app-tab-status [state]="tabStates().location" />
       </button>
 
       <ng-template ngbNavContent>
@@ -32,6 +34,7 @@
     <li [ngbNavItem]="'contact'">
       <button ngbNavLink type="button">
         {{ 'office.contact' | translate }}
+        <app-tab-status [state]="tabStates().contact" />
       </button>
 
       <ng-template ngbNavContent>
@@ -42,6 +45,7 @@
     <li [ngbNavItem]="'hours'">
       <button ngbNavLink type="button">
         {{ 'office.operating_hours' | translate }}
+        <app-tab-status [state]="tabStates().hours" />
       </button>
 
       <ng-template ngbNavContent>
@@ -60,6 +64,7 @@
     <li [ngbNavItem]="'publication'">
       <button ngbNavLink type="button">
         {{ 'office.publication' | translate }}
+        <app-tab-status [state]="tabStates().publication" />
       </button>
 
       <ng-template ngbNavContent>

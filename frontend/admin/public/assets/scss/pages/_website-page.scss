@@ -572,13 +572,13 @@
   .cms-publication-timepicker {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
-    min-height: 78px;
+    min-height: var(--admin-control-height);
 
-    padding: 8px 12px;
+    padding: 0;
 
-    background: #f8f8f8;
+    background: transparent;
 
     border: 1px solid #efefef;
     border-radius: 4px;

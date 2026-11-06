@@ -20,7 +20,7 @@ export class Wishlist {
   readonly product = input<Product>();
   readonly class = input<string>('');
   private notificationService = inject(NotificationService);
-  wishlistIds$: Observable<number[]> = this.store.select(WishlistState.wishlistIds);
+  wishlistIds$: Observable<string[]> = this.store.select(WishlistState.wishlistIds);
 
   addToWishlist(product: Product) {
     const wishlistIds = this.store.selectSnapshot(WishlistState.wishlistIds) || [];

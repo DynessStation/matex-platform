@@ -248,7 +248,7 @@ export class CategoryState {
     );
   }
 
-  getSubCategory(category: Category, ids: number[]) {
+  getSubCategory(category: Category, ids: string[]) {
     if (ids?.includes(category?.id!)) {
       if (category) {
         return category;

@@ -1266,3 +1266,23 @@ body.dark-only {
 // .toast-container .ngx-toastr {
 //   color: #ffffff !important;
 // }
+
+// Part 2 visual rules: controls on one line share one height and stay straight.
+ngb-timepicker .ngb-tp-input.form-control {
+  height: var(--admin-control-height);
+  min-height: var(--admin-control-height);
+}
+
+.title-header-actions .btn {
+  height: var(--admin-bar-height);
+  min-height: var(--admin-bar-height);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.form-kit-warning {
+  color: #9a5b00;
+  display: block;
+  font-size: var(--admin-text);
+  margin-top: 4px;
+}

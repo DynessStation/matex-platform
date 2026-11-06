@@ -82,7 +82,7 @@ export class Wishlist {
     });
   }
 
-  removeWishlist(id: number) {
+  removeWishlist(id: string) {
     this.store.dispatch(new DeleteWishlist(id));
   }
 }

@@ -90,39 +90,129 @@
     <div class="col-md-4">
       <label class="form-label"
         >Barcode / GTIN <app-help-tip section="tab-umum--barcode-gtin" /></label
-      ><input class="form-control" formControlName="barcode" />
+      ><input
+        class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.barcode.invalid &&
+          editor.form.controls.barcode.touched
+        "
+        autocomplete="off"
+        formControlName="barcode"
+      />
+      @if (
+        editor.form.controls.barcode.invalid &&
+        editor.form.controls.barcode.touched
+      ) {
+        <small class="form-kit-error"
+          >Hanya huruf, angka, titik, garis miring, dan tanda hubung, tanpa
+          spasi.</small
+        >
+      }
     </div>
     <div class="col-md-4">
       <label class="form-label"
         >Kode manufaktur
         <app-help-tip section="tab-umum--kode-manufaktur" /></label
-      ><input class="form-control" formControlName="manufacturer_code" />
+      ><input
+        class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.manufacturer_code.invalid &&
+          editor.form.controls.manufacturer_code.touched
+        "
+        autocomplete="off"
+        formControlName="manufacturer_code"
+      />
+      @if (
+        editor.form.controls.manufacturer_code.invalid &&
+        editor.form.controls.manufacturer_code.touched
+      ) {
+        <small class="form-kit-error"
+          >Hanya huruf, angka, titik, garis miring, dan tanda hubung, tanpa
+          spasi.</small
+        >
+      }
     </div>
     <div class="col-md-4">
       <label class="form-label"
         >HS code <app-help-tip section="tab-umum--hs-code" /></label
-      ><input class="form-control" formControlName="hs_code" />
+      ><input
+        class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.hs_code.invalid &&
+          editor.form.controls.hs_code.touched
+        "
+        autocomplete="off"
+        formControlName="hs_code"
+      />
+      @if (
+        editor.form.controls.hs_code.invalid &&
+        editor.form.controls.hs_code.touched
+      ) {
+        <small class="form-kit-error">Hanya angka, titik, dan koma.</small>
+      }
     </div>
     <div class="col-md-4">
       <label class="form-label"
         >Negara asal <app-help-tip section="tab-umum--asal-produk" /></label
-      ><input class="form-control" formControlName="country_origin" />
+      ><input
+        class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.country_origin.invalid &&
+          editor.form.controls.country_origin.touched
+        "
+        autocomplete="off"
+        formControlName="country_origin"
+      />
+      @if (
+        editor.form.controls.country_origin.invalid &&
+        editor.form.controls.country_origin.touched
+      ) {
+        <small class="form-kit-error"
+          >Hanya huruf dan tanda baca nama tempat.</small
+        >
+      }
     </div>
     <div class="col-md-4">
       <label class="form-label">Provinsi asal</label
       ><input
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.origin_province.invalid &&
+          editor.form.controls.origin_province.touched
+        "
+        autocomplete="off"
         formControlName="origin_province"
         placeholder="contoh: Jawa Barat"
       />
+      @if (
+        editor.form.controls.origin_province.invalid &&
+        editor.form.controls.origin_province.touched
+      ) {
+        <small class="form-kit-error"
+          >Hanya huruf dan tanda baca nama tempat.</small
+        >
+      }
     </div>
     <div class="col-md-4">
       <label class="form-label">Kota / kabupaten asal</label
       ><input
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.origin_city.invalid &&
+          editor.form.controls.origin_city.touched
+        "
+        autocomplete="off"
         formControlName="origin_city"
         placeholder="contoh: Bogor"
       />
+      @if (
+        editor.form.controls.origin_city.invalid &&
+        editor.form.controls.origin_city.touched
+      ) {
+        <small class="form-kit-error"
+          >Hanya huruf dan tanda baca nama tempat.</small
+        >
+      }
     </div>
     <div class="col-xl-3 col-md-6">
       <label class="form-label"
@@ -133,8 +223,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.weight_grams.invalid &&
+          editor.form.controls.weight_grams.touched
+        "
         formControlName="weight_grams"
       />
+      @if (
+        editor.form.controls.weight_grams.invalid &&
+        editor.form.controls.weight_grams.touched
+      ) {
+        <small class="form-kit-error">Maksimal 10.000.000 gram.</small>
+      }
       @if (editor.measurementHelper('weight_grams'); as converted) {
         <small class="measurement-helper">≈ {{ converted }}</small>
       }
@@ -146,8 +246,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.length_mm.invalid &&
+          editor.form.controls.length_mm.touched
+        "
         formControlName="length_mm"
       />
+      @if (
+        editor.form.controls.length_mm.invalid &&
+        editor.form.controls.length_mm.touched
+      ) {
+        <small class="form-kit-error">Maksimal 100.000 mm.</small>
+      }
       @if (editor.measurementHelper('length_mm'); as converted) {
         <small class="measurement-helper">= {{ converted }}</small>
       }
@@ -159,8 +269,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.width_mm.invalid &&
+          editor.form.controls.width_mm.touched
+        "
         formControlName="width_mm"
       />
+      @if (
+        editor.form.controls.width_mm.invalid &&
+        editor.form.controls.width_mm.touched
+      ) {
+        <small class="form-kit-error">Maksimal 100.000 mm.</small>
+      }
       @if (editor.measurementHelper('width_mm'); as converted) {
         <small class="measurement-helper">= {{ converted }}</small>
       }
@@ -172,8 +292,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.height_mm.invalid &&
+          editor.form.controls.height_mm.touched
+        "
         formControlName="height_mm"
       />
+      @if (
+        editor.form.controls.height_mm.invalid &&
+        editor.form.controls.height_mm.touched
+      ) {
+        <small class="form-kit-error">Maksimal 100.000 mm.</small>
+      }
       @if (editor.measurementHelper('height_mm'); as converted) {
         <small class="measurement-helper">= {{ converted }}</small>
       }
@@ -198,8 +328,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.lead_time_days.invalid &&
+          editor.form.controls.lead_time_days.touched
+        "
         formControlName="lead_time_days"
       />
+      @if (
+        editor.form.controls.lead_time_days.invalid &&
+        editor.form.controls.lead_time_days.touched
+      ) {
+        <small class="form-kit-error">Maksimal 3.650 hari.</small>
+      }
     </div>
     <div class="col-md-3">
       <label class="form-label"
@@ -221,8 +361,18 @@
         inputmode="numeric"
         appLocalizedNumber
         class="form-control"
+        [class.is-invalid]="
+          editor.form.controls.stock_quantity.invalid &&
+          editor.form.controls.stock_quantity.touched
+        "
         formControlName="stock_quantity"
       />
+      @if (
+        editor.form.controls.stock_quantity.invalid &&
+        editor.form.controls.stock_quantity.touched
+      ) {
+        <small class="form-kit-error">Maksimal 999.999.999.</small>
+      }
     </div>
     <div class="col-md-4">
       <label class="app-check app-check-card category-check"

@@ -55,6 +55,14 @@
   text-align: right;
 }
 
+// The theme opens the list with `.active ~ * > .footer-list`, which needs a wrapper this
+// footer does not have: on a phone the links could never be opened.
+@media (max-width: 575.98px) {
+  .public-footer .main-footer .footer-title.active ~ .footer-list {
+    display: flex;
+  }
+}
+
 @media (max-width: 575px) {
   .footer-copyright {
     text-align: center;

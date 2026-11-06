@@ -1,6 +1,8 @@
+import keyhsid from '../../hsid';
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
 import {
+  PUBLIC_READ_CACHE,
   PUBLIC_WHERE,
   TAG_PAGE_MIN_ARTICLES,
   isPublicContentLocale,
@@ -55,7 +57,7 @@ const tagsOf = async (rows: RowDataPacket[], company: number, locale: string) =>
 };
 
 const dto = (row: RowDataPacket, tags: PublicTag[], detail = false) => ({
-  id: Number(row.id_article),
+  id: keyhsid.idArticle.encode(Number(row.id_article)),
   title: row.article_title,
   slug: row.article_slug,
   localized_slugs: {
@@ -87,7 +89,7 @@ router.get(
   '/api/public/articles/:locale',
   onFailure('ARTICLES_UNAVAILABLE', 'Unable to load articles'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const s = scope(req.params.locale);
     if (!s) return sendError(res, 404, 'ARTICLES_NOT_FOUND', 'Articles not found');
     const {
@@ -130,7 +132,7 @@ router.get(
   '/api/public/articles/:locale/:slug',
   onFailure('ARTICLE_UNAVAILABLE', 'Unable to load article'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const s = scope(req.params.locale);
     if (!s) return sendError(res, 404, 'ARTICLE_NOT_FOUND', 'Article not found');
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -157,7 +159,7 @@ router.get(
   '/api/public/article-tags/:locale/:slug',
   onFailure('ARTICLE_TAG_UNAVAILABLE', 'Unable to load the tag'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const s = scope(req.params.locale);
     if (!s) return sendError(res, 404, 'ARTICLE_TAG_NOT_FOUND', 'Tag not found');
     const slug = String(req.params.slug);

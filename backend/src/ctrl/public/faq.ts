@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
 
-import { isPublicContentLocale } from '../../config/public-content.config';
+import { PUBLIC_READ_CACHE, isPublicContentLocale } from '../../config/public-content.config';
 import { pool } from '../../db';
 import { sendError, sendSuccess } from '../../helper/api-response.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
@@ -12,7 +12,7 @@ router.get(
   '/api/public/faq/:locale',
   onFailure('FAQ_UNAVAILABLE', 'Unable to load FAQ'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const company = Number(process.env.PUBLIC_COMPANY_ID);
     const locale = String(req.params.locale ?? '');
 

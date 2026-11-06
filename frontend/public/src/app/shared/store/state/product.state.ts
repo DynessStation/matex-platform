@@ -223,7 +223,7 @@ export class ProductState {
           });
 
           let products = result.data.filter((product: Product) =>
-            product?.categories_ids?.includes(Number(action.payload!['category_id'])),
+            product?.categories_ids?.includes(String(action.payload!['category_id'])),
           );
           products.splice(Number(action.payload!['paginate']));
 

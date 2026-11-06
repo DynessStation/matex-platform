@@ -24,6 +24,20 @@ const PRICE_TYPES = new Set(['end_user', 'wholesale']);
 const PRICE_CURRENCIES = new Set(['IDR', 'USD']);
 const MEDIA_ROLES = new Set(['thumbnail', 'gallery', 'og', 'size_chart', 'document']);
 
+const CODE = /^[A-Za-z0-9._/-]+$/;
+const HS_CODE = /^[0-9][0-9.,]*$/;
+const PLACE = /^\p{L}[\p{L}\s.'()-]*$/u;
+const LIMITS = {
+  weight: 10_000_000,
+  size: 100_000,
+  minOrder: 1_000_000,
+  leadTime: 3650,
+  stock: 999_999_999,
+};
+/** Trimmed, inner spaces collapsed, cut to the column length. */
+const tidy = (value: unknown, max: number) => trimTo(value, max).replace(/\s+/g, ' ') || null;
+const fits = (value: string | null, shape: RegExp) => value == null || shape.test(value);
+
 const numberOrNull = (value: unknown) =>
   value === '' || value == null || !Number.isFinite(Number(value)) ? null : Number(value);
 
@@ -214,7 +228,26 @@ export const parsePayload = (body: RequestBody) => {
     [weight, length, width, height, leadTimeDays, stockQuantity].some(
       (value) => value != null && value < 0,
     ) ||
-    minOrderQty < 1
+    minOrderQty < 1 ||
+    (weight ?? 0) > LIMITS.weight ||
+    [length, width, height].some((value) => (value ?? 0) > LIMITS.size) ||
+    minOrderQty > LIMITS.minOrder ||
+    (leadTimeDays ?? 0) > LIMITS.leadTime ||
+    (stockQuantity ?? 0) > LIMITS.stock
+  ) {
+    return null;
+  }
+  const barcode = tidy(body?.barcode, 120);
+  const manufacturerCode = tidy(body?.manufacturer_code, 120);
+  const countryOrigin = tidy(body?.country_origin, 100);
+  const provinceOrigin = tidy(body?.origin_province, 100);
+  const cityOrigin = tidy(body?.origin_city, 100);
+  const hsCode = tidy(body?.hs_code, 50);
+  if (
+    !fits(barcode, CODE) ||
+    !fits(manufacturerCode, CODE) ||
+    !fits(hsCode, HS_CODE) ||
+    ![countryOrigin, provinceOrigin, cityOrigin].every((place) => fits(place, PLACE))
   ) {
     return null;
   }
@@ -233,12 +266,12 @@ export const parsePayload = (body: RequestBody) => {
     translations,
     kind: trimTo(body?.product_kind, 120) || null,
     unit: trimTo(body?.unit, 40) || null,
-    barcode: trimTo(body?.barcode, 120) || null,
-    manufacturerCode: trimTo(body?.manufacturer_code, 120) || null,
-    countryOrigin: trimTo(body?.country_origin, 100) || null,
-    provinceOrigin: trimTo(body?.origin_province, 100) || null,
-    cityOrigin: trimTo(body?.origin_city, 100) || null,
-    hsCode: trimTo(body?.hs_code, 50) || null,
+    barcode,
+    manufacturerCode,
+    countryOrigin,
+    provinceOrigin,
+    cityOrigin,
+    hsCode,
     weight,
     length,
     width,

@@ -9,7 +9,7 @@ export interface CartModel {
 export type ICart = Cart;
 export interface Cart {
   id: number;
-  product_id: number;
+  product_id: string;
   variation: Variation;
   variation_id: number | null;
   wholesale_price: number | null;
@@ -26,7 +26,7 @@ export interface Cart {
 export interface CartAddOrUpdate {
   id: number | null;
   product: Product | null;
-  product_id: number;
+  product_id: string;
   variation: Variation | null;
   variation_id: number | null;
   quantity: number;

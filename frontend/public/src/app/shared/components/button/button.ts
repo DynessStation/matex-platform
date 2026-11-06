@@ -60,7 +60,7 @@ export class Button {
     }
   }
 
-  getProductSlug(id: number, products: Product[]) {
+  getProductSlug(id: string, products: Product[]) {
     let product = products.find((product) => {
       product.id === id;
     });

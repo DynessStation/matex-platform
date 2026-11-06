@@ -163,8 +163,8 @@ test('list tree, detail, and the public site', async () => {
   });
   await expectCode(await owner.get(`${base}/not-a-hash`), 404, 'PRODUCT_CATEGORY_NOT_FOUND');
 
-  const shown = flatten(await publicCategories()).map((item: any) => item.key);
-  expect(shown).toEqual(expect.arrayContaining([key, `${key}-anak`]));
+  const shown = flatten(await publicCategories()).map((item: any) => item.slug);
+  expect(shown).toEqual(expect.arrayContaining([`${key}-id`, `${key}-anak-id`]));
   await expectCode(await anonymous.get(`/api/public/product-categories/en-US/${key}-en`), 200);
   await expectCode(
     await anonymous.get('/api/public/product-categories/fr-FR'),
@@ -217,8 +217,8 @@ test('update guards the parent tree', async () => {
     category_image: null,
     translations: [{ name: 'Kategori Ubah EN', status: 0 }, { name: 'Kategori Ubah ID' }],
   });
-  const shown = flatten(await publicCategories()).map((item: any) => item.key);
-  expect(shown).not.toContain(key);
+  const shown = flatten(await publicCategories()).map((item: any) => item.slug);
+  expect(shown).not.toContain(`${key}-id`);
 });
 
 test('reorder one level; moved and deleted categories keep each level 1..n', async () => {

@@ -285,10 +285,10 @@
 .article-timepicker {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 78px;
-  padding: 8px 12px;
-  background: #f8f8f8;
+  justify-content: flex-start;
+  min-height: var(--admin-control-height);
+  padding: 0;
+  background: transparent;
   border: 1px solid #efefef;
   border-radius: 4px;
 

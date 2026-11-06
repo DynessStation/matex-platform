@@ -1,11 +1,16 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
-import { PUBLIC_WHERE, isPublicContentLocale } from '../../config/public-content.config';
+import {
+  PUBLIC_READ_CACHE,
+  PUBLIC_WHERE,
+  isPublicContentLocale,
+} from '../../config/public-content.config';
 import { pool } from '../../db';
 import { buildAttachmentUrl } from '../../helper/attachment.helper';
 import { sendError, sendList, sendSuccess } from '../../helper/api-response.helper';
 import { movedSlug, notFoundData } from '../../helper/slug-redirect.helper';
 import { onFailure } from '../../middleware/error-handler.middleware';
+import keyhsid from '../../hsid';
 
 const router = Router();
 const publicScope = (locale: unknown) => {
@@ -38,9 +43,11 @@ const select = `SELECT c.id_product_category,c.id_parent_product_category,c.prod
   LEFT JOIN attachment og ON og.id_attachment=cao.id_attachment AND og.attachment_status=1 AND og.deleted_at IS NULL`;
 const where = PUBLIC_WHERE.product_category;
 const dto = (row: RowDataPacket) => ({
-  id: Number(row.id_product_category),
-  parent_id: row.id_parent_product_category == null ? null : Number(row.id_parent_product_category),
-  key: row.product_category_key,
+  id: keyhsid.idProductCategory.encode(Number(row.id_product_category)),
+  parent_id:
+    row.id_parent_product_category == null
+      ? null
+      : keyhsid.idProductCategory.encode(Number(row.id_parent_product_category)),
   name: row.product_category_name,
   slug: row.product_category_slug,
   localized_slugs: row.localized_slugs ?? {},
@@ -48,7 +55,6 @@ const dto = (row: RowDataPacket) => ({
   type: 'product',
   status: true,
   is_featured: Boolean(row.product_category_is_featured),
-  sort_order: Number(row.product_category_sort_order ?? 0),
   meta_title: row.product_category_meta_title ?? row.product_category_name,
   meta_description: row.product_category_meta_description ?? row.product_category_description ?? '',
   canonical_url: row.product_category_canonical_url ?? '',
@@ -64,7 +70,7 @@ const dto = (row: RowDataPacket) => ({
   category_meta_image: image(row, 'og') ?? image(row, 'image'),
   subcategories: [] as unknown[],
 });
-const tree = <T extends { id: number; parent_id: number | null; subcategories: unknown[] }>(
+const tree = <T extends { id: string; parent_id: string | null; subcategories: unknown[] }>(
   items: T[],
 ) => {
   const byId = new Map(items.map((item) => [item.id, item]));
@@ -106,7 +112,7 @@ router.get(
   '/api/public/product-categories/:locale',
   onFailure('PRODUCT_CATEGORIES_UNAVAILABLE', 'Unable to load product categories'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const scope = publicScope(req.params.locale);
     if (!scope)
       return sendError(res, 404, 'PRODUCT_CATEGORIES_NOT_FOUND', 'Product categories not found');
@@ -125,7 +131,7 @@ router.get(
   '/api/public/product-categories/:locale/:slug',
   onFailure('PRODUCT_CATEGORY_UNAVAILABLE', 'Unable to load product category'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
     const scope = publicScope(req.params.locale);
     if (!scope)
       return sendError(res, 404, 'PRODUCT_CATEGORY_NOT_FOUND', 'Product category not found');

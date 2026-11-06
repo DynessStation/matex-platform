@@ -63,6 +63,13 @@ import {
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
 
+// Same rules as the server (backend ctrl/admin/product/input.ts).
+const CODE = /^[A-Za-z0-9._/-]+$/;
+const HS_CODE = /^[0-9][0-9.,]*$/;
+const PLACE = /^\p{L}[\p{L}\s.'()-]*$/u;
+const tidy = (value: string | null | undefined) =>
+  value?.replace(/\s+/g, ' ').trim() || null;
+
 // Shared state of the product form and its tabs: the reactive form and its row arrays,
 // categories and media, loading the edited product, and saving with its validation.
 // Provided by FormProduct (one instance per open form); the tab components inject it.
@@ -120,22 +127,52 @@ export class ProductFormService {
     product_kind: [''],
     status: ['draft', Validators.required],
     unit: ['pcs'],
-    barcode: [''],
-    manufacturer_code: [''],
-    country_origin: ['Indonesia'],
-    origin_province: [''],
-    origin_city: [''],
-    hs_code: [''],
+    barcode: ['', [Validators.maxLength(120), Validators.pattern(CODE)]],
+    manufacturer_code: [
+      '',
+      [Validators.maxLength(120), Validators.pattern(CODE)],
+    ],
+    country_origin: [
+      'Indonesia',
+      [Validators.maxLength(100), Validators.pattern(PLACE)],
+    ],
+    origin_province: [
+      '',
+      [Validators.maxLength(100), Validators.pattern(PLACE)],
+    ],
+    origin_city: ['', [Validators.maxLength(100), Validators.pattern(PLACE)]],
+    hs_code: ['', [Validators.maxLength(50), Validators.pattern(HS_CODE)]],
     is_featured: [false],
     catalog_front: [false],
-    weight_grams: [null as number | null, Validators.min(0)],
-    length_mm: [null as number | null, Validators.min(0)],
-    width_mm: [null as number | null, Validators.min(0)],
-    height_mm: [null as number | null, Validators.min(0)],
-    min_order_qty: [1, [Validators.required, Validators.min(1)]],
-    lead_time_days: [null as number | null, Validators.min(0)],
+    weight_grams: [
+      null as number | null,
+      [Validators.min(0), Validators.max(10_000_000)],
+    ],
+    length_mm: [
+      null as number | null,
+      [Validators.min(0), Validators.max(100_000)],
+    ],
+    width_mm: [
+      null as number | null,
+      [Validators.min(0), Validators.max(100_000)],
+    ],
+    height_mm: [
+      null as number | null,
+      [Validators.min(0), Validators.max(100_000)],
+    ],
+    min_order_qty: [
+      1,
+      [Validators.required, Validators.min(1), Validators.max(1_000_000)],
+    ],
+    lead_time_days: [
+      null as number | null,
+      [Validators.min(0), Validators.max(3650)],
+    ],
     manage_stock: [false],
-    stock_quantity: [null as number | null, Validators.min(0)],
+    stock_quantity: [
+      null as number | null,
+      [Validators.min(0), Validators.max(999_999_999)],
+    ],
     stock_status: ['in_stock'],
     price_visibility: ['contact'],
     internal_commerce_enabled: [false],
@@ -372,12 +409,12 @@ export class ProductFormService {
       product_kind: v.product_kind || null,
       status: v.status as IProductPayload['status'],
       unit: v.unit || null,
-      barcode: v.barcode || null,
-      manufacturer_code: v.manufacturer_code || null,
-      country_origin: v.country_origin || null,
-      origin_province: v.origin_province || null,
-      origin_city: v.origin_city || null,
-      hs_code: v.hs_code || null,
+      barcode: tidy(v.barcode),
+      manufacturer_code: tidy(v.manufacturer_code),
+      country_origin: tidy(v.country_origin),
+      origin_province: tidy(v.origin_province),
+      origin_city: tidy(v.origin_city),
+      hs_code: tidy(v.hs_code),
       weight_grams: v.weight_grams,
       length_mm: v.length_mm,
       width_mm: v.width_mm,

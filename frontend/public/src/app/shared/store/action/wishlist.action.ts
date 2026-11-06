@@ -11,5 +11,5 @@ export class AddToWishlist {
 
 export class DeleteWishlist {
   static readonly type = '[Wishlist] delete';
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }

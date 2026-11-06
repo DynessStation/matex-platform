@@ -91,7 +91,7 @@
             <ngb-timepicker
               [(ngModel)]="editor.publishTime"
               [ngModelOptions]="{ standalone: true }"
-              [spinners]="true"
+              [spinners]="false"
               (ngModelChange)="editor.syncSchedule()"
             />
           </div>
@@ -148,7 +148,7 @@
           <ngb-timepicker
             [(ngModel)]="editor.unpublishTime"
             [ngModelOptions]="{ standalone: true }"
-            [spinners]="true"
+            [spinners]="false"
             (ngModelChange)="editor.syncSchedule()"
           />
         </div>

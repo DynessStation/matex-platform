@@ -9,7 +9,7 @@ export interface IBlogModel extends PaginateModel {
 }
 
 export interface IBlog {
-  id: number;
+  id: string;
   title: string;
   slug: string;
   localized_slugs?: Record<string, string>;

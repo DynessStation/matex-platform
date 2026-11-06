@@ -1,5 +1,10 @@
 export const PUBLIC_CONTENT_LOCALES = ['id-ID', 'en-US'] as const;
 
+// Public reads stay fresh (the browser asks again, the ETag answers 304) but may be stored.
+// `no-store` here also stopped Angular from sending server-rendered data along with the page,
+// so every visit fetched everything a second time.
+export const PUBLIC_READ_CACHE = 'public, max-age=0, must-revalidate';
+
 export type PublicContentLocale = (typeof PUBLIC_CONTENT_LOCALES)[number];
 
 export const isPublicContentLocale = (value: unknown): value is PublicContentLocale =>

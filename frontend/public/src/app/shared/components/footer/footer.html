@@ -77,8 +77,16 @@
             }
           </div>
 
-          <div class="col-xl-3 col-md-3 col-sm-6" (click)="toggle('company')">
-            <div class="footer-title" [class.active]="active['company']">
+          <div class="col-xl-3 col-md-3 col-sm-6">
+            <div
+              class="footer-title"
+              role="button"
+              tabindex="0"
+              [class.active]="active['company']"
+              [attr.aria-expanded]="!!active['company']"
+              (click)="toggle('company')"
+              (keydown.enter)="toggle('company')"
+            >
               <h4>{{ locale === 'en-US' ? 'Company' : 'Perusahaan' }}</h4>
             </div>
             <ul class="footer-list">
@@ -99,8 +107,16 @@
             </ul>
           </div>
 
-          <div class="col-xl-2 col-md-3 col-sm-6" (click)="toggle('explore')">
-            <div class="footer-title" [class.active]="active['explore']">
+          <div class="col-xl-2 col-md-3 col-sm-6">
+            <div
+              class="footer-title"
+              role="button"
+              tabindex="0"
+              [class.active]="active['explore']"
+              [attr.aria-expanded]="!!active['explore']"
+              (click)="toggle('explore')"
+              (keydown.enter)="toggle('explore')"
+            >
               <h4>{{ locale === 'en-US' ? 'Explore' : 'Jelajahi' }}</h4>
             </div>
             <ul class="footer-list">

@@ -12,6 +12,11 @@ import { OfficeLocationTab } from './office-location-tab/office-location-tab';
 import { OfficeMediaTab } from './office-media-tab/office-media-tab';
 import { OfficePublicationTab } from './office-publication-tab/office-publication-tab';
 import { Button } from '../../../shared/components/ui/button/button';
+import {
+  TabState,
+  tabState,
+} from '../../../shared/components/ui/form-kit/form-kit.util';
+import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import {
   IOfficeDetail,
@@ -26,6 +31,7 @@ import {
     TranslateModule,
     NgbNavModule,
     Button,
+    TabStatus,
     HasPermissionDirective,
     OfficeGeneralTab,
     OfficeLocationTab,
@@ -41,6 +47,27 @@ import {
 })
 export class FormOffice {
   readonly office = inject(OfficeFormService);
+
+  /** The dots on the tabs (G-2). */
+  tabStates(): Record<
+    'general' | 'location' | 'contact' | 'hours' | 'publication',
+    TabState
+  > {
+    const c = this.office.form.controls;
+    return {
+      general: tabState({
+        required: [c.office_code, c.office_name],
+        recommended: [c.office_description],
+      }),
+      location: tabState({
+        required: [c.lat, c.lng],
+        recommended: [c.address, c.city, c.province],
+      }),
+      contact: tabState({ required: [c.email], recommended: [c.phone] }),
+      hours: 'ok',
+      publication: 'ok',
+    };
+  }
 
   readonly mode = input<'create' | 'edit'>('create');
 

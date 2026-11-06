@@ -1,3 +1,4 @@
+import { PUBLIC_READ_CACHE } from '../../config/public-content.config';
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
 import { pool } from '../../db';
@@ -83,7 +84,7 @@ router.get(
   '/api/public/website-page/:locale/:path',
   onFailure('WEBSITE_UNAVAILABLE', 'Unable to load page'),
   async (req, res) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', PUBLIC_READ_CACHE);
 
     const company = Number(process.env.PUBLIC_COMPANY_ID);
     if (!Number.isSafeInteger(company) || company <= 0) {
