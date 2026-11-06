@@ -53,6 +53,14 @@ const idArticleTag = new SafeHashids('key_articleTag123', 8);
 
 const idProductCategory = new SafeHashids('key_productCategory123', 8);
 
+const idCostItem = new SafeHashids('key_costItem123', 8);
+
+const idCostMaterial = new SafeHashids('key_costMaterial123', 8);
+
+const idSalesChannel = new SafeHashids('key_salesChannel123', 8);
+
+const idSalesChannelFee = new SafeHashids('key_salesChannelFee123', 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -74,4 +82,8 @@ export default {
   idArticle,
   idArticleTag,
   idProductCategory,
+  idCostItem,
+  idCostMaterial,
+  idSalesChannel,
+  idSalesChannelFee,
 };
