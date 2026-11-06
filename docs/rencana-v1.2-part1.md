@@ -166,6 +166,8 @@ Yang belum pasti: fitur masih berlabel Beta di hPanel, batas rate dan batas kiri
 
 Hasil persiapan 6 November: nama parameter lama dibuang dari API, lalu satu putaran test penuh mencatat apakah masih ada yang mengirimnya; latihan migration lolos (catatan di `cloudpanel-production-runbook.md` bagian 6).
 
+**Live 6 November 2026 di `f525a1a`**, backup sebelum deploy `matex-20261106T042111Z`, migration 32 dari 32, cek runtime dan cek dari luar lolos, log error API dan admin kosong setelah restart. Sisa file drill di VPS sudah dihapus; database `miadrill` dihapus pemilik di CloudPanel.
+
 Setelah deploy, pemilik perlu: mengisi `HOSTINGER_MAIL_API_TOKEN` di `.env` VPS, mencentang izin Email di profil akses yang bukan akses penuh, dan mengisi akun di tabel Sosial Media. Production tidak punya kanal sosial yang bisa dipindah, jadi widget sosial di header website kosong sampai tabel itu diisi.
 
 ## Ancang-ancang: Part 2 Produk, HPP, dan internal (belum dikerjakan)
