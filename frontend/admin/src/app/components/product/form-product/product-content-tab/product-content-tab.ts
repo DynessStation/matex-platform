@@ -4,7 +4,14 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { NgxEditorModule } from 'ngx-editor';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
+import { TitleSlug } from '../../../../shared/components/ui/form-kit/title-slug';
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
+import { InlineTable } from '../../../../shared/components/ui/inline-table/inline-table';
+import {
+  InlineChange,
+  InlineRow,
+} from '../../../../shared/components/ui/inline-table/inline-table.model';
+import { SPEC_COLUMNS } from '../form-product.columns';
 import { ProductAssistantService } from '../product-assistant.service';
 import { ProductFormService } from '../product-form.service';
 
@@ -13,7 +20,14 @@ import { ProductFormService } from '../product-form.service';
 @Component({
   selector: 'app-product-content-tab',
 
-  imports: [HelpTip, ReactiveFormsModule, NgxEditorModule, AiFieldAction],
+  imports: [
+    TitleSlug,
+    InlineTable,
+    HelpTip,
+    ReactiveFormsModule,
+    NgxEditorModule,
+    AiFieldAction,
+  ],
 
   templateUrl: './product-content-tab.html',
 
@@ -34,4 +48,12 @@ export class ProductContentTab {
   readonly assistant = inject(ProductAssistantService);
 
   readonly form = this.editor.form;
+
+  readonly specColumns = SPEC_COLUMNS;
+  readonly whileEditing = (_row: InlineRow, editing: boolean) => editing;
+
+  /** Rows live in the form until its save: a row's check just closes it. */
+  keep(change: InlineChange): void {
+    change.done(true);
+  }
 }

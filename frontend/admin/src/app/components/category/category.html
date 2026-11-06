@@ -1,4 +1,7 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'categories'">
+  <div button>
+    <app-insight-toggle storageKey="category" [(open)]="insightOpen" />
+  </div>
   <div button *hasPermission="'product_category.create'">
     @if (type() === 'edit') {
       <a routerLink="/category" class="align-items-center btn btn-theme d-flex">
@@ -6,6 +9,9 @@
       </a>
     }
   </div>
+  @if (insightOpen()) {
+    <app-category-insight />
+  }
   <!-- U-12: tree and form share one card; the form has its tabs on top. -->
   <div class="row g-4 category-layout">
     <div class="col-xl-4 col-lg-5">

@@ -10,6 +10,7 @@ import { getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError, sendList, sendSuccess } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { trimTo } from '../../../helper/input.helper';
+import { PRODUCT_AUDITS, isProductAudit } from '../../../helper/product-audit.helper';
 import { countOf, pageMeta, parseListQuery, sortColumn } from '../../../helper/list-query.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
@@ -49,6 +50,8 @@ router.get(
     if (categoryParam && !idCategory) {
       return sendError(res, 400, 'PRODUCT_LIST_CATEGORY_INVALID', 'Invalid category filter');
     }
+    // "Perbaiki" in the insight band: only the products with this problem.
+    const audit = isProductAudit(req.query.audit) ? `AND ${PRODUCT_AUDITS[req.query.audit]}` : '';
     const sortField = sortColumn(SORTABLE, sort, '');
     const direction = requested ?? 'ASC';
     const orderBy = sortField
@@ -60,12 +63,12 @@ router.get(
       `SELECT COUNT(DISTINCT p.id_product) AS total
        FROM product_catalog p
        LEFT JOIN product_catalog_i18n i ON i.id_product = p.id_product AND i.product_locale = ?
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY}`,
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY} ${audit}`,
       [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory],
     );
     const [rows] = await pool.query<RowDataPacket[]>(
       `${BASE_SELECT}
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY}
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY} ${audit}
        ORDER BY ${orderBy}
        LIMIT ? OFFSET ?`,
       [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory, limit, offset],

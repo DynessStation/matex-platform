@@ -111,7 +111,6 @@ test('admin can publish a product that appears on the public site', async ({ pag
   expect(category.status(), await category.text()).toBe(201);
 
   await page.goto(`${stack.adminOrigin}/product/create`);
-  await page.locator('input[formcontrolname=key]').fill(`e2e-product-${run}`);
   await page.locator('input[formcontrolname=sku]').fill(`E2E-${run}`.toUpperCase());
   await chooseSelect2(page, 'status', 'Dipublikasikan');
   const categories = page.locator('app-advance-dropdown');
@@ -122,30 +121,19 @@ test('admin can publish a product that appears on the public site', async ({ pag
     .click();
 
   await openTab(page, 'Konten & Bahasa');
-  await page.locator('input[formcontrolname=id_slug]').fill(slug);
-  await page.locator('input[formcontrolname=id_name]').fill(name);
+  await page.locator('#id_title').click();
+  await page.locator('#id_title').pressSequentially(name);
   await page.getByRole('button', { name: /EN\s*English/ }).click();
-  await page.locator('input[formcontrolname=en_slug]').fill(`${slug}-en`);
-  await page.locator('input[formcontrolname=en_name]').fill(`Test Product ${run}`);
+  await page.locator('#en_title').click();
+  await page.locator('#en_title').pressSequentially(`Test Product ${run}`);
 
-  await openTab(page, 'Harga & Kanal');
-  const amounts = page.locator('input[formcontrolname=amount]:visible');
-  await expect(amounts.first()).toBeVisible();
-  for (let index = 0; index < (await amounts.count()); index += 1) {
-    await amounts.nth(index).fill('150000');
-  }
-  const labels = page.locator('input[formcontrolname=label]:visible');
-  for (let index = 0; index < (await labels.count()); index += 1) {
-    if (!(await labels.nth(index).inputValue())) await labels.nth(index).fill(`Harga ${index + 1}`);
-  }
-
-  // The save button only shows on the last tab.
-  await openTab(page, 'SEO');
   await page.locator('button#product_btn').click();
   await page.waitForURL(/\/product(?:[?#]|$)/);
   await expect(page.locator('body')).toContainText(name);
 
-  const response = await page.goto(`${stack.publicOrigin}/produk/${slug}`);
+  const response = await page.goto(
+    `${stack.publicOrigin}/produk/${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+  );
   expect(response?.status()).toBe(200);
   await expect(page.locator('h1, h2').filter({ hasText: name }).first()).toBeVisible();
 });

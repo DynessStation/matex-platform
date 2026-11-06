@@ -10,6 +10,9 @@ import { ProductFormService } from './product-form.service';
 import { ProductGeneralTab } from './product-general-tab/product-general-tab';
 import { ProductMediaTab } from './product-media-tab/product-media-tab';
 import { ProductSeoTab } from './product-seo-tab/product-seo-tab';
+import { FormHeading } from '../../../shared/components/ui/form-kit/form-heading';
+import { FormSubmit } from '../../../shared/components/ui/form-kit/form-submit';
+import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
 
 @Component({
   selector: 'app-form-product',
@@ -21,6 +24,9 @@ import { ProductSeoTab } from './product-seo-tab/product-seo-tab';
     ProductChannelsTab,
     ProductMediaTab,
     ProductSeoTab,
+    FormHeading,
+    FormSubmit,
+    TabStatus,
   ],
   templateUrl: './form-product.html',
   // Kept as component styles, used by every tab: several rules override base elements

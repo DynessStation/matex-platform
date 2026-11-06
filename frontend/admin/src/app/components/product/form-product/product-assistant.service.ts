@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 
 import { finalize } from 'rxjs';
 
 import { ProductAssistField, ProductFormLocale } from './form-product.model';
 import { assistFieldType } from './form-product.util';
 import { ProductFormService } from './product-form.service';
+import { InlineRow } from '../../../shared/components/ui/inline-table/inline-table.model';
 import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -21,19 +21,25 @@ export class ProductAssistantService {
 
   assistingField: string | null = null;
 
-  assistSpecificationValue(locale: ProductFormLocale, index: number): void {
+  assistSpecificationValue(
+    locale: ProductFormLocale,
+    row: InlineRow,
+    set: (key: string, value: unknown) => void,
+  ): void {
     if (this.assistingField) return;
-    const target = this.editor.specifications(locale).at(index) as FormGroup;
-    const indonesia = this.editor.specifications('id').at(index) as
-      FormGroup | undefined;
+    const label = String(row['label'] ?? '');
+    // The Indonesian row with the same place in its table, as the source of a translation.
+    const position = this.editor.enSpecRows().findIndex((item) => item === row);
+    const indonesia =
+      this.editor.idSpecRows()[position] ??
+      this.editor.idSpecRows().find((item) => item['label'] === label);
     const mode = locale === 'en' ? 'translate' : 'generate';
     const sourceValue =
       mode === 'translate'
-        ? String(indonesia?.controls['value']?.value || '')
-        : String(target.controls['value']?.value || '');
-    const fieldKey = `${locale}_specification_${index}`;
+        ? String(indonesia?.['value'] ?? '')
+        : String(row['value'] ?? '');
 
-    this.assistingField = fieldKey;
+    this.assistingField = `${locale}_specification`;
     this.contentAssistant
       .assist({
         mode,
@@ -43,10 +49,7 @@ export class ProductAssistantService {
         context: JSON.stringify({
           user_written_product_name: this.editor.form.get(`${locale}_name`)
             ?.value,
-          user_written_specification_name:
-            target.controls['label']?.value ||
-            indonesia?.controls['label']?.value ||
-            '',
+          user_written_specification_name: label,
           sku: this.editor.form.controls.sku.value,
         }),
         fields: { value: sourceValue },
@@ -55,7 +58,7 @@ export class ProductAssistantService {
       .pipe(finalize(() => (this.assistingField = null)))
       .subscribe({
         next: (fields) => {
-          target.controls['value'].setValue(fields['value'] || '');
+          set('value', fields['value'] || '');
           this.notification.showSuccess(
             locale === 'id'
               ? 'Nilai spesifikasi sudah diisi. Periksa kembali sebelum menyimpan.'

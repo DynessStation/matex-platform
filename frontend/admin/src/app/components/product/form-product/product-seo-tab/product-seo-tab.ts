@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
 import { AiFieldAction } from '../../../../shared/components/ui/ai-field-action/ai-field-action';
-import { Button } from '../../../../shared/components/ui/button/button';
+import { AutoField } from '../../../../shared/components/ui/form-kit/auto-field';
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
 import { ProductAssistantService } from '../product-assistant.service';
 import { ProductFormService } from '../product-form.service';
@@ -12,7 +12,7 @@ import { ProductFormService } from '../product-form.service';
 @Component({
   selector: 'app-product-seo-tab',
 
-  imports: [HelpTip, ReactiveFormsModule, AiFieldAction, Button],
+  imports: [HelpTip, ReactiveFormsModule, AiFieldAction, AutoField],
 
   templateUrl: './product-seo-tab.html',
 

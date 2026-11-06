@@ -110,25 +110,24 @@ test('save works from any tab and shows the missing field; slugs follow the name
   await page.goto(`${stack.adminOrigin}/category`);
   const save = page.locator('#category_btn');
 
-  await page.locator('#key').fill(`baru-${runId}`);
   await save.click();
   // Indonesian name and slug are missing: the Konten tab opens on Bahasa Indonesia.
   await expect(page.locator('.category-nav .nav-link.active')).toContainText('Konten');
   await expect(
     page.locator('.category-tab-content .tab-pane.active .category-language-tabs button.active'),
   ).toContainText('ID');
-  await page.locator('[formcontrolname=id_name]').fill(name('Kategori Baru'));
-  await page.locator('[formcontrolname=id_name]').blur();
-  await expect(page.locator('[formcontrolname=id_slug]')).toHaveValue(`kategori-baru-${runId}`);
+  await page.locator('#id_title').click();
+  await page.locator('#id_title').pressSequentially(name('Kategori Baru'));
+  await expect(page.locator('#id_slug')).toHaveValue(`kategori-baru-${runId}`);
+  await expect(page.getByTestId('form-heading')).toHaveText(name('Kategori Baru'));
 
   // Now English is missing: the form switches to the English fields.
   await save.click();
   await expect(
     page.locator('.category-tab-content .tab-pane.active .category-language-tabs button.active'),
   ).toContainText('EN');
-  await page.locator('[formcontrolname=en_name]').fill(`New Category ${runId}`);
-  await page.locator('[formcontrolname=en_name]').blur();
-  await expect(page.locator('[formcontrolname=en_slug]')).toHaveValue(`new-category-${runId}`);
+  await page.locator('#en_title').pressSequentially(`New Category ${runId}`);
+  await expect(page.locator('#en_slug')).toHaveValue(`new-category-${runId}`);
 
   // Saved from the Konten tab, without visiting Media.
   const created = page.waitForResponse(
@@ -139,7 +138,13 @@ test('save works from any tab and shows the missing field; slugs follow the name
   expect(response.status()).toBe(201);
   ids['baru'] = (await response.json()).data.id;
   await expect(node(page, 'Kategori Baru')).toBeVisible();
-  await expect(page.locator('#key')).toHaveValue('');
+  // The form is empty again, and its address follows the next name.
+  await page.locator('.category-nav .nav-link', { hasText: 'Konten' }).click();
+  await expect(page.locator('#id_title')).toHaveValue('');
+  // The tab takes the focus for a moment after it opens.
+  await page.locator('#id_title').click();
+  await page.locator('#id_title').pressSequentially('Berikutnya');
+  await expect(page.locator('#id_slug')).toHaveValue('berikutnya');
   expect(errors).toEqual([]);
 });
 
@@ -152,6 +157,7 @@ test('edit shows the place, saves from the first tab, and goes back to the page'
   await page.goto(`${stack.adminOrigin}/category/edit/${ids['anak-a']}`);
   await expect(page.locator('.category-form-heading')).toContainText('Ubah kategori');
   await expect(page.locator('.category-form-name')).toHaveText(name('Anak A'));
+  await expect(page.locator('.category-nav .tab-status')).toHaveCount(4);
   await expect(page.locator('#position')).toHaveValue('Posisi 1 dari 2');
   await expect(page.locator('.title-header a', { hasText: 'Kategori baru' })).toBeVisible();
 
@@ -171,6 +177,8 @@ test('drag reorders a level; the search stays after the tree reloads', async ({ 
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);
   await page.goto(`${stack.adminOrigin}/category`);
+  // The insight band pushes the tree below the fold of this small window.
+  await page.getByTestId('insight-toggle').click();
   expect(await position(ids['anak-b'])).toBe(2);
 
   // Drop B on A: B takes A's place (native drag and drop).

@@ -4,6 +4,7 @@ import {
   TemplateRef,
   computed,
   contentChild,
+  effect,
   input,
   model,
   output,
@@ -53,6 +54,10 @@ export class InlineTable {
   readonly readonly = input(false);
   /** Rows start with their extra part folded. */
   readonly foldedByDefault = input(false);
+  /** Whether a row shows its extra part; always, by default. */
+  readonly showDetail = input<
+    ((row: InlineRow, editing: boolean) => boolean) | null
+  >(null);
   /** Checks across fields or rows: messages by field, on top of each column's validate. */
   readonly validateRow = input<
     ((row: InlineRow, index: number) => Record<string, string>) | null
@@ -61,6 +66,8 @@ export class InlineTable {
   readonly saveRow = output<InlineChange>();
   readonly removeRow = output<InlineChange>();
   readonly reordered = output<InlineRow[]>();
+  /** A row opened or closed: forms that save later can tell one is still open. */
+  readonly editingChange = output<boolean>();
 
   readonly detail = contentChild<TemplateRef<InlineDetailContext>>('rowDetail');
 
@@ -81,6 +88,15 @@ export class InlineTable {
   readonly detailSpan = computed(
     () => this.columns().length + (this.orderable() ? 2 : 0),
   );
+
+  constructor() {
+    effect(() => this.editingChange.emit(this.editingIndex() !== null));
+  }
+
+  detailVisible(row: InlineRow, index: number): boolean {
+    const rule = this.showDetail();
+    return rule ? rule(row, this.isEditing(index)) : true;
+  }
 
   readonly setValue = (key: string, value: unknown): void => {
     this.draft.update((row) => ({ ...row, [key]: value }));

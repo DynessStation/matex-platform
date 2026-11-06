@@ -203,7 +203,8 @@ export interface IProductMarketplace {
   sort_order: number;
 }
 export interface IProductPayload {
-  key: string;
+  /** Left out: the server makes it, and an existing product keeps its own. */
+  key?: string;
   sku: string;
   product_type: 'physical' | 'service' | 'digital';
   product_kind: string | null;
@@ -313,4 +314,34 @@ export interface IProductData {
   slug: string;
   stock_status: string;
   type: string;
+}
+
+export interface IProductInsightTop {
+  id: string;
+  name: string;
+  sku: string;
+  slug: string;
+  thumbnail: string | null;
+  views: number;
+}
+
+export interface IProductInsightMarketplace {
+  key: string;
+  name: string;
+  clicks: number;
+  products: number;
+}
+
+export interface IProductInsightAudit {
+  total: number;
+  published: number;
+  draft: number;
+  archived: number;
+  checks: {
+    no_image: number;
+    no_price: number;
+    no_channel: number;
+    untranslated: number;
+    no_summary: number;
+  };
 }

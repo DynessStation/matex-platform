@@ -192,7 +192,7 @@
             }
           </td>
         </tr>
-        @if (detail(); as template) {
+        @if (detail() && detailVisible(row, index)) {
           <tr class="inline-table-detail" data-testid="inline-detail">
             <td class="inline-table-no">
               @if (!editing) {
@@ -217,7 +217,7 @@
             </td>
             <td [attr.colspan]="detailSpan()">
               <ng-container
-                [ngTemplateOutlet]="template"
+                [ngTemplateOutlet]="detail()!"
                 [ngTemplateOutletContext]="detailContext(row, index)"
               />
             </td>

@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -18,7 +19,9 @@ import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
 import { ProductCategoryFilter } from './product-category-filter/product-category-filter';
+import { ProductInsight } from './product-insight/product-insight';
 import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
+import { InsightToggle } from '../../shared/components/ui/insight/insight-toggle';
 import { OrderList } from '../../shared/components/ui/order-list/order-list';
 import { Table } from '../../shared/components/ui/table/table';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
@@ -51,6 +54,8 @@ import { ProductState } from '../../shared/store/state/product.state';
     Table,
     OrderList,
     ProductCategoryFilter,
+    ProductInsight,
+    InsightToggle,
   ],
   templateUrl: './product.html',
   styleUrl: './product.scss',
@@ -63,6 +68,9 @@ export class Product implements AfterViewInit {
   private productService = inject(ProductService);
   private notifications = inject(NotificationService);
   private messages = inject(ApiMessageService);
+  readonly insightOpen = signal(true);
+  /** The insight band's "Perbaiki" lands here with ?audit=. */
+  readonly auditFilter = signal('');
   // "Produk di depan": products ticked "Tampilkan di depan katalog", in their order.
   ordering = false;
   orderItems: IOrderItem[] = [];
@@ -82,6 +90,7 @@ export class Product implements AfterViewInit {
     field: '',
     sort: '',
     category: '',
+    audit: '',
   };
   product$: Observable<IProductModel> = this.store.select(ProductState.product);
   tableConfig: ITableConfig<IProduct> = {
@@ -176,7 +185,9 @@ export class Product implements AfterViewInit {
           : '',
       // Category panel (U-13): products in this category only.
       category: params.get('category')?.trim() ?? '',
+      audit: params.get('audit')?.trim() ?? '',
     };
+    this.auditFilter.set(String(state['audit']));
     this.filter = state;
     if (this.table()) this.table()?.syncState(state);
     else this.pendingTableState = state;
@@ -197,6 +208,8 @@ export class Product implements AfterViewInit {
       query['sort'] = state['sort'];
     if (String(state['category'] ?? '').trim())
       query['category'] = String(state['category']).trim();
+    if (String(state['audit'] ?? '').trim())
+      query['audit'] = String(state['audit']).trim();
     const replaceUrl =
       (this.route.snapshot.queryParamMap.get('search') ?? '') !==
       String(query['search'] ?? '');
@@ -210,6 +223,10 @@ export class Product implements AfterViewInit {
   /** Category panel: show that category's products from page 1 ('' for every product). */
   selectCategory(id: string) {
     this.onTableChange({ category: id, page: 1 });
+  }
+
+  clearAudit() {
+    this.onTableChange({ audit: '', page: 1 });
   }
 
   onActionClicked(action: ITableClickedAction<IProduct>) {

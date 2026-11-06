@@ -1,23 +1,36 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { Select2Module } from 'ng-select2-component';
 
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
-import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
-import { formatPrice } from '../form-product.util';
+import { InlineTable } from '../../../../shared/components/ui/inline-table/inline-table';
+import {
+  InlineChange,
+  InlineRow,
+} from '../../../../shared/components/ui/inline-table/inline-table.model';
+import {
+  marketplaceColumns,
+  oneMainChannel,
+  priceColumns,
+} from '../form-product.columns';
+import { MARKETPLACE_PROVIDER_OPTIONS } from '../form-product.model';
 import { ProductFormService } from '../product-form.service';
 
-// Prices and marketplace links tab of the product form. The row arrays live in
-// ProductFormService; this tab keeps the card labels and the primary-link rules.
+// Prices and marketplace links tab of the product form: compact tables whose rows are kept by
+// ProductFormService and go to the server with the form's one save.
 @Component({
   selector: 'app-product-channels-tab',
 
   imports: [
     HelpTip,
+    InlineTable,
+    NgTemplateOutlet,
     ReactiveFormsModule,
     Select2Module,
-    LocalizedNumberInputDirective,
+    TranslateModule,
   ],
 
   templateUrl: './product-channels-tab.html',
@@ -38,70 +51,38 @@ export class ProductChannelsTab {
 
   readonly form = this.editor.form;
 
-  //==================================================
-  //==== PRICES
-  //==================================================
+  readonly idrColumns = priceColumns('IDR');
+  readonly usdColumns = priceColumns('USD');
+  readonly marketplaceColumns = marketplaceColumns(
+    MARKETPLACE_PROVIDER_OPTIONS as { value: string; label: string }[],
+  );
 
-  priceSymbol(index: number) {
-    return this.editor.prices.at(index).get('currency')?.value === 'USD'
-      ? 'US$'
-      : 'Rp';
-  }
-  priceCardTitle(index: number) {
-    const row = this.editor.prices.at(index);
-    const type =
-      row.get('type')?.value === 'wholesale'
-        ? 'Harga grosir'
-        : 'Harga konsumen';
-    const currency =
-      row.get('currency')?.value === 'USD' ? 'Dollar AS' : 'Rupiah';
-    return `${type} · ${currency}`;
-  }
-  pricePreview(index: number) {
-    const row = this.editor.prices.at(index);
-    const currency = row.get('currency')?.value === 'USD' ? 'USD' : 'IDR';
-    const amount = Number(row.get('amount')?.value);
-    if (!Number.isFinite(amount)) return '';
-    return formatPrice(amount, currency);
+  readonly priceBlank: InlineRow = {
+    type: 'end_user',
+    status: 'active',
+    shown: 'shown',
+  };
+  readonly marketplaceBlank: InlineRow = {
+    provider: 'shopee',
+    currency: 'IDR',
+    rank: 'normal',
+    shown: 'shown',
+  };
+
+  /** Minimum and maximum belong to a wholesale price only. */
+  readonly wholesaleOnly = (row: InlineRow, editing: boolean) =>
+    editing && row['type'] === 'wholesale';
+  readonly whileEditing = (_row: InlineRow, editing: boolean) => editing;
+
+  /** Rows live in the form until its save: a row's check just closes it. */
+  keep(change: InlineChange): void {
+    change.done(true);
   }
 
-  //==================================================
-  //==== MARKETPLACES (exactly one active link is primary)
-  //==================================================
-
-  selectPrimaryMarketplace(index: number) {
-    const marketplaces = this.editor.marketplaces;
-    const selected = marketplaces.at(index);
-    if (!selected.get('is_primary')?.value) return;
-    selected.get('is_active')?.setValue(true, { emitEvent: false });
-    marketplaces.controls.forEach((control, itemIndex) => {
-      if (itemIndex !== index)
-        control.get('is_primary')?.setValue(false, { emitEvent: false });
-    });
-  }
-  toggleMarketplaceActive(index: number) {
-    const marketplaces = this.editor.marketplaces;
-    const current = marketplaces.at(index);
-    if (current.get('is_active')?.value || !current.get('is_primary')?.value)
-      return;
-    current.get('is_primary')?.setValue(false, { emitEvent: false });
-    const replacement = marketplaces.controls.find(
-      (control, itemIndex) =>
-        itemIndex !== index && control.get('is_active')?.value,
+  saveMarketplace(change: InlineChange): void {
+    change.done(true);
+    this.editor.marketplaceRows.update((rows) =>
+      oneMainChannel(rows, rows[change.index]),
     );
-    replacement?.get('is_primary')?.setValue(true, { emitEvent: false });
-  }
-  removeMarketplace(index: number) {
-    const marketplaces = this.editor.marketplaces;
-    const removedPrimary = Boolean(
-      marketplaces.at(index).get('is_primary')?.value,
-    );
-    marketplaces.removeAt(index);
-    if (removedPrimary) {
-      const replacement = marketplaces.controls.find(
-        (control) => control.get('is_active')?.value,
-      );
-      replacement?.get('is_primary')?.setValue(true, { emitEvent: false });
-    }
   }
 }

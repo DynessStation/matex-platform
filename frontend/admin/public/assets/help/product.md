@@ -12,6 +12,10 @@ Cara memakai tabel dijelaskan di Panduan umum bagian Tabel Daftar.
 
 URL: https://internal.matexindo.com/product
 
+## Ringkasan di Atas Daftar
+
+Tombol ikon grafik membuka atau menutup ringkasan: produk paling dilihat, klik ke marketplace, dan audit data. **Perbaiki** menyaring daftar ke produk yang bermasalah.
+
 ## Daftar Produk
 
 Kotak **Cari** mencari di kunci internal, SKU, dan nama produk. Pencarian, urutan, halaman, dan kategori yang dipilih tersimpan di alamat halaman, jadi bisa dibagikan atau dibuka lagi, dan tombol **Kembali** di formulir produk membawa Anda ke daftar yang sama.
@@ -45,10 +49,6 @@ Produk ditambahkan ke depan katalog dengan mencentang **Tampilkan di depan katal
 ## Tab Umum
 
 Identitas, kategori, ukuran, dan stok produk.
-
-### Kunci internal
-
-Kode tetap produk untuk sistem, wajib dan unik, misalnya sarung-tangan-lateks-m. Hanya huruf kecil, angka, dan tanda hubung; huruf lain otomatis disesuaikan.
 
 ### SKU
 
@@ -126,7 +126,7 @@ Nama dan isi halaman produk, diisi untuk Bahasa Indonesia dan English (pilih bah
 
 ### Slug URL
 
-Bagian alamat halaman produk di website, wajib per bahasa, misalnya sarung-tangan-lateks-m menjadi matexindo.com/produk/sarung-tangan-lateks-m. Harus unik.
+Alamat produk. Pada produk baru dibuat otomatis dari nama; ikon pensil membukanya untuk diisi sendiri. Bila alamat produk yang sudah ada diubah, alamat lama otomatis dialihkan ke alamat baru. Kunci internal dibuat otomatis oleh sistem dan tampil kecil di bawah alamat.
 
 ### Nama produk
 
@@ -142,7 +142,7 @@ Isi halaman produk dengan format teks (tebal, daftar, tautan), opsional.
 
 ### Spesifikasi
 
-Daftar pasangan **Nama spesifikasi** dan **Nilai**, misalnya Bahan: Lateks alami. Tampil sebagai tabel spesifikasi di halaman produk.
+Tabel nama dan nilai per bahasa. Pensil membuka baris, ceklis menutupnya, dan panah mengatur urutan. Isi tabel baru benar-benar tersimpan saat tombol Simpan di bawah daftar tab ditekan; baris yang masih terbuka harus ditutup dulu.
 
 ## Tab Harga & Kanal
 
@@ -160,7 +160,7 @@ Konsumen (end user) atau Grosir. Harga grosir selalu internal dan tidak pernah t
 
 ### Mata uang dan nominal
 
-Rupiah (IDR) atau Dollar (USD), dengan nominal tidak boleh negatif. Tiap mata uang hanya boleh punya satu harga konsumen publik.
+Rupiah dan Dollar punya tabel sendiri. Nominal ditulis angka saja, misalnya 150000 atau 12.50. Bila harga ditampilkan di website, harga Konsumen untuk kedua mata uang harus Aktif dan Published.
 
 ### Nama harga
 
@@ -224,7 +224,7 @@ Teks di bawah judul pada hasil pencarian Google, paling banyak 500 karakter; ide
 
 ### Canonical URL
 
-Alamat utama halaman bila konten yang sama ada di beberapa alamat. Biarkan kosong kecuali developer meminta.
+Otomatis memakai alamat produk itu sendiri, dan biasanya tidak perlu diubah. Ikon pensil membuka isian untuk alamat lain di website yang sama; ikon putar mengembalikannya ke otomatis.
 
 ### Judul dan deskripsi OG
 

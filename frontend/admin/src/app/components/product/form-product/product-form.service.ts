@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, Signal, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -8,9 +8,13 @@ import { Editor } from 'ngx-editor';
 import { filter, Observable, switchMap, take } from 'rxjs';
 
 import {
-  CURRENCY_OPTIONS,
+  marketplacePayload,
+  marketplaceRow,
+  pricePayload,
+  priceRow,
+} from './form-product.columns';
+import {
   MARKETPLACE_PROVIDER_OPTIONS,
-  PRICE_TYPE_OPTIONS,
   PRICE_VISIBILITY_OPTIONS,
   PRODUCT_GALLERY_ACCEPT,
   PRODUCT_IMAGE_ACCEPT,
@@ -18,8 +22,8 @@ import {
   PRODUCT_TYPE_OPTIONS,
   ProductFormLocale,
   ProductMeasurementControl,
-  ProductSpecificationRow,
   STOCK_STATUS_OPTIONS,
+  ProductSpecificationRow,
 } from './form-product.model';
 import {
   formatMeasurement,
@@ -27,6 +31,11 @@ import {
   specificationRows,
   uniqueGallery,
 } from './form-product.util';
+import {
+  TabState,
+  tabState,
+} from '../../../shared/components/ui/form-kit/form-kit.util';
+import { InlineRow } from '../../../shared/components/ui/inline-table/inline-table.model';
 import {
   MediaSelection,
   selectedAttachment,
@@ -38,9 +47,7 @@ import { IAttachment } from '../../../shared/interface/attachment.interface';
 import { ICategoryModel } from '../../../shared/interface/category.interface';
 import {
   IProduct,
-  IProductMarketplace,
   IProductPayload,
-  IProductPrice,
   IProductRawColumns,
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
@@ -83,8 +90,6 @@ export class ProductFormService {
   readonly productStatusOptions = PRODUCT_STATUS_OPTIONS;
   readonly stockStatusOptions = STOCK_STATUS_OPTIONS;
   readonly priceVisibilityOptions = PRICE_VISIBILITY_OPTIONS;
-  readonly priceTypeOptions = PRICE_TYPE_OPTIONS;
-  readonly currencyOptions = CURRENCY_OPTIONS;
   readonly marketplaceProviderOptions = MARKETPLACE_PROVIDER_OPTIONS;
   categories$: Observable<ICategoryModel> = this.store.select(
     CategoryState.category,
@@ -98,13 +103,18 @@ export class ProductFormService {
   categoryIds: string[] = [];
   categoryError = false;
   pricePublicationError = false;
+  readonly saving = signal(false);
+  readonly tried = signal(false);
+  readonly idSpecRows = signal<InlineRow[]>([]);
+  readonly enSpecRows = signal<InlineRow[]>([]);
+  readonly idrRows = signal<InlineRow[]>([]);
+  readonly usdRows = signal<InlineRow[]>([]);
+  readonly marketplaceRows = signal<InlineRow[]>([]);
+  /** Tables with a row still open: saving asks to close them first. */
+  private readonly openRows = new Set<string>();
   media: Partial<Record<ProductMediaRole, IAttachment | IAttachment[] | null>> =
     { thumbnail: null, gallery: [], og: null };
   readonly form = this.fb.group({
-    key: [
-      '',
-      [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)],
-    ],
     sku: ['', Validators.required],
     product_type: ['physical', Validators.required],
     product_kind: [''],
@@ -133,7 +143,6 @@ export class ProductFormService {
     id_name: ['', Validators.required],
     id_short_description: [''],
     id_description: [''],
-    id_specifications: this.fb.array([]),
     id_meta_title: [''],
     id_meta_description: [''],
     id_canonical_url: [''],
@@ -143,21 +152,12 @@ export class ProductFormService {
     en_name: ['', Validators.required],
     en_short_description: [''],
     en_description: [''],
-    en_specifications: this.fb.array([]),
     en_meta_title: [''],
     en_meta_description: [''],
     en_canonical_url: [''],
     en_og_title: [''],
     en_og_description: [''],
-    prices: this.fb.array([]),
-    marketplaces: this.fb.array([]),
   });
-  get prices() {
-    return this.form.controls.prices as FormArray;
-  }
-  get marketplaces() {
-    return this.form.controls.marketplaces as FormArray;
-  }
 
   //==================================================
   //==== LIFECYCLE (called by FormProduct)
@@ -179,10 +179,6 @@ export class ProductFormService {
           take(1),
         )
         .subscribe((v) => this.patch(v));
-    else {
-      this.addCurrencyPrice('IDR');
-      this.addCurrencyPrice('USD');
-    }
   }
 
   destroy() {
@@ -220,92 +216,76 @@ export class ProductFormService {
   }
 
   //==================================================
-  //==== ROWS
+  //==== ROWS AND TAB STATE
   //==================================================
 
-  specifications(locale: ProductFormLocale) {
-    return this.form.get(`${locale}_specifications`) as FormArray;
+  setRowOpen(table: string, open: boolean) {
+    if (open) this.openRows.add(table);
+    else this.openRows.delete(table);
   }
-  addSpecification(
-    locale: ProductFormLocale,
-    value: Partial<ProductSpecificationRow> = {},
-  ) {
-    this.specifications(locale).push(
-      this.fb.group({
-        label: [value.label ?? '', Validators.required],
-        value: [value.value ?? '', Validators.required],
-      }),
-    );
-  }
-  removeSpecification(locale: ProductFormLocale, index: number) {
-    this.specifications(locale).removeAt(index);
+  specRows(locale: ProductFormLocale) {
+    return locale === 'id' ? this.idSpecRows : this.enSpecRows;
   }
   /** The filled specifications of one language as the stored object. */
   specificationPayload(locale: ProductFormLocale) {
     return specificationPayload(
-      this.specifications(locale).getRawValue() as ProductSpecificationRow[],
+      this.specRows(locale)() as unknown as ProductSpecificationRow[],
     );
   }
-  addPrice(value: Partial<IProductPrice> = {}) {
-    this.prices.push(
-      this.fb.group({
-        type: [value.type ?? 'end_user', Validators.required],
-        label: [value.label ?? ''],
-        currency: [value.currency ?? 'IDR', Validators.required],
-        amount: [
-          value.amount ?? null,
-          [Validators.required, Validators.min(0)],
-        ],
-        compare_at: [value.compare_at ?? null],
-        min_qty: [value.min_qty ?? null],
-        max_qty: [value.max_qty ?? null],
-        is_public: [value.is_public ?? true],
-        is_active: [value.is_active ?? true],
+  /** Website prices need both currencies. */
+  private get missingPublicPrice(): boolean {
+    const shown = (rows: InlineRow[]) =>
+      rows.some(
+        (row) =>
+          row['type'] === 'end_user' &&
+          row['status'] === 'active' &&
+          row['shown'] === 'shown',
+      );
+    return (
+      this.form.controls.price_visibility.value === 'displayed' &&
+      !(shown(this.idrRows()) && shown(this.usdRows()))
+    );
+  }
+  tabStates(): Record<
+    'general' | 'content' | 'channels' | 'media' | 'seo',
+    TabState
+  > {
+    const c = this.form.controls;
+    const noCategory = this.categoryIds.length === 0;
+    const general = tabState({ required: [c.sku, c.status] });
+    return {
+      general:
+        general === 'error' || (noCategory && this.tried())
+          ? 'error'
+          : noCategory
+            ? 'warn'
+            : general,
+      content: tabState({
+        required: [c.id_name, c.id_slug, c.en_name, c.en_slug],
+        recommended: [c.id_short_description, c.en_short_description],
       }),
-    );
-  }
-  addCurrencyPrice(currency: 'IDR' | 'USD') {
-    const existing = this.prices.controls.find(
-      (row) =>
-        row.get('type')?.value === 'end_user' &&
-        row.get('currency')?.value === currency,
-    );
-    if (existing) {
-      existing.get('is_active')?.setValue(true);
-      existing.get('is_public')?.setValue(true);
-      return;
-    }
-    this.addPrice({
-      currency,
-      type: 'end_user',
-      label: currency === 'IDR' ? 'Harga konsumen' : 'Consumer price',
-      is_public: true,
-      is_active: true,
-    });
-  }
-  addMarketplace(value: Partial<IProductMarketplace> = {}) {
-    const isFirst = this.marketplaces.length === 0;
-    this.marketplaces.push(
-      this.fb.group({
-        provider: [value.provider ?? 'shopee', Validators.required],
-        label: [value.label ?? ''],
-        url: [
-          value.url ?? '',
-          [Validators.required, Validators.pattern(/^https?:\/\//i)],
-        ],
-        sku: [value.sku ?? ''],
-        price: [value.price ?? null, Validators.min(0)],
-        currency: [
-          value.currency ?? 'IDR',
-          [Validators.required, Validators.pattern(/^[A-Za-z]{3}$/)],
-        ],
-        is_primary: [value.is_primary ?? isFirst],
-        is_active: [value.is_active ?? true],
+      channels: this.missingPublicPrice
+        ? this.tried()
+          ? 'error'
+          : 'warn'
+        : this.marketplaceRows().length
+          ? 'ok'
+          : 'warn',
+      media: this.media.thumbnail ? 'ok' : 'warn',
+      seo: tabState({
+        recommended: [c.id_meta_description, c.en_meta_description],
       }),
-    );
+    };
   }
-  remove(array: FormArray, index: number) {
-    array.removeAt(index);
+  /** After a save was tried: something still stops it. */
+  get showIssue(): boolean {
+    return (
+      this.tried() &&
+      (this.form.invalid ||
+        this.categoryIds.length === 0 ||
+        this.missingPublicPrice ||
+        this.openRows.size > 0)
+    );
   }
 
   //==================================================
@@ -313,20 +293,18 @@ export class ProductFormService {
   //==================================================
 
   submit() {
+    this.tried.set(true);
     this.form.markAllAsTouched();
     this.categoryError = this.categoryIds.length === 0;
-    const publicCurrencies = new Set(
-      this.prices
-        .getRawValue()
-        .filter(
-          (price: IProductPrice) =>
-            price.type === 'end_user' && price.is_active && price.is_public,
-        )
-        .map((price: IProductPrice) => String(price.currency).toUpperCase()),
-    );
-    this.pricePublicationError =
-      this.form.controls.price_visibility.value === 'displayed' &&
-      !['IDR', 'USD'].every((currency) => publicCurrencies.has(currency));
+    this.pricePublicationError = this.missingPublicPrice;
+    if (this.openRows.size) {
+      const table = [...this.openRows][0];
+      this.activeTab = table.startsWith('spec') ? 'content' : 'channels';
+      this.notification.showError(
+        'Masih ada baris yang terbuka. Simpan atau batalkan baris itu dulu.',
+      );
+      return;
+    }
     if (this.form.invalid || this.categoryError || this.pricePublicationError) {
       this.activeTab = this.categoryError
         ? 'general'
@@ -348,9 +326,13 @@ export class ProductFormService {
       this.type() === 'edit' && this.id
         ? new UpdateProductAction(payload, this.id)
         : new CreateProductAction(payload);
+    this.saving.set(true);
     this.store.dispatch(action).subscribe({
       complete: () => void this.router.navigateByUrl('/product'),
-      error: (error) => this.handleSaveError(error),
+      error: (error) => {
+        this.saving.set(false);
+        this.handleSaveError(error);
+      },
     });
   }
   private payload(): IProductPayload {
@@ -385,7 +367,6 @@ export class ProductFormService {
           sort_order: index,
         });
     return {
-      key: v.key!,
       sku: v.sku!,
       product_type: v.product_type as IProductPayload['product_type'],
       product_kind: v.product_kind || null,
@@ -413,18 +394,13 @@ export class ProductFormService {
       catalog_front: v.catalog_front ? 1 : 0,
       category_ids: this.categoryIds,
       media,
-      prices: v.prices.map((x: IProductPrice, i: number) => ({
-        ...x,
-        currency: String(x.currency || 'IDR').toUpperCase(),
-        is_public: x.type === 'end_user' ? Boolean(x.is_public) : false,
-        label: x.label || null,
-        sort_order: i,
-      })),
-      marketplaces: v.marketplaces.map((x: IProductMarketplace, i: number) => ({
-        ...x,
-        label: x.label || null,
-        sku: x.sku || null,
-        sort_order: i,
+      prices: [
+        ...this.idrRows().map((row) => pricePayload(row, 'IDR')),
+        ...this.usdRows().map((row) => pricePayload(row, 'USD')),
+      ].map((price, index) => ({ ...price, sort_order: index })),
+      marketplaces: this.marketplaceRows().map((row, index) => ({
+        ...marketplacePayload(row),
+        sort_order: index,
       })),
       translations: [translation('id-ID', 'id'), translation('en-US', 'en')],
     };
@@ -441,7 +417,6 @@ export class ProductFormService {
     const id = p.translations?.find((x) => x.locale === 'id-ID'),
       en = p.translations?.find((x) => x.locale === 'en-US');
     const value: Record<string, unknown> = {
-      key: p.key,
       sku: p.sku,
       product_type: raw.product_type,
       product_kind: raw.product_kind ?? p.product_kind,
@@ -485,24 +460,29 @@ export class ProductFormService {
           [`${prefix}_og_title`]: t.og_title,
           [`${prefix}_og_description`]: t.og_description,
         });
-        this.specifications(prefix).clear();
-        specificationRows(t.specifications).forEach((row) =>
-          this.addSpecification(prefix, row),
+        this.specRows(prefix).set(
+          specificationRows(t.specifications).map((row) => ({ ...row })),
         );
       }
     this.form.patchValue(value as Parameters<typeof this.form.patchValue>[0]);
-    this.prices.clear();
-    (p.prices ?? []).forEach((x) => this.addPrice(x));
-    if (!this.prices.length) this.addPrice();
-    this.marketplaces.clear();
-    let primaryAssigned = false;
-    (p.marketplaces ?? []).forEach((x) => {
-      const isPrimary = Boolean(x.is_primary) && !primaryAssigned;
-      if (isPrimary) primaryAssigned = true;
-      this.addMarketplace({ ...x, is_primary: isPrimary });
-    });
-    if (this.marketplaces.length && !primaryAssigned)
-      this.marketplaces.at(0).get('is_primary')?.setValue(true);
+    const prices = p.prices ?? [];
+    this.idrRows.set(
+      prices.filter((x) => x.currency !== 'USD').map((x) => priceRow(x)),
+    );
+    this.usdRows.set(
+      prices.filter((x) => x.currency === 'USD').map((x) => priceRow(x)),
+    );
+    // One recommended channel, the first one if none (or several) are marked.
+    const links = p.marketplaces ?? [];
+    const main = Math.max(
+      links.findIndex((x) => x.is_primary),
+      0,
+    );
+    this.marketplaceRows.set(
+      links.map((x, index) =>
+        marketplaceRow({ ...x, is_primary: index === main }),
+      ),
+    );
     this.media.thumbnail = raw.product_thumbnail;
     this.media.gallery = raw.product_galleries ?? [];
     this.media.og = p.media?.find((x) => x.role === 'og') ?? null;
@@ -519,7 +499,6 @@ export class ProductFormService {
       )
     )
       return 'content';
-    if (this.prices.invalid || this.marketplaces.invalid) return 'channels';
     return 'general';
   }
 
@@ -551,15 +530,6 @@ export class ProductFormService {
     ) {
       this.activeTab = 'media';
       this.formIssues.focusFirstInvalid();
-      return;
-    }
-    if (code === 'PRODUCT_DUPLICATE' || code === 'PRODUCT_KEY_EXISTS') {
-      this.activeTab = 'general';
-      this.form.controls.key.setErrors({
-        ...(this.form.controls.key.errors ?? {}),
-        duplicate: true,
-      });
-      this.formIssues.focusFirstInvalid('key');
       return;
     }
     if (code === 'PRODUCT_SKU_EXISTS') {

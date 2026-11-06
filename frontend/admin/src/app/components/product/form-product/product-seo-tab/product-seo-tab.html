@@ -29,7 +29,10 @@
         <label class="form-label"
           >Canonical URL
           <app-help-tip section="tab-seo--canonical-url" /></label
-        ><input class="form-control" formControlName="id_canonical_url" />
+        ><app-auto-field
+          [control]="form.controls.id_canonical_url"
+          [autoValue]="'/produk/' + (form.controls.id_slug.value ?? '')"
+        />
       </div>
       <div class="col-12">
         <div class="field-heading">
@@ -84,7 +87,10 @@
         <label class="form-label"
           >Canonical URL
           <app-help-tip section="tab-seo--canonical-url" /></label
-        ><input class="form-control" formControlName="en_canonical_url" />
+        ><app-auto-field
+          [control]="form.controls.en_canonical_url"
+          [autoValue]="'/en/product/' + (form.controls.en_slug.value ?? '')"
+        />
       </div>
       <div class="col-12">
         <div class="field-heading">
@@ -145,8 +151,6 @@
       (click)="editor.setTab('media')"
     >
       <i class="ri-arrow-left-line"></i> Kembali</button
-    ><app-button [id]="'product_btn'">{{
-      editor.type() === 'edit' ? 'Perbarui Produk' : 'Simpan Produk'
-    }}</app-button>
+    ><span></span>
   </div>
 </section>

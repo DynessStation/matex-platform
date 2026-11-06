@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -8,12 +8,20 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngxs/store';
 import { filter, finalize, switchMap, take } from 'rxjs';
 
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
+import { AutoField } from '../../../shared/components/ui/form-kit/auto-field';
+import {
+  TabState,
+  tabState,
+} from '../../../shared/components/ui/form-kit/form-kit.util';
+import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
+import { TitleSlug } from '../../../shared/components/ui/form-kit/title-slug';
 import { HelpTip } from '../../../shared/components/ui/help/help-tip/help-tip';
 import { ImageUpload } from '../../../shared/components/ui/image-upload/image-upload';
 import {
@@ -51,6 +59,10 @@ import { CategoryState } from '../../../shared/store/state/category.state';
     AiFieldAction,
     ImageUpload,
     Button,
+    TranslateModule,
+    AutoField,
+    TabStatus,
+    TitleSlug,
   ],
   templateUrl: './form-category.html',
   styleUrl: './form-category.scss',
@@ -82,6 +94,7 @@ export class FormCategory {
   }
   id: string | null = null;
   activeTab = 'general';
+  readonly tried = signal(false);
   activeLocale: 'id' | 'en' = 'id';
   assisting = false;
   assistingField: string | null = null;
@@ -103,7 +116,7 @@ export class FormCategory {
         target_locale: locale === 'id' ? 'id-ID' : 'en-US',
         context: JSON.stringify({
           user_written_name: value[`${locale}_name`] || '',
-          category_key: value.key || '',
+          category_key: this.category?.key || '',
         }),
         fields: {
           [field]:
@@ -131,10 +144,6 @@ export class FormCategory {
   }
 
   readonly form = this.fb.group({
-    key: [
-      '',
-      [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)],
-    ],
     parent_id: [''],
     status: ['draft' as ProductCategoryStatus, Validators.required],
     is_featured: [false],
@@ -172,12 +181,19 @@ export class FormCategory {
       .subscribe((category) => this.patch(category));
   }
 
-  /** Indonesian name of the category being edited, shown next to the form title. */
-  get categoryName(): string {
-    const name = this.category?.translations.find(
-      (item) => item.locale === 'id-ID',
-    )?.name;
-    return name || this.category?.key || '';
+  tabStates(): Record<'general' | 'content' | 'seo' | 'media', TabState> {
+    const c = this.form.controls;
+    return {
+      general: tabState({ required: [c.status] }),
+      content: tabState({
+        required: [c.id_name, c.id_slug, c.en_name, c.en_slug],
+        recommended: [c.id_description, c.en_description],
+      }),
+      seo: tabState({
+        recommended: [c.id_meta_description, c.en_meta_description],
+      }),
+      media: tabState({ recommended: [c.image_id] }),
+    };
   }
   selectItem(value: Array<string | number> | null) {
     this.form.controls.parent_id.setValue(String(value?.[0] ?? ''));
@@ -191,92 +207,6 @@ export class FormCategory {
     );
   }
 
-  generateDescription(locale: 'id' | 'en') {
-    const value = this.form.getRawValue();
-    this.assisting = true;
-    this.contentAssistant
-      .assist({
-        mode: 'generate',
-        content_type: 'product-category',
-        target_locale: locale === 'id' ? 'id-ID' : 'en-US',
-        context: JSON.stringify({
-          name: value[`${locale}_name`] || '',
-          key: value.key || '',
-        }),
-        fields: {
-          description: value[`${locale}_description`] || '',
-          meta_description: value[`${locale}_meta_description`] || '',
-          og_description: value[`${locale}_og_description`] || '',
-        },
-        field_types: {
-          description: 'multiline_text',
-          meta_description: 'seo_description',
-          og_description: 'seo_description',
-        },
-      })
-      .pipe(finalize(() => (this.assisting = false)))
-      .subscribe({
-        next: (fields) => {
-          this.form.patchValue({
-            [`${locale}_description`]: fields['description'] || '',
-            [`${locale}_meta_description`]: fields['meta_description'] || '',
-            [`${locale}_og_description`]: fields['og_description'] || '',
-          });
-          this.notification.showSuccess(
-            'Draf deskripsi kategori dibuat. Periksa kembali sebelum menyimpan.',
-          );
-        },
-        error: (error) => this.showAssistantError(error),
-      });
-  }
-
-  copyAndTranslateToEnglish() {
-    const value = this.form.getRawValue();
-    this.assisting = true;
-    this.contentAssistant
-      .assist({
-        mode: 'translate',
-        content_type: 'product-category',
-        source_locale: 'id-ID',
-        target_locale: 'en-US',
-        fields: {
-          description: value.id_description || '',
-          meta_description: value.id_meta_description || '',
-          og_description: value.id_og_description || '',
-        },
-        field_types: {
-          description: 'multiline_text',
-          meta_description: 'seo_description',
-          og_description: 'seo_description',
-        },
-      })
-      .pipe(finalize(() => (this.assisting = false)))
-      .subscribe({
-        next: (fields) => {
-          this.form.patchValue({
-            en_description: fields['description'] || '',
-            en_meta_description: fields['meta_description'] || '',
-            en_og_description: fields['og_description'] || '',
-          });
-          this.activeLocale = 'en';
-          this.notification.showSuccess(
-            'Deskripsi English sudah diisi. Nama dan slug tetap Anda tentukan sendiri.',
-          );
-        },
-        error: (error) => this.showAssistantError(error),
-      });
-  }
-
-  private slugify(value: string) {
-    return String(value || '')
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 255);
-  }
-
   private showAssistantError(error: IApiErrorResponse) {
     this.notification.showError(
       error?.error?.code === 'CONTENT_ASSISTANT_NOT_CONFIGURED'
@@ -286,6 +216,7 @@ export class FormCategory {
   }
 
   submit() {
+    this.tried.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.activeTab = this.invalidTab();
@@ -307,18 +238,22 @@ export class FormCategory {
           return;
         }
         this.form.reset({ status: 'draft', is_featured: false });
+        this.tried.set(false);
+        this.activeLocale = 'id';
         this.category = null;
         this.activeTab = 'general';
         this.store.dispatch(new GetCategoriesAction({ type: 'product' }));
       },
       error: (error) => {
         if (error?.error?.code !== 'PRODUCT_CATEGORY_CONFLICT') return;
-        this.activeTab = 'general';
-        this.form.controls.key.setErrors({
-          ...(this.form.controls.key.errors ?? {}),
+        // The server found the address taken after the form's own check said free.
+        this.activeTab = 'content';
+        this.activeLocale = 'id';
+        this.form.controls.id_slug.setErrors({
+          ...(this.form.controls.id_slug.errors ?? {}),
           duplicate: true,
         });
-        this.formIssues.focusFirstInvalid('key');
+        this.formIssues.focusFirstInvalid('id_slug');
       },
     });
   }
@@ -328,7 +263,6 @@ export class FormCategory {
     const id = category.translations.find((item) => item.locale === 'id-ID');
     const en = category.translations.find((item) => item.locale === 'en-US');
     this.form.patchValue({
-      key: category.key,
       parent_id: category.parent_id ?? '',
       status: category.status,
       is_featured: category.is_featured,
@@ -369,7 +303,6 @@ export class FormCategory {
       status: 1 as const,
     });
     return {
-      key: value.key!,
       parent_id: value.parent_id || null,
       status: value.status!,
       is_featured: value.is_featured ? 1 : 0,
@@ -392,13 +325,5 @@ export class FormCategory {
       }
     }
     return 'general';
-  }
-
-  /** Fills an empty slug from the name once the name is typed (U-12). */
-  fillSlug(locale: 'id' | 'en') {
-    const slug = this.form.get(`${locale}_slug`);
-    if (slug && !slug.value) {
-      slug.setValue(this.slugify(this.form.get(`${locale}_name`)?.value));
-    }
   }
 }

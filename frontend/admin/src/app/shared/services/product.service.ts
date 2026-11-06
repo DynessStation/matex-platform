@@ -10,6 +10,9 @@ import {
   IOrderSaveResponse,
 } from '../interface/order-list.interface';
 import {
+  IProductInsightAudit,
+  IProductInsightMarketplace,
+  IProductInsightTop,
   IProduct,
   IProductModel,
   IProductPayload,
@@ -51,5 +54,22 @@ export class ProductService {
   }
   delete(id: string) {
     return this.http.delete<IApiResponse<null>>(`${this.api}/${id}`);
+  }
+  insightTop(days: number) {
+    return this.http.get<IApiResponse<IProductInsightTop[]>>(
+      `${this.api}/insight/top`,
+      { params: { days } },
+    );
+  }
+  insightMarketplaces(days: number) {
+    return this.http.get<IApiResponse<IProductInsightMarketplace[]>>(
+      `${this.api}/insight/marketplaces`,
+      { params: { days } },
+    );
+  }
+  insightAudit() {
+    return this.http.get<IApiResponse<IProductInsightAudit>>(
+      `${this.api}/insight/audit`,
+    );
   }
 }

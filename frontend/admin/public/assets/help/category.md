@@ -10,6 +10,10 @@ Kategori mengelompokkan produk dalam struktur induk dan anak, misalnya Sarung Ta
 
 URL: https://internal.matexindo.com/category
 
+## Ringkasan di Atas Halaman
+
+Tombol ikon grafik membuka atau menutup ringkasan: kategori paling dilihat, jumlah produk per kategori, dan audit data. **Perbaiki** membuka kategori pertama yang punya masalah itu.
+
 ## Tata Letak Halaman
 
 Pohon kategori dan formulir ada dalam satu kartu: pohon di kiri, formulir di kanan. Tab formulir (Umum, Konten & Bahasa, SEO, Media) ada di atas formulir, dan tombol **Simpan Kategori** (atau **Perbarui Kategori** saat mengubah) ada di bawahnya, sehingga bisa disimpan dari tab mana pun. Bila ada isian wajib yang kosong, formulir langsung membuka tab dan bahasa tempat isian itu berada.
@@ -29,10 +33,6 @@ Saat sedang mengubah kategori, tombol **Kategori baru** mengosongkan formulir un
 ## Tab Umum
 
 Pengaturan dasar kategori.
-
-### Kunci internal
-
-Kode tetap kategori untuk sistem, wajib dan unik, misalnya sarung-tangan-lateks. Hanya huruf kecil, angka, dan tanda hubung.
 
 ### Status
 
@@ -58,7 +58,7 @@ Nama dan isi kategori, diisi untuk Bahasa Indonesia dan English.
 
 ### Slug URL
 
-Bagian alamat halaman kategori di website, wajib per bahasa, misalnya sarung-tangan-lateks. Bila masih kosong, terisi otomatis dari nama kategori setelah nama diketik; bisa diubah, dengan huruf kecil, angka, dan tanda hubung, dan harus unik.
+Alamat kategori. Pada kategori baru dibuat otomatis dari nama; ikon pensil membukanya untuk diisi sendiri. Bila alamat kategori yang sudah ada diubah, alamat lama otomatis dialihkan ke alamat baru. Kunci internal dibuat otomatis oleh sistem dan tampil kecil di bawah alamat.
 
 ### Nama kategori
 
@@ -82,7 +82,7 @@ Teks di bawah judul pada hasil pencarian Google; idealnya sekitar 155 karakter.
 
 ### Canonical URL
 
-Alamat utama halaman bila konten yang sama ada di beberapa alamat. Biarkan kosong kecuali developer meminta.
+Otomatis memakai alamat kategori itu sendiri, dan biasanya tidak perlu diubah. Ikon pensil membuka isian untuk alamat lain di website yang sama; ikon putar mengembalikannya ke otomatis.
 
 ### Judul dan deskripsi saat dibagikan
 

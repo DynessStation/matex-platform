@@ -72,7 +72,7 @@ export class TitleSlug {
   // Only typing moves the address: loading a saved record does not reach this.
   onTitleInput(): void {
     const slug = this.slugControl();
-    if (this.custom || (!this.follow() && slug.value)) return;
+    if (slug.value && (this.custom || !this.follow())) return;
     slug.setValue(slugify(this.titleControl().value));
     this.checks.next(slug.value ?? '');
   }

@@ -42,7 +42,8 @@ export interface ICategoryDetail extends ICategory {
 }
 export type ICategoryModel = IListResponse<ICategory>;
 export interface ICategoryPayload {
-  key: string;
+  /** Left out: the server makes it, and an existing category keeps its own. */
+  key?: string;
   parent_id: string | null;
   status: ProductCategoryStatus;
   is_featured: 0 | 1;
@@ -55,4 +56,36 @@ export interface ICategoryPayload {
 export interface ICategoryOrderItem {
   id: string;
   sort_order: number;
+}
+
+export interface ICategoryInsightTop {
+  id: string;
+  name: string;
+  slug: string;
+  views: number;
+}
+
+export interface ICategoryInsightCheck {
+  count: number;
+  first_id: string | null;
+}
+
+export interface ICategoryInsightAudit {
+  total: number;
+  published: number;
+  draft: number;
+  archived: number;
+  products: {
+    id: string;
+    name: string;
+    products: number;
+    published_products: number;
+  }[];
+  checks: {
+    no_product: ICategoryInsightCheck;
+    no_image: ICategoryInsightCheck;
+    no_description: ICategoryInsightCheck;
+    untranslated: ICategoryInsightCheck;
+    no_seo: ICategoryInsightCheck;
+  };
 }

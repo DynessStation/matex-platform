@@ -1,5 +1,6 @@
 <app-page-wrapper [gridClass]="'col-sm-12'" [title]="'products'">
   <div button class="d-flex flex-wrap gap-2">
+    <app-insight-toggle storageKey="product" [(open)]="insightOpen" />
     @if (!ordering) {
       <button
         *hasPermission="'product.update'"
@@ -20,6 +21,21 @@
       <i class="ri-add-line"></i> {{ 'add_product' | translate }}
     </a>
   </div>
+  @if (insightOpen() && !ordering) {
+    <app-product-insight />
+  }
+  @if (auditFilter() && !ordering) {
+    <div class="audit-filter" data-testid="audit-filter">
+      {{ 'product_insight.filter_' + auditFilter() | translate }}
+      <button
+        type="button"
+        [attr.aria-label]="'form_kit.cancel' | translate"
+        (click)="clearAudit()"
+      >
+        <i class="ri-close-line" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
   @if (ordering) {
     <app-order-list
       title="Produk di depan katalog"

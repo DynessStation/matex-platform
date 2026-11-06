@@ -104,6 +104,13 @@ Yang disesuaikan dari PDF:
 
 ## Tahap 4: Kategori dan Produk
 
+**Selesai 6 November (lokal).** Tanpa migration baru. Test `catalog-insight-api.spec.ts` dan `product-table.spec.ts`. Catatan hasil:
+
+- Tabel di form Produk menyimpan barisnya di form, dan baru dikirim saat tombol Simpan ditekan; baris yang masih terbuka menahan simpan.
+- Produk baru tidak lagi dimulai dengan dua baris harga kosong, jadi produk bisa disimpan tanpa harga selama harganya tidak ditampilkan.
+- Perbaiki di audit Kategori membuka kategori pertama yang bermasalah, karena pohon kategori tidak punya filter.
+- Klik marketplace dihitung dari host tautan, jadi data lama ikut terhitung. Kanal "Toko resmi" dan "Lainnya" tidak ikut, karena hostnya tidak bisa dikenali.
+
 **Kategori** (`/category`): kunci otomatis, slug otomatis dan bisa custom, urutan input ditukar dengan Nama, penanda status di tab atas, panel insight. Isi panel usulan: view tertinggi per kategori; jumlah produk terbit dibanding total; audit kategori kosong, tanpa gambar, tanpa konten EN, tanpa SEO.
 
 **Produk** (`/product`)

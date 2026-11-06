@@ -6,9 +6,9 @@
   <div class="category-form">
     <div class="category-form-heading">
       <h5>{{ type() === 'edit' ? 'Ubah kategori' : 'Kategori baru' }}</h5>
-      @if (type() === 'edit' && category) {
-        <span class="category-form-name">{{ categoryName }}</span>
-      }
+      <span class="category-form-name" data-testid="form-heading">{{
+        form.controls.id_name.value || ('form_kit.untitled' | translate)
+      }}</span>
     </div>
     <ul
       ngbNav
@@ -19,6 +19,7 @@
       <li [ngbNavItem]="'general'">
         <button ngbNavLink type="button">
           <i class="ri-settings-3-line"></i> Umum
+          <app-tab-status [state]="tabStates().general" />
         </button>
         <ng-template ngbNavContent>
           <section class="category-panel">
@@ -27,29 +28,6 @@
               <p>Identitas internal, susunan, dan status kategori produk.</p>
             </div>
             <div class="row g-4">
-              <div class="col-md-6">
-                <label class="form-label" for="key"
-                  >Kunci internal <span>*</span>
-                  <app-help-tip section="tab-umum--kunci-internal"
-                /></label>
-                <input
-                  id="key"
-                  class="form-control"
-                  formControlName="key"
-                  placeholder="contoh: kasur-latex"
-                  [class.is-invalid]="
-                    form.controls.key.touched && form.controls.key.invalid
-                  "
-                />
-                <small class="text-muted"
-                  >Gunakan huruf kecil, angka, dan tanda hubung.</small
-                >
-                @if (form.controls.key.errors?.['duplicate']) {
-                  <div class="invalid-feedback d-block">
-                    Kunci atau alamat kategori ini sudah digunakan.
-                  </div>
-                }
-              </div>
               <div class="col-md-6">
                 <label class="form-label" for="status"
                   >Status <app-help-tip section="tab-umum--status"
@@ -111,6 +89,7 @@
       <li [ngbNavItem]="'content'">
         <button ngbNavLink type="button">
           <i class="ri-translate-2"></i> Konten & Bahasa
+          <app-tab-status [state]="tabStates().content" />
         </button>
         <ng-template ngbNavContent>
           <section class="category-panel">
@@ -136,25 +115,21 @@
             </div>
             @if (activeLocale === 'id') {
               <div class="row g-4">
-                <div class="col-md-5">
-                  <label class="form-label"
-                    >Slug URL <span>*</span>
-                    <app-help-tip section="tab-konten-bahasa--slug-url"
-                  /></label>
-                  <div class="input-group">
-                    <span class="input-group-text">/kategori/</span
-                    ><input class="form-control" formControlName="id_slug" />
-                  </div>
-                </div>
-                <div class="col-md-7">
-                  <label class="form-label"
-                    >Nama kategori <span>*</span>
-                    <app-help-tip
-                      section="tab-konten-bahasa--nama-kategori" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="id_name"
-                    (blur)="fillSlug('id')"
+                <div class="col-12">
+                  <app-title-slug
+                    fieldPrefix="id_"
+                    prefix="/kategori/"
+                    entity="product_category"
+                    locale="id-ID"
+                    titleLabelKey="form_kit.name_category"
+                    slugLabelKey="form_kit.slug"
+                    titleHelp="tab-konten-bahasa--nama-kategori"
+                    slugHelp="tab-konten-bahasa--slug-url"
+                    [internalKey]="category?.key ?? ''"
+                    [follow]="!id"
+                    [recordId]="id"
+                    [titleControl]="form.controls.id_name"
+                    [slugControl]="form.controls.id_slug"
                   />
                 </div>
                 <div class="col-12">
@@ -181,25 +156,20 @@
               </div>
             } @else {
               <div class="row g-4">
-                <div class="col-md-5">
-                  <label class="form-label"
-                    >URL slug <span>*</span>
-                    <app-help-tip section="tab-konten-bahasa--slug-url"
-                  /></label>
-                  <div class="input-group">
-                    <span class="input-group-text">/en/category/</span
-                    ><input class="form-control" formControlName="en_slug" />
-                  </div>
-                </div>
-                <div class="col-md-7">
-                  <label class="form-label"
-                    >Category name <span>*</span>
-                    <app-help-tip
-                      section="tab-konten-bahasa--nama-kategori" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="en_name"
-                    (blur)="fillSlug('en')"
+                <div class="col-12">
+                  <app-title-slug
+                    fieldPrefix="en_"
+                    prefix="/en/category/"
+                    entity="product_category"
+                    locale="en-US"
+                    titleLabelKey="form_kit.name_category_en"
+                    slugLabelKey="form_kit.slug_en"
+                    titleHelp="tab-konten-bahasa--nama-kategori"
+                    slugHelp="tab-konten-bahasa--slug-url"
+                    [follow]="!id"
+                    [recordId]="id"
+                    [titleControl]="form.controls.en_name"
+                    [slugControl]="form.controls.en_slug"
                   />
                 </div>
                 <div class="col-12">
@@ -238,6 +208,7 @@
       <li [ngbNavItem]="'seo'">
         <button ngbNavLink type="button">
           <i class="ri-search-eye-line"></i> SEO
+          <app-tab-status [state]="tabStates().seo" />
         </button>
         <ng-template ngbNavContent>
           <section class="category-panel">
@@ -279,10 +250,11 @@
                   <label class="form-label"
                     >Canonical URL
                     <app-help-tip section="tab-seo--canonical-url" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="id_canonical_url"
-                    placeholder="https://..."
+                  ><app-auto-field
+                    [control]="form.controls.id_canonical_url"
+                    [autoValue]="
+                      '/kategori/' + (form.controls.id_slug.value ?? '')
+                    "
                   />
                 </div>
                 <div class="col-12">
@@ -345,10 +317,11 @@
                   <label class="form-label"
                     >Canonical URL
                     <app-help-tip section="tab-seo--canonical-url" /></label
-                  ><input
-                    class="form-control"
-                    formControlName="en_canonical_url"
-                    placeholder="https://..."
+                  ><app-auto-field
+                    [control]="form.controls.en_canonical_url"
+                    [autoValue]="
+                      '/en/category/' + (form.controls.en_slug.value ?? '')
+                    "
                   />
                 </div>
                 <div class="col-12">
@@ -418,6 +391,7 @@
       <li [ngbNavItem]="'media'">
         <button ngbNavLink type="button">
           <i class="ri-image-line"></i> Media
+          <app-tab-status [state]="tabStates().media" />
         </button>
         <ng-template ngbNavContent>
           <section class="category-panel">
@@ -485,6 +459,12 @@
     <div [ngbNavOutlet]="nav" class="category-tab-content"></div>
     <!-- One save for every tab: the form keeps all tabs' values. -->
     <div class="category-form-footer">
+      @if (tried() && form.invalid) {
+        <span class="form-submit-note me-3" data-testid="form-submit-note">
+          <i class="ri-error-warning-line" aria-hidden="true"></i>
+          {{ 'form_kit.check_again' | translate }}
+        </span>
+      }
       <app-button [id]="'category_btn'" [class]="'btn btn-theme'">{{
         type() === 'edit' ? 'Perbarui Kategori' : 'Simpan Kategori'
       }}</app-button>

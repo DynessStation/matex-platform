@@ -6,49 +6,72 @@
   <div class="vertical-tabs category-form">
     <div class="row g-4">
       <div class="col-xl-3 col-lg-4">
-        <ul
-          ngbNav
-          #nav="ngbNav"
-          [(activeId)]="editor.activeTab"
-          class="nav-pills"
-          orientation="vertical"
-        >
-          <li ngbNavItem="general">
-            <button ngbNavLink type="button">
-              <i class="ri-settings-3-line"></i> Umum</button
-            ><ng-template ngbNavContent>
-              <app-product-general-tab />
-            </ng-template>
-          </li>
-          <li ngbNavItem="content">
-            <button ngbNavLink type="button">
-              <i class="ri-translate-2"></i> Konten & Bahasa</button
-            ><ng-template ngbNavContent>
-              <app-product-content-tab />
-            </ng-template>
-          </li>
-          <li ngbNavItem="channels">
-            <button ngbNavLink type="button">
-              <i class="ri-price-tag-3-line"></i> Harga & Kanal</button
-            ><ng-template ngbNavContent>
-              <app-product-channels-tab />
-            </ng-template>
-          </li>
-          <li ngbNavItem="media">
-            <button ngbNavLink type="button">
-              <i class="ri-image-line"></i> Media</button
-            ><ng-template ngbNavContent>
-              <app-product-media-tab />
-            </ng-template>
-          </li>
-          <li ngbNavItem="seo">
-            <button ngbNavLink type="button">
-              <i class="ri-search-eye-line"></i> SEO</button
-            ><ng-template ngbNavContent>
-              <app-product-seo-tab />
-            </ng-template>
-          </li>
-        </ul>
+        <div class="form-kit-sidebar">
+          <app-form-heading [title]="editor.form.controls.id_name.value" />
+          <ul
+            ngbNav
+            #nav="ngbNav"
+            [(activeId)]="editor.activeTab"
+            class="nav-pills"
+            orientation="vertical"
+          >
+            <li ngbNavItem="general">
+              <button ngbNavLink type="button">
+                <i class="ri-settings-3-line"></i> Umum
+                <app-tab-status [state]="editor.tabStates().general" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-product-general-tab />
+              </ng-template>
+            </li>
+            <li ngbNavItem="content">
+              <button ngbNavLink type="button">
+                <i class="ri-translate-2"></i> Konten & Bahasa
+                <app-tab-status [state]="editor.tabStates().content" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-product-content-tab />
+              </ng-template>
+            </li>
+            <li ngbNavItem="channels">
+              <button ngbNavLink type="button">
+                <i class="ri-price-tag-3-line"></i> Harga & Kanal
+                <app-tab-status [state]="editor.tabStates().channels" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-product-channels-tab />
+              </ng-template>
+            </li>
+            <li ngbNavItem="media">
+              <button ngbNavLink type="button">
+                <i class="ri-image-line"></i> Media
+                <app-tab-status [state]="editor.tabStates().media" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-product-media-tab />
+              </ng-template>
+            </li>
+            <li ngbNavItem="seo">
+              <button ngbNavLink type="button">
+                <i class="ri-search-eye-line"></i> SEO
+                <app-tab-status [state]="editor.tabStates().seo" />
+              </button>
+              <ng-template ngbNavContent>
+                <app-product-seo-tab />
+              </ng-template>
+            </li>
+          </ul>
+          <app-form-submit
+            buttonId="product_btn"
+            [labelKey]="
+              editor.type() === 'edit'
+                ? 'product_form.update'
+                : 'product_form.create'
+            "
+            [loading]="editor.saving()"
+            [issue]="editor.showIssue"
+          />
+        </div>
       </div>
       <div class="col-xl-9 col-lg-8"><div [ngbNavOutlet]="nav"></div></div>
     </div>

@@ -1,0 +1,24 @@
+<app-insight-panel>
+  <app-insight-column
+    headingKey="product_insight.top"
+    [range]="topRange()"
+    (rangeChange)="topRange.set($event)"
+  >
+    <app-insight-rank [items]="top()" />
+  </app-insight-column>
+  <app-insight-column
+    headingKey="product_insight.channels"
+    [range]="channelRange()"
+    (rangeChange)="channelRange.set($event)"
+  >
+    <app-insight-rank [items]="channels()" />
+  </app-insight-column>
+  <app-insight-column headingKey="product_insight.audit" [showRange]="false">
+    <app-insight-audit
+      [totalLabel]="'product_insight.total' | translate"
+      [total]="audit()?.total ?? 0"
+      [segments]="segments()"
+      [checks]="checks()"
+    />
+  </app-insight-column>
+</app-insight-panel>

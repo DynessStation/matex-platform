@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { admin, runId, saveRecording } from './api-contract';
 import { stack } from './stack.mjs';
@@ -72,6 +72,27 @@ async function uploadThroughModal(page: Page): Promise<void> {
   await expect(modal).toBeHidden();
 }
 
+/** Adds a table row, fills its inputs, and closes it. */
+async function addRow(
+  table: Locator,
+  values: Record<string, string>,
+  more?: (row: Locator) => Promise<void>,
+): Promise<void> {
+  await table.getByTestId('inline-add').click();
+  const row = table.locator('.inline-table-editing');
+  for (const [key, value] of Object.entries(values)) {
+    await row.locator(`[data-column="${key}"] input`).fill(value);
+  }
+  if (more) await more(row);
+  await row.getByTestId('inline-save').click();
+  await expect(table.locator('.inline-table-editing')).toHaveCount(0);
+}
+
+async function chooseInRow(page: Page, row: Locator, column: string, label: string): Promise<void> {
+  await row.locator(`[data-column="${column}"] .inline-table-toggle`).click();
+  await page.locator('.inline-table-menu.show .dropdown-item', { hasText: label }).first().click();
+}
+
 async function save(page: Page, method: 'POST' | 'PUT'): Promise<any> {
   await openTab(page, 'SEO');
   const response = page.waitForResponse(
@@ -112,7 +133,6 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await expect(page.locator('app-form-product .nav-link.active')).toContainText('Umum');
 
   // General: identity, category, and the measurement hints.
-  await control(page, 'key').fill(`form-product-${runId}`);
   await control(page, 'sku').fill(`FORM-${runId}`.toUpperCase());
   await chooseSelect2(page, 'status', 'Dipublikasikan');
   const categories = panel(page).locator('app-advance-dropdown');
@@ -128,20 +148,17 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
 
   // Content: both languages, a specification row each, and the writing help.
   await openTab(page, 'Konten & Bahasa');
-  await control(page, 'id_slug').fill(`form-produk-${runId}`);
-  await control(page, 'id_name').fill(`Produk Form ${runId}`);
+  await panel(page).locator('#id_title').pressSequentially(`Produk Form ${runId}`);
+  await expect(panel(page).locator('#id_slug')).toHaveValue(`produk-form-${runId}`);
+  await expect(page.getByTestId('form-heading')).toHaveText(`Produk Form ${runId}`);
   await control(page, 'id_short_description').fill('Ringkasan produk uji form.');
-  await panel(page)
-    .getByRole('button', { name: /Tambah spesifikasi/i })
-    .click();
-  await panel(page)
-    .getByRole('button', { name: /Tambah spesifikasi/i })
-    .click();
-  await expect(panel(page).locator('[formcontrolname=label]')).toHaveCount(2);
-  await panel(page).locator('.remove-row').nth(1).click();
-  await expect(panel(page).locator('[formcontrolname=label]')).toHaveCount(1);
-  await panel(page).locator('[formcontrolname=label]').fill('Bahan');
-  await panel(page).locator('[formcontrolname=value]').fill('Lateks alam');
+  const idSpecs = panel(page).getByTestId('specs-id');
+  await addRow(idSpecs, { label: 'Bahan', value: 'Lateks alam' });
+  await addRow(idSpecs, { label: 'Dihapus', value: 'x' });
+  await expect(idSpecs.getByTestId('inline-row')).toHaveCount(2);
+  await idSpecs.getByTestId('inline-row').nth(1).getByTestId('inline-edit').click();
+  await idSpecs.locator('.inline-table-editing').getByTestId('inline-remove').click();
+  await expect(idSpecs.getByTestId('inline-row')).toHaveCount(1);
   await panel(page).getByRole('button', { name: 'Isi ringkasan otomatis' }).click();
   await expect(
     page.getByText(/Fitur isi otomatis belum aktif|Bantuan penulisan belum berhasil/).first(),
@@ -149,39 +166,39 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await panel(page)
     .getByRole('button', { name: /EN\s*English/ })
     .click();
-  await control(page, 'en_slug').fill(`form-product-${runId}`);
-  await control(page, 'en_name').fill(`Form Product ${runId}`);
-  await panel(page)
-    .getByRole('button', { name: /Add specification|Tambah spesifikasi/i })
-    .click();
-  await panel(page).locator('[formcontrolname=label]').fill('Material');
-  await panel(page).locator('[formcontrolname=value]').fill('Natural latex');
+  await panel(page).locator('#en_title').pressSequentially(`Form Product ${runId}`);
+  await addRow(panel(page).getByTestId('specs-en'), { label: 'Material', value: 'Natural latex' });
 
-  // Channels: both consumer prices with their preview, and two marketplace links.
+  // Channels: a price per currency with its format, and two marketplace links with one main.
   await openTab(page, 'Harga & Kanal');
-  const amounts = control(page, 'amount');
-  await expect(amounts).toHaveCount(2);
-  await amounts.nth(0).fill('150000');
-  await expect(panel(page).locator('.price-preview').first()).toContainText('150.000');
-  await amounts.nth(1).fill('12');
-  await expect(panel(page).locator('.price-preview').nth(1)).toContainText('$12.00');
-  await panel(page)
-    .getByRole('button', { name: /Tambah kanal/ })
-    .click();
-  await panel(page)
-    .getByRole('button', { name: /Tambah kanal/ })
-    .click();
-  const cards = panel(page).locator('.marketplace-card');
-  await expect(cards).toHaveCount(2);
-  const primary = (index: number) => cards.nth(index).locator('[formcontrolname=is_primary]');
-  await expect(primary(0)).toBeChecked();
-  await expect(primary(1)).not.toBeChecked();
-  await primary(1).check();
-  await expect(primary(0)).not.toBeChecked();
-  await cards.nth(1).getByRole('button', { name: /Hapus/ }).click();
-  await expect(cards).toHaveCount(1);
-  await expect(primary(0)).toBeChecked();
-  await cards.nth(0).locator('[formcontrolname=url]').fill('https://example.invalid/produk-form');
+  const idr = panel(page).getByTestId('prices-idr');
+  await addRow(idr, { label: 'Harga konsumen', amount: '150000' });
+  await expect(idr.locator('[data-column="amount"]')).toContainText('150.000');
+  const usd = panel(page).getByTestId('prices-usd');
+  await addRow(usd, { label: 'Consumer price', amount: '12' });
+  await expect(usd.locator('[data-column="amount"]')).toContainText('$12.00');
+  const links = panel(page).getByTestId('marketplaces');
+  await addRow(links, { url: 'https://example.invalid/produk-form' }, async (row) => {
+    await chooseInRow(page, row, 'rank', 'Utama');
+  });
+  await addRow(links, { url: 'https://example.invalid/kedua' }, async (row) => {
+    await chooseInRow(page, row, 'provider', 'Tokopedia');
+    await chooseInRow(page, row, 'rank', 'Utama');
+  });
+  const rows = links.getByTestId('inline-row');
+  await expect(rows.nth(0).locator('[data-column="rank"]')).toHaveText('Biasa');
+  await expect(rows.nth(1).locator('[data-column="rank"]')).toHaveText('Utama');
+  await rows.nth(1).getByTestId('inline-edit').click();
+  await links.locator('.inline-table-editing').getByTestId('inline-remove').click();
+  await expect(rows).toHaveCount(1);
+
+  // A row left open holds the save back.
+  await idr.getByTestId('inline-add').click();
+  await page.locator('button#product_btn').click();
+  await expect(
+    page.getByText('Masih ada baris yang terbuka', { exact: false }).first(),
+  ).toBeVisible();
+  await idr.getByTestId('inline-remove').click();
 
   // Media: a thumbnail through the media modal.
   await openTab(page, 'Media');
@@ -211,14 +228,17 @@ test('edit shows the stored product and saves it unchanged', async ({ page }) =>
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);
   await page.goto(`${stack.adminOrigin}/product/edit/${productId}`);
-  await expect(control(page, 'key')).toHaveValue(`form-product-${runId}`);
   await expect(panel(page).getByText('1,5 kg')).toBeVisible();
   await openTab(page, 'Konten & Bahasa');
-  await expect(control(page, 'id_name')).toHaveValue(`Produk Form ${runId}`);
-  await expect(panel(page).locator('[formcontrolname=value]')).toHaveValue('Lateks alam');
+  await expect(panel(page).locator('#id_title')).toHaveValue(`Produk Form ${runId}`);
+  await expect(panel(page).getByTestId('internal-key')).toContainText(`produk-form-${runId}`);
+  await expect(panel(page).getByTestId('specs-id').locator('[data-column="value"]')).toHaveText(
+    'Lateks alam',
+  );
   await openTab(page, 'Harga & Kanal');
-  await expect(control(page, 'amount')).toHaveCount(2);
-  await expect(panel(page).locator('.marketplace-card')).toHaveCount(1);
+  await expect(panel(page).getByTestId('prices-idr').getByTestId('inline-row')).toHaveCount(1);
+  await expect(panel(page).getByTestId('prices-usd').getByTestId('inline-row')).toHaveCount(1);
+  await expect(panel(page).getByTestId('marketplaces').getByTestId('inline-row')).toHaveCount(1);
   await openTab(page, 'Media');
   await expect(panel(page).locator('.image-select-list img').nth(1)).toBeVisible();
 

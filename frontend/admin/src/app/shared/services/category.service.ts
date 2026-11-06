@@ -7,6 +7,8 @@ import { listParams } from './list-params';
 import { environment } from '../../../environments/environment';
 import { IApiResponse } from '../interface/api-response.interface';
 import {
+  ICategoryInsightAudit,
+  ICategoryInsightTop,
   ICategoryDetail,
   ICategoryModel,
   ICategoryOrderItem,
@@ -43,5 +45,16 @@ export class CategoryService {
   }
   delete(id: string) {
     return this.http.delete<IApiResponse<null>>(`${this.api}/${id}`);
+  }
+  insightTop(days: number) {
+    return this.http.get<IApiResponse<ICategoryInsightTop[]>>(
+      `${this.api}/insight/top`,
+      { params: { days } },
+    );
+  }
+  insightAudit() {
+    return this.http.get<IApiResponse<ICategoryInsightAudit>>(
+      `${this.api}/insight/audit`,
+    );
   }
 }
