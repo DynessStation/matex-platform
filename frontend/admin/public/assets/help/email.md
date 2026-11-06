@@ -16,6 +16,8 @@ URL: https://internal.matexindo.com/email
 
 Membuka pesan menandainya sudah dibaca, dan ini juga terlihat di webmail. **Tandai belum dibaca** mengembalikannya.
 
+Nama pengirim bisa diisi apa saja oleh siapa pun, jadi lihat juga alamat di kolom Dari sebelum menindaklanjuti.
+
 Isi email ditampilkan di bingkai terkunci: skrip di dalamnya tidak jalan. Gambar dari luar diblokir sampai **Tampilkan gambar** ditekan, karena gambar seperti itu bisa memberi tahu pengirim bahwa email sudah dibuka.
 
 Lampiran selalu terunduh, tidak dibuka di admin. Periksa dulu sebelum membuka file dari pengirim yang tidak dikenal.

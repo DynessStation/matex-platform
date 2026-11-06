@@ -66,7 +66,11 @@
                   [class.active]="item.path === folder()"
                   (click)="selectFolder(item.path)"
                 >
-                  <span>{{ item.name }}</span>
+                  @if (folderKey(item.special_use); as key) {
+                    <span>{{ 'email_page.folder_' + key | translate }}</span>
+                  } @else {
+                    <span>{{ item.name }}</span>
+                  }
                   @if (item.unread) {
                     <b data-testid="email-unread">{{ item.unread }}</b>
                   }
@@ -221,9 +225,11 @@
               </h5>
               <dl class="email-meta">
                 <dt>{{ 'email_page.from' | translate }}</dt>
-                <dd>{{ addressText(open.from) }}</dd>
+                <dd data-testid="email-open-from">
+                  {{ addressFull(open.from) }}
+                </dd>
                 <dt>{{ 'email_page.to' | translate }}</dt>
-                <dd>{{ addressText(open.to) }}</dd>
+                <dd>{{ addressFull(open.to) }}</dd>
                 <dt>{{ 'email_page.date' | translate }}</dt>
                 <dd>{{ open.date | date: 'dd MMM yyyy HH:mm' }}</dd>
               </dl>

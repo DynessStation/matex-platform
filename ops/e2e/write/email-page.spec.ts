@@ -58,6 +58,11 @@ test('the menu leads to the page, and opening a message marks it read', async ({
   await rows.nth(0).click();
   await expect(page).toHaveURL(/uid=3/);
   await expect(page.getByTestId('email-open-subject')).toHaveText('Tanya harga kasur');
+  // The address shows beside the name, and standard folders have our own words.
+  await expect(page.getByTestId('email-open-from')).toHaveText(
+    'Budi Pelanggan <budi@example.invalid>',
+  );
+  await expect(page.getByTestId('email-folder').first()).toContainText('Kotak Masuk');
   await expect(rows.nth(0)).not.toHaveClass(/unseen/);
   await expect(page.getByTestId('email-unread')).toHaveCount(0);
 
@@ -104,7 +109,7 @@ test('searching and moving between folders stay in the address', async ({ page }
   await expect(page).toHaveURL(/search=distributor/);
   await expect(page.getByTestId('email-row')).toHaveCount(1);
 
-  await page.getByTestId('email-folder').filter({ hasText: 'Trash' }).click();
+  await page.getByTestId('email-folder').filter({ hasText: 'Sampah' }).click();
   await expect(page).toHaveURL(/folder=INBOX.Trash/);
   await expect(page).not.toHaveURL(/search=/);
   await expect(page.getByTestId('email-row')).toHaveCount(0);
@@ -148,7 +153,7 @@ test('the trash button moves the message and the list follows', async ({ page })
   await page.getByTestId('email-trash').click();
   await expect(page.getByTestId('email-row')).toHaveCount(2);
   await expect(page.getByTestId('email-message')).toHaveCount(0);
-  await page.getByTestId('email-folder').filter({ hasText: 'Trash' }).click();
+  await page.getByTestId('email-folder').filter({ hasText: 'Sampah' }).click();
   await page.getByTestId('email-row').nth(0).click();
   await expect(page.getByTestId('email-trash')).toHaveCount(0);
 });

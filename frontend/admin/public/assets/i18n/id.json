@@ -1,5 +1,10 @@
 {
   "email_page": {
+    "folder_inbox": "Kotak Masuk",
+    "folder_drafts": "Draf",
+    "folder_junk": "Spam",
+    "folder_sent": "Terkirim",
+    "folder_trash": "Sampah",
     "title": "Email",
     "reload": "Muat ulang",
     "compose": "Tulis",

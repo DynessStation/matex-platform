@@ -200,8 +200,21 @@
 }
 
 .email-images {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
   margin-bottom: 8px;
-  padding: 4px 8px;
+  padding: 2px 8px;
+
+  .btn {
+    width: auto;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    font-size: var(--admin-text);
+  }
+
   background-color: #fff7e8;
   border-radius: 4px;
   font-size: var(--admin-text);

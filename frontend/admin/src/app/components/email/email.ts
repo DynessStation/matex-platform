@@ -17,8 +17,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 
 import {
+  addressFull,
   addressList,
   addressText,
+  folderKey,
   forwardSubject,
   hasRemoteImages,
   mailDocument,
@@ -63,6 +65,8 @@ export class Email {
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly addressText = addressText;
+  readonly addressFull = addressFull;
+  readonly folderKey = folderKey;
 
   private readonly query = toSignal(this.route.queryParamMap, {
     requireSync: true,

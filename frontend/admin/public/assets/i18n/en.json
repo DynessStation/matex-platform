@@ -1,5 +1,10 @@
 {
   "email_page": {
+    "folder_inbox": "Inbox",
+    "folder_drafts": "Drafts",
+    "folder_junk": "Junk",
+    "folder_sent": "Sent",
+    "folder_trash": "Trash",
     "title": "Email",
     "reload": "Reload",
     "compose": "Compose",

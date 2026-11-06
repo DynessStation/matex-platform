@@ -8,6 +8,28 @@ import {
 export const addressText = (items: IEmailAddress[] = []) =>
   items.map((item) => item.name || item.address || '').join(', ');
 
+/** With the address: a name alone can claim to be anyone. */
+export const addressFull = (items: IEmailAddress[] = []) =>
+  items
+    .map((item) =>
+      item.name && item.address
+        ? `${item.name} <${item.address}>`
+        : item.address || item.name || '',
+    )
+    .join(', ');
+
+const FOLDER_KEYS: Record<string, string> = {
+  '\\inbox': 'inbox',
+  '\\drafts': 'drafts',
+  '\\junk': 'junk',
+  '\\sent': 'sent',
+  '\\trash': 'trash',
+};
+
+/** The word for a standard folder; other folders keep the name they have in the mailbox. */
+export const folderKey = (specialUse: string | null) =>
+  FOLDER_KEYS[(specialUse ?? '').toLowerCase()] ?? null;
+
 export const addressList = (items: IEmailAddress[] = []) =>
   items
     .map((item) => item.address ?? '')
