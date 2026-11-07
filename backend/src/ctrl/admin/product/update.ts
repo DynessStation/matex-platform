@@ -1,6 +1,7 @@
 // Product update and status change.
 import express = require('express');
 import { Response } from 'express';
+import { RowDataPacket } from 'mysql2';
 
 import db = require('../../../db');
 import keyhsid from '../../../hsid';
@@ -40,6 +41,25 @@ router.patch(
     const status = String(req.body?.status ?? '');
     if (!id || !PRODUCT_STATUSES.has(status)) {
       return sendError(res, 400, 'PRODUCT_STATUS_INVALID', 'Invalid product status');
+    }
+    // A draft may still have no price; it cannot go public without one if it displays its price.
+    if (status === 'published') {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        `SELECT p.product_price_visibility AS visibility,
+                COUNT(DISTINCT CASE
+                  WHEN price.product_price_type = 'end_user' AND price.product_price_is_public = 1
+                   AND price.product_price_is_active = 1
+                  THEN price.product_price_currency END) AS currencies
+         FROM product_catalog p
+         LEFT JOIN product_catalog_price price
+           ON price.id_product = p.id_product AND price.id_master_comp = p.id_master_comp
+         WHERE p.id_product = ? AND p.id_master_comp = ? AND p.product_deleted_at IS NULL
+         GROUP BY p.id_product, p.product_price_visibility`,
+        [id, scope.idMasterComp],
+      );
+      if (rows[0]?.visibility === 'displayed' && Number(rows[0].currencies) < 2) {
+        return sendError(res, 400, 'PRODUCT_PRICE_REQUIRED', 'Public prices are required');
+      }
     }
 
     const found = await changeProduct(id, scope.idMasterComp, async (connection, product) => {

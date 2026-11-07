@@ -152,7 +152,7 @@ Harga publik, harga internal, dan tautan pembelian di marketplace.
 
 Tampilkan harga (harga konsumen tampil di website), Hubungi kami (pengunjung diarahkan menghubungi MATEX), atau Sembunyikan.
 
-Bila memilih Tampilkan harga, harga konsumen aktif dan publik wajib ada untuk Rupiah (IDR) dan Dollar (USD).
+Draf boleh belum berharga. Saat produk terbit dengan Tampilkan harga, harga konsumen aktif dan publik wajib ada untuk Rupiah (IDR) dan Dollar (USD).
 
 ### Untuk siapa?
 

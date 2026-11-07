@@ -113,7 +113,6 @@ export class ProductFormService {
   enDescriptionEditor?: Editor;
   categoryIds: string[] = [];
   categoryError = false;
-  pricePublicationError = false;
   readonly saving = signal(false);
   /** The price follows the HPP calculation, so its rows are read-only. */
   readonly priceLocked = signal(false);
@@ -277,7 +276,11 @@ export class ProductFormService {
       this.specRows(locale)() as unknown as ProductSpecificationRow[],
     );
   }
-  /** Website prices need both currencies. */
+  /** Shown after a save was tried, and gone as soon as the price or the status is settled. */
+  get pricePublicationError(): boolean {
+    return this.tried() && this.missingPublicPrice;
+  }
+  /** A published product that displays its price needs both currencies; a draft can wait. */
   private get missingPublicPrice(): boolean {
     const shown = (rows: InlineRow[]) =>
       rows.some(
@@ -287,6 +290,7 @@ export class ProductFormService {
           row['shown'] === 'shown',
       );
     return (
+      this.form.controls.status.value === 'published' &&
       this.form.controls.price_visibility.value === 'displayed' &&
       !(shown(this.idrRows()) && shown(this.usdRows()))
     );
@@ -366,7 +370,6 @@ export class ProductFormService {
     this.tried.set(true);
     this.form.markAllAsTouched();
     this.categoryError = this.categoryIds.length === 0;
-    this.pricePublicationError = this.missingPublicPrice;
     if (this.openRows.size) {
       const table = [...this.openRows][0];
       this.activeTab = table.startsWith('spec') ? 'content' : 'channels';

@@ -96,9 +96,10 @@ const readMedia = (value: unknown) => {
   return media as { id: number; role: string; sortOrder: number }[];
 };
 
-// Public end-user prices: one per currency; a "displayed" price needs an active one in both
-// currencies. Only end-user prices can be public.
-const readPrices = (value: unknown, priceVisibility: string) => {
+// Public end-user prices: one per currency. A published product that displays its price needs
+// an active one in both currencies; a draft may have none yet, since its HPP and price come after
+// the first save. Only end-user prices can be public.
+const readPrices = (value: unknown, mustShowPrice: boolean) => {
   const prices = (Array.isArray(value) ? value : []).map((item: RequestBody, index: number) => ({
     type: trimTo(item?.type, 40),
     label: trimTo(item?.label, 120) || null,
@@ -131,8 +132,7 @@ const readPrices = (value: unknown, priceVisibility: string) => {
   );
   if (
     new Set(publicCurrencies).size !== publicCurrencies.length ||
-    (priceVisibility === 'displayed' &&
-      !['IDR', 'USD'].every((currency) => activeCurrencies.has(currency)))
+    (mustShowPrice && !['IDR', 'USD'].every((currency) => activeCurrencies.has(currency)))
   ) {
     return null;
   }
@@ -212,7 +212,10 @@ export const parsePayload = (body: RequestBody) => {
   if (!categoryIds.length) return null;
   const media = readMedia(body?.media);
   if (!media) return null;
-  const prices = readPrices(body?.prices, priceVisibility);
+  const prices = readPrices(
+    body?.prices,
+    status === 'published' && priceVisibility === 'displayed',
+  );
   if (!prices) return null;
   const marketplaces = readMarketplaces(body?.marketplaces);
   if (!marketplaces) return null;

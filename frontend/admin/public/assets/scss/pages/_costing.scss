@@ -499,6 +499,11 @@ body.dark-only {
   background: #fff8ed;
   padding: 14px;
 
+  strong,
+  p {
+    display: block;
+  }
+
   p {
     font-size: var(--admin-text);
     margin: 4px 0 10px;

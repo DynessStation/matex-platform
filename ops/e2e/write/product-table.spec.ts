@@ -118,7 +118,9 @@ test('a saved product shows its prices split by currency and keeps them on save'
   expect(errors).toEqual([]);
 });
 
-test('showing prices needs both currencies, and the tab says so', async ({ page }) => {
+test('publishing with prices shown needs both currencies, and the tab says so', async ({
+  page,
+}) => {
   await login(page);
   await page.goto(`${stack.adminOrigin}/product/create`);
   await expect(tabDot(page, 'Umum')).toHaveAttribute('data-state', 'warn');
@@ -133,9 +135,19 @@ test('showing prices needs both currencies, and the tab says so', async ({ page 
     })
     .click();
   await page.locator('#product_btn').click();
-  // The category is asked for first; the price rule still marks its tab.
-  await expect(tabDot(page, 'Harga')).toHaveAttribute('data-state', 'error');
+  // The category is asked for first. A draft may wait for its price, so that tab only warns.
   await expect(tabDot(page, 'Umum')).toHaveAttribute('data-state', 'error');
+  await expect(tabDot(page, 'Harga')).toHaveAttribute('data-state', 'warn');
+  await expect(page.getByTestId('price-publication-error')).toHaveCount(0);
+
+  await openTab(page, 'Umum');
+  await page.locator('.tab-pane.active [formcontrolname=status] .select2-selection').click();
+  await page
+    .locator('.tab-pane.active [formcontrolname=status] .select2-results__option', {
+      hasText: 'Dipublikasikan',
+    })
+    .click();
+  await expect(tabDot(page, 'Harga')).toHaveAttribute('data-state', 'error');
   await expect(page.getByTestId('form-submit-note')).toBeVisible();
   if (screenshots) {
     await openTab(page, 'Harga & Kanal');

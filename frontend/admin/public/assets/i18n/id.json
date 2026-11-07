@@ -1628,6 +1628,7 @@
     "PRODUCT_KEY_EXISTS": "Kunci produk sudah digunakan. Gunakan kunci lain",
     "PRODUCT_SKU_EXISTS": "SKU produk sudah digunakan. Gunakan SKU lain",
     "PRODUCT_SLUG_EXISTS": "Alamat produk untuk bahasa tersebut sudah digunakan",
+    "PRODUCT_PRICE_REQUIRED": "Produk belum bisa terbit: harga konsumen Rupiah dan Dollar wajib diisi serta diaktifkan",
     "PRODUCT_PAYLOAD_INVALID": "Data produk belum lengkap atau tidak valid. Periksa field yang ditandai",
     "CONTENT_ASSISTANT_PAYLOAD_INVALID": "Permintaan isi otomatis tidak sesuai dengan jenis field",
     "CONTENT_ASSISTANT_FIELD_PROTECTED": "Judul, nama, label, pertanyaan, slug, dan kunci harus ditentukan sendiri",

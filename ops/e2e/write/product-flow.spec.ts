@@ -72,6 +72,16 @@ test('a new product with one language goes on to its HPP after the first save', 
 
   await openTab(page, 'Harga & Kanal');
   await expect(page.locator('[data-testid=cost-panel-unsaved]')).toBeVisible();
+  await expect(page.locator('[data-testid=cost-panel-unsaved] strong')).toHaveCSS(
+    'display',
+    'block',
+  );
+  await expect(page.locator('[data-testid=cost-panel-unsaved] p')).toHaveCSS('display', 'block');
+  // Displaying the price must not stop a draft: its price comes after the first save.
+  const visibility = page.locator('app-form-product select2[formcontrolname=price_visibility]');
+  await visibility.locator('.select2-selection').click();
+  await visibility.locator('.select2-results__option', { hasText: 'Tampilkan harga' }).click();
+  await expect(visibility.locator('.select2-selection__rendered')).toContainText('Tampilkan harga');
 
   await openTab(page, 'Konten & Bahasa');
   // The page can still be settling right after the tab switch: type again if it was lost.
@@ -89,6 +99,56 @@ test('a new product with one language goes on to its HPP after the first save', 
   productUrl = page.url();
   await expect(page.locator('app-form-product .nav-link.active')).toContainText('Harga & Kanal');
   await expect(page.locator('[data-testid=cost-panel-start]')).toBeVisible();
+});
+
+test('a draft may wait for its price, publishing it may not', async () => {
+  const slug = `tanpa-harga-${runId}`;
+  const data = {
+    key: slug,
+    sku: `HARGA-${runId}`.toUpperCase(),
+    status: 'draft',
+    price_visibility: 'displayed',
+    category_ids: [categoryId],
+    translations: [
+      { locale: 'id-ID', slug: `${slug}-id`, name: 'Tanpa Harga ID', short_description: 'Singkat' },
+      { locale: 'en-US', slug: `${slug}-en`, name: 'Tanpa Harga EN', short_description: 'Short' },
+    ],
+  };
+  const made = await expectCode(await owner.post('/api/v1/products', { data }), 201);
+  await expectCode(
+    await owner.patch(`/api/v1/products/${made.data.id}/status`, { data: { status: 'published' } }),
+    400,
+    'PRODUCT_PRICE_REQUIRED',
+  );
+  await expectCode(
+    await owner.post('/api/v1/products', {
+      data: {
+        ...data,
+        key: `${slug}-2`,
+        sku: `HARGA2-${runId}`.toUpperCase(),
+        status: 'published',
+        translations: data.translations.map((t) => ({ ...t, slug: `${t.slug}-2` })),
+      },
+    }),
+    400,
+    'PRODUCT_PAYLOAD_INVALID',
+  );
+  await expectCode(
+    await owner.put(`/api/v1/products/${made.data.id}`, {
+      data: {
+        ...data,
+        prices: [
+          { type: 'end_user', currency: 'IDR', amount: 150000, is_public: true },
+          { type: 'end_user', currency: 'USD', amount: 10, is_public: true },
+        ],
+      },
+    }),
+    200,
+  );
+  await expectCode(
+    await owner.patch(`/api/v1/products/${made.data.id}/status`, { data: { status: 'published' } }),
+    200,
+  );
 });
 
 test('recipe, margin, and price live in the product form', async ({ page }) => {
