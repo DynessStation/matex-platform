@@ -54,11 +54,11 @@
                 }}</label>
                 <input
                   class="form-control"
-                  type="number"
-                  min="0"
+                  appLocalizedNumber
+                  inputmode="numeric"
                   data-testid="social-followers"
-                  [value]="row['followers']"
-                  (input)="set('followers', $any($event.target).value)"
+                  [ngModel]="row['followers']"
+                  (ngModelChange)="set('followers', $event)"
                 />
               </div>
               <div class="col-md-3 col-6">
@@ -67,11 +67,11 @@
                 }}</label>
                 <input
                   class="form-control"
-                  type="number"
-                  min="0"
+                  appLocalizedNumber
+                  inputmode="numeric"
                   data-testid="social-content"
-                  [value]="row['content_count']"
-                  (input)="set('content_count', $any($event.target).value)"
+                  [ngModel]="row['content_count']"
+                  (ngModelChange)="set('content_count', $event)"
                 />
               </div>
               <div class="col-md-6 form-kit-note align-self-end">

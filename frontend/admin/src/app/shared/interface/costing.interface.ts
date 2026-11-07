@@ -1,5 +1,25 @@
 // HPP, prices, channels, and the calculator (backend ctrl/admin/costing). Rates are fractions.
 
+export type CostPriceStatus =
+  'no_product' | 'no_hpp' | 'manual' | 'follow' | 'review';
+
+export const PRICE_STATUS_LABELS: Record<CostPriceStatus, string> = {
+  no_product: 'Belum ada produk',
+  no_hpp: 'Belum ada HPP',
+  manual: 'Harga manual',
+  follow: 'Ikut hitungan',
+  review: 'Perlu ditinjau',
+};
+
+export const COST_KIND_LABELS: Record<string, string> = {
+  material: 'Bahan',
+  service: 'Tenaga kerja & jasa',
+  overhead: 'Overhead',
+  packaging: 'Kemasan',
+  shipping: 'Ongkir',
+  other: 'Lainnya',
+};
+
 export interface ICostRates {
   gpm: number;
   affiliate: number;
@@ -36,6 +56,9 @@ export interface ICostItem {
     affiliate: number | null;
     app: number | null;
   };
+  price_mode: 'follow' | 'manual';
+  status: CostPriceStatus;
+  breakdown: { kind: string; total: number }[];
   version: number;
   hpp: number;
   net: number;

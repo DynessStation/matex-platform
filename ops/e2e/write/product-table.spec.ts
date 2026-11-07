@@ -96,7 +96,8 @@ test('a saved product shows its prices split by currency and keeps them on save'
   const amount = idr.locator('.inline-table-editing [data-column="amount"] input');
   await amount.fill('seratus');
   await idr.locator('.inline-table-editing').getByTestId('inline-save').click();
-  await expect(idr.locator('.inline-table-editing .form-kit-error')).toContainText('Isi angka');
+  await expect(amount).toHaveValue('');
+  await expect(idr.locator('.inline-table-editing .form-kit-error')).toContainText('Wajib diisi');
   await amount.fill('175000');
   await idr.locator('.inline-table-editing').getByTestId('inline-save').click();
   await expect(

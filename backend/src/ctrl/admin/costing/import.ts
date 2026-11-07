@@ -91,7 +91,7 @@ const saveItem = async (
         cost_item_gpm, cost_item_affiliate, cost_item_app, cost_item_sort_order, id_created_by, id_updated_by)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE id_cost_item = LAST_INSERT_ID(id_cost_item),
-       id_product = VALUES(id_product), cost_item_name = VALUES(cost_item_name),
+       id_product = COALESCE(VALUES(id_product), id_product), cost_item_name = VALUES(cost_item_name),
        cost_item_group = VALUES(cost_item_group), cost_item_width_cm = VALUES(cost_item_width_cm),
        cost_item_length_cm = VALUES(cost_item_length_cm), cost_item_height_cm = VALUES(cost_item_height_cm),
        cost_item_gpm = VALUES(cost_item_gpm), cost_item_affiliate = VALUES(cost_item_affiliate),

@@ -271,6 +271,45 @@ router.put(
   },
 );
 
+/** The rates and price mode alone, from the product form. */
+router.put(
+  '/api/v1/costing/items/:id/pricing',
+  verifyToken,
+  requirePermission('cost.manage'),
+  onFailure('COSTING_ITEM_SAVE_FAILED', 'Unable to save the HPP item'),
+  async (req: AuthRequest, res: Response) => {
+    const scope = await scopeOf(req, res);
+    if (!scope) return;
+    const id = decodeId(req.params.id, keyhsid.idCostItem);
+    if (!id) return sendError(res, 404, 'COSTING_ITEM_NOT_FOUND', 'HPP item not found');
+    const rates = [req.body?.gpm, req.body?.affiliate, req.body?.app].map(rateOrNull);
+    const mode = String(req.body?.price_mode ?? 'follow');
+    if (rates.includes(undefined) || !['follow', 'manual'].includes(mode)) {
+      return sendError(res, 400, 'COSTING_ITEM_INVALID', 'Check the rates');
+    }
+    const found = await withTransaction(pool, async (connection) => {
+      const [result] = await connection.query(
+        `UPDATE cost_item SET cost_item_gpm = ?, cost_item_affiliate = ?, cost_item_app = ?,
+           cost_item_price_mode = ?, id_updated_by = ?
+         WHERE id_cost_item = ? AND id_master_comp = ? AND cost_item_deleted_at IS NULL`,
+        [...rates, mode, scope.idAdminAcct, id, scope.idMasterComp],
+      );
+      if (!(result as { affectedRows: number }).affectedRows) return false;
+      await auditCosting(req, connection, scope, {
+        eventCode: 'costing.item_pricing_updated',
+        action: 'update',
+        entityType: 'cost_item',
+        entityId: id,
+        entityLabel: String(id),
+        after: { rates, mode },
+      });
+      return true;
+    });
+    if (!found) return sendError(res, 404, 'COSTING_ITEM_NOT_FOUND', 'HPP item not found');
+    return sendSuccess(res, 200, 'COSTING_ITEM_UPDATED', 'HPP item saved');
+  },
+);
+
 //==================================================
 //==== RECIPE
 //==================================================
@@ -600,6 +639,10 @@ router.post(
             );
           }
         }
+        await connection.query(
+          "UPDATE cost_item SET cost_item_price_mode = 'follow' WHERE id_cost_item = ?",
+          [item.id],
+        );
         await auditCosting(req, connection, scope, {
           eventCode: 'costing.price_applied',
           action: 'update',

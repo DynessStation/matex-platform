@@ -56,7 +56,8 @@ export class CostingMaterials implements OnInit {
       width: '130px',
       options: [
         { value: 'material', label: 'Bahan' },
-        { value: 'service', label: 'Jasa' },
+        { value: 'service', label: 'Tenaga kerja & jasa' },
+        { value: 'overhead', label: 'Overhead' },
         { value: 'packaging', label: 'Kemasan' },
         { value: 'shipping', label: 'Ongkir' },
         { value: 'other', label: 'Lainnya' },
@@ -72,18 +73,20 @@ export class CostingMaterials implements OnInit {
     {
       key: 'price',
       label: 'Harga',
+      type: 'number',
+      decimals: 2,
       width: '130px',
       compute: (row) => rupiah(Number(row['price'])),
       validate: (value) =>
-        String(value ?? '').trim() !== '' && Number(value) >= 0
-          ? null
-          : 'Isi angka.',
+        value === null || value === '' || value === undefined
+          ? 'form_kit.required'
+          : null,
     },
     {
       key: 'from',
       label: 'Berlaku dari',
-      width: '130px',
-      placeholder: 'YYYY-MM-DD',
+      type: 'date',
+      width: '150px',
       validate: (value) =>
         /^\d{4}-\d{2}-\d{2}$/.test(String(value ?? '')) ? null : 'YYYY-MM-DD',
     },

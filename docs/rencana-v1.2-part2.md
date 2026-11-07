@@ -13,6 +13,28 @@ Status: **disetujui pemilik 6 November 2026.** Tahap 0 dan keamanan API publik d
 - **Tarif per kanal:** input manual dulu.
 - **API marketplace:** diminta dikaji, lihat Tahap 5.
 
+## Alur satu pintu (7 November, lokal, belum live)
+
+Masukan pemilik setelah 1.2.11B: harga punya terlalu banyak pintu, dan orang yang input produk dari nol bingung mulai dari mana. Bisnis MIA juga masih mencari bentuk, jadi platform harus nyaman dicoba oleh produksi dan marketing, dan tidak terpaku pada Excel.
+
+| Langkah | Tempat | Isi |
+| --- | --- | --- |
+| 1. Produk | Form produk, Umum dan Konten | SKU, kategori, nama. Draf cukup satu bahasa, bahasa lain disalin dulu |
+| 2. Modal | Form produk, Harga & Kanal | Resep: bahan, tenaga kerja, overhead, kemasan. HPP tampil per jenis biaya |
+| 3. Margin dan harga | Tab yang sama | Target margin, komisi affiliate, biaya platform dan promosi. Harga ikut hitungan atau diatur manual |
+| 4. Kanal | Tab yang sama | Link marketplace, serta laba dan harga minimum tiap kanal |
+| 5. Publikasi | Status produk | Terbit kalau sudah siap |
+
+Simpan pertama membawa pengguna ke langkah 2. Menu **HPP & Harga** menjadi daftar semua produk, penerapan harga massal, serta pengaturan bahan, tarif, dan impor. Tombol Tambah item dihapus: item tanpa produk bisa dijadikan produk draf.
+
+**Status harga tiap produk:** Belum ada produk, Belum ada HPP, Ikut hitungan, Harga manual, Perlu ditinjau. Harga website tidak pernah berubah sendiri: kalau bahan atau tarif berubah, statusnya menjadi Perlu ditinjau.
+
+**Rumusnya tidak mengunci pada Excel.** HPP memakai pembagian yang lazim (bahan langsung, tenaga kerja, overhead, kemasan). Harga jual dihitung dari target margin dan potongan, dan harga minimum tiap kanal dihitung dari biaya kanal itu sendiri. Istilah dan persentasenya bisa diubah setelah dicoba tim. Excel tetap bisa diimpor, tetapi bukan keharusan.
+
+**Isian angka di seluruh admin:** harga, ukuran, stok, tarif, dan jumlah hanya menerima angka dan tampil berkelompok saat diketik (1000000 menjadi 1.000.000), termasuk tempel teks seperti "Rp 1.000.000". Telepon hanya menerima angka dan + di depan. Tanggal memakai pemilih tanggal, dan mata uang kanal memakai pilihan IDR atau USD.
+
+Rancangan toko lain seperti SATRIAJAYA dan marketplace V2 ada di `rancangan-platform-multi-penjual.md`.
+
 ## Keputusan utama: tidak perlu rombak total
 
 Fondasi katalog sudah benar, jadi yang ditambah adalah lapisan di sampingnya. Tabel dan halaman publik tidak dibongkar.

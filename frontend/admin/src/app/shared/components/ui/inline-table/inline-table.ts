@@ -22,6 +22,7 @@ import {
   InlineOption,
   InlineRow,
 } from './inline-table.model';
+import { LocalizedNumberInputDirective } from '../../../directives/localized-number-input.directive';
 import { TextFitDirective } from '../../../directives/text-fit.directive';
 
 // Compact table edited in its own rows (G-4): the pencil opens one row, the number cell becomes
@@ -35,6 +36,7 @@ import { TextFitDirective } from '../../../directives/text-fit.directive';
     NgbDropdownModule,
     TranslateModule,
     TextFitDirective,
+    LocalizedNumberInputDirective,
   ],
   templateUrl: './inline-table.html',
 })
@@ -215,7 +217,13 @@ export class InlineTable {
 
   text(row: InlineRow, column: InlineColumn): string {
     if (column.compute) return column.compute(row);
-    return String(row[column.key] ?? '');
+    const value = row[column.key];
+    if (column.type === 'number' && value !== '' && value != null) {
+      return new Intl.NumberFormat('id-ID', {
+        maximumFractionDigits: column.decimals ?? 0,
+      }).format(Number(value));
+    }
+    return String(value ?? '');
   }
 
   value(row: InlineRow, column: InlineColumn): string {

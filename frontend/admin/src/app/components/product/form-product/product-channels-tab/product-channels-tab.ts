@@ -1,6 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  ControlContainer,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { Select2Module } from 'ng-select2-component';
@@ -11,6 +15,9 @@ import {
   InlineChange,
   InlineRow,
 } from '../../../../shared/components/ui/inline-table/inline-table.model';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { LocalizedNumberInputDirective } from '../../../../shared/directives/localized-number-input.directive';
+import { CostPanel } from '../../../costing/cost-panel/cost-panel';
 import {
   marketplaceColumns,
   oneMainChannel,
@@ -31,6 +38,10 @@ import { ProductFormService } from '../product-form.service';
     ReactiveFormsModule,
     Select2Module,
     TranslateModule,
+    FormsModule,
+    HasPermissionDirective,
+    LocalizedNumberInputDirective,
+    CostPanel,
   ],
 
   templateUrl: './product-channels-tab.html',

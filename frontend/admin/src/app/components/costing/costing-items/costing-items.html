@@ -34,10 +34,11 @@
       *hasPermission="'cost.manage'"
       type="button"
       class="btn btn-outline-primary"
-      data-testid="costing-add"
-      (click)="open(null)"
+      data-testid="costing-create-products"
+      [disabled]="!withoutProduct().length"
+      (click)="askCategory()"
     >
-      <i class="ri-add-line"></i> Tambah item
+      Buat produk draf ({{ withoutProduct().length }})
     </button>
     <button
       *hasPermission="'price.apply'"
@@ -82,11 +83,52 @@
   </div>
 }
 
+@if (creating()) {
+  <div class="costing-confirm" data-testid="costing-create-confirm">
+    <strong
+      >Buat {{ withoutProduct().length }} produk draf dari item ini.</strong
+    >
+    <p>
+      Pilih kategorinya. SKU dibuat otomatis dan bisa diubah. Produk baru belum
+      tampil di website sampai dilengkapi dan diterbitkan.
+    </p>
+    <div class="costing-confirm-actions">
+      <select
+        class="form-select costing-group"
+        data-testid="costing-create-category"
+        [(ngModel)]="categoryId"
+      >
+        <option value="">Pilih kategori</option>
+        @for (category of categoryOptions(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+      <button
+        type="button"
+        class="btn btn-theme"
+        data-testid="costing-create-yes"
+        [disabled]="applying() || !categoryId"
+        (click)="createProducts()"
+      >
+        Ya, buat
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="creating.set(false)"
+      >
+        Batal
+      </button>
+    </div>
+  </div>
+}
+
 @if (loading()) {
   <p class="costing-empty">Memuat...</p>
 } @else if (!items().length) {
   <div class="costing-empty" data-testid="costing-empty">
-    Belum ada data HPP. Isi lewat tab Impor Excel atau tombol Tambah item.
+    Belum ada data HPP. Mulai dari form produk, tab Harga & Kanal, atau lewat
+    tab Impor Excel.
   </div>
 } @else {
   <div class="costing-table-wrap">
@@ -112,21 +154,20 @@
           <th class="text-end">E-commerce</th>
           <th class="text-end">Harga website</th>
           <th class="text-end">Beda</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         @for (item of shown(); track item.id) {
           <tr data-testid="costing-row" [attr.data-sku]="item.sku">
             <td class="costing-tick">
-              @if (canApply(item)) {
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  [attr.aria-label]="'Pilih ' + item.name"
-                  [checked]="selected().has(item.id)"
-                  (change)="toggle(item)"
-                />
-              }
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [attr.aria-label]="'Pilih ' + item.name"
+                [checked]="selected().has(item.id)"
+                (change)="toggle(item)"
+              />
             </td>
             <td class="text-start">
               <button
@@ -156,10 +197,17 @@
             <td class="text-end" [class.costing-diff]="isDifferent(item)">
               {{ isDifferent(item) ? percent(difference(item)) : '-' }}
             </td>
+            <td>
+              <span
+                [class]="'cost-status cost-status-' + item.status"
+                data-testid="costing-status"
+                >{{ statusLabels[item.status] }}</span
+              >
+            </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="11" class="costing-empty">Tidak ada yang cocok.</td>
+            <td colspan="12" class="costing-empty">Tidak ada yang cocok.</td>
           </tr>
         }
       </tbody>

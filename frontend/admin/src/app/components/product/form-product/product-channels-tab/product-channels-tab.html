@@ -2,10 +2,18 @@
   <div class="category-heading">
     <h5>Harga dan kanal penjualan</h5>
     <p>
-      Harga publik dapat ditampilkan atau disembunyikan. Marketplace tetap
-      berupa tautan resmi; commerce internal disiapkan tetapi belum diaktifkan.
+      Isi modalnya, tentukan marginnya, lalu harga dan laba tiap kanal terlihat
+      di sini.
     </p>
   </div>
+  <div *hasPermission="'cost.view'" class="mb-4">
+    <app-cost-panel
+      [productId]="editor.id"
+      (locked)="editor.priceLocked.set($event)"
+      (pricesApplied)="editor.reloadPrices()"
+    />
+  </div>
+  <h6>Harga di website</h6>
   <div class="row g-4 mb-4">
     <div class="col-md-6">
       <label class="form-label"
@@ -48,10 +56,17 @@
     </div>
   }
 
+  @if (editor.priceLocked()) {
+    <p class="costing-help" data-testid="prices-locked">
+      Harga ini mengikuti hitungan di atas. Pilih Atur harga manual kalau ingin
+      mengetik sendiri.
+    </p>
+  }
   <div class="mb-3" data-testid="prices-idr">
     <strong class="product-table-title">Rupiah (IDR / Rp)</strong>
     <app-inline-table
       [columns]="idrColumns"
+      [readonly]="editor.priceLocked()"
       [blank]="priceBlank"
       [orderable]="true"
       [showDetail]="wholesaleOnly"
@@ -79,6 +94,7 @@
     <strong class="product-table-title">Dollar (USD / $)</strong>
     <app-inline-table
       [columns]="usdColumns"
+      [readonly]="editor.priceLocked()"
       [blank]="priceBlank"
       [orderable]="true"
       [showDetail]="wholesaleOnly"
@@ -111,20 +127,24 @@
             section="tab-harga-kanal--minimum-dan-maksimum-pembelian"
         /></label>
         <input
+          appLocalizedNumber
           class="form-control"
           inputmode="numeric"
-          [value]="row['min_qty'] ?? ''"
-          (input)="set('min_qty', $any($event.target).value)"
+          [ngModel]="row['min_qty']"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="set('min_qty', $event)"
         />
       </div>
       <div class="col-md-3 col-6">
         <label class="form-label">Maksimum pembelian</label>
         <input
+          appLocalizedNumber
           class="form-control"
           inputmode="numeric"
           placeholder="Opsional"
-          [value]="row['max_qty'] ?? ''"
-          (input)="set('max_qty', $any($event.target).value)"
+          [ngModel]="row['max_qty']"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="set('max_qty', $event)"
         />
       </div>
     </div>
@@ -163,21 +183,30 @@
           <div class="col-md-4">
             <label class="form-label">Harga marketplace</label>
             <input
+              appLocalizedNumber
+              [decimals]="2"
               class="form-control"
               inputmode="decimal"
               placeholder="Opsional"
-              [value]="row['price'] ?? ''"
-              (input)="set('price', $any($event.target).value)"
+              [ngModel]="row['price']"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="set('price', $event)"
             />
           </div>
           <div class="col-md-3">
             <label class="form-label">Mata uang</label>
-            <input
-              class="form-control text-uppercase"
-              maxlength="3"
-              [value]="row['currency'] ?? ''"
-              (input)="set('currency', $any($event.target).value)"
-            />
+            <select
+              class="form-select"
+              [value]="row['currency'] ?? 'IDR'"
+              (change)="set('currency', $any($event.target).value)"
+            >
+              <option value="IDR" [selected]="row['currency'] !== 'USD'">
+                IDR
+              </option>
+              <option value="USD" [selected]="row['currency'] === 'USD'">
+                USD
+              </option>
+            </select>
           </div>
         </div>
       </ng-template>

@@ -26,7 +26,7 @@ const scopeOf = async (req: AuthRequest, res: Response): Promise<AdminScope | nu
   return null;
 };
 
-const KINDS = new Set(['material', 'service', 'packaging', 'shipping', 'other']);
+const KINDS = new Set(['material', 'service', 'overhead', 'packaging', 'shipping', 'other']);
 const isDate = (value: unknown): value is string =>
   typeof value === 'string' &&
   /^\d{4}-\d{2}-\d{2}$/.test(value) &&

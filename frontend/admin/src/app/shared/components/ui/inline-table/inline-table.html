@@ -87,6 +87,30 @@
                     }
                   </div>
                 </div>
+              } @else if (editing && column.type === 'number') {
+                <input
+                  appLocalizedNumber
+                  class="form-control"
+                  [class.is-invalid]="errors()[column.key]"
+                  [decimals]="column.decimals ?? 0"
+                  [attr.inputmode]="column.decimals ? 'decimal' : 'numeric'"
+                  [ngModel]="row[column.key]"
+                  [ngModelOptions]="{ standalone: true }"
+                  [placeholder]="column.placeholder ?? ''"
+                  (ngModelChange)="setValue(column.key, $event)"
+                  (keydown.enter)="$event.preventDefault(); save()"
+                  (keydown.escape)="cancel()"
+                />
+              } @else if (editing && column.type === 'date') {
+                <input
+                  type="date"
+                  class="form-control"
+                  [class.is-invalid]="errors()[column.key]"
+                  [ngModel]="value(row, column)"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="setValue(column.key, $event)"
+                  (keydown.escape)="cancel()"
+                />
               } @else if (editing && column.type !== 'computed') {
                 <input
                   class="form-control"

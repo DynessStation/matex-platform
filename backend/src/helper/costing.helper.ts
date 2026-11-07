@@ -108,6 +108,7 @@ export interface CostItem {
   height: number | null;
   ownRates: { gpm: number | null; affiliate: number | null; app: number | null };
   rates: { gpm: number; affiliate: number; app: number };
+  priceMode: 'follow' | 'manual';
   version: number;
   lines: CostLine[];
   hpp: number;
@@ -159,7 +160,8 @@ export const loadCostItems = async (
     params.push(only.idProduct);
   }
   const [items] = await executor.query<RowDataPacket[]>(
-    `SELECT i.*, p.product_sku, p.product_status, n.product_name, c.id_product_category,
+    `SELECT i.*, p.product_sku, p.product_status, p.product_width_mm, p.product_length_mm,
+       p.product_height_mm, n.product_name, c.id_product_category,
        (SELECT MAX(r.id_cost_recipe) FROM cost_recipe r WHERE r.id_cost_item = i.id_cost_item) AS id_recipe
      FROM cost_item i
      LEFT JOIN product_catalog p
@@ -214,11 +216,22 @@ export const loadCostItems = async (
   };
 
   return items.map((row) => {
-    const size = {
-      L: orNull(row.cost_item_width_cm),
-      P: orNull(row.cost_item_length_cm),
-      T: orNull(row.cost_item_height_cm),
-    };
+    // A product's own size counts; the item's is for those without a product yet.
+    const fromProduct =
+      row.product_width_mm != null &&
+      row.product_length_mm != null &&
+      row.product_height_mm != null;
+    const size = fromProduct
+      ? {
+          L: Number(row.product_width_mm) / 10,
+          P: Number(row.product_length_mm) / 10,
+          T: Number(row.product_height_mm) / 10,
+        }
+      : {
+          L: orNull(row.cost_item_width_cm),
+          P: orNull(row.cost_item_length_cm),
+          T: orNull(row.cost_item_height_cm),
+        };
     const recipeLines = byRecipe.get(row.id_recipe) ?? [];
     const costLines: CostLine[] = recipeLines.map((line) => {
       const qty = lineQty(Number(line.cost_recipe_line_qty), line.cost_recipe_line_formula, size);
@@ -268,6 +281,7 @@ export const loadCostItems = async (
       height: size.T,
       ownRates,
       rates,
+      priceMode: row.cost_item_price_mode === 'manual' ? 'manual' : 'follow',
       version: recipeLines[0]?.cost_recipe_version ?? 0,
       lines: costLines,
       hpp,
@@ -289,6 +303,26 @@ export const loadCostItems = async (
   });
 };
 
+/** Where an item's price stands, in one word for the lists and the form. */
+export const priceStatus = (item: CostItem) => {
+  if (!item.idProduct) return 'no_product';
+  if (item.hpp <= 0) return 'no_hpp';
+  if (item.priceMode === 'manual') return 'manual';
+  return item.live.idr != null && Math.abs(item.live.idr - item.commerce) <= 1
+    ? 'follow'
+    : 'review';
+};
+
+/** HPP per kind of cost: materials, labor, overhead, packaging. */
+const breakdown = (item: CostItem) => {
+  const totals = new Map<string, number>();
+  for (const line of item.lines) {
+    const kind = line.kind ?? 'other';
+    totals.set(kind, (totals.get(kind) ?? 0) + line.total);
+  }
+  return [...totals.entries()].map(([kind, total]) => ({ kind, total }));
+};
+
 /** The API's view of an item; `withLines` adds the recipe. */
 export const costItemDto = (item: CostItem, withLines = false) => ({
   id: keyhsid.idCostItem.encode(item.id),
@@ -303,6 +337,9 @@ export const costItemDto = (item: CostItem, withLines = false) => ({
   height: item.height,
   rates: item.rates,
   own_rates: item.ownRates,
+  price_mode: item.priceMode,
+  status: priceStatus(item),
+  breakdown: breakdown(item),
   version: item.version,
   hpp: item.hpp,
   net: item.net,

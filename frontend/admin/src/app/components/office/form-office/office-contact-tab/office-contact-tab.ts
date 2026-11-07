@@ -4,6 +4,7 @@ import { ControlContainer, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { HelpTip } from '../../../../shared/components/ui/help/help-tip/help-tip';
+import { PhoneInputDirective } from '../../../../shared/directives/phone-input.directive';
 import { OfficeFormService } from '../office-form.service';
 
 // Contact tab (email, phone, links) of the office form.
@@ -11,7 +12,7 @@ import { OfficeFormService } from '../office-form.service';
 @Component({
   selector: 'app-office-contact-tab',
 
-  imports: [HelpTip, ReactiveFormsModule, TranslateModule],
+  imports: [PhoneInputDirective, HelpTip, ReactiveFormsModule, TranslateModule],
 
   templateUrl: './office-contact-tab.html',
 

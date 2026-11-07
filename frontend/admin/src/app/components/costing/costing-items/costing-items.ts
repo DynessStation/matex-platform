@@ -10,8 +10,10 @@ import {
   costSize,
   ICostItem,
   percent,
+  PRICE_STATUS_LABELS,
   rupiah,
 } from '../../../shared/interface/costing.interface';
+import { CategoryService } from '../../../shared/services/category.service';
 import { CostingService } from '../../../shared/services/costing.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 
@@ -25,12 +27,14 @@ const SAME_PRICE = 1;
 })
 export class CostingItems implements OnInit {
   private costing = inject(CostingService);
+  private categories = inject(CategoryService);
   private modal = inject(NgbModal);
   private notifications = inject(NotificationService);
 
   readonly rupiah = rupiah;
   readonly percent = percent;
   readonly costSize = costSize;
+  readonly statusLabels = PRICE_STATUS_LABELS;
 
   readonly items = signal<ICostItem[]>([]);
   readonly loading = signal(true);
@@ -40,6 +44,10 @@ export class CostingItems implements OnInit {
   readonly selected = signal<Set<string>>(new Set());
   readonly confirming = signal(false);
   readonly applying = signal(false);
+  /** Asking for a category before making draft products. */
+  readonly creating = signal(false);
+  readonly categoryOptions = signal<{ id: string; name: string }[]>([]);
+  categoryId = '';
 
   readonly groups = computed(() => [
     ...new Set(
@@ -67,6 +75,13 @@ export class CostingItems implements OnInit {
   readonly chosen = computed(() =>
     this.items().filter(
       (item) => this.selected().has(item.id) && this.canApply(item),
+    ),
+  );
+
+  /** The ticked items that have no product yet. */
+  readonly withoutProduct = computed(() =>
+    this.items().filter(
+      (item) => this.selected().has(item.id) && !item.product_id,
     ),
   );
 
@@ -114,14 +129,14 @@ export class CostingItems implements OnInit {
   }
 
   get allShownSelected(): boolean {
-    const usable = this.shown().filter((item) => this.canApply(item));
+    const usable = this.shown();
     return (
       usable.length > 0 && usable.every((item) => this.selected().has(item.id))
     );
   }
 
   toggleAll(): void {
-    const usable = this.shown().filter((item) => this.canApply(item));
+    const usable = this.shown();
     const all = this.allShownSelected;
     this.selected.update((set) => {
       const next = new Set(set);
@@ -152,14 +167,54 @@ export class CostingItems implements OnInit {
     });
   }
 
-  open(item: ICostItem | null): void {
+  askCategory(): void {
+    this.creating.set(true);
+    this.confirming.set(false);
+    if (this.categoryOptions().length) return;
+    this.categories.getCategories({ locale: 'id-ID' }).subscribe((model) => {
+      const flat: { id: string; name: string }[] = [];
+      const walk = (list: typeof model.data, depth: number) => {
+        for (const category of list ?? []) {
+          flat.push({
+            id: String(category.id),
+            name: `${'- '.repeat(depth)}${category.name}`,
+          });
+          walk(category.subcategories ?? [], depth + 1);
+        }
+      };
+      walk(model.data, 0);
+      this.categoryOptions.set(flat);
+    });
+  }
+
+  createProducts(): void {
+    if (!this.categoryId) return;
+    this.applying.set(true);
+    this.costing
+      .createProducts(
+        this.withoutProduct().map((item) => item.id),
+        this.categoryId,
+      )
+      .subscribe({
+        next: (response) => {
+          this.applying.set(false);
+          this.creating.set(false);
+          this.selected.set(new Set());
+          this.notifications.showSuccess(
+            `${response.data?.created ?? 0} produk draf dibuat. Lengkapi isinya di menu Produk.`,
+          );
+          this.load();
+        },
+        error: () => this.applying.set(false),
+      });
+  }
+
+  open(item: ICostItem): void {
     const reference = this.modal.open(CostingItemModal, {
       size: 'xl',
       scrollable: true,
     });
-    (reference.componentInstance as CostingItemModal).itemId.set(
-      item?.id ?? null,
-    );
+    (reference.componentInstance as CostingItemModal).itemId.set(item.id);
     reference.closed.subscribe(() => this.load());
   }
 }

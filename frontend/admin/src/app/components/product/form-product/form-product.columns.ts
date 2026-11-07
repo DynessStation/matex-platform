@@ -14,7 +14,7 @@ import {
 const required = (value: unknown) =>
   String(value ?? '').trim() ? null : 'form_kit.required';
 
-const AMOUNT = /^\d+(\.\d{1,2})?$/;
+const AMOUNT = /^\d+(\.\d+)?$/;
 
 const amountError = (value: unknown) => {
   const clean = String(value ?? '').trim();
@@ -71,13 +71,17 @@ export const priceColumns = (currency: 'IDR' | 'USD'): InlineColumn[] => [
   {
     key: 'amount',
     label: 'product_form.price_amount',
+    type: 'number',
+    decimals: 2,
     validate: amountError,
-    placeholder: currency === 'USD' ? '12.50' : '150000',
+    placeholder: currency === 'USD' ? '12,50' : '150.000',
     compute: (row) => money(row['amount'], currency),
   },
   {
     key: 'compare_at',
     label: 'product_form.price_compare',
+    type: 'number',
+    decimals: 2,
     validate: optionalAmountError,
     compute: (row) => money(row['compare_at'], currency),
   },

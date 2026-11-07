@@ -1,0 +1,265 @@
+<section class="cost-panel" data-testid="cost-panel">
+  @if (!productId() && !itemId()) {
+    <div class="cost-panel-empty" data-testid="cost-panel-unsaved">
+      <strong>HPP dan margin diisi setelah produk tersimpan.</strong>
+      <p>
+        Simpan dulu sebagai draf. Setelah itu halaman ini kembali ke tab yang
+        sama, dan resepnya bisa langsung diisi.
+      </p>
+    </div>
+  } @else if (loading()) {
+    <p class="costing-muted">Memuat...</p>
+  } @else if (!item()) {
+    <div class="cost-panel-empty" data-testid="cost-panel-start">
+      <strong>Produk ini belum punya HPP.</strong>
+      <p>
+        Isi resepnya supaya modal, margin, dan laba per kanal bisa dihitung.
+      </p>
+      <button
+        *hasPermission="'cost.manage'"
+        type="button"
+        class="btn btn-theme"
+        data-testid="cost-start"
+        [disabled]="saving()"
+        (click)="start()"
+      >
+        Mulai isi HPP
+      </button>
+    </div>
+  } @else {
+    @let current = item()!;
+    <div class="cost-panel-head">
+      <h6>1. Modal (HPP)</h6>
+      <span
+        class="cost-status"
+        [class]="'cost-status cost-status-' + current.status"
+        data-testid="cost-status"
+        >{{ statusLabels[current.status] }}</span
+      >
+    </div>
+    <p class="costing-help">
+      Pilih bahan dari daftar, lalu isi jumlahnya. Kolom Rumus ukuran boleh
+      dipakai supaya jumlah mengikuti ukuran produk.
+      <a
+        class="costing-text-link"
+        routerLink="/costing"
+        [queryParams]="{ tab: 'materials' }"
+        >Kelola bahan</a
+      >
+    </p>
+    <div data-testid="recipe">
+      <app-inline-table
+        [columns]="columns()"
+        [blank]="blank"
+        [orderable]="true"
+        [(rows)]="lines"
+        (saveRow)="keepLine($event)"
+        (removeRow)="keepLine($event)"
+        (reordered)="recipeChanged.set(true)"
+        (editingChange)="rowOpen.set($event)"
+      />
+    </div>
+    <div class="costing-recipe-foot">
+      <div class="cost-breakdown" data-testid="cost-breakdown">
+        @for (part of current.breakdown; track part.kind) {
+          <span
+            >{{ kindLabels[part.kind] ?? part.kind }}:
+            {{ rupiah(part.total) }}</span
+          >
+        }
+        <strong data-testid="recipe-total">HPP {{ rupiah(total()) }}</strong>
+      </div>
+      <button
+        *hasPermission="'cost.manage'"
+        type="button"
+        class="btn btn-theme"
+        data-testid="recipe-save"
+        [disabled]="saving() || rowOpen() || !recipeChanged()"
+        (click)="saveRecipe()"
+      >
+        Simpan resep
+      </button>
+    </div>
+
+    <h6>2. Margin dan harga</h6>
+    <p class="costing-help">
+      Kosongkan untuk memakai tarif umum dari
+      <a
+        class="costing-text-link"
+        routerLink="/costing"
+        [queryParams]="{ tab: 'channels' }"
+        >Tarif & Kanal</a
+      >.
+    </p>
+    <div class="row g-3">
+      <div class="col-md-3 col-6">
+        <label class="form-label">Target margin (%)</label>
+        <input
+          appLocalizedNumber
+          [decimals]="2"
+          class="form-control"
+          inputmode="decimal"
+          data-testid="cost-gpm"
+          [placeholder]="percent(current.rates.gpm)"
+          [(ngModel)]="rates.gpm"
+        />
+      </div>
+      <div class="col-md-3 col-6">
+        <label class="form-label">Komisi affiliate (%)</label>
+        <input
+          appLocalizedNumber
+          [decimals]="2"
+          class="form-control"
+          inputmode="decimal"
+          [placeholder]="percent(current.rates.affiliate)"
+          [(ngModel)]="rates.affiliate"
+        />
+      </div>
+      <div class="col-md-3 col-6">
+        <label class="form-label">Biaya platform & promosi (%)</label>
+        <input
+          appLocalizedNumber
+          [decimals]="2"
+          class="form-control"
+          inputmode="decimal"
+          [placeholder]="percent(current.rates.app)"
+          [(ngModel)]="rates.app"
+        />
+      </div>
+      <div
+        *hasPermission="'cost.manage'"
+        class="col-md-3 col-6 cost-panel-action"
+      >
+        <button
+          type="button"
+          class="btn btn-outline-primary w-100"
+          data-testid="cost-rates-save"
+          [disabled]="saving()"
+          (click)="saveRates()"
+        >
+          Simpan tarif
+        </button>
+      </div>
+    </div>
+
+    <div class="costing-ladder cost-panel-ladder" data-testid="costing-ladder">
+      <div>
+        <span>HPP</span><strong>{{ rupiah(current.hpp) }}</strong>
+      </div>
+      <div>
+        <span>Net MIA</span><strong>{{ rupiah(current.net) }}</strong>
+      </div>
+      <div>
+        <span>Affiliate</span>
+        <strong>{{ rupiah(current.affiliate_price) }}</strong>
+      </div>
+      <div class="cost-panel-main">
+        <span>Harga jual hitungan</span>
+        <strong>{{ rupiah(current.commerce) }}</strong>
+      </div>
+      <div>
+        <span>Grosir</span><strong>{{ rupiah(current.wholesale) }}</strong>
+      </div>
+      <div>
+        <span>Harga website sekarang</span>
+        <strong>{{ rupiah(current.live.idr) }}</strong>
+      </div>
+    </div>
+
+    @if (current.product_id) {
+      <div class="cost-panel-mode">
+        <label class="form-check">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="cost-mode"
+            data-testid="cost-mode-follow"
+            [checked]="current.price_mode === 'follow'"
+            [disabled]="saving()"
+            (change)="setMode('follow')"
+          />
+          <span class="form-check-label">Harga ikut hitungan</span>
+        </label>
+        <label class="form-check">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="cost-mode"
+            data-testid="cost-mode-manual"
+            [checked]="current.price_mode === 'manual'"
+            [disabled]="saving()"
+            (change)="setMode('manual')"
+          />
+          <span class="form-check-label">Atur harga manual</span>
+        </label>
+        @if (current.status === 'review') {
+          <button
+            *hasPermission="'price.apply'"
+            type="button"
+            class="btn btn-theme"
+            data-testid="cost-apply"
+            [disabled]="saving() || rowOpen() || recipeChanged()"
+            (click)="apply()"
+          >
+            Pakai harga hitungan
+          </button>
+        }
+      </div>
+      <small class="costing-help d-block">
+        Harga website tidak berubah sendiri. Kalau bahan atau tarif berubah,
+        statusnya jadi Perlu ditinjau sampai harganya diterapkan.
+      </small>
+    }
+
+    <h6>3. Laba per kanal</h6>
+    <p class="costing-help">
+      Untuk satu item. Biaya tiap kanal diisi di Tarif & Kanal. Harga minimum
+      adalah harga terendah yang masih mencapai target margin.
+    </p>
+    <div class="costing-table-wrap" data-testid="cost-channels">
+      <table class="costing-table">
+        <thead>
+          <tr>
+            <th class="text-start">Kanal</th>
+            <th class="text-end">Harga</th>
+            <th class="text-end">Potongan</th>
+            <th class="text-end">Diterima</th>
+            <th class="text-end">Laba</th>
+            <th class="text-end">Margin</th>
+            <th class="text-end">Harga minimum</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (channel of channels(); track channel.id) {
+            <tr>
+              <td class="text-start">
+                {{ channel.name }}
+                @if (!channel.has_rules && channel.name !== 'Website') {
+                  <small class="costing-warn">Biaya belum diisi</small>
+                }
+              </td>
+              <td class="text-end">{{ rupiah(channel.revenue) }}</td>
+              <td class="text-end">
+                {{ rupiah(channel.revenue - channel.received) }}
+              </td>
+              <td class="text-end">{{ rupiah(channel.received) }}</td>
+              <td class="text-end" [class.costing-loss]="channel.profit < 0">
+                {{ rupiah(channel.profit) }}
+              </td>
+              <td class="text-end" [class.costing-loss]="channel.profit < 0">
+                {{ percent(channel.margin) }}
+              </td>
+              <td class="text-end">
+                {{
+                  channel.minimum_price === null
+                    ? '-'
+                    : rupiah(channel.minimum_price)
+                }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

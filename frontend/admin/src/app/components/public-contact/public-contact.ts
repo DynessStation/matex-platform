@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -39,6 +40,7 @@ import {
 } from '../../shared/components/ui/inline-table/inline-table.model';
 import { InsightToggle } from '../../shared/components/ui/insight/insight-toggle';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { LocalizedNumberInputDirective } from '../../shared/directives/localized-number-input.directive';
 import { IApiErrorResponse } from '../../shared/interface/api-response.interface';
 import {
   IPublicContactResponse,
@@ -64,6 +66,8 @@ const SHOWN_OPTIONS: InlineOption[] = [
 @Component({
   selector: 'app-public-contact',
   imports: [
+    FormsModule,
+    LocalizedNumberInputDirective,
     RouterModule,
     TranslateModule,
     PageWrapper,

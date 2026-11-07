@@ -45,6 +45,26 @@ export class CostingService {
           payload,
         );
   }
+  /** Starts the HPP of a product; asking twice changes nothing. */
+  startProductItem(productId: string) {
+    return this.http.post<IApiResponse<ICostItem>>(
+      `${this.api}/products/${productId}/item`,
+      {},
+    );
+  }
+  savePricing(id: string, pricing: Record<string, unknown>) {
+    return this.http.put<IApiResponse<unknown>>(
+      `${this.api}/items/${id}/pricing`,
+      pricing,
+    );
+  }
+  /** Draft products for items that have none. */
+  createProducts(itemIds: string[], categoryId: string) {
+    return this.http.post<IApiResponse<{ created: number }>>(
+      `${this.api}/create-products`,
+      { item_ids: itemIds, category_id: categoryId },
+    );
+  }
   saveRecipe(id: string, lines: ICostLinePayload[]) {
     return this.http.put<IApiResponse<{ version: number }>>(
       `${this.api}/items/${id}/recipe`,

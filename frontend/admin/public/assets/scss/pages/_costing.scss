@@ -473,3 +473,116 @@ body.dark-only {
     border-color: #404754;
   }
 }
+
+// The HPP panel, in the product form and the item popup.
+.cost-panel {
+  border-left: 3px solid var(--theme-color);
+  padding-left: 14px;
+
+  h6 {
+    margin: 18px 0 6px;
+  }
+}
+
+.cost-panel-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+
+  h6 {
+    margin-top: 0;
+  }
+}
+
+.cost-panel-empty {
+  background: #fff8ed;
+  padding: 14px;
+
+  p {
+    font-size: var(--admin-text);
+    margin: 4px 0 10px;
+  }
+}
+
+.cost-panel-action {
+  align-items: flex-end;
+  display: flex;
+}
+
+.cost-panel-ladder {
+  margin-top: 14px;
+
+  .cost-panel-main {
+    outline: 1px solid var(--theme-color);
+  }
+}
+
+.cost-panel-mode {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 12px 0 6px;
+
+  .form-check {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    margin: 0;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .form-check-input {
+    float: none;
+    margin: 0;
+  }
+}
+
+.cost-breakdown {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--admin-text);
+  gap: 6px 14px;
+
+  span {
+    color: #666;
+  }
+}
+
+.cost-status {
+  border-radius: 12px;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.cost-status-follow {
+  background: #d9f2e3;
+  color: #137a43;
+}
+
+.cost-status-review {
+  background: #fff1dc;
+  color: #8a4c00;
+}
+
+.cost-status-manual {
+  background: #e1ebfb;
+  color: #1d4f9c;
+}
+
+.cost-status-no_hpp,
+.cost-status-no_product {
+  background: #eceef1;
+  color: #5e6672;
+}
+
+body.dark-only .cost-panel-empty {
+  background: #2d333d;
+  color: #e4e7ec;
+}

@@ -24,6 +24,7 @@ import { PageWrapper } from '../../shared/components/page-wrapper/page-wrapper';
 import { Button } from '../../shared/components/ui/button/button';
 import { FormFields } from '../../shared/components/ui/form-fields/form-fields';
 import { ImagePreviewDirective } from '../../shared/directives/image-preview.directive';
+import { PhoneInputDirective } from '../../shared/directives/phone-input.directive';
 import { TextFitDirective } from '../../shared/directives/text-fit.directive';
 import { IAuthResponse } from '../../shared/interface/auth.interface';
 import { ApiMessageService } from '../../shared/services/api-message.service';
@@ -52,6 +53,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-account',
   imports: [
+    PhoneInputDirective,
     TranslateModule,
     ReactiveFormsModule,
     PageWrapper,

@@ -5,8 +5,10 @@
 </p>
 <div class="row g-3 costing-rates">
   <div class="col-md-2 col-6">
-    <label class="form-label">GPM (%)</label>
+    <label class="form-label">Target margin (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       data-testid="rate-gpm"
@@ -14,16 +16,20 @@
     />
   </div>
   <div class="col-md-2 col-6">
-    <label class="form-label">Affiliate (%)</label>
+    <label class="form-label">Komisi affiliate (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="rates['affiliate']"
     />
   </div>
   <div class="col-md-2 col-6">
-    <label class="form-label">Aplikasi (%)</label>
+    <label class="form-label">Biaya platform & promosi (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="rates['app']"
@@ -32,6 +38,8 @@
   <div class="col-md-2 col-6">
     <label class="form-label">Diskon grosir (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="rates['wholesale_discount']"
@@ -40,6 +48,8 @@
   <div class="col-md-2 col-6">
     <label class="form-label">Kurs USD</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="rates['usd_rate']"
@@ -48,6 +58,8 @@
   <div class="col-md-2 col-6">
     <label class="form-label">Bulatkan ke (Rp)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="rates['round_idr']"

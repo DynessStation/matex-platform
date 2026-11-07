@@ -12,8 +12,11 @@ export interface InlineOption {
 export interface InlineColumn {
   key: string;
   label: string;
-  /** text: input; select: dropdown of options; computed: read-only from compute(). */
-  type?: 'text' | 'select' | 'computed';
+  /** text: input; number: digits only, grouped as typed; date: date picker; select: dropdown
+   * of options; computed: read-only from compute(). */
+  type?: 'text' | 'number' | 'date' | 'select' | 'computed';
+  /** Digits after the decimal mark, for number columns. */
+  decimals?: number;
   width?: string;
   options?: InlineOption[];
   placeholder?: string;

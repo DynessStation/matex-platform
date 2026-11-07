@@ -6,11 +6,19 @@
 
 ## Gambaran Umum
 
-Lima tab: HPP & Harga, Bahan, Tarif & Kanal, Kalkulator, dan Impor Excel. Rumus harga mengikuti Excel produksi dan marketing.
+Modal dan harga satu produk diisi di form produk, tab Harga & Kanal. Halaman ini untuk melihat semua produk sekaligus dan mengatur yang berlaku umum: Daftar Harga, Bahan, Tarif & Kanal, Kalkulator, dan Impor Excel.
 
-## Tab HPP & Harga
+## Tab Daftar Harga
 
-Daftar item beserta HPP, GPM, Net MIA, Affiliate, E-commerce, dan harga website sekarang. Klik nama item untuk mengubah tarif dan resepnya.
+Daftar item beserta HPP, target margin, Net MIA, Affiliate, harga jual hitungan, harga website sekarang, dan statusnya. Klik nama item untuk mengubah tarif dan resepnya.
+
+### Status harga
+
+Belum ada produk, Belum ada HPP, Ikut hitungan, Harga manual, atau Perlu ditinjau. Harga website tidak berubah sendiri: kalau bahan atau tarif berubah, statusnya menjadi Perlu ditinjau.
+
+### Buat produk draf
+
+Item tanpa produk bisa dicentang dan dijadikan produk draf. SKU dibuat otomatis dan bisa diubah di form produk.
 
 ### Terapkan harga
 

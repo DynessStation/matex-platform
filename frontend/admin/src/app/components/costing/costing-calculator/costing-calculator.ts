@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 
 import { debounceTime, Subject, switchMap } from 'rxjs';
 
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import {
   ICalculateResult,
   ICostItem,
@@ -19,15 +20,13 @@ import {
 } from '../../../shared/interface/costing.interface';
 import { CostingService } from '../../../shared/services/costing.service';
 
-const number = (value: string) => {
-  const parsed = Number(String(value ?? '').replace(',', '.'));
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-};
+const number = (value: number | null) =>
+  value !== null && Number.isFinite(value) && value > 0 ? value : 0;
 
 /** One product on every channel: what is charged, what arrives, what remains. */
 @Component({
   selector: 'app-costing-calculator',
-  imports: [FormsModule],
+  imports: [FormsModule, LocalizedNumberInputDirective],
   templateUrl: './costing-calculator.html',
 })
 export class CostingCalculator implements OnInit {
@@ -43,21 +42,21 @@ export class CostingCalculator implements OnInit {
   readonly result = signal<ICalculateResult | null>(null);
   readonly open = signal<string | null>(null);
 
-  form: Record<string, string> = {
-    item: '',
-    hpp: '',
-    price: '',
-    qty: '1',
-    discount: '',
-    voucher: '',
-    ads: '',
-    shipping: '',
-    tax: '',
-    target: '',
+  item = '';
+  form: Record<string, number | null> = {
+    hpp: null,
+    price: null,
+    qty: 1,
+    discount: null,
+    voucher: null,
+    ads: null,
+    shipping: null,
+    tax: null,
+    target: null,
   };
 
   ngOnInit(): void {
-    this.form['item'] = this.itemId();
+    this.item = this.itemId();
     this.changes
       .pipe(
         debounceTime(250),
@@ -74,7 +73,7 @@ export class CostingCalculator implements OnInit {
   private request() {
     const target = number(this.form['target']);
     return {
-      ...(this.form['item'] ? { item_id: this.form['item'] } : {}),
+      ...(this.item ? { item_id: this.item } : {}),
       ...(this.form['hpp'] ? { hpp: number(this.form['hpp']) } : {}),
       ...(this.form['price'] ? { price: number(this.form['price']) } : {}),
       qty: number(this.form['qty']) || 1,
@@ -93,8 +92,8 @@ export class CostingCalculator implements OnInit {
 
   /** Choosing an item brings back its HPP and calculated price. */
   chooseItem(): void {
-    this.form['hpp'] = '';
-    this.form['price'] = '';
+    this.form['hpp'] = null;
+    this.form['price'] = null;
     this.changed();
   }
 }

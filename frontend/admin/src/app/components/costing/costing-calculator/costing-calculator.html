@@ -1,16 +1,16 @@
-<div class="row g-3 costing-calculator-form" (input)="changed()">
+<div class="row g-3 costing-calculator-form">
   <div class="col-md-6">
     <label class="form-label">Produk</label>
     <select
       class="form-select"
       data-testid="calc-item"
-      [(ngModel)]="form['item']"
+      [(ngModel)]="item"
       (ngModelChange)="chooseItem()"
     >
       <option value="">Isi HPP sendiri</option>
-      @for (item of items(); track item.id) {
-        <option [value]="item.id">
-          {{ item.name }} {{ item.sku ? '(' + item.sku + ')' : '' }}
+      @for (entry of items(); track entry.id) {
+        <option [value]="entry.id">
+          {{ entry.name }} {{ entry.sku ? '(' + entry.sku + ')' : '' }}
         </option>
       }
     </select>
@@ -18,77 +18,108 @@
   <div class="col-md-3 col-6">
     <label class="form-label">HPP per item</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       data-testid="calc-hpp"
       [placeholder]="result() ? rupiah(result()!.hpp) : ''"
       [(ngModel)]="form['hpp']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-3 col-6">
     <label class="form-label">Harga jual per item</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       data-testid="calc-price"
       [placeholder]="result() ? rupiah(result()!.price) : ''"
       [(ngModel)]="form['price']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Jumlah</label>
     <input
+      appLocalizedNumber
+      [decimals]="0"
       class="form-control"
       inputmode="numeric"
       data-testid="calc-qty"
       [(ngModel)]="form['qty']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Diskon per item</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="form['discount']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Voucher toko</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="form['voucher']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Iklan (%)</label>
-    <input class="form-control" inputmode="decimal" [(ngModel)]="form['ads']" />
+    <input
+      appLocalizedNumber
+      [decimals]="2"
+      class="form-control"
+      inputmode="decimal"
+      [(ngModel)]="form['ads']"
+      (ngModelChange)="changed()"
+    />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Ongkir ditanggung</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       [(ngModel)]="form['shipping']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-2 col-6">
     <label class="form-label">Pajak (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
       placeholder="Belum diatur"
       [(ngModel)]="form['tax']"
+      (ngModelChange)="changed()"
     />
   </div>
   <div class="col-md-3 col-6">
     <label class="form-label">Target margin (%)</label>
     <input
+      appLocalizedNumber
+      [decimals]="2"
       class="form-control"
       inputmode="decimal"
-      placeholder="Untuk harga minimum"
       data-testid="calc-target"
+      placeholder="Untuk harga minimum"
       [(ngModel)]="form['target']"
+      (ngModelChange)="changed()"
     />
   </div>
 </div>

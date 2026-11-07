@@ -146,7 +146,6 @@ test('an item opens with its recipe, and a new line changes the HPP', async ({ p
   await expect(modal.locator('[data-testid=recipe-total]')).toContainText(/120\.000/);
   await modal.locator('[data-testid=recipe-save]').click();
   await expect(modal.locator('[data-testid=costing-ladder]')).toContainText(/Rp\s*120\.000/);
-  await expect(modal.locator('h6', { hasText: 'Resep' })).toContainText('versi 2');
 });
 
 test('materials: a new price shows its effect before it is saved', async ({ page }) => {

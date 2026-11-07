@@ -8,6 +8,7 @@ import {
   InlineRow,
 } from '../../../shared/components/ui/inline-table/inline-table.model';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { LocalizedNumberInputDirective } from '../../../shared/directives/localized-number-input.directive';
 import { ISalesChannel } from '../../../shared/interface/costing.interface';
 import { CostingService } from '../../../shared/services/costing.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -24,7 +25,12 @@ const today = () => {
 /** The general rates of the ladder, and the dated charges of each sales channel. */
 @Component({
   selector: 'app-costing-channels',
-  imports: [FormsModule, InlineTable, HasPermissionDirective],
+  imports: [
+    FormsModule,
+    InlineTable,
+    HasPermissionDirective,
+    LocalizedNumberInputDirective,
+  ],
   templateUrl: './costing-channels.html',
 })
 export class CostingChannels implements OnInit {
@@ -35,13 +41,13 @@ export class CostingChannels implements OnInit {
     [],
   );
   readonly savingRates = signal(false);
-  rates: Record<string, string> = {
-    gpm: '',
-    affiliate: '',
-    app: '',
-    wholesale_discount: '',
-    usd_rate: '',
-    round_idr: '',
+  rates: Record<string, number | null> = {
+    gpm: null,
+    affiliate: null,
+    app: null,
+    wholesale_discount: null,
+    usd_rate: null,
+    round_idr: null,
   };
 
   readonly blank: InlineRow = {
@@ -75,15 +81,13 @@ export class CostingChannels implements OnInit {
     {
       key: 'value',
       label: 'Nilai',
-      width: '100px',
+      type: 'number',
+      decimals: 4,
+      width: '110px',
       validate: (value, row) => {
         const number = Number(value);
-        if (
-          String(value ?? '').trim() === '' ||
-          !Number.isFinite(number) ||
-          number < 0
-        )
-          return 'Isi angka.';
+        if (value === null || value === '' || value === undefined)
+          return 'form_kit.required';
         return row['type'] === 'percent' && number >= 100
           ? 'Di bawah 100.'
           : null;
@@ -92,6 +96,8 @@ export class CostingChannels implements OnInit {
     {
       key: 'cap',
       label: 'Batas per item',
+      type: 'number',
+      decimals: 2,
       width: '110px',
       placeholder: 'Opsional',
     },
@@ -108,15 +114,15 @@ export class CostingChannels implements OnInit {
     {
       key: 'from',
       label: 'Berlaku dari',
-      width: '125px',
-      placeholder: 'YYYY-MM-DD',
+      type: 'date',
+      width: '140px',
       validate: (value) => (isDate(value) ? null : 'YYYY-MM-DD'),
     },
     {
       key: 'to',
       label: 'Sampai',
-      width: '125px',
-      placeholder: 'Opsional',
+      type: 'date',
+      width: '140px',
       validate: (value) => (!value || isDate(value) ? null : 'YYYY-MM-DD'),
     },
   ];
@@ -124,14 +130,14 @@ export class CostingChannels implements OnInit {
   ngOnInit(): void {
     this.costing.setting().subscribe((response) => {
       const setting = response.data;
-      const pct = (value: number) => String(Math.round(value * 10000) / 100);
+      const pct = (value: number) => Math.round(value * 10000) / 100;
       this.rates = {
         gpm: pct(setting.gpm),
         affiliate: pct(setting.affiliate),
         app: pct(setting.app),
         wholesale_discount: pct(setting.wholesale_discount),
-        usd_rate: String(setting.usd_rate),
-        round_idr: String(setting.round_idr),
+        usd_rate: setting.usd_rate,
+        round_idr: setting.round_idr,
       };
     });
     this.costing.channels().subscribe((response) => {
@@ -142,8 +148,8 @@ export class CostingChannels implements OnInit {
             id: fee.id,
             name: fee.name,
             type: fee.type,
-            value: String(fee.value),
-            cap: fee.cap == null ? '' : String(fee.cap),
+            value: fee.value,
+            cap: fee.cap,
             per: fee.per,
             from: fee.from,
             to: fee.to ?? '',
@@ -184,7 +190,8 @@ export class CostingChannels implements OnInit {
         name: row['name'],
         type: row['type'],
         value: Number(row['value']),
-        cap: row['cap'] === '' ? null : Number(row['cap']),
+        cap:
+          row['cap'] === '' || row['cap'] == null ? null : Number(row['cap']),
         per: row['per'],
         from: row['from'],
         to: row['to'] || null,

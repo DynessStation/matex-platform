@@ -51,15 +51,17 @@ import {
   IProductRawColumns,
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
+import { ApiMessageService } from '../../../shared/services/api-message.service';
 import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { ProductService } from '../../../shared/services/product.service';
 import { GetCategoriesAction } from '../../../shared/store/action/category.action';
 import {
-  CreateProductAction,
   EditProductAction,
   UpdateProductAction,
 } from '../../../shared/store/action/product.action';
+import { AuthState } from '../../../shared/store/state/auth.state';
 import { CategoryState } from '../../../shared/store/state/category.state';
 import { ProductState } from '../../../shared/store/state/product.state';
 
@@ -82,6 +84,8 @@ export class ProductFormService {
   private localization = inject(LocalizationService);
   private notification = inject(NotificationService);
   private formIssues = inject(FormIssueNavigatorService);
+  private products = inject(ProductService);
+  private messages = inject(ApiMessageService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   // Bound to the form's input in connect().
@@ -111,6 +115,8 @@ export class ProductFormService {
   categoryError = false;
   pricePublicationError = false;
   readonly saving = signal(false);
+  /** The price follows the HPP calculation, so its rows are read-only. */
+  readonly priceLocked = signal(false);
   readonly tried = signal(false);
   readonly idSpecRows = signal<InlineRow[]>([]);
   readonly enSpecRows = signal<InlineRow[]>([]);
@@ -207,6 +213,8 @@ export class ProductFormService {
     }
     this.store.dispatch(new GetCategoriesAction({ locale: 'id-ID' }));
     this.id = this.route.snapshot.paramMap.get('id');
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab) this.activeTab = tab;
     if (this.id)
       this.store
         .dispatch(new EditProductAction(this.id))
@@ -329,7 +337,32 @@ export class ProductFormService {
   //==== SUBMIT
   //==================================================
 
+  /** A draft needs one language: the other starts as a copy until someone translates it. */
+  private fillDraftLanguage() {
+    const c = this.form.controls;
+    if (c.status.value !== 'draft') return;
+    if (!c.en_name.value?.trim() && c.id_name.value?.trim()) {
+      c.en_name.setValue(c.id_name.value);
+      if (!c.en_slug.value) c.en_slug.setValue(c.id_slug.value);
+    }
+  }
+
+  /** The website price rows, read again after the HPP panel replaced them. */
+  reloadPrices() {
+    if (!this.id) return;
+    this.products.getProduct(this.id).subscribe((response) => {
+      const prices = response.data.prices ?? [];
+      this.idrRows.set(
+        prices.filter((x) => x.currency !== 'USD').map((x) => priceRow(x)),
+      );
+      this.usdRows.set(
+        prices.filter((x) => x.currency === 'USD').map((x) => priceRow(x)),
+      );
+    });
+  }
+
   submit() {
+    this.fillDraftLanguage();
     this.tried.set(true);
     this.form.markAllAsTouched();
     this.categoryError = this.categoryIds.length === 0;
@@ -359,13 +392,34 @@ export class ProductFormService {
       return;
     }
     const payload = this.payload();
-    const action =
-      this.type() === 'edit' && this.id
-        ? new UpdateProductAction(payload, this.id)
-        : new CreateProductAction(payload);
     this.saving.set(true);
-    this.store.dispatch(action).subscribe({
-      complete: () => void this.router.navigateByUrl('/product'),
+    if (this.type() === 'edit' && this.id) {
+      this.store.dispatch(new UpdateProductAction(payload, this.id)).subscribe({
+        complete: () => void this.router.navigateByUrl('/product'),
+        error: (error) => {
+          this.saving.set(false);
+          this.handleSaveError(error);
+        },
+      });
+      return;
+    }
+    // A new draft goes on to its costs, the next step of filling it in, for those who may
+    // see them. Anything else returns to the list.
+    const goesOn =
+      payload.status === 'draft' &&
+      (this.store.selectSnapshot(AuthState.isAllAccess) === true ||
+        (this.store.selectSnapshot(AuthState.permissions) ?? []).includes(
+          'cost.view',
+        ));
+    this.products.create(payload).subscribe({
+      next: (response) => {
+        this.notification.showSuccess(this.messages.resolveResponse(response));
+        void (goesOn
+          ? this.router.navigate(['/product/edit', response.data.id], {
+              queryParams: { tab: 'channels' },
+            })
+          : this.router.navigateByUrl('/product'));
+      },
       error: (error) => {
         this.saving.set(false);
         this.handleSaveError(error);
