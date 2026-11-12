@@ -268,6 +268,14 @@ export const menu: ISidebar[] = [
     children: [
       {
         parent_id: 12,
+        title: 'money',
+        path: '/money',
+        type: 'link',
+        level: 2,
+        permission: 'money.view',
+      },
+      {
+        parent_id: 12,
         title: 'business_entities',
         path: '/business',
         type: 'link',

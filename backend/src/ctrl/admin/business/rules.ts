@@ -220,17 +220,14 @@ const readRuleInput = async (
     idStore = typeof body.store_id === 'string' ? decodeId(body.store_id, keyhsid.idStore) : null;
     const [stores] = idStore
       ? await connection.query<RowDataPacket[]>(
-          `SELECT 1 FROM store WHERE id_store = ? AND id_business_entity = ? AND id_master_comp = ?
+          // The entity's own store, or another party's store its products are listed in.
+          `SELECT 1 FROM store WHERE id_store = ? AND id_master_comp = ?
              AND store_deleted_at IS NULL LIMIT 1`,
-          [idStore, idEntity, scope.idMasterComp],
+          [idStore, scope.idMasterComp],
         )
       : [[] as RowDataPacket[]];
     if (!stores.length) {
-      throw new HttpError(
-        400,
-        'REVENUE_SHARE_STORE_INVALID',
-        'The store does not belong to this entity',
-      );
+      throw new HttpError(400, 'REVENUE_SHARE_STORE_INVALID', 'Store not found');
     }
   }
   const components = readComponents(body?.components ?? []);

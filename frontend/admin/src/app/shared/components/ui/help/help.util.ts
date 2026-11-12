@@ -68,6 +68,7 @@ export const HELP_GUIDES: HelpGuideEntry[] = [
   { key: 'costing', title: 'hpp_price', path: '/costing' },
   { key: 'business', title: 'business_entities', path: '/business' },
   { key: 'sales', title: 'sales', path: '/sales' },
+  { key: 'money', title: 'money', path: '/money' },
   { key: 'media', title: 'media', path: '/media' },
   { key: 'email', title: 'email', path: '/email' },
   { key: 'account', title: 'my_account', path: '/account' },

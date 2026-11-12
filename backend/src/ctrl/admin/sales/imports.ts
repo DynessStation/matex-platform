@@ -17,6 +17,7 @@ import {
   SalesFileError,
 } from '../../../helper/sales-import.helper';
 import { dateText } from '../../../helper/business.helper';
+import { postSettlements } from '../../../helper/money.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
 import { AuthRequest, verifyToken } from '../../../middleware/auth-jwt.middleware';
 import { requirePermission } from '../../../middleware/auth-permission.middleware';
@@ -198,6 +199,7 @@ const saveSettlements = async (
   idImport: number,
   settlements: ParsedSettlement[],
 ) => {
+  const ids: number[] = [];
   for (const row of settlements) {
     await connection.query(
       `INSERT INTO sales_settlement (id_master_comp, id_store, sales_settlement_ref,
@@ -206,7 +208,8 @@ const saveSettlements = async (
          sales_settlement_revenue, sales_settlement_fees, sales_settlement_source,
          sales_settlement_detail, id_sales_import)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE sales_settlement_kind = VALUES(sales_settlement_kind),
+       ON DUPLICATE KEY UPDATE id_sales_settlement = LAST_INSERT_ID(id_sales_settlement),
+         sales_settlement_kind = VALUES(sales_settlement_kind),
          sales_settlement_label = VALUES(sales_settlement_label),
          sales_settlement_order_ref = VALUES(sales_settlement_order_ref),
          sales_settlement_order_at = VALUES(sales_settlement_order_at),
@@ -234,7 +237,11 @@ const saveSettlements = async (
         idImport,
       ],
     );
+    const [last] = await connection.query<RowDataPacket[]>('SELECT LAST_INSERT_ID() AS id');
+    ids.push(Number(last[0].id));
   }
+  // The books follow the money as soon as it is known.
+  await postSettlements(connection, scope, ids);
 };
 
 router.post(

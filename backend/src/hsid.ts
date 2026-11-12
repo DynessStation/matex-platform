@@ -75,6 +75,8 @@ const idSalesSettlement = new SafeHashids('key_salesSettlement123', 8);
 
 const idStoreSkuMap = new SafeHashids('key_storeSkuMap123', 8);
 
+const idLedgerEntry = new SafeHashids('key_ledgerEntry123', 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -107,4 +109,5 @@ export default {
   idSalesOrder,
   idSalesSettlement,
   idStoreSkuMap,
+  idLedgerEntry,
 };

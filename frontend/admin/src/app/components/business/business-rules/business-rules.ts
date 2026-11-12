@@ -123,11 +123,17 @@ export class BusinessRules implements OnInit {
         (entities.data ?? [])
           .filter((entity) => entity.kind !== 'platform')
           .map((entity) => {
-            const entityStores = storesOf.get(entity.id) ?? [];
+            // Its own stores first, then the stores of others its products may be listed in.
+            const entityStores = [
+              ...(storesOf.get(entity.id) ?? []),
+              ...(stores.data ?? []).filter(
+                (store) => store.entity_id !== entity.id,
+              ),
+            ];
             return {
               entity,
               stores: entityStores,
-              columns: this.buildColumns(entityStores),
+              columns: this.buildColumns(entity.id, entityStores),
               rows: rulesOf.get(entity.id) ?? [],
             };
           }),
@@ -136,7 +142,7 @@ export class BusinessRules implements OnInit {
     });
   }
 
-  private buildColumns(stores: IStore[]): InlineColumn[] {
+  private buildColumns(entityId: string, stores: IStore[]): InlineColumn[] {
     return [
       {
         key: 'name',
@@ -154,7 +160,10 @@ export class BusinessRules implements OnInit {
           { value: '', label: 'Seluruh entitas' },
           ...stores.map((store) => ({
             value: store.id,
-            label: `${store.name} (${store.channel_name})`,
+            label:
+              store.entity_id === entityId
+                ? `${store.name} (${store.channel_name})`
+                : `Numpang: ${store.entity_name} · ${store.name}`,
           })),
         ],
       },

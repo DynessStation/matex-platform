@@ -138,6 +138,14 @@ export const content: Routes = [
       ),
   },
   {
+    path: 'money',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../components/money/money.routes').then(
+        (routes) => routes.moneyRoutes,
+      ),
+  },
+  {
     path: 'sales',
     canActivate: [AuthGuard],
     loadChildren: () =>

@@ -1,0 +1,331 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'money'">
+  <p class="costing-help">
+    Angka di sini datang dari laporan keuangan toko yang diimpor di Penjualan:
+    pendapatan menurut kanal, potongannya, dana yang cair, HPP barang yang
+    terjual, dan hak tiap pihak menurut aturan bagi hasil. Periode mengikuti
+    tanggal cair.
+  </p>
+
+  <div class="costing-toolbar">
+    @if (manyEntities()) {
+      <select
+        class="form-select sales-store"
+        data-testid="money-entity"
+        (change)="set('entity', $event)"
+      >
+        <option value="">Semua pihak</option>
+        @for (entity of entities(); track entity.value) {
+          <option [value]="entity.value">{{ entity.label }}</option>
+        }
+      </select>
+    }
+    <input
+      type="date"
+      class="form-control sales-date"
+      data-testid="money-from"
+      aria-label="Dari tanggal"
+      [value]="filter().from ?? ''"
+      (change)="set('from', $event)"
+    />
+    <input
+      type="date"
+      class="form-control sales-date"
+      data-testid="money-to"
+      aria-label="Sampai tanggal"
+      [value]="filter().to ?? ''"
+      (change)="set('to', $event)"
+    />
+    @if (canManage()) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        data-testid="money-rebuild"
+        [disabled]="busy()"
+        (click)="rebuild()"
+      >
+        Hitung ulang buku
+      </button>
+    }
+  </div>
+
+  @if (summary(); as s) {
+    <div class="costing-summary money-cards" data-testid="money-cards">
+      <div>
+        <span>Pesanan cair</span><strong>{{ s.orders }}</strong>
+      </div>
+      <div>
+        <span>Pendapatan</span><strong>{{ rupiah(s.revenue) }}</strong>
+      </div>
+      <div>
+        <span>Potongan kanal</span><strong>{{ rupiah(s.fees) }}</strong>
+      </div>
+      <div>
+        <span>Penyesuaian</span><strong>{{ rupiah(s.adjustments) }}</strong>
+      </div>
+      <div class="money-card-main">
+        <span>Dana cair</span>
+        <strong data-testid="money-amount">{{ rupiah(s.amount) }}</strong>
+      </div>
+      <div>
+        <span>HPP terjual</span><strong>{{ rupiah(s.hpp) }}</strong>
+      </div>
+      <div class="money-card-main">
+        <span>Laba kotor</span>
+        <strong data-testid="money-gross">{{ rupiah(s.gross_profit) }}</strong>
+      </div>
+    </div>
+    @if (s.unmapped_qty) {
+      <p class="costing-help money-warn" data-testid="money-unmapped">
+        {{ s.unmapped_qty }} barang terjual belum dipetakan ke produk, jadi HPP
+        dan laba kotor masih kurang. Lengkapi di Penjualan → Peta SKU, lalu
+        tekan "Hitung ulang buku".
+      </p>
+    }
+
+    <div class="money-columns">
+      <section>
+        <h6>Per toko</h6>
+        <div class="costing-table-wrap">
+          <table class="costing-table sales-table" data-testid="money-stores">
+            <thead>
+              <tr>
+                <th class="text-start">Toko</th>
+                <th class="text-end">Pesanan</th>
+                <th class="text-end">Pendapatan</th>
+                <th class="text-end">Dana cair</th>
+                <th class="text-end">HPP</th>
+                <th class="text-end">Laba kotor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of s.stores; track row.key) {
+                <tr [attr.data-key]="row.key">
+                  <td class="text-start sales-wrap">
+                    {{ row.name }} <small>{{ row.detail }}</small>
+                  </td>
+                  <td class="text-end">{{ row.orders }}</td>
+                  <td class="text-end">{{ rupiah(row.revenue) }}</td>
+                  <td class="text-end">{{ rupiah(row.amount) }}</td>
+                  <td class="text-end">{{ rupiah(row.hpp) }}</td>
+                  <td class="text-end">{{ rupiah(row.amount - row.hpp) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="costing-muted">
+                    Belum ada dana cair di periode ini.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section>
+        <h6>Per produk</h6>
+        <div class="costing-table-wrap">
+          <table class="costing-table sales-table" data-testid="money-products">
+            <thead>
+              <tr>
+                <th class="text-start">Produk</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Dana cair</th>
+                <th class="text-end">HPP</th>
+                <th class="text-end">Laba kotor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of s.products; track row.key) {
+                <tr [attr.data-key]="row.key">
+                  <td class="text-start sales-wrap">
+                    {{ row.name }}
+                    @if (row.unmapped) {
+                      <small class="costing-warn">belum dipetakan</small>
+                    } @else if (row.detail) {
+                      <small>{{ row.detail }}</small>
+                    }
+                  </td>
+                  <td class="text-end">{{ row.qty }}</td>
+                  <td class="text-end">{{ rupiah(row.amount) }}</td>
+                  <td class="text-end">{{ rupiah(row.hpp) }}</td>
+                  <td class="text-end">{{ rupiah(row.amount - row.hpp) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="costing-muted">
+                    Belum ada produk terjual.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <h6>Hak tiap pihak di periode ini</h6>
+    <div class="costing-table-wrap">
+      <table
+        class="costing-table sales-table money-parties"
+        data-testid="money-parties"
+      >
+        <thead>
+          <tr>
+            <th class="text-start">Pihak</th>
+            <th class="text-end">Hak penjualan</th>
+            <th class="text-end">Biaya ke MIA</th>
+            <th class="text-end">Bersih</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (party of s.parties; track party.id) {
+            <tr [attr.data-entity]="party.name">
+              <td class="text-start">{{ party.name }}</td>
+              <td class="text-end">{{ rupiah(party.share) }}</td>
+              <td class="text-end">{{ rupiah(party.fees) }}</td>
+              <td class="text-end" [class.sales-negative]="party.total < 0">
+                {{ rupiah(party.total) }}
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="costing-muted">
+                Belum ada aturan bagi hasil yang terpakai di periode ini.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (loaded()) {
+    <h5 class="money-book-title">Buku per pihak</h5>
+    <p class="costing-help">
+      Saldo positif berarti pihak itu masih harus menerima dari lawannya;
+      negatif berarti masih harus membayar. Uang berpindah di luar sistem; catat
+      di sini setelah terjadi.
+    </p>
+    <div class="costing-summary" data-testid="money-balances">
+      @for (row of owed(); track row.entity_id + row.counter_id) {
+        <div [attr.data-entity]="row.entity_name">
+          <span>{{ row.entity_name }} ↔ {{ row.counter_name }}</span>
+          <strong [class.sales-negative]="row.balance < 0">
+            {{ rupiah(row.balance) }}
+          </strong>
+        </div>
+      } @empty {
+        <div><span>Saldo</span><strong>Semua lunas</strong></div>
+      }
+    </div>
+
+    @if (canManage() && manyEntities()) {
+      <form
+        class="costing-toolbar money-payment"
+        data-testid="money-payment"
+        (submit)="$event.preventDefault(); recordPayment()"
+      >
+        <select
+          class="form-select"
+          data-testid="money-payer"
+          aria-label="Pembayar"
+          [value]="payment().payer"
+          (change)="setPayment('payer', $event)"
+        >
+          <option value="">Pembayar…</option>
+          @for (entity of entities(); track entity.value) {
+            <option [value]="entity.value">{{ entity.label }}</option>
+          }
+        </select>
+        <span class="costing-muted">membayar ke</span>
+        <select
+          class="form-select"
+          data-testid="money-payee"
+          aria-label="Penerima"
+          [value]="payment().payee"
+          (change)="setPayment('payee', $event)"
+        >
+          <option value="">Penerima…</option>
+          @for (entity of entities(); track entity.value) {
+            <option [value]="entity.value">{{ entity.label }}</option>
+          }
+        </select>
+        <input
+          type="date"
+          class="form-control sales-date"
+          data-testid="money-payment-date"
+          [value]="payment().date"
+          (change)="setPayment('date', $event)"
+        />
+        <input
+          type="text"
+          inputmode="numeric"
+          class="form-control money-amount"
+          data-testid="money-payment-amount"
+          placeholder="Jumlah (Rp)"
+          [value]="payment().amount"
+          (input)="setPayment('amount', $event)"
+        />
+        <input
+          type="text"
+          class="form-control money-note"
+          data-testid="money-payment-note"
+          placeholder="Catatan, misal: transfer BCA 12 Nov"
+          [value]="payment().note"
+          (input)="setPayment('note', $event)"
+        />
+        <button
+          type="submit"
+          class="btn btn-theme"
+          data-testid="money-payment-save"
+          [disabled]="paying()"
+        >
+          Catat pembayaran
+        </button>
+      </form>
+    }
+
+    <div class="costing-table-wrap">
+      <table class="costing-table sales-table" data-testid="money-ledger">
+        <thead>
+          <tr>
+            <th class="text-start">Tanggal</th>
+            <th class="text-start">Buku</th>
+            <th class="text-start">Lawan</th>
+            <th class="text-start">Jenis</th>
+            <th class="text-start">Keterangan</th>
+            <th class="text-start">Toko</th>
+            <th class="text-end">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of entries(); track row.id) {
+            <tr data-testid="money-entry" [attr.data-kind]="row.kind">
+              <td class="text-start">{{ row.date | date: 'dd MMM yyyy' }}</td>
+              <td class="text-start">{{ row.entity_name }}</td>
+              <td class="text-start">{{ row.counter_name }}</td>
+              <td class="text-start">
+                {{ ledgerLabels[row.kind] ?? row.kind }}
+              </td>
+              <td class="text-start sales-wrap">
+                {{ row.label }}
+                @if (row.note) {
+                  <small>{{ row.note }}</small>
+                }
+              </td>
+              <td class="text-start">{{ row.store_name }}</td>
+              <td class="text-end" [class.sales-negative]="row.amount < 0">
+                {{ rupiah(row.amount) }}
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="costing-muted">
+                Belum ada baris buku di periode ini.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</app-page-wrapper>

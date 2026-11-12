@@ -1,0 +1,67 @@
+// Bisnis > Dasbor Uang. Shares the help, toolbar, summary, and table styles of
+// pages/_costing.scss and pages/_sales.scss.
+.money-cards {
+  margin-top: 0;
+
+  .money-card-main {
+    background: #fff1d6;
+
+    strong {
+      font-size: 16px;
+    }
+  }
+}
+
+.money-warn {
+  color: #b35c00;
+}
+
+.money-columns {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 18px;
+
+  // A grid column must be allowed to shrink, or a wide table pushes past the card.
+  section {
+    min-width: 0;
+  }
+
+  h6 {
+    margin-bottom: 8px;
+  }
+}
+
+.money-parties {
+  max-width: 640px;
+}
+
+.money-book-title {
+  margin-top: 24px;
+}
+
+.money-payment {
+  .form-select {
+    max-width: 220px;
+  }
+}
+
+.money-amount {
+  max-width: 160px;
+}
+
+.money-note {
+  max-width: 320px;
+}
+
+@media (max-width: 991.98px) {
+  .money-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+body.dark-only {
+  .money-cards .money-card-main {
+    background: rgba(255, 170, 0, 0.14);
+  }
+}
