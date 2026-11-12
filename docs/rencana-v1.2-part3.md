@@ -80,7 +80,14 @@ API marketplace bergantung pada NIB dan persetujuan tiap portal (Part 2 Tahap 5)
 - Riwayat impor (`sales_import`): siapa, kapan, file apa, hasilnya. File tidak disimpan di repo.
 - Tabel ini sama persis yang nanti diisi konektor API, jadi impor manual dan API tidak saling mengganggu.
 
-**Perlu dari pemilik sebelum tahap ini dikode:** satu contoh file ekspor Shopee dan satu TikTok Shop dari toko mana saja (boleh data lama). Tanpa itu formatnya tebakan, dan tebakan dilarang.
+**Yang sudah dilihat langsung di Seller Center TikTok Shop (12 Nov 2026, toko uji "CUMA LATEX"; di Indonesia Seller Center TikTok Shop dan Tokopedia sudah satu panel):**
+
+- **Pesanan › Ekspor**: pilih rentang (pesanan terfilter, status tertentu, atau semua), format **CSV atau Excel**, maksimal 200.000 pesanan, bawaan 12 bulan terakhir. Kolom di layar: nomor pesanan, pembeli (disamarkan), produk, status pesanan, metode dan opsi pengiriman, total.
+- **Keuangan › Laporan**: inilah "duit yang bisa ditarik". Satu laporan per hari penyelesaian, isinya **Pendapatan, Biaya, Penyesuaian, Jumlah penyelesaian pembayaran**, ID laporan, ID pembayaran. Tampilan "per pesanan" memberi baris per pesanan (ID pesanan, tanggal pesan, nama SKU, pendapatan, biaya, dana diterima) dan baris **penyesuaian** yang bukan pesanan (contoh: "Pembayaran GMV untuk Iklan TikTok", minus). Ada tombol Unduh dan riwayat ekspor.
+- Kesimpulan untuk importer: dua file per toko, **pesanan** (apa yang terjual) dan **laporan keuangan** (berapa yang benar-benar masuk). Dana diterima diambil dari laporan keuangan, bukan dihitung sendiri. Penyesuaian non-pesanan masuk `sales_order_line` tanpa produk, berjenis `adjustment`, supaya saldo toko tetap cocok dengan panel marketplace.
+- Shopee: pemilik tidak punya akun. Importer Shopee menunggu ada toko Shopee yang hidup; strukturnya disiapkan, formatnya dibaca dari file pertama yang masuk (layar impor menampilkan kolom yang terbaca sebelum apa pun disimpan).
+
+**Masih perlu sebelum kode:** satu file CSV hasil Unduh dari dua layar di atas (boleh dari toko uji), supaya nama kolom dan format angka/tanggal dibaca dari file asli, bukan dari layar.
 
 Migration 035.
 
@@ -137,9 +144,11 @@ Tanpa migration, hanya kolom penanda `*_en_source` (`auto`, `manual`) di tabel i
 
 Tahap 1 bisa mulai sekarang. Tahap 4 bisa dimajukan kapan saja karena tidak bergantung tahap lain.
 
-## Pertanyaan untuk pemilik, tidak menahan Tahap 1
+## Jawaban pemilik (12 Nov 2026)
 
-1. Contoh file ekspor Shopee dan TikTok Shop (untuk Tahap 2).
-2. Atrija dan Koh Joni: produknya buatan MIA (skenario C di rancangan multi-penjual) atau buatan sendiri (skenario B)? Menentukan komponen default aturan bagi hasil.
-3. Setia Latex dan Rasa Latex: badan usaha terpisah atau merek MIA? Menentukan apakah bukunya benar-benar terpisah atau hanya laporan per merek.
-4. Siapa di tim yang akan mengimpor laporan tiap hari atau tiap minggu? Menentukan seberapa sederhana layar impornya harus dibuat.
+1. **Contoh file ekspor**: akun uji TikTok Shop dibuka untuk dilihat (temuan di Tahap 2 di atas). Shopee tidak ada akun.
+2. **Atrija dan Koh Joni: barangnya buatan MIA** (skenario C). Aturan bagi hasil bawaan untuk mitra: komponen **biaya produksi** (cost_plus dari HPP) ke MIA, sisa hak mitra; komisi platform opsional.
+3. **Setia Latex dan Rasa Latex: nama toko di luar, pembukuannya terpisah tapi tergabung.** Jadi entitas `own_brand`, masing-masing dengan tokonya; bukunya terpisah per entitas, dan MIA melihat gabungannya. Tidak perlu badan usaha terpisah di sistem.
+4. Soal "siapa yang mengimpor": belum dijawab karena pertanyaannya tidak jelas. Maksudnya: Tahap 2 butuh seseorang **mengunduh file dari Seller Center lalu mengunggahnya ke panel** tiap hari atau tiap minggu, sampai API marketplace tersambung. Keputusan sementara: siapa pun yang punya izin `sales.import`, layarnya dibuat sesederhana unggah satu file dan tekan "Masuk".
+
+**Contoh pembukuan mitra yang dikirim pemilik** (lembar "SETIA LATEX, bulan Oktober", dari Om Ardi): per baris: tanggal, nomor PO, nama barang, ukuran P×L×T, qty, harga/pcs, **modal**, pembayaran masuk, sisa pembayaran, **perkiraan penerimaan**, **perkiraan margin**. Ini persis bentuk `ledger_entry` Tahap 3: per baris penjualan ada HPP (modal), hak yang diterima, dan margin; pembayaran masuk dicatat terpisah dan sisanya dihitung. Tahap 3 harus bisa menampilkan lembar seperti ini per entitas per bulan tanpa Excel.
