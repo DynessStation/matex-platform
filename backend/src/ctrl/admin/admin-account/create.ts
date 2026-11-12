@@ -72,9 +72,9 @@ router.post(
       const [insert] = await connection.query<ResultSetHeader>(
         `INSERT INTO admin_acct
            (id_master_comp, id_office, password, name, alias, email_1, email_2, phone_1, phone_2,
-            id_profile_photo, uuid, id_chair, id_access, is_all_access, fcm, created, updated,
-            admin_acct_status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NOW(), NOW(), 1)`,
+            id_profile_photo, uuid, id_chair, id_access, id_business_entity, is_all_access, fcm,
+            created, updated, admin_acct_status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NOW(), NOW(), 1)`,
         [
           input.idMasterComp,
           input.idOffice,
@@ -89,6 +89,7 @@ router.post(
           await newAccountUuid(connection),
           input.idChair,
           input.idAccess,
+          input.idBusinessEntity,
           input.isAllAccess,
         ],
       );
@@ -121,6 +122,7 @@ router.post(
           id_profile_photo: idProfilePhoto,
           id_chair: input.idChair,
           id_access: input.idAccess,
+          id_business_entity: input.idBusinessEntity,
           is_all_access: input.isAllAccess,
           admin_acct_status: 1,
         },

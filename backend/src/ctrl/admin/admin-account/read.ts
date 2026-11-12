@@ -45,6 +45,7 @@ const JOINS = `INNER JOIN master_comp mc ON aa.id_master_comp = mc.id_master_com
   INNER JOIN office o ON aa.id_office = o.id_office
   INNER JOIN chair ch ON aa.id_chair = ch.id_chair
   INNER JOIN admin_access ac ON aa.id_access = ac.id_admin_access
+  LEFT JOIN business_entity bes ON bes.id_business_entity = aa.id_business_entity
   ${PROFILE_PHOTO_JOIN}`;
 
 router.get(
@@ -141,7 +142,7 @@ router.get(
          o.office_name, aa.id_chair, ch.chair_name, ch.chair_description, aa.id_access,
          ac.access_name, aa.name, aa.alias, aa.email_1, aa.email_2, aa.phone_1, aa.phone_2,
          aa.id_profile_photo, ${PROFILE_PHOTO_COLUMNS}, aa.is_all_access, aa.created, aa.updated,
-         aa.admin_acct_status
+         aa.admin_acct_status, aa.id_business_entity, bes.business_entity_name
        FROM admin_acct aa
        ${JOINS}
        WHERE aa.id_admin_acct = ? AND aa.admin_acct_deleted_at IS NULL
@@ -186,6 +187,12 @@ router.get(
           id_access: keyhsid.idAdminAccess.encode(account.id_access),
           access_name: account.access_name,
         },
+        business_entity: account.id_business_entity
+          ? {
+              id: keyhsid.idBusinessEntity.encode(Number(account.id_business_entity)),
+              name: account.business_entity_name ?? null,
+            }
+          : null,
         is_all_access: account.is_all_access,
         admin_acct_status: account.admin_acct_status,
         created: account.created,

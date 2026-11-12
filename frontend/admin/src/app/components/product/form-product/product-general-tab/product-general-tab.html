@@ -400,6 +400,36 @@
       }}</small>
     </div>
   </div>
+  @if (editor.entityOptions().length > 1) {
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Penjual</label>
+        <select
+          class="form-select"
+          formControlName="seller_entity_id"
+          data-testid="seller-entity"
+        >
+          @for (option of editor.entityOptions(); track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        <small class="field-help">Entitas yang memajang dan menjual produk ini.</small>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Produsen</label>
+        <select
+          class="form-select"
+          formControlName="producer_entity_id"
+          data-testid="producer-entity"
+        >
+          @for (option of editor.entityOptions(); track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        <small class="field-help">Entitas yang membuat barangnya.</small>
+      </div>
+    </div>
+  }
   <div class="category-actions">
     <span></span
     ><button

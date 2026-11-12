@@ -7,7 +7,7 @@ import { sendError } from '../helper/api-response.helper';
 
 import { writeAuditLog } from '../helper/audit-log.helper';
 
-import type { AdminScope } from '../helper/admin-scope.helper';
+import { entityOf, type AdminScope } from '../helper/admin-scope.helper';
 
 import { ACCOUNT_ACCESS_QUERY, AuthRequest } from './auth-jwt.middleware';
 
@@ -175,6 +175,7 @@ export const requirePermission =
         idOffice: Number(account.id_office),
         idAccess,
         isAllAccess: Number(account.is_all_access),
+        idBusinessEntity: entityOf(account.id_business_entity),
       };
 
       // Full company access

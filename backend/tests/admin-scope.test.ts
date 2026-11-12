@@ -76,6 +76,7 @@ test('getAdminScope queries the account once and caches it on req', async () => 
     idOffice: 3,
     idAccess: 5,
     isAllAccess: 0,
+    idBusinessEntity: null,
   };
   assert.deepEqual(first, expected);
   assert.deepEqual(second, expected);
@@ -118,6 +119,7 @@ test('requirePermission stores the scope, so the handler needs no account query'
     idOffice: 3,
     idAccess: 5,
     isAllAccess: 0,
+    idBusinessEntity: null,
   });
 
   const before = queries.length;
@@ -134,7 +136,14 @@ test('requirePermission stores the scope for full-access accounts too', async ()
 });
 
 test('adminHasPermission: full access passes, others need the permission row', async () => {
-  const scope = { idAdminAcct: 11, idMasterComp: 7, idOffice: 3, idAccess: 5, isAllAccess: 0 };
+  const scope = {
+    idAdminAcct: 11,
+    idMasterComp: 7,
+    idOffice: 3,
+    idAccess: 5,
+    isAllAccess: 0,
+    idBusinessEntity: null,
+  };
   stubPool(accountRow, true);
   assert.equal(await adminHasPermission(scope, 'attachment.view', pool), true);
   stubPool(accountRow, false);

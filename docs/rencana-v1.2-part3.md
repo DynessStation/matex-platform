@@ -50,6 +50,16 @@ Istilah yang dipakai di panel:
 
 ## Tahap 1: Entitas dan Toko
 
+**Selesai lokal 12 November 2026, belum di-deploy.** Migration 034, API `/api/v1/business` (`backend/src/ctrl/admin/business`, helper `business.helper.ts`), halaman `components/business` (tab Entitas, Toko, Bagi hasil, tabel inline), panduan `assets/help/business.md`. Test: `business-api.spec.ts`, `business-page.spec.ts`.
+
+Bedanya dari rancangan di bawah, diputuskan saat pengerjaan:
+
+- Entitas disimpan di tabel baru `business_entity`, bukan di `master_comp`. `master_comp` adalah perusahaan pemilik panel, dan semua query lama sudah terikat ke sana; menambahkan tabel di bawahnya membuat tidak ada query lama yang berubah. Tiap perusahaan otomatis punya satu entitas berjenis `platform` (dibuat migration, atau saat pertama dibutuhkan).
+- Akun mitra adalah akun admin biasa dengan kolom `admin_acct.id_business_entity`. Pembatasannya ada di SQL (`entityWhere`, `productEntityWhere`): entitas, toko, aturan, dan produk pihak lain tidak pernah terkirim, bukan hanya disembunyikan di menu. Akun mitra boleh memperbarui kontak dan tokonya sendiri, tidak bisa mengubah jenis entitas, status, atau aturan bagi hasil. Produk yang dibuatnya otomatis dijual oleh entitasnya, dan produsennya ditentukan staf platform.
+- Aturan bagi hasil punya komponen generik di `revenue_share_component` (jenis komisi platform, tagihan produksi, biaya lain; tipe persen dari harga pembeli atau dana diterima, nominal per item, atau HPP + persen). Halaman menampilkannya sebagai tiga baris tetap. Dua aturan untuk lingkup yang sama tidak boleh bertumpuk tanggalnya.
+- Produk membawa `id_seller_business_entity` dan `id_producer_business_entity` (form produk tab Umum, hanya tampil kalau entitasnya lebih dari satu). Semua produk lama menjadi milik entitas platform.
+- Kolom logo entitas sudah ada, pemilih gambarnya belum dibuat. Pembagian hasil belum dihitung di mana pun: itu pekerjaan Tahap 3.
+
 Menu baru **Bisnis** di atas Katalog (dasbor tetap paling atas).
 
 - **Entitas**: daftar dan form. Kolom baru di `master_comp`: jenis (`own_brand`, `partner_b2b`, `platform` untuk MIA), logo, kontak, catatan. MIA ditandai sebagai platform dan tidak bisa dihapus.

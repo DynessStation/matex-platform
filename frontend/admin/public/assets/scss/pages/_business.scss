@@ -1,0 +1,66 @@
+// Bisnis > Entitas & Toko. Shares the tab, help, and section styles of pages/_costing.scss.
+.business-detail {
+  padding: 4px 0;
+
+  .app-check {
+    margin-top: 28px;
+  }
+}
+
+.business-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+
+  textarea {
+    max-width: 640px;
+  }
+}
+
+// One component of a rule: label, value, kind, and base in one row of one height.
+.business-slot {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .form-control,
+  .form-select {
+    height: var(--admin-bar-height);
+    min-height: var(--admin-bar-height);
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .form-kit-error {
+    flex-basis: 100%;
+  }
+}
+
+.business-slot-label {
+  flex: 0 0 180px;
+  font-weight: 600;
+}
+
+.business-slot-value {
+  flex: 0 0 140px;
+  text-align: right;
+}
+
+.business-slot-type {
+  flex: 0 0 130px;
+}
+
+.business-slot-base {
+  flex: 0 0 150px;
+}
+
+@media (max-width: 767.98px) {
+  .business-slot-label,
+  .business-slot-value,
+  .business-slot-type,
+  .business-slot-base {
+    flex-basis: calc(50% - 4px);
+  }
+}

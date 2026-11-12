@@ -289,6 +289,12 @@ export const parsePayload = (body: RequestBody) => {
     // A sort_order in the body is ignored.
     catalogFront: body?.catalog_front ? 1 : 0,
     sortOrder: 0,
+    // Who sells and who makes it (entity hashes); saveProduct resolves them. Left out on an
+    // update, the product keeps its entities.
+    sellerEntity: body?.seller_entity_id,
+    producerEntity: body?.producer_entity_id,
+    idSellerEntity: 0,
+    idProducerEntity: 0,
   };
 };
 

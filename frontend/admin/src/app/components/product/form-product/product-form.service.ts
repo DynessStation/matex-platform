@@ -44,6 +44,7 @@ import {
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
 import { IAttachment } from '../../../shared/interface/attachment.interface';
+import { IBusinessEntityOption } from '../../../shared/interface/business.interface';
 import { ICategoryModel } from '../../../shared/interface/category.interface';
 import {
   IProduct,
@@ -52,6 +53,7 @@ import {
   ProductMediaRole,
 } from '../../../shared/interface/product.interface';
 import { ApiMessageService } from '../../../shared/services/api-message.service';
+import { BusinessService } from '../../../shared/services/business.service';
 import { FormIssueNavigatorService } from '../../../shared/services/form-issue-navigator.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -85,6 +87,7 @@ export class ProductFormService {
   private notification = inject(NotificationService);
   private formIssues = inject(FormIssueNavigatorService);
   private products = inject(ProductService);
+  private business = inject(BusinessService);
   private messages = inject(ApiMessageService);
   readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -93,6 +96,25 @@ export class ProductFormService {
 
   connect(form: { type: Signal<string> }): void {
     this.type = form.type;
+    this.loadEntityOptions();
+  }
+
+  /** Seller and producer choices; a new product starts with the platform entity. */
+  readonly entityOptions = signal<IBusinessEntityOption[]>([]);
+
+  private loadEntityOptions(): void {
+    this.business.entityOptions().subscribe((response) => {
+      const options = response.data ?? [];
+      this.entityOptions.set(options);
+      const first = options[0]?.value ?? '';
+      for (const control of [
+        this.form.controls.seller_entity_id,
+        this.form.controls.producer_entity_id,
+      ]) {
+        if (!control.value && first)
+          control.setValue(first, { emitEvent: false });
+      }
+    });
   }
 
   readonly productImageAccept = PRODUCT_IMAGE_ACCEPT;
@@ -149,6 +171,8 @@ export class ProductFormService {
     hs_code: ['', [Validators.maxLength(50), Validators.pattern(HS_CODE)]],
     is_featured: [false],
     catalog_front: [false],
+    seller_entity_id: [''],
+    producer_entity_id: [''],
     weight_grams: [
       null as number | null,
       [Validators.min(0), Validators.max(10_000_000)],
@@ -486,6 +510,10 @@ export class ProductFormService {
       internal_commerce_enabled: v.internal_commerce_enabled ? 1 : 0,
       is_featured: v.is_featured ? 1 : 0,
       catalog_front: v.catalog_front ? 1 : 0,
+      ...(v.seller_entity_id ? { seller_entity_id: v.seller_entity_id } : {}),
+      ...(v.producer_entity_id
+        ? { producer_entity_id: v.producer_entity_id }
+        : {}),
       category_ids: this.categoryIds,
       media,
       prices: [
@@ -537,6 +565,8 @@ export class ProductFormService {
       ),
       is_featured: p.is_featured,
       catalog_front: Boolean(p.catalog_front),
+      seller_entity_id: p.seller_entity_id ?? '',
+      producer_entity_id: p.producer_entity_id ?? '',
     };
     for (const [prefix, t] of [
       ['id', id],

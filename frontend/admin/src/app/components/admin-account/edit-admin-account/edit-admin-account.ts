@@ -154,6 +154,8 @@ export class EditAdminAccount {
       id_access: value.id_access,
 
       is_all_access: value.is_all_access,
+
+      id_business_entity: value.id_business_entity || null,
     };
 
     //==================================================

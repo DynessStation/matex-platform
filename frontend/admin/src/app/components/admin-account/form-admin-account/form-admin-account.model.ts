@@ -24,6 +24,8 @@ export interface AdminAccountFormValue {
 
   is_all_access: boolean;
 
+  id_business_entity: string;
+
   password: string;
   confirm_password: string;
 }

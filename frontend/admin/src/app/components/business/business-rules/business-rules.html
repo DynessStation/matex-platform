@@ -1,0 +1,139 @@
+<p class="costing-help">
+  Satu kasus, satu aturan bertanggal. Komponen diambil berurutan dari tiap
+  penjualan, dan sisanya adalah hak entitas. Aturan untuk satu toko mengalahkan
+  aturan seluruh entitas. Saat kesepakatan berubah, beri tanggal "Sampai" pada
+  aturan lama dan buat aturan baru, supaya hitungan lama tetap bisa ditelusuri.
+</p>
+@if (loaded()) {
+  @for (group of groups(); track group.entity.id) {
+    <section
+      class="costing-channel"
+      data-testid="business-rule-group"
+      [attr.data-entity]="group.entity.name"
+    >
+      <strong class="costing-channel-name">
+        {{ group.entity.name }}
+        <small class="costing-muted">
+          {{ group.entity.kind === 'partner' ? 'Mitra B2B' : 'Brand sendiri' }}
+        </small>
+      </strong>
+      <app-inline-table
+        [readonly]="!canManage()"
+        [columns]="group.columns"
+        [blank]="blank"
+        [rows]="group.rows"
+        [validateRow]="validateRow"
+        (rowsChange)="group.rows = $event"
+        (saveRow)="save(group.entity.id, $event)"
+        (removeRow)="remove($event)"
+      >
+        <ng-template
+          #rowDetail
+          let-row
+          let-editing="editing"
+          let-set="set"
+          let-errors="errors"
+        >
+          @if (editing) {
+            <div class="business-slots">
+              @for (slot of row['slots']; track slot.kind) {
+                <div class="business-slot" [attr.data-slot]="slot.kind">
+                  @if (slot.kind === 'other_fee') {
+                    <input
+                      class="form-control business-slot-label"
+                      placeholder="Nama biaya"
+                      [value]="slot.label"
+                      (input)="
+                        updateSlot(
+                          row,
+                          set,
+                          slot.kind,
+                          'label',
+                          $any($event.target).value
+                        )
+                      "
+                    />
+                  } @else {
+                    <span class="business-slot-label">{{ slot.label }}</span>
+                  }
+                  <input
+                    class="form-control business-slot-value"
+                    inputmode="decimal"
+                    placeholder="Kosong = tidak ada"
+                    [attr.data-testid]="'slot-' + slot.kind"
+                    [value]="slot.value"
+                    (change)="
+                      updateSlot(
+                        row,
+                        set,
+                        slot.kind,
+                        'value',
+                        slotValue($any($event.target).value)
+                      )
+                    "
+                  />
+                  <select
+                    class="form-select business-slot-type"
+                    [value]="slot.type"
+                    (change)="
+                      updateSlot(
+                        row,
+                        set,
+                        slot.kind,
+                        'type',
+                        $any($event.target).value
+                      )
+                    "
+                  >
+                    <option value="percent">% dari</option>
+                    <option value="fixed">Rp per item</option>
+                    <option value="cost_plus">HPP + %</option>
+                  </select>
+                  @if (slot.type === 'percent') {
+                    <select
+                      class="form-select business-slot-base"
+                      [value]="slot.base"
+                      (change)="
+                        updateSlot(
+                          row,
+                          set,
+                          slot.kind,
+                          'base',
+                          $any($event.target).value
+                        )
+                      "
+                    >
+                      <option value="gross">harga pembeli</option>
+                      <option value="net">dana diterima</option>
+                    </select>
+                  }
+                  @if (errors['slot-' + slot.kind]; as message) {
+                    <small class="form-kit-error">{{ message }}</small>
+                  }
+                </div>
+              }
+              <textarea
+                class="form-control"
+                rows="2"
+                placeholder="Catatan kesepakatan (opsional)"
+                [value]="row['note'] ?? ''"
+                (input)="set('note', $any($event.target).value)"
+              ></textarea>
+            </div>
+          } @else {
+            <span class="costing-muted" data-testid="rule-summary">
+              {{ summary(row) }}
+              @if (row['note']) {
+                — {{ row['note'] }}
+              }
+            </span>
+          }
+        </ng-template>
+      </app-inline-table>
+    </section>
+  } @empty {
+    <p class="costing-muted">
+      Belum ada brand atau mitra. Tambahkan di tab Entitas dulu.
+    </p>
+  }
+}

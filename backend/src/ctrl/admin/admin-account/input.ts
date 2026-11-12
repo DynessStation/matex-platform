@@ -21,6 +21,8 @@ export interface AccountInput {
   idOffice: number;
   idChair: number;
   idAccess: number;
+  /** The entity a partner's login is tied to; null for the platform's staff. */
+  idBusinessEntity: number | null;
   isAllAccess: 0 | 1;
   /** Raw request value; undefined means "keep the current photo" on update. */
   profilePhoto: unknown;
@@ -96,6 +98,12 @@ export const readAccountInput = (
   if (!idMasterComp || !idOffice || !idChair || !idAccess) {
     throw invalid('ADMIN_ACCOUNT_REFERENCE_INVALID', 'Invalid reference identifier');
   }
+  const rawEntity = body.id_business_entity;
+  const hasEntity = rawEntity != null && rawEntity !== '';
+  const idBusinessEntity = hasEntity ? decodeId(rawEntity, keyhsid.idBusinessEntity) : null;
+  if (hasEntity && !idBusinessEntity) {
+    throw invalid('ADMIN_ACCOUNT_REFERENCE_INVALID', 'Invalid reference identifier');
+  }
 
   return {
     name,
@@ -109,6 +117,7 @@ export const readAccountInput = (
     idOffice,
     idChair,
     idAccess,
+    idBusinessEntity,
     isAllAccess: body.is_all_access ? 1 : 0,
     profilePhoto: body.id_profile_photo,
   };
@@ -179,6 +188,22 @@ export const assertAccountReferences = async (
     throw invalid(
       'ADMIN_ACCOUNT_ACCESS_NOT_AVAILABLE',
       'Access profile is not available for the selected company',
+    );
+  }
+
+  if (
+    input.idBusinessEntity &&
+    !(await exists(
+      connection,
+      `SELECT id_business_entity FROM business_entity
+       WHERE id_business_entity = ? AND id_master_comp = ? AND business_entity_status = 1
+         AND business_entity_deleted_at IS NULL LIMIT 1`,
+      [input.idBusinessEntity, input.idMasterComp],
+    ))
+  ) {
+    throw invalid(
+      'ADMIN_ACCOUNT_ENTITY_NOT_AVAILABLE',
+      'Entity is not available for the selected company',
     );
   }
 

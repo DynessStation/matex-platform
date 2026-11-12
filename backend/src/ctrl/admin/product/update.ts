@@ -62,7 +62,7 @@ router.patch(
       }
     }
 
-    const found = await changeProduct(id, scope.idMasterComp, async (connection, product) => {
+    const found = await changeProduct(id, scope, async (connection, product) => {
       await connection.query(
         `UPDATE product_catalog SET product_status = ?, id_updated_by = ?
          WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL`,

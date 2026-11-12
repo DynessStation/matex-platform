@@ -7,6 +7,7 @@ import db = require('../../../db');
 import keyhsid from '../../../hsid';
 import { isPublicContentLocale } from '../../../config/public-content.config';
 import { getAdminScope } from '../../../helper/admin-scope.helper';
+import { productEntityWhere } from '../../../helper/business.helper';
 import { sendError, sendList, sendSuccess } from '../../../helper/api-response.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { trimTo } from '../../../helper/input.helper';
@@ -59,26 +60,41 @@ router.get(
       : // The front of the catalog in its order first, then the rest by name.
         'p.product_sort_order = 0, p.product_sort_order, i.product_name ASC';
 
+    const own = productEntityWhere(scope, 'p.');
     const [countRows] = await pool.query<RowDataPacket[]>(
       `SELECT COUNT(DISTINCT p.id_product) AS total
        FROM product_catalog p
        LEFT JOIN product_catalog_i18n i ON i.id_product = p.id_product AND i.product_locale = ?
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY} ${audit}`,
-      [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory],
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL ${own.sql}
+         AND ${SEARCH} AND ${IN_CATEGORY} ${audit}`,
+      [locale, scope.idMasterComp, ...own.params, search, like, like, like, idCategory, idCategory],
     );
     const [rows] = await pool.query<RowDataPacket[]>(
       `${BASE_SELECT}
-       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL AND ${SEARCH} AND ${IN_CATEGORY} ${audit}
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL ${own.sql}
+         AND ${SEARCH} AND ${IN_CATEGORY} ${audit}
        ORDER BY ${orderBy}
        LIMIT ? OFFSET ?`,
-      [locale, scope.idMasterComp, search, like, like, like, idCategory, idCategory, limit, offset],
+      [
+        locale,
+        scope.idMasterComp,
+        ...own.params,
+        search,
+        like,
+        like,
+        like,
+        idCategory,
+        idCategory,
+        limit,
+        offset,
+      ],
     );
 
     const totalAll = await countOf(
       pool,
-      `SELECT COUNT(*) AS total FROM product_catalog
-       WHERE id_master_comp = ? AND product_deleted_at IS NULL`,
-      [scope.idMasterComp],
+      `SELECT COUNT(*) AS total FROM product_catalog p
+       WHERE p.id_master_comp = ? AND p.product_deleted_at IS NULL ${own.sql}`,
+      [scope.idMasterComp, ...own.params],
     );
     return sendList(
       res,
@@ -102,10 +118,11 @@ router.get(
     const id = decodeId(req.params.id, keyhsid.idProduct);
     if (!id) return productNotFound(res);
 
+    const own = productEntityWhere(scope);
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM product_catalog
-       WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL`,
-      [id, scope.idMasterComp],
+       WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL ${own.sql}`,
+      [id, scope.idMasterComp, ...own.params],
     );
     if (!rows.length) return productNotFound(res);
     const [translations] = await pool.query<RowDataPacket[]>(

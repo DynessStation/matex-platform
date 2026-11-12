@@ -10,7 +10,8 @@ import { HttpError } from '../../../helper/http-error.helper';
 const { pool } = db;
 
 const ACCOUNT_COLUMNS = `id_admin_acct, id_master_comp, id_office, name, alias, email_1, email_2,
-  phone_1, phone_2, id_profile_photo, id_chair, id_access, is_all_access, admin_acct_status`;
+  phone_1, phone_2, id_profile_photo, id_chair, id_access, id_business_entity, is_all_access,
+  admin_acct_status`;
 
 /** An admin_acct row (ACCOUNT_COLUMNS and the session columns). */
 export interface AccountRow extends RowDataPacket {
@@ -94,6 +95,7 @@ export const accountAudit = (account: AccountRow) => ({
   id_profile_photo: account.id_profile_photo ? Number(account.id_profile_photo) : null,
   id_chair: Number(account.id_chair),
   id_access: Number(account.id_access),
+  id_business_entity: account.id_business_entity ? Number(account.id_business_entity) : null,
   is_all_access: Number(account.is_all_access),
   admin_acct_status: Number(account.admin_acct_status),
 });
@@ -132,6 +134,7 @@ export const profilePhotoDto = (row: RowDataPacket) =>
 export const SESSION_ACCOUNT_SELECT = `SELECT aa.id_admin_acct, aa.id_master_comp, aa.id_office,
     aa.password, aa.name, aa.alias, aa.email_1, aa.email_2, aa.phone_1, aa.phone_2,
     aa.id_profile_photo, ${PROFILE_PHOTO_COLUMNS}, aa.id_chair, aa.id_access, aa.is_all_access,
+    aa.id_business_entity, bes.business_entity_name,
     aa.admin_acct_status, aa.token_version, mc.comp_name, mc.comp_alias, o.office_name, o.address, ch.chair_name,
     ch.chair_description, ac.access_name, ac.id_master_comp AS access_master_comp,
     ac.admin_access_status
@@ -140,6 +143,7 @@ export const SESSION_ACCOUNT_SELECT = `SELECT aa.id_admin_acct, aa.id_master_com
   INNER JOIN office o ON aa.id_office = o.id_office
   INNER JOIN chair ch ON aa.id_chair = ch.id_chair
   INNER JOIN admin_access ac ON aa.id_access = ac.id_admin_access
+  LEFT JOIN business_entity bes ON bes.id_business_entity = aa.id_business_entity
   ${PROFILE_PHOTO_JOIN}`;
 
 /** Active permission keys of an access profile, in catalog order. */
@@ -188,6 +192,13 @@ export const sessionAccountDto = (user: AccountRow, permissions: string[]) => {
       access_name: user.access_name,
       permissions,
     },
+    // Set for a partner's login: the panel then shows that entity's data only.
+    business_entity: user.id_business_entity
+      ? {
+          id: keyhsid.idBusinessEntity.encode(Number(user.id_business_entity)),
+          name: user.business_entity_name ?? null,
+        }
+      : null,
     is_all_access: user.is_all_access,
   };
 };

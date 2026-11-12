@@ -125,6 +125,9 @@ export interface ICreateAdminAccount {
 
   is_all_access: boolean;
 
+  /** A partner's login: the entity it is tied to; null for the platform's staff. */
+  id_business_entity?: string | null;
+
   password: string;
 }
 
@@ -156,6 +159,9 @@ export interface IUpdateAdminAccount {
   id_access: string;
 
   is_all_access: boolean;
+
+  /** A partner's login: the entity it is tied to; null for the platform's staff. */
+  id_business_entity?: string | null;
 }
 
 //==================================================
@@ -225,6 +231,12 @@ export interface IAdminAccountDetailResponse {
 
       access_name: string;
     };
+
+    business_entity?: {
+      id: string;
+
+      name: string | null;
+    } | null;
 
     is_all_access: 0 | 1;
 

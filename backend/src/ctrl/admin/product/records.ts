@@ -6,7 +6,8 @@ import { PoolConnection } from 'mysql2/promise';
 
 import db = require('../../../db');
 import keyhsid from '../../../hsid';
-import { getAdminScope } from '../../../helper/admin-scope.helper';
+import { AdminScope, getAdminScope } from '../../../helper/admin-scope.helper';
+import { productEntityWhere, resolveEntityId } from '../../../helper/business.helper';
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
 import { buildAttachmentUrl } from '../../../helper/attachment.helper';
 import { writeAuditLog } from '../../../helper/audit-log.helper';
@@ -80,6 +81,20 @@ export const hydrate = async (rows: RowDataPacket[], company: number, locale: st
   if (!rows.length) return [];
   const ids = rows.map((row) => Number(row.id_product));
   const marks = ids.map(() => '?').join(',');
+  const [entities] = await pool.query<RowDataPacket[]>(
+    `SELECT id_business_entity, business_entity_name FROM business_entity WHERE id_master_comp = ?`,
+    [company],
+  );
+  const entityName = new Map(
+    entities.map((row) => [Number(row.id_business_entity), String(row.business_entity_name)]),
+  );
+  const entityOf = (value: unknown) => {
+    const idEntity = Number(value);
+    return {
+      id: idEntity ? keyhsid.idBusinessEntity.encode(idEntity) : null,
+      name: entityName.get(idEntity) ?? null,
+    };
+  };
   const [categories] = await pool.query<RowDataPacket[]>(
     `SELECT pc.id_product, c.id_product_category, i.product_category_name,
        i.product_category_slug
@@ -141,6 +156,10 @@ export const hydrate = async (rows: RowDataPacket[], company: number, locale: st
       is_featured: Boolean(row.product_is_featured),
       sort_order: Number(row.product_sort_order),
       catalog_front: Number(row.product_sort_order) > 0,
+      seller_entity_id: entityOf(row.id_seller_business_entity).id,
+      seller_entity_name: entityOf(row.id_seller_business_entity).name,
+      producer_entity_id: entityOf(row.id_producer_business_entity).id,
+      producer_entity_name: entityOf(row.id_producer_business_entity).name,
       product_thumbnail: productMedia.find((item) => item.role === 'thumbnail') ?? null,
       product_galleries: productMedia.filter((item) => item.role === 'gallery'),
       media: productMedia,
@@ -222,6 +241,8 @@ const PRODUCT_COLUMNS = [
   'product_internal_commerce_enabled',
   'product_is_featured',
   'product_sort_order',
+  'id_seller_business_entity',
+  'id_producer_business_entity',
 ];
 
 // Values in PRODUCT_COLUMNS order.
@@ -251,6 +272,8 @@ const productValues = (payload: ProductPayload) => [
   payload.internalCommerce,
   payload.isFeatured,
   payload.sortOrder,
+  payload.idSellerEntity,
+  payload.idProducerEntity,
 ];
 
 // Translations, categories, media, prices, and marketplaces are replaced as a whole.
@@ -407,6 +430,7 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
   if (!payload) {
     return sendError(res, 400, 'PRODUCT_PAYLOAD_INVALID', 'Product data is incomplete or invalid');
   }
+  const ownProducts = productEntityWhere(scope);
 
   const productId = await withTransaction(pool, async (connection) => {
     payload.key = await resolveAutoKey(
@@ -421,15 +445,34 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
     await recordSlugChanges(connection, 'product', id, scope.idMasterComp, payload.translations);
     let savedId: number;
     let frontBefore = 0;
+    let current: RowDataPacket | undefined;
     if (id) {
       const [exists] = await connection.query<RowDataPacket[]>(
-        `SELECT id_product, product_sort_order FROM product_catalog
-         WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL FOR UPDATE`,
-        [id, scope.idMasterComp],
+        `SELECT id_product, product_sort_order, id_seller_business_entity,
+           id_producer_business_entity
+         FROM product_catalog
+         WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL
+           ${ownProducts.sql} FOR UPDATE`,
+        [id, scope.idMasterComp, ...ownProducts.params],
       );
       if (!exists.length) throw new HttpError(404, 'PRODUCT_NOT_FOUND', 'Product not found');
-      frontBefore = Number(exists[0].product_sort_order);
+      current = exists[0];
+      frontBefore = Number(current.product_sort_order);
     }
+    // Seller and producer: kept when an update leaves them out; a partner's login can only
+    // name its own entity, and its producer is set by the platform's staff.
+    payload.idSellerEntity =
+      current && payload.sellerEntity === undefined
+        ? Number(current.id_seller_business_entity)
+        : await resolveEntityId(connection, scope, payload.sellerEntity, 'seller_entity_id');
+    payload.idProducerEntity =
+      scope.idBusinessEntity != null
+        ? current
+          ? Number(current.id_producer_business_entity)
+          : scope.idBusinessEntity
+        : current && payload.producerEntity === undefined
+          ? Number(current.id_producer_business_entity)
+          : await resolveEntityId(connection, scope, payload.producerEntity, 'producer_entity_id');
     // A product at the front keeps its place; one newly put there goes last (at most FRONT_MAX).
     const group = frontGroup(scope.idMasterComp);
     if (payload.catalogFront) {
@@ -489,14 +532,16 @@ export const saveProduct = async (req: AuthRequest, res: Response, id: number | 
  */
 export const changeProduct = async (
   id: number,
-  idMasterComp: number,
+  scope: AdminScope,
   change: (connection: PoolConnection, product: RowDataPacket) => Promise<void>,
 ) =>
   withTransaction(pool, async (connection) => {
+    const ownProducts = productEntityWhere(scope);
     const [rows] = await connection.query<RowDataPacket[]>(
       `SELECT product_sku, product_status FROM product_catalog
-       WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL FOR UPDATE`,
-      [id, idMasterComp],
+       WHERE id_product = ? AND id_master_comp = ? AND product_deleted_at IS NULL
+         ${ownProducts.sql} FOR UPDATE`,
+      [id, scope.idMasterComp, ...ownProducts.params],
     );
     if (!rows.length) return false;
     await change(connection, rows[0]);

@@ -130,6 +130,14 @@ export const content: Routes = [
       ),
   },
   {
+    path: 'business',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../components/business/business.routes').then(
+        (routes) => routes.businessRoutes,
+      ),
+  },
+  {
     path: 'email',
     canActivate: [AuthGuard],
     loadChildren: () =>

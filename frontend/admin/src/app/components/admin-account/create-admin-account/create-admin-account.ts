@@ -52,6 +52,8 @@ export class CreateAdminAccount {
 
       is_all_access: data.is_all_access,
 
+      id_business_entity: data.id_business_entity || null,
+
       password: data.password,
     };
 

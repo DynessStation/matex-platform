@@ -437,6 +437,8 @@
   "role": "Role",
   "products": "Products",
   "hpp_price": "Costs & Prices",
+  "business": "Business",
+  "business_entities": "Entities & Stores",
   "add_product": "Add Product",
   "all_products": "All Products",
   "attributes": "Attributes",
@@ -2051,6 +2053,9 @@
     "no_data_found": "No data found",
 
     "full_system_access": "Full System Access",
+    "partner_entity": "Partner entity",
+    "partner_entity_none": "Platform staff (sees every entity)",
+    "partner_entity_description": "Only for a partner's login. That account then sees only its own entity, stores, rules, and products.",
     "grant_full_system_access": "Grant Full System Access",
     "full_system_access_description": "Bypasses assigned permissions and grants unrestricted access to all admin features.",
 

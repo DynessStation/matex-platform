@@ -28,7 +28,7 @@ router.delete(
     const id = decodeId(req.params.id, keyhsid.idProduct);
     if (!id) return productNotFound(res);
 
-    const found = await changeProduct(id, scope.idMasterComp, async (connection, product) => {
+    const found = await changeProduct(id, scope, async (connection, product) => {
       await connection.query(
         `UPDATE product_catalog
          SET product_status = 'archived', product_deleted_at = NOW(), product_sort_order = 0,

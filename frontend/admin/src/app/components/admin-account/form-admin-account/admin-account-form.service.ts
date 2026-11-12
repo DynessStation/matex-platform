@@ -192,6 +192,8 @@ export class AdminAccountFormService {
 
       is_all_access: [false],
 
+      id_business_entity: [''],
+
       password: [
         '',
         [
@@ -329,6 +331,8 @@ export class AdminAccountFormService {
         id_profile_photo: data.id_profile_photo ?? '',
 
         is_all_access: data.is_all_access === 1,
+
+        id_business_entity: data.business_entity?.id ?? '',
       },
       {
         emitEvent: false,

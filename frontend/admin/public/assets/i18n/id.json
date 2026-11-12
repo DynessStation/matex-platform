@@ -437,6 +437,8 @@
   "role": "Peran",
   "products": "Produk",
   "hpp_price": "HPP & Harga",
+  "business": "Bisnis",
+  "business_entities": "Entitas & Toko",
   "add_product": "Tambah Produk",
   "all_products": "Semua Produk",
   "attributes": "Atribut",
@@ -2051,6 +2053,9 @@
     "no_data_found": "Data tidak ditemukan",
 
     "full_system_access": "Akses Sistem Penuh",
+    "partner_entity": "Entitas mitra",
+    "partner_entity_none": "Staf platform (melihat semua entitas)",
+    "partner_entity_description": "Isi hanya untuk akun mitra. Akun itu lalu hanya melihat entitas, toko, aturan, dan produk miliknya.",
     "grant_full_system_access": "Berikan Akses Sistem Penuh",
     "full_system_access_description": "Melewati hak akses yang ditetapkan dan memberikan akses tanpa batas ke seluruh fitur admin.",
 

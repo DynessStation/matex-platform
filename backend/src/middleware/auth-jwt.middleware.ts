@@ -24,6 +24,7 @@ export interface AuthAccount {
   id_master_comp: number;
   id_office: number;
   id_access: number;
+  id_business_entity: number | null;
   is_all_access: number;
   admin_acct_status: number;
   token_version: number;
@@ -41,7 +42,8 @@ export interface AuthRequest extends Request {
 }
 
 export const ACCOUNT_ACCESS_QUERY = `SELECT aa.id_admin_acct, aa.alias, aa.id_master_comp,
-    aa.id_office, aa.id_access, aa.is_all_access, aa.admin_acct_status, aa.token_version,
+    aa.id_office, aa.id_access, aa.id_business_entity, aa.is_all_access, aa.admin_acct_status,
+    aa.token_version,
     ac.id_master_comp AS access_master_comp, ac.access_name, ac.admin_access_status
   FROM admin_acct aa
   INNER JOIN admin_access ac ON aa.id_access = ac.id_admin_access

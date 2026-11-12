@@ -13,7 +13,15 @@ export interface AdminScope {
   idOffice: number;
   idAccess: number;
   isAllAccess: number;
+  /** The entity a partner's login is tied to; null for the platform's own staff. */
+  idBusinessEntity: number | null;
 }
+
+/** The entity id of an account row, or null when the account is not tied to one. */
+export const entityOf = (value: unknown): number | null => {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
 
 export type AdminScopeResult =
   | ({ success: true } & AdminScope)
@@ -72,6 +80,7 @@ export const getAdminScope = async (
       idOffice: Number(account.id_office),
       idAccess: Number(account.id_access),
       isAllAccess: Number(account.is_all_access),
+      idBusinessEntity: entityOf(account.id_business_entity),
     };
     return { success: true, ...req.adminScope };
   }
@@ -89,7 +98,8 @@ export const getAdminScope = async (
 
   const [rows] = await pool.query(
     `
-      SELECT id_admin_acct, id_master_comp, id_office, id_access, is_all_access, admin_acct_status
+      SELECT id_admin_acct, id_master_comp, id_office, id_access, id_business_entity, is_all_access,
+        admin_acct_status
       FROM admin_acct
       WHERE id_admin_acct = ?
       LIMIT 1
@@ -114,6 +124,7 @@ export const getAdminScope = async (
     idOffice: Number(account.id_office),
     idAccess: Number(account.id_access),
     isAllAccess: Number(account.is_all_access),
+    idBusinessEntity: entityOf(account.id_business_entity),
   };
 
   return { success: true, ...req.adminScope };

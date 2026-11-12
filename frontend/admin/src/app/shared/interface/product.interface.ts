@@ -130,6 +130,11 @@ export interface IProduct {
   sort_order?: number;
   /** "Tampilkan di depan katalog"; sort_order is then its place 1..n. */
   catalog_front?: boolean;
+  /** Who sells and who makes it (entity hashes and names). */
+  seller_entity_id?: string | null;
+  seller_entity_name?: string | null;
+  producer_entity_id?: string | null;
+  producer_entity_name?: string | null;
   front_total?: number;
   front_max?: number;
 }
@@ -229,6 +234,9 @@ export interface IProductPayload {
   internal_commerce_enabled: 0 | 1;
   is_featured: 0 | 1;
   catalog_front: 0 | 1;
+  /** Left out: the server keeps the current ones, or uses the platform entity. */
+  seller_entity_id?: string;
+  producer_entity_id?: string;
   category_ids: string[];
   media: Array<{ id: string; role: ProductMediaRole; sort_order: number }>;
   prices: IProductPrice[];

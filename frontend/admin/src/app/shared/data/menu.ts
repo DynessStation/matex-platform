@@ -254,6 +254,29 @@ export const menu: ISidebar[] = [
     ],
   },
 
+  //==================================================
+  //==== BUSINESS
+  //==================================================
+
+  {
+    id: 12,
+    title: 'business',
+    active: false,
+    icon: 'ri-briefcase-line',
+    type: 'sub',
+    level: 1,
+    children: [
+      {
+        parent_id: 12,
+        title: 'business_entities',
+        path: '/business',
+        type: 'link',
+        level: 2,
+        permission: 'business.view',
+      },
+    ],
+  },
+
   {
     id: 5,
     title: 'catalog',

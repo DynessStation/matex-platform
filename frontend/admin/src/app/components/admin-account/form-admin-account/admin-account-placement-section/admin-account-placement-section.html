@@ -201,3 +201,33 @@
     </label>
   </div>
 </app-form-fields>
+
+<!--==================================================-->
+<!--==== PARTNER ENTITY ===============================-->
+<!--==================================================-->
+
+@if (entityOptions().length > 1) {
+  <app-form-fields
+    [label]="'admin_account.partner_entity' | translate"
+    [for]="'id_business_entity'"
+  >
+    <select
+      id="id_business_entity"
+      class="form-select"
+      formControlName="id_business_entity"
+      data-testid="account-entity"
+    >
+      <option value="">
+        {{ 'admin_account.partner_entity_none' | translate }}
+      </option>
+      @for (option of entityOptions(); track option.value) {
+        @if (option.kind !== 'platform') {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      }
+    </select>
+    <small class="form-helper">
+      {{ 'admin_account.partner_entity_description' | translate }}
+    </small>
+  </app-form-fields>
+}

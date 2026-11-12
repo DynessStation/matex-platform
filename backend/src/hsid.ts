@@ -61,6 +61,12 @@ const idSalesChannel = new SafeHashids('key_salesChannel123', 8);
 
 const idSalesChannelFee = new SafeHashids('key_salesChannelFee123', 8);
 
+const idBusinessEntity = new SafeHashids('key_businessEntity123', 8);
+
+const idStore = new SafeHashids('key_store123', 8);
+
+const idRevenueShareRule = new SafeHashids('key_revenueShareRule123', 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -86,4 +92,7 @@ export default {
   idCostMaterial,
   idSalesChannel,
   idSalesChannelFee,
+  idBusinessEntity,
+  idStore,
+  idRevenueShareRule,
 };

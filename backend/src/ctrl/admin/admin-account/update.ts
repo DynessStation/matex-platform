@@ -88,7 +88,7 @@ router.put(
         `UPDATE admin_acct
          SET id_master_comp = ?, id_office = ?, name = ?, alias = ?, email_1 = ?, email_2 = ?,
            phone_1 = ?, phone_2 = ?, id_profile_photo = ?, id_chair = ?, id_access = ?,
-           is_all_access = ?, updated = NOW()
+           id_business_entity = ?, is_all_access = ?, updated = NOW()
          WHERE id_admin_acct = ?`,
         [
           input.idMasterComp,
@@ -102,6 +102,7 @@ router.put(
           idProfilePhoto,
           input.idChair,
           input.idAccess,
+          input.idBusinessEntity,
           input.isAllAccess,
           idAdminAcct,
         ],
@@ -135,6 +136,7 @@ router.put(
           id_profile_photo: idProfilePhoto,
           id_chair: input.idChair,
           id_access: input.idAccess,
+          id_business_entity: input.idBusinessEntity,
           is_all_access: input.isAllAccess,
           admin_acct_status: before.admin_acct_status,
         },

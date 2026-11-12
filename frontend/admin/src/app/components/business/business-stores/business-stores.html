@@ -1,0 +1,32 @@
+<p class="costing-help">
+  Satu toko adalah satu akun entitas di satu kanal, misalnya "Setia Latex di
+  TikTok". ID penjual diambil dari Seller Center supaya laporan yang diimpor
+  nanti langsung menemukan tokonya.
+</p>
+@if (loaded()) {
+  @for (group of groups(); track group.entity.id) {
+    <section
+      class="costing-channel"
+      data-testid="business-store-group"
+      [attr.data-entity]="group.entity.name"
+    >
+      <strong class="costing-channel-name">
+        {{ group.entity.name }}
+        @if (!group.entity.status) {
+          <small class="costing-muted">(nonaktif)</small>
+        }
+      </strong>
+      <app-inline-table
+        [readonly]="!canManage()"
+        [columns]="columns"
+        [blank]="blank"
+        [rows]="group.rows"
+        (rowsChange)="group.rows = $event"
+        (saveRow)="save(group.entity.id, $event)"
+        (removeRow)="remove($event)"
+      />
+    </section>
+  } @empty {
+    <p class="costing-muted">Belum ada entitas.</p>
+  }
+}

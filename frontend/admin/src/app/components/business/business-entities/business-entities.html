@@ -1,0 +1,55 @@
+<p class="costing-help">
+  Entitas adalah pihak yang punya buku sendiri: platform (perusahaan ini),
+  brand sendiri, atau mitra B2B. Tiap entitas bisa punya toko di beberapa
+  kanal dan aturan bagi hasilnya sendiri. Entitas yang masih punya toko,
+  produk, atau akun tidak bisa dihapus; nonaktifkan dulu kalau sudah tidak
+  dipakai.
+</p>
+<div data-testid="business-entities">
+  <app-inline-table
+    [readonly]="!canManage()"
+    [columns]="columns"
+    [blank]="blank"
+    [(rows)]="rows"
+    [validateRow]="validateRow"
+    [canRemove]="canRemove"
+    [showDetail]="showDetail"
+    (saveRow)="save($event)"
+    (removeRow)="remove($event)"
+  >
+    <ng-template #rowDetail let-row let-editing="editing" let-set="set">
+      @if (editing) {
+        <div class="row g-3 business-detail">
+          <div class="col-md-8">
+            <label class="form-label">Catatan</label>
+            <textarea
+              class="form-control"
+              rows="2"
+              data-testid="entity-note"
+              [value]="row['note'] ?? ''"
+              (input)="set('note', $any($event.target).value)"
+            ></textarea>
+          </div>
+          <div class="col-md-4">
+            <label class="app-check app-check-card">
+              <input
+                type="checkbox"
+                data-testid="entity-show-on-website"
+                [checked]="row['show_on_website']"
+                (change)="set('show_on_website', $any($event.target).checked)"
+              />
+              Tampilkan nama toko di website
+            </label>
+          </div>
+        </div>
+      } @else {
+        <span class="costing-muted">
+          @if (row['show_on_website']) {
+            <i class="ri-global-line"></i> Tampil di website.
+          }
+          {{ row['note'] }}
+        </span>
+      }
+    </ng-template>
+  </app-inline-table>
+</div>
