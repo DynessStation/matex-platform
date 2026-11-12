@@ -1,0 +1,203 @@
+<p class="costing-help">
+  Unduh dua file dari Seller Center toko itu: ekspor
+  <strong>Pesanan</strong> (apa yang terjual) dan
+  <strong>Laporan Keuangan</strong> (berapa yang benar-benar masuk). Sistem
+  mengenali jenisnya sendiri, membaca dan melaporkannya dulu; belum ada yang
+  tersimpan sampai tombol Simpan ditekan. File yang sama dua kali tidak
+  menggandakan apa pun. Nama dan alamat pembeli tidak disimpan.
+</p>
+
+@if (loaded()) {
+  @if (!stores().length) {
+    <p class="costing-muted" data-testid="sales-no-store">
+      Belum ada toko. Tambahkan dulu di Bisnis → Entitas & Toko.
+    </p>
+  } @else if (canImport()) {
+    <div class="costing-toolbar">
+      <select
+        class="form-select sales-store"
+        data-testid="sales-import-store"
+        [value]="store()"
+        (change)="chooseStore($event)"
+      >
+        <option value="">Pilih toko…</option>
+        @for (item of stores(); track item.id) {
+          <option [value]="item.id">
+            {{ item.entity_name }} · {{ item.name }} ({{ item.channel_name }})
+          </option>
+        }
+      </select>
+      <input
+        type="file"
+        class="form-control costing-file"
+        accept=".csv,.xlsx"
+        data-testid="sales-import-file"
+        (change)="chooseFile($event)"
+      />
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        data-testid="sales-import-read"
+        [disabled]="!file() || !store() || busy()"
+        (click)="run(false)"
+      >
+        Baca file
+      </button>
+      @if (report(); as current) {
+        @if (!current.saved) {
+          <button
+            type="button"
+            class="btn btn-theme"
+            data-testid="sales-import-save"
+            [disabled]="busy()"
+            (click)="run(true)"
+          >
+            Simpan ke sistem
+          </button>
+        }
+      }
+    </div>
+  } @else {
+    <p class="costing-muted">
+      Akun ini hanya bisa melihat. Mengimpor file butuh izin Impor Penjualan.
+    </p>
+  }
+}
+
+@if (report(); as current) {
+  @if (current.saved) {
+    <div class="costing-confirm" data-testid="sales-import-saved">
+      <strong>
+        Tersimpan: {{ current.summary.new_records }} baru,
+        {{ current.summary.updated_records }} diperbarui.
+      </strong>
+      <p>
+        Lihat hasilnya di tab
+        {{ current.summary.kind === 'orders' ? 'Pesanan' : 'Dana cair' }}.
+        @if (current.summary.unknown_skus.length) {
+          Ada {{ current.summary.unknown_skus.length }} SKU yang belum dipetakan
+          ke produk: isi di tab Peta SKU.
+        }
+      </p>
+    </div>
+  }
+  <div class="costing-summary" data-testid="sales-import-summary">
+    <div>
+      <span>Jenis file</span>
+      <strong data-testid="sales-import-kind">
+        {{ kindLabels[current.summary.kind] }}
+      </strong>
+    </div>
+    <div>
+      <span>Toko</span><strong>{{ current.summary.store.name }}</strong>
+    </div>
+    <div>
+      <span>Periode</span>
+      <strong>
+        {{ current.summary.period.from | date: 'dd MMM yyyy' }} –
+        {{ current.summary.period.to | date: 'dd MMM yyyy' }}
+      </strong>
+    </div>
+    <div>
+      <span>{{ current.summary.kind === 'orders' ? 'Pesanan' : 'Baris' }}</span>
+      <strong>{{ current.summary.records }}</strong>
+    </div>
+    <div>
+      <span>Baru</span><strong>{{ current.summary.new_records }}</strong>
+    </div>
+    <div>
+      <span>Sudah ada</span
+      ><strong>{{ current.summary.updated_records }}</strong>
+    </div>
+    <div>
+      <span>{{
+        current.summary.kind === 'orders' ? 'Total pesanan' : 'Dana cair'
+      }}</span>
+      <strong>{{ rupiah(current.summary.amount) }}</strong>
+    </div>
+    @if (current.summary.kind === 'settlement') {
+      <div>
+        <span>Penyesuaian</span
+        ><strong>{{ current.summary.adjustments }}</strong>
+      </div>
+    }
+  </div>
+
+  @if (current.summary.unknown_skus.length) {
+    <h6>SKU toko yang belum dipetakan ke produk</h6>
+    <div class="costing-table-wrap">
+      <table class="costing-table" data-testid="sales-unknown-skus">
+        <thead>
+          <tr>
+            <th class="text-start">Nama di toko</th>
+            <th class="text-start">Varian</th>
+            <th class="text-start">SKU penjual</th>
+            <th class="text-start">SKU ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sku of current.summary.unknown_skus; track sku.ref) {
+            <tr>
+              <td class="text-start sales-wrap">{{ sku.name }}</td>
+              <td class="text-start">{{ sku.variation }}</td>
+              <td class="text-start">{{ sku.seller_sku }}</td>
+              <td class="text-start">
+                <code>{{ sku.ref }}</code>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (current.issues.length) {
+    <details class="costing-issues" data-testid="sales-import-issues">
+      <summary>Baris yang dilewati ({{ current.issues.length }})</summary>
+      <ul>
+        @for (issue of current.issues; track $index) {
+          <li>Baris {{ issue.row }}: {{ issue.detail }}</li>
+        }
+      </ul>
+    </details>
+  }
+}
+
+@if (history().length) {
+  <h6 class="sales-history-title">Riwayat impor</h6>
+  <div class="costing-table-wrap">
+    <table class="costing-table" data-testid="sales-import-history">
+      <thead>
+        <tr>
+          <th class="text-start">Waktu</th>
+          <th class="text-start">Toko</th>
+          <th class="text-start">Jenis</th>
+          <th class="text-start">File</th>
+          <th>Periode</th>
+          <th class="text-end">Baru</th>
+          <th class="text-end">Diperbarui</th>
+          <th class="text-start">Oleh</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of history(); track item.id) {
+          <tr>
+            <td class="text-start">
+              {{ item.created | date: 'dd MMM yyyy HH:mm' }}
+            </td>
+            <td class="text-start">{{ item.store_name }}</td>
+            <td class="text-start">{{ kindLabels[item.kind] }}</td>
+            <td class="text-start">{{ item.file }}</td>
+            <td>
+              {{ item.from | date: 'dd MMM' }} –
+              {{ item.to | date: 'dd MMM yyyy' }}
+            </td>
+            <td class="text-end">{{ item.new_records }}</td>
+            <td class="text-end">{{ item.updated_records }}</td>
+            <td class="text-start">{{ item.created_by }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

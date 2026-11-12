@@ -1,0 +1,35 @@
+<app-page-wrapper [gridClass]="'col-sm-12'" [title]="'sales'">
+  <ul
+    ngbNav
+    #nav="ngbNav"
+    class="nav-tabs costing-nav"
+    [activeId]="tab()"
+    (activeIdChange)="setTab($event)"
+  >
+    <li ngbNavItem="import">
+      <button ngbNavLink type="button" data-testid="sales-tab-import">
+        Impor
+      </button>
+      <ng-template ngbNavContent><app-sales-import /></ng-template>
+    </li>
+    <li ngbNavItem="orders">
+      <button ngbNavLink type="button" data-testid="sales-tab-orders">
+        Pesanan
+      </button>
+      <ng-template ngbNavContent><app-sales-orders /></ng-template>
+    </li>
+    <li ngbNavItem="settlements">
+      <button ngbNavLink type="button" data-testid="sales-tab-settlements">
+        Dana cair
+      </button>
+      <ng-template ngbNavContent><app-sales-settlements /></ng-template>
+    </li>
+    <li ngbNavItem="sku-map">
+      <button ngbNavLink type="button" data-testid="sales-tab-sku-map">
+        Peta SKU
+      </button>
+      <ng-template ngbNavContent><app-sales-sku-map /></ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="costing-content"></div>
+</app-page-wrapper>

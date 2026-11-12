@@ -1,0 +1,97 @@
+// Bisnis > Penjualan. Shares the tab, help, toolbar, summary, and table styles of
+// pages/_costing.scss.
+.sales-store {
+  max-width: 320px;
+}
+
+.sales-date {
+  max-width: 160px;
+}
+
+.sales-kind {
+  max-width: 160px;
+}
+
+.sales-search {
+  max-width: 280px;
+}
+
+.sales-product {
+  max-width: 360px;
+  min-width: 220px;
+}
+
+.sales-check {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.sales-history-title {
+  margin-top: 18px;
+}
+
+.sales-row {
+  cursor: pointer;
+}
+
+// Eight columns at 1280px: tighter cells than the costing tables.
+.sales-table {
+  th,
+  td {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+}
+
+// Long names from the channel wrap; numbers and dates stay on one line.
+.sales-table td.sales-wrap {
+  max-width: 360px;
+  min-width: 200px;
+  white-space: normal;
+}
+
+.sales-line-name {
+  line-height: 1.35;
+}
+
+.sales-detail > td {
+  background: #fafafa;
+  padding: 10px 14px;
+  white-space: normal;
+}
+
+.sales-lines {
+  margin-bottom: 8px;
+  min-width: 0;
+  width: auto;
+
+  td.sales-wrap {
+    max-width: 320px;
+  }
+}
+
+.sales-fees {
+  max-width: 520px;
+}
+
+.sales-detail-foot {
+  margin: 0;
+}
+
+.sales-negative {
+  color: #c0392b;
+}
+
+.sales-pager {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+body.dark-only {
+  .sales-detail > td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}

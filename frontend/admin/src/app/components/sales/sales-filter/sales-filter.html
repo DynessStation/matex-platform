@@ -1,0 +1,46 @@
+<div class="costing-toolbar sales-filter">
+  <select
+    class="form-select sales-store"
+    data-testid="sales-filter-store"
+    (change)="set('store', $event)"
+  >
+    <option value="">Semua toko</option>
+    @for (item of stores(); track item.id) {
+      <option [value]="item.id">
+        {{ item.entity_name }} · {{ item.name }}
+      </option>
+    }
+  </select>
+  <input
+    type="date"
+    class="form-control sales-date"
+    data-testid="sales-filter-from"
+    aria-label="Dari tanggal"
+    (change)="set('from', $event)"
+  />
+  <input
+    type="date"
+    class="form-control sales-date"
+    data-testid="sales-filter-to"
+    aria-label="Sampai tanggal"
+    (change)="set('to', $event)"
+  />
+  @if (kinds()) {
+    <select
+      class="form-select sales-kind"
+      data-testid="sales-filter-kind"
+      (change)="set('kind', $event)"
+    >
+      <option value="">Semua baris</option>
+      <option value="order">Pesanan</option>
+      <option value="adjustment">Penyesuaian</option>
+    </select>
+  }
+  <input
+    type="search"
+    class="form-control sales-search"
+    data-testid="sales-filter-search"
+    [placeholder]="searchPlaceholder()"
+    (change)="set('search', $event)"
+  />
+</div>

@@ -1,0 +1,143 @@
+<p class="costing-help">
+  Pesanan seperti yang dilaporkan kanal. Kolom "Dana cair" terisi begitu laporan
+  keuangan toko itu diimpor. Klik satu baris untuk melihat SKU-nya.
+</p>
+<app-sales-filter (changed)="apply($event)" />
+
+@if (meta(); as m) {
+  <div class="costing-summary" data-testid="sales-orders-summary">
+    <div>
+      <span>Pesanan</span><strong>{{ m.total }}</strong>
+    </div>
+    <div>
+      <span>Total dibayar pembeli</span><strong>{{ rupiah(m.amount) }}</strong>
+    </div>
+  </div>
+}
+
+@if (loaded()) {
+  <div class="costing-table-wrap">
+    <table class="costing-table sales-table" data-testid="sales-orders">
+      <thead>
+        <tr>
+          <th class="text-start">Tanggal</th>
+          <th class="text-start">Nomor pesanan</th>
+          <th class="text-start">Toko</th>
+          <th class="text-start">Status</th>
+          <th class="text-start">Produk</th>
+          <th class="text-start">Kota</th>
+          <th class="text-end">Dibayar pembeli</th>
+          <th class="text-end">Dana cair</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of rows(); track order.id) {
+          <tr
+            class="sales-row"
+            data-testid="sales-order"
+            [attr.data-ref]="order.ref"
+            (click)="toggle(order.id)"
+          >
+            <td class="text-start">
+              {{ order.ordered_at | date: 'dd MMM yyyy HH:mm' }}
+            </td>
+            <td class="text-start">
+              <code>{{ order.ref }}</code>
+            </td>
+            <td class="text-start">{{ order.store_name }}</td>
+            <td class="text-start">{{ order.status }}</td>
+            <td class="text-start sales-wrap">
+              @for (line of order.lines; track $index) {
+                <div class="sales-line-name">
+                  {{ line.qty }} × {{ line.product_name ?? line.name }}
+                  @if (!line.product_id) {
+                    <small class="costing-warn">belum dipetakan</small>
+                  }
+                </div>
+              }
+            </td>
+            <td class="text-start">{{ order.city }}</td>
+            <td class="text-end">{{ rupiah(order.amount) }}</td>
+            <td class="text-end">{{ rupiah(order.settled_amount) }}</td>
+          </tr>
+          @if (open() === order.id) {
+            <tr class="sales-detail" data-testid="sales-order-detail">
+              <td colspan="8">
+                <table class="costing-table sales-lines">
+                  <thead>
+                    <tr>
+                      <th class="text-start">Nama di toko</th>
+                      <th class="text-start">Varian</th>
+                      <th class="text-start">Produk kita</th>
+                      <th class="text-end">Qty</th>
+                      <th class="text-end">Harga</th>
+                      <th class="text-end">Diskon platform</th>
+                      <th class="text-end">Diskon penjual</th>
+                      <th class="text-end">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of order.lines; track $index) {
+                      <tr>
+                        <td class="text-start sales-wrap">{{ line.name }}</td>
+                        <td class="text-start">{{ line.variation }}</td>
+                        <td class="text-start sales-wrap">
+                          {{ line.product_name ?? '—' }}
+                        </td>
+                        <td class="text-end">{{ line.qty }}</td>
+                        <td class="text-end">{{ rupiah(line.unit_price) }}</td>
+                        <td class="text-end">
+                          {{ rupiah(line.discount_platform) }}
+                        </td>
+                        <td class="text-end">
+                          {{ rupiah(line.discount_seller) }}
+                        </td>
+                        <td class="text-end">{{ rupiah(line.subtotal) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <p class="costing-muted sales-detail-foot">
+                  {{ order.payment_method }} · {{ order.source }} ·
+                  {{ order.province }}
+                  @if (order.paid_at) {
+                    · dibayar {{ order.paid_at | date: 'dd MMM yyyy HH:mm' }}
+                  }
+                </p>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="8" class="costing-muted">Belum ada pesanan.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (meta(); as m) {
+    @if (m.total_pages > 1) {
+      <div class="sales-pager">
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          [disabled]="m.page <= 1"
+          (click)="page(-1)"
+        >
+          Sebelumnya
+        </button>
+        <span class="costing-muted"
+          >Halaman {{ m.page }} dari {{ m.total_pages }}</span
+        >
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          [disabled]="m.page >= m.total_pages"
+          (click)="page(1)"
+        >
+          Berikutnya
+        </button>
+      </div>
+    }
+  }
+}

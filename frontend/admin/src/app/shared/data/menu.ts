@@ -274,6 +274,14 @@ export const menu: ISidebar[] = [
         level: 2,
         permission: 'business.view',
       },
+      {
+        parent_id: 12,
+        title: 'sales',
+        path: '/sales',
+        type: 'link',
+        level: 2,
+        permission: 'sales.view',
+      },
     ],
   },
 

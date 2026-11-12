@@ -1,0 +1,72 @@
+<p class="costing-help">
+  Setiap SKU yang pernah muncul di file toko ada di sini. Pilih produk kita
+  untuk tiap SKU sekali saja; semua pesanan, yang lama maupun yang akan datang,
+  langsung mengikuti. SKU yang belum dipetakan tidak ikut hitungan HPP.
+</p>
+
+@if (loaded()) {
+  <div class="costing-toolbar">
+    <label class="sales-check">
+      <input
+        type="checkbox"
+        data-testid="sales-sku-unmapped"
+        [checked]="onlyUnmapped()"
+        (change)="toggleUnmapped($event)"
+      />
+      Hanya yang belum dipetakan ({{ unmappedCount() }})
+    </label>
+  </div>
+  <div class="costing-table-wrap">
+    <table class="costing-table sales-table" data-testid="sales-sku-map">
+      <thead>
+        <tr>
+          <th class="text-start">Toko</th>
+          <th class="text-start">Nama di toko</th>
+          <th class="text-start">Varian</th>
+          <th class="text-start">SKU penjual</th>
+          <th class="text-end">Terjual</th>
+          <th class="text-start">Produk kita</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of visible(); track row.id) {
+          <tr data-testid="sales-sku" [attr.data-ref]="row.ref">
+            <td class="text-start">{{ row.store_name }}</td>
+            <td class="text-start sales-wrap">{{ row.name }}</td>
+            <td class="text-start">{{ row.variation }}</td>
+            <td class="text-start">{{ row.seller_sku }}</td>
+            <td class="text-end">{{ row.sold_qty }}</td>
+            <td class="text-start">
+              @if (canImport()) {
+                <select
+                  class="form-select sales-product"
+                  data-testid="sales-sku-product"
+                  [value]="row.product_id ?? ''"
+                  (change)="map(row, $event)"
+                >
+                  <option value="">— belum dipetakan —</option>
+                  @for (product of products(); track product.id) {
+                    <option [value]="product.id">
+                      {{ product.name }}
+                      @if (product.sku) {
+                        ({{ product.sku }})
+                      }
+                    </option>
+                  }
+                </select>
+              } @else {
+                {{ row.product_name ?? '—' }}
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="costing-muted">
+              Belum ada SKU. Impor file pesanan dulu.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

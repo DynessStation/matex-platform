@@ -67,6 +67,14 @@ const idStore = new SafeHashids('key_store123', 8);
 
 const idRevenueShareRule = new SafeHashids('key_revenueShareRule123', 8);
 
+const idSalesImport = new SafeHashids('key_salesImport123', 8);
+
+const idSalesOrder = new SafeHashids('key_salesOrder123', 8);
+
+const idSalesSettlement = new SafeHashids('key_salesSettlement123', 8);
+
+const idStoreSkuMap = new SafeHashids('key_storeSkuMap123', 8);
+
 export default {
   idAttachment,
   idAdmin,
@@ -95,4 +103,8 @@ export default {
   idBusinessEntity,
   idStore,
   idRevenueShareRule,
+  idSalesImport,
+  idSalesOrder,
+  idSalesSettlement,
+  idStoreSkuMap,
 };
