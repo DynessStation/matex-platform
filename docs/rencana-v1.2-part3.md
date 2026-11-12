@@ -87,7 +87,17 @@ API marketplace bergantung pada NIB dan persetujuan tiap portal (Part 2 Tahap 5)
 - Kesimpulan untuk importer: dua file per toko, **pesanan** (apa yang terjual) dan **laporan keuangan** (berapa yang benar-benar masuk). Dana diterima diambil dari laporan keuangan, bukan dihitung sendiri. Penyesuaian non-pesanan masuk `sales_order_line` tanpa produk, berjenis `adjustment`, supaya saldo toko tetap cocok dengan panel marketplace.
 - Shopee: pemilik tidak punya akun. Importer Shopee menunggu ada toko Shopee yang hidup; strukturnya disiapkan, formatnya dibaca dari file pertama yang masuk (layar impor menampilkan kolom yang terbaca sebelum apa pun disimpan).
 
-**Masih perlu sebelum kode:** satu file CSV hasil Unduh dari dua layar di atas (boleh dari toko uji), supaya nama kolom dan format angka/tanggal dibaca dari file asli, bukan dari layar.
+**File asli sudah diunduh (12 Nov, dengan izin pemilik, dari toko uji; disimpan di luar repo karena berisi nama dan alamat pembeli).** Yang dibaca dari file:
+
+| | Pesanan › Ekspor | Keuangan › Laporan › Unduh |
+|---|---|---|
+| Bentuk | CSV UTF-8 BOM, header **Inggris**, 1 baris per SKU per pesanan | **xlsx** `income_<waktu>(UTC+7).xlsx`, 4 sheet: Detail pesanan, Laporan, Riwayat penarikan, Penjelasan tentang biaya; header **Indonesia** |
+| Kunci | `Order ID`, `SKU ID` (keduanya diakhiri TAB, harus di-trim) | `ID Pesanan/Penyesuaian`, `Detail produk terjual` = `"<sku_id> * <qty>;"` |
+| Tanggal | `DD/MM/YYYY HH:MM:SS` | `YYYY/MM/DD` |
+| Angka | rupiah bulat tanpa pemisah | sama; potongan negatif |
+| Isi penting | status (Indonesia), qty, harga asli, diskon platform, diskon penjual, subtotal, `Order Amount`, metode bayar, provinsi/kota, **plus data pribadi pembeli yang tidak kita simpan** | `Jenis transaksi` (Pesanan / penyesuaian seperti "Pembayaran GMV untuk Iklan TikTok"), `Jumlah penyelesaian pembayaran` (dana cair), `Total Pendapatan`, `Total Biaya`, lalu ±60 kolom rincian biaya (komisi platform, ongkir, bebas ongkir, pemrosesan, PPh 22, afiliasi, iklan, dst.), `Sumber pesanan` (TikTok Shop / Tokopedia) |
+
+Rancangan importer dari sini: baris pesanan (CSV) mengisi `sales_order` + `sales_order_line`; baris laporan (xlsx sheet "Detail pesanan") mengisi `sales_settlement` per ID pesanan/penyesuaian dengan tiga angka inti (pendapatan, biaya, dana cair) dan rinciannya disimpan sebagai JSON supaya kolom baru dari TikTok tidak merusak impor. `store_sku_map` memetakan `SKU ID` ke produk kita; `Seller SKU` dan `Variation` hanya ditampilkan untuk membantu pemetaan. Kamus "Penjelasan tentang biaya" bisa ditampilkan sebagai tip "?" di dasbor. Shopee menyusul saat ada tokonya.
 
 Migration 035.
 
