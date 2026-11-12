@@ -8,6 +8,7 @@ import db = require('../../../db');
 import keyhsid from '../../../hsid';
 import { AdminScope, getAdminScope } from '../../../helper/admin-scope.helper';
 import { sendError, sendSuccess } from '../../../helper/api-response.helper';
+import { resolveEntityId } from '../../../helper/business.helper';
 import { costItemDto, loadCostItems } from '../../../helper/costing.helper';
 import { decodeId } from '../../../helper/id.helper';
 import { withTransaction } from '../../../helper/transaction.helper';
@@ -158,13 +159,18 @@ router.post(
           sku = `${skuBase}-${suffix}`;
         }
         const mm = (value: unknown) => (value == null ? null : Number(value) * 10);
+        // A draft made here is sold and made by the account's own entity (the platform, usually).
+        const idEntity = await resolveEntityId(connection, scope, undefined, 'seller_entity_id');
         const [product] = await connection.query(
           `INSERT INTO product_catalog
-             (id_master_comp, product_key, product_sku, product_status, product_unit,
-              product_length_mm, product_width_mm, product_height_mm, id_created_by, id_updated_by)
-           VALUES (?, ?, ?, 'draft', 'pcs', ?, ?, ?, ?, ?)`,
+             (id_master_comp, id_seller_business_entity, id_producer_business_entity, product_key,
+              product_sku, product_status, product_unit, product_length_mm, product_width_mm,
+              product_height_mm, id_created_by, id_updated_by)
+           VALUES (?, ?, ?, ?, ?, 'draft', 'pcs', ?, ?, ?, ?, ?)`,
           [
             scope.idMasterComp,
+            idEntity,
+            idEntity,
             slug,
             sku,
             mm(item.cost_item_length_cm),
