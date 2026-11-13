@@ -11,7 +11,7 @@ test.describe.configure({ mode: 'serial' });
 let owner: APIRequestContext;
 let platformId = '';
 let partnerId = '';
-const partnerName = `Atrija ${runId}`;
+const partnerName = `Atrija Uang ${runId}`;
 const orderRef = `58901${runId.padStart(8, '0')}1`.replace(/\D/g, '');
 const skuRef = `17390${runId.padStart(8, '0')}1`.replace(/\D/g, '');
 
@@ -201,7 +201,17 @@ test('the dashboard shows the period, and a payment is recorded from the book', 
   await expect(page.locator('[data-testid=money-entry][data-kind=payment]')).toHaveCount(1);
   await expect(page.locator('[data-testid=money-balances]')).toContainText('Semua lunas');
 
-  const rebuilt = page.waitForResponse((response) => response.url().includes('/money/rebuild'));
-  await page.locator('[data-testid=money-rebuild]').click();
-  expect((await (await rebuilt).json()).data).toMatchObject({ rows_added: 0 });
+  // The button rebuilds every store: the first press may catch up on maps other specs changed
+  // after their payouts were imported; a second press must find nothing left to add.
+  const rebuild = async () => {
+    const response = page.waitForResponse((r) => r.url().includes('/money/rebuild'));
+    await page.locator('[data-testid=money-rebuild]').click();
+    const body = await (await response).json();
+    await expect(page.locator('[data-testid=money-rebuild]')).toBeEnabled();
+    return body.data as { settlements: number; rows_added: number };
+  };
+  await rebuild();
+  expect(await rebuild()).toMatchObject({ rows_added: 0 });
+  // This partner's book was already right: still settled after the rebuilds.
+  await expect(page.locator('[data-testid=money-balances]')).toContainText('Semua lunas');
 });

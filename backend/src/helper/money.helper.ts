@@ -13,6 +13,9 @@ import { loadCostItems } from './costing.helper';
 
 type Executor = Pick<Pool, 'query'> | PoolConnection;
 
+/** Prefix of a row that corrects earlier rows of the same party, kind, and label. */
+export const CORRECTION = 'Koreksi: ';
+
 export const LEDGER_KINDS = new Set([
   'share',
   'platform_fee',
@@ -309,46 +312,68 @@ export const postSettlements = async (
   let added = 0;
   for (const settlement of settlements) {
     const desired = await desiredRows(connection, settlement, platform, costs);
+    // A correction row carries the label of the row it corrects behind CORRECTION, so rows are
+    // summed per base label: the original and all its corrections count as one.
     const [existing] = await connection.query<RowDataPacket[]>(
-      `SELECT id_business_entity, id_counter_business_entity, ledger_entry_kind, ledger_entry_label,
+      `SELECT id_business_entity, id_counter_business_entity, ledger_entry_kind,
+         CASE WHEN ledger_entry_label LIKE ? THEN SUBSTRING(ledger_entry_label, ?)
+           ELSE ledger_entry_label END AS base_label,
          SUM(ledger_entry_amount) AS amount
        FROM ledger_entry WHERE id_sales_settlement = ?
-       GROUP BY id_business_entity, id_counter_business_entity, ledger_entry_kind, ledger_entry_label`,
-      [settlement.id_sales_settlement],
+       GROUP BY id_business_entity, id_counter_business_entity, ledger_entry_kind, base_label`,
+      [`${CORRECTION}%`, CORRECTION.length + 1, settlement.id_sales_settlement],
     );
-    const have = new Map<string, number>();
+    interface Slot {
+      entity: number;
+      counter: number;
+      kind: string;
+      label: string;
+      current: number;
+      target: number;
+      rule: number | null;
+    }
+    const slots = new Map<string, Slot>();
+    const slotOf = (entity: number, counter: number, kind: string, label: string): Slot => {
+      const key = JSON.stringify([entity, counter, kind, label]);
+      let slot = slots.get(key);
+      if (!slot) {
+        slot = { entity, counter, kind, label, current: 0, target: 0, rule: null };
+        slots.set(key, slot);
+      }
+      return slot;
+    };
     for (const row of existing) {
-      have.set(
-        `${row.id_business_entity}:${row.id_counter_business_entity}:${row.ledger_entry_kind}:${row.ledger_entry_label}`,
-        Number(row.amount),
+      const slot = slotOf(
+        Number(row.id_business_entity),
+        Number(row.id_counter_business_entity),
+        String(row.ledger_entry_kind),
+        String(row.base_label),
       );
+      slot.current = round(slot.current + Number(row.amount));
+    }
+    for (const row of desired) {
+      const slot = slotOf(row.entity, row.counter, row.kind, row.label);
+      slot.target = round(slot.target + row.amount);
+      slot.rule = row.rule;
     }
     const date =
       dateOnly(settlement.sales_settlement_settled_at) ??
       dateOnly(settlement.sales_settlement_order_at) ??
       new Date().toISOString().slice(0, 10);
     const inserts: unknown[][] = [];
-    const keys = new Set<string>([...have.keys()]);
-    for (const row of desired) keys.add(`${row.entity}:${row.counter}:${row.kind}:${row.label}`);
-    for (const key of keys) {
-      const want = desired.find(
-        (row) => `${row.entity}:${row.counter}:${row.kind}:${row.label}` === key,
-      );
-      const current = have.get(key) ?? 0;
-      const target = want?.amount ?? 0;
-      const diff = round(target - current);
+    for (const slot of slots.values()) {
+      const diff = round(slot.target - slot.current);
       if (Math.abs(diff) < 0.005) continue;
-      const [entity, counter, kind, label] = key.split(':');
       inserts.push([
         scope.idMasterComp,
-        Number(entity),
-        Number(counter),
+        slot.entity,
+        slot.counter,
         settlement.id_store,
         settlement.id_sales_settlement,
-        want?.rule ?? null,
-        kind,
+        slot.rule,
+        slot.kind,
         date,
-        current === 0 ? label : `Koreksi: ${label}`.slice(0, 150),
+        (slot.current === 0 ? slot.label : `${CORRECTION}${slot.label}`).slice(0, 150),
         diff,
         `Pesanan ${settlement.sales_settlement_order_ref ?? settlement.sales_settlement_ref}`,
         scope.idAdminAcct,

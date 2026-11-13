@@ -96,7 +96,7 @@ test.beforeAll(async () => {
   platformId = entities.data.find((e: { kind: string }) => e.kind === 'platform').id;
   const partner = await expectCode(
     await owner.post('/api/v1/business/entities', {
-      data: { name: `Koh Joni ${runId}`, kind: 'partner' },
+      data: { name: `Koh Joni Uang ${runId}`, kind: 'partner' },
     }),
     201,
   );
@@ -364,6 +364,17 @@ test('a payment settles the balance, and a changed payout yields a correction ro
   expect(ledger.data.filter((row: { kind: string }) => row.kind === 'platform_fee')).toHaveLength(
     3,
   );
+
+  // A correction counts with the row it corrects: rebuilding twice adds nothing.
+  for (let round = 0; round < 2; round += 1) {
+    const rebuilt = await expectCode(await owner.post(`${base}/rebuild`, { data: {} }), 200);
+    if (round === 1) expect(rebuilt.data.rows_added).toBe(0);
+  }
+  const after = await expectCode(
+    await owner.get(`${base}/ledger`, { params: { entity: partnerId } }),
+    200,
+  );
+  expect(balance(after, partnerId, platformId)).toBe(500);
 });
 
 test('the dashboard sums the period by store, product, and party', async () => {
