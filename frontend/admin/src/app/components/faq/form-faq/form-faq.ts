@@ -8,6 +8,11 @@ import { finalize } from 'rxjs';
 
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
+import {
+  EnglishAutofill,
+  controlPairs,
+} from '../../../shared/components/ui/english/english-autofill';
+import { EnglishToggle } from '../../../shared/components/ui/english/english-toggle';
 import { FormFields } from '../../../shared/components/ui/form-fields/form-fields';
 import { positionText } from '../../../shared/components/ui/order-list/order-list.util';
 import { IApiErrorResponse } from '../../../shared/interface/api-response.interface';
@@ -34,7 +39,9 @@ import { FaqState } from '../../../shared/store/state/faq.state';
     FormFields,
     Button,
     AiFieldAction,
+    EnglishToggle,
   ],
+  providers: [EnglishAutofill],
   templateUrl: './form-faq.html',
   styleUrl: './form-faq.scss',
 })
@@ -46,6 +53,7 @@ export class FormFaq {
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
   private formIssues = inject(FormIssueNavigatorService);
+  readonly english = inject(EnglishAutofill);
   assistingField: 'id_answer' | 'en_answer' | null = null;
   assistingMode: 'generate' | 'translate' | null = null;
 
@@ -66,9 +74,20 @@ export class FormFaq {
     en_answer: ['', [Validators.required, Validators.maxLength(50000)]],
   });
 
+  constructor() {
+    this.english.configure('faq', () =>
+      controlPairs(this.form.controls, ['question', 'answer'], {
+        types: { answer: 'multiline_text' },
+      }),
+    );
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (!id) return;
+    if (!id) {
+      void this.english.remember(null);
+      return;
+    }
     this.store.dispatch(new EditFaqAction(id)).subscribe(() => {
       const faq = this.store.selectSnapshot(FaqState.selectedFaq);
       if (!faq) return;
@@ -86,6 +105,7 @@ export class FormFaq {
         en_question: english?.question ?? '',
         en_answer: english?.answer ?? '',
       });
+      void this.english.remember(faq.id);
     });
   }
 
@@ -166,9 +186,13 @@ export class FormFaq {
     );
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
+    if (this.english.busy()) return;
+    // English follows Indonesian before anything is checked.
+    await this.english.fill(this.form.controls.id_question.value ?? '');
     this.form.markAllAsTouched();
     if (this.form.invalid) {
+      this.english.revealInvalid(this.form.controls);
       this.notification.showError(
         'Form FAQ belum lengkap. Periksa field yang ditandai merah.',
       );
@@ -200,7 +224,12 @@ export class FormFaq {
         ? new UpdateFaqAction(payload, this.faq.id)
         : new CreateFaqAction(payload);
     this.store.dispatch(action).subscribe({
-      complete: () => void this.router.navigateByUrl('/faq'),
+      complete: async () => {
+        await this.english.saveSources(
+          this.faq?.id ?? this.store.selectSnapshot(FaqState.lastCreatedId),
+        );
+        void this.router.navigateByUrl('/faq');
+      },
       error: (error) => {
         if (error?.error?.code !== 'FAQ_KEY_EXISTS') return;
         this.form.controls.key.setErrors({

@@ -20,11 +20,13 @@ import {
 export interface FaqStateModel {
   faq: IFaqModel | null;
   selectedFaq: IFaqDetail | null;
+  /** The id of the FAQ the last create made, for what the form saves right after it. */
+  lastCreatedId: string | null;
 }
 
 @State<FaqStateModel>({
   name: 'faq',
-  defaults: { faq: null, selectedFaq: null },
+  defaults: { faq: null, selectedFaq: null, lastCreatedId: null },
 })
 @Injectable()
 export class FaqState {
@@ -38,6 +40,9 @@ export class FaqState {
   @Selector() static selectedFaq(state: FaqStateModel) {
     return state.selectedFaq;
   }
+  @Selector() static lastCreatedId(state: FaqStateModel) {
+    return state.lastCreatedId;
+  }
 
   @Action(GetFaqsAction)
   getFaqs(ctx: StateContext<FaqStateModel>, action: GetFaqsAction) {
@@ -47,14 +52,16 @@ export class FaqState {
   }
 
   @Action(CreateFaqAction)
-  create(_ctx: StateContext<FaqStateModel>, action: CreateFaqAction) {
-    return this.faqService
-      .createFaq(action.payload)
-      .pipe(
-        tap((result) =>
-          this.notifications.showSuccess(this.messages.resolveResponse(result)),
-        ),
-      );
+  create(ctx: StateContext<FaqStateModel>, action: CreateFaqAction) {
+    ctx.patchState({ lastCreatedId: null });
+    return this.faqService.createFaq(action.payload).pipe(
+      tap((result) => {
+        ctx.patchState({
+          lastCreatedId: (result.data as { id?: string } | null)?.id ?? null,
+        });
+        this.notifications.showSuccess(this.messages.resolveResponse(result));
+      }),
+    );
   }
 
   @Action(EditFaqAction)

@@ -1,0 +1,94 @@
+// English that follows Indonesian (V1.2 Part 3, stage 4): the "Tampilkan Inggris" switch above
+// a form and the small mark beside an English field (shared/components/ui/english).
+.english-toggle {
+  align-items: center;
+  background: #f7f8fa;
+  border: 1px solid #eef0f3;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+
+  .btn {
+    margin-left: auto;
+  }
+}
+
+.english-toggle-switch {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 600;
+  gap: 8px;
+  margin: 0;
+
+  input {
+    accent-color: var(--theme-color);
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.english-toggle-note {
+  align-items: center;
+  color: #6b7280;
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: var(--admin-text);
+  gap: 6px;
+}
+
+.english-badge {
+  border-radius: 10px;
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-left: 6px;
+  padding: 0 7px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.english-badge-auto {
+  background: #e8f1ff;
+  color: #1d4ed8;
+}
+
+.english-badge-manual {
+  background: #ecfdf3;
+  color: #047857;
+}
+
+.english-badge-copy {
+  background: #fff4e5;
+  color: #b45309;
+}
+
+body.dark-only {
+  .english-toggle {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .english-toggle-note {
+    color: #a8b0bd;
+  }
+
+  .english-badge-auto {
+    background: rgba(59, 130, 246, 0.18);
+    color: #93c5fd;
+  }
+
+  .english-badge-manual {
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+  }
+
+  .english-badge-copy {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fcd34d;
+  }
+}

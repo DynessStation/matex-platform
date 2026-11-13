@@ -93,6 +93,7 @@ test('writing an article: heading, address, dots, tags, writer', async ({ page }
   await expect(page.getByTestId('tag-chip').nth(1)).toContainText('baru');
 
   // English: its own address follows its own title.
+  await page.getByTestId('english-show').check();
   await page.getByRole('button', { name: /EN\s*English/ }).click();
   await page.locator('#en_title').pressSequentially(`Healthy Pillow ${runId}`);
   await expect(page.locator('#en_slug')).toHaveValue(`healthy-pillow-${runId}`);

@@ -45,6 +45,8 @@
     </div>
   </div>
 
+  <app-english-toggle />
+
   <div class="card mt-4">
     <div class="card-body">
       <h4 class="mb-3">Bahasa Indonesia</h4>
@@ -101,7 +103,7 @@
     </div>
   </div>
 
-  <div class="card mt-4">
+  <div class="card mt-4" [hidden]="!english.visible()">
     <div class="card-body">
       <h4 class="mb-3">English</h4>
       <app-form-fields

@@ -9,6 +9,8 @@ import { BlogFormService } from './blog-form.service';
 import { BlogMediaTab } from './blog-media-tab/blog-media-tab';
 import { BlogPublicationTab } from './blog-publication-tab/blog-publication-tab';
 import { BlogSeoTab } from './blog-seo-tab/blog-seo-tab';
+import { EnglishAutofill } from '../../../shared/components/ui/english/english-autofill';
+import { EnglishToggle } from '../../../shared/components/ui/english/english-toggle';
 import { FormHeading } from '../../../shared/components/ui/form-kit/form-heading';
 import { FormSubmit } from '../../../shared/components/ui/form-kit/form-submit';
 import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
@@ -25,13 +27,14 @@ import { TabStatus } from '../../../shared/components/ui/form-kit/tab-status';
     BlogSeoTab,
     BlogMediaTab,
     BlogPublicationTab,
+    EnglishToggle,
   ],
   templateUrl: './form-blog.html',
   // Kept as component styles, used by every tab: they override base elements and use
   // nested selectors, so a move to the global layer changes the cascade (standar-kode
   // 4.3). They move with the other base overrides in 6D.
   styleUrl: './form-blog.scss',
-  providers: [BlogFormService, BlogAssistantService],
+  providers: [EnglishAutofill, BlogFormService, BlogAssistantService],
 })
 export class FormBlog implements OnInit, OnDestroy {
   readonly editor = inject(BlogFormService);

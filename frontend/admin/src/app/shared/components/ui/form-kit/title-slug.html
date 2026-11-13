@@ -5,6 +5,7 @@
       @if (titleHelp()) {
         <app-help-tip [section]="titleHelp()" />
       }
+      <app-english-badge [field]="fieldPrefix() + 'title'" />
     </label>
     <input
       class="form-control"

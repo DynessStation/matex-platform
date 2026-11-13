@@ -14,7 +14,7 @@
   <!--==================================================-->
 
   <div class="d-flex flex-wrap gap-2 mb-4">
-    @for (language of editor.supportedLanguages; track language.locale) {
+    @for (language of editor.visibleLanguages; track language.locale) {
       <button
         type="button"
         class="btn d-flex align-items-center gap-2"

@@ -1,5 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, Signal, inject, signal } from '@angular/core';
+import {
+  effect,
+  inject,
+  Injectable,
+  PLATFORM_ID,
+  Signal,
+  signal,
+} from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -31,6 +38,11 @@ import {
   specificationRows,
   uniqueGallery,
 } from './form-product.util';
+import {
+  EnglishAutofill,
+  EnglishPair,
+  controlPairs,
+} from '../../../shared/components/ui/english/english-autofill';
 import {
   TabState,
   tabState,
@@ -97,6 +109,63 @@ export class ProductFormService {
   connect(form: { type: Signal<string> }): void {
     this.type = form.type;
     this.loadEntityOptions();
+  }
+
+  /** English that follows Indonesian on save (V1.2 Part 3, stage 4). */
+  readonly english = inject(EnglishAutofill);
+
+  constructor() {
+    this.english.configure('product', () => [
+      ...controlPairs(
+        this.form.controls,
+        [
+          'name',
+          'slug',
+          'short_description',
+          'description',
+          'meta_title',
+          'meta_description',
+          'og_title',
+          'og_description',
+        ],
+        {
+          types: {
+            short_description: 'multiline_text',
+            description: 'rich_text_html',
+            meta_description: 'seo_description',
+            og_description: 'seo_description',
+          },
+          domIds: { name: 'en_title' },
+          slugs: { slug: 'name' },
+        },
+      ),
+      ...this.specPairs(),
+    ]);
+    // English hidden: the Indonesian fields are the ones on screen.
+    effect(() => {
+      if (!this.english.visible()) this.activeLocale = 'id';
+    });
+  }
+
+  /** Each specification row's label and value follow the Indonesian row at the same place. */
+  private specPairs(): EnglishPair[] {
+    const write = (index: number, field: 'label' | 'value', value: string) => {
+      const rows = [...this.enSpecRows()];
+      while (rows.length <= index) rows.push({ label: '', value: '' });
+      rows[index] = { ...rows[index], [field]: value };
+      this.enSpecRows.set(rows);
+    };
+    const text = (rows: InlineRow[], index: number, field: string) =>
+      String(rows[index]?.[field] ?? '');
+    return this.idSpecRows().flatMap((_, index) =>
+      (['label', 'value'] as const).map((field) => ({
+        key: `specs.${index}.${field}`,
+        id: () => text(this.idSpecRows(), index, field),
+        en: () => text(this.enSpecRows(), index, field),
+        set: (value: string) => write(index, field, value),
+        type: 'plain_text' as const,
+      })),
+    );
   }
 
   /** Seller and producer choices; a new product starts with the platform entity. */
@@ -238,6 +307,7 @@ export class ProductFormService {
     this.id = this.route.snapshot.paramMap.get('id');
     const tab = this.route.snapshot.queryParamMap.get('tab');
     if (tab) this.activeTab = tab;
+    if (!this.id) void this.english.remember(null);
     if (this.id)
       this.store
         .dispatch(new EditProductAction(this.id))
@@ -389,7 +459,10 @@ export class ProductFormService {
     });
   }
 
-  submit() {
+  async submit() {
+    if (this.english.busy() || this.saving()) return;
+    // English follows Indonesian before anything is checked.
+    await this.english.fill(this.form.controls.id_name.value ?? '');
     this.fillDraftLanguage();
     this.tried.set(true);
     this.form.markAllAsTouched();
@@ -403,6 +476,7 @@ export class ProductFormService {
       return;
     }
     if (this.form.invalid || this.categoryError || this.pricePublicationError) {
+      this.english.revealInvalid(this.form.controls);
       this.activeTab = this.categoryError
         ? 'general'
         : this.pricePublicationError
@@ -421,8 +495,12 @@ export class ProductFormService {
     const payload = this.payload();
     this.saving.set(true);
     if (this.type() === 'edit' && this.id) {
-      this.store.dispatch(new UpdateProductAction(payload, this.id)).subscribe({
-        complete: () => void this.router.navigateByUrl('/product'),
+      const id = this.id;
+      this.store.dispatch(new UpdateProductAction(payload, id)).subscribe({
+        complete: async () => {
+          await this.english.saveSources(id);
+          void this.router.navigateByUrl('/product');
+        },
         error: (error) => {
           this.saving.set(false);
           this.handleSaveError(error);
@@ -439,8 +517,9 @@ export class ProductFormService {
           'cost.view',
         ));
     this.products.create(payload).subscribe({
-      next: (response) => {
+      next: async (response) => {
         this.notification.showSuccess(this.messages.resolveResponse(response));
+        await this.english.saveSources(response.data.id);
         void (goesOn
           ? this.router.navigate(['/product/edit', response.data.id], {
               queryParams: { tab: 'channels' },
@@ -610,6 +689,7 @@ export class ProductFormService {
     this.media.thumbnail = raw.product_thumbnail;
     this.media.gallery = raw.product_galleries ?? [];
     this.media.og = p.media?.find((x) => x.role === 'og') ?? null;
+    void this.english.remember(this.id ?? p.id);
   }
 
   //==================================================

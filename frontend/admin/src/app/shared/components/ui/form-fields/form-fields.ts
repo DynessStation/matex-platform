@@ -2,11 +2,12 @@ import { Component, input } from '@angular/core';
 
 import { TranslateModule } from '@ngx-translate/core';
 
+import { EnglishBadge } from '../english/english-badge';
 import { HelpTip } from '../help/help-tip/help-tip';
 
 @Component({
   selector: 'app-form-fields',
-  imports: [TranslateModule, HelpTip],
+  imports: [TranslateModule, HelpTip, EnglishBadge],
   templateUrl: './form-fields.html',
   styleUrl: './form-fields.scss',
 })

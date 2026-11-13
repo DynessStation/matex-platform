@@ -11,6 +11,7 @@ import {
   SlugCheckService,
   SlugEntity,
 } from '../../../services/slug-check.service';
+import { EnglishBadge } from '../english/english-badge';
 import { HelpTip } from '../help/help-tip/help-tip';
 
 // Title, then its address (G-3). In a new record the address follows what is typed in the title
@@ -18,7 +19,13 @@ import { HelpTip } from '../help/help-tip/help-tip';
 // page that may already be linked (the old address keeps working, backend slug-redirect).
 @Component({
   selector: 'app-title-slug',
-  imports: [ReactiveFormsModule, TranslateModule, AutoField, HelpTip],
+  imports: [
+    ReactiveFormsModule,
+    TranslateModule,
+    AutoField,
+    HelpTip,
+    EnglishBadge,
+  ],
   templateUrl: './title-slug.html',
 })
 export class TitleSlug {

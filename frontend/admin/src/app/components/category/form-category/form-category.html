@@ -3,6 +3,7 @@
   [formGroup]="form"
   (ngSubmit)="submit()"
 >
+  <app-english-toggle />
   <div class="category-form">
     <div class="category-form-heading">
       <h5>{{ type() === 'edit' ? 'Ubah kategori' : 'Kategori baru' }}</h5>
@@ -105,13 +106,15 @@
               >
                 <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
               </button>
-              <button
-                type="button"
-                [class.active]="activeLocale === 'en'"
-                (click)="activeLocale = 'en'"
-              >
-                <strong>EN</strong> English
-              </button>
+              @if (english.visible()) {
+                <button
+                  type="button"
+                  [class.active]="activeLocale === 'en'"
+                  (click)="activeLocale = 'en'"
+                >
+                  <strong>EN</strong> English
+                </button>
+              }
             </div>
             @if (activeLocale === 'id') {
               <div class="row g-4">
@@ -227,13 +230,15 @@
               >
                 <strong>ID</strong> Bahasa Indonesia
               </button>
-              <button
-                type="button"
-                [class.active]="activeLocale === 'en'"
-                (click)="activeLocale = 'en'"
-              >
-                <strong>EN</strong> English
-              </button>
+              @if (english.visible()) {
+                <button
+                  type="button"
+                  [class.active]="activeLocale === 'en'"
+                  (click)="activeLocale = 'en'"
+                >
+                  <strong>EN</strong> English
+                </button>
+              }
             </div>
             @if (activeLocale === 'id') {
               <div class="row g-4">

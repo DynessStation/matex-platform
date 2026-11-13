@@ -161,6 +161,7 @@ test('tab handlers work without saving', async ({ page }) => {
 
   // Terms: switch the content language, then step to SEO with the tab button.
   await expectTab(page, 'Konten & Bahasa', 'Konten & Bahasa');
+  await page.getByTestId('english-show').check();
   const english = panel.locator('button', { hasText: 'English' }).first();
   await english.click();
   await expect(english).toHaveClass(/btn-theme/);

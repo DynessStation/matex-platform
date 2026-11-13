@@ -24,8 +24,10 @@ const apiEnvironment: Record<string, string> = {
   PUBLIC_ANALYTICS_ENABLED: 'true',
   ANALYTICS_HASH_SECRET: 'e2e-only-analytics-hash-secret-0123456789',
   LOGIN_RATE_LIMIT_MAX: '1000',
+  // The stand-in of the AI provider (write/fake-ai-server.mjs), never the real service.
+  OPENAI_API_KEY: 'e2e-ai-key',
+  OPENAI_BASE_URL: 'http://127.0.0.1:3198/v1',
   // Empty values stop dotenv from loading real third-party keys from backend/.env.
-  OPENAI_API_KEY: '',
   SMTP_HOST: '',
   // The stand-in of the mail provider, never the real service.
   HOSTINGER_MAIL_API_TOKEN: 'e2e-mail-token',
@@ -42,6 +44,13 @@ const apiEnvironment: Record<string, string> = {
 export const mailServer = {
   command: 'node write/fake-mail-server.mjs',
   url: 'http://127.0.0.1:3199/health',
+  reuseExistingServer,
+  timeout: 15_000,
+};
+
+export const aiServer = {
+  command: 'node write/fake-ai-server.mjs',
+  url: 'http://127.0.0.1:3198/health',
   reuseExistingServer,
   timeout: 15_000,
 };

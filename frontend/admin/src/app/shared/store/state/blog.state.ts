@@ -21,16 +21,21 @@ import {
 export interface BlogStateModel {
   blog: IBlogModel;
   selectedBlog: IArticleDetail | null;
+  /** The id of the article the last create made, for what the form saves right after it. */
+  lastCreatedId: string | null;
 }
 @State<BlogStateModel>({
   name: 'blog',
-  defaults: { blog: emptyList(), selectedBlog: null },
+  defaults: { blog: emptyList(), selectedBlog: null, lastCreatedId: null },
 })
 @Injectable()
 export class BlogState {
   private service = inject(BlogService);
   private notes = inject(NotificationService);
   private messages = inject(ApiMessageService);
+  @Selector() static lastCreatedId(state: BlogStateModel) {
+    return state.lastCreatedId;
+  }
   @Selector() static blog(s: BlogStateModel) {
     return s.blog;
   }
@@ -58,14 +63,18 @@ export class BlogState {
       .pipe(tap((v) => ctx.patchState({ selectedBlog: v.data ?? null })));
   }
   @Action(CreateBlogAction) create(
-    _: StateContext<BlogStateModel>,
+    ctx: StateContext<BlogStateModel>,
     a: CreateBlogAction,
   ) {
-    return this.service
-      .create(a.payload)
-      .pipe(
-        tap((v) => this.notes.showSuccess(this.messages.resolveResponse(v))),
-      );
+    ctx.patchState({ lastCreatedId: null });
+    return this.service.create(a.payload).pipe(
+      tap((v) => {
+        ctx.patchState({
+          lastCreatedId: (v.data as { id?: string } | null)?.id ?? null,
+        });
+        this.notes.showSuccess(this.messages.resolveResponse(v));
+      }),
+    );
   }
   @Action(UpdateBlogAction) update(
     _: StateContext<BlogStateModel>,

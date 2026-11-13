@@ -14,13 +14,15 @@
     >
       <strong>ID</strong> Bahasa Indonesia <span>Utama</span>
     </button>
-    <button
-      type="button"
-      [class.active]="editor.activeLocale === 'en'"
-      (click)="editor.activeLocale = 'en'"
-    >
-      <strong>EN</strong> English
-    </button>
+    @if (editor.english.visible()) {
+      <button
+        type="button"
+        [class.active]="editor.activeLocale === 'en'"
+        (click)="editor.activeLocale = 'en'"
+      >
+        <strong>EN</strong> English
+      </button>
+    }
   </div>
   @if (editor.activeLocale === 'id') {
     <div class="row g-4">

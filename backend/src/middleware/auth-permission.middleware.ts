@@ -17,9 +17,12 @@ const { pool } = db;
 
 // Require permission
 
+/** Passes with the permission, or with any one of a list of permissions. */
 export const requirePermission =
-  (permissionKey: string) =>
+  (permission: string | string[]) =>
   async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    const permissionKeys = Array.isArray(permission) ? permission : [permission];
+    const permissionKey = permissionKeys.join(' | ');
     try {
       // Session
 
@@ -232,12 +235,12 @@ export const requirePermission =
                 ap.id_admin_permission
 
             WHERE aap.id_admin_access = ?
-              AND ap.permission_key = ?
+              AND ap.permission_key IN (?)
               AND ap.permission_status = 1
 
             LIMIT 1
           `,
-        [idAccess, permissionKey],
+        [idAccess, permissionKeys.length === 1 ? permissionKeys[0] : permissionKeys],
       );
 
       const permissions = permissionRows as RowDataPacket[];

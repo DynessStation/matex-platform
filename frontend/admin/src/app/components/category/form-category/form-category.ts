@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -15,6 +15,11 @@ import { filter, finalize, switchMap, take } from 'rxjs';
 import { AdvanceDropdown } from '../../../shared/components/ui/advance-dropdown/advance-dropdown';
 import { AiFieldAction } from '../../../shared/components/ui/ai-field-action/ai-field-action';
 import { Button } from '../../../shared/components/ui/button/button';
+import {
+  EnglishAutofill,
+  controlPairs,
+} from '../../../shared/components/ui/english/english-autofill';
+import { EnglishToggle } from '../../../shared/components/ui/english/english-toggle';
 import { AutoField } from '../../../shared/components/ui/form-kit/auto-field';
 import {
   TabState,
@@ -63,7 +68,9 @@ import { CategoryState } from '../../../shared/store/state/category.state';
     AutoField,
     TabStatus,
     TitleSlug,
+    EnglishToggle,
   ],
+  providers: [EnglishAutofill],
   templateUrl: './form-category.html',
   styleUrl: './form-category.scss',
 })
@@ -75,6 +82,36 @@ export class FormCategory {
   private contentAssistant = inject(ContentAssistantService);
   private notification = inject(NotificationService);
   private formIssues = inject(FormIssueNavigatorService);
+  readonly english = inject(EnglishAutofill);
+
+  constructor() {
+    this.english.configure('product_category', () =>
+      controlPairs(
+        this.form.controls,
+        [
+          'name',
+          'slug',
+          'description',
+          'meta_title',
+          'meta_description',
+          'og_title',
+          'og_description',
+        ],
+        {
+          types: {
+            meta_description: 'seo_description',
+            og_description: 'seo_description',
+          },
+          domIds: { name: 'en_title' },
+          slugs: { slug: 'name' },
+        },
+      ),
+    );
+    // English hidden: the Indonesian fields are the ones on screen.
+    effect(() => {
+      if (!this.english.visible()) this.activeLocale = 'id';
+    });
+  }
 
   readonly type = input<string>('create');
   readonly categories = input<ICategory[]>([]);
@@ -170,7 +207,10 @@ export class FormCategory {
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id');
-    if (!this.id) return;
+    if (!this.id) {
+      void this.english.remember(null);
+      return;
+    }
     this.store
       .dispatch(new EditCategoryAction(this.id))
       .pipe(
@@ -215,10 +255,14 @@ export class FormCategory {
     );
   }
 
-  submit() {
+  async submit() {
+    if (this.english.busy()) return;
+    // English follows Indonesian before anything is checked.
+    await this.english.fill(this.form.controls.id_name.value ?? '');
     this.tried.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid) {
+      this.english.revealInvalid(this.form.controls);
       this.activeTab = this.invalidTab();
       this.notification.showError(
         'Form kategori belum lengkap. Periksa field yang ditandai merah.',
@@ -232,12 +276,18 @@ export class FormCategory {
         ? new UpdateCategoryAction(payload, this.id)
         : new CreateCategoryAction(payload);
     this.store.dispatch(action).subscribe({
-      complete: () => {
+      complete: async () => {
+        await this.english.saveSources(
+          this.type() === 'edit' && this.id
+            ? this.id
+            : this.store.selectSnapshot(CategoryState.lastCreatedId),
+        );
         if (this.type() === 'edit') {
           void this.router.navigateByUrl('/category');
           return;
         }
         this.form.reset({ status: 'draft', is_featured: false });
+        void this.english.remember(null);
         this.tried.set(false);
         this.activeLocale = 'id';
         this.category = null;
@@ -286,6 +336,7 @@ export class FormCategory {
       en_og_title: en?.og_title ?? '',
       en_og_description: en?.og_description ?? '',
     });
+    void this.english.remember(category.id);
   }
 
   private payload(): ICategoryPayload {

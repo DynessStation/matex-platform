@@ -163,6 +163,7 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
   await expect(
     page.getByText(/Fitur isi otomatis belum aktif|Bantuan penulisan belum berhasil/).first(),
   ).toBeVisible();
+  await page.getByTestId('english-show').check();
   await panel(page)
     .getByRole('button', { name: /EN\s*English/ })
     .click();
@@ -212,6 +213,7 @@ test('create renders every tab, drives the handlers, and saves', async ({ page }
     .getByRole('button', { name: /ID\s*Bahasa Indonesia/ })
     .click();
   await control(page, 'id_meta_title').fill('Produk Form | MATEX');
+  await page.getByTestId('english-show').check();
   await panel(page)
     .getByRole('button', { name: /EN\s*English/ })
     .click();

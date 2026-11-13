@@ -1,5 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, Signal, inject, signal } from '@angular/core';
+import {
+  Injectable,
+  PLATFORM_ID,
+  Signal,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -19,6 +26,10 @@ import {
   dateToStruct,
   localDate,
 } from './form-blog.util';
+import {
+  EnglishAutofill,
+  controlPairs,
+} from '../../../shared/components/ui/english/english-autofill';
 import {
   TabState,
   tabState,
@@ -68,6 +79,40 @@ export class BlogFormService {
 
   connect(form: { type: Signal<'create' | 'edit'> }): void {
     this.type = form.type;
+  }
+
+  /** English that follows Indonesian on save (V1.2 Part 3, stage 4). */
+  readonly english = inject(EnglishAutofill);
+
+  constructor() {
+    this.english.configure('article', () =>
+      controlPairs(
+        this.form.controls,
+        [
+          'title',
+          'slug',
+          'excerpt',
+          'body',
+          'meta_title',
+          'meta_description',
+          'og_title',
+          'og_description',
+        ],
+        {
+          types: {
+            excerpt: 'multiline_text',
+            body: 'rich_text_html',
+            meta_description: 'seo_description',
+            og_description: 'seo_description',
+          },
+          slugs: { slug: 'title' },
+        },
+      ),
+    );
+    // English hidden: the Indonesian fields are the ones on screen.
+    effect(() => {
+      if (!this.english.visible()) this.activeLocale = 'id';
+    });
   }
 
   readonly mediaConfig = mediaConfig;
@@ -129,6 +174,7 @@ export class BlogFormService {
     this.loadTags();
     // A new article starts under its writer's name; a pen name can replace it.
     if (!this.id) {
+      void this.english.remember(null);
       this.form.controls.author_name.setValue(
         this.store.selectSnapshot(AuthState.user)?.name ?? '',
       );
@@ -171,6 +217,7 @@ export class BlogFormService {
         });
         this.patchSchedule('publish', a.published_at);
         this.patchSchedule('unpublish', a.unpublished_at);
+        void this.english.remember(this.id);
       });
   }
 
@@ -309,11 +356,15 @@ export class BlogFormService {
   //==== SUBMIT
   //==================================================
 
-  submit() {
+  async submit() {
+    if (this.english.busy() || this.saving()) return;
+    // English follows Indonesian before anything is checked.
+    await this.english.fill(this.form.controls.id_title.value ?? '');
     this.syncSchedule();
     this.tried.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid || this.scheduledDateInvalid) {
+      this.english.revealInvalid(this.form.controls);
       this.activeTab = this.firstInvalidTab();
       this.notification.showError(
         this.scheduledDateInvalid
@@ -343,8 +394,14 @@ export class BlogFormService {
       ? new UpdateBlogAction(payload, this.id)
       : new CreateBlogAction(payload);
     this.saving.set(true);
+    const id = this.id;
     this.store.dispatch(action).subscribe({
-      complete: () => void this.router.navigateByUrl('/blog'),
+      complete: async () => {
+        await this.english.saveSources(
+          id ?? this.store.selectSnapshot(BlogState.lastCreatedId),
+        );
+        void this.router.navigateByUrl('/blog');
+      },
       error: (error) => {
         this.saving.set(false);
         if (error?.error?.code !== 'ARTICLE_CONFLICT') return;

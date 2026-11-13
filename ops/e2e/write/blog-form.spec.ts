@@ -40,6 +40,8 @@ async function openTab(page: Page, name: string): Promise<void> {
 }
 
 async function language(page: Page, code: 'ID' | 'EN'): Promise<void> {
+  // English is behind "Tampilkan Inggris" (Part 3 stage 4).
+  if (code === 'EN') await page.getByTestId('english-show').check();
   await panel(page)
     .getByRole('button', { name: code === 'ID' ? /ID\s*Bahasa Indonesia/ : /EN\s*English/ })
     .click();

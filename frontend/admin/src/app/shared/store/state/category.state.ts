@@ -24,10 +24,16 @@ import {
 export interface CategoryStateModel {
   category: ICategoryModel;
   selectedCategory: ICategoryDetail | null;
+  /** The id of the category the last create made, for what the form saves right after it. */
+  lastCreatedId: string | null;
 }
 @State<CategoryStateModel>({
   name: 'category',
-  defaults: { category: emptyList(), selectedCategory: null },
+  defaults: {
+    category: emptyList(),
+    selectedCategory: null,
+    lastCreatedId: null,
+  },
 })
 @Injectable()
 export class CategoryState {
@@ -35,6 +41,9 @@ export class CategoryState {
   private notes = inject(NotificationService);
   private messages = inject(ApiMessageService);
 
+  @Selector() static lastCreatedId(state: CategoryStateModel) {
+    return state.lastCreatedId;
+  }
   @Selector() static category(state: CategoryStateModel) {
     return state.category;
   }
@@ -82,14 +91,16 @@ export class CategoryState {
       );
   }
   @Action(CreateCategoryAction)
-  create(_: StateContext<CategoryStateModel>, action: CreateCategoryAction) {
-    return this.service
-      .create(action.payload)
-      .pipe(
-        tap((result) =>
-          this.notes.showSuccess(this.messages.resolveResponse(result)),
-        ),
-      );
+  create(ctx: StateContext<CategoryStateModel>, action: CreateCategoryAction) {
+    ctx.patchState({ lastCreatedId: null });
+    return this.service.create(action.payload).pipe(
+      tap((result) => {
+        ctx.patchState({
+          lastCreatedId: (result.data as { id?: string } | null)?.id ?? null,
+        });
+        this.notes.showSuccess(this.messages.resolveResponse(result));
+      }),
+    );
   }
   @Action(UpdateCategoryAction)
   update(_: StateContext<CategoryStateModel>, action: UpdateCategoryAction) {

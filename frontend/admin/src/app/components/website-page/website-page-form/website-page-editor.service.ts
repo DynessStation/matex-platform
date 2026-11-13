@@ -52,6 +52,7 @@ import {
   IWebsitePageEditorDetail,
 } from '../../../shared/interface/website-page-editor.interface';
 import { ContentAssistantService } from '../../../shared/services/content-assistant.service';
+import { EnglishService } from '../../../shared/services/english.service';
 import { LocalizationService } from '../../../shared/services/localization.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { AuthState } from '../../../shared/store/state/auth.state';
@@ -74,6 +75,14 @@ export class WebsitePageEditorService {
   readonly contentAssistant = inject(ContentAssistantService);
   readonly notification = inject(NotificationService);
   readonly publication = inject(WebsitePagePublicationService);
+  private readonly english = inject(EnglishService);
+
+  /** The language buttons: English only while "Tampilkan Inggris" is on. */
+  get visibleLanguages() {
+    return this.supportedLanguages.filter(
+      (language) => language.locale === 'id-ID' || this.english.visible(),
+    );
+  }
 
   //==================================================
   //==== INPUT
@@ -262,6 +271,10 @@ export class WebsitePageEditorService {
   //==================================================
 
   constructor() {
+    // English hidden: the Indonesian fields are the ones on screen.
+    effect(() => {
+      if (!this.english.visible()) this.activeLocale = 'id-ID';
+    });
     // English belum otomatis dibuat pada page baru.
     this.translationForm('en-US').disable({
       emitEvent: false,

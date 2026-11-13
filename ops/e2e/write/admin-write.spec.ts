@@ -123,6 +123,7 @@ test('admin can publish a product that appears on the public site', async ({ pag
   await openTab(page, 'Konten & Bahasa');
   await page.locator('#id_title').click();
   await page.locator('#id_title').pressSequentially(name);
+  await page.getByTestId('english-show').check();
   await page.getByRole('button', { name: /EN\s*English/ }).click();
   await page.locator('#en_title').click();
   await page.locator('#en_title').pressSequentially(`Test Product ${run}`);
@@ -149,6 +150,7 @@ test('admin can publish an article that appears on the public site', async ({ pa
   await page.locator('#id_title').pressSequentially(title);
   await expect(page.locator('#id_slug')).toHaveValue(slug.replace('e2e-artikel', 'artikel-uji'));
   await typeInEditor(page, 0, 'Isi artikel uji otomatis.');
+  await page.getByTestId('english-show').check();
   await page.getByRole('button', { name: /EN\s*English/ }).click();
   await page.locator('#en_title').pressSequentially(`Test Article ${run}`);
   await typeInEditor(page, 0, 'Automated test article body.');

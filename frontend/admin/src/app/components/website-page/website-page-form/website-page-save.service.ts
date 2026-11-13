@@ -12,6 +12,7 @@ import {
   homeTagItems,
 } from './website-page-form.util';
 import { WebsitePagePublicationService } from './website-page-publication.service';
+import { EnglishAutofill } from '../../../shared/components/ui/english/english-autofill';
 import {
   IWebsitePageEditorAttachment,
   IWebsitePageEditorDetail,
@@ -30,6 +31,7 @@ export class WebsitePageSaveService {
   private readonly publication = inject(WebsitePagePublicationService);
   private readonly notification = inject(NotificationService);
   private readonly formIssues = inject(FormIssueNavigatorService);
+  private readonly english = inject(EnglishAutofill);
 
   // Bound to the form's output in connect().
   private submitted: OutputEmitterRef<IWebsitePageEditorSaveRequest> | null =
@@ -285,8 +287,13 @@ export class WebsitePageSaveService {
   //==== SAVE
   //==================================================
 
-  submitForm(): void {
+  async submitForm(): Promise<void> {
     const editor = this.editor;
+    if (this.english.busy()) return;
+    // English follows Indonesian before anything is checked.
+    await this.english.fill(
+      editor.translationForm('id-ID').controls.title.value ?? '',
+    );
 
     this.publication.publicationValidationAttempted = true;
     editor.mediaValidationAttempted = true;
@@ -353,6 +360,9 @@ export class WebsitePageSaveService {
 
       return;
     }
+
+    // Website pages always exist, so the marks are stored with the page's key right away.
+    await this.english.saveSources(editor.form.controls.website_page_key.value);
 
     this.submitted?.emit({
       payload: buildSavePayload(this.buildPreviewPage(), editor.editData()),

@@ -242,6 +242,18 @@ Tombol **Kembali** di kepala formulir membuka daftar asalnya dengan pencarian, u
 
 Arahkan kursor ke gambar lalu klik ikon mata untuk melihatnya penuh di layar. Kumpulan gambar bisa digeser dengan panah kiri dan kanan. Tutup dengan Esc, klik area gelap, atau tombol ×.
 
+## Bahasa Inggris
+
+Produk, kategori, artikel, FAQ, dan halaman website cukup diisi dalam Bahasa Indonesia. Saat disimpan, isi English diterjemahkan otomatis dari Bahasa Indonesia, termasuk nama dan judul. Alamat (slug) English hanya dibuat otomatis selama masih kosong; alamat yang sudah tersimpan tidak pernah berpindah sendiri.
+
+### Tampilkan Inggris
+
+Sakelar di atas formulir membuka kolom English di samping Bahasa Indonesia. Pilihan ini diingat di peramban yang sama. Kolom English yang Anda ubah sendiri tidak akan ditimpa lagi oleh terjemahan otomatis.
+
+### Tanda di kolom English
+
+Di samping judul kolom English ada tanda kecil: **otomatis** (diterjemahkan dari Bahasa Indonesia), **disunting** (diubah orang, tidak ditimpa), atau **belum diterjemahkan** (terjemahan gagal, isinya sementara salinan Bahasa Indonesia; akan dicoba lagi saat disimpan berikutnya). Isi English dari sebelum fitur ini ada dianggap **disunting**. Tombol **Isi ulang English dari Indonesia** menerjemahkan ulang semua kolom English saat disimpan, termasuk yang pernah disunting.
+
 ## Editor Halaman Website
 
 Halaman tetap website (Beranda, Tentang MATEX, Syarat dan Ketentuan, Karir, serta pengaturan halaman Kontak dan FAQ) memakai editor yang sama dengan tab di kiri: Umum, Konten & Bahasa, SEO, Media, Publikasi, dan Pratinjau. Isi khusus tiap halaman dijelaskan di panduan halamannya; bagian ini menjelaskan kolom yang sama di semua halaman. Simpan kapan saja dengan **Simpan Perubahan** di sisi kiri.

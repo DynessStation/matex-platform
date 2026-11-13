@@ -107,7 +107,9 @@ test('the home editor keeps one tag list, refuses an incomplete tag, and saves',
   await expect(rows(page).nth(0).getByLabel('Teks Indonesia tag 1')).toHaveValue('Anti tungau');
   await expect(editor.locator('#home_tags_count')).toHaveText('2 dari maksimal 12');
 
-  // The section switch is per language: on for Indonesian and English.
+  // The section switch is per language: on for Indonesian and English (English is behind
+  // "Tampilkan Inggris", Part 3 stage 4).
+  await page.getByTestId('english-show').check();
   for (const language of ['Indonesia', 'English']) {
     await panel.locator('button', { hasText: language }).first().click();
     const toggle = page.locator('#home-section-tags');

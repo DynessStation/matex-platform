@@ -121,21 +121,22 @@ test('save works from any tab and shows the missing field; slugs follow the name
   await expect(page.locator('#id_slug')).toHaveValue(`kategori-baru-${runId}`);
   await expect(page.getByTestId('form-heading')).toHaveText(name('Kategori Baru'));
 
-  // Now English is missing: the form switches to the English fields.
-  await save.click();
-  await expect(
-    page.locator('.category-tab-content .tab-pane.active .category-language-tabs button.active'),
-  ).toContainText('EN');
-  await page.locator('#en_title').pressSequentially(`New Category ${runId}`);
-  await expect(page.locator('#en_slug')).toHaveValue(`new-category-${runId}`);
-
-  // Saved from the Konten tab, without visiting Media.
+  // English follows Indonesian on save (Part 3 stage 4): saved from the Konten tab, without
+  // visiting Media or typing English.
   const created = page.waitForResponse(
     (r) => r.url().endsWith('/api/v1/product-categories') && r.request().method() === 'POST',
   );
   await save.click();
   const response = await created;
   expect(response.status()).toBe(201);
+  const english = response
+    .request()
+    .postDataJSON()
+    .translations.find((item: { locale: string }) => item.locale === 'en-US');
+  expect(english).toMatchObject({
+    name: `EN ${name('Kategori Baru')}`,
+    slug: `en-kategori-baru-${runId}`,
+  });
   ids['baru'] = (await response.json()).data.id;
   await expect(node(page, 'Kategori Baru')).toBeVisible();
   // The form is empty again, and its address follows the next name.
