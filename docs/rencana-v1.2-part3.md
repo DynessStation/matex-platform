@@ -137,6 +137,7 @@ Tanpa migration, hanya kolom penanda `*_en_source` (`auto`, `manual`) di tabel i
 | Ditunda | Alasan |
 | --- | --- |
 | Keranjang, pembayaran, pengiriman di website (V2) | Butuh legalitas, payment gateway, layanan pelanggan. Tahap 1-3 di atas menyiapkan datanya tanpa memegang uang |
+| Penerjemah lokal (tanpa OpenAI) | Pemilik, 13 Nov 2026: ditunda sampai ada server rumah sendiri, tahun depan. Titik gantinya satu file, `backend/src/helper/content-ai.helper.ts` (`OPENAI_BASE_URL`) |
 | Konektor API Shopee, TikTok, Tokopedia | Menunggu NIB dan pendaftaran developer oleh pemilik. Tabelnya sudah disiapkan di Tahap 2 |
 | Manufacturing, kapasitas mesin, order produksi (V3) | Harga produksi ke mitra cukup sebagai angka di aturan bagi hasil dulu |
 | Pembukuan akuntansi penuh dan laporan pajak | Buku per pihak di Tahap 3 adalah bahan mentahnya, bukan penggantinya |

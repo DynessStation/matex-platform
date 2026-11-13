@@ -15,6 +15,61 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.2.11C',
+    date: '13 November 2026',
+    summary:
+      'Menu Bisnis baru: entitas dan toko, impor penjualan dari Seller Center, dan Dasbor Uang dengan buku tiap pihak. Konten cukup diisi Bahasa Indonesia, English mengikuti otomatis. HPP dan harga sekarang satu pintu dari form produk.',
+    sections: [
+      {
+        title: 'Bisnis: Entitas & Toko',
+        items: [
+          'Daftar pihak dalam bisnis: MIA sebagai platform, merek sendiri seperti Setia Latex dan Rasa Latex, dan mitra seperti Atrija dan Koh Joni.',
+          'Tiap entitas punya toko per kanal (TikTok, Shopee, website, dan lainnya), lengkap dengan ID penjual dari Seller Center.',
+          'Aturan bagi hasil bertanggal per entitas atau per toko: komisi platform, biaya produksi dari HPP, dan biaya lain. Produk mitra yang numpang di toko orang lain bisa punya aturannya sendiri.',
+          'Produk mencatat penjual dan produsennya.',
+          'Akun bisa diikat ke satu mitra: akun itu hanya melihat entitas, toko, produk, penjualan, dan buku miliknya sendiri.',
+        ],
+      },
+      {
+        title: 'Bisnis: Penjualan',
+        items: [
+          'Impor file Pesanan dan Laporan Keuangan dari Seller Center TikTok Shop: sistem mengenali jenis filenya, melaporkan dulu, lalu menyimpan setelah diminta.',
+          'File yang sama dua kali tidak menggandakan apa pun; ekspor yang lebih baru memperbarui status pesanan.',
+          'Tab Pesanan, Dana cair (uang yang benar-benar masuk, dengan rincian biaya kanal), dan riwayat impor.',
+          'Peta SKU: tiap SKU toko dipetakan sekali ke produk kita, dan semua pesanan mengikutinya.',
+          'Nama, nomor HP, dan alamat pembeli tidak pernah disimpan.',
+        ],
+      },
+      {
+        title: 'Bisnis: Dasbor Uang',
+        items: [
+          'Ringkasan per periode: pendapatan, potongan kanal, dana cair, HPP terjual, dan laba kotor, per toko dan per produk.',
+          'Buku per pihak dibuat otomatis dari dana cair menurut aturan bagi hasil, dengan saldo siapa harus membayar siapa.',
+          'Pembayaran antar pihak dicatat setelah uangnya berpindah. Koreksi selalu berupa baris baru, tidak pernah menimpa.',
+          'Tombol Hitung ulang buku setelah aturan atau Peta SKU berubah.',
+        ],
+      },
+      {
+        title: 'Konten: cukup Bahasa Indonesia',
+        items: [
+          'Produk, kategori, artikel, FAQ, dan halaman website cukup diisi Bahasa Indonesia; English diterjemahkan otomatis saat disimpan, termasuk nama dan judul.',
+          'Sakelar Tampilkan Inggris membuka kolom English bagi yang ingin menyunting. Kolom yang disunting tidak ditimpa lagi.',
+          'Tanda di tiap kolom English: otomatis, disunting, atau belum diterjemahkan.',
+          'Isi English yang sudah ada sebelumnya tetap seperti semula sampai tombol Isi ulang English dari Indonesia ditekan.',
+        ],
+      },
+      {
+        title: 'HPP & Harga satu pintu',
+        items: [
+          'Modal, margin, harga, dan kanal diisi dari tab Harga & Kanal di form produk; produk baru langsung dibawa ke sana setelah disimpan.',
+          'Status harga tiap produk: Belum ada HPP, Ikut hitungan, Harga manual, atau Perlu ditinjau. Harga website tidak pernah berubah sendiri.',
+          'Draf produk bisa disimpan sebelum punya harga.',
+          'Isian angka di seluruh admin hanya menerima angka dan tampil berkelompok saat diketik.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.11B',
     date: '7 November 2026',
     summary:
